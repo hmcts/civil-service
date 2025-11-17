@@ -24,20 +24,18 @@ public class RoboticsManualOfflineSupport {
         requireNonNull(caseData, "caseData must not be null");
         CaseCategory category = caseData.getCaseAccessCategory();
         if (CaseCategory.UNSPEC_CLAIM.equals(category)) {
-            ClaimProceedsInCaseman unspecDetails = caseData.getClaimProceedsInCaseman();
-            if (!hasRequiredDetails(unspecDetails == null ? null : unspecDetails.getReason(),
-                unspecDetails == null ? null : unspecDetails.getDate())) {
-                return textFormatter.caseTakenOfflineByStaff();
-            }
+            ClaimProceedsInCaseman unspecDetails = requireNonNull(caseData.getClaimProceedsInCaseman(),
+                "claimProceedsInCaseman must not be null");
+            requireNonNull(unspecDetails.getReason(), "offline reason must not be null");
+            requireNonNull(unspecDetails.getDate(), "offline date must not be null");
             return buildDetails(resolveReason(unspecDetails.getReason(), unspecDetails.getOther()),
                                 unspecDetails.getDate());
         }
 
-        ClaimProceedsInCasemanLR specDetails = caseData.getClaimProceedsInCasemanLR();
-        if (!hasRequiredDetails(specDetails == null ? null : specDetails.getReason(),
-            specDetails == null ? null : specDetails.getDate())) {
-            return textFormatter.caseTakenOfflineByStaff();
-        }
+        ClaimProceedsInCasemanLR specDetails = requireNonNull(caseData.getClaimProceedsInCasemanLR(),
+            "claimProceedsInCasemanLR must not be null");
+        requireNonNull(specDetails.getReason(), "offline reason must not be null");
+        requireNonNull(specDetails.getDate(), "offline date must not be null");
         return buildDetails(resolveReason(specDetails.getReason(), specDetails.getOther()), specDetails.getDate());
     }
 
@@ -52,12 +50,8 @@ public class RoboticsManualOfflineSupport {
 
     private String resolveReason(ReasonForProceedingOnPaper reason, String other) {
         if (reason == ReasonForProceedingOnPaper.OTHER) {
-            return other;
+            return requireNonNull(other, "offline reason must not be null");
         }
         return requireNonNull(reason, "offline reason must not be null").name();
-    }
-
-    private boolean hasRequiredDetails(ReasonForProceedingOnPaper reason, LocalDate date) {
-        return reason != null && date != null;
     }
 }

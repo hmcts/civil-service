@@ -261,10 +261,23 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
                                         Party respondent,
                                         boolean isRespondent1,
                                         LocalDateTime responseDate) {
-        if (respondent == null) {
+        if (respondent == null || !shouldAddMiscEvent(caseData, isRespondent1)) {
             return;
         }
         respondentResponseSupport.addRespondentMiscEvent(builder, sequenceGenerator, caseData, respondent, isRespondent1, responseDate);
+    }
+
+    private boolean shouldAddMiscEvent(CaseData caseData, boolean isRespondent1) {
+        if (caseData == null || CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return false;
+        }
+        RespondentResponseType responseType = isRespondent1
+            ? caseData.getRespondent1ClaimResponseType()
+            : caseData.getRespondent2ClaimResponseType();
+        if (responseType == null) {
+            return true;
+        }
+        return responseType != RespondentResponseType.FULL_DEFENCE;
     }
 
     private boolean isAllPaid(BigDecimal totalClaimAmount, RespondToClaim respondToClaim) {

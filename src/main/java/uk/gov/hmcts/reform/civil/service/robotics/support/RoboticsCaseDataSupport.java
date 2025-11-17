@@ -47,9 +47,7 @@ public class RoboticsCaseDataSupport {
             .type(type)
             .name(PartyUtils.getLitigiousPartyName(party, litigationFriend))
             .dateOfBirth(PartyUtils.getDateOfBirth(party).map(d -> d.format(ISO_DATE)).orElse(null))
-            .addresses(Optional.ofNullable(party.getPrimaryAddress())
-                           .map(addressMapper::toRoboticsAddresses)
-                           .orElse(null))
+            .addresses(addressMapper.toRoboticsAddresses(party.getPrimaryAddress()))
             .dateOfService(Optional.ofNullable(dateOfService).map(d -> d.format(ISO_DATE)).orElse(null))
             .solicitorOrganisationID(solicitorOrganisationId)
             .build();
