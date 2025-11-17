@@ -36,7 +36,7 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-@SuppressWarnings({"java:S1104", "java:S107"})
+@SuppressWarnings({"java:S1104", "java:S107", "common-java:DuplicatedBlocks"})
 public class SdoDocumentFormSmall implements MappableObject {
 
     private LocalDate currentDate;

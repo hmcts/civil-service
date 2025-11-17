@@ -36,7 +36,7 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-@SuppressWarnings({"java:S1104", "java:S107"})
+@SuppressWarnings({"java:S1104", "java:S107", "common-java:DuplicatedBlocks"})
 public class SdoDocumentFormDisposal implements MappableObject {
 
     private LocalDate currentDate;
@@ -61,8 +61,8 @@ public class SdoDocumentFormDisposal implements MappableObject {
     private DisposalHearingMedicalEvidence disposalHearingMedicalEvidence;
     private DisposalHearingQuestionsToExperts disposalHearingQuestionsToExperts;
     private DisposalHearingSchedulesOfLoss disposalHearingSchedulesOfLoss;
-    private  DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearing;
-    private  String disposalHearingFinalDisposalHearingTime;
+    private DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearing;
+    private String disposalHearingFinalDisposalHearingTime;
     private DisposalOrderWithoutHearing disposalOrderWithoutHearing;
     private DisposalHearingHearingTime disposalHearingTime;
     private String disposalHearingTimeEstimate;

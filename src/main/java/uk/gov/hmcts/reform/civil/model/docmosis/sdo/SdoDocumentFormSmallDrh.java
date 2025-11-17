@@ -27,12 +27,12 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-@SuppressWarnings("java:S1104")
+@SuppressWarnings({"java:S1104", "common-java:DuplicatedBlocks"})
 public class SdoDocumentFormSmallDrh implements MappableObject {
 
     private LocalDate currentDate;
     //Header
-    private  String judgeName;
+    private String judgeName;
     private String caseNumber;
     private Party applicant1;
     private Party respondent1;
