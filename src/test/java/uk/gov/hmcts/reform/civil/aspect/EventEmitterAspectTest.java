@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaEventEmitterService;
@@ -34,7 +35,9 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION_COSC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MAKE_DECISION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESPOND_TO_APPLICATION;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -94,18 +97,14 @@ class EventEmitterAspectTest {
     @ParameterizedTest
     @EnumSource(value = BusinessProcessStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"READY"})
     void shouldNotEmitBusinessProcessCamundaEvent_whenBPStatusIsNotReadyAndPIIdnull(BusinessProcessStatus status) {
-        GeneralApplication generalApplication = GeneralApplication.builder()
+        final GeneralApplication generalApplication = GeneralApplication.builder()
             .businessProcess(BusinessProcess.builder().status(status).build())
             .build();
-        List<Element<GeneralApplication>> newApplication = newArrayList();
-        newApplication.add(element(generalApplication));
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .generalApplications(newApplication)
-            .build();
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(SUBMITTED, caseData)
-            .isGeneralApplicationCase(true)
-            .build();
+        final CallbackParams callbackParams = callbackParamsForSubmittedGeneralApplicationCase(
+            1L,
+            generalApplication,
+            RESPOND_TO_APPLICATION
+        );
 
         aspect.emitBusinessProcessEvent(proceedingJoinPoint, callbackParams);
 
@@ -117,11 +116,22 @@ class EventEmitterAspectTest {
     @ParameterizedTest
     @EnumSource(value = BusinessProcessStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"READY"})
     void shouldNotEmitBusinessProcessGACamundaEvent_whenBPStatusIsNotReadyAndPIIdnull(BusinessProcessStatus status) {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        final GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .businessProcess(BusinessProcess.builder().status(status).build())
             .build();
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(SUBMITTED, caseData)
+        final CaseDetails caseDetails = CaseDetailsBuilder.builder()
+            .id(1L)
+            .data(caseData)
+            .build();
+
+        when(caseDetailsConverter.toGeneralApplicationCaseData(eq(caseDetails))).thenReturn(caseData);
+
+        final CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(SUBMITTED, caseDetails)
+            .request(CallbackRequest.builder()
+                         .caseDetails(caseDetails)
+                         .eventId(RESPOND_TO_APPLICATION.name())
+                         .build())
             .isGeneralApplicationCase(true)
             .build();
 
@@ -134,10 +144,21 @@ class EventEmitterAspectTest {
     @SneakyThrows
     @Test
     void shouldNotEmitBusinessProcessCamundaEvent_whenGAIsNull() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        final GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .build();
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(SUBMITTED, caseData)
+        final CaseDetails caseDetails = CaseDetailsBuilder.builder()
+            .id(1L)
+            .data(caseData)
+            .build();
+
+        when(caseDetailsConverter.toGeneralApplicationCaseData(eq(caseDetails))).thenReturn(caseData);
+
+        final CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(SUBMITTED, caseDetails)
+            .request(CallbackRequest.builder()
+                         .caseDetails(caseDetails)
+                         .eventId(RESPOND_TO_APPLICATION.name())
+                         .build())
             .isGeneralApplicationCase(true)
             .build();
 
@@ -150,20 +171,16 @@ class EventEmitterAspectTest {
     @SneakyThrows
     @Test
     void shouldEmitBusinessProcessCamundaEvent_whenCallbackIsSubmittedABPStatusIsReadyAndPIIsNotNull() {
-        GeneralApplication generalApplication = GeneralApplication.builder()
-            .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
+        final Long caseId = 1L;
+        final GeneralApplication generalApplication = GeneralApplication.builder()
+            .businessProcess(BusinessProcess.ready(RESPOND_TO_APPLICATION))
             .build();
-        List<Element<GeneralApplication>> newApplication = newArrayList();
-        newApplication.add(element(generalApplication));
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .generalApplications(newApplication)
-            .ccdCaseReference(1L)
-            .build();
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(SUBMITTED, caseData)
-            .isGeneralApplicationCase(true)
-            .build();
-        Long caseId = 1L;
+        final CallbackParams callbackParams = callbackParamsForSubmittedGeneralApplicationCase(
+            caseId,
+            generalApplication,
+            RESPOND_TO_APPLICATION
+        );
+
         aspect.emitBusinessProcessEvent(proceedingJoinPoint, callbackParams);
 
         verify(gaEventEmitterService).emitBusinessProcessCamundaEvent(caseId, generalApplication, false);
@@ -173,16 +190,15 @@ class EventEmitterAspectTest {
     @SneakyThrows
     @Test
     void shouldEmitBusinessProcessGACamundaEvent_whenCallbackIsSubmittedABPStatusIsReadyAndPIIsNotNull() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        final Long caseId = 1L;
+        final GeneralApplication generalApplication = GeneralApplication.builder()
             .businessProcess(BusinessProcess.ready(MAKE_DECISION))
             .build();
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(SUBMITTED, caseData)
-            .isGeneralApplicationCase(true)
-            .build();
+        final CallbackParams callbackParams = callbackParamsForSubmittedGeneralApplicationCase(caseId, generalApplication, MAKE_DECISION);
+
         aspect.emitBusinessProcessEvent(proceedingJoinPoint, callbackParams);
 
-        verify(gaEventEmitterService).emitBusinessProcessCamundaGAEvent(caseData, false);
+        verify(gaEventEmitterService).emitBusinessProcessCamundaEvent(caseId, generalApplication, false);
         verify(proceedingJoinPoint).proceed();
     }
 
@@ -193,6 +209,46 @@ class EventEmitterAspectTest {
         final GeneralApplication generalApplication = GeneralApplication.builder()
             .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
             .build();
+        final CallbackParams callbackParams = callbackParamsForSubmittedCivilCase(
+            caseId,
+            generalApplication,
+            INITIATE_GENERAL_APPLICATION
+        );
+
+        aspect.emitBusinessProcessEvent(proceedingJoinPoint, callbackParams);
+
+        verify(gaEventEmitterService).emitBusinessProcessCamundaEvent(caseId, generalApplication, false);
+        verify(proceedingJoinPoint).proceed();
+    }
+
+    @SneakyThrows
+    @Test
+    void shouldEmitBusinessProcessCamundaEvent_whenCallbackIsSubmittedAndEventIsInitiateGeneralApplicationCosc() {
+        final Long caseId = 1L;
+        final GeneralApplication generalApplication = GeneralApplication.builder()
+            .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION_COSC))
+            .build();
+        final CallbackParams callbackParams = callbackParamsForSubmittedCivilCase(
+            caseId,
+            generalApplication,
+            INITIATE_GENERAL_APPLICATION_COSC
+        );
+
+        aspect.emitBusinessProcessEvent(proceedingJoinPoint, callbackParams);
+
+        verify(gaEventEmitterService).emitBusinessProcessCamundaEvent(caseId, generalApplication, false);
+        verify(proceedingJoinPoint).proceed();
+    }
+
+    private CallbackParams callbackParamsForSubmittedGeneralApplicationCase(Long caseId, GeneralApplication generalApplication, CaseEvent event) {
+        return callbackParamsForSubmittedWith(caseId, generalApplication, event, true);
+    }
+
+    private CallbackParams callbackParamsForSubmittedCivilCase(Long caseId, GeneralApplication generalApplication, CaseEvent event) {
+        return callbackParamsForSubmittedWith(caseId, generalApplication, event, false);
+    }
+
+    private CallbackParams callbackParamsForSubmittedWith(Long caseId, GeneralApplication generalApplication, CaseEvent event, boolean isGaCase) {
         final List<Element<GeneralApplication>> newApplication = newArrayList();
         newApplication.add(element(generalApplication));
         final GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
@@ -203,22 +259,17 @@ class EventEmitterAspectTest {
             .id(caseId)
             .data(caseData)
             .build();
-        final CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(SUBMITTED, caseDetails)
-            .request(CallbackRequest.builder()
-                         .caseDetails(caseDetails)
-                         .eventId(INITIATE_GENERAL_APPLICATION.name())
-                         .build())
-            .isGeneralApplicationCase(false)
-            .build();
 
         when(caseDetailsConverter.toGeneralApplicationCaseData(eq(caseDetails))).thenReturn(caseData);
 
-        aspect.emitBusinessProcessEvent(proceedingJoinPoint, callbackParams);
-
-        verify(caseDetailsConverter).toGeneralApplicationCaseData(eq(caseDetails));
-        verify(gaEventEmitterService).emitBusinessProcessCamundaEvent(caseId, generalApplication, false);
-        verify(proceedingJoinPoint).proceed();
+        return CallbackParamsBuilder.builder()
+            .of(SUBMITTED, caseDetails)
+            .request(CallbackRequest.builder()
+                         .caseDetails(caseDetails)
+                         .eventId(event.name())
+                         .build())
+            .isGeneralApplicationCase(isGaCase)
+            .build();
     }
 
     private CallbackParams buildCallbackParams(CallbackType callbackType, CaseData caseData) {

@@ -41,17 +41,8 @@ public class EventEmitterAspect {
         throws Throwable {
 
         if (callbackParams.getType() == SUBMITTED) {
-            if (callbackParams.isGeneralApplicationCase()) {
-                GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
-                processGeneralApplicationBusinessProcessEvent(caseData);
-            } else if (Objects.equals(callbackParams.getRequest().getEventId(), INITIATE_GENERAL_APPLICATION.name())
-                || Objects.equals(callbackParams.getRequest().getEventId(), INITIATE_GENERAL_APPLICATION_COSC.name())) {
-                GeneralApplicationCaseData caseData = caseDetailsConverter.toGeneralApplicationCaseData(
-                    callbackParams.getRequest().getCaseDetails());
-                log.info(format(
-                    "Emit business process event for INITIATE_GENERAL_APPLICATION submitted callback for caseId: %d",
-                    caseData.getCcdCaseReference()
-                ));
+            if (callbackParams.isGeneralApplicationCase() || isInitiateGeneralApplication(callbackParams)) {
+                GeneralApplicationCaseData caseData = caseDetailsConverter.toGeneralApplicationCaseData(callbackParams.getRequest().getCaseDetails());
                 processGeneralApplicationBusinessProcessEvent(caseData);
             } else {
                 CaseData caseData = callbackParams.getCaseData();
@@ -70,6 +61,11 @@ public class EventEmitterAspect {
             }
         }
         return joinPoint.proceed();
+    }
+
+    private boolean isInitiateGeneralApplication(CallbackParams callbackParams) {
+        return Objects.equals(callbackParams.getRequest().getEventId(), INITIATE_GENERAL_APPLICATION.name())
+            || Objects.equals(callbackParams.getRequest().getEventId(), INITIATE_GENERAL_APPLICATION_COSC.name());
     }
 
     private void processGeneralApplicationBusinessProcessEvent(GeneralApplicationCaseData caseData) {
