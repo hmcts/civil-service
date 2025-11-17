@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,6 +30,8 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonDeserialize(builder = Party.PartyBuilder.class)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Party {
 
     private String partyID;
@@ -116,5 +121,10 @@ public class Party {
     @JsonIgnore
     public LocalDate getDateOfBirth() {
         return Optional.ofNullable(individualDateOfBirth).orElse(soleTraderDateOfBirth);
+    }
+
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class PartyBuilder {
+
     }
 }

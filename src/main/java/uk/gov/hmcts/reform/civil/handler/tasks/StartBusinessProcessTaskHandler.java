@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -21,6 +22,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 
 import java.util.Map;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class StartBusinessProcessTaskHandler extends BaseExternalTaskHandler {
@@ -55,17 +57,18 @@ public class StartBusinessProcessTaskHandler extends BaseExternalTaskHandler {
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, caseEvent);
         CaseData data = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
         BusinessProcess businessProcess = data.getBusinessProcess();
+        log.info("business process current status {} and getStatusOrDefault {} for caseId{}",
+                 businessProcess.getStatus(), businessProcess.getStatusOrDefault(), caseId);
         switch (businessProcess.getStatusOrDefault()) {
             case READY, DISPATCHED:
                 return updateBusinessProcess(caseId, externalTask, startEventResponse, businessProcess);
             case STARTED:
-                if (businessProcess.hasSameProcessInstanceId(externalTask.getProcessInstanceId())) {
-                    log.error("----------------CAMUNDA SAME PROCESS ID ERROR -START------------------");
-                    log.error("CAMUNDAERROR CaseId ({}) CaseEvent ({}) LegacyCaseReference ({}) AllocatedTrack ({})"
-                              + "externalTaskProcessInstanceId({}) businessProcessInstanceId({})", caseId,
-                              caseEvent, data.getLegacyCaseReference(), data.getAllocatedTrack(),
-                              externalTask.getProcessInstanceId(), businessProcess.getProcessInstanceId());
-                    log.error("----------------CAMUNDA SAME PROCESS ID ERROR -END------------------");
+                if (!businessProcess.hasSameProcessInstanceId(externalTask.getProcessInstanceId())) {
+                    log.error("Duplicated attempt to Start a business process -  CaseId ({}) CaseEvent ({}) " +
+                                  "LegacyCaseReference ({}) AllocatedTrack ({})"
+                        + "externalTaskProcessInstanceId({}) businessProcessInstanceId({})", caseId,
+                        caseEvent, data.getLegacyCaseReference(), data.getAllocatedTrack(),
+                        externalTask.getProcessInstanceId(), businessProcess.getProcessInstanceId());
                     throw new BpmnError("ABORT");
                 }
                 return data;

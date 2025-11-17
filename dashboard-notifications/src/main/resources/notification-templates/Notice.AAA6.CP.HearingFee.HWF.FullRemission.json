@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.CP.HearingFee.HWF.FullRemission",
+  "role": "CLAIMANT",
+  "titleEn": "Your help with fees application has been approved",
+  "titleCy": "Mae eich cais am help gyda ffioedd wedi'i gymeradwyo",
+  "descriptionEn": "<p class=\"govuk-body\">The full hearing fee of ${hearingFee} will be covered by fee remission. You do not need to make a payment.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Telir ffi lawn y gwrandawiad o ${hearingFee}. Nid oes angen i chi wneud taliad.</p>"
+}

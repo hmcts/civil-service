@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.JudgmentsOnline.JudgmentDeterminationIssued.Defendant",
+  "role": "DEFENDANT",
+  "titleEn": "A judgment by determination has been made against you",
+  "titleCy": "Mae dyfarniad trwy benderfyniad wedi’i wneud yn eich erbyn",
+  "descriptionEn": "<p class=\"govuk-body\">The instalments you need to pay have been decided by the court. They made a ‘determination of means’ and have determined an instalment amount that you can afford. <br> ${paymentFrequencyMessage}.<br> The claimant’s details for payment and the full payment plan can be found on <a href=\"{VIEW_JUDGEMENT}\" class=\"govuk-link\">the judgment</a>.<br> If you want to dispute the judgment, or ask to change how and when you pay back the claim amount, you can ${djDefendantNotificationMessage}.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Mae’r rhandaliadau y mae’n rhaid i chi eu talu wedi cael eu penderfynu gan y llys. Bu iddynt wneud ‘penderfyniad ynghylch modd’ ac wedi penderfynu ar swm o randaliadau y gallwch eu fforddio. <br> ${paymentFrequencyMessageCy}.<br> Gellir dod o hyd i fanylion yr hawlydd ar gyfer talu a’r cynllun talu llawn a <a href=\"{VIEW_JUDGEMENT}\" class=\"govuk-link\">y dyfarniad.</a>.<br> Os ydych eisiau gwrthwynebu’r dyfarniad, neu ofyn i newid pryd a sut y byddwch yn talu swm yr hawliad yn ôl, gallwch ${djDefendantNotificationMessageCy}.</p>"
+}

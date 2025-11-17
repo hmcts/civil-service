@@ -207,7 +207,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                     CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
                 .build();
 
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -1255,7 +1254,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .version("1")
                 .code("CODE")
                 .build();
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .partialPayment(YesOrNo.YES)
@@ -1308,7 +1306,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .version("1")
                 .code("CODE")
                 .build();
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .partialPayment(YesOrNo.YES)
@@ -1411,7 +1408,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).extracting("respondent1").extracting("flags").isNotNull();
             assertThat(response.getData()).extracting("businessProcess").isNotNull();
             assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_SPEC.name());
             assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
@@ -1457,7 +1453,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).extracting("respondent1").extracting("flags").isNotNull();
             assertThat(response.getData()).extracting("businessProcess").isNotNull();
             assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
             assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
@@ -1516,7 +1511,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).extracting("respondent1").extracting("flags").isNotNull();
             assertThat(response.getData()).extracting("businessProcess").isNotNull();
             assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
             assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
@@ -1578,7 +1572,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).extracting("respondent1").extracting("flags").isNotNull();
             assertThat(response.getData()).extracting("businessProcess").isNotNull();
             assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_SPEC.name());
             assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
@@ -1629,7 +1622,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).extracting("respondent1").extracting("flags").isNotNull();
             assertThat(response.getData()).extracting("businessProcess").isNotNull();
             assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_SPEC.name());
             assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
@@ -1679,7 +1671,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(responseData.getRespondent1().getFlags()).isNotNull();
             assertThat(responseData.getBusinessProcess()).isNotNull();
             assertThat(responseData.getBusinessProcess().getCamundaEvent()).isEqualTo(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
             assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());

@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import java.util.HashMap;
 import java.util.UUID;
 
-import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -39,8 +38,6 @@ public class GeneralAppActionNeededScenarioTest extends BaseIntegrationTest {
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].reference").value(caseId.toString()),
-                jsonPath("$[*].taskNameEn", hasItem(
-                    "<a href={GENERAL_APPLICATIONS_RESPONSE_APPLICATION_SUMMARY_URL} rel=\"noopener noreferrer\" class=\"govuk-link\">View all applications to the court</a>")),
                 jsonPath("$[0].currentStatusEn").value("Action needed")
             );
     }

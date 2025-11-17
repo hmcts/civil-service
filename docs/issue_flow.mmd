@@ -1,0 +1,66 @@
+stateDiagram-v2
+  %% Claim Issue & Notification (spec + unspec)
+  state "NOTIFICATION_ACKNOWLEDGED (continues in Defence flow)" as ISSUE_FLOW_OUT_0
+  state "TAKEN_OFFLINE_SPEC_DEFENDANT_NOC (continues in Post-response flow) 🔚" as ISSUE_FLOW_OUT_1
+  state "TAKEN_OFFLINE_BY_STAFF (continues in Post-response flow) 🔚" as ISSUE_FLOW_OUT_2
+  state "TAKEN_OFFLINE_BY_SYSTEM (continues in Post-response flow) 🔚" as ISSUE_FLOW_OUT_3
+  state "TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED (continues in Post-response flow) 🔚" as ISSUE_FLOW_OUT_4
+  state "TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED (continues in Post-response flow) 🔚" as ISSUE_FLOW_OUT_5
+  state "TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT (continues in Post-response flow) 🔚" as ISSUE_FLOW_OUT_6
+  state "TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT (continues in Post-response flow) 🔚" as ISSUE_FLOW_OUT_7
+  state "TAKEN_OFFLINE_UNREGISTERED_DEFENDANT (continues in Post-response flow) 🔚" as ISSUE_FLOW_OUT_8
+  state "FULL_DEFENCE (continues in Defence flow)" as ISSUE_FLOW_OUT_9
+  state "FULL_ADMISSION (continues in Defence flow)" as ISSUE_FLOW_OUT_10
+  state "PART_ADMISSION (continues in Defence flow)" as ISSUE_FLOW_OUT_11
+  state "COUNTER_CLAIM (continues in Defence flow) 🔚" as ISSUE_FLOW_OUT_12
+  state "DIVERGENT_RESPOND_GO_OFFLINE (continues in Defence flow) 🔚" as ISSUE_FLOW_OUT_13
+  state "DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE (continues in Defence flow) 🔚" as ISSUE_FLOW_OUT_14
+  CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION --> ISSUE_FLOW_OUT_0 : At least one defendant has acknowledged service per scenario rules.
+  CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION --> ISSUE_FLOW_OUT_2 : Staff took the case offline after claim details were notified while…
+  CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION --> PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA : Claim details notification deadline expired while an extension appl…
+  CLAIM_DETAILS_NOTIFIED --> CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION : A defendant has obtained a time extension to respond
+  CLAIM_DETAILS_NOTIFIED --> ISSUE_FLOW_OUT_0 : At least one defendant has acknowledged service per scenario rules
+  CLAIM_DETAILS_NOTIFIED --> ISSUE_FLOW_OUT_2 : Staff took the case offline after claim details were notified and b…
+  CLAIM_DETAILS_NOTIFIED --> PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA : Claim details notification deadline expired with no response or sta…
+  CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE --> ISSUE_FLOW_OUT_2 : HMCTS staff have manually taken the case offline.
+  CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE --> ISSUE_FLOW_OUT_2 : HMCTS staff have manually taken the case offline.
+  CLAIM_ISSUED_PAYMENT_SUCCESSFUL --> PENDING_CLAIM_ISSUED : Case ready to move from payment success to pending issue represente…
+  CLAIM_ISSUED_PAYMENT_SUCCESSFUL --> PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT : At least one defendant is unrepresented with scenario-specific rule…
+  CLAIM_ISSUED_PAYMENT_SUCCESSFUL --> PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC : Case is a single claimant v single defendant matter
+  CLAIM_ISSUED_PAYMENT_SUCCESSFUL --> PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT : First defendant is represented but their organisation is not regist…
+  CLAIM_ISSUED_PAYMENT_SUCCESSFUL --> PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT : First defendant is unrepresented
+  CLAIM_ISSUED --> CLAIM_NOTIFIED : Claim notification has been sent acknowledgement deadline exists.
+  CLAIM_ISSUED --> ISSUE_FLOW_OUT_2 : Staff took the case offline between claim submission and issue.
+  CLAIM_ISSUED --> ISSUE_FLOW_OUT_4 : Claim was taken offline after notification but before claim details…
+  CLAIM_ISSUED --> PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA : Claim notification deadline has expired.
+  CLAIM_ISSUED --> ISSUE_FLOW_OUT_9 : Latest defence is a full defence in SPEC
+  CLAIM_ISSUED --> ISSUE_FLOW_OUT_11 : Latest defence is a part admission in SPEC
+  CLAIM_ISSUED --> ISSUE_FLOW_OUT_10 : Latest defence is a full admission in SPEC
+  CLAIM_ISSUED --> ISSUE_FLOW_OUT_12 : Latest defence is a counter claim for SPEC
+  CLAIM_ISSUED --> ISSUE_FLOW_OUT_14 : SPEC divergent responses requiring DQs before going offline
+  CLAIM_ISSUED --> ISSUE_FLOW_OUT_13 : SPEC defendant/claimant responses diverge so the case must go offline
+  CLAIM_NOTIFIED --> CLAIM_DETAILS_NOTIFIED : Claim details have been successfully notified.
+  CLAIM_NOTIFIED --> ISSUE_FLOW_OUT_5 : Claim was taken offline because not all defendants were notified of…
+  CLAIM_NOTIFIED --> ISSUE_FLOW_OUT_2 : Staff took the case offline after notification but before claim det…
+  CLAIM_NOTIFIED --> PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA : Claim details notification deadline has expired.
+  CLAIM_SUBMITTED --> CLAIM_ISSUED_PAYMENT_SUCCESSFUL : Card payment succeeded for the claim issue fee.
+  CLAIM_SUBMITTED --> ISSUE_FLOW_OUT_2 : Staff took the case offline before the claim was issued.
+  CLAIM_SUBMITTED --> CLAIM_ISSUED_PAYMENT_FAILED : Card payment failed for the claim issue fee.
+  CLAIM_SUBMITTED --> PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC : Case is LiP v LiP in a 1v1 scenario
+  CLAIM_SUBMITTED --> PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC : Notice of Change submitted for a LiP claimant.
+  CLAIM_SUBMITTED --> PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC : not Defendant Notice of Change online feature flag is active for th…
+  CLAIM_SUBMITTED --> PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC : Defendant Notice of Change online feature flag is active for this case
+  CLAIM_SUBMITTED --> SPEC_DEFENDANT_NOC : not Defendant Notice of Change online feature flag is active for th…
+  PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA --> CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE : Camunda automation has already dismissed the claim.
+  PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA --> CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE : Camunda automation has already dismissed the claim.
+  PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA --> CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE : Camunda automation has already dismissed the claim.
+  PENDING_CLAIM_ISSUED --> CLAIM_ISSUED : Claim has been issued a notification deadline exists.
+  PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT --> ISSUE_FLOW_OUT_8 : System automatically took the case offline for example because of r…
+  PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC --> CLAIM_ISSUED : Claim has been issued a notification deadline exists
+  PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC --> ISSUE_FLOW_OUT_6 : System automatically took the case offline for example because of r…
+  PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT --> CLAIM_ISSUED : Claim has been issued a notification deadline exists
+  PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT --> ISSUE_FLOW_OUT_6 : System automatically took the case offline for example because of r…
+  PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT --> ISSUE_FLOW_OUT_7 : System automatically took the case offline for example because of r…
+  SPEC_DEFENDANT_NOC --> ISSUE_FLOW_OUT_1 : not Defendant Notice of Change online feature flag is active for th…
+  note right of CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE : 🔚 Terminal state
+  note right of CLAIM_ISSUED_PAYMENT_FAILED : 🔚 Terminal state

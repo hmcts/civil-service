@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.ClaimIssue.ClaimFee.Required",
+  "role": "CLAIMANT",
+  "titleEn": "You need to pay your claim fee",
+  "titleCy": "Mae angen i chi dalu ffi eich hawliad",
+  "descriptionEn": "<p class=\"govuk-body\">Your claim has not yet been issued, in order to proceed you must pay the claim fee of ${claimFee}. <a href={CLAIM_FEE_URL}  rel=\"noopener noreferrer\" class=\"govuk-link\">Pay the claim fee</a>.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Nid yw eich hawliad wedi'i gyhoeddi eto, er mwyn bwrw ymlaen, rhaid i chi dalu ffi’r hawliad o ${claimFee}. <a href={CLAIM_FEE_URL}  rel=\"noopener noreferrer\" class=\"govuk-link\">Talu ffi’r hawliad</a>.</p>"
+}

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,16 +20,13 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -50,27 +46,18 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockitoBean
     private Time time;
 
-    @MockitoBean
-    private FeatureToggleService toggleService;
-
     @Autowired
     private NotSuitableSDOCallbackHandler handler;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Nested
     class AboutToStartCallback {
 
         private CallbackParams params;
 
-        private static final String EMAIL = "example@email.com";
-
         @BeforeEach
         void setup() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             params = callbackParamsOf(caseData, ABOUT_TO_START);
-            String userId = UUID.randomUUID().toString();
 
             given(time.now()).willReturn(LocalDateTime.now());
 
@@ -97,7 +84,6 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldValidateReasonLessThan150_whenInvoked() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(false);
             final String PAGE_ID = "not-suitable-reason";
 
             caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
@@ -111,7 +97,6 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldValidateReasonMoreThan150_whenInvokedA() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(false);
             final String PAGE_ID = "not-suitable-reason";
             final int lengthALlowed = 4000;
 
@@ -128,7 +113,6 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldValidateReasonLessThan150_whenInvokedAndTOCEnabledOtherReasons() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
             final String PAGE_ID = "not-suitable-reason";
 
             caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
@@ -142,7 +126,6 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldValidateReasonMoreThan150_whenInvokedAndTOCEnabledOtherReasons() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
             final String PAGE_ID = "not-suitable-reason";
             final int lengthALlowed = 4000;
 
@@ -159,7 +142,6 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldValidateTOCReasonLessThan150_whenInvokedAndTOCEnabledTransferCase() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
             final String PAGE_ID = "not-suitable-reason";
 
             caseData = CaseDataBuilder.builder().atStateBeforeTransferCaseSDONotDrawn().build();
@@ -173,7 +155,6 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldValidateTOCReasonMoreThan150_whenInvokedAndTOCEnabledTransferCase() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
             final String PAGE_ID = "not-suitable-reason";
             final int lengthALlowed = 4000;
 
@@ -194,19 +175,13 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         private CaseData caseData;
         private CallbackParams params;
 
-        private static final String EMAIL = "example@email.com";
-
         @BeforeEach
         void setup() {
-            String userId = UUID.randomUUID().toString();
-
             given(time.now()).willReturn(LocalDateTime.now());
-
         }
 
         @Test
         void shouldUpdateBusinessProcess_whenInvoked() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(false);
             caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -220,7 +195,6 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void checkOtherDetailsUpdated() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(false);
             caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -232,7 +206,6 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateBusinessProcess_whenInvokedAndTOCEnabledOtherReasons() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
             caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -246,7 +219,6 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void checkOtherDetailsUpdated_whenTOCEnabledOtherReasons() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
             caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -259,7 +231,6 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateBusinessProcess_whenInvokedAndTOCEnabledTransferCase() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
             caseData = CaseDataBuilder.builder().atStateBeforeTransferCaseSDONotDrawn().build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -269,7 +240,6 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void checkOtherDetailsUpdated_whenTOCEnabledTransferCase() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
             caseData = CaseDataBuilder.builder().atStateBeforeTransferCaseSDONotDrawn().build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -285,8 +255,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @ParameterizedTest
         @ValueSource(booleans = {true, false})
-        void shouldReturnExpectedSubmittedCallbackResponse(Boolean toggleState) {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(toggleState);
+        void shouldReturnExpectedSubmittedCallbackResponse() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
@@ -306,14 +275,13 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenTOCEnabledTransferCase() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateBeforeTransferCaseSDONotDrawn().build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             String header = format("# Your request was successful%n## This claim will be transferred to a different location");
-            String body = format("<br />A notification will be sent to the listing officer to look at this case and " +
-                                     "process the transfer of case.");
+            String body = "<br />A notification will be sent to the listing officer to look at this case and " +
+                                     "process the transfer of case.";
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
@@ -325,8 +293,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void handleEventsReturnsTheExpectedCallbackEvent(Boolean toggleState) {
-        when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(toggleState);
+    void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(NotSuitable_SDO);
     }
 }

@@ -9,8 +9,6 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -33,11 +31,6 @@ public class DashboardNotificationsEntity implements Serializable {
     @NotNull
     @Schema(name = "id")
     private UUID id;
-
-    @ManyToOne(cascade = CascadeType.DETACH)
-    @JoinColumn
-    @Schema(name = "dashboard_notifications_templates_id")
-    private NotificationTemplateEntity dashboardNotificationsTemplates;
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "dashboardNotification")
     @Schema(name = "notification_action_id")
@@ -84,4 +77,8 @@ public class DashboardNotificationsEntity implements Serializable {
 
     @Schema(name = "deadline")
     private LocalDateTime deadline;
+
+    @Column(name = "time_to_live")
+    @Schema(name = "time_to_live")
+    private String timeToLive;
 }

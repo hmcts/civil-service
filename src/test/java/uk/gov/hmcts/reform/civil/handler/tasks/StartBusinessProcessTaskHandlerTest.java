@@ -121,26 +121,28 @@ class StartBusinessProcessTaskHandlerTest {
         //when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
         when(mockTask.getTopicName()).thenReturn("test");
         //when(mockTask.getActivityId()).thenReturn("activityId");
-        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(StateFlowDTO.builder()
-                                                                               .state(State.from("MAIN.DRAFT"))
-                                                                               .flags(Map.of())
-                                                                               .build());
 
         handler.execute(mockTask, externalTaskService);
 
         verify(coreCaseDataService).startUpdate(CASE_ID, START_BUSINESS_PROCESS);
-        verify(externalTaskService).complete(mockTask, variables);
+        verify(externalTaskService, never()).complete(any(), any());
         verify(coreCaseDataService, never()).submitUpdate(anyString(), any(CaseDataContent.class));
+        verify(externalTaskService).handleBpmnError(mockTask, ERROR_CODE);
     }
 
     @Test
-    void shouldRaiseBpmnError_whenBusinessProcessStatusIsStarted_AndHaveSameProcessInstanceId() {
+    void shouldCompleteWithoutUpdate_whenBusinessProcessStatusIsStartedAndProcessInstanceMatches() {
         BusinessProcess businessProcess = getBusinessProcess(STARTED, PROCESS_INSTANCE_ID);
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft().businessProcess(businessProcess).build();
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
 
         when(coreCaseDataService.startUpdate(CASE_ID, START_BUSINESS_PROCESS)).thenReturn(startEventResponse);
+        when(mockTask.getTopicName()).thenReturn("test");
+        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(StateFlowDTO.builder()
+                                                                               .state(State.from("MAIN.DRAFT"))
+                                                                               .flags(Map.of())
+                                                                               .build());
 
         handler.execute(mockTask, externalTaskService);
 
@@ -153,7 +155,8 @@ class StartBusinessProcessTaskHandlerTest {
             anyInt(),
             anyLong()
         );
-        verify(externalTaskService).handleBpmnError(mockTask, ERROR_CODE);
+        verify(externalTaskService, never()).handleBpmnError(mockTask, ERROR_CODE);
+        verify(externalTaskService).complete(mockTask, variables);
     }
 
     @Test

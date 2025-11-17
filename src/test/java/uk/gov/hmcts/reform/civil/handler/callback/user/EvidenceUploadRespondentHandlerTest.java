@@ -438,11 +438,18 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .toLocalDate().minusWeeks(1)).build()));
 
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .build().toBuilder(), collectionField, date)
+                                       .build().toBuilder(), collectionField, date)
             .addRespondent2(NO)
             .caseTypeFlag("do_not_show")
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .build().toBuilder(), collectionField, List.of())
+            .addRespondent2(NO)
+            .caseTypeFlag("do_not_show")
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -468,7 +475,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(NO)
             .caseTypeFlag("do_not_show")
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                                       .build().toBuilder(), collectionField, List.of())
+            .addRespondent2(NO)
+            .caseTypeFlag("do_not_show")
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -498,7 +511,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(NO)
             .caseTypeFlag("do_not_show")
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                                       .build().toBuilder(), collectionField, List.of())
+            .addRespondent2(NO)
+            .caseTypeFlag("do_not_show")
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -525,7 +544,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(NO)
             .caseTypeFlag("do_not_show")
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                                       .build().toBuilder(), collectionField, List.of())
+            .addRespondent2(NO)
+            .caseTypeFlag("do_not_show")
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -552,7 +577,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(NO)
             .caseTypeFlag("do_not_show")
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                                       .build().toBuilder(), collectionField, List.of())
+            .addRespondent2(NO)
+            .caseTypeFlag("do_not_show")
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -584,7 +615,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(NO)
             .caseTypeFlag("do_not_show")
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
+                                   collectionField, List.of())
+            .addRespondent2(NO)
+            .caseTypeFlag("do_not_show")
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -614,7 +651,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(NO)
             .caseTypeFlag("do_not_show")
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
+                                   collectionField, List.of())
+            .addRespondent2(NO)
+            .caseTypeFlag("do_not_show")
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -639,7 +682,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(NO)
             .caseTypeFlag("do_not_show")
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
+                                   collectionField, List.of())
+            .addRespondent2(NO)
+            .caseTypeFlag("do_not_show")
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -664,7 +713,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(NO)
             .caseTypeFlag("do_not_show")
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
+                                   collectionField, List.of())
+            .addRespondent2(NO)
+            .caseTypeFlag("do_not_show")
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -697,7 +752,12 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(NO)
             .caseTypeFlag("do_not_show")
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(), collectionField, List.of())
+            .addRespondent2(NO)
+            .caseTypeFlag("do_not_show")
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -725,7 +785,15 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .respondent2SameLegalRepresentative(NO)
             .caseTypeFlag("RespondentTwoFields")
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                                       .build().toBuilder(), collectionField, List.of())
+            .addRespondent2(YES)
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2SameLegalRepresentative(NO)
+            .caseTypeFlag("RespondentTwoFields")
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -753,7 +821,15 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .respondent2SameLegalRepresentative(NO)
             .caseTypeFlag("RespondentTwoFields")
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                                       .build().toBuilder(), collectionField, List.of())
+            .addRespondent2(YES)
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2SameLegalRepresentative(NO)
+            .caseTypeFlag("RespondentTwoFields")
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -785,7 +861,15 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .respondent2SameLegalRepresentative(NO)
             .caseTypeFlag("RespondentTwoFields")
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                                       .build().toBuilder(), collectionField, List.of())
+            .addRespondent2(YES)
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2SameLegalRepresentative(NO)
+            .caseTypeFlag("RespondentTwoFields")
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -814,8 +898,15 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .respondent2SameLegalRepresentative(NO)
             .caseTypeFlag("RespondentTwoFields")
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                                       .build().toBuilder(), collectionField, List.of())
+            .addRespondent2(YES)
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2SameLegalRepresentative(NO)
+            .caseTypeFlag("RespondentTwoFields")
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -843,7 +934,15 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .respondent2SameLegalRepresentative(NO)
             .caseTypeFlag("RespondentTwoFields")
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                                       .build().toBuilder(), collectionField, List.of())
+            .addRespondent2(YES)
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2SameLegalRepresentative(NO)
+            .caseTypeFlag("RespondentTwoFields")
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -877,7 +976,15 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .respondent2SameLegalRepresentative(NO)
             .caseTypeFlag("RespondentTwoFields")
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
+                                   collectionField, List.of())
+            .addRespondent2(YES)
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2SameLegalRepresentative(NO)
+            .caseTypeFlag("RespondentTwoFields")
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -911,8 +1018,15 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .respondent2SameLegalRepresentative(NO)
             .caseTypeFlag("RespondentTwoFields")
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
+                                   collectionField, List.of())
+            .addRespondent2(YES)
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2SameLegalRepresentative(NO)
+            .caseTypeFlag("RespondentTwoFields")
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -940,7 +1054,15 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .respondent2SameLegalRepresentative(NO)
             .caseTypeFlag("RespondentTwoFields")
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
+                                   collectionField, List.of())
+            .addRespondent2(YES)
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2SameLegalRepresentative(NO)
+            .caseTypeFlag("RespondentTwoFields")
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -963,13 +1085,22 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             time.toLocalDate().minusWeeks(1)).build()));
 
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
-            collectionField, date)
+                                   collectionField, date)
             .addRespondent2(YES)
             .respondent2(PartyBuilder.builder().individual().build())
             .respondent2SameLegalRepresentative(NO)
             .caseTypeFlag("RespondentTwoFields")
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
+            collectionField, List.of())
+            .addRespondent2(YES)
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2SameLegalRepresentative(NO)
+            .caseTypeFlag("RespondentTwoFields")
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1006,7 +1137,14 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .respondent2SameLegalRepresentative(NO)
             .caseTypeFlag("RespondentTwoFields")
             .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(), collectionField, List.of())
+            .addRespondent2(YES)
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2SameLegalRepresentative(NO)
+            .caseTypeFlag("RespondentTwoFields")
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                 PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

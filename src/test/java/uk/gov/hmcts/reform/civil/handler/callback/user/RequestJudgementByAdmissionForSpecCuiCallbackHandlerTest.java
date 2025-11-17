@@ -390,8 +390,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
         void shouldSetTheJudgmentSummaryDetailsToProceedWithoutDefendantSolicitor() {
             String expected = "The Judgement request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.";
 
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-
             Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
@@ -416,40 +414,10 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
         }
 
         @Test
-        void shouldNotSetTheJudgmentSummaryDetailsToProceedWithoutFlag() {
-            String expected = "The Judgement request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.";
-
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(false);
-
-            Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
-            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
-                .ccjPaymentPaidSomeOption(YesOrNo.YES)
-                .ccjJudgmentFixedCostOption(YES)
-                .build();
-
-            BigDecimal interestAmount = BigDecimal.valueOf(100);
-            CaseData caseData = CaseDataBuilder.builder()
-                .ccjPaymentDetails(ccjPaymentDetails)
-                .totalClaimAmount(BigDecimal.valueOf(1000))
-                .claimFee(fee)
-                .totalInterest(interestAmount)
-                .specRespondent1Represented(NO)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            String judgementStatement = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentStatement();
-
-            assertThat(judgementStatement).isNotEqualTo(expected);
-        }
-
-        @Test
         void shouldShowSummaryForAllFinalOrdersIssued() {
             String expected = "The judgment request will be processed and a County"
                 + " Court Judgment (CCJ) will be issued, you will receive any further updates by email.";
 
-            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
