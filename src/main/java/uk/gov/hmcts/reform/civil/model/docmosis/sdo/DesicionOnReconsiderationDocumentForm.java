@@ -18,7 +18,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-@SuppressWarnings("java:CPD")
 public class DesicionOnReconsiderationDocumentForm implements MappableObject {
 
     private String caseNumber;

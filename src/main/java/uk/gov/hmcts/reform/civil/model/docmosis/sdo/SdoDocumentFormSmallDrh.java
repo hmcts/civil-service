@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.sdo;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
-import uk.gov.hmcts.reform.civil.model.Party;
+import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsAddNewDirection;
@@ -15,30 +15,16 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsPPI;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsUploadDoc;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Getter
-@Builder
+@SuperBuilder
+@NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
-@ToString
-@SuppressWarnings("java:CPD")
-public class SdoDocumentFormSmallDrh implements MappableObject {
-
-    private LocalDate currentDate;
-    //Header
-    private String judgeName;
-    private String caseNumber;
-    private Party applicant1;
-    private Party respondent1;
-    private boolean hasApplicant2;
-    private Party applicant2;
-    private boolean hasRespondent2;
-    private Party respondent2;
-    private boolean writtenByJudge;
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public class SdoDocumentFormSmallDrh extends SdoDocumentFormBase implements MappableObject {
 
     //Toggles
     private boolean hasPaymentProtectionInsurance;
@@ -46,7 +32,6 @@ public class SdoDocumentFormSmallDrh implements MappableObject {
     private boolean hasUploadDocToggle;
     private boolean hasHearingToggle;
     private boolean hasWitnessStatements;
-    private boolean hasNewDirections;
     private boolean hasSdoR2HearingTrialWindow;
     private boolean hasDRHWelshLangToggle;
     private boolean sdoR2SmallClaimsMediationSectionToggle;
@@ -62,8 +47,5 @@ public class SdoDocumentFormSmallDrh implements MappableObject {
     private String hearingTime;
     private String smallClaimsMethod;
     private String sdoR2SmallClaimsPhysicalTrialBundleTxt;
-    private LocationRefData hearingLocation;
-    private LocationRefData caseManagementLocation;
-    private String welshLanguageDescription;
     private String sdoR2SmallClaimMediationSectionInput;
 }
