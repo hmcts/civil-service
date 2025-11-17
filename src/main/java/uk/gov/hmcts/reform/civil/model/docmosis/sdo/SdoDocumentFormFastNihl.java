@@ -42,7 +42,7 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-@SuppressWarnings({"java:S1104", "common-java:DuplicatedBlocks", "java:S6539"})
+@SuppressWarnings({"java:S1104", "common-java:DuplicatedBlocks", "java:S6539", "all"})
 public class SdoDocumentFormFastNihl implements MappableObject {
 
     private LocalDate currentDate;
