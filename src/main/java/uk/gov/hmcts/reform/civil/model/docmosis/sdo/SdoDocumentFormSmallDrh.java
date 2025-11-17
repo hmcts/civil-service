@@ -25,6 +25,7 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
+@SuppressWarnings("java:CPD")
 public class SdoDocumentFormSmallDrh implements MappableObject {
 
     private LocalDate currentDate;

@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 @Builder
 @AllArgsConstructor
 @EqualsAndHashCode
+@SuppressWarnings("java:CPD")
 public class SdoCoverLetter implements MappableObject {
 
     private Party party;

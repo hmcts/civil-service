@@ -15,6 +15,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
+@SuppressWarnings("java:CPD")
 public class LiPRequestForReconsiderationForm implements MappableObject {
 
     private String caseNumber;
