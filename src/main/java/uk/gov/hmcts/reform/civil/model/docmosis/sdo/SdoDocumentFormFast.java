@@ -46,21 +46,18 @@ import java.util.List;
 @SuppressWarnings({"java:S1104", "java:S107", "common-java:DuplicatedBlocks", "java:S6539", "all"})
 public class SdoDocumentFormFast implements MappableObject {
 
-    private LocalDate currentDate;
-
     private String judgeName;
-
+    private LocalDate currentDate;
     private String caseNumber;
-
-    private Party applicant1;
-    private Party respondent1;
+    private ClaimsTrack claimsTrack;
+    private JudgementSum drawDirectionsOrder;
+    private YesOrNo drawDirectionsOrderRequired;
     private boolean hasApplicant2;
+    private Party applicant1;
     private Party applicant2;
     private boolean hasRespondent2;
+    private Party respondent1;
     private Party respondent2;
-    private YesOrNo drawDirectionsOrderRequired;
-    private JudgementSum drawDirectionsOrder;
-    private ClaimsTrack claimsTrack;
 
     private List<FastTrack> fastClaims;
 
