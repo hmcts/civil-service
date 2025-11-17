@@ -165,10 +165,8 @@ sourceSets {
   }
 }
 
-tasks.withType(JavaCompile).configureEach {
-  if (!options.compilerArgs.contains('-Xlint:unchecked')) {
-    options.compilerArgs.add('-Xlint:unchecked')
-  }
+tasks.withType(JavaCompile) {
+  options.compilerArgs << "-Xlint:unchecked" << "-Werror"
 }
 
 tasks.withType(Test) {
@@ -176,12 +174,6 @@ tasks.withType(Test) {
   maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
   testLogging {
     exceptionFormat = 'full'
-  }
-  jacoco {
-    includes = [
-            'uk.gov.hmcts.reform.civil.*',
-            'uk.gov.hmcts.reform.dashboard.*'
-    ]
   }
 }
 
@@ -278,7 +270,6 @@ configure(subprojects.findAll { it.name == 'dashboard-notifications' }) {
 }
 
 jacocoTestReport {
-  dependsOn test, integration
   executionData(test, integration)
   executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
   subprojects.each {
