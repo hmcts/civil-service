@@ -293,8 +293,6 @@ jacocoTestReport {
     csv.required.set(false)
     xml.outputLocation.set(file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml"))
   }
-  dependsOn tasks.named('bootStartScripts')
-  dependsOn tasks.named('startScripts')
 }
 
 jacocoTestReport.dependsOn {
