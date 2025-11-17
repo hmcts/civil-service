@@ -32,7 +32,7 @@ dependencies:
     condition: aac-manage-case-assignment.enabled
   - name: wiremock
     version: 0.0.5
-    repository: 'file://charts/wiremock'
+    repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: wiremock.enabled
   - name: ccd-case-document-am-api
     version: 1.7.17
