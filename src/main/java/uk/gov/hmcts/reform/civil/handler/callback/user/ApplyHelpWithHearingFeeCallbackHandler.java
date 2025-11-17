@@ -44,19 +44,18 @@ public class ApplyHelpWithHearingFeeCallbackHandler extends CallbackHandler {
 
     private CallbackResponse setState(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (caseData.getHearingHelpFeesReferenceNumber() != null) {
-            setUpHelpWithFees(caseDataBuilder);
+            caseData = setUpHelpWithFees(caseData);
         }
-        caseDataBuilder.businessProcess(BusinessProcess.ready(APPLY_HELP_WITH_HEARING_FEE));
+        caseData.setBusinessProcess(BusinessProcess.ready(APPLY_HELP_WITH_HEARING_FEE));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(mapper))
+            .data(caseData.toMap(mapper))
             .build();
     }
 
-    private void setUpHelpWithFees(CaseData.CaseDataBuilder caseDataBuilder) {
-        helpWithFeesForTabService.setUpHelpWithFeeTab(caseDataBuilder);
+    private CaseData setUpHelpWithFees(CaseData caseData) {
+        return helpWithFeesForTabService.setUpHelpWithFeeTab(caseData);
     }
 }

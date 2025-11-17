@@ -48,7 +48,6 @@ public class AmendPartyDetailsCallbackHandler extends CallbackHandler {
 
     private CallbackResponse validateUpdatedDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         List<String> errors = new ArrayList<>();
         if (caseData.isApplicantRepresented() || caseData.getApplicantSolicitor1UserDetails() != null && caseData.getApplicantSolicitor1UserDetails().getEmail() != null) {
@@ -61,17 +60,17 @@ public class AmendPartyDetailsCallbackHandler extends CallbackHandler {
 
         // set organisation policy after removing it in claim issue
         // workaround for hiding cases in CAA list before case notify
-        setOrganisationPolicy(caseData, caseDataBuilder);
+        setOrganisationPolicy(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .errors(!errors.isEmpty() ? errors : null)
             .build();
     }
 
-    private void setOrganisationPolicy(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
-        if (caseData.getRespondent1OrganisationIDCopy() != null) {
-            caseDataBuilder.respondent1OrganisationPolicy(
+    private void setOrganisationPolicy(CaseData caseData) {
+        if (caseData.getRespondent1OrganisationIDCopy() != null && caseData.getRespondent1OrganisationPolicy() != null) {
+            caseData.setRespondent1OrganisationPolicy(
                 caseData.getRespondent1OrganisationPolicy().toBuilder()
                     .organisation(Organisation.builder()
                                       .organisationID(caseData.getRespondent1OrganisationIDCopy())
@@ -80,8 +79,8 @@ public class AmendPartyDetailsCallbackHandler extends CallbackHandler {
             );
         }
 
-        if (caseData.getRespondent2OrganisationIDCopy() != null) {
-            caseDataBuilder.respondent2OrganisationPolicy(
+        if (caseData.getRespondent2OrganisationIDCopy() != null && caseData.getRespondent2OrganisationPolicy() != null) {
+            caseData.setRespondent2OrganisationPolicy(
                 caseData.getRespondent2OrganisationPolicy().toBuilder()
                     .organisation(Organisation.builder()
                                       .organisationID(caseData.getRespondent2OrganisationIDCopy())

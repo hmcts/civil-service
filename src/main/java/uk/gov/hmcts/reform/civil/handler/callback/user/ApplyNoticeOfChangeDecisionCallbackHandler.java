@@ -1,9 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION_DEFENDANT_LIP;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION_LIP;
+
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -14,24 +17,22 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.cas.client.CaseAssignmentApi;
+import uk.gov.hmcts.reform.civil.cas.model.DecisionRequest;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
-import uk.gov.hmcts.reform.civil.cas.model.DecisionRequest;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION_DEFENDANT_LIP;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION_LIP;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -72,22 +73,20 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
         );
 
         CaseData postDecisionCaseData = objectMapper.convertValue(applyDecision.getData(), CaseData.class);
-        CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder = postDecisionCaseData.toBuilder();
 
-        setAddLegalRepDeadlinesToNull(updatedCaseDataBuilder, caseRole);
+        setAddLegalRepDeadlinesToNull(postDecisionCaseData, caseRole);
 
         updateChangeOrganisationRequestFieldAfterNoCDecisionApplied(
-            updatedCaseDataBuilder,
+            postDecisionCaseData,
             preDecisionCaseData.getChangeOrganisationRequestField()
         );
 
-        updatedCaseDataBuilder
-            .businessProcess(BusinessProcess.ready(getBusinessProcessEvent(postDecisionCaseData, caseRole)))
-            .changeOfRepresentation(getChangeOfRepresentation(
-                callbackParams.getCaseData().getChangeOrganisationRequestField(), postDecisionCaseData));
+        postDecisionCaseData.setBusinessProcess(BusinessProcess.ready(getBusinessProcessEvent(postDecisionCaseData, caseRole)));
+        postDecisionCaseData.setChangeOfRepresentation(getChangeOfRepresentation(
+            callbackParams.getCaseData().getChangeOrganisationRequestField(), postDecisionCaseData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseDataBuilder.build().toMap(objectMapper)).build();
+            .data(postDecisionCaseData.toMap(objectMapper)).build();
     }
 
     private ChangeOfRepresentation getChangeOfRepresentation(ChangeOrganisationRequest corFieldBeforeNoC,
@@ -118,18 +117,17 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
      *
      * <p>This value will be deleted in the next callback UpdateCaseDetailsAfterNoCHandler</p>
      *
-     * @param updatedCaseDataBuilder updatedcaseDataBuilder
-     * @param changeOrganisationRequest preDecisionCor
+     * @param caseData caseData
+     * @param preDecisionCor preDecisionCor
      */
     private void updateChangeOrganisationRequestFieldAfterNoCDecisionApplied(
-        CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder,
+        CaseData caseData,
         ChangeOrganisationRequest preDecisionCor) {
-        updatedCaseDataBuilder
-                .changeOrganisationRequestField(
-                    ChangeOrganisationRequest.builder()
-                        .createdBy(preDecisionCor.getCreatedBy())
-                        .organisationToAdd(
-                            Organisation.builder().organisationID(ORG_ID_FOR_AUTO_APPROVAL).build()).build());
+        caseData.setChangeOrganisationRequestField(
+            ChangeOrganisationRequest.builder()
+                .createdBy(preDecisionCor.getCreatedBy())
+                .organisationToAdd(
+                    Organisation.builder().organisationID(ORG_ID_FOR_AUTO_APPROVAL).build()).build());
 
     }
 
@@ -198,11 +196,11 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
         return null;
     }
 
-    private void setAddLegalRepDeadlinesToNull(CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder, String caseRole) {
+    private void setAddLegalRepDeadlinesToNull(CaseData caseData, String caseRole) {
         if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(caseRole)) {
-            updatedCaseDataBuilder.addLegalRepDeadlineRes1(null);
+            caseData.setAddLegalRepDeadlineRes1(null);
         } else if (CaseRole.RESPONDENTSOLICITORTWO.getFormattedName().equals(caseRole)) {
-            updatedCaseDataBuilder.addLegalRepDeadlineRes2(null);
+            caseData.setAddLegalRepDeadlineRes2(null);
         }
     }
 
