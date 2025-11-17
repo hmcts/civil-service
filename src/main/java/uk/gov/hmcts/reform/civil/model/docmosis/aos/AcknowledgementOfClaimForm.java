@@ -24,6 +24,7 @@ import java.util.List;
 public class AcknowledgementOfClaimForm implements MappableObject {
 
     @JsonProperty("courtseal")
+    @Builder.Default
     private String courtSeal = "[userImage:courtseal.PNG]"; //NOSONAR
     private String caseName;
     private String referenceNumber;

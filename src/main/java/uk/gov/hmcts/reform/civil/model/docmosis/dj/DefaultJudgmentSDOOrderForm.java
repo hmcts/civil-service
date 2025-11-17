@@ -87,7 +87,7 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private  boolean disposalHearingMedicalEvidenceDJAddSection;
     private  boolean disposalHearingQuestionsToExpertsDJAddSection;
     private  boolean disposalHearingSchedulesOfLossDJAddSection;
-    private  boolean disposalHearingDisposalHearingDJAddSection;
+    private  boolean disposalHearingFinalDisposalHearingDJAddSection;
     private  boolean disposalHearingBundleDJAddSection;
     private  boolean disposalHearingClaimSettlingAddSection;
     private  boolean disposalHearingCostsAddSection;

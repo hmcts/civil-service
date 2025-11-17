@@ -22,6 +22,7 @@ import java.util.List;
 public class SealedClaimForm implements MappableObject {
 
     @JsonProperty("courtseal")
+    @Builder.Default
     private String courtSeal = "[userImage:courtseal.PNG]"; //NOSONAR
     private List<Party> applicants;
     private List<Party> respondents;

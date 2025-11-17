@@ -23,6 +23,7 @@ import java.time.LocalDate;
 public class AcknowledgementOfClaimFormForSpec implements MappableObject {
 
     @JsonProperty("courtseal")
+    @Builder.Default
     private String courtSeal = "[userImage:courtseal.PNG]"; //NOSONAR
     private String caseName;
     private String referenceNumber;

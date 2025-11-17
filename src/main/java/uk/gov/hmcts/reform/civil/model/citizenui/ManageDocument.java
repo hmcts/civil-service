@@ -14,5 +14,6 @@ public class ManageDocument {
     private String documentName;
     private ManageDocumentType documentType;
     private String documentTypeOther;
+    @Builder.Default
     private LocalDateTime createdDatetime = LocalDateTime.now();
 }
