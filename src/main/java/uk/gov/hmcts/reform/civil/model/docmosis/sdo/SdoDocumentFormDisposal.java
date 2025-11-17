@@ -1,14 +1,12 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.sdo;
 
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -24,10 +22,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
-import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
-import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -35,30 +30,13 @@ import java.util.List;
  * Represents the complete data model for disposal hearing documentation.
  */
 @Getter
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
-@ToString
-@SuppressWarnings({"java:S1104", "java:S107", "java:S1192", "java:CPD"})
-public class SdoDocumentFormDisposal implements MappableObject {
-
-    private LocalDate currentDate;
-    private String judgeName;
-    private String caseNumber;
-
-    private Party applicant1;
-
-    private Party respondent1;
-    private boolean hasApplicant2;
-
-    private Party applicant2;
-    private boolean hasRespondent2;
-
-    private Party respondent2;
-    private YesOrNo drawDirectionsOrderRequired;
-
-    private JudgementSum drawDirectionsOrder;
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@SuppressWarnings({"java:S1104", "java:S107"})
+public class SdoDocumentFormDisposal extends SdoDocumentFormBase implements MappableObject {
 
     private DisposalHearingJudgesRecital disposalHearingJudgesRecital;
     private DisposalHearingDisclosureOfDocuments disposalHearingDisclosureOfDocuments;
@@ -76,17 +54,13 @@ public class SdoDocumentFormDisposal implements MappableObject {
     private DynamicList disposalHearingMethodInPerson;
     private String disposalHearingMethodTelephoneHearing;
     private String disposalHearingMethodVideoConferenceHearing;
-    private LocationRefData hearingLocation;
-    private LocationRefData caseManagementLocation;
 
     private DisposalHearingBundle disposalHearingBundle;
     private String disposalHearingBundleTypeText;
 
-    private boolean hasNewDirections;
     private List<Element<DisposalHearingAddNewDirections>> disposalHearingAddNewDirections;
 
     private DisposalHearingNotes disposalHearingNotes;
-    private String welshLanguageDescription;
 
     private boolean disposalHearingDisclosureOfDocumentsToggle;
     private boolean disposalHearingWitnessOfFactToggle;
@@ -98,7 +72,6 @@ public class SdoDocumentFormDisposal implements MappableObject {
     private boolean disposalHearingBundleToggle;
     private boolean disposalHearingClaimSettlingToggle;
     private boolean disposalHearingCostsToggle;
-    private boolean writtenByJudge;
     private boolean hasDisposalWelshToggle;
 
     @SuppressWarnings("unused")
