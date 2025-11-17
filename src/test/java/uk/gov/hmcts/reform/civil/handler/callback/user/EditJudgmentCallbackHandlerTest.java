@@ -149,6 +149,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(addressMapper.toRoboticsAddress(any())).thenReturn(RoboticsAddress.builder().build());
             when(interestCalculator.calculateInterest(any())).thenReturn(BigDecimal.ZERO);
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            caseData.setJoIsRegisteredWithRTL(YesOrNo.YES);
             caseData.setJoShowRegisteredWithRTLOption(YesOrNo.NO);
             RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper(time, addressMapper);
             caseData.setActiveJudgment(recordMapper.addUpdateActiveJudgment(caseData));
@@ -162,10 +163,47 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
                 "joJudgmentRecordReason",
                 JudgmentRecordedReason.JUDGE_ORDER.name()
             );
+
             assertThat(response.getData().get("joPaymentPlan")).isNotNull();
             assertThat(response.getData().get("joInstalmentDetails")).isNotNull();
+            // When RTL is YES, joIssuedDate should be set to joOrderMadeDate
+            assertThat(response.getData().get("joIssuedDate")).isNotNull();
+            assertThat(response.getData().get("joPaymentPlan")).extracting("type").isEqualTo(PaymentPlanSelection.PAY_IN_INSTALMENTS.name());
+            assertThat(response.getData().get("joInstalmentDetails")).extracting("amount").isEqualTo("120");
+            assertThat(response.getData().get("joInstalmentDetails")).extracting("paymentFrequency").isEqualTo("MONTHLY");
+            assertThat(response.getData().get("joInstalmentDetails")).extracting("startDate").isEqualTo("2022-12-12");
+            assertThat(response.getData()).containsEntry("joIsRegisteredWithRTL", "Yes");
+            assertThat(response.getData()).containsEntry("joIsRegisteredWithRTL", "Yes");
+            assertThat(response.getData()).containsEntry("joAmountOrdered", "1200");
+            assertThat(response.getData()).containsEntry("joAmountCostOrdered", "1100");
+            assertThat(response.getData()).containsEntry("joOrderMadeDate", "2022-12-12");
+            assertThat(response.getData()).containsEntry("joIssuedDate", "2022-12-12");
+            assertThat(response.getData().get("joJudgmentPaidInFull")).isNull();
+
             assertThat(response.getData().get("activeJudgment")).isNotNull();
+            assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("MODIFIED");
+            assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo(
+                "JUDGMENT_FOLLOWING_HEARING");
+            assertThat(response.getData().get("activeJudgment")).extracting("judgmentId").isEqualTo(1);
+            assertThat(response.getData().get("activeJudgment")).extracting("isRegisterWithRTL").isEqualTo("Yes");
+            assertThat(response.getData().get("activeJudgment")).extracting("paymentPlan").extracting("type").isEqualTo(
+                "PAY_IN_INSTALMENTS");
+            assertThat(response.getData().get("activeJudgment")).extracting("orderedAmount").isEqualTo("1200");
+            assertThat(response.getData().get("activeJudgment")).extracting("costs").isEqualTo("1100");
+            assertThat(response.getData().get("activeJudgment")).extracting("totalAmount").isEqualTo("2300");
+            assertThat(response.getData().get("activeJudgment")).extracting("issueDate").isEqualTo("2022-12-12");
+            assertThat(response.getData().get("activeJudgment")).extracting("instalmentDetails").extracting(
+                "paymentFrequency").isEqualTo("MONTHLY");
+            assertThat(response.getData().get("activeJudgment")).extracting("instalmentDetails").extracting("amount").isEqualTo(
+                "120");
+            assertThat(response.getData().get("activeJudgment")).extracting("instalmentDetails").extracting("startDate").isEqualTo(
+                "2022-12-12");
+            assertThat(response.getData().get("activeJudgment")).extracting("defendant1Name").isEqualTo("Mr. John Rambo");
+            assertThat(response.getData().get("activeJudgment")).extracting("defendant1Address").isNotNull();
+            assertThat(response.getData().get("activeJudgment")).extracting("defendant1Dob").isNotNull();
+
             assertThat(response.getData().get("joRepaymentSummaryObject")).isNotNull();
+
         }
 
         @Test
@@ -187,8 +225,29 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
                 "joJudgmentRecordReason",
                 JudgmentRecordedReason.JUDGE_ORDER.name()
             );
+
             assertThat(response.getData().get("joPaymentPlan")).isNotNull();
+            assertThat(response.getData().get("joPaymentPlan")).extracting("type").isEqualTo(PaymentPlanSelection.PAY_IMMEDIATELY.name());
+            assertThat(response.getData()).containsEntry("joIsRegisteredWithRTL", "Yes");
+            assertThat(response.getData()).containsEntry("joAmountOrdered", "1200");
+            assertThat(response.getData()).containsEntry("joAmountCostOrdered", "1100");
+            assertThat(response.getData()).containsEntry("joOrderMadeDate", "2022-12-12");
+            assertThat(response.getData()).containsEntry("joIssuedDate", "2022-12-12");
+            assertThat(response.getData().get("joJudgmentPaidInFull")).isNull();
+
             assertThat(response.getData().get("activeJudgment")).isNotNull();
+            assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("MODIFIED");
+            assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo(
+                "JUDGMENT_FOLLOWING_HEARING");
+            assertThat(response.getData().get("activeJudgment")).extracting("judgmentId").isEqualTo(1);
+            assertThat(response.getData().get("activeJudgment")).extracting("isRegisterWithRTL").isEqualTo("Yes");
+            assertThat(response.getData().get("activeJudgment")).extracting("paymentPlan").extracting("type").isEqualTo(
+                PaymentPlanSelection.PAY_IMMEDIATELY.name());
+            assertThat(response.getData().get("activeJudgment")).extracting("orderedAmount").isEqualTo("1200");
+            assertThat(response.getData().get("activeJudgment")).extracting("costs").isEqualTo("1100");
+            assertThat(response.getData().get("activeJudgment")).extracting("totalAmount").isEqualTo("2300");
+            assertThat(response.getData().get("activeJudgment")).extracting("issueDate").isEqualTo("2022-12-12");
+
             assertThat(response.getData().get("joRepaymentSummaryObject")).isNotNull();
         }
 
@@ -213,11 +272,32 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
                 "joJudgmentRecordReason",
                 JudgmentRecordedReason.JUDGE_ORDER.name()
             );
+
             assertThat(response.getData().get("joPaymentPlan")).isNotNull();
-            assertThat(response.getData().get("activeJudgment")).isNotNull();
-            assertThat(response.getData().get("joRepaymentSummaryObject")).isNotNull();
+            assertThat(response.getData().get("joPaymentPlan")).extracting("type").isEqualTo(PaymentPlanSelection.PAY_BY_DATE.name());
+            assertThat(response.getData()).containsEntry("joAmountOrdered", "1200");
+            assertThat(response.getData()).containsEntry("joAmountCostOrdered", "1100");
+            assertThat(response.getData()).containsEntry("joOrderMadeDate", "2022-12-12");
+            assertThat(response.getData().get("joPaymentPlan")).extracting("paymentDeadlineDate").isEqualTo("2023-12-12");
             // When RTL is NO, joIssuedDate should be null
             assertThat(response.getData().get("joIssuedDate")).isNull();
+            assertThat(response.getData().get("joJudgmentPaidInFull")).isNull();
+            assertThat(response.getData().get("activeJudgment")).isNotNull();
+            assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("MODIFIED");
+            assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo(
+                "JUDGMENT_FOLLOWING_HEARING");
+            assertThat(response.getData().get("activeJudgment")).extracting("judgmentId").isEqualTo(1);
+            assertThat(response.getData().get("activeJudgment")).extracting("isRegisterWithRTL").isEqualTo("No");
+            assertThat(response.getData().get("activeJudgment")).extracting("paymentPlan").extracting("type").isEqualTo(
+                PaymentPlanSelection.PAY_BY_DATE.name());
+            assertThat(response.getData().get("activeJudgment")).extracting("paymentPlan").extracting(
+                "paymentDeadlineDate").isEqualTo("2023-12-12");
+            assertThat(response.getData().get("activeJudgment")).extracting("orderedAmount").isEqualTo("1200");
+            assertThat(response.getData().get("activeJudgment")).extracting("costs").isEqualTo("1100");
+            assertThat(response.getData().get("activeJudgment")).extracting("totalAmount").isEqualTo("2300");
+            assertThat(response.getData().get("activeJudgment")).extracting("issueDate").isEqualTo("2022-12-12");
+
+            assertThat(response.getData().get("joRepaymentSummaryObject")).isNotNull();
         }
 
         @Test

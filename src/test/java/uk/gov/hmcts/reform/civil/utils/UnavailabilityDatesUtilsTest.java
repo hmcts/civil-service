@@ -163,7 +163,6 @@ public class UnavailabilityDatesUtilsTest {
 
             LocalDate dateAdded = LocalDate.now();
 
-            //CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
             UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicantDJ(caseData);
 
             UnavailableDate expectedSingleDate = UnavailableDate.builder()
