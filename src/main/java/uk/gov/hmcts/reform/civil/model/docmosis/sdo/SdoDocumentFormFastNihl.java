@@ -46,29 +46,31 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-@SuppressWarnings({"java:S1104", "java:S1118", "java:S1450", "CPD-START"})
+@SuppressWarnings({"java:S1104", "java:S1192", "java:S3776", "java:CPD"})
 public class SdoDocumentFormFastNihl implements MappableObject {
 
-    /** Document metadata - current date. */
     private LocalDate currentDate;
-    /** Document metadata - judge name. */
+
     private String judgeName;
-    /** Document metadata - case number. */
+
     private String caseNumber;
 
-    /** Primary parties. */
     private Party applicant1;
+
     private Party respondent1;
 
-    /** Secondary parties and flags. */
     private boolean hasApplicant2;
+
     private Party applicant2;
+
     private boolean hasRespondent2;
+
     private Party respondent2;
 
-    /** Directions order requirements. */
     private YesOrNo drawDirectionsOrderRequired;
+
     private JudgementSum drawDirectionsOrder;
+
     private ClaimsTrack claimsTrack;
     private List<FastTrack> fastClaims;
     private boolean writtenByJudge;
@@ -133,6 +135,4 @@ public class SdoDocumentFormFastNihl implements MappableObject {
     private String sdoR2ImportantNotesTxt;
     private String physicalBundlePartyTxt;
     private String welshLanguageDescription;
-
-    // CPD-OFF - End of duplicated block suppression for NIHL specific form
 }

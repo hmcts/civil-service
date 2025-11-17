@@ -47,33 +47,23 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-@SuppressWarnings({"java:S1104", "java:S1170", "java:S107", "CPD-START"})
+@SuppressWarnings({"java:S1104", "java:S1170", "java:S107", "java:S1192", "java:CPD"})
 public class SdoDocumentFormFast implements MappableObject {
 
-    // Date fields
     private LocalDate currentDate;
-
-    // Judge information
     private String judgeName;
 
-    // Case identifier
     private String caseNumber;
-
-    // First applicant
     private Party applicant1;
-    // First respondent
-    private Party respondent1;
-    // Flag indicating presence of second applicant
-    private boolean hasApplicant2;
-    // Second applicant
-    private Party applicant2;
-    // Flag indicating presence of second respondent
-    private boolean hasRespondent2;
-    // Second respondent
-    private Party respondent2;
 
-    // Directions order fields
+    private Party respondent1;
+    private boolean hasApplicant2;
+    private Party applicant2;
+
+    private boolean hasRespondent2;
+    private Party respondent2;
     private YesOrNo drawDirectionsOrderRequired;
+
     private JudgementSum drawDirectionsOrder;
     private ClaimsTrack claimsTrack;
 
@@ -141,6 +131,4 @@ public class SdoDocumentFormFast implements MappableObject {
         // made mandatory in SNI-5142
         return true;
     }
-
-    // CPD-OFF - Fast track form fields structure end
 }

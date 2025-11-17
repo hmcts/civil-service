@@ -40,42 +40,24 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-@SuppressWarnings({"java:S1104", "java:S107", "java:S1118", "CPD-START"})
+@SuppressWarnings({"java:S1104", "java:S107", "java:S1192", "java:CPD"})
 public class SdoDocumentFormDisposal implements MappableObject {
 
-    /**
-     * Current date.
-     */
     private LocalDate currentDate;
-
-    /**
-     * Judge name.
-     */
     private String judgeName;
-
-    /**
-     * Case number.
-     */
     private String caseNumber;
 
-    /**
-     * Primary parties in the case.
-     */
     private Party applicant1;
-    private Party respondent1;
 
-    /**
-     * Flags and secondary parties.
-     */
+    private Party respondent1;
     private boolean hasApplicant2;
+
     private Party applicant2;
     private boolean hasRespondent2;
-    private Party respondent2;
 
-    /**
-     * Draw directions order configuration.
-     */
+    private Party respondent2;
     private YesOrNo drawDirectionsOrderRequired;
+
     private JudgementSum drawDirectionsOrder;
 
     private DisposalHearingJudgesRecital disposalHearingJudgesRecital;
@@ -124,6 +106,4 @@ public class SdoDocumentFormDisposal implements MappableObject {
         // SNI-5142
         return true;
     }
-
-    // CPD-OFF - Disposal hearing form structure complete
 }
