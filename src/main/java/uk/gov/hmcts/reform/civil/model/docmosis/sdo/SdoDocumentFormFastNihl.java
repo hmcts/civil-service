@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.sdo;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -37,11 +37,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Getter
-@SuperBuilder
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
-@ToString(callSuper = true)
+@EqualsAndHashCode
+@ToString
 @SuppressWarnings("java:S1104")
 public class SdoDocumentFormFastNihl implements MappableObject {
 

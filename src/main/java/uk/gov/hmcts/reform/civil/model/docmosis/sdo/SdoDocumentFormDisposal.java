@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lombok.experimental.SuperBuilder;
+import lombok.Builder;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -31,11 +31,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Getter
-@SuperBuilder
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
-@ToString(callSuper = true)
+@EqualsAndHashCode
+@ToString
 @SuppressWarnings({"java:S1104", "java:S107"})
 public class SdoDocumentFormDisposal implements MappableObject {
 
