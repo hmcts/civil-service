@@ -36,20 +36,20 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-@SuppressWarnings({"java:S1104", "java:S107", "common-java:DuplicatedBlocks", "java:S6539", "all"})
+@SuppressWarnings({"java:S1104", "java:S107", "common-java:DuplicatedBlocks", "java:S6539"})
 public class SdoDocumentFormDisposal implements MappableObject {
 
     private LocalDate currentDate;
-    private String judgeName;
     private String caseNumber;
-    private Party applicant1;
-    private Party respondent1;
-    private boolean hasApplicant2;
-    private Party applicant2;
-    private boolean hasRespondent2;
-    private Party respondent2;
-    private YesOrNo drawDirectionsOrderRequired;
+    private String judgeName;
     private JudgementSum drawDirectionsOrder;
+    private YesOrNo drawDirectionsOrderRequired;
+    private Party respondent1;
+    private Party respondent2;
+    private boolean hasRespondent2;
+    private Party applicant1;
+    private Party applicant2;
+    private boolean hasApplicant2;
 
     private DisposalHearingJudgesRecital disposalHearingJudgesRecital;
     private DisposalHearingDisclosureOfDocuments disposalHearingDisclosureOfDocuments;
