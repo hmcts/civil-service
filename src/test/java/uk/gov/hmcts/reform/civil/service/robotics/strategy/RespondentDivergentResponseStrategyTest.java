@@ -148,7 +148,7 @@ class RespondentDivergentResponseStrategyTest {
         when(stateFlow.getState()).thenReturn(
             State.from(FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE.fullName())
         );
-        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(20, 21, 22, 23);
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(20, 21, 22);
 
         CaseData caseData = createSpecDivergentCase();
 
@@ -163,24 +163,15 @@ class RespondentDivergentResponseStrategyTest {
             .extracting(Event::getEventSequence)
             .containsExactly(20);
 
-        assertThat(history.getMiscellaneous())
-            .extracting(Event::getEventSequence)
-            .containsExactly(21);
-
-        assertThat(history.getMiscellaneous())
-            .extracting(Event::getEventDetails)
-            .extracting(EventDetails::getMiscText)
-            .containsExactly(
-                respondentResponseSupport.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true)
-            );
+        assertThat(history.getMiscellaneous()).isEmpty();
 
         assertThat(history.getDefenceFiled())
             .extracting(Event::getEventSequence)
-            .containsExactly(22);
+            .containsExactly(21);
 
         assertThat(history.getDirectionsQuestionnaireFiled())
             .extracting(Event::getEventSequence)
-            .containsExactly(23);
+            .containsExactly(22);
     }
 
     @Test

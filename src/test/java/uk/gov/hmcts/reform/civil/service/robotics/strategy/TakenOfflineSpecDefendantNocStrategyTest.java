@@ -97,7 +97,7 @@ class TakenOfflineSpecDefendantNocStrategyTest {
         assertThat(history.getMiscellaneous().get(0).getEventCode())
             .isEqualTo(EventType.MISCELLANEOUS.getCode());
         assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
-            .isEqualTo("RPA Reason: Notice of Change filed.");
+            .isEqualTo("RPA Reason : Notice of Change filed.");
         assertThat(history.getMiscellaneous().get(0).getDateReceived()).isEqualTo(offlineDate);
     }
 }

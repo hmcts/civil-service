@@ -172,6 +172,9 @@ public class RoboticsRespondentResponseSupport {
                                        Party respondent,
                                        boolean isRespondent1,
                                        LocalDateTime dateReceived) {
+        if (caseData != null && SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return;
+        }
         String message = prepareRespondentResponseText(caseData, respondent, isRespondent1);
         if (!StringUtils.hasText(message)) {
             return;

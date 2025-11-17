@@ -183,6 +183,6 @@ public class RoboticsEventTextFormatter {
     }
 
     public String noticeOfChangeFiled() {
-        return withRpaPrefix("Notice of Change filed.");
+        return "RPA Reason : Notice of Change filed.";
     }
 }

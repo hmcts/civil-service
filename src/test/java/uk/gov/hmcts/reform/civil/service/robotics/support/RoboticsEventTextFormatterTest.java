@@ -108,7 +108,7 @@ class RoboticsEventTextFormatterTest {
             "RPA Reason: Case Proceeds in Caseman.",
             "RPA Reason: Summary judgment requested and referred to judge.",
             "RPA Reason: Summary judgment granted and referred to judge.",
-            "RPA Reason: Notice of Change filed."
+            "RPA Reason : Notice of Change filed."
         );
 
         assertThat(actual)

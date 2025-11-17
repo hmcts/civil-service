@@ -178,7 +178,7 @@ class RespondentFullAdmissionStrategyTest {
     }
 
     @Test
-    void contributeAddsSpecMiscEventToMatchLegacyMapper() {
+    void contributeDoesNotAddSpecMiscEvent() {
         CaseData caseData = CaseDataBuilder.builder()
             .setClaimTypeToSpecClaim()
             .atStateSpec1v1ClaimSubmitted()
@@ -194,11 +194,7 @@ class RespondentFullAdmissionStrategyTest {
         assertThat(history.getReceiptOfAdmission()).hasSize(1);
         assertThat(history.getReceiptOfAdmission().get(0).getEventSequence()).isEqualTo(10);
 
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(11);
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
-            .isEqualTo(respondentResponseSupport.prepareRespondentResponseText(
-                caseData, caseData.getRespondent1(), true));
+        assertThat(history.getMiscellaneous()).isEmpty();
     }
 
     @Test
