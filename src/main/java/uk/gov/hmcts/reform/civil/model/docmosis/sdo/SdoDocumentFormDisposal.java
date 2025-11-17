@@ -40,16 +40,16 @@ import java.util.List;
 public class SdoDocumentFormDisposal implements MappableObject {
 
     private LocalDate currentDate;
-    private String caseNumber;
     private String judgeName;
-    private Party respondent1;
-    private Party respondent2;
-    private boolean hasRespondent2;
+    private String caseNumber;
     private Party applicant1;
-    private Party applicant2;
+    private Party respondent1;
     private boolean hasApplicant2;
-    private JudgementSum drawDirectionsOrder;
+    private Party applicant2;
+    private boolean hasRespondent2;
+    private Party respondent2;
     private YesOrNo drawDirectionsOrderRequired;
+    private JudgementSum drawDirectionsOrder;
 
     private DisposalHearingJudgesRecital disposalHearingJudgesRecital;
     private DisposalHearingDisclosureOfDocuments disposalHearingDisclosureOfDocuments;

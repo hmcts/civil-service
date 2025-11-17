@@ -43,11 +43,11 @@ import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent2
 @RequiredArgsConstructor
 public class JudgmentByAdmissionOrDeterminationMapper {
 
-    private DeadlineExtensionCalculatorService deadlineCalculatorService;
-    private JudgementService judgementService;
-    private OrganisationService organisationService;
-    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy 'at' h:mma");
-    private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
+    private final DeadlineExtensionCalculatorService deadlineCalculatorService;
+    private final JudgementService judgementService;
+    private final OrganisationService organisationService;
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy 'at' h:mma");
+    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
 
     public JudgmentByAdmissionOrDetermination toClaimantResponseForm(CaseData caseData, CaseEvent caseEvent) {
         Optional<CaseDataLiP> caseDataLip = Optional.ofNullable(caseData.getCaseDataLiP());

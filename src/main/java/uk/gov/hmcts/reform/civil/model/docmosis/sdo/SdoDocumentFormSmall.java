@@ -39,18 +39,18 @@ import java.util.List;
 @SuppressWarnings({"java:S1104", "java:S107", "common-java:DuplicatedBlocks", "java:S6539", "all"})
 public class SdoDocumentFormSmall implements MappableObject {
 
+    private LocalDate currentDate;
     private String judgeName;
     private String caseNumber;
-    private LocalDate currentDate;
-    private ClaimsTrack claimsTrack;
+    private Party applicant1;
+    private Party respondent1;
+    private boolean hasApplicant2;
+    private Party applicant2;
+    private boolean hasRespondent2;
+    private Party respondent2;
     private YesOrNo drawDirectionsOrderRequired;
     private JudgementSum drawDirectionsOrder;
-    private Party applicant1;
-    private Party applicant2;
-    private boolean hasApplicant2;
-    private Party respondent1;
-    private Party respondent2;
-    private boolean hasRespondent2;
+    private ClaimsTrack claimsTrack;
 
     private List<SmallTrack> smallClaims;
 
