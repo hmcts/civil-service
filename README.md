@@ -312,7 +312,6 @@ civilDefinitionBranch:????
 where ???? is the branch name you want to point to. e.g civilDefinitionBranch:DTSCCI-1699
 ```
 
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
