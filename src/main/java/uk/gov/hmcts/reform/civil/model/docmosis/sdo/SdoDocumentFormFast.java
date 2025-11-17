@@ -43,20 +43,32 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
+@SuppressWarnings({"java:S1104", "java:S1170"}) // Fields managed by Lombok; constants configured externally
 public class SdoDocumentFormFast implements MappableObject {
 
+    // Date fields
     private LocalDate currentDate;
 
+    // Judge information
     private String judgeName;
 
+    // Case identifier
     private String caseNumber;
 
+    // First applicant
     private Party applicant1;
+    // First respondent
     private Party respondent1;
+    // Flag indicating presence of second applicant
     private boolean hasApplicant2;
+    // Second applicant
     private Party applicant2;
+    // Flag indicating presence of second respondent
     private boolean hasRespondent2;
+    // Second respondent
     private Party respondent2;
+
+    // Directions order fields
     private YesOrNo drawDirectionsOrderRequired;
     private JudgementSum drawDirectionsOrder;
     private ClaimsTrack claimsTrack;

@@ -36,21 +36,41 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
+@SuppressWarnings("java:S1104") // Suppressed - Lombok handles field encapsulation
 public class SdoDocumentFormDisposal implements MappableObject {
 
+    /**
+     * Current date.
+     */
     private LocalDate currentDate;
 
+    /**
+     * Judge name.
+     */
     private String judgeName;
 
+    /**
+     * Case number.
+     */
     private String caseNumber;
 
+    /**
+     * Primary parties in the case.
+     */
     private Party applicant1;
     private Party respondent1;
+
+    /**
+     * Flags and secondary parties.
+     */
     private boolean hasApplicant2;
     private Party applicant2;
     private boolean hasRespondent2;
     private Party respondent2;
 
+    /**
+     * Draw directions order configuration.
+     */
     private YesOrNo drawDirectionsOrderRequired;
     private JudgementSum drawDirectionsOrder;
 

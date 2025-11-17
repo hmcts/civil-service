@@ -36,21 +36,29 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
+@SuppressWarnings({"java:S1104", "java:S107"}) // Lombok manages fields; many parameters needed for builder
 public class SdoDocumentFormSmall implements MappableObject {
 
+    // Current date for the document
     private LocalDate currentDate;
 
+    // Judge name for the case
     private String judgeName;
 
+    // Case number identifier
     private String caseNumber;
 
+    // Primary applicant and respondent
     private Party applicant1;
     private Party respondent1;
+
+    // Secondary parties with existence flags
     private boolean hasApplicant2;
     private Party applicant2;
     private boolean hasRespondent2;
     private Party respondent2;
 
+    // Draw directions order configuration
     private YesOrNo drawDirectionsOrderRequired;
     private JudgementSum drawDirectionsOrder;
     private ClaimsTrack claimsTrack;
