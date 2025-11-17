@@ -10,10 +10,10 @@ import uk.gov.hmcts.reform.civil.model.dq.DocumentsToBeConsidered;
 @SuperBuilder(toBuilder = true)
 public class DocumentsToBeConsideredSection extends DocumentsToBeConsidered {
 
-    private static String SECTION_HEADING_FORMAT = "%s documents to be considered";
-    private static String QUESTION_FORMAT = "Are there any documents the %s have that you want the court to consider?";
-    private static String DEFENDANTS = "Defendants";
-    private static String CLAIMANTS = "Claimants";
+    private static final String SECTION_HEADING_FORMAT = "%s documents to be considered";
+    private static final String QUESTION_FORMAT = "Are there any documents the %s have that you want the court to consider?";
+    private static final String DEFENDANTS = "Defendants";
+    private static final String CLAIMANTS = "Claimants";
     private String sectionHeading;
     private String question;
 

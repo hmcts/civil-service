@@ -23,7 +23,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class InterlocutoryJudgementDocMapper implements MappableObject {
 
-    private static String REFER_TO_JUDGE = "Refer to Judge";
+    private static final String REFER_TO_JUDGE = "Refer to Judge";
 
     private final DeadlineExtensionCalculatorService calculatorService;
     private final RepaymentPlanDecisionCalculator repaymentPlanDecisionCalculator;

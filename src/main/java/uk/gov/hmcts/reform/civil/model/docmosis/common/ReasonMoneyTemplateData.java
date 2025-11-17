@@ -44,7 +44,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.IncomeTypeLRspec.WORKING_TAX_CR
 public class ReasonMoneyTemplateData {
 
     @JsonIgnore
-    private static Map<IncomeTypeLRspec, String> INCOME_TYPE_LIP_RESPONSE = Map.of(
+    private static Map<IncomeTypeLRspec, String> incomeTypeLipResponse = Map.of(
         JOB, "Income from your job",
         UNIVERSAL_CREDIT, "Universal Credit",
         JOBSEEKER_ALLOWANCE_INCOME, "Jobseeker's Allowance (income based)",
@@ -85,7 +85,7 @@ public class ReasonMoneyTemplateData {
         return ReasonMoneyTemplateData.builder()
             .type(item.getType() == IncomeTypeLRspec.OTHER
                       ? "Other: " + item.getTypeOtherDetails()
-                      : INCOME_TYPE_LIP_RESPONSE.get(item.getType()))
+                      : incomeTypeLipResponse.get(item.getType()))
             .amountPounds(getAmountPounds(item.getAmount()))
             .frequency(item.getFrequency().getDashboardLabel())
             .build();

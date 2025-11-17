@@ -14,5 +14,5 @@ public class PartyData {
     private PartyRole role;
     private Party details;
     private LocalDateTime timeExtensionDate;
-    public LocalDate solicitorAgreedDeadlineExtension;
+    private LocalDate solicitorAgreedDeadlineExtension;
 }

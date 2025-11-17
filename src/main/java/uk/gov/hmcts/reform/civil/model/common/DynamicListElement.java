@@ -16,7 +16,7 @@ import java.util.UUID;
 @Builder
 public class DynamicListElement {
 
-    public static DynamicListElement EMPTY = DynamicListElement.builder().build();
+    public static final DynamicListElement EMPTY = DynamicListElement.builder().build();
 
     /**
      * Property that maps to the value attribute of the option tag.
