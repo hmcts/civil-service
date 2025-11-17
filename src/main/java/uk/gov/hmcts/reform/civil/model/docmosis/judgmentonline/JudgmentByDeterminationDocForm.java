@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.judgmentonline;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Getter
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
 public class JudgmentByDeterminationDocForm implements MappableObject {
