@@ -13,20 +13,20 @@ import java.time.LocalDateTime;
 @SuppressWarnings("PMD.ExcessiveParameterList")
 public class CcdServiceBusMessage implements Serializable {
 
-    private static final long serialVersionUID = 3213665975741833471L;
+    private static long serialVersionUID = 3213665975741833471L;
 
-    private final String messageId;
-    private final Long sequence;
-    private final String caseId;
-    private final LocalDateTime eventTimestamp;
-    private final Boolean fromDlq;
-    private final MessageState state;
-    private final JsonNode messageProperties;
-    private final String messageContent;
-    private final LocalDateTime received;
-    private final Integer deliveryCount;
-    private final LocalDateTime holdUntil;
-    private final Integer retryCount;
+    private String messageId;
+    private Long sequence;
+    private String caseId;
+    private LocalDateTime eventTimestamp;
+    private Boolean fromDlq;
+    private MessageState state;
+    private JsonNode messageProperties;
+    private String messageContent;
+    private LocalDateTime received;
+    private Integer deliveryCount;
+    private LocalDateTime holdUntil;
+    private Integer retryCount;
 
     @JsonCreator
     public CcdServiceBusMessage(@JsonProperty("MessageId") String messageId,

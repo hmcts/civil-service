@@ -23,11 +23,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class InterlocutoryJudgementDocMapper implements MappableObject {
 
-    private static final String REFER_TO_JUDGE = "Refer to Judge";
+    private static String REFER_TO_JUDGE = "Refer to Judge";
 
-    private final DeadlineExtensionCalculatorService calculatorService;
-    private final RepaymentPlanDecisionCalculator repaymentPlanDecisionCalculator;
-    private final ClaimantResponseUtils claimantResponseUtils;
+    private DeadlineExtensionCalculatorService calculatorService;
+    private RepaymentPlanDecisionCalculator repaymentPlanDecisionCalculator;
+    private ClaimantResponseUtils claimantResponseUtils;
 
     private static String getClaimantResponseToDefendantAdmission(CaseData caseData) {
         RespondentResponseTypeSpec respondentResponseTypeSpec = caseData.getRespondent1ClaimResponseTypeForSpec();

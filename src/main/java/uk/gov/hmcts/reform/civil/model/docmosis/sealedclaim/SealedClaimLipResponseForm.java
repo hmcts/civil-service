@@ -50,40 +50,40 @@ import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.formatCc
 @EqualsAndHashCode
 public class SealedClaimLipResponseForm implements MappableObject {
 
-    private final String claimReferenceNumber;
-    private final String ccdCaseReference;
-    private final String claimantReferenceNumber;
-    private final String defendantReferenceNumber;
+    private String claimReferenceNumber;
+    private String ccdCaseReference;
+    private String claimantReferenceNumber;
+    private String defendantReferenceNumber;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate generationDate;
-    private final LipFormPartyDefence claimant1;
-    private final LipFormPartyDefence defendant1;
-    private final LipFormPartyDefence defendant2;
-    private final AccommodationTemplate whereTheyLive;
-    private final PartnerAndDependentsLRspec partnerAndDependent;
-    private final List<EmployerDetailsLRspec> employerDetails;
-    private final Respondent1SelfEmploymentLRspec selfEmployment;
-    private final List<AccountSimpleTemplateData> bankAccountList;
-    private final List<Respondent1CourtOrderDetails> courtOrderDetails;
-    private final List<DebtTemplateData> debtList;
-    private final List<ReasonMoneyTemplateData> incomeList;
-    private final List<ReasonMoneyTemplateData> expenseList;
+    private LocalDate generationDate;
+    private LipFormPartyDefence claimant1;
+    private LipFormPartyDefence defendant1;
+    private LipFormPartyDefence defendant2;
+    private AccommodationTemplate whereTheyLive;
+    private PartnerAndDependentsLRspec partnerAndDependent;
+    private List<EmployerDetailsLRspec> employerDetails;
+    private Respondent1SelfEmploymentLRspec selfEmployment;
+    private List<AccountSimpleTemplateData> bankAccountList;
+    private List<Respondent1CourtOrderDetails> courtOrderDetails;
+    private List<DebtTemplateData> debtList;
+    private List<ReasonMoneyTemplateData> incomeList;
+    private List<ReasonMoneyTemplateData> expenseList;
     //repayment details for repayment plan that are common between LR and LiP
-    private final ResponseRepaymentDetailsForm commonDetails;
+    private ResponseRepaymentDetailsForm commonDetails;
 
     //CARM defendant Mediation Fields
-    private final String defendant1MediationContactNumber;
-    private final String defendant1MediationEmail;
-    private final String defendant1MediationCompanyName;
-    private final boolean defendant1MediationUnavailableDatesExists;
-    private final List<Element<UnavailableDate>> defendant1UnavailableDatesList;
-    private final boolean checkCarmToggle;
-    private final StatementOfTruth uiStatementOfTruth;
-    private final String faContent;
+    private String defendant1MediationContactNumber;
+    private String defendant1MediationEmail;
+    private String defendant1MediationCompanyName;
+    private boolean defendant1MediationUnavailableDatesExists;
+    private List<Element<UnavailableDate>> defendant1UnavailableDatesList;
+    private boolean checkCarmToggle;
+    private StatementOfTruth uiStatementOfTruth;
+    private String faContent;
 
     @JsonIgnore
-    public static SealedClaimLipResponseForm toTemplate(final CaseData caseData, BigDecimal admittedAmount) {
+    public static SealedClaimLipResponseForm toTemplate(CaseData caseData, BigDecimal admittedAmount) {
         SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder = SealedClaimLipResponseForm.builder()
             .generationDate(LocalDate.now())
             .ccdCaseReference(formatCcdCaseReference(caseData))
@@ -118,7 +118,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
                         "The amount does not include the claim fee and any fixed costs which are payable in addition.";
 
                 } else if (caseData.isPayByInstallment()) {
-                    return "The final payment date may be later to reflect any additional interest, " +
+                    return "The payment date may be later to reflect any additional interest, " +
                         "any fixed costs and claim fee added to the judgment, settlement agreement or earlier payment amount";
                 }
             } else if (PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
@@ -130,14 +130,14 @@ public class SealedClaimLipResponseForm implements MappableObject {
         return "";
     }
 
-    private static void addSolicitorDetails(final CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
+    private static void addSolicitorDetails(CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
         Optional.ofNullable(caseData.getSolicitorReferences())
             .ifPresent(references ->
                            builder.claimantReferenceNumber(references.getApplicantSolicitor1Reference())
                                .defendantReferenceNumber(references.getRespondentSolicitor1Reference()));
     }
 
-    private static void addEmployeeDetails(final CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
+    private static void addEmployeeDetails(CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
         Optional.ofNullable(caseData.getResponseClaimAdmitPartEmployer())
             .map(Respondent1EmployerDetailsLRspec::getEmployerDetails)
             .map(ElementUtils::unwrapElements)
@@ -207,7 +207,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
         }
     }
 
-    private static void addCourtOrderDetails(final CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
+    private static void addCourtOrderDetails(CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
         builder.courtOrderDetails(
             Optional.ofNullable(caseData.getRespondent1CourtOrderDetails()).map(Collection::stream)
                 .orElseGet(Stream::empty)

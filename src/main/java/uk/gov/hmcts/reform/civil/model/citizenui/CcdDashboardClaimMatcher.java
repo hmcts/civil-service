@@ -29,7 +29,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
      * sorted in descending order by creation date.
      */
     protected List<CaseEventDetail> eventHistory;
-    protected static final int DAY_LIMIT = 42;
+    protected static int DAY_LIMIT = 42;
 
     protected CcdDashboardClaimMatcher(CaseData caseData,
                                        FeatureToggleService featureToggleService,

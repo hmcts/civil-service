@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 @Builder(toBuilder = true)
 public class PartyData {
 
-    private final PartyRole role;
-    private final Party details;
-    private final LocalDateTime timeExtensionDate;
-    public final LocalDate solicitorAgreedDeadlineExtension;
+    private PartyRole role;
+    private Party details;
+    private LocalDateTime timeExtensionDate;
+    public LocalDate solicitorAgreedDeadlineExtension;
 }

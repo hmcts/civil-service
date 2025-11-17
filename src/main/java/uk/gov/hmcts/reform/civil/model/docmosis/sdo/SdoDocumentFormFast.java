@@ -43,79 +43,79 @@ import java.util.List;
 @ToString
 public class SdoDocumentFormFast implements MappableObject {
 
-    private final LocalDate currentDate;
+    private LocalDate currentDate;
 
-    private final String judgeName;
+    private String judgeName;
 
-    private final String caseNumber;
+    private String caseNumber;
 
-    private final Party applicant1;
-    private final Party respondent1;
-    private final boolean hasApplicant2;
-    private final Party applicant2;
-    private final boolean hasRespondent2;
-    private final Party respondent2;
-    private final YesOrNo drawDirectionsOrderRequired;
-    private final JudgementSum drawDirectionsOrder;
-    private final ClaimsTrack claimsTrack;
+    private Party applicant1;
+    private Party respondent1;
+    private boolean hasApplicant2;
+    private Party applicant2;
+    private boolean hasRespondent2;
+    private Party respondent2;
+    private YesOrNo drawDirectionsOrderRequired;
+    private JudgementSum drawDirectionsOrder;
+    private ClaimsTrack claimsTrack;
 
-    private final List<FastTrack> fastClaims;
+    private List<FastTrack> fastClaims;
 
-    private final boolean hasBuildingDispute;
-    private final boolean hasClinicalNegligence;
-    private final boolean hasCreditHire;
-    private final boolean hasEmployersLiability;
-    private final boolean hasHousingDisrepair;
-    private final boolean hasPersonalInjury;
-    private final boolean hasRoadTrafficAccident;
-    private final boolean writtenByJudge;
-    private final boolean hasSdoR2CreditHire;
-    private final boolean hasSdoR2CreditHireDetails;
+    private boolean hasBuildingDispute;
+    private boolean hasClinicalNegligence;
+    private boolean hasCreditHire;
+    private boolean hasEmployersLiability;
+    private boolean hasHousingDisrepair;
+    private boolean hasPersonalInjury;
+    private boolean hasRoadTrafficAccident;
+    private boolean writtenByJudge;
+    private boolean hasSdoR2CreditHire;
+    private boolean hasSdoR2CreditHireDetails;
 
-    private final FastTrackJudgesRecital fastTrackJudgesRecital;
-    private final FastTrackDisclosureOfDocuments fastTrackDisclosureOfDocuments;
-    private final FastTrackWitnessOfFact fastTrackWitnessOfFact;
-    private final FastTrackSchedulesOfLoss fastTrackSchedulesOfLoss;
-    private final FastTrackTrial fastTrackTrial;
-    private final FastTrackHearingTime fastTrackHearingTime;
-    private final String fastTrackHearingTimeEstimate;
-    private final String fastTrackTrialBundleTypeText;
+    private FastTrackJudgesRecital fastTrackJudgesRecital;
+    private FastTrackDisclosureOfDocuments fastTrackDisclosureOfDocuments;
+    private FastTrackWitnessOfFact fastTrackWitnessOfFact;
+    private FastTrackSchedulesOfLoss fastTrackSchedulesOfLoss;
+    private FastTrackTrial fastTrackTrial;
+    private FastTrackHearingTime fastTrackHearingTime;
+    private String fastTrackHearingTimeEstimate;
+    private String fastTrackTrialBundleTypeText;
 
-    private final FastTrackMethod fastTrackMethod;
-    private final DynamicList fastTrackMethodInPerson;
-    private final String fastTrackMethodTelephoneHearing;
-    private final String fastTrackMethodVideoConferenceHearing;
-    private final LocationRefData hearingLocation;
-    private final LocationRefData caseManagementLocation;
+    private FastTrackMethod fastTrackMethod;
+    private DynamicList fastTrackMethodInPerson;
+    private String fastTrackMethodTelephoneHearing;
+    private String fastTrackMethodVideoConferenceHearing;
+    private LocationRefData hearingLocation;
+    private LocationRefData caseManagementLocation;
 
-    private final FastTrackBuildingDispute fastTrackBuildingDispute;
-    private final FastTrackClinicalNegligence fastTrackClinicalNegligence;
-    private final FastTrackCreditHire fastTrackCreditHire;
-    private final FastTrackHousingDisrepair fastTrackHousingDisrepair;
-    private final FastTrackPersonalInjury fastTrackPersonalInjury;
-    private final FastTrackRoadTrafficAccident fastTrackRoadTrafficAccident;
-    private final SdoR2WitnessOfFact sdoR2WitnessesOfFact;
-    private final SdoR2FastTrackCreditHire sdoR2FastTrackCreditHire;
+    private FastTrackBuildingDispute fastTrackBuildingDispute;
+    private FastTrackClinicalNegligence fastTrackClinicalNegligence;
+    private FastTrackCreditHire fastTrackCreditHire;
+    private FastTrackHousingDisrepair fastTrackHousingDisrepair;
+    private FastTrackPersonalInjury fastTrackPersonalInjury;
+    private FastTrackRoadTrafficAccident fastTrackRoadTrafficAccident;
+    private SdoR2WitnessOfFact sdoR2WitnessesOfFact;
+    private SdoR2FastTrackCreditHire sdoR2FastTrackCreditHire;
 
-    private final boolean hasNewDirections;
-    private final List<Element<FastTrackAddNewDirections>> fastTrackAddNewDirections;
+    private boolean hasNewDirections;
+    private List<Element<FastTrackAddNewDirections>> fastTrackAddNewDirections;
 
     private FastTrackNotes fastTrackNotes;
     private FastTrackOrderWithoutJudgement fastTrackOrderWithoutJudgement;
 
-    private final boolean fastTrackAltDisputeResolutionToggle;
-    private final boolean fastTrackVariationOfDirectionsToggle;
-    private final boolean fastTrackSettlementToggle;
-    private final boolean fastTrackDisclosureOfDocumentsToggle;
-    private final boolean fastTrackWitnessOfFactToggle;
-    private final boolean fastTrackSchedulesOfLossToggle;
-    private final boolean fastTrackCostsToggle;
-    private final boolean fastTrackTrialDateToToggle;
-    private final boolean fastTrackTrialToggle;
-    private final boolean fastTrackMethodToggle;
-    private final boolean fastTrackWelshLanguageToggle;
-    private final String fastTrackAllocation;
-    private final String welshLanguageDescription;
+    private boolean fastTrackAltDisputeResolutionToggle;
+    private boolean fastTrackVariationOfDirectionsToggle;
+    private boolean fastTrackSettlementToggle;
+    private boolean fastTrackDisclosureOfDocumentsToggle;
+    private boolean fastTrackWitnessOfFactToggle;
+    private boolean fastTrackSchedulesOfLossToggle;
+    private boolean fastTrackCostsToggle;
+    private boolean fastTrackTrialDateToToggle;
+    private boolean fastTrackTrialToggle;
+    private boolean fastTrackMethodToggle;
+    private boolean fastTrackWelshLanguageToggle;
+    private String fastTrackAllocation;
+    private String welshLanguageDescription;
     private boolean showBundleInfo;
 
     @SuppressWarnings("unused")

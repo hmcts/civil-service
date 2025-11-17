@@ -9,9 +9,9 @@ import static net.minidev.json.JSONValue.toJSONString;
 
 public class Query {
 
-    private final QueryBuilder queryBuilder;
-    private final List<String> dataToReturn;
-    private final int startIndex;
+    private QueryBuilder queryBuilder;
+    private List<String> dataToReturn;
+    private int startIndex;
     private boolean initialSearch;
     private String searchAfterValue;
 
@@ -71,7 +71,7 @@ public class Query {
         return getStartQuery() + "," + String.format(SEARCH_AFTER, searchAfterValue) + END_QUERY;
     }
 
-    private static final String END_QUERY = "\n}";
+    private static String END_QUERY = "\n}";
 
-    private static final String SEARCH_AFTER = "\"search_after\": [%s]";
+    private static String SEARCH_AFTER = "\"search_after\": [%s]";
 }

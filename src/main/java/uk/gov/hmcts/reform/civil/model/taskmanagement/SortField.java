@@ -19,7 +19,7 @@ public enum SortField {
     TASK_ID("taskId");
 
     @JsonValue
-    private final String id;
+    private String id;
 
     @Override
     public String toString() {

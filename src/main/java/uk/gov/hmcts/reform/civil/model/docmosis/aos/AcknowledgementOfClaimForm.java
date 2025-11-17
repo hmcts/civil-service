@@ -24,16 +24,16 @@ import java.util.List;
 public class AcknowledgementOfClaimForm implements MappableObject {
 
     @JsonProperty("courtseal")
-    private final String courtSeal = "[userImage:courtseal.PNG]"; //NOSONAR
-    private final String caseName;
-    private final String referenceNumber;
-    private final SolicitorReferences solicitorReferences;
+    private String courtSeal = "[userImage:courtseal.PNG]"; //NOSONAR
+    private String caseName;
+    private String referenceNumber;
+    private SolicitorReferences solicitorReferences;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate issueDate;
+    private LocalDate issueDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate responseDeadline;
-    private final List<Party> respondent;
-    private final List<String> responseIntentions;
+    private LocalDate responseDeadline;
+    private List<Party> respondent;
+    private List<String> responseIntentions;
 }

@@ -15,8 +15,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 @Builder(toBuilder = true)
 public class HearingSupportLip {
 
-    private final YesOrNo supportRequirementLip;
-    private final List<Element<RequirementsLip>> requirementsLip;
+    private YesOrNo supportRequirementLip;
+    private List<Element<RequirementsLip>> requirementsLip;
 
     @JsonIgnore
     public List<RequirementsLip> getUnwrappedRequirementsLip() {

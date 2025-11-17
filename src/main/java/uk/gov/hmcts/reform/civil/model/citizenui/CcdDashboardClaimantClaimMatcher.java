@@ -30,7 +30,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @Slf4j
 public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher implements Claim {
 
-    private static final LocalTime FOUR_PM = LocalTime.of(16, 1, 0);
+    private static LocalTime FOUR_PM = LocalTime.of(16, 1, 0);
 
     public CcdDashboardClaimantClaimMatcher(CaseData caseData, FeatureToggleService featureToggleService, List<CaseEventDetail> eventHistory) {
         super(caseData, featureToggleService, eventHistory);

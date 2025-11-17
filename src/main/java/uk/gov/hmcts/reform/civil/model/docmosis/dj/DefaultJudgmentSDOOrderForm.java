@@ -45,98 +45,98 @@ import java.util.List;
 @EqualsAndHashCode
 public class DefaultJudgmentSDOOrderForm implements MappableObject {
 
-    private final String caseNumber;
-    private final String applicant;
-    private final String respondent;
-    private final String judgeNameTitle;
+    private  String caseNumber;
+    private  String applicant;
+    private  String respondent;
+    private  String judgeNameTitle;
 
     //default judgement SDO fields for disposal
-    private final DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
-    private final DisposalHearingDisclosureOfDocumentsDJ disposalHearingDisclosureOfDocumentsDJ;
-    private final DisposalHearingWitnessOfFactDJ disposalHearingWitnessOfFactDJ;
-    private final DisposalHearingMedicalEvidenceDJ disposalHearingMedicalEvidenceDJ;
-    private final DisposalHearingQuestionsToExpertsDJ disposalHearingQuestionsToExpertsDJ;
-    private final DisposalHearingSchedulesOfLossDJ disposalHearingSchedulesOfLossDJ;
-    private final DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
-    private final DisposalHearingBundleDJ disposalHearingBundleDJ;
-    private final DisposalHearingNotesDJ disposalHearingNotesDJ;
-    private final List<Element<DisposalHearingAddNewDirectionsDJ>> disposalHearingAddNewDirectionsDJ;
-    private final boolean hasNewDirections;
+    private  DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
+    private  DisposalHearingDisclosureOfDocumentsDJ disposalHearingDisclosureOfDocumentsDJ;
+    private  DisposalHearingWitnessOfFactDJ disposalHearingWitnessOfFactDJ;
+    private  DisposalHearingMedicalEvidenceDJ disposalHearingMedicalEvidenceDJ;
+    private  DisposalHearingQuestionsToExpertsDJ disposalHearingQuestionsToExpertsDJ;
+    private  DisposalHearingSchedulesOfLossDJ disposalHearingSchedulesOfLossDJ;
+    private DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
+    private  DisposalHearingBundleDJ disposalHearingBundleDJ;
+    private  DisposalHearingNotesDJ disposalHearingNotesDJ;
+    private  List<Element<DisposalHearingAddNewDirectionsDJ>> disposalHearingAddNewDirectionsDJ;
+    private  boolean hasNewDirections;
 
     //default judgement SDO fields for trial
-    private final TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
-    private final TrialHearingDisclosureOfDocuments trialHearingDisclosureOfDocumentsDJ;
-    private final TrialHearingWitnessOfFact trialHearingWitnessOfFactDJ;
-    private final TrialHearingSchedulesOfLoss trialHearingSchedulesOfLossDJ;
-    private final TrialHearingTrial trialHearingTrialDJ;
-    private final TrialHearingNotes trialHearingNotesDJ;
-    private final TrialBuildingDispute trialBuildingDispute;
-    private final TrialClinicalNegligence trialClinicalNegligence;
-    private final TrialCreditHire trialCreditHire;
-    private final TrialPersonalInjury trialPersonalInjury;
-    private final TrialRoadTrafficAccident trialRoadTrafficAccident;
-    private final TrialHousingDisrepair trialHousingDisrepair;
-    private final List<Element<TrialHearingAddNewDirectionsDJ>> trialHearingAddNewDirectionsDJ;
-    private final LocationRefData hearingLocation;
-    private final LocationRefData caseManagementLocation;
-    private final SdoDJR2TrialCreditHire sdoDJR2TrialCreditHire;
+    private  TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
+    private  TrialHearingDisclosureOfDocuments trialHearingDisclosureOfDocumentsDJ;
+    private  TrialHearingWitnessOfFact trialHearingWitnessOfFactDJ;
+    private  TrialHearingSchedulesOfLoss trialHearingSchedulesOfLossDJ;
+    private  TrialHearingTrial trialHearingTrialDJ;
+    private  TrialHearingNotes trialHearingNotesDJ;
+    private  TrialBuildingDispute trialBuildingDispute;
+    private  TrialClinicalNegligence trialClinicalNegligence;
+    private  TrialCreditHire trialCreditHire;
+    private  TrialPersonalInjury trialPersonalInjury;
+    private  TrialRoadTrafficAccident trialRoadTrafficAccident;
+    private  TrialHousingDisrepair trialHousingDisrepair;
+    private  List<Element<TrialHearingAddNewDirectionsDJ>> trialHearingAddNewDirectionsDJ;
+    private  LocationRefData hearingLocation;
+    private  LocationRefData caseManagementLocation;
+    private  SdoDJR2TrialCreditHire sdoDJR2TrialCreditHire;
 
     //additional data for hearings
-    private final boolean disposalHearingDisclosureOfDocumentsDJAddSection;
-    private final boolean disposalHearingWitnessOfFactDJAddSection;
-    private final boolean disposalHearingMedicalEvidenceDJAddSection;
-    private final boolean disposalHearingQuestionsToExpertsDJAddSection;
-    private final boolean disposalHearingSchedulesOfLossDJAddSection;
-    private final boolean disposalHearingFinalDisposalHearingDJAddSection;
-    private final boolean disposalHearingBundleDJAddSection;
-    private final boolean disposalHearingClaimSettlingAddSection;
-    private final boolean disposalHearingCostsAddSection;
+    private  boolean disposalHearingDisclosureOfDocumentsDJAddSection;
+    private  boolean disposalHearingWitnessOfFactDJAddSection;
+    private  boolean disposalHearingMedicalEvidenceDJAddSection;
+    private  boolean disposalHearingQuestionsToExpertsDJAddSection;
+    private  boolean disposalHearingSchedulesOfLossDJAddSection;
+    private  boolean disposalHearingDisposalHearingDJAddSection;
+    private  boolean disposalHearingBundleDJAddSection;
+    private  boolean disposalHearingClaimSettlingAddSection;
+    private  boolean disposalHearingCostsAddSection;
 
-    private final String typeBundleInfo;
-    private final String disposalHearingTime;
-    private final DisposalHearingMethodDJ disposalHearingMethodDJ;
-    private final String disposalHearingAttendance;
-    private final String courtLocation;
-    private final String telephoneOrganisedBy;
-    private final String videoConferenceOrganisedBy;
+    private  String typeBundleInfo;
+    private  String disposalHearingTime;
+    private  DisposalHearingMethodDJ disposalHearingMethodDJ;
+    private  String disposalHearingAttendance;
+    private  String courtLocation;
+    private  String telephoneOrganisedBy;
+    private  String videoConferenceOrganisedBy;
 
     //additional data for trial
-    private final boolean trialHearingDisputeAddSection;
-    private final boolean trialHearingVariationsAddSection;
-    private final boolean trialHearingSettlementAddSection;
-    private final boolean trialHearingDisclosureOfDocumentsDJAddSection;
-    private final boolean trialHearingWitnessOfFactDJAddSection;
-    private final boolean trialHearingSchedulesOfLossDJAddSection;
-    private final boolean trialHearingCostsAddSection;
-    private final boolean trialHearingTrialDJAddSection;
-    private final boolean trialBuildingDisputeAddSection;
-    private final boolean trialClinicalNegligenceAddSection;
-    private final boolean trialCreditHireAddSection;
-    private final boolean trialEmployerLiabilityAddSection;
-    private final boolean trialPersonalInjuryAddSection;
-    private final boolean trialRoadTrafficAccidentAddSection;
-    private final boolean trialHousingDisrepairAddSection;
-    private final boolean trialHearingMethodInPersonAddSection;
-    private final DisposalHearingMethodDJ trialHearingMethodDJ;
-    private final String trialHearingLocation;
-    private final boolean sdoDJR2TrialCreditHireAddSection;
-    private final boolean sdoDJR2TrialCreditHireDetailsAddSection;
+    private  boolean trialHearingDisputeAddSection;
+    private  boolean trialHearingVariationsAddSection;
+    private  boolean trialHearingSettlementAddSection;
+    private  boolean trialHearingDisclosureOfDocumentsDJAddSection;
+    private  boolean trialHearingWitnessOfFactDJAddSection;
+    private  boolean trialHearingSchedulesOfLossDJAddSection;
+    private  boolean trialHearingCostsAddSection;
+    private  boolean trialHearingTrialDJAddSection;
+    private  boolean trialBuildingDisputeAddSection;
+    private  boolean trialClinicalNegligenceAddSection;
+    private  boolean trialCreditHireAddSection;
+    private  boolean trialEmployerLiabilityAddSection;
+    private  boolean trialPersonalInjuryAddSection;
+    private  boolean trialRoadTrafficAccidentAddSection;
+    private  boolean trialHousingDisrepairAddSection;
+    private  boolean trialHearingMethodInPersonAddSection;
+    private  DisposalHearingMethodDJ trialHearingMethodDJ;
+    private  String trialHearingLocation;
+    private  boolean sdoDJR2TrialCreditHireAddSection;
+    private  boolean sdoDJR2TrialCreditHireDetailsAddSection;
 
     //hnl fields
-    private final DisposalHearingOrderMadeWithoutHearingDJ disposalHearingOrderMadeWithoutHearingDJ;
+    private  DisposalHearingOrderMadeWithoutHearingDJ disposalHearingOrderMadeWithoutHearingDJ;
     private DisposalHearingFinalDisposalHearingTimeDJ disposalHearingFinalDisposalHearingTimeDJ;
     private String disposalHearingTimeEstimateDJ;
 
     //hnl fields for trial
     private TrialHearingTimeDJ trialHearingTimeDJ;
-    private final boolean disposalHearingDateToToggle;
+    private  boolean disposalHearingDateToToggle;
     private TrialOrderMadeWithoutHearingDJ trialOrderMadeWithoutHearingDJ;
     private String trialHearingTimeEstimateDJ;
-    private final boolean writtenByJudge;
+    private  boolean writtenByJudge;
 
     //sdoR2 fields
-    private final boolean hasDisposalHearingWelshSectionDJ;
-    private final boolean hasTrialHearingWelshSectionDJ;
-    private final String welshLanguageDescriptionDJ;
+    private  boolean hasDisposalHearingWelshSectionDJ;
+    private  boolean hasTrialHearingWelshSectionDJ;
+    private  String welshLanguageDescriptionDJ;
 
 }

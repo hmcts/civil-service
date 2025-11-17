@@ -15,26 +15,26 @@ import java.util.List;
 @EqualsAndHashCode
 public class JudgmentByDeterminationDocForm implements MappableObject {
 
-    private final String claimReferenceNumber;
-    private final Party applicant;
-    private final String applicantReference;
-    private final String respondentReference;
-    private final Party respondent;
-    private final String formText;
-    private final Party claimantLR;
-    private final String debt;
-    private final String costs;
-    private final String totalCost;
-    private final String respondent1Name;
-    private final String respondent2Name;
-    private final String respondent1Ref;
-    private final String respondent2Ref;
-    private final List<Party> applicants;
+    private String claimReferenceNumber;
+    private Party applicant;
+    private String applicantReference;
+    private String respondentReference;
+    private Party respondent;
+    private String formText;
+    private Party claimantLR;
+    private String debt;
+    private String costs;
+    private String totalCost;
+    private String respondent1Name;
+    private String respondent2Name;
+    private String respondent1Ref;
+    private String respondent2Ref;
+    private List<Party> applicants;
     private String paymentPlan;
-    private final String payByDate;
-    private final String repaymentFrequency;
-    private final String repaymentDate;
-    private final String paymentStr;
-    private final String installmentAmount;
+    private String payByDate;
+    private String repaymentFrequency;
+    private String repaymentDate;
+    private String paymentStr;
+    private String installmentAmount;
 
 }

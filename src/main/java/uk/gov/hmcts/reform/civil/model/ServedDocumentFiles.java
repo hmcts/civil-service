@@ -27,9 +27,9 @@ public class ServedDocumentFiles {
     private List<Element<DocumentWithRegex>> certificateOfSuitability;
     private List<Element<Document>> timelineEventUpload;
 
-    private static final String BOTH_PARTICULARS_OF_CLAIM_ERROR = "You need to either upload 1 Particulars of claim "
+    private static String BOTH_PARTICULARS_OF_CLAIM_ERROR = "You need to either upload 1 Particulars of claim "
         + "only or enter the Particulars of claim text in the field provided. You cannot do both.";
-    private static final String EMPTY_ERROR = "You must add Particulars of claim details";
+    private static String EMPTY_ERROR = "You must add Particulars of claim details";
 
     @JsonIgnore
     public List<String> getErrors() {

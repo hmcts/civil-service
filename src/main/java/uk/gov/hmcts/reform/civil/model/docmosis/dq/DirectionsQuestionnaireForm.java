@@ -36,43 +36,43 @@ import java.util.List;
 public class DirectionsQuestionnaireForm implements MappableObject {
 
     @JsonProperty("courtseal")
-    private final String courtSeal = "[userImage:courtseal.PNG]"; //NOSONAR
-    private final String caseName;
-    private final String referenceNumber;
-    private final SolicitorReferences solicitorReferences;
+    private String courtSeal = "[userImage:courtseal.PNG]"; //NOSONAR
+    private String caseName;
+    private String referenceNumber;
+    private SolicitorReferences solicitorReferences;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate submittedOn;
-    private final Party applicant;
-    private final Party applicant2;
-    private final List<Party> respondents;
-    private final List<Party> applicants;
-    private final FileDirectionsQuestionnaire fileDirectionsQuestionnaire;
-    private final FixedRecoverableCostsSection fixedRecoverableCosts;
-    private final DisclosureOfElectronicDocuments disclosureOfElectronicDocuments;
-    private final DisclosureOfNonElectronicDocuments disclosureOfNonElectronicDocuments;
-    private final YesOrNo deterWithoutHearingYesNo;
-    private final String deterWithoutHearingWhyNot;
-    private final Experts experts;
-    private final Witnesses witnesses;
-    private final Integer witnessesIncludingDefendants;
-    private final Hearing hearing;
-    private final String hearingSupport;
-    private final HearingSupport support;
-    private final FurtherInformation furtherInformation;
-    private final WelshLanguageRequirements welshLanguageRequirements;
-    private final StatementOfTruth statementOfTruth;
-    private final String allocatedTrack;
-    private final DisclosureReport disclosureReport;
-    private final RequestedCourt requestedCourt;
-    private final VulnerabilityQuestions vulnerabilityQuestions;
-    private final String statementOfTruthText;
-    private final Address respondent1LiPCorrespondenceAddress;
-    private final Address applicant1LiPCorrespondenceAddress;
-    private final LipExperts lipExperts;
-    private final LipExtraDQ lipExtraDQ;
-    private final List<HearingLipSupportRequirements> hearingLipSupportRequirements;
-    private final String lipStatementOfTruthName;
-    private final DocumentsToBeConsideredSection documentsToBeConsidered;
-    private final String representativeOrganisationName;
+    private LocalDate submittedOn;
+    private Party applicant;
+    private Party applicant2;
+    private List<Party> respondents;
+    private List<Party> applicants;
+    private FileDirectionsQuestionnaire fileDirectionsQuestionnaire;
+    private FixedRecoverableCostsSection fixedRecoverableCosts;
+    private DisclosureOfElectronicDocuments disclosureOfElectronicDocuments;
+    private DisclosureOfNonElectronicDocuments disclosureOfNonElectronicDocuments;
+    private YesOrNo deterWithoutHearingYesNo;
+    private String deterWithoutHearingWhyNot;
+    private Experts experts;
+    private Witnesses witnesses;
+    private Integer witnessesIncludingDefendants;
+    private Hearing hearing;
+    private String hearingSupport;
+    private HearingSupport support;
+    private FurtherInformation furtherInformation;
+    private WelshLanguageRequirements welshLanguageRequirements;
+    private StatementOfTruth statementOfTruth;
+    private String allocatedTrack;
+    private DisclosureReport disclosureReport;
+    private RequestedCourt requestedCourt;
+    private VulnerabilityQuestions vulnerabilityQuestions;
+    private String statementOfTruthText;
+    private Address respondent1LiPCorrespondenceAddress;
+    private Address applicant1LiPCorrespondenceAddress;
+    private LipExperts lipExperts;
+    private LipExtraDQ lipExtraDQ;
+    private List<HearingLipSupportRequirements> hearingLipSupportRequirements;
+    private String lipStatementOfTruthName;
+    private DocumentsToBeConsideredSection documentsToBeConsidered;
+    private String representativeOrganisationName;
 }
