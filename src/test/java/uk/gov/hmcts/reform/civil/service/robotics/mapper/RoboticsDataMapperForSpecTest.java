@@ -1,10 +1,11 @@
 package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.ccd.model.PreviousOrganisation;
@@ -17,10 +18,13 @@ import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
+import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.NoticeOfChange;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsCaseDataSupport;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -28,15 +32,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static java.time.format.DateTimeFormatter.ISO_DATE;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 class RoboticsDataMapperForSpecTest {
 
-    @InjectMocks
     private RoboticsDataMapperForSpec mapper;
 
-    @Mock
-    private RoboticsAddressMapper addressMapper;
     @Mock
     private EventHistoryMapper eventHistoryMapper;
     @Mock
@@ -44,6 +47,22 @@ class RoboticsDataMapperForSpecTest {
     @Mock
     private FeatureToggleService featureToggleService;
     private static final String BEARER_TOKEN = "Bearer Token";
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
+        RoboticsCaseDataSupport caseDataSupport =
+            new RoboticsCaseDataSupport(addressMapper, new RoboticsPartyLookup());
+        mapper = new RoboticsDataMapperForSpec(
+            addressMapper,
+            eventHistoryMapper,
+            organisationService,
+            featureToggleService,
+            caseDataSupport
+        );
+        when(eventHistoryMapper.buildEvents(any(), any())).thenReturn(EventHistory.builder().build());
+    }
 
     @Test
     void whenSpecEnabled_includeBS() {

@@ -12,10 +12,16 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -27,6 +33,10 @@ class CaseProceedsInCasemanStrategyTest {
     private RoboticsEventTextFormatter textFormatter;
     @Mock
     private RoboticsSequenceGenerator sequenceGenerator;
+    @Mock
+    private IStateFlowEngine stateFlowEngine;
+    @Mock
+    private StateFlow stateFlow;
 
     @InjectMocks
     private CaseProceedsInCasemanStrategy strategy;
@@ -35,6 +45,8 @@ class CaseProceedsInCasemanStrategyTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         when(textFormatter.caseProceedsInCaseman()).thenReturn("RPA Reason: Case Proceeds in Caseman.");
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
+        when(stateFlow.getStateHistory()).thenReturn(Collections.emptyList());
     }
 
     @Test
@@ -87,12 +99,34 @@ class CaseProceedsInCasemanStrategyTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_ONE)
             .build();
+        when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.TAKEN_OFFLINE_AFTER_SDO.fullName())));
         assertThat(strategy.supports(caseData)).isTrue();
 
         when(sequenceGenerator.nextSequence(any())).thenReturn(5);
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);
         assertThat(builder.build().getMiscellaneous()).hasSize(1);
+    }
+
+    @Test
+    void supportsReturnsTrueWhenStateHistoryIndicatesTakenOfflineAfterSdo() {
+        when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.TAKEN_OFFLINE_AFTER_SDO.fullName())));
+        CaseData caseData = CaseData.builder()
+            .takenOfflineDate(LocalDateTime.now())
+            .build();
+
+        assertThat(strategy.supports(caseData)).isTrue();
+    }
+
+    @Test
+    void supportsReturnsFalseWhenStateHistoryIndicatesTakenOfflineAfterSdoButStaffTookCaseOffline() {
+        when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.TAKEN_OFFLINE_AFTER_SDO.fullName())));
+        CaseData caseData = CaseData.builder()
+            .takenOfflineDate(LocalDateTime.now())
+            .takenOfflineByStaffDate(LocalDateTime.now())
+            .build();
+
+        assertThat(strategy.supports(caseData)).isFalse();
     }
 
     @Test

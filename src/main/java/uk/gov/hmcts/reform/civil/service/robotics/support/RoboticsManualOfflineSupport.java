@@ -24,16 +24,20 @@ public class RoboticsManualOfflineSupport {
         requireNonNull(caseData, "caseData must not be null");
         CaseCategory category = caseData.getCaseAccessCategory();
         if (CaseCategory.UNSPEC_CLAIM.equals(category)) {
-            ClaimProceedsInCaseman unspecDetails = requireNonNull(
-                caseData.getClaimProceedsInCaseman(),
-                "claimProceedsInCaseman must be provided for unspec claims");
+            ClaimProceedsInCaseman unspecDetails = caseData.getClaimProceedsInCaseman();
+            if (!hasRequiredDetails(unspecDetails == null ? null : unspecDetails.getReason(),
+                unspecDetails == null ? null : unspecDetails.getDate())) {
+                return textFormatter.caseTakenOfflineByStaff();
+            }
             return buildDetails(resolveReason(unspecDetails.getReason(), unspecDetails.getOther()),
                                 unspecDetails.getDate());
         }
 
-        ClaimProceedsInCasemanLR specDetails = requireNonNull(
-            caseData.getClaimProceedsInCasemanLR(),
-            "claimProceedsInCasemanLR must be provided for spec claims");
+        ClaimProceedsInCasemanLR specDetails = caseData.getClaimProceedsInCasemanLR();
+        if (!hasRequiredDetails(specDetails == null ? null : specDetails.getReason(),
+            specDetails == null ? null : specDetails.getDate())) {
+            return textFormatter.caseTakenOfflineByStaff();
+        }
         return buildDetails(resolveReason(specDetails.getReason(), specDetails.getOther()), specDetails.getDate());
     }
 
@@ -51,5 +55,9 @@ public class RoboticsManualOfflineSupport {
             return other;
         }
         return requireNonNull(reason, "offline reason must not be null").name();
+    }
+
+    private boolean hasRequiredDetails(ReasonForProceedingOnPaper reason, LocalDate date) {
+        return reason != null && date != null;
     }
 }
