@@ -1,17 +1,20 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.sdo;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import lombok.ToString;
-import lombok.experimental.SuperBuilder;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
@@ -22,24 +25,41 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-@SuppressWarnings({"java:S1104", "java:S107"})
-public class SdoDocumentFormSmall extends SdoDocumentFormBase implements MappableObject {
+@EqualsAndHashCode
+@ToString
+public class SdoDocumentFormSmall implements MappableObject {
 
+    private LocalDate currentDate;
+
+    private String judgeName;
+
+    private String caseNumber;
+
+    private Party applicant1;
+    private Party respondent1;
+    private boolean hasApplicant2;
+    private Party applicant2;
+    private boolean hasRespondent2;
+    private Party respondent2;
+
+    private YesOrNo drawDirectionsOrderRequired;
+    private JudgementSum drawDirectionsOrder;
     private ClaimsTrack claimsTrack;
 
     private List<SmallTrack> smallClaims;
 
     private boolean hasCreditHire;
     private boolean hasRoadTrafficAccident;
+    private boolean writtenByJudge;
 
     private SmallClaimsJudgesRecital smallClaimsJudgesRecital;
     private SmallClaimsHearing smallClaimsHearing;
@@ -51,10 +71,14 @@ public class SdoDocumentFormSmall extends SdoDocumentFormBase implements Mappabl
     private SmallClaimsDocuments smallClaimsDocuments;
     private SmallClaimsFlightDelay smallClaimsFlightDelay;
     private SmallClaimsWitnessStatement smallClaimsWitnessStatement;
+    private LocationRefData hearingLocation;
+    private LocationRefData caseManagementLocation;
     private SmallClaimsCreditHire smallClaimsCreditHire;
     private SmallClaimsRoadTrafficAccident smallClaimsRoadTrafficAccident;
     private SdoR2SmallClaimsWitnessStatements sdoR2SmallClaimsWitnessStatements;
 
+    private String welshLanguageDescription;
+    private boolean hasNewDirections;
     private List<Element<SmallClaimsAddNewDirections>> smallClaimsAddNewDirections;
 
     private SmallClaimsNotes smallClaimsNotes;

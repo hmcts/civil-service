@@ -2,16 +2,19 @@ package uk.gov.hmcts.reform.civil.model.docmosis.sdo;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import lombok.experimental.SuperBuilder;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2AddNewDirection;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2AddendumReport;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2DisclosureOfDocuments;
@@ -28,6 +31,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2UploadOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2VariationOfDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -36,13 +40,25 @@ import java.util.List;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 @ToString(callSuper = true)
 @SuppressWarnings("java:S1104")
-public class SdoDocumentFormFastNihl extends SdoDocumentFormBase implements MappableObject {
+public class SdoDocumentFormFastNihl implements MappableObject {
 
+    private LocalDate currentDate;
+    private String judgeName;
+    private String caseNumber;
+    private Party applicant1;
+    private Party respondent1;
+    private boolean hasApplicant2;
+    private Party applicant2;
+    private boolean hasRespondent2;
+    private Party respondent2;
+    private YesOrNo drawDirectionsOrderRequired;
+    private JudgementSum drawDirectionsOrder;
     private ClaimsTrack claimsTrack;
     private List<FastTrack> fastClaims;
+    private boolean writtenByJudge;
     private boolean hasAltDisputeResolution;
     private boolean hasVariationOfDirections;
     private boolean hasSettlement;
@@ -61,6 +77,7 @@ public class SdoDocumentFormFastNihl extends SdoDocumentFormBase implements Mapp
     private boolean hasClaimForPecuniaryLoss;
     private boolean hasUploadDocuments;
     private boolean hasSdoTrial;
+    private boolean hasNewDirections;
     private boolean hasSdoR2TrialWindow;
     private boolean hasSdoR2TrialPhysicalBundleParty;
     private List<IncludeInOrderToggle> sdoR2DisclosureOfDocumentsToggle;
@@ -95,9 +112,12 @@ public class SdoDocumentFormFastNihl extends SdoDocumentFormBase implements Mapp
     private SdoR2DisclosureOfDocuments sdoR2DisclosureOfDocuments;
     private SdoR2ExpertEvidence sdoR2ExpertEvidence;
     private SdoR2WitnessOfFact sdoR2WitnessesOfFact;
+    private LocationRefData hearingLocation;
+    private LocationRefData caseManagementLocation;
     private String sdoTrialHearingTimeAllocated;
     private String sdoTrialMethodOfHearing;
     private String isApplicationToRelyOnFurther;
     private String sdoR2ImportantNotesTxt;
     private String physicalBundlePartyTxt;
+    private String welshLanguageDescription;
 }
