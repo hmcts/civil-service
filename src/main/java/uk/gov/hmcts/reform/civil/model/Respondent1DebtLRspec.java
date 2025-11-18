@@ -11,8 +11,8 @@ import java.util.List;
 @Builder(toBuilder = true)
 public class Respondent1DebtLRspec {
 
-    private final List<Element<DebtLRspec>> debtDetails;
-    private final YesOrNo hasLoanCardDebt;
-    private final List<Element<LoanCardDebtLRspec>> loanCardDebtDetails;
+    private List<Element<DebtLRspec>> debtDetails;
+    private YesOrNo hasLoanCardDebt;
+    private List<Element<LoanCardDebtLRspec>> loanCardDebtDetails;
 
 }

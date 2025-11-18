@@ -16,12 +16,12 @@ import java.time.LocalDateTime;
 @Builder(toBuilder = true)
 public class SRPbaDetails {
 
-    private final DynamicList applicantsPbaAccounts;
-    private final String pbaReference;
-    private final Fee fee;
-    private final PaymentDetails paymentDetails;
-    private final LocalDateTime paymentSuccessfulDate;
-    private final String serviceReqReference;
+    private DynamicList applicantsPbaAccounts;
+    private String pbaReference;
+    private Fee fee;
+    private PaymentDetails paymentDetails;
+    private LocalDateTime paymentSuccessfulDate;
+    private String serviceReqReference;
 
     @JsonCreator
     SRPbaDetails(@JsonProperty("applicantsPbaAccounts") DynamicList applicantsPbaAccounts,

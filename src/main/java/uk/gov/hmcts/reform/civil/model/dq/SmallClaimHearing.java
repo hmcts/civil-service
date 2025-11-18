@@ -12,7 +12,7 @@ import java.util.List;
 @Builder(toBuilder = true)
 public class SmallClaimHearing {
 
-    private final YesOrNo unavailableDatesRequired;
-    private final List<Element<UnavailableDate>> smallClaimUnavailableDate;
+    private YesOrNo unavailableDatesRequired;
+    private List<Element<UnavailableDate>> smallClaimUnavailableDate;
 
 }

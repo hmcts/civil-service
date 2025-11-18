@@ -13,8 +13,8 @@ import lombok.ToString;
 public class SortingParameter {
 
     @JsonProperty("sort_by")
-    private final SortField sortBy;
+    private SortField sortBy;
 
     @JsonProperty("sort_order")
-    private final SortOrder sortOrder;
+    private SortOrder sortOrder;
 }

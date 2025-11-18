@@ -9,7 +9,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class PartyDetailsChange {
 
-    private final String fieldName;
-    private final String previousValue;
-    private final String updatedValue;
+    private String fieldName;
+    private String previousValue;
+    private String updatedValue;
 }

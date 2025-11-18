@@ -13,8 +13,8 @@ import java.time.LocalDate;
 @Builder(toBuilder = true)
 public class GAUnavailabilityDates {
 
-    private final LocalDate unavailableTrialDateFrom;
-    private final LocalDate unavailableTrialDateTo;
+    private LocalDate unavailableTrialDateFrom;
+    private LocalDate unavailableTrialDateTo;
 
     @JsonCreator
     GAUnavailabilityDates(@JsonProperty("unavailableTrialDateFrom") LocalDate unavailableTrialDateFrom,
