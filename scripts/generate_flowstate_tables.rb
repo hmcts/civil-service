@@ -47,9 +47,18 @@ class StateTable
   end
 end
 
-def load_mapping(path, key)
-  data = YAML.safe_load(File.read(path))
-  data.fetch('flow-state').fetch(key)
+def load_mapping(path)
+  YAML.safe_load(File.read(path))
+end
+
+def merge_whitelist(mapping, whitelist)
+  mapping.each do |state, events|
+    if state.start_with?('MAIN.')
+      current_events = events || []
+      mapping[state] = (current_events + whitelist).uniq.sort
+    end
+  end
+  mapping
 end
 
 def write_diagram(target, contents)
@@ -60,6 +69,7 @@ end
 if __FILE__ == $PROGRAM_NAME
   generate_general = true
   generate_spec = true
+  include_whitelist = ARGV.include?('--inc-whitelist')
 
   if ARGV.include?('--general') && !ARGV.include?('--spec')
     generate_spec = false
@@ -67,15 +77,27 @@ if __FILE__ == $PROGRAM_NAME
     generate_general = false
   end
 
+  whitelist = []
+  if include_whitelist
+    whitelist_path = File.join(CONFIG_DIR, 'allowed-whitelist-events.yml')
+    if File.exist?(whitelist_path)
+      whitelist = load_mapping(whitelist_path)
+    else
+      puts "Warning: Whitelist file not found at #{whitelist_path}"
+    end
+  end
+
   if generate_general
-    mapping = load_mapping(File.join(CONFIG_DIR, 'flowstate-allowed-events.yml'), 'allowed-events')
-    write_diagram(File.join(DOCS_DIR, 'flowstate_allowed_events.md'),
-                  StateTable.new('flowstate-allowed-events.yml', mapping).render)
+    mapping = load_mapping(File.join(CONFIG_DIR, 'allowed-unspec-events.yml'))
+    mapping = merge_whitelist(mapping, whitelist) if include_whitelist && !whitelist.empty?
+    write_diagram(File.join(DOCS_DIR, 'allowed-unspec-events.md'),
+                  StateTable.new('allowed-unspec-events.yml', mapping).render)
   end
 
   if generate_spec
-    mapping = load_mapping(File.join(CONFIG_DIR, 'flowstate-allowed-spec-events.yml'), 'allowed-events-spec')
-    write_diagram(File.join(DOCS_DIR, 'flowstate_allowed_spec_events.md'),
-                  StateTable.new('flowstate-allowed-spec-events.yml', mapping).render)
+    mapping = load_mapping(File.join(CONFIG_DIR, 'allowed-spec-events.yml'))
+    mapping = merge_whitelist(mapping, whitelist) if include_whitelist && !whitelist.empty?
+    write_diagram(File.join(DOCS_DIR, 'allowed-spec-events.md'),
+                  StateTable.new('allowed-spec-events.yml', mapping).render)
   end
 end

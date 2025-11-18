@@ -434,7 +434,6 @@ public class FlowPredicate {
                 case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP, ONE_V_ONE ->
                     YES.equals(caseData.getApplicant1ProceedWithClaim());
                 case TWO_V_ONE -> YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1());
-                default -> false;
             };
         } else {
             return switch (getMultiPartyScenario(caseData)) {
@@ -454,7 +453,6 @@ public class FlowPredicate {
                 case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP, ONE_V_ONE ->
                     NO.equals(caseData.getApplicant1ProceedWithClaim());
                 case TWO_V_ONE -> NO.equals(caseData.getApplicant1ProceedWithClaimSpec2v1());
-                default -> false;
             };
         } else {
             return switch (getMultiPartyScenario(caseData)) {
