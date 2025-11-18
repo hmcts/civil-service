@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
@@ -47,7 +48,7 @@ class MoreInformationHwfCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldValidationMoreInformationClaimIssued_withInvalidDate() {
             //Given
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
                 .helpWithFeesMoreInformationClaimIssue(
                     HelpWithFeesMoreInformation.builder()
                         .hwFMoreInfoDocumentDate(LocalDate.now())
@@ -63,7 +64,7 @@ class MoreInformationHwfCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldValidationMoreInformationHearing_withInvalidDate() {
             //Given
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
                 .hwfFeeType(FeeType.HEARING)
                 .helpWithFeesMoreInformationHearing(
                     HelpWithFeesMoreInformation.builder()
@@ -86,10 +87,9 @@ class MoreInformationHwfCallbackHandlerTest extends BaseCallbackHandlerTest {
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
                 .hwfCaseEvent(MORE_INFORMATION_HWF)
                 .noRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET).build();
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
                 .claimIssuedHwfDetails(hwfeeDetails)
-                .hwfFeeType(
-                    FeeType.CLAIMISSUED)
+                .hwfFeeType(FeeType.CLAIMISSUED)
                 .build();
             //When
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -108,10 +108,9 @@ class MoreInformationHwfCallbackHandlerTest extends BaseCallbackHandlerTest {
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
                 .hwfCaseEvent(MORE_INFORMATION_HWF)
                 .noRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET).build();
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
                 .hearingHwfDetails(hwfeeDetails)
-                .hwfFeeType(
-                    FeeType.HEARING)
+                .hwfFeeType(FeeType.HEARING)
                 .build();
             //When
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

@@ -173,31 +173,31 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldNotReturnReturnErrors_WhenAboutToStartIsInvokedByAdminUserWhileCaseInAwaitingApplicantIntentionState() {
             when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
                 .applicant1(Party.builder()
                                 .type(COMPANY)
                                 .companyName("Test Inc")
                                 .build())
                 .respondent1(Party.builder()
-                        .type(COMPANY)
-                        .companyName("Test Inc")
-                        .build())
-                    .applicant1OrgIndividuals(wrapElements(List.of(PartyFlagStructure.builder()
-                            .firstName("Claimant")
-                            .lastName("OrgIndividual")
-                            .email("claiamnt-orgindividual@example.com")
-                            .phone("07867654543")
-                            .partyID("party-id")
-                            .build())))
-                    .respondent1OrgIndividuals(wrapElements(List.of(PartyFlagStructure.builder()
-                            .firstName("Defendant")
-                            .lastName("OrgIndividual")
-                            .email("defendant-orgindividual@example.com")
-                            .phone("07867654543")
-                            .partyID("party-id")
-                            .build())))
-                    .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
-                    .ccdCaseReference(123L)
+                                 .type(COMPANY)
+                                 .companyName("Test Inc")
+                                 .build())
+                .applicant1OrgIndividuals(wrapElements(List.of(PartyFlagStructure.builder()
+                    .firstName("Claimant")
+                    .lastName("OrgIndividual")
+                    .email("claiamnt-orgindividual@example.com")
+                    .phone("07867654543")
+                    .partyID("party-id")
+                    .build())))
+                .respondent1OrgIndividuals(wrapElements(List.of(PartyFlagStructure.builder()
+                    .firstName("Defendant")
+                    .lastName("OrgIndividual")
+                    .email("defendant-orgindividual@example.com")
+                    .phone("07867654543")
+                    .partyID("party-id")
+                    .build())))
+                .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
+                .ccdCaseReference(123L)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
 
@@ -211,7 +211,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @EnumSource(value = CaseState.class, names = {"AWAITING_RESPONDENT_ACKNOWLEDGEMENT", "AWAITING_APPLICANT_INTENTION"})
         void shouldReturnErrors_WhenAboutToStartIsInvokedByNonAdminUserWhileCaseInAwaitingRespondentAcknowledgementState(CaseState states) {
             when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
-            CaseData caseData = CaseData.builder().ccdState(states)
+            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+                .ccdState(states)
                 .ccdCaseReference(123L)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
@@ -228,7 +229,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldNotReturnErrors_WhenAboutToStartIsInvokedByNonAdminUserWhileCaseInANonAwaitingApplicantIntentionState() {
             when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
-            CaseData caseData = CaseData.builder().ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
+            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+                .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
                 .ccdCaseReference(123L)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
@@ -2882,7 +2884,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldBuildConfirmation() {
 
-            CallbackParams params = callbackParamsOf(CaseData.builder().build(), SUBMITTED);
+            CallbackParams params = callbackParamsOf(CaseDataBuilder.builder().build(), SUBMITTED);
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler
                 .handle(params);
