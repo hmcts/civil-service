@@ -147,7 +147,7 @@ public class RoboticsDataMapperForSpec extends BaseRoboticsDataMapper {
         );
         solicitorBuilder
             .id(RoboticsDataUtil.RESPONDENT_SOLICITOR_ID)
-            .isPayee(false)
+            .payee(false)
             .organisationId(organisationId.orElse(null))
             .contactEmailAddress(solicitorEmail.orElse(null))
             .reference(ofNullable(caseData.getSolicitorReferences())
@@ -177,7 +177,7 @@ public class RoboticsDataMapperForSpec extends BaseRoboticsDataMapper {
         }
         solicitorBuilder
             .id(RoboticsDataUtil.RESPONDENT2_SOLICITOR_ID)
-            .isPayee(false)
+            .payee(false)
             .organisationId(organisationId.orElse(null))
             .reference(ofNullable(caseData.getSolicitorReferences())
                 .map(SolicitorReferences::getRespondentSolicitor2Reference)
@@ -203,7 +203,7 @@ public class RoboticsDataMapperForSpec extends BaseRoboticsDataMapper {
         var providedServiceAddress = caseData.getSpecApplicantCorrespondenceAddressdetails();
         Solicitor.SolicitorBuilder<?, ?> solicitorBuilder = Solicitor.builder()
             .id(RoboticsDataUtil.APPLICANT_SOLICITOR_ID)
-            .isPayee(true)
+            .payee(true)
             .organisationId(organisationId.orElse(null))
             .contactEmailAddress(caseData.getApplicantSolicitor1UserDetails().getEmail())
             .reference(ofNullable(caseData.getSolicitorReferences())
