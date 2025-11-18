@@ -22,7 +22,7 @@ import static uk.gov.hmcts.reform.civil.enums.HomeTypeOptionLRspec.PRIVATE_RENTA
 @Builder
 public class AccommodationTemplate {
 
-    private static Map<HomeTypeOptionLRspec, String> whereDoTheyLiveMap = Map.of(OWNED_HOME,
+    private static final Map<HomeTypeOptionLRspec, String> WHERE_DO_THEY_LIVE_MAP = Map.of(OWNED_HOME,
                                                                                            "Owned outright",
                                                                                            PRIVATE_RENTAL,
                                                                                            "Rent",
@@ -42,6 +42,6 @@ public class AccommodationTemplate {
         if (OTHER == homeDetails.type()) {
             return homeDetails.typeOtherDetails();
         }
-        return whereDoTheyLiveMap.get(homeDetails.type());
+        return WHERE_DO_THEY_LIVE_MAP.get(homeDetails.type());
     }
 }

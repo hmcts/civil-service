@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @SuppressWarnings("PMD.ExcessiveParameterList")
 public class CcdServiceBusMessage implements Serializable {
 
-    private static long serialVersionUID = 3213665975741833471L;
+    private static final long serialVersionUID = 3213665975741833471L;
 
     private String messageId;
     private Long sequence;
