@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.aspect.NoOngoingBusinessProcess;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -29,10 +28,17 @@ public class CallbackHandlerFactory {
     @Autowired
     public CallbackHandlerFactory(CaseDetailsConverter caseDetailsConverter,
                                   CaseTypeHandlerKeyFactory caseTypeHandlerKeyFactory,
-                                  CallbackHandler... beans) {
+                                  CallbackHandler... callbackHandlers) {
         this.caseDetailsConverter = caseDetailsConverter;
         this.caseTypeHandlerKeyFactory = caseTypeHandlerKeyFactory;
-        Arrays.asList(beans).forEach(bean -> bean.register(eventHandlers, caseTypeHandlerKeyFactory));
+        for (CallbackHandler callbackHandler : callbackHandlers) {
+            for (CaseEvent handledEvent : callbackHandler.handledEvents()) {
+                eventHandlers.put(
+                    caseTypeHandlerKeyFactory.createHandlerKey(callbackHandler, handledEvent),
+                    callbackHandler
+                );
+            }
+        }
     }
 
     @EventAllowed

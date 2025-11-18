@@ -63,14 +63,6 @@ public abstract class CallbackHandler {
         return businessProcess != null && currentActivityId.contains(lastExecutedActivityId);
     }
 
-    public void register(Map<String, CallbackHandler> handlers, CaseTypeHandlerKeyFactory caseTypeHandlerKeyFactory) {
-        handledEvents().forEach(
-            handledEvent -> {
-                final String handleEventKey = caseTypeHandlerKeyFactory.createHandlerKey(this, handledEvent);
-                handlers.put(handleEventKey, this);
-            });
-    }
-
     public CallbackResponse handle(CallbackParams callbackParams) {
         String callbackKey;
 
