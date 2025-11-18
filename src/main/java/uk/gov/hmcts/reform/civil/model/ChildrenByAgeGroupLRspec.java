@@ -11,9 +11,9 @@ import java.util.stream.Stream;
 @Builder
 public class ChildrenByAgeGroupLRspec {
 
-    private final String numberOfUnderEleven;
-    private final String numberOfElevenToFifteen;
-    private final String numberOfSixteenToNineteen;
+    private String numberOfUnderEleven;
+    private String numberOfElevenToFifteen;
+    private String numberOfSixteenToNineteen;
 
     @JsonIgnore
     public int getTotalChildren() {

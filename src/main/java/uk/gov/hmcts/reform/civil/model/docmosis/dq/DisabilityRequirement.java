@@ -10,9 +10,9 @@ import static uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements.OTHER_SUPPO
 @AllArgsConstructor
 public class DisabilityRequirement {
 
-    private final String requirement;
+    private String requirement;
 
-    public static final DisabilityRequirement toDisabilityRequirements(final SupportRequirements requirement, String otherSupport) {
+    public static DisabilityRequirement toDisabilityRequirements(final SupportRequirements requirement, String otherSupport) {
         String requirementGenerated = requirement != OTHER_SUPPORT ? requirement.getDisplayedValue() : otherSupport;
         return new DisabilityRequirement(requirementGenerated);
     }

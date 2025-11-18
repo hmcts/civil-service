@@ -17,18 +17,18 @@ import java.time.LocalDate;
 @EqualsAndHashCode
 public class SettleClaimMarkedPaidInFullDefendantLiPLetter implements MappableObject {
 
-    private final String claimReferenceNumber;
+    private String claimReferenceNumber;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate letterIssueDate;
+    private LocalDate letterIssueDate;
     private String letterIssueDateWelsh;
-    private final String defendantLipName;
-    private final String addressLine1;
-    private final String addressLine2;
-    private final String addressLine3;
-    private final String postCode;
+    private String defendantLipName;
+    private String addressLine1;
+    private String addressLine2;
+    private String addressLine3;
+    private String postCode;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate dateOfEvent;
+    private LocalDate dateOfEvent;
     private String dateOfEventWelsh;
 }

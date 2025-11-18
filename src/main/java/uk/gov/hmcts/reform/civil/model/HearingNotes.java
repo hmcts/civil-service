@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Builder
 public class HearingNotes {
 
-    private final LocalDate date;
-    private final String notes;
+    private LocalDate date;
+    private String notes;
 
 }
