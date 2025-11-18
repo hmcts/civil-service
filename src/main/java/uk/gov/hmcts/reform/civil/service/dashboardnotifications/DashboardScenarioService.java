@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.service.dashboardnotifications;
 
 import com.google.common.base.Strings;
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 public abstract class DashboardScenarioService {
 
     protected final DashboardScenariosService dashboardScenariosService;
@@ -22,40 +23,66 @@ public abstract class DashboardScenarioService {
     }
 
     protected void recordScenario(CaseData caseData, String authToken) {
+        String caseReference = resolveCaseReference(caseData);
+        log.info("Evaluating dashboard scenarios for case {}", caseReference);
+
         ScenarioRequestParams scenarioParams = ScenarioRequestParams.builder()
             .params(mapper.mapCaseDataToParams(caseData))
             .build();
 
         String scenario = getScenario(caseData);
         if (!Strings.isNullOrEmpty(scenario) && shouldRecordScenario(caseData)) {
+            log.info("Recording primary dashboard scenario {} for case {}", scenario, caseReference);
             beforeRecordScenario(caseData, authToken);
             dashboardScenariosService.recordScenarios(
                 authToken,
                 scenario,
-                caseData.getCcdCaseReference().toString(),
+                caseReference,
                 scenarioParams
             );
+        } else if (!Strings.isNullOrEmpty(scenario)) {
+            log.debug("Primary scenario {} not recorded for case {} due to eligibility", scenario, caseReference);
+        } else {
+            log.debug("No primary dashboard scenario resolved for case {}", caseReference);
         }
 
         String extraScenario = getExtraScenario();
         if (!Strings.isNullOrEmpty(extraScenario) && shouldRecordExtraScenario(caseData)) {
+            log.info("Recording extra dashboard scenario {} for case {}", extraScenario, caseReference);
             dashboardScenariosService.recordScenarios(
                 authToken,
                 extraScenario,
-                caseData.getCcdCaseReference().toString(),
+                caseReference,
                 scenarioParams
             );
+        } else if (!Strings.isNullOrEmpty(extraScenario)) {
+            log.debug("Extra scenario {} not recorded for case {} due to eligibility", extraScenario, caseReference);
         }
 
         Optional.ofNullable(getScenarios(caseData)).orElse(new HashMap<>())
-            .entrySet().stream()
-            .filter(entry -> !Strings.isNullOrEmpty(entry.getKey()) && Boolean.TRUE.equals(entry.getValue()))
-            .forEach(entry -> dashboardScenariosService.recordScenarios(
-                authToken,
-                entry.getKey(),
-                caseData.getCcdCaseReference().toString(),
-                scenarioParams
-            ));
+            .forEach((scenarioName, shouldRecord) -> {
+                if (Strings.isNullOrEmpty(scenarioName)) {
+                    return;
+                }
+                if (Boolean.TRUE.equals(shouldRecord)) {
+                    log.info("Recording additional dashboard scenario {} for case {}", scenarioName, caseReference);
+                    dashboardScenariosService.recordScenarios(
+                        authToken,
+                        scenarioName,
+                        caseReference,
+                        scenarioParams
+                    );
+                } else {
+                    log.debug("Additional scenario {} not recorded for case {} due to eligibility", scenarioName, caseReference);
+                }
+            });
+    }
+
+    private String resolveCaseReference(CaseData caseData) {
+        if (caseData != null && caseData.getCcdCaseReference() != null) {
+            return caseData.getCcdCaseReference().toString();
+        }
+        return "unknown";
     }
 
     protected abstract String getScenario(CaseData caseData);
