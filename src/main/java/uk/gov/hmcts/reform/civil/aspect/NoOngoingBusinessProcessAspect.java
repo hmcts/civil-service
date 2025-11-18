@@ -11,8 +11,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 
 import java.util.List;
 
@@ -28,7 +29,6 @@ public class NoOngoingBusinessProcessAspect {
     public static final String ERROR_MESSAGE = "There is a technical issue causing a delay. "
         + "You do not need to do anything. Please come back later.";
 
-    private final FlowStateAllowedEventService flowStateAllowedEventService;
     private final IStateFlowEngine stateFlowEngine;
 
     @Around("execution(* *(*)) && @annotation(NoOngoingBusinessProcess) && args(callbackParams))")
@@ -46,19 +46,26 @@ public class NoOngoingBusinessProcessAspect {
         ) {
             return joinPoint.proceed();
         }
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
         StringBuilder stateHistoryBuilder = new StringBuilder();
-        FlowState flowState = flowStateAllowedEventService.getFlowState(caseData);
-        stateFlowEngine.evaluate(caseData).getStateHistory().forEach(s -> {
+        stateFlow.getStateHistory().forEach(s -> {
             stateHistoryBuilder.append(s.getName());
             stateHistoryBuilder.append(", ");
         });
-        log.info(format(
-            "%s is not allowed on the case %s due to ongoing business process, current FlowState: %s, "
-                + "stateFlowHistory: %s",
-            caseEvent.name(),
-            caseData.getCcdCaseReference(),
-            flowState, stateHistoryBuilder.toString()
-        ));
+
+        try {
+            log.info(format(
+                "%s is not allowed on the case %s due to ongoing business process, current FlowState: %s, "
+                    + "stateFlowHistory: %s",
+                caseEvent.name(),
+                caseData.getCcdCaseReference(),
+                FlowState.fromFullName(stateFlow.getState().getName()),
+                stateHistoryBuilder
+            ));
+        } catch (StateFlowException e) {
+            log.warn("Error during state flow evaluation.", e);
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(List.of(ERROR_MESSAGE))
             .build();
