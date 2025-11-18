@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.controllers.testingsupport;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,6 +34,8 @@ import uk.gov.hmcts.reform.civil.event.TrialReadyNotificationEvent;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseUserService;
 import uk.gov.hmcts.reform.civil.ga.service.GaOrganisationService;
+import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
+import uk.gov.hmcts.reform.civil.ga.stateflow.GaStateFlow;
 import uk.gov.hmcts.reform.civil.handler.event.HearingFeePaidEventHandler;
 import uk.gov.hmcts.reform.civil.handler.event.HearingFeeUnpaidEventHandler;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
@@ -63,6 +66,7 @@ import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import java.util.List;
 import java.util.Objects;
 
+import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.GENERALAPPLICATION_CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.STARTED;
 
 @Tag(name = "Testing Support Controller")
@@ -77,6 +81,7 @@ public class TestingSupportController {
     private final CamundaRestEngineClient camundaRestEngineClient;
     private final FeatureToggleService featureToggleService;
     private final IStateFlowEngine stateFlowEngine;
+    private final GaStateFlowEngine gaStateFlowEngine;
     private final EventHistoryMapper eventHistoryMapper;
     private final RoboticsDataMapperForUnspec roboticsDataMapper;
     private final RoboticsDataMapperForSpec roboticsSpecDataMapper;
@@ -98,6 +103,8 @@ public class TestingSupportController {
     private final GaCoreCaseUserService gaCoreCaseUserService;
     private final GAJudgeRevisitTaskHandler gaJudgeRevisitTaskHandler;
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String SUCCESS = "success";
     private static final String FAILED = "failed";
@@ -106,8 +113,8 @@ public class TestingSupportController {
     public ResponseEntity<BusinessProcessInfo> getBusinessProcess(@PathVariable("caseId") Long caseId) {
         CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseId));
         var businessProcess = caseData.getBusinessProcess();
-        var caseState = caseData.getCcdState();
         var businessProcessInfo = new BusinessProcessInfo(businessProcess);
+        businessProcessInfo.setCcdState(caseData.getCcdState().toString());
 
         if (businessProcess.getStatus() == STARTED) {
             try {
@@ -120,8 +127,6 @@ public class TestingSupportController {
                 }
             }
         }
-
-        businessProcessInfo.setCcdState(caseState.toString());
 
         return new ResponseEntity<>(businessProcessInfo, HttpStatus.OK);
     }
@@ -171,6 +176,14 @@ public class TestingSupportController {
     public StateFlow getFlowStateInformationForCaseData(
         @RequestBody CaseData caseData) {
         return stateFlowEngine.evaluate(caseData);
+    }
+
+    @PostMapping(
+        value = "/testing-support/flowstate/ga",
+        produces = "application/json")
+    public GaStateFlow getFlowStateInformationForCaseData(
+        @RequestBody GeneralApplicationCaseData caseData) {
+        return gaStateFlowEngine.evaluate(caseData);
     }
 
     @PostMapping(
@@ -300,8 +313,10 @@ public class TestingSupportController {
         return new ResponseEntity<>(response.getBody(), response.getStatusCode());
     }
 
-    /*Check if Camunda Event CREATE_GENERAL_APPLICATION_CASE is Finished
-if so, generalApplicationsDetails object will be populated with GA case references*/
+    /*
+     * Check if Camunda Event CREATE_GENERAL_APPLICATION_CASE is Finished
+     * if so, generalApplicationsDetails object will be populated with GA case references
+     */
     @GetMapping("/testing-support/case/{caseId}/business-process/ga")
     public ResponseEntity<BusinessProcessInfo> getGACaseReference(@PathVariable("caseId") Long caseId) {
         log.info("Get GA case reference for caseId: {}", caseId);
@@ -309,13 +324,12 @@ if so, generalApplicationsDetails object will be populated with GA case referenc
 
         int size = caseData.getGeneralApplications().size();
 
-        /**
+        /*
          * Check the business process status of latest GA case
          * if caseData.getGeneralApplications() collection size is more than 1
          */
 
         var generalApplication = caseData.getGeneralApplications().get(size - 1);
-
         var businessProcess = Objects.requireNonNull(generalApplication).getValue().getBusinessProcess();
         var businessProcessInfo = new BusinessProcessInfo(businessProcess);
 
@@ -360,7 +374,7 @@ if so, generalApplicationsDetails object will be populated with GA case referenc
         return new ResponseEntity<>(responseMsg, HttpStatus.OK);
     }
 
-    @PostMapping(value = {"/user-roles/{caseId}", "/user-roles/{caseId}"})
+    @PostMapping(value = {"/user-roles/{caseId}"})
     @Operation(summary = "user roles for the cases")
     public CaseAssignmentUserRolesResource getUserRoles(
         @PathVariable("caseId") String caseId) {
