@@ -17,11 +17,7 @@ management:
       enabled: true
 spring:
   config:
-    import:
-      - "optional:configtree:/mnt/secrets/civil/"
-      - "classpath:config/flowstate-whitelist-events.yml"
-      - "classpath:config/flowstate-allowed-events.yml"
-      - "classpath:config/flowstate-allowed-spec-events.yml"
+    import: "optional:configtree:/mnt/secrets/civil/"
   application:
     name: civil-service
   main:
