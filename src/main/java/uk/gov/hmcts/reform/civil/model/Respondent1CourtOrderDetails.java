@@ -12,11 +12,11 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class Respondent1CourtOrderDetails {
 
-    private final String claimNumberText;
+    private String claimNumberText;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal amountOwed;
+    private BigDecimal amountOwed;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal monthlyInstalmentAmount;
+    private BigDecimal monthlyInstalmentAmount;
 
 
 }
