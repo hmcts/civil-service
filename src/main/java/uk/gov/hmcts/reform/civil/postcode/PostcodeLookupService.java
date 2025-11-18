@@ -89,7 +89,8 @@ public class PostcodeLookupService {
                     }
                 }
             } else if (responseStatus.value() == org.apache.http.HttpStatus.SC_NOT_FOUND) {
-                LOG.info("Postcode " + postcode + " not found");
+                postcode = postcode.replaceAll("[\n\r]", "_");
+                LOG.info("Postcode {0} not found", postcode);
             } else {
                 LOG.info("Postcode lookup failed with status ", responseStatus.value());
             }
