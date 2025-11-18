@@ -141,7 +141,6 @@ class CaseProceedOfflineDefendantDashboardServiceTest {
                 .previousCCDState(CaseState.All_FINAL_ORDERS_ISSUED)
                 .build();
 
-
             service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);
 
             verify(dashboardScenariosService).recordScenarios(
