@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.ccd.model;
+package uk.gov.hmcts.reform.civil.ga.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
@@ -8,14 +8,14 @@ import lombok.ToString;
 @ToString
 @Getter
 @Builder(toBuilder = true)
-public class CaseAssignedUserRole {
+public class SolicitorDetails {
 
-    @JsonProperty("case_id")
+    @JsonProperty("caseDataId")
     private String caseDataId;
 
-    @JsonProperty("user_id")
+    @JsonProperty("userId")
     private String userId;
 
-    @JsonProperty("case_role")
+    @JsonProperty("caseRole")
     private String caseRole;
 }
