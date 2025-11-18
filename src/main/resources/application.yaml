@@ -27,9 +27,12 @@ spring:
   main:
     allow-bean-definition-overriding: true
   cache:
-    cache-names: userInfoCache, accessTokenCache
+    cache-names: userInfoCache, accessTokenCache, courtVenueCache
     caffeine:
-      spec: expireAfterWrite=3600s
+      spec: |
+        userInfoCache=expireAfterWrite=3600s,
+        accessTokenCache=expireAfterWrite=1800s,
+        courtVenueCache=expireAfterWrite=86400s
   datasource:
     driverClassName: org.postgresql.Driver
     username: ${CMC_DB_USERNAME:-}
