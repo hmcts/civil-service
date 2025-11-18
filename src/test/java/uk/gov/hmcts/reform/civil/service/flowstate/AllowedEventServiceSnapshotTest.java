@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.wrapper.CaseDataDirector;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 
 import java.io.InputStream;
 import java.util.List;
@@ -51,10 +52,9 @@ class AllowedEventServiceSnapshotTest {
     @Autowired
     private AllowedEventService allowedEventService;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
-
-    @MockBean
+    @MockitoBean
     private CaseDetailsConverter caseDetailsConverter;
 
     private static List<CaseEvent> whitelistEvents;
