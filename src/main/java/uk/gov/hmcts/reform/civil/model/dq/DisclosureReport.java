@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 @Builder
 public class DisclosureReport {
 
-    private final YesOrNo disclosureFormFiledAndServed;
-    private final YesOrNo disclosureProposalAgreed;
-    private final String draftOrderNumber;
+    private YesOrNo disclosureFormFiledAndServed;
+    private YesOrNo disclosureProposalAgreed;
+    private String draftOrderNumber;
 }
