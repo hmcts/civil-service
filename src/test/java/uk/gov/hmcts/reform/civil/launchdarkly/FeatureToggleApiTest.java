@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.launchdarkly.sdk.LDUser;
 import com.launchdarkly.sdk.server.interfaces.LDClientInterface;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -12,6 +13,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -66,9 +68,66 @@ class FeatureToggleApiTest {
         verifyBoolVariationCalled(FAKE_FEATURE, List.of("timestamp", "environment"));
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldHonourProvidedDefaultValue(boolean toggleState) {
+        givenToggle(FAKE_FEATURE, true, toggleState);
+
+        assertThat(featureToggleApi.isFeatureEnabled(FAKE_FEATURE, true)).isEqualTo(toggleState);
+        verify(ldClient).boolVariation(eq(FAKE_FEATURE), any(LDUser.class), eq(true));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldHonourProvidedDefaultValueForCustomUser(boolean toggleState) {
+        LDUser user = new LDUser.Builder("custom").build();
+        when(ldClient.boolVariation(FAKE_FEATURE, user, true)).thenReturn(toggleState);
+
+        assertThat(featureToggleApi.isFeatureEnabled(FAKE_FEATURE, user, true)).isEqualTo(toggleState);
+        verify(ldClient).boolVariation(FAKE_FEATURE, user, true);
+    }
+
+    @Test
+    void shouldIncludeLocationAttributeWhenRequested() {
+        givenToggle(FAKE_FEATURE, true);
+
+        featureToggleApi.isFeatureEnabledForLocation(FAKE_FEATURE, "LON", true);
+
+        verify(ldClient).boolVariation(eq(FAKE_FEATURE), ldUserArgumentCaptor.capture(), eq(true));
+        assertThat(ImmutableList.copyOf(ldUserArgumentCaptor.getValue().getCustomAttributes()))
+            .extracting("name")
+            .contains("location");
+    }
+
+    @Test
+    void shouldIncludeDateAttributeWhenRequested() {
+        givenToggle(FAKE_FEATURE, true);
+
+        featureToggleApi.isFeatureEnabledForDate(FAKE_FEATURE, 123L, false);
+
+        verify(ldClient).boolVariation(eq(FAKE_FEATURE), ldUserArgumentCaptor.capture(), eq(false));
+        assertThat(ImmutableList.copyOf(ldUserArgumentCaptor.getValue().getCustomAttributes()))
+            .extracting("name")
+            .contains("timestamp");
+    }
+
+    @Test
+    void shouldCloseClientWhenShutdownHookRuns() throws Exception {
+        Method close = FeatureToggleApi.class.getDeclaredMethod("close");
+        close.setAccessible(true);
+
+        close.invoke(featureToggleApi);
+
+        verify(ldClient).close();
+    }
+
     private void givenToggle(String feature, boolean state) {
         when(ldClient.boolVariation(eq(feature), any(LDUser.class), anyBoolean()))
             .thenReturn(state);
+    }
+
+    private void givenToggle(String feature, boolean defaultValue, boolean state) {
+        when(ldClient.boolVariation(eq(feature), any(LDUser.class), eq(defaultValue))).thenReturn(state);
     }
 
     private void verifyBoolVariationCalled(String feature, List<String> customAttributesKeys) {

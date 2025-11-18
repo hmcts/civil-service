@@ -17,22 +17,22 @@ public class LaunchDarklyConfigurationTest {
     @Test
     public void streamingLD() {
         String key = "sdkkey";
-        Boolean offline = false;
+        boolean offline = false;
         LDClient client = configuration.ldClient(key, offline, null);
-        Assertions.assertEquals(client.isOffline(), offline.booleanValue());
+        Assertions.assertEquals(client.isOffline(), offline);
 
         client = configuration.ldClient(key, offline, new String[0]);
-        Assertions.assertEquals(client.isOffline(), offline.booleanValue());
+        Assertions.assertEquals(client.isOffline(), offline);
     }
 
     @Test
     public void unexistentFiles() {
         String key = "sdkkey";
-        Boolean offline = false;
+        boolean offline = false;
         LDClient client = configuration.ldClient(key, offline, new String[]{
             "AFileThatDoesNotExist"
         });
-        Assertions.assertEquals(client.isOffline(), offline.booleanValue());
+        Assertions.assertEquals(client.isOffline(), offline);
     }
 
     @Test
@@ -40,11 +40,11 @@ public class LaunchDarklyConfigurationTest {
         String path = "./bin/utils/launchdarkly-flags.json";
         if (Files.exists(Paths.get(path))) {
             String key = "sdkkey";
-            Boolean offline = false;
+            boolean offline = false;
             LDClient client = configuration.ldClient(key, offline, new String[]{
                 "AFileThatDoesNotExist"
             });
-            Assertions.assertEquals(client.isOffline(), offline.booleanValue());
+            Assertions.assertEquals(client.isOffline(), offline);
         }
     }
 }
