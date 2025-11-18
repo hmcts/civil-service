@@ -99,7 +99,7 @@ public class TranslatedDocumentUploadedRespondentNotificationHandler extends Cal
     }
 
     private CallbackResponse notifyRespondent(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
 
         log.info("Translated document uploaded for respondent for case: {}", caseData.getCcdCaseReference());
         GeneralApplicationCaseData civilCaseData = caseDetailsConverter

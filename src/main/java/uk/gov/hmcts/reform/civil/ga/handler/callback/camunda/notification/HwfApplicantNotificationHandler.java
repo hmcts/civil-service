@@ -44,7 +44,7 @@ public class HwfApplicantNotificationHandler extends CallbackHandler implements 
     }
 
     private CallbackResponse hwfApplicantNotification(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         log.info("HWF applicant notification for case: {}", caseData.getCcdCaseReference());
         notificationService.sendNotification(caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()

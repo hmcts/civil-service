@@ -52,7 +52,7 @@ public class GeneralApplicationAfterPaymentCallbackHandler extends CallbackHandl
     }
 
     private CallbackResponse generalAppAfterPayment(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         PaymentStatus paymentStatus = Optional.of(caseData).map(GeneralApplicationCaseData::getGeneralAppPBADetails).map(
                 GAPbaDetails::getPaymentDetails)

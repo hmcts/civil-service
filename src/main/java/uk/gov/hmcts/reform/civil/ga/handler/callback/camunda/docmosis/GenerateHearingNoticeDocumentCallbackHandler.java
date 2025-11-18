@@ -75,7 +75,7 @@ public class GenerateHearingNoticeDocumentCallbackHandler extends CallbackHandle
     }
 
     private CallbackResponse generateHearingNoticeDocument(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         log.info("Generate hearing notice document for case id: {}", caseData.getCcdCaseReference());
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         buildDocument(callbackParams, caseDataBuilder, caseData);
@@ -92,7 +92,7 @@ public class GenerateHearingNoticeDocumentCallbackHandler extends CallbackHandle
                 Optional.ofNullable(caseData.getPreTranslationGaDocuments())
                     .orElseGet(ArrayList::new);
             preTranslatedDocuments.addAll(wrapElements(hearingFormGenerator.generate(
-                (GeneralApplicationCaseData) callbackParams.getBaseCaseData(),
+                callbackParams.getGeneralApplicationCaseData(),
                 callbackParams.getParams().get(BEARER_TOKEN).toString()
             )));
             assignCategoryId.assignCategoryIdToCollection(
@@ -106,7 +106,7 @@ public class GenerateHearingNoticeDocumentCallbackHandler extends CallbackHandle
             List<Element<CaseDocument>> documents = ofNullable(caseData.getHearingNoticeDocument())
                 .orElse(newArrayList());
             documents.addAll(wrapElements(hearingFormGenerator.generate(
-                (GeneralApplicationCaseData) callbackParams.getBaseCaseData(),
+                callbackParams.getGeneralApplicationCaseData(),
                 callbackParams.getParams().get(BEARER_TOKEN).toString()
             )));
 

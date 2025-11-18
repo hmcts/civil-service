@@ -51,7 +51,7 @@ public class GaPartialRemissionHWFCallbackHandler extends HWFCallbackHandlerBase
     }
 
     private CallbackResponse validateRemissionAmount(CallbackParams callbackParams) {
-        var caseData = (GeneralApplicationCaseData)callbackParams.getBaseCaseData();
+        var caseData = callbackParams.getGeneralApplicationCaseData();
         var gaRemissionAmount = HwFFeeTypeUtil.getGaRemissionAmount(caseData);
         var additionalRemissionAmount = HwFFeeTypeUtil.getAdditionalRemissionAmount(caseData);
         var feeAmount = HwFFeeTypeUtil.getCalculatedFeeInPence(caseData);
@@ -73,7 +73,7 @@ public class GaPartialRemissionHWFCallbackHandler extends HWFCallbackHandlerBase
     }
 
     private CallbackResponse partRemissionHWF(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         caseData = HwFFeeTypeUtil.updateOutstandingFee(caseData, callbackParams.getRequest().getEventId());
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
                 .businessProcess(BusinessProcess.readyGa(NOTIFY_APPLICANT_LIP_HWF));

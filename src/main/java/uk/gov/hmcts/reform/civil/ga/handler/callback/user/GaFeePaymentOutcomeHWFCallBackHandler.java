@@ -60,7 +60,7 @@ public class GaFeePaymentOutcomeHWFCallBackHandler extends HWFCallbackHandlerBas
     }
 
     private CallbackResponse setData(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         FeePaymentOutcomeDetails.FeePaymentOutcomeDetailsBuilder feeDetailBuilder = FeePaymentOutcomeDetails.builder();
         feeDetailBuilder.hwfNumberAvailable(YesOrNo.NO);
@@ -76,7 +76,7 @@ public class GaFeePaymentOutcomeHWFCallBackHandler extends HWFCallbackHandlerBas
     }
 
     private CallbackResponse validateSelectedRemissionType(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         var errors = new ArrayList<String>();
 
         if ((caseData.isHWFTypeApplication()
@@ -97,7 +97,7 @@ public class GaFeePaymentOutcomeHWFCallBackHandler extends HWFCallbackHandlerBas
     }
 
     private CallbackResponse submitFeePaymentOutcome(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (caseData.isHWFTypeApplication()) {

@@ -117,7 +117,7 @@ public class GeneratePDFDocumentCallbackHandler extends CallbackHandler implemen
          * Uncomment the assignCategoryID code for setting up the categoryID after CIV-7926 is merged in Civil repo
          * */
 
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         log.info("Create PDF document for case: {}", caseData.getCcdCaseReference());
 
         GeneralApplicationCaseData civilCaseData = GeneralApplicationCaseData.builder().build();

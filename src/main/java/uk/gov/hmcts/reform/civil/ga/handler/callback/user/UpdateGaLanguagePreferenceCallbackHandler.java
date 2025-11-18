@@ -47,7 +47,7 @@ public class UpdateGaLanguagePreferenceCallbackHandler extends CallbackHandler i
     }
 
     private CallbackResponse updateLanguagePreference(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         GeneralApplicationCaseData civilCaseData = caseDetailsConverter
             .toGeneralApplicationCaseData(coreCaseDataService
                             .getCase(Long.parseLong(caseData.getGeneralAppParentCaseLink().getCaseReference())));

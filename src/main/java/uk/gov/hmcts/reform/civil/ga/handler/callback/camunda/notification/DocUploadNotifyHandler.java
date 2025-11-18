@@ -41,7 +41,7 @@ public class DocUploadNotifyHandler extends CallbackHandler implements GeneralAp
 
     private CallbackResponse notifyDocUpload(CallbackParams callbackParams) {
 
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
 
         try {
             docUploadNotificationService.notifyApplicantEvidenceUpload(caseData);

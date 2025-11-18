@@ -63,7 +63,7 @@ public class HearingScheduledEventCallbackHandler extends CallbackHandler implem
     }
 
     private CallbackResponse locationList(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
@@ -101,7 +101,7 @@ public class HearingScheduledEventCallbackHandler extends CallbackHandler implem
     private CallbackResponse checkFutureDate(CallbackParams callbackParams) {
         List<String> errors = new ArrayList<>();
         LocalDateTime hearingDateTime = null;
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         LocalDate date = caseData.getGaHearingNoticeDetail().getHearingDate();
         String hourMinute = caseData.getGaHearingNoticeDetail().getHearingTimeHourMinute();
@@ -135,7 +135,7 @@ public class HearingScheduledEventCallbackHandler extends CallbackHandler implem
     }
 
     private CallbackResponse validateHearingScheduledProcess(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         if (nonNull(caseData.getGaHearingNoticeDetail().getHearingLocation())) {
             caseData.getGaHearingNoticeDetail().getHearingLocation().setListItems(null);
         }

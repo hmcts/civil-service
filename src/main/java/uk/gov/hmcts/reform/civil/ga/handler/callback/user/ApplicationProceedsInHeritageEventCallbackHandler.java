@@ -53,7 +53,7 @@ public class ApplicationProceedsInHeritageEventCallbackHandler extends CallbackH
     }
 
     private CallbackResponse changeApplicationStateToProceedsInHeritage(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         Long caseId = caseData.getCcdCaseReference();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         if (!NON_LIVE_STATES.contains(caseData.getCcdState())) {

@@ -86,7 +86,7 @@ public class TranslatedDocumentUploadedApplicantNotificationHandler extends Call
     }
 
     private CallbackResponse notifyApplicant(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         log.info("Translated document uploaded for applicant for case: {}", caseData.getCcdCaseReference());
         GeneralApplicationCaseData civilCaseData = caseDetailsConverter
             .toGeneralApplicationCaseData(coreCaseDataService

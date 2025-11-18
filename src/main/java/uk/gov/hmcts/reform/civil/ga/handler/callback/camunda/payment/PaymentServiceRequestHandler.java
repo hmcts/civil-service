@@ -68,7 +68,7 @@ public class PaymentServiceRequestHandler extends CallbackHandler implements Gen
     }
 
     private CallbackResponse makePaymentServiceReq(CallbackParams callbackParams) {
-        var caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        var caseData = callbackParams.getGeneralApplicationCaseData();
         var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
         try {

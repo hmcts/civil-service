@@ -99,7 +99,7 @@ public class GenerateApplicationDraftCallbackHandler extends CallbackHandler imp
 
     private CallbackResponse createPDFdocument(CallbackParams callbackParams) {
 
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
 
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         CaseDocument gaDraftDocument;

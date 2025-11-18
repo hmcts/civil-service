@@ -49,7 +49,7 @@ public class GaFullRemissionHWFCallbackHandler extends HWFCallbackHandlerBase {
     }
 
     private CallbackResponse fullRemissionHWF(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
         BigDecimal feeAmount = HwFFeeTypeUtil.getCalculatedFeeInPence(caseData);
 

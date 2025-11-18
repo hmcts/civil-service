@@ -78,7 +78,7 @@ public class SendTranslatedOrderToLiPCallbackHandler extends CallbackHandler imp
     }
 
     private CallbackResponse sendTranslatedOrderLetter(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         if (printServiceEnabled && isDocumentCorrectType(caseData)) {
             CaseDocument originalCaseDocument = caseData.getOriginalDocumentsBulkPrint().get(caseData.getOriginalDocumentsBulkPrint().size() - 1).getValue();

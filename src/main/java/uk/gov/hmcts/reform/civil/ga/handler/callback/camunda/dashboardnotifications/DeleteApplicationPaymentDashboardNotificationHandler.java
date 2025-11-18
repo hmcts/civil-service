@@ -46,7 +46,7 @@ public class DeleteApplicationPaymentDashboardNotificationHandler extends Callba
     }
 
     private CallbackResponse deletePaymentDashboardNotification(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
         if (gaForLipService.isGaForLip(caseData) && gaForLipService.isLipApp(caseData)) {

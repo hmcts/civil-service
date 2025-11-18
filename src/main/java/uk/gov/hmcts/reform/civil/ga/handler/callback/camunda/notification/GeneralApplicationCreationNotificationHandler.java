@@ -50,7 +50,7 @@ public class GeneralApplicationCreationNotificationHandler extends CallbackHandl
 
     private CallbackResponse notifyGeneralApplicationCreationRespondent(CallbackParams callbackParams) {
 
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         log.info("Notify general application creation respondent for case: {}", caseData.getCcdCaseReference());
         if (generalAppFeesService.isFreeApplication(caseData)
                 || !caseData.getCcdState().equals(CaseState.PENDING_APPLICATION_ISSUED)) {

@@ -54,7 +54,7 @@ public class MoveToAdditionalResponseTimeExpiredCallbackHandler extends Callback
     }
 
     private CallbackResponse changeGADetailsStatusInParent(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData)callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         log.info("Updating parent with latest state of application-caseId: {}", caseData.getCcdCaseReference());
         parentCaseUpdateHelper.updateParentWithGAState(
             caseData,

@@ -65,7 +65,7 @@ public class TaskListForClaimantUpdateHandler extends TaskListUpdateHandler {
     }
 
     protected boolean shouldRecordScenario(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         GeneralApplicationCaseData parentCaseData = getParentCaseData(caseData.getParentCaseReference());
         return parentCaseData.isApplicantNotRepresented();
     }

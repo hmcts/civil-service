@@ -90,7 +90,7 @@ public class ModifyStateAfterAdditionalFeeReceivedCallbackHandler extends Callba
     }
 
     private CallbackResponse changeApplicationState(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         Long caseId = caseData.getCcdCaseReference();
         // Do not progress the application if payment not successful
         if (gaForLipService.isLipApp(caseData) && getPaymentStatus(caseData) == PaymentStatus.FAILED) {
@@ -119,7 +119,7 @@ public class ModifyStateAfterAdditionalFeeReceivedCallbackHandler extends Callba
     private void updateDashboardTaskListAndNotification(CallbackParams callbackParams, List<String> scenarios,
                                                         String caseReference) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         if (gaForLipService.isGaForLip(caseData)) {
             ScenarioRequestParams scenarioParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(
                 caseData)).build();
@@ -160,7 +160,7 @@ public class ModifyStateAfterAdditionalFeeReceivedCallbackHandler extends Callba
     }
 
     private CallbackResponse changeGADetailsStatusInParent(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         // Do not progress the application if payment not successful
         if (gaForLipService.isLipApp(caseData) && getPaymentStatus(caseData) == PaymentStatus.FAILED) {
             log.info("Payment status is failed for caseId: {}", caseData.getCcdCaseReference());

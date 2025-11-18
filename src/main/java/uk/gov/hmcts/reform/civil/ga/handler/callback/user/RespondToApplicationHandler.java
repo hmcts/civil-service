@@ -125,7 +125,7 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
     }
 
     private AboutToStartOrSubmitCallbackResponse applicationValidation(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
@@ -153,7 +153,7 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
     }
 
     private CallbackResponse validateDebtorOffer(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         ArrayList<String> errors = new ArrayList<>();
         if (ofNullable(caseData.getGaRespondentDebtorOffer()).isPresent()
             && caseData.getGaRespondentDebtorOffer().getRespondentDebtorOffer().equals(DECLINE)
@@ -179,7 +179,7 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
     }
 
     private SubmittedCallbackResponse buildResponseConfirmation(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         // Generate Dashboard Notification for Lip Party
         if (gaForLipService.isGaForLip(caseData) && !(featureToggleService.isGaForWelshEnabled() && caseData.isApplicationBilingual())) {
@@ -205,7 +205,7 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
     }
 
     public List<String> applicationExistsValidation(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         UserInfo userInfo = idamClient.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         List<Element<GARespondentResponse>> respondentResponse = caseData.getRespondentsResponses();
@@ -230,7 +230,7 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
     }
 
     private CallbackResponse hearingScreenResponse(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         List<String> errors = null;
         if (callbackParams.getRequest().getEventId().equals("RESPOND_TO_APPLICATION")) {
             GAHearingDetails hearingDetails = caseData.getHearingDetailsResp();

@@ -56,7 +56,7 @@ public class ApproveConsentOrderCallbackHandler extends CallbackHandler implemen
     }
 
     private CallbackResponse validateApplicationType(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<GeneralApplicationTypes> validGATypes = List.of(STAY_THE_CLAIM);
         GAApproveConsentOrder.GAApproveConsentOrderBuilder gaApproveConsentOrderBuilder = GAApproveConsentOrder.builder();
@@ -78,7 +78,7 @@ public class ApproveConsentOrderCallbackHandler extends CallbackHandler implemen
     }
 
     private CallbackResponse populateConsentOrder(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         List<String> errors = new ArrayList<>();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (caseData.getApproveConsentOrder() != null
@@ -106,7 +106,7 @@ public class ApproveConsentOrderCallbackHandler extends CallbackHandler implemen
     }
 
     private CallbackResponse setBusinessProcess(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> dataBuilder = caseData.toBuilder();
         dataBuilder.businessProcess(BusinessProcess.readyGa(APPROVE_CONSENT_ORDER)).build();
         log.info("Set business process to APPROVE_CONSENT_ORDER for caseId: {}", caseData.getCcdCaseReference());

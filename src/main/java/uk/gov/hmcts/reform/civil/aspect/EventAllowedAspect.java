@@ -93,7 +93,7 @@ public class EventAllowedAspect {
     }
 
     private void evaluateGeneralApplicationFlowState(CallbackParams callbackParams, CaseEvent caseEvent, CaseDetails caseDetails) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData)callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         StringBuilder stateHistoryBuilder = new StringBuilder();
         GaFlowState flowState = gaFlowStateAllowedEventService.getFlowState(caseData);
         gaStateFlowEngine.evaluate(caseData).getStateHistory().forEach(s -> {

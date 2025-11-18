@@ -40,7 +40,7 @@ public class AddApplicationToTranslationCollection extends CallbackHandler imple
     }
 
     private CallbackResponse addApplicationToTranslationCollection(CallbackParams callbackParams) {
-        GeneralApplicationCaseData gaCaseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData gaCaseData = callbackParams.getGeneralApplicationCaseData();
         parentCaseUpdateHelper.updateCollectionForWelshApplication(gaCaseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();

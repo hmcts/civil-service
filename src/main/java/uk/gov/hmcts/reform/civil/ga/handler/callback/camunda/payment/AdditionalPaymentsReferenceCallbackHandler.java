@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
-import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.ga.service.JudicialDecisionHelper;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
@@ -60,7 +59,7 @@ public class AdditionalPaymentsReferenceCallbackHandler extends CallbackHandler 
 
     private CallbackResponse getAdditionalPaymentReference(CallbackParams callbackParams) {
 
-        var caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        var caseData = callbackParams.getGeneralApplicationCaseData();
         var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
         if (judicialDecisionHelper.isApplicationUncloakedWithAdditionalFee(caseData)) {

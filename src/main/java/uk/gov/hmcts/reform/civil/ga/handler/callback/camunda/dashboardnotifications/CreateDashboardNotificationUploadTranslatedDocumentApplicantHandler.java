@@ -38,7 +38,7 @@ public class CreateDashboardNotificationUploadTranslatedDocumentApplicantHandler
 
     @Override
     public boolean shouldRecordScenario(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         return caseData.getIsGaApplicantLip() == YesOrNo.YES;
     }
 }

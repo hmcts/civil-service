@@ -122,7 +122,7 @@ public class JudicialFinalDecisionHandler extends CallbackHandler implements Gen
     }
 
     private CallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        var caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        var caseData = callbackParams.getGeneralApplicationCaseData();
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(getHeader(caseData))
             .confirmationBody(getBody(caseData))
@@ -148,7 +148,7 @@ public class JudicialFinalDecisionHandler extends CallbackHandler implements Gen
     }
 
     private CallbackResponse gaPopulateFinalOrderPreviewDoc(final CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<String> errors = validAssistedOrderForm(caseData);
         if (caseData.getFinalOrderSelection().equals(FREE_FORM_ORDER)) {
@@ -173,7 +173,7 @@ public class JudicialFinalDecisionHandler extends CallbackHandler implements Gen
     }
 
     private CallbackResponse setCaseName(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder()
             .caseNameHmctsInternal(getAllPartyNames(caseData));
         UserInfo userDetails = idamClient.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
@@ -186,7 +186,7 @@ public class JudicialFinalDecisionHandler extends CallbackHandler implements Gen
     }
 
     public CallbackResponse populateFreeFormValues(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         caseDataBuilder.orderOnCourtInitiative(FreeFormOrderValues.builder()
@@ -323,7 +323,7 @@ public class JudicialFinalDecisionHandler extends CallbackHandler implements Gen
     }
 
     private CallbackResponse setFinalDecisionBusinessProcess(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         log.info("General app for LiP is enabled for caseId: {}", caseData.getCcdCaseReference());
         caseDataBuilder.bilingualHint(null);

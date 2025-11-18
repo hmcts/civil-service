@@ -61,7 +61,7 @@ public class MoveToJudicialDecisionStateEventCallbackHandler extends CallbackHan
 
     private CallbackResponse changeApplicationState(CallbackParams callbackParams) {
         Long caseId = ((GeneralApplicationCaseData)callbackParams.getBaseCaseData()).getCcdCaseReference();
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData)callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         log.info("Changing state to APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION for caseId: {}", caseId);
         CaseDocument gaDraftDocument;
@@ -87,7 +87,7 @@ public class MoveToJudicialDecisionStateEventCallbackHandler extends CallbackHan
     }
 
     private CallbackResponse changeGADetailsStatusInParent(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData)callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         log.info("Updating parent with latest state of application-caseId: {}", caseData.getCcdCaseReference());
         parentCaseUpdateHelper.updateParentWithGAState(
             caseData,

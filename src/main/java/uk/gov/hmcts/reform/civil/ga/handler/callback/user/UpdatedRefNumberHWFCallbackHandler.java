@@ -49,7 +49,7 @@ public class UpdatedRefNumberHWFCallbackHandler extends CallbackHandler implemen
     }
 
     private CallbackResponse updatedRefNumberHWF(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData)callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         GeneralApplicationCaseData updatedCaseData = updateHwFReference(caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))

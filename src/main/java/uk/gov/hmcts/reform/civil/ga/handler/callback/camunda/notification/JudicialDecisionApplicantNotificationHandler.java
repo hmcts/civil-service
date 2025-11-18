@@ -47,7 +47,7 @@ public class JudicialDecisionApplicantNotificationHandler extends CallbackHandle
     }
 
     private CallbackResponse judicialDecisionNotification(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         log.info("Judicial decision applicant notification for case: {}", caseData.getCcdCaseReference());
         try {
             caseData = judicialNotificationService.sendNotification(caseData, SOLICITOR_TYPE);

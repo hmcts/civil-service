@@ -48,7 +48,7 @@ public class MainCaseClosedEventCallbackHandler extends CallbackHandler implemen
     }
 
     private CallbackResponse changeApplicationStateToApplicationClosed(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         Long caseId = caseData.getCcdCaseReference();
 
         if (!NON_LIVE_STATES.contains(caseData.getCcdState())) {

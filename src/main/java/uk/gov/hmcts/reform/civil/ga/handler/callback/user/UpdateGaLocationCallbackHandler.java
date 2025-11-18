@@ -61,7 +61,7 @@ public class UpdateGaLocationCallbackHandler extends CallbackHandler implements 
     }
 
     private CallbackResponse updateCaseManagementLocation(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         String parentCaseReference = caseData.getGeneralAppParentCaseLink() != null
             ? caseData.getGeneralAppParentCaseLink().getCaseReference() : caseData.getParentCaseReference();

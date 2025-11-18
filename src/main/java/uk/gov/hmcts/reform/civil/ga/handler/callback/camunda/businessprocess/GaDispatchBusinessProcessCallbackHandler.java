@@ -47,7 +47,7 @@ public class GaDispatchBusinessProcessCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse checkIfBusinessProcessStarted(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         log.info("Check if business process started for caseId: {}", caseData.getCcdCaseReference());
         List<String> errors = new ArrayList<>();
 
@@ -61,7 +61,7 @@ public class GaDispatchBusinessProcessCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse dispatchBusinessProcess(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         log.info("Dispatch business process for caseId: {}", caseData.getCcdCaseReference());
         BusinessProcess businessProcess = caseData.getBusinessProcess();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();

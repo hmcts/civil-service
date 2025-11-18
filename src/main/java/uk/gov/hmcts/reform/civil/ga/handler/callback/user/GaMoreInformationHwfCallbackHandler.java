@@ -51,7 +51,7 @@ public class GaMoreInformationHwfCallbackHandler extends HWFCallbackHandlerBase 
     }
 
     private CallbackResponse validationMoreInformation(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         List<String> errors = new ArrayList<>();
         HelpWithFeesMoreInformation moreInformationData =
             FeeType.ADDITIONAL == caseData.getHwfFeeType()
@@ -67,7 +67,7 @@ public class GaMoreInformationHwfCallbackHandler extends HWFCallbackHandlerBase 
     }
 
     private CallbackResponse submitMoreInformationHwf(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
                 .businessProcess(BusinessProcess.readyGa(NOTIFY_APPLICANT_LIP_HWF));
 

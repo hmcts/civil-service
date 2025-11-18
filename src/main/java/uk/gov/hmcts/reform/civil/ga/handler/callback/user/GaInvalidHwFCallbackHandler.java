@@ -43,7 +43,7 @@ public class GaInvalidHwFCallbackHandler extends HWFCallbackHandlerBase {
     }
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData)callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         GeneralApplicationCaseData updatedCaseData = setUpBusinessProcess(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()

@@ -39,7 +39,7 @@ public class CreateDashboardNotificationUploadTranslatedDocumentRespondentHandle
 
     @Override
     public boolean shouldRecordScenario(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         return (caseData.getIsGaRespondentOneLip() == YesOrNo.YES
             && ((caseData.getGeneralAppInformOtherParty() != null && caseData.getGeneralAppInformOtherParty().getIsWithNotice() == YES)
             || caseData.getGeneralAppConsentOrder() == YES));

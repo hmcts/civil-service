@@ -46,7 +46,7 @@ public class DeleteWrittenRepresentationNotificationDefendantHandler extends Del
 
     @Override
     protected boolean shouldRecordScenario(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         if (caseData.getParentClaimantIsApplicant() == YES) {
             return caseData.getIsGaRespondentOneLip() == YES;
         } else {

@@ -45,7 +45,7 @@ public class CreateApplicationRespondedDashboardNotificationHandler extends Call
 
     public CallbackResponse configureDashboardScenario(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        GeneralApplicationCaseData caseData = (GeneralApplicationCaseData) callbackParams.getBaseCaseData();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         if (caseData.getParentClaimantIsApplicant().equals(YesOrNo.NO) && caseData.getGeneralAppType().getTypes().contains(
             GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {
             if (gaForLipService.isLipApp(caseData)) {
