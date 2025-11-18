@@ -130,7 +130,6 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
 
     private CallbackResponse showPartyField(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder builder = caseData.toBuilder();
 
         String partyChosen = caseData.getUpdateDetailsForm().getPartyChosen().getValue().getCode();
         String partyChosenType = null;
@@ -142,20 +141,20 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             boolean isAdmin = isAdmin(authToken);
             partyChosenType = appendUserAndType(partyChosen, oldCaseData, isAdmin);
         }
-
-        UpdateDetailsForm.UpdateDetailsFormBuilder formBuilder = caseData.getUpdateDetailsForm().toBuilder()
+// Todo: Sumit: UpdatedDetailedForm To Builder
+        UpdateDetailsForm updatedForm = caseData.getUpdateDetailsForm().toBuilder()
             .partyChosenId(partyChosen)
             .partyChosenType(partyChosenType)
             .updateExpertsDetailsForm(prepareExperts(partyChosen, caseData))
             .updateWitnessesDetailsForm(prepareWitnesses(partyChosen, caseData))
             .updateLRIndividualsForm(prepareLRIndividuals(partyChosen, caseData))
             .updateOrgIndividualsForm(prepareOrgIndividuals(partyChosen, caseData))
-            .build().toBuilder();
+            .build();
 
-        builder.updateDetailsForm(formBuilder.build());
+        caseData.setUpdateDetailsForm(updatedForm);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

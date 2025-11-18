@@ -110,11 +110,10 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         }
 
         //build options for field (Default Value & List Options), add to case data
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.defendantSolicitorNotifyClaimOptions(DynamicList.fromList(dynamicListOptions));
+        caseData.setDefendantSolicitorNotifyClaimOptions(DynamicList.fromList(dynamicListOptions));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
@@ -127,9 +126,8 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
             warnings.add(WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR);
         }
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .warnings(warnings)
             .build();
     }
@@ -141,11 +139,10 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         List<String> dateValidationErrorMessages = serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(certificateOfService);
         errors.addAll(dateValidationErrorMessages);
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.cosNotifyClaimDefendant1(certificateOfService.toBuilder().build());
+        caseData.setCosNotifyClaimDefendant1(certificateOfService.toBuilder().build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .errors(errors)
             .build();
     }
@@ -157,12 +154,10 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         List<String> dateValidationErrorMessages = serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(certificateOfServiceDef2);
         errors.addAll(dateValidationErrorMessages);
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-
-        caseDataBuilder.cosNotifyClaimDefendant2(certificateOfServiceDef2.toBuilder().build());
+        caseData.setCosNotifyClaimDefendant2(certificateOfServiceDef2.toBuilder().build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .errors(errors)
             .build();
     }
@@ -171,26 +166,22 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime claimNotificationDate = time.now();
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder()
-            .businessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM))
-            .claimNotificationDate(claimNotificationDate);
+        caseData.setBusinessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM));
+        caseData.setClaimNotificationDate(claimNotificationDate);
 
         // set organisation policy after removing it in claim issue
         // workaround for hiding cases in CAA list before case notify
-        setOrganisationPolicy(caseData, caseDataBuilder);
+        //Todo: Sumit setOrganisationPolicy
+        setOrganisationPolicy(caseData);
         LocalDateTime claimDetailsNotificationDeadline;
         if (areAnyRespondentsLitigantInPerson(caseData)) {
             claimDetailsNotificationDeadline = getDeadline(getServiceDate(caseData));
             if (Objects.nonNull(caseData.getCosNotifyClaimDefendant1())) {
-                caseDataBuilder
-                    .cosNotifyClaimDefendant1(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDefendant1()))
-                    .build();
+                caseData.setCosNotifyClaimDefendant1(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDefendant1()));
             }
 
             if (Objects.nonNull(caseData.getCosNotifyClaimDefendant2())) {
-                caseDataBuilder
-                    .cosNotifyClaimDefendant2(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDefendant2()))
-                    .build();
+                caseData.setCosNotifyClaimDefendant2(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDefendant2()));
             }
 
         } else {
@@ -202,18 +193,17 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
             claimDetailsNotificationDeadline = caseData.getClaimNotificationDeadline();
         }
 
-        caseDataBuilder
-            .claimDetailsNotificationDeadline(claimDetailsNotificationDeadline)
-            .nextDeadline(claimDetailsNotificationDeadline.toLocalDate());
+        caseData.setClaimDetailsNotificationDeadline(claimDetailsNotificationDeadline);
+        caseData.setNextDeadline(claimDetailsNotificationDeadline.toLocalDate());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
-    private void setOrganisationPolicy(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
+    private void setOrganisationPolicy(CaseData caseData) {
         if (caseData.getRespondent1OrganisationIDCopy() != null) {
-            caseDataBuilder.respondent1OrganisationPolicy(
+            caseData.setRespondent1OrganisationPolicy(
                 caseData.getRespondent1OrganisationPolicy().toBuilder()
                     .organisation(Organisation.builder()
                                       .organisationID(caseData.getRespondent1OrganisationIDCopy())
@@ -223,7 +213,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         }
 
         if (caseData.getRespondent2OrganisationIDCopy() != null) {
-            caseDataBuilder.respondent2OrganisationPolicy(
+            caseData.setRespondent2OrganisationPolicy(
                 caseData.getRespondent2OrganisationPolicy().toBuilder()
                     .organisation(Organisation.builder()
                                       .organisationID(caseData.getRespondent2OrganisationIDCopy())
