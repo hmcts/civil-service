@@ -57,7 +57,7 @@ public class NotificationUtils {
         //NO-OP
     }
 
-    public static String REFERENCE_NOT_PROVIDED = "Not provided";
+    public static final String REFERENCE_NOT_PROVIDED = "Not provided";
 
     public static boolean isRespondent1(CallbackParams callbackParams, CaseEvent matchEvent) {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());

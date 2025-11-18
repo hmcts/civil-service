@@ -11,10 +11,10 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 @Builder(toBuilder = true)
 public class CourtLocation {
 
-    private final String applicantPreferredCourt;
-    private final DynamicList applicantPreferredCourtLocationList;
-    private final CaseLocationCivil caseLocation;
-    private final String reasonForHearingAtSpecificCourt;
+    private String applicantPreferredCourt;
+    private DynamicList applicantPreferredCourtLocationList;
+    private CaseLocationCivil caseLocation;
+    private String reasonForHearingAtSpecificCourt;
 
     @JsonCreator
     CourtLocation(@JsonProperty("applicantPreferredCourt") String applicantPreferredCourt,

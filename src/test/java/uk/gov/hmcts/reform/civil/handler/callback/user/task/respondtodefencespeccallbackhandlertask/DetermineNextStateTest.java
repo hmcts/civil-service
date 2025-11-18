@@ -31,8 +31,9 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DirectionsQuestionnairePreparer;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -76,7 +77,7 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     private JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
 
     @Mock
-    private FlowStateAllowedEventService flowStateAllowedEventService;
+    private IStateFlowEngine stateFlowEngine;
 
     @Mock
     private DirectionsQuestionnairePreparer directionsQuestionnairePreparer;
@@ -93,7 +94,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
             .build();
 
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
         String resultState = determineNextState.determineNextStatePostTranslation(caseData, callbackParams(caseData));
         var response = (AboutToStartOrSubmitCallbackResponse) determineNextState.handle(params);
@@ -139,9 +139,12 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
         "NON_LIP, IN_MEDIATION, MAIN.FULL_DEFENCE_PROCEED"
     })
     void shouldPauseStateChangeDefendantLipAndRequiresTranslation(String lipCase, String expectedState, String flowState) {
-        FlowState flowStateTest = FlowState.fromFullName(flowState);
+        StateFlow mockStateFlow = mock(StateFlow.class);
+        State mockState = mock(uk.gov.hmcts.reform.civil.stateflow.model.State.class);
+        when(mockStateFlow.getState()).thenReturn(mockState);
+        when(mockState.getName()).thenReturn(flowState);
 
-        when(flowStateAllowedEventService.getFlowState(any())).thenReturn(flowStateTest);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockStateFlow);
 
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         CaseData caseData;
@@ -155,7 +158,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
                 .build();
         }
 
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         BusinessProcess businessProcess = BusinessProcess.builder().build();
 
@@ -175,8 +177,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
             .build();
 
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-
         String resultState;
         if (postTranslation) {
             resultState = determineNextState.determineNextStatePostTranslation(caseData, callbackParams(caseData));
@@ -195,7 +195,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         BusinessProcess businessProcess = BusinessProcess.builder().build();
 
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
@@ -254,8 +253,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
             .build();
 
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-
         String resultState;
         if (postTranslation) {
             resultState = determineNextState.determineNextStatePostTranslation(caseData, callbackParams(caseData));
@@ -280,8 +277,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .responseClaimTrack(FAST_CLAIM.name())
             .build();
-
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
         String resultState;
         if (postTranslation) {
@@ -368,8 +363,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
             .build();
 
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-
         String resultState;
         if (postTranslation) {
             resultState = determineNextState.determineNextStatePostTranslation(caseData, callbackParams(caseData));
@@ -399,7 +392,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .defenceRouteRequired(SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM)
             .build();
 
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         String resultState;
@@ -419,7 +411,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         BusinessProcess businessProcess = BusinessProcess.builder().build();
 
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
@@ -482,7 +473,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
             .build();
 
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         String resultState;
@@ -511,7 +501,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
             .build();
 
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
                                                                    builder, "", businessProcess);

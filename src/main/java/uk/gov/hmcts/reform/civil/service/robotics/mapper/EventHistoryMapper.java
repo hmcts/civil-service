@@ -420,7 +420,7 @@ public class EventHistoryMapper {
 
         // Costs and installments
         BigDecimal amountOfCosts = (caseData.isApplicantLipOneVOne() && featureToggleService.isLipVLipEnabled())
-            ? MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
+            ? ClaimFeeUtility.getCourtFee(caseData)
             : JudgmentsOnlineHelper.getFixedCostsOfJudgmentForDJ(caseData).add(
             JudgmentsOnlineHelper.getClaimFeeOfJudgmentForDJ(caseData));
 
@@ -707,12 +707,14 @@ public class EventHistoryMapper {
     private void buildJudgmentByAdmissionEventDetails(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
 
         Optional<CCJPaymentDetails> ccjPaymentDetails = ofNullable(caseData.getCcjPaymentDetails());
+        BigDecimal amountOfCosts = (caseData.isApplicantLipOneVOne() && featureToggleService.isLipVLipEnabled())
+            ? ClaimFeeUtility.getCourtFee(caseData) : ccjPaymentDetails.map(CCJPaymentDetails::getCcjJudgmentFixedCostAmount).orElse(BigDecimal.ZERO)
+            .add(ccjPaymentDetails.map(CCJPaymentDetails::getCcjJudgmentAmountClaimFee)
+                     .map(amount -> amount.setScale(2)).orElse(ZERO));
+
         EventDetails judgmentByAdmissionEvent = EventDetails.builder()
             .amountOfJudgment(getAmountOfJudgmentForAdmission(caseData))
-            .amountOfCosts(
-                ccjPaymentDetails.map(CCJPaymentDetails::getCcjJudgmentFixedCostAmount).orElse(BigDecimal.ZERO)
-                               .add(ccjPaymentDetails.map(CCJPaymentDetails::getCcjJudgmentAmountClaimFee)
-                                        .map(amount -> amount.setScale(2)).orElse(ZERO)))
+            .amountOfCosts(amountOfCosts)
             .amountPaidBeforeJudgment(ccjPaymentDetails.map(CCJPaymentDetails::getCcjPaymentPaidSomeAmountInPounds).map(amountPaid -> amountPaid.setScale(2)).orElse(ZERO))
             .isJudgmentForthwith(hasCourtDecisionInFavourOfClaimant(caseData) ? caseData.applicant1SuggestedPayImmediately() : caseData.isPayImmediately())
             .paymentInFullDate(getPaymentInFullDate(caseData))
@@ -1243,18 +1245,21 @@ public class EventHistoryMapper {
     private void buildGeneralFormApplicationEventsStrikeOutOrder(EventHistory.EventHistoryBuilder builder,
                                                                  CaseData caseData) {
         if (caseData.getGeneralApplications() != null) {
+
             var generalApplications = caseData
-                    .getGeneralApplications()
-                    .stream()
-                    .filter(application -> application.getValue().getGeneralAppType().getTypes().contains(STRIKE_OUT)
-                            && getGeneralApplicationDetailsJudgeDecisionWithStruckOutDefence(
-                            application.getValue()
-                                    .getCaseLink()
-                                    .getCaseReference(),
-                            caseData
-                    )
-                            != null)
-                    .toList();
+                .getGeneralApplications()
+                .stream()
+                .filter(application -> {
+                    if (application.getValue().getCaseLink() == null) {
+                        return false;
+                    }
+
+                    return application.getValue().getGeneralAppType().getTypes().contains(STRIKE_OUT)
+                        && getGeneralApplicationDetailsJudgeDecisionWithStruckOutDefence(
+                        application.getValue().getCaseLink().getCaseReference(), caseData
+                    ) != null;
+                })
+                .toList();
 
             if (!generalApplications.isEmpty()) {
                 buildGeneralFormOfApplicationStrikeOut(builder, generalApplications);

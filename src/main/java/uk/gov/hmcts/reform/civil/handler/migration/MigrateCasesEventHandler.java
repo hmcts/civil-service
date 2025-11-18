@@ -2,14 +2,22 @@ package uk.gov.hmcts.reform.civil.handler.migration;
 
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
+import org.camunda.bpm.engine.variable.value.FileValue;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReferenceCsvLoader;
+import uk.gov.hmcts.reform.civil.bulkupdate.csv.DashboardScenarioCaseReference;
+import uk.gov.hmcts.reform.civil.bulkupdate.csv.ExcelMappable;
 import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.utils.CaseMigrationEncryptionUtil;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -39,9 +47,7 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
         assert externalTask.getVariable(TASK_NAME) != null;
-        if (externalTask.getVariable(CSV_FILE_NAME) == null) {
-            throw new AssertionError("csvFileName is null");
-        }
+
         String taskName = externalTask.getVariable(TASK_NAME);
         MigrationTask<? extends CaseReference> task = migrationTaskFactory
             .getMigrationTask(taskName)
@@ -49,15 +55,75 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
         return handleTypedTask(externalTask, task);
     }
 
+    @SuppressWarnings("unchecked")
     private <T extends CaseReference> ExternalTaskData handleTypedTask(ExternalTask externalTask, MigrationTask<T> task) {
-        String csvFileName = externalTask.getVariable(CSV_FILE_NAME);
-        List<T> caseReferences = getCaseReferenceList(task.getType(), csvFileName);
-        log.info("Found {} case references to process", caseReferences.size());
+        List<T> caseReferences = new ArrayList<>();
+        String caseIds = externalTask.getVariable("caseIds");
+        String scenario = externalTask.getVariable("scenario");
+
+        FileValue excelFileValue = externalTask.getVariableTyped("excelFile", false);
+
+        if (excelFileValue != null) {
+            byte[] excelBytes;
+            try (InputStream is = excelFileValue.getValue();
+                 ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+
+                byte[] buffer = new byte[8192];
+                int bytesRead;
+                while ((bytesRead = is.read(buffer)) != -1) {
+                    baos.write(buffer, 0, bytesRead);
+                }
+                excelBytes = baos.toByteArray();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            if (ExcelMappable.class.isAssignableFrom(task.getType())) {
+                caseReferences = caseReferenceCsvLoader.loadFromExcelBytes(task.getType(), excelBytes);
+            }
+
+        } else if (caseIds != null && !caseIds.isEmpty()) {
+            List<String> caseIdList = Arrays.stream(caseIds.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
+
+            caseReferences = caseIdList.stream()
+                .map(id -> {
+                    Object instance;
+                    if (scenario != null) {
+                        DashboardScenarioCaseReference scenarioInstance = new DashboardScenarioCaseReference();
+                        scenarioInstance.setCaseReference(id);
+                        scenarioInstance.setDashboardScenario(scenario);
+                        instance = scenarioInstance;
+                    } else {
+                        CaseReference caseRef = new CaseReference();
+                        caseRef.setCaseReference(id);
+                        instance = caseRef;
+                    }
+                    return task.getType().cast(instance);
+                })
+                .toList();
+            log.info("Created {} case references from Camunda variables", caseReferences.size());
+        } else {
+            log.info("caseIds or scenario are not provided. Falling back to csv check");
+            // Fallback to CSV
+            String csvFileName = externalTask.getVariable(CSV_FILE_NAME);
+            if (csvFileName == null) {
+                throw new IllegalArgumentException("csvFileName is missing and no caseIds provided");
+            }
+            caseReferences = getCaseReferenceList(task.getType(), csvFileName);
+        }
+
         if (caseReferences.isEmpty()) {
             log.warn("No case references found to process");
             return ExternalTaskData.builder().build();
         }
-        asyncCaseMigrationService.migrateCasesAsync(task, caseReferences);
+
+        log.info("Found {} case references to process", caseReferences.size());
+
+        String state = externalTask.getVariable("state");
+        asyncCaseMigrationService.migrateCasesAsync(task, caseReferences, state);
 
         return ExternalTaskData.builder().build();
     }

@@ -2141,11 +2141,14 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateClaimDismissedPastHearingFeeDueDeadline() {
-        atStateHearingFeeDueUnpaid();
+        return atStateClaimDismissedPastHearingFeeDueDeadline(ONE_V_ONE);
+    }
+
+    public CaseDataBuilder atStateClaimDismissedPastHearingFeeDueDeadline(MultiPartyScenario mpScenario) {
+        atStateHearingFeeDueUnpaid(mpScenario);
         ccdState = CASE_DISMISSED;
         caseDismissedHearingFeeDueDate = LocalDateTime.now();
         hearingDate = hearingDueDate.plusWeeks(2);
-
         return this;
     }
 
@@ -5039,6 +5042,7 @@ public class CaseDataBuilder {
         atStateRespondentFullDefenceAfterNotificationAcknowledgement();
         defendantSingleResponseToBothClaimants = YES;
         respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
+        applicant1ProceedWithClaimSpec2v1 = YES;
         applicant1ProceedWithClaimMultiParty2v1 = YES;
         applicant2ProceedWithClaimMultiParty2v1 = YES;
 
@@ -5270,7 +5274,11 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateHearingFeeDueUnpaid() {
-        atStateApplicantRespondToDefenceAndProceed();
+        return atStateHearingFeeDueUnpaid(ONE_V_ONE);
+    }
+
+    public CaseDataBuilder atStateHearingFeeDueUnpaid(MultiPartyScenario mpScenario) {
+        atStateApplicantRespondToDefenceAndProceed(mpScenario);
         hearingDueDate = LocalDate.now().minusDays(1);
         hearingFeePaymentDetails = PaymentDetails.builder().status(FAILED).build();
         ccdState = HEARING_READINESS;

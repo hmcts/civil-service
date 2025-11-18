@@ -11,7 +11,7 @@ import java.util.List;
 @Builder(toBuilder = true)
 public class Respondent1EmployerDetailsLRspec {
 
-    private final List<Element<EmployerDetailsLRspec>> employerDetails;
+    private List<Element<EmployerDetailsLRspec>> employerDetails;
 
     @JsonCreator
     public Respondent1EmployerDetailsLRspec(List<Element<EmployerDetailsLRspec>> employerDetails) {

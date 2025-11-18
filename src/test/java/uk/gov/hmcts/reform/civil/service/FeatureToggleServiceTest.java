@@ -48,15 +48,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsGAForLipInvoked(Boolean toggleStat) {
-        var caseFlagsKey = "GaForLips";
-        givenToggle(caseFlagsKey, toggleStat);
-
-        assertThat(featureToggleService.isGaForLipsEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsAmendBundleEnabledInvoked(Boolean toggleStat) {
         var caseFlagsKey = "amend-bundle-enabled";
         givenToggle(caseFlagsKey, toggleStat);
@@ -84,29 +75,11 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsPinInPostEnabledInvoked(Boolean toggleStat) {
-        var pinInPostKey = "pin-in-post";
-        givenToggle(pinInPostKey, toggleStat);
-
-        assertThat(featureToggleService.isPinInPostEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenEnableRPAEmailsInvoked(Boolean toggleStat) {
         var enableRPAEmailsKey = "enable-rpa-emails";
         givenToggle(enableRPAEmailsKey, toggleStat);
 
         assertThat(featureToggleService.isRPAEmailEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenFastTrackUpliftsEnabled(Boolean toggleStat) {
-        var caseFileKey = "fast-track-uplifts";
-        givenToggle(caseFileKey, toggleStat);
-
-        assertThat(featureToggleService.isFastTrackUpliftsEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
@@ -135,21 +108,11 @@ class FeatureToggleServiceTest {
                 location,
                 false
             )).thenReturn(isFeatureEnabled);
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(isFeatureEnabled);
         }
 
-        boolean result = featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(location);
+        boolean result = featureToggleService.isLocationWhiteListed(location);
 
         assertEquals(expected, result);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsTransferCaseOnlineEnabled(Boolean toggleStat) {
-        var transferCaseOnlineKey = "isTransferOnlineCaseEnabled";
-        givenToggle(transferCaseOnlineKey, toggleStat);
-
-        assertThat(featureToggleService.isTransferOnlineCaseEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
@@ -296,11 +259,11 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsHmcForLipEnabled(Boolean toggleStat) {
-        var hmcCui = "hmc-cui-enabled";
-        givenToggle(hmcCui, toggleStat);
+    void shouldReturnCorrectValue_whenIsQMForLRs(Boolean toggleStat) {
+        var caseFlagsKey = "query-management";
+        givenToggle(caseFlagsKey, toggleStat);
 
-        assertThat(featureToggleService.isHmcForLipEnabled()).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isQueryManagementLRsEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
