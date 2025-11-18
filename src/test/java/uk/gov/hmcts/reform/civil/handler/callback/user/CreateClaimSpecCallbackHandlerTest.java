@@ -2377,22 +2377,22 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsExactly("2", "420219");
         }
 
+        @Test
         void shouldAddMissingRespondent1OrgPolicyWithCaseRole_whenInvoked() {
+            // Given
             var callbackParams = params.toBuilder()
                 .caseData(params.getCaseData().toBuilder()
-                              .respondent1OrganisationPolicy(
-                                  OrganisationPolicy.builder()
-                                      .organisation(null)
-                                      .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORONE.name())
-                                      .build())
+                              .respondent1OrganisationPolicy(null)
                               .build())
                 .build();
 
+            // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
 
+            // Then
             assertThat(response.getData())
                 .extracting("respondent1OrganisationPolicy")
-                .isNotNull();
+                .extracting("OrgPolicyCaseAssignedRole").isEqualTo("[RESPONDENTSOLICITORONE]");
         }
 
         @Test

@@ -239,6 +239,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
                     dq,
                     isFlightDelaySmallClaimAndOther(caseData)
                 );
+                dq = caseData.getApplicant1DQ().toBuilder().applicant1DQStatementOfTruth(statementOfTruth);
             }
 
             var smallClaimWitnesses = caseData.getApplicant1DQWitnessesSmallClaim();
@@ -318,6 +319,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         handleCourtLocationData(caseData, dq, callbackParams);
 
         caseData.setApplicant1DQ(dq.build());
+
         Optional<RequestedCourt> newCourt;
 
         if (forceClaimantCourt) {
@@ -326,15 +328,13 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             newCourt = locationHelper.getCaseManagementLocation(caseData);
         }
 
-        // Don't update CML if it's at CNBC - maintain CNBC location
-        if (!notTransferredOnline(caseData)) {
-            newCourt.ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
-                caseData,
-                requestedCourt,
-                () -> locationRefDataService.getCourtLocationsForDefaultJudgments(
-                    callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString())
-            ));
-        }
+        newCourt.ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
+            caseData,
+            requestedCourt,
+            () -> locationRefDataService.getCourtLocationsForDefaultJudgments(
+                callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString())
+        ));
+
         if (log.isDebugEnabled()) {
             log.debug(
                 "Case management location for {} is {}",
