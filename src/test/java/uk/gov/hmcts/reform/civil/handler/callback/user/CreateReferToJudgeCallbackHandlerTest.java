@@ -154,7 +154,7 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void thereIsAMatchingLocation() {
-            CaseData updatedData = CaseData.builder().build();
+            CaseData updatedData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
 
             LocationHelper.updateWithLocation(updatedData, LocationRefData.builder()
                 .courtLocationCode("123").regionId("regionId").region("region name").epimmsId("epimms").build());
