@@ -1,11 +1,15 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.ras.client.RoleAssignmentsApi;
 import uk.gov.hmcts.reform.civil.ras.model.QueryRequest;
@@ -33,10 +37,19 @@ class RoleAssignmentsServiceUnitTest {
     private AuthTokenGenerator authTokenGenerator;
     @InjectMocks
     private RoleAssignmentsService service;
+    private Level originalLevel;
 
     @BeforeEach
     void setUp() {
         when(authTokenGenerator.generate()).thenReturn("service-token");
+        Logger logger = (Logger) LoggerFactory.getLogger(RoleAssignmentsService.class);
+        originalLevel = logger.getLevel();
+        logger.setLevel(Level.DEBUG);
+    }
+
+    @AfterEach
+    void tearDown() {
+        ((Logger) LoggerFactory.getLogger(RoleAssignmentsService.class)).setLevel(originalLevel);
     }
 
     @Test
@@ -77,5 +90,24 @@ class RoleAssignmentsServiceUnitTest {
         service.assignUserRoles(ACTOR_ID, AUTH, request);
 
         verify(roleAssignmentsApi).createRoleAssignment(AUTH, "service-token", request);
+    }
+
+    @Test
+    void shouldGetRoleAssignmentsWithLabels() {
+        RoleAssignmentServiceResponse response = RoleAssignmentServiceResponse.builder().build();
+        List<String> roleNames = List.of("judge");
+        when(roleAssignmentsApi.getRoleAssignments(
+            eq(AUTH),
+            eq("service-token"),
+            eq(null),
+            eq(null),
+            eq(100),
+            eq(null),
+            eq(null),
+            eq(QueryRequest.builder().actorId(ACTOR_ID).roleName(roleNames).build()),
+            eq(true)
+        )).thenReturn(response);
+
+        assertThat(service.getRoleAssignmentsWithLabels(ACTOR_ID, AUTH, roleNames)).isEqualTo(response);
     }
 }
