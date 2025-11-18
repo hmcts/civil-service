@@ -171,7 +171,6 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
 
         // set organisation policy after removing it in claim issue
         // workaround for hiding cases in CAA list before case notify
-        //Todo: Sumit setOrganisationPolicy
         setOrganisationPolicy(caseData);
         LocalDateTime claimDetailsNotificationDeadline;
         if (areAnyRespondentsLitigantInPerson(caseData)) {

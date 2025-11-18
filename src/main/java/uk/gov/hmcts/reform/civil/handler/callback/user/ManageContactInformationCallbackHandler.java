@@ -141,15 +141,15 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             boolean isAdmin = isAdmin(authToken);
             partyChosenType = appendUserAndType(partyChosen, oldCaseData, isAdmin);
         }
-// Todo: Sumit: UpdatedDetailedForm To Builder
-        UpdateDetailsForm updatedForm = caseData.getUpdateDetailsForm().toBuilder()
-            .partyChosenId(partyChosen)
-            .partyChosenType(partyChosenType)
-            .updateExpertsDetailsForm(prepareExperts(partyChosen, caseData))
-            .updateWitnessesDetailsForm(prepareWitnesses(partyChosen, caseData))
-            .updateLRIndividualsForm(prepareLRIndividuals(partyChosen, caseData))
-            .updateOrgIndividualsForm(prepareOrgIndividuals(partyChosen, caseData))
-            .build();
+
+        UpdateDetailsForm updatedForm = caseData.getUpdateDetailsForm();
+
+        updatedForm.setPartyChosenId(partyChosen);
+        updatedForm.setPartyChosenType(partyChosenType);
+        updatedForm.setUpdateExpertsDetailsForm(prepareExperts(partyChosen, caseData));
+        updatedForm.setUpdateWitnessesDetailsForm(prepareWitnesses(partyChosen, caseData));
+        updatedForm.setUpdateLRIndividualsForm(prepareLRIndividuals(partyChosen, caseData));
+        updatedForm.setUpdateOrgIndividualsForm(prepareOrgIndividuals(partyChosen, caseData));
 
         caseData.setUpdateDetailsForm(updatedForm);
 

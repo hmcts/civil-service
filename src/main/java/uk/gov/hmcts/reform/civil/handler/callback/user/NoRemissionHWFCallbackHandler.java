@@ -52,11 +52,11 @@ public class NoRemissionHWFCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         caseData = hwfFeePaymentOutcomeService.updateOutstandingFee(caseData, callbackParams.getRequest().getEventId());
         caseData.setBusinessProcess(BusinessProcess.ready(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME));
-// ToDo: Sumit: Hearing Fee Details Builder
         if (caseData.isHWFTypeHearing()) {
             HelpWithFeesDetails hearingFeeDetails =
                 Optional.ofNullable(caseData.getHearingHwfDetails()).orElse(new HelpWithFeesDetails());
-            caseData.setHearingHwfDetails(hearingFeeDetails.toBuilder().hwfCaseEvent(NO_REMISSION_HWF).build());
+            hearingFeeDetails.setHwfCaseEvent(NO_REMISSION_HWF);
+            caseData.setHearingHwfDetails(hearingFeeDetails);
         }
         if (caseData.isHWFTypeClaimIssued()) {
             HelpWithFeesDetails claimIssuedHwfDetails =
