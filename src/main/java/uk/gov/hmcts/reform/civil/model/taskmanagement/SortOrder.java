@@ -10,7 +10,7 @@ public enum SortOrder {
     DESCENDANT("desc");
 
     @JsonValue
-private final String id;
+    private String id;
 
     @Override
     public String toString() {

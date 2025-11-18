@@ -118,7 +118,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
                         "The amount does not include the claim fee and any fixed costs which are payable in addition.";
 
                 } else if (caseData.isPayByInstallment()) {
-                    return "The payment date may be later to reflect any additional interest, " +
+                    return "The final payment date may be later to reflect any additional interest, " +
                         "any fixed costs and claim fee added to the judgment, settlement agreement or earlier payment amount";
                 }
             } else if (PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())

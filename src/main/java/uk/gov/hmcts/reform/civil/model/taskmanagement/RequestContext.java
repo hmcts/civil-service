@@ -12,7 +12,7 @@ public enum RequestContext {
     AVAILABLE_TASKS("AVAILABLE_TASKS");
 
     @JsonValue
-    private final String  id;
+    private final String id;
 
     @Override
     public String toString() {
