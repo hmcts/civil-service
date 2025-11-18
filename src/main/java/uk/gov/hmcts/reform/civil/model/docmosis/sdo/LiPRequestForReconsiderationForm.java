@@ -17,11 +17,11 @@ import java.time.LocalDate;
 @ToString
 public class LiPRequestForReconsiderationForm implements MappableObject {
 
-    private final String caseNumber;
+    private String caseNumber;
 
-    private final LocalDate currentDate;
-    private final String countyCourt;
-    private final String partyName;
-    private final Address partyAddress;
-    private final String requestReason;
+    private LocalDate currentDate;
+    private String countyCourt;
+    private String partyName;
+    private Address partyAddress;
+    private String requestReason;
 }
