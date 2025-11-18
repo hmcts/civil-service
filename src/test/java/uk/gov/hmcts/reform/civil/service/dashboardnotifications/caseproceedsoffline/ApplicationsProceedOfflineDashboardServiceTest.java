@@ -58,7 +58,7 @@ class ApplicationsProceedOfflineDashboardServiceTest {
 
     @Test
     void shouldRecordInactiveScenarioWhenNoLiveApplications() {
-        CaseData caseData = baseCaseData();
+        final CaseData caseData = baseCaseData();
         dashboardService.lip = true;
         dashboardService.applicationStates = List.of("Application Closed");
         stubMapper();
@@ -82,7 +82,7 @@ class ApplicationsProceedOfflineDashboardServiceTest {
 
     @Test
     void shouldRecordActiveScenarioWhenLiveApplicationsPresent() {
-        CaseData caseData = baseCaseData();
+        final CaseData caseData = baseCaseData();
         dashboardService.lip = true;
         dashboardService.applicationStates = List.of("Awaiting Judge");
         stubMapper();

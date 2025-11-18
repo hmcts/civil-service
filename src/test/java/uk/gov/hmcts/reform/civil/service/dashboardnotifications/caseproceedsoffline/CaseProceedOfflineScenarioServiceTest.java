@@ -9,9 +9,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CaseProceedOfflineScenarioServiceTest {
 
     private static final class ScenarioService extends CaseProceedOfflineScenarioService {
+
         ScenarioService() {
             super(null);
         }
+
         public boolean isInCaseProgression(CaseData caseData) {
             return inCaseProgressionState(caseData);
         }
