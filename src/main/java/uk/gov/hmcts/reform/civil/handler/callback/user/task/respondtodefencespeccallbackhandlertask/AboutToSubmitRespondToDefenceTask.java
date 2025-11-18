@@ -93,8 +93,8 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         caseData.setApplicant1ResponseDate(time.now());
 
         setResponseDocumentNull(caseData);
-        updateCaselocationDetails(caseData);
         updateApplicant1DQ(callbackParams, caseData);
+        updateCaselocationDetails(caseData);
         assignApplicant1DQExpertsIfPresent(caseData);
         assignApplicant2DQExpertsIfPresent(caseData);
 
