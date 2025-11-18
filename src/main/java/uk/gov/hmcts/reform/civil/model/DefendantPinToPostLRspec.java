@@ -12,11 +12,11 @@ import java.time.LocalDate;
 @Builder
 public class DefendantPinToPostLRspec {
 
-    private final String accessCode;
-    private final String respondentCaseRole;
+    private String accessCode;
+    private String respondentCaseRole;
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private final LocalDate expiryDate;
-    private final String citizenCaseRole;
+    private LocalDate expiryDate;
+    private String citizenCaseRole;
 
     @JsonCreator
     public DefendantPinToPostLRspec(@JsonProperty("accessCode") String accessCode,

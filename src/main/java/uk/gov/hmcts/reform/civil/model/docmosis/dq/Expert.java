@@ -7,12 +7,12 @@ import lombok.Data;
 @Builder
 public class Expert {
 
-    private final String name;
-    private final String firstName;
-    private final String lastName;
-    private final String phoneNumber;
-    private final String emailAddress;
-    private final String fieldOfExpertise;
-    private final String whyRequired;
-    private final String formattedCost;
+    private String name;
+    private String firstName;
+    private String lastName;
+    private String phoneNumber;
+    private String emailAddress;
+    private String fieldOfExpertise;
+    private String whyRequired;
+    private String formattedCost;
 }

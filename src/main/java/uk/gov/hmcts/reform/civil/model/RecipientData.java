@@ -7,6 +7,6 @@ import lombok.Data;
 @Builder(toBuilder = true)
 public class RecipientData {
 
-    private final String email;
-    private final String orgId;
+    private String email;
+    private String orgId;
 }
