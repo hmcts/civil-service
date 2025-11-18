@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 ccdRepoName="civil-general-apps-ccd-definition"
+directoryName="civil-ga-ccd-definition"
 branchName=$1
 functionalTestType=$2
-directoryName="civil-ga-ccd-definition"
 
 #Checkout specific branch of CCD definitions
 git clone https://github.com/hmcts/${ccdRepoName}.git
