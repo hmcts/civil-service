@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CaseAccessDataStoreApi;
@@ -17,6 +16,7 @@ import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesRequest;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 
 import java.util.Collections;
 import java.util.List;
@@ -44,16 +44,16 @@ class CoreCaseUserServiceTest {
     private static final String USER_ID2 = "User2";
     public static final String ORG_ID = "62LYJRF";
 
-    @MockBean
+    @MockitoBean
     private CrossAccessUserConfiguration userConfig;
 
-    @MockBean
+    @MockitoBean
     private CaseAccessDataStoreApi caseAccessDataStoreApi;
 
-    @MockBean
+    @MockitoBean
     private UserService userService;
 
-    @MockBean
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
 
     @Autowired

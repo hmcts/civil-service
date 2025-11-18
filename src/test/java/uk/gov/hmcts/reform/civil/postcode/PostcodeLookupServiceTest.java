@@ -4,12 +4,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -21,9 +21,9 @@ class PostcodeLookupServiceTest {
     private static final String LOOKUP_URL = "https://api.ordnancesurvey.co.uk/opennames/v1/find";
     private static final String ACCESS_KEY = "dummy-key";
 
-    @MockBean
+    @MockitoBean
     private RestTemplate restTemplate;
-    @MockBean
+    @MockitoBean
     private PostcodeLookupConfiguration postcodeLookupConfiguration;
 
     @Autowired

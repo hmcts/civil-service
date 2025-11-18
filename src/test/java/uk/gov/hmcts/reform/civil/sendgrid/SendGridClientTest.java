@@ -16,12 +16,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment;
-import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
-import uk.gov.hmcts.reform.civil.sendgrid.EmailSendFailedException;
-import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 
 import java.io.IOException;
 import java.util.List;
@@ -52,7 +48,7 @@ class SendGridClientTest {
         .build();
     private static final String EMAIL_FROM = "from@server.net";
 
-    @MockBean
+    @MockitoBean
     private SendGrid sendGrid;
 
     @Captor
