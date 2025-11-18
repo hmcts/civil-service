@@ -31,8 +31,9 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DirectionsQuestionnairePreparer;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -42,6 +43,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
+
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -75,7 +78,7 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     private JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
 
     @Mock
-    private FlowStateAllowedEventService flowStateAllowedEventService;
+    private IStateFlowEngine stateFlowEngine;
 
     @Mock
     private DirectionsQuestionnairePreparer directionsQuestionnairePreparer;
@@ -135,9 +138,12 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
         "NON_LIP, IN_MEDIATION, MAIN.FULL_DEFENCE_PROCEED"
     })
     void shouldPauseStateChangeDefendantLipAndRequiresTranslation(String lipCase, String expectedState, String flowState) {
-        FlowState flowStateTest = FlowState.fromFullName(flowState);
+        StateFlow mockStateFlow = mock(StateFlow.class);
+        State mockState = mock(uk.gov.hmcts.reform.civil.stateflow.model.State.class);
+        when(mockStateFlow.getState()).thenReturn(mockState);
+        when(mockState.getName()).thenReturn(flowState);
 
-        when(flowStateAllowedEventService.getFlowState(any())).thenReturn(flowStateTest);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockStateFlow);
 
         CaseData caseData;
         if (lipCase.equals("LIP")) {
@@ -226,12 +232,10 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
                                                                        "", businessProcess);
         }
 
-        CaseData results = caseData;
-
         assertEquals(All_FINAL_ORDERS_ISSUED.name(), resultState);
-        assertThat(results.getActiveJudgment()).isEqualTo(activeJudgment);
-        assertThat(results.getJoIsLiveJudgmentExists()).isEqualTo(YesOrNo.YES);
-        assertThat(results.getJoJudgementByAdmissionIssueDate()).isEqualTo(now);
+        assertThat(caseData.getActiveJudgment()).isEqualTo(activeJudgment);
+        assertThat(caseData.getJoIsLiveJudgmentExists()).isEqualTo(YesOrNo.YES);
+        assertThat(caseData.getJoJudgementByAdmissionIssueDate()).isEqualTo(now);
     }
 
     @ParameterizedTest
@@ -436,13 +440,12 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
                                                                 "", businessProcess);
         }
-        CaseData results = caseData;
 
         assertNotNull(resultState);
         assertEquals(PROCEEDS_IN_HERITAGE_SYSTEM.name(), resultState);
-        assertThat(results.getActiveJudgment()).isEqualTo(activeJudgment);
-        assertThat(results.getJoIsLiveJudgmentExists()).isEqualTo(YesOrNo.YES);
-        assertThat(results.getJoJudgementByAdmissionIssueDate()).isEqualTo(now);
+        assertThat(caseData.getActiveJudgment()).isEqualTo(activeJudgment);
+        assertThat(caseData.getJoIsLiveJudgmentExists()).isEqualTo(YesOrNo.YES);
+        assertThat(caseData.getJoJudgementByAdmissionIssueDate()).isEqualTo(now);
     }
 
     @ParameterizedTest

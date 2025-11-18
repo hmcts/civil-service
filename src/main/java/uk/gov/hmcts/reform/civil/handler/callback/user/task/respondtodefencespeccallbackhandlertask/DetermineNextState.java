@@ -20,7 +20,9 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
 
 import java.util.Collections;
@@ -49,13 +51,24 @@ import static uk.gov.hmcts.reform.civil.utils.CaseStateUtils.shouldMoveToInMedia
 @Slf4j
 public class DetermineNextState extends CallbackHandler {
 
-    private final List<CaseEvent> events = Collections.singletonList(UPDATE_CLAIM_STATE_AFTER_CLAIMANT_INTENTION_LR_DOC_UPLOADED);
-    private Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::updateClaimStatePostTranslation);
     private static final String TASK_ID = "UpdateClaimStateAfterClaimantIntentionLrTranslatedDocUploaded";
+    private final List<CaseEvent> events = Collections.singletonList(
+        UPDATE_CLAIM_STATE_AFTER_CLAIMANT_INTENTION_LR_DOC_UPLOADED);
     private final ObjectMapper objectMapper;
     private final FeatureToggleService featureToggleService;
     private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
-    private final FlowStateAllowedEventService flowStateAllowedEventService;
+    private final IStateFlowEngine stateFlowEngine;
+    private Map<String, Callback> callbackMap = Map.of(
+        callbackKey(ABOUT_TO_SUBMIT),
+        this::updateClaimStatePostTranslation
+    );
+
+    private static boolean isClaimNotSettled(CaseData caseData) {
+        return caseData.isClaimantNotSettlePartAdmitClaim()
+            && ((caseData.hasClaimantNotAgreedToFreeMediation()
+            || caseData.hasDefendantNotAgreedToFreeMediation())
+            || caseData.isFastTrackClaim());
+    }
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -117,7 +130,10 @@ public class DetermineNextState extends CallbackHandler {
 
     private String putCaseStateInJudicialReferral(CaseData caseData) {
         if (caseData.isRespondentResponseFullDefence()
-            && JudicialReferralUtils.shouldMoveToJudicialReferral(caseData, featureToggleService.isMultiOrIntermediateTrackEnabled(caseData))) {
+            && JudicialReferralUtils.shouldMoveToJudicialReferral(
+            caseData,
+            featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
+        )) {
             return CaseState.JUDICIAL_REFERRAL.name();
         }
         return null;
@@ -200,13 +216,6 @@ public class DetermineNextState extends CallbackHandler {
         return CaseState.All_FINAL_ORDERS_ISSUED.name();
     }
 
-    private static boolean isClaimNotSettled(CaseData caseData) {
-        return caseData.isClaimantNotSettlePartAdmitClaim()
-            && ((caseData.hasClaimantNotAgreedToFreeMediation()
-            || caseData.hasDefendantNotAgreedToFreeMediation())
-            || caseData.isFastTrackClaim());
-    }
-
     private boolean isLipVLipOneVOne(CaseData caseData) {
         return featureToggleService.isLipVLipEnabled()
             && caseData.isLRvLipOneVOne()
@@ -240,11 +249,19 @@ public class DetermineNextState extends CallbackHandler {
     }
 
     public boolean translationRequiredInFlowState(CaseData caseData) {
-        FlowState flowState = flowStateAllowedEventService.getFlowState(caseData);
-        return flowState.equals(FULL_DEFENCE_PROCEED)
-            || flowState.equals(PART_ADMIT_NOT_SETTLED_NO_MEDIATION)
-            || flowState.equals(FULL_ADMIT_PROCEED)
-            || flowState.equals(PART_ADMIT_PROCEED)
-            || flowState.equals(IN_MEDIATION);
+        try {
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+            FlowState flowState = FlowState.fromFullName(stateFlow.getState().getName());
+            return List.<FlowState>of(
+                FULL_DEFENCE_PROCEED,
+                PART_ADMIT_NOT_SETTLED_NO_MEDIATION,
+                FULL_ADMIT_PROCEED,
+                PART_ADMIT_PROCEED,
+                IN_MEDIATION
+            ).contains(flowState);
+        } catch (StateFlowException e) {
+            log.error("Error during state flow evaluation.", e);
+        }
+        return false;
     }
 }

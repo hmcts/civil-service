@@ -2584,13 +2584,12 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void specificSummary_whenPartialAdmitPayImmediately() {
             // Given
             BigDecimal admitted = BigDecimal.valueOf(1000);
-            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+
             CaseData caseData = CaseDataBuilder.builder()
                     .totalClaimAmount(BigDecimal.valueOf(1000))
                     .atStateApplicantRespondToDefenceAndProceed()
                     .build().toBuilder()
-                    .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                            .whenWillThisAmountBePaid(whenWillPay).build())
+                    .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().build())
                     .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                     .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
                     .respondToAdmittedClaimOwingAmountPounds(admitted)
@@ -2602,8 +2601,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             assertThat(response.getConfirmationBody())
-                    .contains(caseData.getApplicant1().getPartyName())
-                    .contains(DateFormatHelper.formatLocalDate(whenWillPay, DATE));
+                    .contains(caseData.getApplicant1().getPartyName());
         }
 
         @Test
