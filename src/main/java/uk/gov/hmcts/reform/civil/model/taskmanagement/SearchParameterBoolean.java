@@ -12,9 +12,9 @@ import lombok.ToString;
 @Builder
 public class SearchParameterBoolean implements SearchParameter<Boolean> {
 
-    private final SearchParameterKey key;
-    private final SearchOperator operator;
+    private SearchParameterKey key;
+    private SearchOperator operator;
 
     @JsonProperty("value")
-    private final Boolean values;
+    private Boolean values;
 }

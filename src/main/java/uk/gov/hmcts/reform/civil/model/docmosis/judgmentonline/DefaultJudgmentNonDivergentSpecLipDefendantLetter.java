@@ -18,22 +18,22 @@ import java.time.LocalDate;
 @EqualsAndHashCode
 public class DefaultJudgmentNonDivergentSpecLipDefendantLetter implements MappableObject {
 
-    private final Party defendant;
-    private final String claimantName;
-    private final String claimReferenceNumber;
+    private Party defendant;
+    private String claimantName;
+    private String claimReferenceNumber;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate letterIssueDate;
+    private LocalDate letterIssueDate;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate caseSubmittedDate;
+    private LocalDate caseSubmittedDate;
 
-    private final String respondToClaimUrl;
-    private final String pin;
-    private final String varyJudgmentFee;
-    private final String judgmentSetAsideFee;
-    private final String certifOfSatisfactionFee;
+    private String respondToClaimUrl;
+    private String pin;
+    private String varyJudgmentFee;
+    private String judgmentSetAsideFee;
+    private String certifOfSatisfactionFee;
 
 }
