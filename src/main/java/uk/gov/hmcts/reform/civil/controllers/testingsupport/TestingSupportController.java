@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.controllers.testingsupport;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,7 +34,6 @@ import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseUserService;
 import uk.gov.hmcts.reform.civil.ga.service.GaOrganisationService;
 import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
-import uk.gov.hmcts.reform.civil.ga.stateflow.GaStateFlow;
 import uk.gov.hmcts.reform.civil.handler.event.HearingFeePaidEventHandler;
 import uk.gov.hmcts.reform.civil.handler.event.HearingFeeUnpaidEventHandler;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
@@ -49,6 +47,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BaseCaseData;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.StateFlowDTO;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -61,12 +60,10 @@ import uk.gov.hmcts.reform.civil.service.judgments.CjesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
-import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
 import java.util.List;
 import java.util.Objects;
 
-import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.GENERALAPPLICATION_CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.STARTED;
 
 @Tag(name = "Testing Support Controller")
@@ -102,8 +99,6 @@ public class TestingSupportController {
     private final CoreCaseUserService coreCaseUserService;
     private final GaCoreCaseUserService gaCoreCaseUserService;
     private final GAJudgeRevisitTaskHandler gaJudgeRevisitTaskHandler;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String SUCCESS = "success";
@@ -173,17 +168,17 @@ public class TestingSupportController {
     @PostMapping(
         value = "/testing-support/flowstate",
         produces = "application/json")
-    public StateFlow getFlowStateInformationForCaseData(
+    public StateFlowDTO getFlowStateInformationForCaseData(
         @RequestBody CaseData caseData) {
-        return stateFlowEngine.evaluate(caseData);
+        return stateFlowEngine.evaluate(caseData).toStateFlowDTO();
     }
 
     @PostMapping(
         value = "/testing-support/flowstate/ga",
         produces = "application/json")
-    public GaStateFlow getFlowStateInformationForCaseData(
+    public StateFlowDTO getFlowStateInformationForGaCaseData(
         @RequestBody GeneralApplicationCaseData caseData) {
-        return gaStateFlowEngine.evaluate(caseData);
+        return gaStateFlowEngine.evaluate(caseData).toStateFlowDTO();
     }
 
     @PostMapping(
