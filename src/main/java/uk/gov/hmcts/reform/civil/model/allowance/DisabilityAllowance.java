@@ -23,7 +23,7 @@ public enum DisabilityAllowance {
     NO_DISABILITY(0.0, DisabilityParam::notDisabled);
 
     private double allowance;
-    private final Predicate<DisabilityParam> disabilityMatcher;
+    private Predicate<DisabilityParam> disabilityMatcher;
 
     DisabilityAllowance(double allowance, Predicate<DisabilityParam> disabilityMatcher) {
         this.allowance = allowance;

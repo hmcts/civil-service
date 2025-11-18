@@ -20,32 +20,32 @@ import java.util.List;
 @Builder(toBuilder = true)
 public class GAHearingDetails {
 
-    private final YesOrNo hearingYesorNo;
-    private final LocalDate hearingDate;
-    private final YesOrNo judgeRequiredYesOrNo;
-    private final String judgeName;
-    private final YesOrNo trialRequiredYesOrNo;
-    private final LocalDate trialDateFrom;
-    private final LocalDate trialDateTo;
-    private final GAHearingType hearingPreferencesPreferredType;
-    private final String telephoneHearingPreferredType;
-    private final String reasonForPreferredHearingType;
-    private final DynamicList hearingPreferredLocation;
-    private final String hearingDetailsTelephoneNumber;
-    private final String hearingDetailsEmailID;
-    private final GAHearingDuration hearingDuration;
-    private final String generalAppHearingDays;
-    private final String generalAppHearingHours;
-    private final String generalAppHearingMinutes;
-    private final YesOrNo unavailableTrialRequiredYesOrNo;
-    private final List<Element<GAUnavailabilityDates>> generalAppUnavailableDates;
-    private final YesOrNo vulnerabilityQuestionsYesOrNo;
-    private final String vulnerabilityQuestion;
-    private final List<GAHearingSupportRequirements> supportRequirement;
-    private final String supportRequirementSignLanguage;
-    private final String supportRequirementLanguageInterpreter;
-    private final String supportRequirementOther;
-    private final String respondentResponsePartyName;
+    private YesOrNo hearingYesorNo;
+    private LocalDate hearingDate;
+    private YesOrNo judgeRequiredYesOrNo;
+    private String judgeName;
+    private YesOrNo trialRequiredYesOrNo;
+    private LocalDate trialDateFrom;
+    private LocalDate trialDateTo;
+    private GAHearingType hearingPreferencesPreferredType;
+    private String telephoneHearingPreferredType;
+    private String reasonForPreferredHearingType;
+    private DynamicList hearingPreferredLocation;
+    private String hearingDetailsTelephoneNumber;
+    private String hearingDetailsEmailID;
+    private GAHearingDuration hearingDuration;
+    private String generalAppHearingDays;
+    private String generalAppHearingHours;
+    private String generalAppHearingMinutes;
+    private YesOrNo unavailableTrialRequiredYesOrNo;
+    private List<Element<GAUnavailabilityDates>> generalAppUnavailableDates;
+    private YesOrNo vulnerabilityQuestionsYesOrNo;
+    private String vulnerabilityQuestion;
+    private List<GAHearingSupportRequirements> supportRequirement;
+    private String supportRequirementSignLanguage;
+    private String supportRequirementLanguageInterpreter;
+    private String supportRequirementOther;
+    private String respondentResponsePartyName;
 
     @JsonCreator
     GAHearingDetails(@JsonProperty("hearingYesorNo") YesOrNo hearingYesorNo,

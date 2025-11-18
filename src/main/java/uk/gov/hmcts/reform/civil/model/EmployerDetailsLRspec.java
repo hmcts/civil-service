@@ -7,6 +7,6 @@ import lombok.Data;
 @Builder
 public class EmployerDetailsLRspec {
 
-    private final String employerName;
-    private final String jobTitle;
+    private String employerName;
+    private String jobTitle;
 }
