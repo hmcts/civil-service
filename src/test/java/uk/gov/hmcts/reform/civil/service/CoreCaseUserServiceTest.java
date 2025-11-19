@@ -10,6 +10,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CaseAccessDataStoreApi;
+import uk.gov.hmcts.reform.ccd.client.CaseAssignmentApi;
+import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRole;
+import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
 import uk.gov.hmcts.reform.ccd.model.AddCaseAssignedUserRolesRequest;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRole;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRoleWithOrganisation;
@@ -49,6 +52,9 @@ class CoreCaseUserServiceTest {
 
     @MockBean
     private CaseAccessDataStoreApi caseAccessDataStoreApi;
+
+    @MockBean
+    private CaseAssignmentApi caseAssignmentApi;
 
     @MockBean
     private UserService userService;
@@ -287,6 +293,27 @@ class CoreCaseUserServiceTest {
 
             assertThat(caseRoles.contains("[RESPONDENTSOLICITORONE]"));
             assertThat(!caseRoles.contains("[RESPONDENTSOLICITORTWO]"));
+        }
+
+        @Test
+        void shouldReturnUserRoles_getUserRoles() {
+            CaseAssignmentUserRolesResource caseAssignedUserRolesResource = CaseAssignmentUserRolesResource.builder()
+                .caseAssignmentUserRoles(List.of(
+                    CaseAssignmentUserRole.builder()
+                        .userId(USER_ID)
+                        .caseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
+                        .build(),
+                    CaseAssignmentUserRole.builder()
+                        .userId(USER_ID2)
+                        .caseRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
+                        .build()
+                ))
+                .build();
+            
+            when(caseAssignmentApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+                .thenReturn(caseAssignedUserRolesResource);
+
+            assertThat(service.getUserRoles(CASE_ID).getCaseAssignmentUserRoles()).hasSize(2);
         }
     }
 }

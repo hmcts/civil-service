@@ -31,7 +31,6 @@ import uk.gov.hmcts.reform.civil.event.HearingFeePaidEvent;
 import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
 import uk.gov.hmcts.reform.civil.event.TrialReadyNotificationEvent;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseUserService;
 import uk.gov.hmcts.reform.civil.ga.service.GaOrganisationService;
 import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
 import uk.gov.hmcts.reform.civil.handler.event.HearingFeePaidEventHandler;
@@ -97,7 +96,6 @@ public class TestingSupportController {
     private final OrganisationService organisationService;
     private final GaOrganisationService gaOrganisationService;
     private final CoreCaseUserService coreCaseUserService;
-    private final GaCoreCaseUserService gaCoreCaseUserService;
     private final GAJudgeRevisitTaskHandler gaJudgeRevisitTaskHandler;
 
     private static final String BEARER_TOKEN = "Bearer Token";
@@ -373,7 +371,7 @@ public class TestingSupportController {
     @Operation(summary = "user roles for the cases")
     public CaseAssignmentUserRolesResource getUserRoles(
         @PathVariable("caseId") String caseId) {
-        return gaCoreCaseUserService.getUserRoles(caseId);
+        return coreCaseUserService.getUserRoles(caseId);
     }
 
     @PostMapping(value = {"/assignCase/{caseId}", "/assignCase/{caseId}/{caseRole}"})
