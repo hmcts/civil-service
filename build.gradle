@@ -151,8 +151,8 @@ sourceSets {
   }
 }
 
-tasks.withType(JavaCompile) {
-  options.compilerArgs << "-Xlint:unchecked" << "-Werror"
+tasks.withType(JavaCompile).configureEach {
+  options.compilerArgs += ["-Xlint:unchecked", "-Xlint:-removal", "-Werror"]
 }
 
 tasks.withType(Test) {
