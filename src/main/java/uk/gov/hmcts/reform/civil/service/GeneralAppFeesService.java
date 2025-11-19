@@ -308,13 +308,6 @@ public class GeneralAppFeesService {
             .orElse(null);
     }
 
-    protected Boolean getRespondentAgreed(GeneralApplicationCaseData caseData) {
-        return Optional.ofNullable(caseData.getGeneralAppRespondentAgreement())
-            .map(GARespondentOrderAgreement::getHasAgreed)
-            .map(hasAgreed -> hasAgreed == YES)
-            .orElse(null);
-    }
-
     protected Boolean getRespondentAgreed(GeneralApplication generalApplication) {
         return Optional.ofNullable(generalApplication.getGeneralAppRespondentAgreement())
             .map(GARespondentOrderAgreement::getHasAgreed)
@@ -323,13 +316,6 @@ public class GeneralAppFeesService {
     }
 
     protected Boolean getInformOtherParty(CaseData caseData) {
-        return Optional.ofNullable(caseData.getGeneralAppInformOtherParty())
-            .map(GAInformOtherParty::getIsWithNotice)
-            .map(isWithNotice -> isWithNotice == YES)
-            .orElse(null);
-    }
-
-    protected Boolean getInformOtherParty(GeneralApplicationCaseData caseData) {
         return Optional.ofNullable(caseData.getGeneralAppInformOtherParty())
             .map(GAInformOtherParty::getIsWithNotice)
             .map(isWithNotice -> isWithNotice == YES)

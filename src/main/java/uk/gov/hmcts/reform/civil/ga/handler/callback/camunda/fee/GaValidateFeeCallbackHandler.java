@@ -10,10 +10,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
-import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
-import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,13 +25,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.VALIDATE_FEE_GASPEC;
 public class GaValidateFeeCallbackHandler extends CallbackHandler implements GeneralApplicationCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(VALIDATE_FEE_GASPEC);
-    private static final String ERROR_MESSAGE_NO_FEE_IN_CASEDATA = "Application case data does not have fee details";
-    private static final String ERROR_MESSAGE_FEE_CHANGED = "Fee has changed since application was submitted. "
-        + "It needs to be validated again";
     private static final String TASK_ID = "GeneralApplicationValidateFee";
-
-    private final GeneralAppFeesService feeService;
-    private final GaForLipService gaForLipService;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -55,33 +45,8 @@ public class GaValidateFeeCallbackHandler extends CallbackHandler implements Gen
     }
 
     private CallbackResponse validateFee(CallbackParams callbackParams) {
-        var caseData = callbackParams.getGeneralApplicationCaseData();
-        List<String> errors = new ArrayList<>();
-        //TODO: Investigate removal as feature flag is not used now
-        //if (!gaForLipService.isGaForLip(caseData)) {
-        //    Fee feeForGA = feeService.getFeeForGA(caseData);
-        //    errors = compareFees(caseData, feeForGA);
-        //}
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
+            .errors(new ArrayList<String>())
             .build();
     }
-
-    private List<String> compareFees(GeneralApplicationCaseData caseData, Fee latestfee) {
-
-        if (caseData.getGeneralAppPBADetails() == null
-            || caseData.getGeneralAppPBADetails().getFee() == null) {
-            return List.of(ERROR_MESSAGE_NO_FEE_IN_CASEDATA);
-        }
-        Fee caseDataFee = caseData.getGeneralAppPBADetails().getFee();
-        if (!caseDataFee.equals(latestfee)) {
-            log.info("Fees not equal - latest fee {} for General Application with value: {} with casedata fee {} with value : {} ",
-                latestfee.getCode(), latestfee.getCalculatedAmountInPence(),  caseData.getGeneralAppPBADetails().getFee().getCode(),
-                caseData.getGeneralAppPBADetails().getFee().getCalculatedAmountInPence());
-            return List.of(ERROR_MESSAGE_FEE_CHANGED);
-        }
-
-        return new ArrayList<>();
-    }
-
 }
