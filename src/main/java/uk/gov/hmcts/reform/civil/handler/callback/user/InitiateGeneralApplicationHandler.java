@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
@@ -20,11 +21,13 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -37,6 +40,7 @@ import uk.gov.hmcts.reform.civil.utils.UserRoleUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,6 +51,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -83,6 +88,10 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     public static final String NOT_IN_EA_REGION = "Sorry this service is not available in the current case management location, please raise an application manually.";
     public static final String NOT_ALLOWED_SETTLE_DISCONTINUE = "Sorry this service is not available, please raise an application manually.";
     private static final String LR_VS_LIP = "Sorry this service is not available, please raise an application manually.";
+    private static final String CONFIRMATION_BODY_FREE = "<br/> <p> The court will make a decision"
+        + " on this application."
+        + "<br/> <p>  The other party's legal representative has been notified that you have"
+        + " submitted this application";
     private final InitiateGeneralApplicationService initiateGeneralApplicationService;
     private final GeneralApplicationValidator generalApplicationValidator;
     private final ObjectMapper objectMapper;
@@ -91,6 +100,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private final LocationReferenceDataService locationRefDataService;
     private final FeatureToggleService featureToggleService;
     private final CoreCaseUserService coreCaseUserService;
+    private final GeneralAppFeesService generalAppFeesService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -103,7 +113,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             callbackKey(MID, VALIDATE_HEARING_PAGE), this::gaValidateHearingScreen,
             callbackKey(MID, SET_FEES_AND_PBA), this::setFeesAndPBA,
             callbackKey(ABOUT_TO_SUBMIT), this::submitApplication,
-            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
+            callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
 
@@ -367,6 +377,28 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 .data(data).build();
     }
 
+    private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        Long ccdCaseReference = caseData.getCcdCaseReference();
+        List<Element<GeneralApplication>> generalApplications = caseData.getGeneralApplications();
+        String body = null;
+        if (generalApplications != null) {
+            Optional<Element<GeneralApplication>> generalApplicationElementOptional = generalApplications.stream()
+                .filter(app -> app.getValue() != null && app.getValue().getBusinessProcess() != null
+                    && app.getValue().getBusinessProcess().getStatus() == BusinessProcessStatus.READY
+                    && app.getValue().getBusinessProcess().getProcessInstanceId() == null).findFirst();
+            if (generalApplicationElementOptional.isPresent()) {
+                GeneralApplication generalApplicationElement = generalApplicationElementOptional.get().getValue();
+                body = buildConfirmationSummary(generalApplicationElement, ccdCaseReference);
+            }
+        }
+
+        return SubmittedCallbackResponse.builder()
+            .confirmationHeader("# You have submitted an application")
+            .confirmationBody(body)
+            .build();
+    }
+
     /**
      * Returns empty submitted callback response. Used by events that set business process to ready, but doesn't have
      * any submitted callback logic (making callback is still required to trigger EventEmitterAspect)
@@ -396,5 +428,33 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         return Objects.nonNull(caseData.getGeneralAppTypeLR())
             && caseData.getGeneralAppTypeLR().getTypes().size() == 1
             && caseData.getGeneralAppTypeLR().getTypes().contains(GeneralApplicationTypesLR.VARY_PAYMENT_TERMS_OF_JUDGMENT);
+    }
+
+    private String buildConfirmationSummary(GeneralApplication application, Long ccdCaseReference) {
+
+        BigDecimal fee = application.getGeneralAppPBADetails().getFee().toPounds();
+
+        return generalAppFeesService.isFreeGa(application) ? CONFIRMATION_BODY_FREE : format(
+            generateConfirmationBody(),
+            fee,
+            format("/cases/case-details/%s#Applications", ccdCaseReference)
+        );
+    }
+
+    private String generateConfirmationBody() {
+        StringBuilder bodyConfirmation = new StringBuilder();
+        bodyConfirmation.append("<br/>");
+        bodyConfirmation.append("<p class=\"govuk-body govuk-!-font-weight-bold\"> Your application fee of £%s"
+                                    + " is now due for payment. Your application will not be processed further"
+                                    + " until this fee is paid.</p>");
+        bodyConfirmation.append("%n%n To pay this fee, click the link below, or else open your application from the"
+                                    + " Applications tab of this case listing and then click on the service request tab.");
+
+        bodyConfirmation.append("%n%n If necessary, all documents relating to this application, "
+                                    + "including any response from the court, will be translated."
+                                    + " You will be notified when these are available.");
+
+        bodyConfirmation.append("%n%n <a href=\"%s\" target=\"_blank\">Pay your application fee </a> %n");
+        return bodyConfirmation.toString();
     }
 }

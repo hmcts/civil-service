@@ -194,7 +194,11 @@ task awaitApplicationReadiness(type: Exec, description: 'Awaits until applicatio
 }
 
 task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:smoke'
+  if (System.env.FT_TYPE == 'CIVIL_FT') {
+    commandLine '/usr/bin/yarn', '--silent', 'run', 'test:smoke'
+  } else {
+    commandLine '/usr/bin/yarn', '--silent', 'run', 'test:ga-smoke'
+  }
 }
 
 task runApiTests(type: Exec, description: 'Runs Prod features in functional tests.') {
@@ -279,8 +283,6 @@ jacocoTestReport.dependsOn subprojects.collect { project ->
 }.findAll { it != null }
 
 jacocoTestReport.dependsOn tasks.matching { it.name.startsWith('compile') || it.name.startsWith('process') }
-jacocoTestReport.dependsOn tasks.named('bootStartScripts')
-jacocoTestReport.dependsOn tasks.named('startScripts')
 
 tasks.named('test') {
   finalizedBy jacocoTestReport
