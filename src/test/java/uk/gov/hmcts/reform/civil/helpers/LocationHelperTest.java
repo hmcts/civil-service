@@ -47,7 +47,7 @@ class LocationHelperTest {
 
     @Test
     void thereIsAMatchingLocation() {
-        CaseData.CaseDataBuilder<?, ?> updatedData = CaseData.builder();
+        CaseData updatedData = CaseData.builder().build();
         List<LocationRefData> locations = List.of(LocationRefData.builder()
                                                       .courtLocationCode("123")
                                                       .regionId("regionId")
@@ -58,7 +58,7 @@ class LocationHelperTest {
             .caseLocation(CaseLocationCivil.builder().baseLocation("99999").build())
             .build();
         helper.updateCaseManagementLocation(updatedData, requestedCourt, () -> locations);
-        Assertions.assertThat(updatedData.build().getCaseManagementLocation())
+        Assertions.assertThat(updatedData.getCaseManagementLocation())
             .isNotNull()
             .isEqualTo(CaseLocationCivil.builder()
                            .region("regionId")

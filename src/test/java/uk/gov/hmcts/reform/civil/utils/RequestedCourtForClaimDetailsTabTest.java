@@ -62,18 +62,24 @@ class RequestedCourtForClaimDetailsTabTest {
 
     @Test
     void shouldNotUpdateRequestedCourtDetailsWHenRequestedCourtNull() {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder()
-            .respondent1DQ(Respondent1DQ.builder()
-                               .respondent1DQRequestedCourt(null)
-                               .respondent1DQRemoteHearingLRspec(null)
-                               .build());
+        // Given
+        CaseData caseData = CaseData.builder().build();
+        caseData.setRespondent1DQ(
+            Respondent1DQ.builder()
+                .respondent1DQRequestedCourt(null)
+                .respondent1DQRemoteHearingLRspec(null)
+                .build()
+        );
+
         CallbackParams callbackParams = CallbackParams.builder()
             .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "some-token"))
             .build();
 
-        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent1Spec(callbackParams, caseDataBuilder);
-        RequestedCourtForTabDetails tabDetails = caseDataBuilder.build().getRequestedCourtForTabDetailsRes1();
+        // When
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent1Spec(caseData, callbackParams);
 
+        // Then
+        RequestedCourtForTabDetails tabDetails = caseData.getRequestedCourtForTabDetailsRes1();
         assertThat(tabDetails.getRequestedCourt()).isEqualTo(null);
         assertThat(tabDetails.getRequestedCourtName()).isEqualTo(null);
         assertThat(tabDetails.getReasonForHearingAtSpecificCourt()).isEqualTo(null);
@@ -83,23 +89,28 @@ class RequestedCourtForClaimDetailsTabTest {
 
     @Test
     void shouldUpdateRequestedCourtTabDetailsForApplicantUnspec() {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder()
-            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-            .applicant1DQ(Applicant1DQ.builder()
-                              .applicant1DQRequestedCourt(requestedCourt)
-                              .remoteHearing(RemoteHearing.builder()
-                                                 .remoteHearingRequested(YES)
-                                                 .reasonForRemoteHearing("Outside scares me")
-                                                 .build())
-                              .build());
+        // Given
+        CaseData caseData = CaseData.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.UNSPEC_CLAIM);
+        caseData.setApplicant1DQ(
+            Applicant1DQ.builder()
+                .applicant1DQRequestedCourt(requestedCourt)
+                .remoteHearing(RemoteHearing.builder()
+                                   .remoteHearingRequested(YES)
+                                   .reasonForRemoteHearing("Outside scares me")
+                                   .build())
+                .build()
+        );
 
         CallbackParams callbackParams = CallbackParams.builder()
             .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "some-token"))
             .build();
 
-        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicant(callbackParams, caseDataBuilder);
-        RequestedCourtForTabDetails tabDetails = caseDataBuilder.build().getRequestedCourtForTabDetailsApp();
+        // When
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicant(callbackParams, caseData);
 
+        // Then
+        RequestedCourtForTabDetails tabDetails = caseData.getRequestedCourtForTabDetailsApp();
         assertThat(tabDetails.getRequestedCourt()).isEqualTo("121");
         assertThat(tabDetails.getRequestedCourtName()).isEqualTo("court 2");
         assertThat(tabDetails.getReasonForHearingAtSpecificCourt()).isEqualTo("Close to home");
@@ -109,22 +120,28 @@ class RequestedCourtForClaimDetailsTabTest {
 
     @Test
     void shouldUpdateRequestedCourtTabDetailsForApplicantSpec() {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .applicant1DQ(Applicant1DQ.builder()
-                              .applicant1DQRequestedCourt(requestedCourt)
-                              .applicant1DQRemoteHearingLRspec(RemoteHearingLRspec.builder()
-                                                                   .remoteHearingRequested(YES)
-                                                                   .reasonForRemoteHearing("Outside scares me")
-                                                                   .build())
-                              .build());
+        // Given
+        CaseData caseData = CaseData.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        caseData.setApplicant1DQ(
+            Applicant1DQ.builder()
+                .applicant1DQRequestedCourt(requestedCourt)
+                .applicant1DQRemoteHearingLRspec(RemoteHearingLRspec.builder()
+                                                     .remoteHearingRequested(YES)
+                                                     .reasonForRemoteHearing("Outside scares me")
+                                                     .build())
+                .build()
+        );
+
         CallbackParams callbackParams = CallbackParams.builder()
             .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "some-token"))
             .build();
 
-        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicantSpec(callbackParams, caseDataBuilder);
-        RequestedCourtForTabDetails tabDetails = caseDataBuilder.build().getRequestedCourtForTabDetailsApp();
+        // When
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicantSpec(callbackParams, caseData);
 
+        // Then
+        RequestedCourtForTabDetails tabDetails = caseData.getRequestedCourtForTabDetailsApp();
         assertThat(tabDetails.getRequestedCourt()).isEqualTo("121");
         assertThat(tabDetails.getRequestedCourtName()).isEqualTo("court 2");
         assertThat(tabDetails.getReasonForHearingAtSpecificCourt()).isEqualTo("Close to home");
@@ -134,21 +151,27 @@ class RequestedCourtForClaimDetailsTabTest {
 
     @Test
     void shouldUpdateRequestedCourtTabDetailsForRespondent1() {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder()
-            .respondent1DQ(Respondent1DQ.builder()
-                               .respondent1DQRequestedCourt(requestedCourt)
-                               .respondent1DQRemoteHearing(RemoteHearing.builder()
-                                                               .remoteHearingRequested(YES)
-                                                               .reasonForRemoteHearing("Outside scares me")
-                                                               .build())
-                               .build());
+        // Given
+        CaseData caseData = CaseData.builder().build();
+        caseData.setRespondent1DQ(
+            Respondent1DQ.builder()
+                .respondent1DQRequestedCourt(requestedCourt)
+                .respondent1DQRemoteHearing(RemoteHearing.builder()
+                                                .remoteHearingRequested(YES)
+                                                .reasonForRemoteHearing("Outside scares me")
+                                                .build())
+                .build()
+        );
+
         CallbackParams callbackParams = CallbackParams.builder()
             .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "some-token"))
             .build();
 
-        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent1(callbackParams, caseDataBuilder);
-        RequestedCourtForTabDetails tabDetails = caseDataBuilder.build().getRequestedCourtForTabDetailsRes1();
+        // When
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent1(callbackParams, caseData);
 
+        // Then
+        RequestedCourtForTabDetails tabDetails = caseData.getRequestedCourtForTabDetailsRes1();
         assertThat(tabDetails.getRequestedCourt()).isEqualTo("121");
         assertThat(tabDetails.getRequestedCourtName()).isEqualTo("court 2");
         assertThat(tabDetails.getReasonForHearingAtSpecificCourt()).isEqualTo("Close to home");
@@ -158,21 +181,27 @@ class RequestedCourtForClaimDetailsTabTest {
 
     @Test
     void shouldUpdateRequestedCourtTabDetailsForRespondent2() {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder()
-            .respondent2DQ(Respondent2DQ.builder()
-                               .respondent2DQRequestedCourt(requestedCourt)
-                               .respondent2DQRemoteHearing(RemoteHearing.builder()
-                                                               .remoteHearingRequested(YES)
-                                                               .reasonForRemoteHearing("Outside scares me")
-                                                               .build())
-                               .build());
+        // Given
+        CaseData caseData = CaseData.builder().build();
+        caseData.setRespondent2DQ(
+            Respondent2DQ.builder()
+                .respondent2DQRequestedCourt(requestedCourt)
+                .respondent2DQRemoteHearing(RemoteHearing.builder()
+                                                .remoteHearingRequested(YES)
+                                                .reasonForRemoteHearing("Outside scares me")
+                                                .build())
+                .build()
+        );
+
         CallbackParams callbackParams = CallbackParams.builder()
             .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "some-token"))
             .build();
 
-        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent2(callbackParams, caseDataBuilder);
-        RequestedCourtForTabDetails tabDetails = caseDataBuilder.build().getRequestedCourtForTabDetailsRes2();
+        // When
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent2(callbackParams, caseData);
 
+        // Then
+        RequestedCourtForTabDetails tabDetails = caseData.getRequestedCourtForTabDetailsRes2();
         assertThat(tabDetails.getRequestedCourt()).isEqualTo("121");
         assertThat(tabDetails.getRequestedCourtName()).isEqualTo("court 2");
         assertThat(tabDetails.getReasonForHearingAtSpecificCourt()).isEqualTo("Close to home");
@@ -182,21 +211,27 @@ class RequestedCourtForClaimDetailsTabTest {
 
     @Test
     void shouldUpdateRequestedCourtTabDetailsForRespondent1Spec() {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder()
-            .respondent1DQ(Respondent1DQ.builder()
-                               .respondent1DQRequestedCourt(requestedCourt)
-                               .respondent1DQRemoteHearingLRspec(RemoteHearingLRspec.builder()
-                                                                     .remoteHearingRequested(YES)
-                                                                     .reasonForRemoteHearing("Outside scares me")
-                                                                     .build())
-                               .build());
+        // Given
+        CaseData caseData = CaseData.builder().build();
+        caseData.setRespondent1DQ(
+            Respondent1DQ.builder()
+                .respondent1DQRequestedCourt(requestedCourt)
+                .respondent1DQRemoteHearingLRspec(RemoteHearingLRspec.builder()
+                                                      .remoteHearingRequested(YES)
+                                                      .reasonForRemoteHearing("Outside scares me")
+                                                      .build())
+                .build()
+        );
+
         CallbackParams callbackParams = CallbackParams.builder()
             .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "some-token"))
             .build();
 
-        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent1Spec(callbackParams, caseDataBuilder);
-        RequestedCourtForTabDetails tabDetails = caseDataBuilder.build().getRequestedCourtForTabDetailsRes1();
+        // When
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent1Spec(caseData, callbackParams);
 
+        // Then
+        RequestedCourtForTabDetails tabDetails = caseData.getRequestedCourtForTabDetailsRes1();
         assertThat(tabDetails.getRequestedCourt()).isEqualTo("121");
         assertThat(tabDetails.getRequestedCourtName()).isEqualTo("court 2");
         assertThat(tabDetails.getReasonForHearingAtSpecificCourt()).isEqualTo("Close to home");
@@ -206,21 +241,27 @@ class RequestedCourtForClaimDetailsTabTest {
 
     @Test
     void shouldUpdateRequestedCourtTabDetailsForRespondent2Spec() {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder()
-            .respondent2DQ(Respondent2DQ.builder()
-                               .respondent2DQRequestedCourt(requestedCourt)
-                               .respondent2DQRemoteHearingLRspec(RemoteHearingLRspec.builder()
-                                                                     .remoteHearingRequested(YES)
-                                                                     .reasonForRemoteHearing("Outside scares me")
-                                                                     .build())
-                               .build());
+        // Given
+        CaseData caseData = CaseData.builder().build();
+        caseData.setRespondent2DQ(
+            Respondent2DQ.builder()
+                .respondent2DQRequestedCourt(requestedCourt)
+                .respondent2DQRemoteHearingLRspec(RemoteHearingLRspec.builder()
+                                                      .remoteHearingRequested(YES)
+                                                      .reasonForRemoteHearing("Outside scares me")
+                                                      .build())
+                .build()
+        );
+
         CallbackParams callbackParams = CallbackParams.builder()
             .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "some-token"))
             .build();
 
-        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent2Spec(callbackParams, caseDataBuilder);
-        RequestedCourtForTabDetails tabDetails = caseDataBuilder.build().getRequestedCourtForTabDetailsRes2();
+        // When
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent2Spec(callbackParams, caseData);
 
+        // Then
+        RequestedCourtForTabDetails tabDetails = caseData.getRequestedCourtForTabDetailsRes2();
         assertThat(tabDetails.getRequestedCourt()).isEqualTo("121");
         assertThat(tabDetails.getRequestedCourtName()).isEqualTo("court 2");
         assertThat(tabDetails.getReasonForHearingAtSpecificCourt()).isEqualTo("Close to home");
