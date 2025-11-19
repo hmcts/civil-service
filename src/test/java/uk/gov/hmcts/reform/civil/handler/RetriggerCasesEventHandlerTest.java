@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.junit.jupiter.api.Test;
@@ -197,15 +198,15 @@ class RetriggerCasesEventHandlerTest {
 
     @Test
     void handleTask_RetriggerCasesForSuppementaryData() {
-        ExternalTask externalTask = mock(ExternalTask.class);
         String orgId = "XXXXXX";
+        ObjectNode inner = mapper.createObjectNode();
+        inner.put(orgId, 1);
         Map<String, Map<String, Map<String, Object>>> supplementaryDataCivil = new HashMap<>();
-        String orgObj = "{" + orgId + ": 1}";
         supplementaryDataCivil.put(
             "supplementary_data_updates",
-            singletonMap("$set", singletonMap("orgs_assigned_users", orgObj))
+            singletonMap("$set", singletonMap("orgs_assigned_users", inner))
         );
-        System.out.println(supplementaryDataCivil);
+        ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("caseEvent")).thenReturn("RETRIGGER_CASES");
         when(externalTask.getVariable("caseIds")).thenReturn(" 1, 2 ");
         when(externalTask.getVariable("caseData")).thenReturn(null);
