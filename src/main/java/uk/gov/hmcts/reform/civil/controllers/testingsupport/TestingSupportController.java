@@ -31,7 +31,6 @@ import uk.gov.hmcts.reform.civil.event.HearingFeePaidEvent;
 import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
 import uk.gov.hmcts.reform.civil.event.TrialReadyNotificationEvent;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.ga.service.GaOrganisationService;
 import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
 import uk.gov.hmcts.reform.civil.handler.event.HearingFeePaidEventHandler;
 import uk.gov.hmcts.reform.civil.handler.event.HearingFeeUnpaidEventHandler;
@@ -94,7 +93,6 @@ public class TestingSupportController {
     private final CheckStayOrderDeadlineEndTaskHandler checkStayOrderDeadlineEndTaskHandler;
     private final CheckUnlessOrderDeadlineEndTaskHandler checkUnlessOrderDeadlineEndTaskHandler;
     private final OrganisationService organisationService;
-    private final GaOrganisationService gaOrganisationService;
     private final CoreCaseUserService coreCaseUserService;
     private final GAJudgeRevisitTaskHandler gaJudgeRevisitTaskHandler;
 
@@ -390,7 +388,7 @@ public class TestingSupportController {
     @Operation(summary = "Assign case to user")
     public String getOrgDetailsByUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation) {
         String userId = userService.getUserInfo(authorisation).getUid();
-        return gaOrganisationService.findOrganisationByUserId(userId)
+        return organisationService.findOrganisationByUserId(userId)
             .map(Organisation::getOrganisationIdentifier).orElse(null);
 
     }
