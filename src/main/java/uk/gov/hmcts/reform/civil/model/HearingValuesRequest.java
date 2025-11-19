@@ -7,6 +7,6 @@ import lombok.Data;
 @Builder
 public class HearingValuesRequest {
 
-    private final Long caseReference;
-    private final String hearingId;
+    private Long caseReference;
+    private String hearingId;
 }

@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
 
 public class FixedRecoverableCostsSection extends FixedRecoverableCosts {
 
-    private final String bandText;
+    private String bandText;
 
     public static FixedRecoverableCostsSection from(uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts fixedrecoverableCosts) {
         if (fixedrecoverableCosts == null) {
