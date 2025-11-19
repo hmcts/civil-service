@@ -9,7 +9,7 @@ import net.minidev.json.annotate.JsonIgnore;
 
 public class Evidence {
 
-    private final EvidenceDetails value;
+    private EvidenceDetails value;
     @JsonIgnore
-    private final String id;
+    private String id;
 }

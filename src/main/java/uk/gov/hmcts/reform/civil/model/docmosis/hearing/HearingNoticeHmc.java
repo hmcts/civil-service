@@ -17,31 +17,31 @@ import java.time.LocalDate;
 @Data
 public class HearingNoticeHmc implements MappableObject {
 
-    private final String title;
-    private final Long caseNumber;
-    private final LocalDate creationDate;
-    private final String creationDateWelshText;
-    private final String claimant;
-    private final String claimant2;
-    private final String defendant;
-    private final String defendant2;
-    private final String claimantReference;
-    private final String claimant2Reference;
-    private final String defendantReference;
-    private final String defendant2Reference;
-    private final String feeAmount;
-    private final String hearingSiteName;
-    private final String caseManagementLocation;
-    private final String hearingLocation;
-    private final String hearingDays;
-    private final String totalHearingDuration;
-    private final String hearingType;
-    private final String hearingTypePluralWelsh;
-    private final LocalDate hearingDueDate;
-    private final String hearingDueDateWelshText;
-    private final PaymentDetails hearingFeePaymentDetails;
-    private final String partiesAttendingInPerson;
-    private final String partiesAttendingByTelephone;
-    private final String partiesAttendingByVideo;
+    private String title;
+    private Long caseNumber;
+    private LocalDate creationDate;
+    private String creationDateWelshText;
+    private String claimant;
+    private String claimant2;
+    private String defendant;
+    private String defendant2;
+    private String claimantReference;
+    private String claimant2Reference;
+    private String defendantReference;
+    private String defendant2Reference;
+    private String feeAmount;
+    private String hearingSiteName;
+    private String caseManagementLocation;
+    private String hearingLocation;
+    private String hearingDays;
+    private String totalHearingDuration;
+    private String hearingType;
+    private String hearingTypePluralWelsh;
+    private LocalDate hearingDueDate;
+    private String hearingDueDateWelshText;
+    private PaymentDetails hearingFeePaymentDetails;
+    private String partiesAttendingInPerson;
+    private String partiesAttendingByTelephone;
+    private String partiesAttendingByVideo;
 
 }
