@@ -62,7 +62,6 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
     private final UserService userService;
     private final AssignCategoryId assignCategoryId;
     private final FeatureToggleService featureToggleService;
-    private String ext = "";
 
     public static final String HEADER = "## Your order has been issued \n ### Case number \n ### #%s";
 
@@ -165,10 +164,11 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
         assignCategoryId.assignCategoryIdToCaseDocument(courtOfficerDocument, "caseManagementOrders");
 
         StringBuilder updatedFileName = new StringBuilder();
-        ext = FilenameUtils.getExtension(courtOfficerDocument.getDocumentLink().getDocumentFileName());
+        final String ext = FilenameUtils.getExtension(courtOfficerDocument.getDocumentLink().getDocumentFileName());
         courtOfficerDocument.getDocumentLink().setDocumentFileName(updatedFileName
                                                                       .append(courtOfficerDocument.getCreatedDatetime().toLocalDate().toString())
-                                                                      .append("_").append(officerName).append(".").append(ext).toString());
+                                                                      .append("_").append(officerName).append(".").append(
+                ext).toString());
 
         caseData.setPreviewCourtOfficerOrder(courtOfficerDocument);
         return AboutToStartOrSubmitCallbackResponse.builder()

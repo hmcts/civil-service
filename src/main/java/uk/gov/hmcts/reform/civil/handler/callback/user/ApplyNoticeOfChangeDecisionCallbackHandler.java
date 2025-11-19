@@ -179,17 +179,11 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
     private String getOrgIdCopyIfExists(CaseDetails caseDetails, String caseRole) {
         if (!isApplicant(caseRole)) {
             if (caseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
-                String respondent1OrganisationIDCopy = objectMapper.convertValue(caseDetails.getData().get(
+                return objectMapper.convertValue(caseDetails.getData().get(
                     "respondent1OrganisationIDCopy"), String.class);
-                if (respondent1OrganisationIDCopy != null) {
-                    return respondent1OrganisationIDCopy;
-                }
             } else if (caseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
-                String respondent2OrganisationIDCopy = objectMapper.convertValue(caseDetails.getData().get(
+                return objectMapper.convertValue(caseDetails.getData().get(
                     "respondent2OrganisationIDCopy"), String.class);
-                if (respondent2OrganisationIDCopy != null) {
-                    return respondent2OrganisationIDCopy;
-                }
             }
         }
         return null;
