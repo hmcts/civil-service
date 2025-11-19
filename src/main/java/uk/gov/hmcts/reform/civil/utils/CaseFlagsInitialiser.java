@@ -81,7 +81,7 @@ public class CaseFlagsInitialiser {
         }
     }
 
-    public void initialiseMissingCaseFlags(CaseData.CaseDataBuilder dataBuilder) {
+    public void initialiseMissingCaseFlags(CaseData.CaseDataBuilder<?, ?> dataBuilder) {
         CaseData caseData = dataBuilder.build();
         initialiseApplicantAndRespondentFlags(dataBuilder, caseData);
         initialiseRespondentLitigationFriendFlags(dataBuilder, caseData);

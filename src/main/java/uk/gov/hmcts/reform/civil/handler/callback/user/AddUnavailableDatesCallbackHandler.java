@@ -61,9 +61,9 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
     private final UnavailableDateValidator unavailableDateValidator;
     private final ObjectMapper objectMapper;
     private final Time time;
-    static final String claimant = "Claimant";
-    static final String defendant = "Defendant";
-    static final String invalidParticipants = "Invalid participants";
+    static final String CLAIMANT = "Claimant";
+    static final String DEFENDANT = "Defendant";
+    static final String INVALID_PARTICIPANTS = "Invalid participants";
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -88,8 +88,6 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
             callbackParams.getCaseData().getCcdCaseReference().toString(),
             userInfo.getUid()
         );
-
-        // Todo: Sumit:: UpdateDetailsForm builder
         if (isRespondentSolicitorOne(roles) || isRespondentSolicitorTwo(roles) || isApplicantSolicitorOne(roles)) {
             caseData.setUpdateDetailsForm(UpdateDetailsForm.builder()
                                             .hidePartyChoice(YES)
@@ -105,28 +103,28 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
 
         switch (multiPartyScenario) {
             case ONE_V_ONE: {
-                dynamicListOptions.add(claimant);
-                dynamicListOptions.add(defendant);
+                dynamicListOptions.add(CLAIMANT);
+                dynamicListOptions.add(DEFENDANT);
                 break;
             }
             case ONE_V_TWO_ONE_LEGAL_REP: {
-                dynamicListOptions.add(claimant);
+                dynamicListOptions.add(CLAIMANT);
                 dynamicListOptions.add("Defendants");
                 break;
             }
             case ONE_V_TWO_TWO_LEGAL_REP: {
-                dynamicListOptions.add(claimant);
+                dynamicListOptions.add(CLAIMANT);
                 dynamicListOptions.add("Defendant 1");
                 dynamicListOptions.add("Defendant 2");
                 break;
             }
             case TWO_V_ONE: {
                 dynamicListOptions.add("Claimants");
-                dynamicListOptions.add("Defendant");
+                dynamicListOptions.add(DEFENDANT);
                 break;
             }
             default: {
-                throw new CallbackException(invalidParticipants);
+                throw new CallbackException(INVALID_PARTICIPANTS);
             }
         }
 
@@ -153,7 +151,6 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
-        // Todo: Sumit update DateUtils class
         CaseData caseData = copyDatesIntoListingTabFields(callbackParams.getCaseData());
 
         if (caseData.getUpdateDetailsForm() != null
@@ -180,7 +177,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
                 addDateToApplicant2(caseData);
             }
             // FALL-THROUGH
-            case (claimant): {
+            case (CLAIMANT): {
                 addDateToApplicant1(caseData);
                 break;
             }
@@ -188,7 +185,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
                 addDateToRespondent2(caseData);
             }
             // FALL-THROUGH
-            case (defendant), ("Defendant 1"): {
+            case (DEFENDANT), ("Defendant 1"): {
                 addDateToRespondent1(caseData);
                 break;
             }
@@ -197,7 +194,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
                 break;
             }
             default: {
-                throw new CallbackException(invalidParticipants);
+                throw new CallbackException(INVALID_PARTICIPANTS);
             }
         }
     }
@@ -253,7 +250,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
                 break;
             }
             default:
-                throw new CallbackException(invalidParticipants);
+                throw new CallbackException(INVALID_PARTICIPANTS);
         }
     }
 

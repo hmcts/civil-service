@@ -300,7 +300,7 @@ public class UnavailabilityDatesUtils {
         }
     }
 
-    private static void copyDatesIntoListingTabFieldsForApplicant(CaseData caseData, Boolean isApplicant1) {
+    private static void copyDatesIntoListingTabFieldsForApplicant(CaseData caseData, boolean isApplicant1) {
         String eventAdded = null;
         LocalDate dateAdded = null;
 
