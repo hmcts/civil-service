@@ -19,18 +19,18 @@ import java.time.LocalDate;
 @EqualsAndHashCode
 public class PiPLetter implements MappableObject {
 
-    private final Party defendant;
-    private final String claimantName;
-    private final String respondToClaimUrl;
-    private final BigDecimal totalAmountOfClaim;
-    private final String claimReferenceNumber;
-    private final String pin;
-    private final String ccdCaseNumber;
+    private Party defendant;
+    private String claimantName;
+    private String respondToClaimUrl;
+    private BigDecimal totalAmountOfClaim;
+    private String claimReferenceNumber;
+    private String pin;
+    private String ccdCaseNumber;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate responseDeadline;
+    private LocalDate responseDeadline;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate issueDate;
+    private LocalDate issueDate;
 
 }

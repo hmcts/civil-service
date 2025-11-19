@@ -18,15 +18,15 @@ import java.time.LocalDate;
 @EqualsAndHashCode
 public class SetAsideJudgmentInErrorLiPDefendantLetter implements MappableObject {
 
-    private final Party defendant;
-    private final String claimantName;
-    private final String claimReferenceNumber;
+    private Party defendant;
+    private String claimantName;
+    private String claimReferenceNumber;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate letterIssueDate;
+    private LocalDate letterIssueDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate issueDate;
+    private LocalDate issueDate;
 
 
 }

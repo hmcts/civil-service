@@ -12,12 +12,12 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 @EqualsAndHashCode
 public class CertificateOfDebtForm implements MappableObject {
 
-    private final String courtLocationName;
-    private final String claimNumber;
-    private final String defendantFullName;
-    private final String defendantAddress;
-    private final String defendantFullNameFromJudgment;
-    private final String defendantAddressFromJudgment;
+    private String courtLocationName;
+    private String claimNumber;
+    private String defendantFullName;
+    private String defendantAddress;
+    private String defendantFullNameFromJudgment;
+    private String defendantAddressFromJudgment;
     private String applicationIssuedDate;
     private String judgmentOrderDate;
     private String dateFinalPaymentMade;

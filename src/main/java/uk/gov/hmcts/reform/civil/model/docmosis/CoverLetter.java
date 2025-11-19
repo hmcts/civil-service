@@ -13,5 +13,5 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 @EqualsAndHashCode
 public class CoverLetter implements MappableObject {
 
-    private final Party party;
+    private Party party;
 }

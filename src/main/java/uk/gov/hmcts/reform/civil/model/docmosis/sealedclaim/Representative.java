@@ -17,13 +17,13 @@ import static uk.gov.hmcts.reform.civil.model.Address.fromContactInformation;
 @Builder(toBuilder = true)
 public class Representative {
 
-    private final String contactName;
-    private final String organisationName;
-    private final String phoneNumber;
-    private final String dxAddress;
-    private final String emailAddress;
-    private final Address serviceAddress;
-    private final String legalRepHeading;
+    private String contactName;
+    private String organisationName;
+    private String phoneNumber;
+    private String dxAddress;
+    private String emailAddress;
+    private Address serviceAddress;
+    private String legalRepHeading;
 
     public static Representative fromSolicitorOrganisationDetails(
         SolicitorOrganisationDetails solicitorOrganisationDetails) {

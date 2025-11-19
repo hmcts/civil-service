@@ -10,6 +10,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 public class RemoteHearing {
 
     @Deprecated(forRemoval = true)
-    private final YesOrNo remoteHearingRequested;
-    private final String reasonForRemoteHearing;
+    private YesOrNo remoteHearingRequested;
+    private String reasonForRemoteHearing;
 }

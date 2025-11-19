@@ -13,12 +13,12 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 @EqualsAndHashCode
 public class JudgmentByAdmissionLiPDefendantLetter implements MappableObject {
 
-    private final Party defendant;
-    private final String claimantName;
-    private final String claimReferenceNumber;
-    private final String respondToClaimUrl;
-    private final String pin;
-    private final String varyJudgmentFee;
-    private final String certifOfSatisfactionFee;
+    private Party defendant;
+    private String claimantName;
+    private String claimReferenceNumber;
+    private String respondToClaimUrl;
+    private String pin;
+    private String varyJudgmentFee;
+    private String certifOfSatisfactionFee;
 
 }

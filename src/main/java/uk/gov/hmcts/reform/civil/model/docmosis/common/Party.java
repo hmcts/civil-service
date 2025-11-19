@@ -9,19 +9,19 @@ import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 @Builder(toBuilder = true)
 public class Party {
 
-    private final String type;
-    private final String name;
-    private final String phoneNumber;
-    private final String emailAddress;
-    private final Address primaryAddress;
-    private final Representative representative;
-    private final String litigationFriendName;
-    private final String litigationFriendFirstName;
-    private final String litigationFriendLastName;
-    private final String soleTraderTradingAs;
-    private final String litigationFriendPhoneNumber;
-    private final String litigationFriendEmailAddress;
-    private final String legalRepHeading;
+    private String type;
+    private String name;
+    private String phoneNumber;
+    private String emailAddress;
+    private Address primaryAddress;
+    private Representative representative;
+    private String litigationFriendName;
+    private String litigationFriendFirstName;
+    private String litigationFriendLastName;
+    private String soleTraderTradingAs;
+    private String litigationFriendPhoneNumber;
+    private String litigationFriendEmailAddress;
+    private String legalRepHeading;
 
     public static Party toLipParty(uk.gov.hmcts.reform.civil.model.Party party) {
         return Party.builder()

@@ -14,8 +14,8 @@ import java.time.LocalDate;
 @Builder(toBuilder = true)
 public class GAHearingDateGAspec {
 
-    private final YesOrNo hearingScheduledPreferenceYesNo;
-    private final LocalDate hearingScheduledDate;
+    private YesOrNo hearingScheduledPreferenceYesNo;
+    private LocalDate hearingScheduledDate;
 
     @JsonCreator
     GAHearingDateGAspec(@JsonProperty("hearingScheduledPreferenceYesNo") YesOrNo hearingScheduledPreferenceYesNo,

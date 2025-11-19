@@ -17,8 +17,8 @@ import static java.util.Objects.nonNull;
 @Data
 public class QueryDocument implements MappableObject {
 
-    private final String referenceNumber;
-    private final List<DocumentQueryMessage> messages;
+    private String referenceNumber;
+    private List<DocumentQueryMessage> messages;
 
     public static QueryDocument from(String caseId, List<Element<CaseMessage>> messageThread) {
         if (!nonNull(messageThread)) {

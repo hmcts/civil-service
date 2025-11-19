@@ -16,75 +16,75 @@ import java.util.Map;
 public class Task {
 
     @JsonProperty("id")
-    private final String id;
+    private String id;
     @JsonProperty("name")
-    private final String name;
+    private String name;
     @JsonProperty("assignee")
-    private final String assignee;
+    private String assignee;
     @JsonProperty("type")
-    private final String type;
+    private String type;
     @JsonProperty("task_state")
-    private final String taskState;
+    private String taskState;
     @JsonProperty("task_system")
-    private final String taskSystem;
+    private String taskSystem;
     @JsonProperty("security_classification")
-    private final String securityClassification;
+    private String securityClassification;
     @JsonProperty("task_title")
-    private final String taskTitle;
+    private String taskTitle;
     @JsonProperty("created_date")
-    private final ZonedDateTime createdDate;
+    private ZonedDateTime createdDate;
     @JsonProperty("due_date")
-    private final ZonedDateTime dueDate;
+    private ZonedDateTime dueDate;
     @JsonProperty("location_name")
-    private final String locationName;
+    private String locationName;
     @JsonProperty("location")
-    private final String location;
+    private String location;
     @JsonProperty("execution_type")
-    private final String executionType;
+    private String executionType;
     @JsonProperty("jurisdiction")
-    private final String jurisdiction;
+    private String jurisdiction;
     @JsonProperty("region")
-    private final String region;
+    private String region;
     @JsonProperty("case_type_id")
-    private final String caseTypeId;
+    private String caseTypeId;
     @JsonProperty("case_id")
-    private final String caseId;
+    private String caseId;
     @JsonProperty("case_category")
-    private final String caseCategory;
+    private String caseCategory;
     @JsonProperty("case_name")
-    private final String caseName;
+    private String caseName;
     @JsonProperty("auto_assigned")
-    private final boolean autoAssigned;
+    private boolean autoAssigned;
     @JsonProperty("warnings")
-    private final Boolean warnings;
+    private Boolean warnings;
     @JsonProperty("case_management_category")
-    private final String caseManagementCategory;
+    private String caseManagementCategory;
     @JsonProperty("work_type_id")
-    private final String workTypeId;
+    private String workTypeId;
     @JsonProperty("work_type_label")
-    private final String workTypeLabel;
+    private String workTypeLabel;
     @JsonProperty("permissions")
-    private final TaskPermissions permissions;
+    private TaskPermissions permissions;
     @JsonProperty("description")
-    private final String description;
+    private String description;
     @JsonProperty("role_category")
-    private final String roleCategory;
+    private String roleCategory;
     @JsonProperty("additional_properties")
-    private final Map<String, String> additionalProperties;
+    private Map<String, String> additionalProperties;
     @JsonProperty("next_hearing_id")
-    private final String nextHearingId;
+    private String nextHearingId;
     @JsonProperty("next_hearing_date")
-    private final ZonedDateTime nextHearingDate;
+    private ZonedDateTime nextHearingDate;
     @JsonProperty("minor_priority")
-    private final Integer minorPriority;
+    private Integer minorPriority;
     @JsonProperty("major_priority")
-    private final Integer majorPriority;
+    private Integer majorPriority;
     @JsonProperty("priority_date")
-    private final ZonedDateTime priorityDate;
+    private ZonedDateTime priorityDate;
     @JsonProperty("reconfigure_request_time")
-    private final ZonedDateTime reconfigureRequestTime;
+    private ZonedDateTime reconfigureRequestTime;
     @JsonProperty("last_reconfiguration_time")
-    private final ZonedDateTime lastReconfigurationTime;
+    private ZonedDateTime lastReconfigurationTime;
     @JsonProperty("termination_process")
-    private final String terminationProcess;
+    private String terminationProcess;
 }

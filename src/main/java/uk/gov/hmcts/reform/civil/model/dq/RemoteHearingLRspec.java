@@ -14,6 +14,6 @@ public class RemoteHearingLRspec {
      * @deprecated location is mandatory for all parties now
      */
     @Deprecated(forRemoval = true)
-    private final YesOrNo remoteHearingRequested;
-    private final String reasonForRemoteHearing;
+    private YesOrNo remoteHearingRequested;
+    private String reasonForRemoteHearing;
 }

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.model.docmosis.sdo;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -22,47 +23,49 @@ import java.util.List;
 
 @Getter
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
+@SuppressWarnings({"java:S1104", "common-java:DuplicatedBlocks", "java:S6539"})
 public class SdoDocumentFormSmallDrh implements MappableObject {
 
-    private final LocalDate currentDate;
+    private LocalDate currentDate;
     //Header
-    private final String judgeName;
-    private final String caseNumber;
-    private final Party applicant1;
-    private final Party respondent1;
-    private final boolean hasApplicant2;
-    private final Party applicant2;
-    private final boolean hasRespondent2;
-    private final Party respondent2;
-    private final boolean writtenByJudge;
+    private String judgeName;
+    private String caseNumber;
+    private Party applicant1;
+    private Party respondent1;
+    private boolean hasApplicant2;
+    private Party applicant2;
+    private boolean hasRespondent2;
+    private Party respondent2;
+    private boolean writtenByJudge;
 
     //Toggles
-    private final boolean hasPaymentProtectionInsurance;
-    private final boolean hasWitnessStatement;
-    private final boolean hasUploadDocToggle;
-    private final boolean hasHearingToggle;
-    private final boolean hasWitnessStatements;
-    private final boolean hasNewDirections;
-    private final boolean hasSdoR2HearingTrialWindow;
-    private final boolean hasDRHWelshLangToggle;
-    private final boolean sdoR2SmallClaimsMediationSectionToggle;
-    private final boolean carmEnabled;
+    private boolean hasPaymentProtectionInsurance;
+    private boolean hasWitnessStatement;
+    private boolean hasUploadDocToggle;
+    private boolean hasHearingToggle;
+    private boolean hasWitnessStatements;
+    private boolean hasNewDirections;
+    private boolean hasSdoR2HearingTrialWindow;
+    private boolean hasDRHWelshLangToggle;
+    private boolean sdoR2SmallClaimsMediationSectionToggle;
+    private boolean carmEnabled;
 
-    private final List<Element<SdoR2SmallClaimsAddNewDirection>> sdoR2SmallClaimsAddNewDirection;
-    private final SdoR2SmallClaimsJudgesRecital sdoR2SmallClaimsJudgesRecital;
-    private final SdoR2SmallClaimsWitnessStatements sdoR2SmallClaimsWitnessStatements;
-    private final SdoR2SmallClaimsPPI sdoR2SmallClaimsPPI;
-    private final SdoR2SmallClaimsUploadDoc sdoR2SmallClaimsUploadDoc;
-    private final SdoR2SmallClaimsHearing sdoR2SmallClaimsHearing;
-    private final SdoR2SmallClaimsImpNotes sdoR2SmallClaimsImpNotes;
-    private final String hearingTime;
-    private final String smallClaimsMethod;
-    private final String sdoR2SmallClaimsPhysicalTrialBundleTxt;
-    private final LocationRefData hearingLocation;
-    private final LocationRefData caseManagementLocation;
-    private final String welshLanguageDescription;
-    private final String sdoR2SmallClaimMediationSectionInput;
+    private List<Element<SdoR2SmallClaimsAddNewDirection>> sdoR2SmallClaimsAddNewDirection;
+    private SdoR2SmallClaimsJudgesRecital sdoR2SmallClaimsJudgesRecital;
+    private SdoR2SmallClaimsWitnessStatements sdoR2SmallClaimsWitnessStatements;
+    private SdoR2SmallClaimsPPI sdoR2SmallClaimsPPI;
+    private SdoR2SmallClaimsUploadDoc sdoR2SmallClaimsUploadDoc;
+    private SdoR2SmallClaimsHearing sdoR2SmallClaimsHearing;
+    private SdoR2SmallClaimsImpNotes sdoR2SmallClaimsImpNotes;
+    private String hearingTime;
+    private String smallClaimsMethod;
+    private String sdoR2SmallClaimsPhysicalTrialBundleTxt;
+    private LocationRefData hearingLocation;
+    private LocationRefData caseManagementLocation;
+    private String welshLanguageDescription;
+    private String sdoR2SmallClaimMediationSectionInput;
 }

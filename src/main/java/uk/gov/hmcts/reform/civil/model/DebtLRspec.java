@@ -12,9 +12,9 @@ import java.math.BigDecimal;
 @Builder
 public class DebtLRspec {
 
-    private final DebtTypeLRspec debtType;
+    private DebtTypeLRspec debtType;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal paymentAmount;
-    private final PaymentFrequencyLRspec paymentFrequency;
+    private BigDecimal paymentAmount;
+    private PaymentFrequencyLRspec paymentFrequency;
 
 }

@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 @Builder
 public class DocumentWithRegex {
 
-    private final Document document;
+    private Document document;
 
     @JsonCreator
     public DocumentWithRegex(@JsonProperty("document") Document document) {

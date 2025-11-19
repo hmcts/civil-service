@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Builder
 public class CaseNote {
 
-    private final String createdBy;
-    private final LocalDateTime createdOn;
-    private final String note;
+    private String createdBy;
+    private LocalDateTime createdOn;
+    private String note;
 }

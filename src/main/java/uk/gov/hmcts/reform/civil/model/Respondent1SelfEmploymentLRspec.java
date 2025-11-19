@@ -11,12 +11,12 @@ import java.math.BigDecimal;
 @Builder(toBuilder = true)
 public class Respondent1SelfEmploymentLRspec {
 
-    private final String jobTitle;
+    private String jobTitle;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal annualTurnover;
-    private final YesOrNo isBehindOnTaxPayment;
+    private BigDecimal annualTurnover;
+    private YesOrNo isBehindOnTaxPayment;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal amountOwed;
-    private final String reason;
+    private BigDecimal amountOwed;
+    private String reason;
 
 }

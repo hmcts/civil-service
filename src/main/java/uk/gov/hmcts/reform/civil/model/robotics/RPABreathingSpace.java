@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Builder
 public class RPABreathingSpace {
 
-    private final BreathingSpaceType type;
+    private BreathingSpaceType type;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final LocalDate endDate;
+    private LocalDate endDate;
 }

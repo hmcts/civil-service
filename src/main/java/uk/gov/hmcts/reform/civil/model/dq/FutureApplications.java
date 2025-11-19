@@ -8,6 +8,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 @Builder
 public class FutureApplications {
 
-    private final YesOrNo intentionToMakeFutureApplications;
-    private final String whatWillFutureApplicationsBeMadeFor;
+    private YesOrNo intentionToMakeFutureApplications;
+    private String whatWillFutureApplicationsBeMadeFor;
 }

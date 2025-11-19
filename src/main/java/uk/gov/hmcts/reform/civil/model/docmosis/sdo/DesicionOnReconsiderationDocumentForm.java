@@ -20,18 +20,18 @@ import java.time.LocalDate;
 @ToString
 public class DesicionOnReconsiderationDocumentForm implements MappableObject {
 
-    private final String caseNumber;
+    private String caseNumber;
 
-    private final LocalDate currentDate;
+    private LocalDate currentDate;
 
-    private final Party applicant1;
-    private final Party respondent1;
-    private final boolean hasRespondent2;
-    private final Party respondent2;
-    private final boolean hasApplicant2;
-    private final Party applicant2;
-    private final String judgeName;
-    private final boolean writtenByJudge;
+    private Party applicant1;
+    private Party respondent1;
+    private boolean hasRespondent2;
+    private Party respondent2;
+    private boolean hasApplicant2;
+    private Party applicant2;
+    private String judgeName;
+    private boolean writtenByJudge;
     private ReasonForReconsideration reasonForReconsideration;
     private DecisionOnRequestReconsiderationOptions decisionOnRequestReconsiderationOptions;
     private UpholdingPreviousOrderReason upholdingPreviousOrderReason;

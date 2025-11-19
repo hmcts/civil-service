@@ -15,11 +15,11 @@ import java.time.LocalDateTime;
 @Builder(toBuilder = true)
 public class GAPbaDetails {
 
-    private final Fee fee;
-    private final PaymentDetails paymentDetails;
-    private final LocalDateTime paymentSuccessfulDate;
-    private final String generalAppFeeToPayInText;
-    private final String generalAppPayInformationText;
+    private Fee fee;
+    private PaymentDetails paymentDetails;
+    private LocalDateTime paymentSuccessfulDate;
+    private String generalAppFeeToPayInText;
+    private String generalAppPayInformationText;
 
     @JsonCreator
     GAPbaDetails(@JsonProperty("fee") Fee fee,

@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 @Builder
 public class ResponseDocument {
 
-    private final Document file;
+    private Document file;
 
     @JsonCreator
     public ResponseDocument(Document file) {

@@ -14,8 +14,9 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 public class LitigantInPersonForm implements MappableObject {
 
     @JsonProperty("courtseal")
-    private final String courtSeal = "[userImage:courtseal.PNG]"; //NOSONAR
-    private final String ccdCaseReference;
-    private final String referenceNumber;
+    @Builder.Default
+    private String courtSeal = "[userImage:courtseal.PNG]"; //NOSONAR
+    private String ccdCaseReference;
+    private String referenceNumber;
 
 }

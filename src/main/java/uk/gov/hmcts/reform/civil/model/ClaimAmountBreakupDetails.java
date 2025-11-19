@@ -13,9 +13,9 @@ import java.math.BigDecimal;
 public class ClaimAmountBreakupDetails {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal claimAmount;
+    private BigDecimal claimAmount;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final String claimReason;
+    private String claimReason;
 
     @JsonCreator
     public ClaimAmountBreakupDetails(@JsonProperty("claimAmount") BigDecimal claimAmount,

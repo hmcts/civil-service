@@ -15,20 +15,20 @@ import java.util.Locale;
 @Builder
 @EqualsAndHashCode
 @SuppressWarnings("PMD.ExcessiveParameterList")
-public final class CcdEventMessage {
+public class CcdEventMessage {
 
-    private final String eventInstanceId;
+    private String eventInstanceId;
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    private final LocalDateTime eventTimeStamp;
-    private final String caseId;
-    private final String jurisdictionId;
-    private final String caseTypeId;
-    private final String eventId;
-    private final String previousStateId;
-    private final String newStateId;
-    private final String userId;
-    private final AdditionalData additionalData;
+    private LocalDateTime eventTimeStamp;
+    private String caseId;
+    private String jurisdictionId;
+    private String caseTypeId;
+    private String eventId;
+    private String previousStateId;
+    private String newStateId;
+    private String userId;
+    private AdditionalData additionalData;
 
     @JsonCreator
     public CcdEventMessage(@JsonProperty("EventInstanceId") String eventInstanceId,

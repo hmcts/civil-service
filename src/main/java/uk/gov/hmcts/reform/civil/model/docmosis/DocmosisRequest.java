@@ -13,9 +13,9 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DocmosisRequest {
 
-    private final String accessKey;
-    private final String templateName;
-    private final String outputFormat;
-    private final String outputName;
-    private final Map<String, Object> data;
+    private String accessKey;
+    private String templateName;
+    private String outputFormat;
+    private String outputName;
+    private Map<String, Object> data;
 }

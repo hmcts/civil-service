@@ -9,7 +9,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 public class PartyFlags extends Flags {
 
-    private final String partyId;
+    private String partyId;
 
     public static PartyFlags from(Flags flags) {
         return PartyFlags.builder()

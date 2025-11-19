@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.judgmentonline;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 
@@ -11,30 +12,45 @@ import java.util.List;
 
 @Getter
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
+@SuppressWarnings("java:S1104") // Suppressing Sonar warnings for Lombok-generated code
 public class JudgmentByDeterminationDocForm implements MappableObject {
 
-    private final String claimReferenceNumber;
-    private final Party applicant;
-    private final String applicantReference;
-    private final String respondentReference;
-    private final Party respondent;
-    private final String formText;
-    private final Party claimantLR;
-    private final String debt;
-    private final String costs;
-    private final String totalCost;
-    private final String respondent1Name;
-    private final String respondent2Name;
-    private final String respondent1Ref;
-    private final String respondent2Ref;
-    private final List<Party> applicants;
+    // Claim identification
+    private String claimReferenceNumber;
+
+    // Party information
+    private Party applicant;
+    private List<Party> applicants;
+    private String applicantReference;
+
+    // Respondent details
+    private Party respondent;
+    private String respondentReference;
+    private String respondent1Name;
+    private String respondent2Name;
+    private String respondent1Ref;
+    private String respondent2Ref;
+
+    // Legal representative
+    private Party claimantLR;
+
+    // Financial information
+    private String debt;
+    private String costs;
+    private String totalCost;
+
+    // Payment details
     private String paymentPlan;
-    private final String payByDate;
-    private final String repaymentFrequency;
-    private final String repaymentDate;
-    private final String paymentStr;
-    private final String installmentAmount;
+    private String payByDate;
+    private String repaymentFrequency;
+    private String repaymentDate;
+    private String paymentStr;
+    private String installmentAmount;
+
+    // Form content
+    private String formText;
 
 }

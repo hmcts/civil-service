@@ -2,6 +2,8 @@ name: Refresh StateFlow diagrams
 
 on:
   push:
+    branches:
+      - master
     paths:
       - 'src/main/java/uk/gov/hmcts/reform/civil/stateflow/transitions/**'
       - 'scripts/export_stateflow_transitions.py'

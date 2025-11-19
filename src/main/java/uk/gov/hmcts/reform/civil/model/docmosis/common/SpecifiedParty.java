@@ -12,9 +12,9 @@ import java.time.LocalDate;
 @Builder(toBuilder = true)
 public class SpecifiedParty {
 
-    private final String name;
-    private final Address primaryAddress;
-    private final Representative representative;
+    private String name;
+    private Address primaryAddress;
+    private Representative representative;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-    private final LocalDate individualDateOfBirth;
+    private LocalDate individualDateOfBirth;
 }

@@ -7,7 +7,7 @@ import lombok.Data;
 @Builder
 public class WelshLanguageRequirements {
 
-    private final String evidence;
-    private final String court;
-    private final String documents;
+    private String evidence;
+    private String court;
+    private String documents;
 }

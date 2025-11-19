@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.CaseDetails;
 public class BundleRequest {
 
     @JsonProperty("case_details")
-    private final CaseDetails caseDetails;
+    private CaseDetails caseDetails;
 
     public BundleRequest(CaseDetails caseDetails) {
         this.caseDetails = caseDetails;

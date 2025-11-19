@@ -11,6 +11,6 @@ import java.util.List;
 @Builder
 public class Witnesses {
 
-    private final YesOrNo witnessesToAppear;
-    private final List<Witness> details;
+    private YesOrNo witnessesToAppear;
+    private List<Witness> details;
 }

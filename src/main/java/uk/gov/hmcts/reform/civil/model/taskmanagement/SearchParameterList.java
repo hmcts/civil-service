@@ -16,9 +16,9 @@ import java.util.List;
 @AllArgsConstructor
 public class SearchParameterList implements SearchParameter<List<String>> {
 
-    private final SearchParameterKey key;
-    private final SearchOperator operator;
+    private SearchParameterKey key;
+    private SearchOperator operator;
 
     @JsonProperty("values")
-    private final List<String> values;
+    private List<String> values;
 }

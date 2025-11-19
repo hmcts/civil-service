@@ -11,8 +11,8 @@ import java.util.List;
 @Builder
 public class Hearing {
 
-    private final String hearingLength;
-    private final YesOrNo unavailableDatesRequired;
-    private final List<UnavailableDate> unavailableDates;
+    private String hearingLength;
+    private YesOrNo unavailableDatesRequired;
+    private List<UnavailableDate> unavailableDates;
 
 }

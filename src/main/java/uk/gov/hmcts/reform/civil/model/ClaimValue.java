@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 public class ClaimValue {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal statementOfValueInPennies;
+    private BigDecimal statementOfValueInPennies;
 
     @JsonCreator
     public ClaimValue(@JsonProperty("statementOfValueInPennies") BigDecimal statementOfValueInPennies) {

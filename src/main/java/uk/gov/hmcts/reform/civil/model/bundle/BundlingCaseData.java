@@ -19,65 +19,65 @@ public class BundlingCaseData {
     @JsonProperty("id")
     public long id;
     @JsonProperty("trialDocuments")
-    private final List<Element<BundlingRequestDocument>> trialDocuments;
+    private List<Element<BundlingRequestDocument>> trialDocuments;
     @JsonProperty("statementsOfCaseDocuments")
-    private final List<Element<BundlingRequestDocument>> statementsOfCaseDocuments;
+    private List<Element<BundlingRequestDocument>> statementsOfCaseDocuments;
     @JsonProperty("directionsQuestionnaires")
-    private final List<Element<BundlingRequestDocument>> directionsQuestionnaires;
+    private List<Element<BundlingRequestDocument>> directionsQuestionnaires;
     @JsonProperty("particularsOfClaim")
-    private final List<Element<BundlingRequestDocument>> particularsOfClaim;
+    private List<Element<BundlingRequestDocument>> particularsOfClaim;
     @JsonProperty("ordersDocuments")
-    private final List<Element<BundlingRequestDocument>> ordersDocuments;
+    private List<Element<BundlingRequestDocument>> ordersDocuments;
     @JsonProperty("claimant1WitnessStatements")
-    private final List<Element<BundlingRequestDocument>> claimant1WitnessStatements;
+    private List<Element<BundlingRequestDocument>> claimant1WitnessStatements;
     @JsonProperty("claimant2WitnessStatements")
-    private final List<Element<BundlingRequestDocument>> claimant2WitnessStatements;
+    private List<Element<BundlingRequestDocument>> claimant2WitnessStatements;
     @JsonProperty("defendant1WitnessStatements")
-    private final List<Element<BundlingRequestDocument>> defendant1WitnessStatements;
+    private List<Element<BundlingRequestDocument>> defendant1WitnessStatements;
     @JsonProperty("defendant2WitnessStatements")
-    private final List<Element<BundlingRequestDocument>> defendant2WitnessStatements;
+    private List<Element<BundlingRequestDocument>> defendant2WitnessStatements;
     @JsonProperty("claimant1ExpertEvidence")
-    private final List<Element<BundlingRequestDocument>> claimant1ExpertEvidence;
+    private List<Element<BundlingRequestDocument>> claimant1ExpertEvidence;
     @JsonProperty("claimant2ExpertEvidence")
-    private final List<Element<BundlingRequestDocument>> claimant2ExpertEvidence;
+    private List<Element<BundlingRequestDocument>> claimant2ExpertEvidence;
     @JsonProperty("defendant1ExpertEvidence")
-    private final List<Element<BundlingRequestDocument>> defendant1ExpertEvidence;
+    private List<Element<BundlingRequestDocument>> defendant1ExpertEvidence;
     @JsonProperty("defendant2ExpertEvidence")
-    private final List<Element<BundlingRequestDocument>> defendant2ExpertEvidence;
+    private List<Element<BundlingRequestDocument>> defendant2ExpertEvidence;
     @JsonProperty("jointStatementOfExperts")
-    private final List<Element<BundlingRequestDocument>> jointStatementOfExperts;
+    private List<Element<BundlingRequestDocument>> jointStatementOfExperts;
     @JsonProperty("claimant1DisclosedDocuments")
-    private final List<Element<BundlingRequestDocument>> claimant1DisclosedDocuments;
+    private List<Element<BundlingRequestDocument>> claimant1DisclosedDocuments;
     @JsonProperty("claimant2DisclosedDocuments")
-    private final List<Element<BundlingRequestDocument>> claimant2DisclosedDocuments;
+    private List<Element<BundlingRequestDocument>> claimant2DisclosedDocuments;
     @JsonProperty("defendant1DisclosedDocuments")
-    private final List<Element<BundlingRequestDocument>> defendant1DisclosedDocuments;
+    private List<Element<BundlingRequestDocument>> defendant1DisclosedDocuments;
     @JsonProperty("defendant2DisclosedDocuments")
-    private final List<Element<BundlingRequestDocument>> defendant2DisclosedDocuments;
+    private List<Element<BundlingRequestDocument>> defendant2DisclosedDocuments;
     @JsonProperty("claimant1CostsBudgets")
-    private final List<Element<BundlingRequestDocument>> claimant1CostsBudgets;
+    private List<Element<BundlingRequestDocument>> claimant1CostsBudgets;
     @JsonProperty("claimant2CostsBudgets")
-    private final List<Element<BundlingRequestDocument>> claimant2CostsBudgets;
+    private List<Element<BundlingRequestDocument>> claimant2CostsBudgets;
     @JsonProperty("defendant1CostsBudgets")
-    private final List<Element<BundlingRequestDocument>> defendant1CostsBudgets;
+    private List<Element<BundlingRequestDocument>> defendant1CostsBudgets;
     @JsonProperty("defendant2CostsBudgets")
-    private final List<Element<BundlingRequestDocument>> defendant2CostsBudgets;
+    private List<Element<BundlingRequestDocument>> defendant2CostsBudgets;
     @JsonProperty("systemGeneratedCaseDocuments")
-    private final List<Element<BundlingRequestDocument>> systemGeneratedCaseDocuments;
+    private List<Element<BundlingRequestDocument>> systemGeneratedCaseDocuments;
     @JsonProperty("applicant1")
-    private final Party applicant1;
+    private Party applicant1;
     @JsonProperty("hasApplicant2")
-    private final boolean hasApplicant2;
+    private boolean hasApplicant2;
     @JsonProperty("applicant2")
-    private final Party applicant2;
+    private Party applicant2;
     @JsonProperty("respondant1")
-    private final Party respondent1;
+    private Party respondent1;
     @JsonProperty("hasRespondant2")
-    private final boolean hasRespondant2;
+    private boolean hasRespondant2;
     @JsonProperty("respondant2")
-    private final Party respondent2;
+    private Party respondent2;
     @JsonProperty("hearingDate")
-    private final String hearingDate;
+    private String hearingDate;
     @JsonProperty("ccdCaseReference")
-    private final Long ccdCaseReference;
+    private Long ccdCaseReference;
 }

@@ -13,8 +13,8 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 @EqualsAndHashCode
 public class JudgementCoverLetter implements MappableObject {
 
-    private final String claimNumber;
-    private final String partyName;
-    private final Address address;
+    private String claimNumber;
+    private String partyName;
+    private Address address;
 
 }

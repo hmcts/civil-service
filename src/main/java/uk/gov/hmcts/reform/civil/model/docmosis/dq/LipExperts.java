@@ -10,8 +10,8 @@ import java.util.List;
 @Builder
 public class LipExperts {
 
-    private final List<ExpertReportTemplate> details;
-    private final YesOrNo caseNeedsAnExpert;
-    private final String expertCanStillExamineDetails;
-    private final YesOrNo expertReportRequired;
+    private List<ExpertReportTemplate> details;
+    private YesOrNo caseNeedsAnExpert;
+    private String expertCanStillExamineDetails;
+    private YesOrNo expertReportRequired;
 }

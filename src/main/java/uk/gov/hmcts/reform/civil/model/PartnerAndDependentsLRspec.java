@@ -9,14 +9,14 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 @Builder
 public class PartnerAndDependentsLRspec {
 
-    private final YesOrNo liveWithPartnerRequired;
-    private final YesOrNo partnerAgedOver;
-    private final YesOrNo haveAnyChildrenRequired;
-    private final YesOrNo receiveDisabilityPayments;
-    private final ChildrenByAgeGroupLRspec howManyChildrenByAgeGroup;
-    private final YesOrNo supportedAnyoneFinancialRequired;
-    private final String supportPeopleNumber;
-    private final String supportPeopleDetails;
+    private YesOrNo liveWithPartnerRequired;
+    private YesOrNo partnerAgedOver;
+    private YesOrNo haveAnyChildrenRequired;
+    private YesOrNo receiveDisabilityPayments;
+    private ChildrenByAgeGroupLRspec howManyChildrenByAgeGroup;
+    private YesOrNo supportedAnyoneFinancialRequired;
+    private String supportPeopleNumber;
+    private String supportPeopleDetails;
 
     @JsonIgnore
     public boolean hasPartner() {

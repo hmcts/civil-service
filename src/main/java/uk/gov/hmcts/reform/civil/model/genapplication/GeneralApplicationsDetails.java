@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @Builder(toBuilder = true)
 public class GeneralApplicationsDetails implements MappableObject {
 
-    private final String generalApplicationType;
-    private final LocalDateTime generalAppSubmittedDateGAspec;
+    private String generalApplicationType;
+    private LocalDateTime generalAppSubmittedDateGAspec;
     private CaseLink caseLink;
     private String caseState;
     private YesOrNo parentClaimantIsApplicant;

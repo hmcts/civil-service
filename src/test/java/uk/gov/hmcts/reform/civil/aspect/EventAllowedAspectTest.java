@@ -10,15 +10,18 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
-import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
+import uk.gov.hmcts.reform.civil.service.flowstate.AllowedEventService;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.util.List;
 
@@ -41,7 +44,7 @@ class EventAllowedAspectTest {
     private ProceedingJoinPoint proceedingJoinPoint;
 
     @Mock
-    private FlowStateAllowedEventService flowStateAllowedEventService;
+    private AllowedEventService allowedEventService;
 
     @Mock
     private SimpleStateFlowEngine stateFlowEngine;
@@ -65,9 +68,13 @@ class EventAllowedAspectTest {
     void shouldNotProceed_whenEventIsNotAllowed() throws Throwable {
         AboutToStartOrSubmitCallbackResponse response = buildErrorResponse();
 
-        StateFlow stateFlow = mock(StateFlow.class);
-        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
-        when(flowStateAllowedEventService.isAllowed(any(), any())).thenReturn(false);
+        StateFlow mockStateFlow = mock(StateFlow.class);
+        State mockState = mock(State.class);
+        when(mockState.getName()).thenReturn(FlowState.Main.DRAFT.fullName());
+        when(mockStateFlow.getState()).thenReturn(mockState);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockStateFlow);
+        when(allowedEventService.isAllowed(any(CaseDetails.class), any())).thenReturn(false);
+        when(mockStateFlow.getStateHistory()).thenReturn(List.of(mockState));
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
         CallbackParams callbackParams = buildCallbackParamsWithRequest(CallbackType.ABOUT_TO_START, caseData,
@@ -77,12 +84,13 @@ class EventAllowedAspectTest {
 
         assertThat(result).isEqualTo(response);
         verify(proceedingJoinPoint, never()).proceed();
+        verify(mockStateFlow).getStateHistory();
     }
 
     @Test
     void shouldProceed_whenEventIsAllowed() throws Throwable {
         AboutToStartOrSubmitCallbackResponse response = mockProceedingJoinPoint();
-        when(flowStateAllowedEventService.isAllowed(any(), any())).thenReturn(true);
+        when(allowedEventService.isAllowed(any(CaseDetails.class), any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
         CallbackParams callbackParams = buildCallbackParamsWithRequest(CallbackType.ABOUT_TO_START, caseData,

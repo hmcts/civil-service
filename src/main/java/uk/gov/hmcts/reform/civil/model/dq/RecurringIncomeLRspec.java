@@ -14,12 +14,12 @@ import java.math.BigDecimal;
 @Builder
 public class RecurringIncomeLRspec {
 
-    private final IncomeTypeLRspec type;
-    private final String typeOtherDetails;
+    private IncomeTypeLRspec type;
+    private String typeOtherDetails;
     /**
      * amount in pence.
      */
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal amount;
-    private final PaymentFrequencyLRspec frequency;
+    private BigDecimal amount;
+    private PaymentFrequencyLRspec frequency;
 }

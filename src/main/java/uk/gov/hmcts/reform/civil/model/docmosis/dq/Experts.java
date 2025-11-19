@@ -10,9 +10,9 @@ import java.util.List;
 @Builder
 public class Experts {
 
-    private final YesOrNo expertRequired;
-    private final String expertReportsSent;
-    private final YesOrNo jointExpertSuitable;
-    private final List<Expert> details;
+    private YesOrNo expertRequired;
+    private String expertReportsSent;
+    private YesOrNo jointExpertSuitable;
+    private List<Expert> details;
 
 }

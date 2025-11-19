@@ -18,15 +18,15 @@ import java.time.LocalDate;
 @EqualsAndHashCode
 public class NoticeOfDiscontinuanceForm implements MappableObject {
 
-    private final String caseNumber;
-    private final String claimant1Name;
-    private final String claimant2Name;
-    private final String defendant1Name;
-    private final String defendant2Name;
-    private final String claimantNum;
-    private final String defendantNum;
-    private final String claimantNumWelsh;
-    private final String defendantNumWelsh;
+    private String caseNumber;
+    private String claimant1Name;
+    private String claimant2Name;
+    private String defendant1Name;
+    private String defendant2Name;
+    private String claimantNum;
+    private String defendantNum;
+    private String claimantNumWelsh;
+    private String defendantNumWelsh;
     private String claimantWhoIsDiscontinue;
     private String claimantsConsentToDiscontinuance;
     private String courtPermission;
@@ -35,7 +35,7 @@ public class NoticeOfDiscontinuanceForm implements MappableObject {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate judgementDate;
-    private final String judgementDateWelsh;
+    private String judgementDateWelsh;
     private String discontinuingAgainstBothDefendants;
     private String discontinuingAgainstOneDefendant;
     private String typeOfDiscontinuance;
@@ -43,19 +43,19 @@ public class NoticeOfDiscontinuanceForm implements MappableObject {
     private String partOfDiscontinuanceTxt;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate letterIssueDate;
+    private LocalDate letterIssueDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate dateOfEvent;
-    private final String coverLetterName;
-    private final String addressLine1;
-    private final String addressLine2;
-    private final String addressLine3;
-    private final String postCode;
-    private final String claimReferenceNumber;
-    private final String welshDate;
+    private LocalDate dateOfEvent;
+    private String coverLetterName;
+    private String addressLine1;
+    private String addressLine2;
+    private String addressLine3;
+    private String postCode;
+    private String claimReferenceNumber;
+    private String welshDate;
     @JsonProperty("isQMEnabled")
-    private final boolean isQMEnabled;
+    private boolean isQMEnabled;
     @JsonProperty("isRespondent1LiP")
-    private final boolean isRespondent1LiP;
+    private boolean isRespondent1LiP;
 }

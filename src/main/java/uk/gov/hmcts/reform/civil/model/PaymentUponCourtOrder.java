@@ -13,8 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 public class PaymentUponCourtOrder {
 
-    private final YesOrNo payingDetailsRequired;
-    private final List<Element<PayingMoneyDetails>> payingMoneyDetails;
+    private YesOrNo payingDetailsRequired;
+    private List<Element<PayingMoneyDetails>> payingMoneyDetails;
 
 }
 

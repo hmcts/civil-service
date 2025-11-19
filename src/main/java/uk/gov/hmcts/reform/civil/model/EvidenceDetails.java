@@ -15,21 +15,21 @@ import java.util.stream.Stream;
 public class EvidenceDetails {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final String evidenceType;
+    private String evidenceType;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final String photoEvidence;
+    private String photoEvidence;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final String contractAndAgreementsEvidence;
+    private String contractAndAgreementsEvidence;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final String expertWitnessEvidence;
+    private String expertWitnessEvidence;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final String lettersEmailsAndOtherCorrespondenceEvidence;
+    private String lettersEmailsAndOtherCorrespondenceEvidence;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final String receiptsEvidence;
+    private String receiptsEvidence;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final String statementOfTruthEvidence;
+    private String statementOfTruthEvidence;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final String otherEvidence;
+    private String otherEvidence;
 
     @JsonCreator
     public EvidenceDetails(@JsonProperty("evidenceType") String evidenceType,
