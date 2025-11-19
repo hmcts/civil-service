@@ -12,8 +12,8 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 @Builder(toBuilder = true)
 public class GAInformOtherParty {
 
-    private final YesOrNo isWithNotice;
-    private final String reasonsForWithoutNotice;
+    private YesOrNo isWithNotice;
+    private String reasonsForWithoutNotice;
 
     @JsonCreator
     GAInformOtherParty(@JsonProperty("isWithNotice") YesOrNo isWithNotice,

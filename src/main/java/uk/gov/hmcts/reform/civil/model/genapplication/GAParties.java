@@ -11,8 +11,8 @@ import lombok.Setter;
 @Builder(toBuilder = true)
 public class GAParties {
 
-    private final String litigiousPartyID;
-    private final String applicantPartyName;
+    private String litigiousPartyID;
+    private String applicantPartyName;
 
     @JsonCreator
     GAParties(@JsonProperty("litigiousPartyID") String litigiousPartyID,

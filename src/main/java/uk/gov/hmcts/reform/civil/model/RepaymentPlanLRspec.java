@@ -18,9 +18,9 @@ import java.time.LocalDate;
 public class RepaymentPlanLRspec {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal paymentAmount;
-    private final PaymentFrequencyLRspec repaymentFrequency;
-    private final LocalDate firstRepaymentDate;
+    private BigDecimal paymentAmount;
+    private PaymentFrequencyLRspec repaymentFrequency;
+    private LocalDate firstRepaymentDate;
 
     @JsonIgnore
     public LocalDate finalPaymentBy(BigDecimal totalAmount) {

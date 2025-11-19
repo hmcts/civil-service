@@ -24,38 +24,38 @@ import java.util.List;
 @EqualsAndHashCode
 public class ClaimForm implements MappableObject {
 
-    private final String claimNumber;
-    private final String ccdCaseReference;
-    private final LipFormParty claimant;
-    private final LipFormParty defendant;
-    private final Address claimantCorrespondenceAddress;
-    private final Address defendantCorrespondenceAddress;
-    private final String descriptionOfClaim;
-    private final List<Timeline> timelineEvents;
-    private final List<EvidenceTemplateData> evidenceList;
-    private final List<ClaimAmountBreakupDetails> claimAmount;
-    private final String totalClaimAmount;
-    private final String breakdownInterestRate;
-    private final String totalInterestAmount;
-    private final String howTheInterestWasCalculated;
-    private final String interestRate;
-    private final String interestExplanationText;
+    private String claimNumber;
+    private String ccdCaseReference;
+    private LipFormParty claimant;
+    private LipFormParty defendant;
+    private Address claimantCorrespondenceAddress;
+    private Address defendantCorrespondenceAddress;
+    private String descriptionOfClaim;
+    private List<Timeline> timelineEvents;
+    private List<EvidenceTemplateData> evidenceList;
+    private List<ClaimAmountBreakupDetails> claimAmount;
+    private String totalClaimAmount;
+    private String breakdownInterestRate;
+    private String totalInterestAmount;
+    private String howTheInterestWasCalculated;
+    private String interestRate;
+    private String interestExplanationText;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate interestFromDate;
-    private final String whenAreYouClaimingInterestFrom;
+    private LocalDate interestFromDate;
+    private String whenAreYouClaimingInterestFrom;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate interestEndDate;
-    private final String interestEndDateDescription;
-    private final String interestPerDayBreakdown;
-    private final String interestAmount;
-    private final String claimFee;
-    private final String totalAmountOfClaim;
+    private LocalDate interestEndDate;
+    private String interestEndDateDescription;
+    private String interestPerDayBreakdown;
+    private String interestAmount;
+    private String claimFee;
+    private String totalAmountOfClaim;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy 'at' HH:mm a")
-    private final LocalDateTime generationDate;
+    private LocalDateTime generationDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMM yyyy")
-    private final LocalDate claimIssuedDate;
-    private final FlightDelayDetails flightDelayDetails;
-    private final StatementOfTruth uiStatementOfTruth;
+    private LocalDate claimIssuedDate;
+    private FlightDelayDetails flightDelayDetails;
+    private StatementOfTruth uiStatementOfTruth;
 }

@@ -14,8 +14,8 @@ public class DocumentsToBeConsideredSection extends DocumentsToBeConsidered {
     private static final String QUESTION_FORMAT = "Are there any documents the %s have that you want the court to consider?";
     private static final String DEFENDANTS = "Defendants";
     private static final String CLAIMANTS = "Claimants";
-    private final String sectionHeading;
-    private final String question;
+    private String sectionHeading;
+    private String question;
 
     public static DocumentsToBeConsideredSection from(DocumentsToBeConsidered documentsToBeConsidered, boolean isDefendantSection) {
         if (documentsToBeConsidered == null) {
