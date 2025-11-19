@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
 import uk.gov.hmcts.reform.civil.event.TrialReadyNotificationEvent;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
+import uk.gov.hmcts.reform.civil.ga.stateflow.GaStateFlow;
 import uk.gov.hmcts.reform.civil.handler.event.HearingFeePaidEventHandler;
 import uk.gov.hmcts.reform.civil.handler.event.HearingFeeUnpaidEventHandler;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
@@ -58,6 +59,7 @@ import uk.gov.hmcts.reform.civil.service.judgments.CjesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
 import java.util.List;
 import java.util.Objects;
@@ -164,17 +166,17 @@ public class TestingSupportController {
     @PostMapping(
         value = "/testing-support/flowstate",
         produces = "application/json")
-    public StateFlowDTO getFlowStateInformationForCaseData(
+    public StateFlow getFlowStateInformationForCaseData(
         @RequestBody CaseData caseData) {
-        return stateFlowEngine.evaluate(caseData).toStateFlowDTO();
+        return stateFlowEngine.evaluate(caseData);
     }
 
     @PostMapping(
         value = "/testing-support/flowstate/ga",
         produces = "application/json")
-    public StateFlowDTO getFlowStateInformationForGaCaseData(
+    public GaStateFlow getFlowStateInformationForGaCaseData(
         @RequestBody GeneralApplicationCaseData caseData) {
-        return gaStateFlowEngine.evaluate(caseData).toStateFlowDTO();
+        return gaStateFlowEngine.evaluate(caseData);
     }
 
     @PostMapping(
