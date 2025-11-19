@@ -10,9 +10,10 @@ import java.time.LocalDateTime;
 @Builder
 public class ManageDocument {
 
-    private final Document documentLink;
-    private final String documentName;
-    private final ManageDocumentType documentType;
-    private final String documentTypeOther;
-    private final LocalDateTime createdDatetime = LocalDateTime.now();
+    private Document documentLink;
+    private String documentName;
+    private ManageDocumentType documentType;
+    private String documentTypeOther;
+    @Builder.Default
+    private LocalDateTime createdDatetime = LocalDateTime.now();
 }
