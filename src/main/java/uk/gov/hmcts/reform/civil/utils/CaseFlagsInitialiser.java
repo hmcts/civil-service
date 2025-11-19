@@ -1,5 +1,11 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.APPLICANT_ONE;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.APPLICANT_ONE_LITIGATION_FRIEND;
@@ -12,13 +18,6 @@ import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.RESPONDENT_TWO_LITIG
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.addApplicantExpertAndWitnessFlagsStructure;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.addRespondentDQPartiesFlagStructure;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.createOrUpdateFlags;
-
-import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
-
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor

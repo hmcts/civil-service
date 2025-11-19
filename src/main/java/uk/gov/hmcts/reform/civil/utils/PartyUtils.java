@@ -1,14 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
-import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
-import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-
+import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -36,7 +28,14 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-import org.apache.commons.lang.StringUtils;
+import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
+import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 public class PartyUtils {
 

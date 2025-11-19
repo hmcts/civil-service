@@ -256,7 +256,7 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
      * If spec, copy modified correspondence address info back to spec's fields.
      *
      * @param caseData        original case data
-     * @param caseDataBuilder updated case data
+     * @param caseData updated case data
      */
     private void updateSpecCorrespondenceAddresses(CallbackParams callbackParams,
                                                    CaseData caseData) {
@@ -305,7 +305,7 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
      * the field was actually changed before updating the other field(s).
      *
      * @param caseData    original case data
-     * @param caseBuilder case data being updated
+     * @param caseData case data being updated
      */
     private void updateSolicitorReferences(CallbackParams callbackParams, CaseData caseData) {
         List<String> userRoles = getUserRoles(callbackParams);
