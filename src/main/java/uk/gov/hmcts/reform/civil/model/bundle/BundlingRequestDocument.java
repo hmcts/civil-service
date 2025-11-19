@@ -11,7 +11,7 @@ import lombok.Value;
 public class BundlingRequestDocument {
 
     @JsonProperty("documentLink")
-    private final DocumentLink documentLink;
+    private DocumentLink documentLink;
 
     @JsonProperty("documentFileName")
     public String documentFileName;

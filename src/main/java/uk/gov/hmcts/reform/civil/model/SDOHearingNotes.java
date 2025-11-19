@@ -9,5 +9,5 @@ import lombok.extern.jackson.Jacksonized;
 @Data
 public class SDOHearingNotes {
 
-    private final String input;
+    private String input;
 }
