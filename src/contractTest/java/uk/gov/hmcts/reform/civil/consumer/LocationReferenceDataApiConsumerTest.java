@@ -7,7 +7,6 @@ import au.com.dius.pact.consumer.junit5.PactTestFor;
 import au.com.dius.pact.core.model.RequestResponsePact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import org.apache.http.HttpStatus;
-import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -34,145 +33,15 @@ public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
     private LocationReferenceDataApiClient locationReferenceDataApiClient;
 
     @Pact(consumer = "civil_service")
-    public RequestResponsePact getCourtVenueByName(PactDslWithProvider builder)
-        throws JSONException, IOException {
-        return buildCourtVenueByNameResponsePact(builder);
-    }
-
-    @Pact(consumer = "civil_service")
-    public RequestResponsePact getCourtVenueByEpimmsId(PactDslWithProvider builder)
-        throws JSONException, IOException {
-        return buildCourtVenueByEpimmsIdResponsePact(builder);
-    }
-
-    @Pact(consumer = "civil_service")
-    public RequestResponsePact getCourtVenueByEpimmsIdAndType(PactDslWithProvider builder)
-        throws JSONException, IOException {
-        return buildCourtVenueByEpimmsIdAndTypeResponsePact(builder);
-    }
-
-    @Pact(consumer = "civil_service")
-    public RequestResponsePact getCourtVenueByLocationCode(PactDslWithProvider builder)
-        throws JSONException, IOException {
-        return buildCourtVenueByLocationCodeResponsePact(builder);
-    }
-
-    @Pact(consumer = "civil_service")
-    public RequestResponsePact getHearingVenue(PactDslWithProvider builder)
-        throws JSONException, IOException {
-        return buildHearingVenueResponsePact(builder);
-    }
-
-    @Pact(consumer = "civil_service")
-    public RequestResponsePact getCourtVenue(PactDslWithProvider builder)
-        throws JSONException, IOException {
-        return buildCourtVenueResponsePact(builder);
-    }
-
-    @Test
-    @PactTestFor(pactMethod = "getCourtVenue")
-    public void verifyCourtVenue() {
-        List<LocationRefData> response = locationReferenceDataApiClient.getCourtVenue(
-            SERVICE_AUTH_TOKEN,
-            AUTHORIZATION_TOKEN,
-            "isHearingLocation",
-            "isCaseManagementLocation",
-            "courtTypeId",
-            "locationType"
-        );
-        assertThat(
-            response.get(0).getRegion(),
-            is(equalTo("regionTest123"))
-        );
-    }
-
-    @Test
-    @PactTestFor(pactMethod = "getHearingVenue")
-    public void verifyHearingVenue() {
-        List<LocationRefData> response = locationReferenceDataApiClient.getHearingVenue(
-            SERVICE_AUTH_TOKEN,
-            AUTHORIZATION_TOKEN,
-            "isHearingLocation",
-            "courtTypeId",
-            "locationType"
-        );
-        assertThat(
-            response.get(0).getRegion(),
-            is(equalTo("regionTest123"))
-        );
-    }
-
-    @Test
-    @PactTestFor(pactMethod = "getCourtVenueByLocationCode")
-    public void verifyCourtVenueByLocationCode() {
-        List<LocationRefData> response = locationReferenceDataApiClient.getCourtVenueByLocationCode(
-            SERVICE_AUTH_TOKEN,
-            AUTHORIZATION_TOKEN,
-            "isCaseManagementLocation",
-            "courtTypeId",
-            "courtLocationCode",
-            "courtStatus"
-        );
-        assertThat(
-            response.get(0).getRegion(),
-            is(equalTo("regionTest123"))
-        );
-    }
-
-    @Test
-    @PactTestFor(pactMethod = "getCourtVenueByName")
-    public void verifyCourtVenueByName() {
-        List<LocationRefData> response = locationReferenceDataApiClient.getCourtVenueByName(
-            SERVICE_AUTH_TOKEN,
-            AUTHORIZATION_TOKEN,
-            "courtNameTest"
-        );
-        assertThat(
-            response.get(0).getRegion(),
-            is(equalTo("regionTest123"))
-        );
-    }
-
-    @Test
-    @PactTestFor(pactMethod = "getCourtVenueByEpimmsId")
-    public void verifyCourtVenueByEpimmsId() {
-        List<LocationRefData> response = locationReferenceDataApiClient.getCourtVenueByEpimmsId(
-            SERVICE_AUTH_TOKEN,
-            AUTHORIZATION_TOKEN,
-            "epimmsId"
-        );
-        assertThat(
-            response.get(0).getRegion(),
-            is(equalTo("regionTest123"))
-        );
-    }
-
-    @Test
-    @PactTestFor(pactMethod = "getCourtVenueByEpimmsIdAndType")
-    public void verifyCourtVenueByEpimmsIdAndType() {
-        List<LocationRefData> response = locationReferenceDataApiClient.getCourtVenueByEpimmsIdAndType(
-            SERVICE_AUTH_TOKEN,
-            AUTHORIZATION_TOKEN,
-            "epimmsId",
-            "courtType"
-        );
-        assertThat(
-            response.get(0).getRegion(),
-            is(equalTo("regionTest123"))
-        );
-    }
-
-    private RequestResponsePact buildCourtVenueResponsePact(PactDslWithProvider builder) throws IOException {
+    public RequestResponsePact getAllCivilCourtVenuesPact(PactDslWithProvider builder) throws IOException {
         return builder
-            .given("There are court locations to be returned")
-            .uponReceiving("a location request")
+            .given("Court locations exist")
+            .uponReceiving("A request for all civil court venues")
             .path(ENDPOINT)
             .headers(SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN, AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
             .method(HttpMethod.GET.toString())
-            .matchQuery("is_hearing_location", "isHearingLocation", "isHearingLocation")
-            .matchQuery("is_case_management_location", "isCaseManagementLocation", "isCaseManagementLocation")
-            .matchQuery("court_type_id", "courtTypeId", "courtTypeId")
-            .matchQuery("location_type", "locationType", "locationType")
+            .matchQuery("court_type_id", "10", "10")
+            .matchQuery("location_type", "Court", "Court")
             .willRespondWith()
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .body(buildLocationRefDataResponseBody())
@@ -180,108 +49,41 @@ public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
             .toPact();
     }
 
-    private RequestResponsePact buildHearingVenueResponsePact(PactDslWithProvider builder) throws IOException {
-        return builder
-            .given("There are court locations to be returned")
-            .uponReceiving("a location request")
-            .path(ENDPOINT)
-            .headers(SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN, AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
-            .method(HttpMethod.GET.toString())
-            .matchQuery("is_hearing_location", "isHearingLocation", "isHearingLocation")
-            .matchQuery("court_type_id", "courtTypeId", "courtTypeId")
-            .matchQuery("location_type", "locationType", "locationType")
-            .willRespondWith()
-            .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .body(buildLocationRefDataResponseBody())
-            .status(HttpStatus.SC_OK)
-            .toPact();
+    @Test
+    @PactTestFor(pactMethod = "getAllCivilCourtVenuesPact")
+    public void verifyGetAllCivilCourtVenues() {
+        List<LocationRefData> response = locationReferenceDataApiClient.getAllCivilCourtVenues(
+            SERVICE_AUTH_TOKEN,
+            AUTHORIZATION_TOKEN,
+            "10",
+            "Court"
+        );
+
+        assertThat(response.size(), is(1));
+        assertThat(response.get(0).getRegion(), is(equalTo("regionTest123")));
+        assertThat(response.get(0).getCourtVenueId(), is(equalTo("courtVenueId123")));
     }
 
-    private RequestResponsePact buildCourtVenueByLocationCodeResponsePact(PactDslWithProvider builder) throws IOException {
-        return builder
-            .given("There are court locations to be returned")
-            .uponReceiving("a location request")
-            .path(ENDPOINT)
-            .headers(SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN, AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
-            .method(HttpMethod.GET.toString())
-            .matchQuery("is_case_management_location", "isCaseManagementLocation", "isCaseManagementLocation")
-            .matchQuery("court_type_id", "courtTypeId", "courtTypeId")
-            .matchQuery("court_location_code", "courtLocationCode", "courtLocationCode")
-            .matchQuery("court_status", "courtStatus", "courtStatus")
-            .willRespondWith()
-            .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .body(buildLocationRefDataResponseBody())
-            .status(HttpStatus.SC_OK)
-            .toPact();
-    }
-
-    private RequestResponsePact buildCourtVenueByNameResponsePact(PactDslWithProvider builder) throws IOException {
-        return builder
-            .given("There are court locations to be returned")
-            .uponReceiving("a location request")
-            .path(ENDPOINT)
-            .headers(SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN, AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
-            .method(HttpMethod.GET.toString())
-            .matchQuery("court_venue_name", "courtNameTest", "courtNameTest")
-            .willRespondWith()
-            .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .body(buildLocationRefDataResponseBody())
-            .status(HttpStatus.SC_OK)
-            .toPact();
-    }
-
-    private RequestResponsePact buildCourtVenueByEpimmsIdAndTypeResponsePact(PactDslWithProvider builder) throws IOException {
-        return builder
-            .given("There are court locations to be returned")
-            .uponReceiving("a location request")
-            .path(ENDPOINT)
-            .headers(SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN, AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
-            .method(HttpMethod.GET.toString())
-            .matchQuery("epimms_id", "epimmsId", "epimmsId")
-            .matchQuery("court_type_id", "courtType", "courtType")
-            .willRespondWith()
-            .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .body(buildLocationRefDataResponseBody())
-            .status(HttpStatus.SC_OK)
-            .toPact();
-    }
-
-    private RequestResponsePact buildCourtVenueByEpimmsIdResponsePact(PactDslWithProvider builder) throws IOException {
-        return builder
-            .given("There are court locations to be returned")
-            .uponReceiving("a location request")
-            .path(ENDPOINT)
-            .headers(SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN, AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
-            .method(HttpMethod.GET.toString())
-            .matchQuery("epimms_id", "epimmsId", "epimmsId")
-            .willRespondWith()
-            .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .body(buildLocationRefDataResponseBody())
-            .status(HttpStatus.SC_OK)
-            .toPact();
-    }
-
-    static DslPart buildLocationRefDataResponseBody() {
-        return newJsonArray(response ->
-                                response
-                                    .object(locationRefData -> locationRefData
-                                        .stringType("courtVenueId", "courtVenueId123")
-                                        .stringType("epimmsId", "epimmsIdTest123")
-                                        .stringType("siteName", "siteNameTest123")
-                                        .stringType("regionId", "regionIdTest123")
-                                        .stringType("region", "regionTest123")
-                                        .stringType("courtType", "courtTypeTest123")
-                                        .stringType("courtTypeId", "courtTypeIdTest123")
-                                        .stringType("courtAddress", "courtAddressTest123")
-                                        .stringType("postcode", "postcodeTest123")
-                                        .stringType("phoneNumber", "phoneNumberTest123")
-                                        .stringType("courtLocationCode", "courtLocationCodeTest123")
-                                        .stringType("courtStatus", "courtStatusTest123")
-                                        .stringType("courtName", "courtNameTest123")
-                                        .stringType("venueName", "venueNameTest123")
-                                        .stringType("locationType", "locationTypeTest123")
-                                        .stringType("parentLocation", "parentLocationTest123"))
+    private static DslPart buildLocationRefDataResponseBody() {
+        return newJsonArray(arr -> arr
+            .object(locationRefData -> locationRefData
+                .stringType("courtVenueId", "courtVenueId123")
+                .stringType("epimmsId", "epimmsIdTest123")
+                .stringType("siteName", "siteNameTest123")
+                .stringType("regionId", "regionIdTest123")
+                .stringType("region", "regionTest123")
+                .stringType("courtType", "courtTypeTest123")
+                .stringType("courtTypeId", "courtTypeIdTest123")
+                .stringType("courtAddress", "courtAddressTest123")
+                .stringType("postcode", "postcodeTest123")
+                .stringType("phoneNumber", "phoneNumberTest123")
+                .stringType("courtLocationCode", "courtLocationCodeTest123")
+                .stringType("courtStatus", "courtStatusTest123")
+                .stringType("courtName", "courtNameTest123")
+                .stringType("venueName", "venueNameTest123")
+                .stringType("locationType", "locationTypeTest123")
+                .stringType("parentLocation", "parentLocationTest123")
+            )
         ).build();
     }
-
 }
