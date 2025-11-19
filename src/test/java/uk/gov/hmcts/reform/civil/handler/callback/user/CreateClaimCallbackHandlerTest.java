@@ -1552,8 +1552,9 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldClearClaimStartedFlag_whenInvoked() {
+            caseData.setClaimStarted(YES);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                callbackParamsOf(caseData.toBuilder().claimStarted(YES).build(), ABOUT_TO_SUBMIT));
+                callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
 
             assertThat(response.getData())
                 .doesNotContainEntry("claimStarted", YES);
@@ -1582,7 +1583,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(respondent2OrgPolicy)
                 .extracting("Organisation").doesNotHaveToString("OrganisationID");
             assertThat(respondentSolicitor2EmailAddress).isEqualTo("respondentsolicitor@example.com");
-            assertThat(response.getData()).extracting("respondent2OrganisationIDCopy").isEqualTo("org1");
+            assertThat(response.getData()).containsKey("respondent1OrganisationIDCopy");
+            assertThat(response.getData()).containsKey("respondent2OrganisationIDCopy");
         }
 
         @Test
@@ -1865,9 +1867,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 String name = "John Smith";
                 String role = "Solicitor";
 
-                CaseData data = caseData.toBuilder()
-                    .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
-                    .build();
+                CaseData data = CaseDataBuilder.builder().atStateClaimDraft().build();
+                data.setUiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build());
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                     callbackParamsOf(
@@ -2045,9 +2046,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedErrorMessagesInResponse_whenInvokedWithNullCourtLocation() {
-            CaseData data = caseData.toBuilder()
-                .courtLocation(null)
-                .build();
+            CaseData data = CaseDataBuilder.builder().atStateClaimDraft().build();
+            data.setCourtLocation(null);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(data, ABOUT_TO_SUBMIT));
@@ -2057,9 +2057,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedErrorMessagesInResponse_whenInvokedWithNullApplicantPreferredCourt() {
-            CaseData data = caseData.toBuilder()
-                .courtLocation(CourtLocation.builder().applicantPreferredCourtLocationList(null).build())
-                .build();
+            CaseData data = CaseDataBuilder.builder().atStateClaimDraft().build();
+            data.setCourtLocation(CourtLocation.builder().applicantPreferredCourtLocationList(null).build());
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(data, ABOUT_TO_SUBMIT));

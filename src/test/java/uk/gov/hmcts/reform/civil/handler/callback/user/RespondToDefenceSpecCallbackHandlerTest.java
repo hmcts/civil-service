@@ -2006,6 +2006,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.cnbcEpimsId).region("cnbcRegion").build())
+                .build().toBuilder()
+                .applicant1ProceedWithClaimSpec2v1(YES)
                 .build();
             //When
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
