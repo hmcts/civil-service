@@ -6,7 +6,7 @@ def versions = [
   lombok        : '1.18.40'
 ]
 
-def springBootVersion = '3.5.1'
+def springBootVersion = '3.5.7'
 def springCloudVersion = '2025.0.0'
 
 java {
