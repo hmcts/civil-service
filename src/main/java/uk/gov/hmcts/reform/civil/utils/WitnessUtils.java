@@ -1,5 +1,11 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import static uk.gov.hmcts.reform.civil.enums.EventAddedEvents.CLAIMANT_INTENTION_EVENT;
+import static uk.gov.hmcts.reform.civil.enums.EventAddedEvents.DEFENDANT_RESPONSE_EVENT;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
@@ -10,12 +16,6 @@ import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
-import static uk.gov.hmcts.reform.civil.enums.EventAddedEvents.CLAIMANT_INTENTION_EVENT;
-import static uk.gov.hmcts.reform.civil.enums.EventAddedEvents.DEFENDANT_RESPONSE_EVENT;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 public class WitnessUtils {
 
@@ -123,5 +123,50 @@ public class WitnessUtils {
             builder.applicant2DQ(caseData.getApplicant2DQ().toBuilder()
                                          .applicant2DQWitnesses(updatedApplicant2Witnesses).build());
         }
+    }
+
+    public static CaseData addEventAndDateAddedToApplicantWitnesses(CaseData caseData) {
+        if (caseData.getApplicant1DQ() != null
+            && caseData.getApplicant1DQ().getApplicant1DQWitnesses() != null
+            && caseData.getApplicant1DQ().getApplicant1DQWitnesses().getDetails() != null
+            && !caseData.getApplicant1DQ().getApplicant1DQWitnesses().getDetails().isEmpty()) {
+            Witnesses applicant1DQWitnesses = caseData.getApplicant1DQ().getApplicant1DQWitnesses();
+            Witnesses updatedApplicant1Witnesses = addEventAndDateToWitnesses(
+                applicant1DQWitnesses,
+                caseData.getApplicant1ResponseDate().toLocalDate(),
+                CLAIMANT_INTENTION_EVENT.getValue()
+            );
+            caseData.setApplicant1DQ(caseData.getApplicant1DQ().toBuilder()
+                                         .applicant1DQWitnesses(updatedApplicant1Witnesses).build());
+
+            if (caseData.getApplicant2() != null
+                && ((YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+                && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1()))
+                || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1()))) {
+                if (caseData.getApplicant2DQ() == null) {
+                    caseData.setApplicant2DQ(Applicant2DQ.builder()
+                                             .applicant2DQWitnesses(updatedApplicant1Witnesses)
+                                             .build());
+                } else {
+                    caseData.setApplicant2DQ(caseData.getApplicant2DQ().toBuilder()
+                                             .applicant2DQWitnesses(updatedApplicant1Witnesses).build());
+                }
+            }
+        }
+
+        if (caseData.getApplicant2DQ() != null
+            && caseData.getApplicant2DQ().getApplicant2DQWitnesses() != null
+            && caseData.getApplicant2DQ().getApplicant2DQWitnesses().getDetails() != null
+            && !caseData.getApplicant2DQ().getApplicant2DQWitnesses().getDetails().isEmpty()) {
+            Witnesses applicant2DQWitnesses = caseData.getApplicant2DQ().getApplicant2DQWitnesses();
+            Witnesses updatedApplicant2Witnesses = addEventAndDateToWitnesses(
+                applicant2DQWitnesses,
+                caseData.getApplicant2ResponseDate().toLocalDate(),
+                CLAIMANT_INTENTION_EVENT.getValue()
+            );
+            caseData.setApplicant2DQ(caseData.getApplicant2DQ().toBuilder()
+                                         .applicant2DQWitnesses(updatedApplicant2Witnesses).build());
+        }
+        return caseData;
     }
 }

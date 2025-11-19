@@ -1,6 +1,14 @@
 package uk.gov.hmcts.reform.civil.utils;
 
-import org.apache.commons.lang.StringUtils;
+import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
+import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -28,14 +36,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
-import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import org.apache.commons.lang.StringUtils;
 
 public class PartyUtils {
 
@@ -449,7 +450,7 @@ public class PartyUtils {
             .build() : null;
     }
 
-    public static void populateDQPartyIds(CaseData.CaseDataBuilder builder) {
+    public static void populateDQPartyIds(CaseData.CaseDataBuilder<?, ?> builder) {
         CaseData caseData = builder.build();
         builder
             .applicant1DQ(appendWithNewPartyIds(caseData.getApplicant1DQ()))
@@ -458,8 +459,15 @@ public class PartyUtils {
             .respondent2DQ(appendWithNewPartyIds(caseData.getRespondent2DQ()));
     }
 
-    @SuppressWarnings("unchecked")
-    public static void populateWithPartyIds(CaseData.CaseDataBuilder builder) {
+    public static CaseData populateDQPartyIds(CaseData caseData) {
+        caseData.setApplicant1DQ(appendWithNewPartyIds(caseData.getApplicant1DQ()));
+        caseData.setApplicant2DQ(appendWithNewPartyIds(caseData.getApplicant2DQ()));
+        caseData.setRespondent1DQ(appendWithNewPartyIds(caseData.getRespondent1DQ()));
+        caseData.setRespondent2DQ(appendWithNewPartyIds(caseData.getRespondent2DQ()));
+        return caseData;
+    }
+
+    public static void populateWithPartyIds(CaseData.CaseDataBuilder<?, ?> builder) {
         CaseData caseData = builder.build();
         builder
             .applicant1(appendWithNewPartyId(caseData.getApplicant1()))
@@ -472,8 +480,19 @@ public class PartyUtils {
             .respondent2LitigationFriend(appendWithNewPartyId(caseData.getRespondent2LitigationFriend()));
     }
 
-    @SuppressWarnings("unchecked")
-    public static void populateWitnessAndExpertsPartyIds(CaseData.CaseDataBuilder builder) {
+    public static CaseData populateWithPartyIds(CaseData caseData) {
+        caseData.setApplicant1(appendWithNewPartyId(caseData.getApplicant1()));
+        caseData.setApplicant2(appendWithNewPartyId(caseData.getApplicant2()));
+        caseData.setRespondent1(appendWithNewPartyId(caseData.getRespondent1()));
+        caseData.setRespondent2(appendWithNewPartyId(caseData.getRespondent2()));
+        caseData.setApplicant1LitigationFriend(appendWithNewPartyId(caseData.getApplicant1LitigationFriend()));
+        caseData.setApplicant2LitigationFriend(appendWithNewPartyId(caseData.getApplicant2LitigationFriend()));
+        caseData.setRespondent1LitigationFriend(appendWithNewPartyId(caseData.getRespondent1LitigationFriend()));
+        caseData.setRespondent2LitigationFriend(appendWithNewPartyId(caseData.getRespondent2LitigationFriend()));
+        return caseData;
+    }
+
+    public static void populateWitnessAndExpertsPartyIds(CaseData.CaseDataBuilder<?, ?> builder) {
         CaseData caseData = builder.build();
         builder
             .applicantExperts(appendWithNewPartyIds(caseData.getApplicantExperts()))
@@ -484,8 +503,17 @@ public class PartyUtils {
             .respondent2Witnesses(appendWithNewPartyIds(caseData.getRespondent2Witnesses()));
     }
 
-    @SuppressWarnings("unchecked")
-    public static void populatePartyIndividuals(CaseData.CaseDataBuilder builder) {
+    public static CaseData populateWitnessAndExpertsPartyIds(CaseData caseData) {
+        caseData.setApplicantExperts(appendWithNewPartyIds(caseData.getApplicantExperts()));
+        caseData.setRespondent1Experts(appendWithNewPartyIds(caseData.getRespondent1Experts()));
+        caseData.setRespondent2Experts(appendWithNewPartyIds(caseData.getRespondent2Experts()));
+        caseData.setApplicantWitnesses(appendWithNewPartyIds(caseData.getApplicantWitnesses()));
+        caseData.setRespondent1Witnesses(appendWithNewPartyIds(caseData.getRespondent1Witnesses()));
+        caseData.setRespondent2Witnesses(appendWithNewPartyIds(caseData.getRespondent2Witnesses()));
+        return caseData;
+    }
+
+    public static void populatePartyIndividuals(CaseData.CaseDataBuilder<?, ?> builder) {
         CaseData caseData = builder.build();
         builder
             .applicant1LRIndividuals(appendWithNewPartyIds(caseData.getApplicant1LRIndividuals()))
@@ -495,5 +523,16 @@ public class PartyUtils {
             .applicant2OrgIndividuals(appendWithNewPartyIds(caseData.getApplicant2OrgIndividuals()))
             .respondent1OrgIndividuals(appendWithNewPartyIds(caseData.getRespondent1OrgIndividuals()))
             .respondent2OrgIndividuals(appendWithNewPartyIds(caseData.getRespondent2OrgIndividuals()));
+    }
+
+    public static CaseData populatePartyIndividuals(CaseData caseData) {
+        caseData.setApplicant1LRIndividuals(appendWithNewPartyIds(caseData.getApplicant1LRIndividuals()));
+        caseData.setRespondent1LRIndividuals(appendWithNewPartyIds(caseData.getRespondent1LRIndividuals()));
+        caseData.setRespondent2LRIndividuals(appendWithNewPartyIds(caseData.getRespondent2LRIndividuals()));
+        caseData.setApplicant1OrgIndividuals(appendWithNewPartyIds(caseData.getApplicant1OrgIndividuals()));
+        caseData.setApplicant2OrgIndividuals(appendWithNewPartyIds(caseData.getApplicant2OrgIndividuals()));
+        caseData.setRespondent1OrgIndividuals(appendWithNewPartyIds(caseData.getRespondent1OrgIndividuals()));
+        caseData.setRespondent2OrgIndividuals(appendWithNewPartyIds(caseData.getRespondent2OrgIndividuals()));
+        return caseData;
     }
 }

@@ -324,7 +324,6 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
         });
     }
 
-
     private void addDateToRespondent2(CaseData caseData) {
         Optional.ofNullable(caseData.getRespondent2()).ifPresent(respondent2 -> {
             List<Element<UnavailableDate>> accumulatedDates =

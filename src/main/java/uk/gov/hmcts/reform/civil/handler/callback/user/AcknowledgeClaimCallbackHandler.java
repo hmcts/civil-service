@@ -1,8 +1,26 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
+import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
+
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -31,26 +49,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
-import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
-import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -167,12 +168,6 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         LocalDateTime respondent1ResponseDeadline = caseData.getRespondent1ResponseDeadline();
         LocalDateTime respondent2ResponseDeadline = caseData.getRespondent2ResponseDeadline();
 
-        var solicitorReferencesCopy = caseData.getSolicitorReferencesCopy();
-        var respondentSolicitor2Reference = caseData.getRespondentSolicitor2Reference();
-        String defaultCaseListReferences = getAllDefendantSolicitorReferences(caseData);
-        String solicitor1ReferenceFromCopy = solicitorReferencesCopy != null
-            ? solicitorReferencesCopy.getRespondentSolicitor1Reference() : null;
-
         final var updatedRespondent1 = caseData.getRespondent1().toBuilder()
             .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
             .build();
@@ -198,6 +193,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             newDeadlineRespondent2 = deadlinesCalculator.plus14DaysDeadline(respondent2ResponseDeadline);
         }
 
+        String defaultCaseListReferences = getAllDefendantSolicitorReferences(caseData);
         /* for 1v1 */
         if (caseData.getAddApplicant2() != null && caseData.getAddApplicant2().equals(NO)
             && caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(NO)) {
@@ -211,6 +207,9 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             caseData.setCaseListDisplayDefendantSolicitorReferences(defaultCaseListReferences);
         }
         //for 2v1
+        var respondentSolicitor2Reference = caseData.getRespondentSolicitor2Reference();
+        var solicitorReferencesCopy = caseData.getSolicitorReferencesCopy();
+        String solicitor1ReferenceFromCopy = solicitorReferencesCopy != null ? solicitorReferencesCopy.getRespondentSolicitor1Reference() : null;
         if (caseData.getAddApplicant2() != null && caseData.getAddApplicant2().equals(YES)) {
             caseData.setRespondent1AcknowledgeNotificationDate(time.now());
             caseData.setRespondent1ResponseDeadline(newDeadlineRespondent1);

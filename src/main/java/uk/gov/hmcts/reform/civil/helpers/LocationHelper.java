@@ -1,9 +1,8 @@
 package uk.gov.hmcts.reform.civil.helpers;
 
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
+
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -22,8 +21,10 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
@@ -229,6 +230,44 @@ public class LocationHelper {
                                         .filter(this::isValidCaseLocation)
                                         .findFirst().orElseGet(CaseLocationCivil::new));
         matchingLocation.map(LocationRefData::getSiteName).ifPresent(updatedData::locationName);
+        return matchingLocation;
+    }
+
+    /**
+     * The caseManagementLocation is given by the requestedCourt's caseLocation field. If there is a matching location,
+     * we can also populate the locationName field.
+     *
+     * @param caseData    data to update
+     * @param requestedCourt the requested court to be used for the case
+     * @param getLocations   how to get the list of locations
+     * @return matching location
+     */
+    public Optional<LocationRefData> updateCaseManagementLocation(CaseData caseData,
+                                                                  RequestedCourt requestedCourt,
+                                                                  Supplier<List<LocationRefData>> getLocations) {
+        Optional<LocationRefData> matchingLocation = getMatching(getLocations.get(), requestedCourt);
+        Long reference = caseData.getCcdCaseReference();
+        if (log.isInfoEnabled()) {
+            Optional.ofNullable(requestedCourt)
+                .map(RequestedCourt::getCaseLocation)
+                .map(CaseLocationCivil::getBaseLocation)
+                .ifPresentOrElse(baseLocation -> log.info("Case {}, requested court is {}", reference, baseLocation),
+                                 () -> log.info("Case {}, requested court or location is missing", reference)
+                );
+            log.info(
+                "Case {}, there {} a location matching to requested court",
+                reference,
+                matchingLocation.isPresent() ? "is" : "is not"
+            );
+        }
+        caseData.setCaseManagementLocation(Stream.of(
+                Optional.ofNullable(requestedCourt).map(RequestedCourt::getCaseLocation),
+                matchingLocation.map(LocationHelper::buildCaseLocation)
+            ).filter(Optional::isPresent)
+                                               .map(Optional::get)
+                                               .filter(this::isValidCaseLocation)
+                                               .findFirst().orElseGet(CaseLocationCivil::new));
+        matchingLocation.map(LocationRefData::getSiteName).ifPresent(caseData::setLocationName);
         return matchingLocation;
     }
 

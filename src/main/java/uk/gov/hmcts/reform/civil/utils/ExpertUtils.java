@@ -1,5 +1,11 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import static uk.gov.hmcts.reform.civil.enums.EventAddedEvents.CLAIMANT_INTENTION_EVENT;
+import static uk.gov.hmcts.reform.civil.enums.EventAddedEvents.DEFENDANT_RESPONSE_EVENT;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
@@ -10,12 +16,6 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
-import static uk.gov.hmcts.reform.civil.enums.EventAddedEvents.CLAIMANT_INTENTION_EVENT;
-import static uk.gov.hmcts.reform.civil.enums.EventAddedEvents.DEFENDANT_RESPONSE_EVENT;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 public class ExpertUtils {
 
@@ -123,5 +123,50 @@ public class ExpertUtils {
             builder.applicant2DQ(caseData.getApplicant2DQ().toBuilder()
                                          .applicant2DQExperts(updatedApplicant2Experts).build());
         }
+    }
+
+    public static CaseData addEventAndDateAddedToApplicantExperts(CaseData caseData) {
+        if (caseData.getApplicant1DQ() != null
+            && caseData.getApplicant1DQ().getApplicant1DQExperts() != null
+            && caseData.getApplicant1DQ().getApplicant1DQExperts().getDetails() != null
+            && !caseData.getApplicant1DQ().getApplicant1DQExperts().getDetails().isEmpty()) {
+            Experts applicant1DQExperts = caseData.getApplicant1DQ().getApplicant1DQExperts();
+            Experts updatedApplicant1Experts = addEventAndDateToExperts(
+                applicant1DQExperts,
+                caseData.getApplicant1ResponseDate().toLocalDate(),
+                CLAIMANT_INTENTION_EVENT.getValue()
+            );
+            caseData.setApplicant1DQ(caseData.getApplicant1DQ().toBuilder()
+                                         .applicant1DQExperts(updatedApplicant1Experts).build());
+
+            if (caseData.getApplicant2() != null
+                && ((YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+                && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1()))
+                || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1()))) {
+                if (caseData.getApplicant2DQ() == null) {
+                    caseData.setApplicant2DQ(Applicant2DQ.builder()
+                                             .applicant2DQExperts(updatedApplicant1Experts)
+                                             .build());
+                } else {
+                    caseData.setApplicant2DQ(caseData.getApplicant2DQ().toBuilder()
+                                             .applicant2DQExperts(updatedApplicant1Experts).build());
+                }
+            }
+        }
+
+        if (caseData.getApplicant2DQ() != null
+            && caseData.getApplicant2DQ().getApplicant2DQExperts() != null
+            && caseData.getApplicant2DQ().getApplicant2DQExperts().getDetails() != null
+            && !caseData.getApplicant2DQ().getApplicant2DQExperts().getDetails().isEmpty()) {
+            Experts applicant2DQExperts = caseData.getApplicant2DQ().getApplicant2DQExperts();
+            Experts updatedApplicant2Experts = addEventAndDateToExperts(
+                applicant2DQExperts,
+                caseData.getApplicant2ResponseDate().toLocalDate(),
+                CLAIMANT_INTENTION_EVENT.getValue()
+            );
+            caseData.setApplicant2DQ(caseData.getApplicant2DQ().toBuilder()
+                                         .applicant2DQExperts(updatedApplicant2Experts).build());
+        }
+        return caseData;
     }
 }

@@ -110,6 +110,12 @@ public class RequestedCourtForClaimDetailsTab {
         return courtLocationDetails.getSiteName();
     }
 
+    public void updateRequestCourtClaimTabApplicant(CallbackParams callbackParams, CaseData caseData) {
+        DQ appRequestedCourt = caseData.getApplicant1DQ();
+        caseData.setRequestedCourtForTabDetailsApp(createCourtDetails(callbackParams.getParams().get(BEARER_TOKEN).toString(),
+                                                                      appRequestedCourt));
+    }
+
     public void updateRequestCourtClaimTabApplicant(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> updatedData) {
         DQ appRequestedCourt = updatedData.build().getApplicant1DQ();
         updatedData.requestedCourtForTabDetailsApp(createCourtDetails(callbackParams.getParams().get(BEARER_TOKEN).toString(),
