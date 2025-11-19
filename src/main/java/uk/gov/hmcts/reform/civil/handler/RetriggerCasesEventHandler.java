@@ -41,7 +41,9 @@ public class RetriggerCasesEventHandler extends BaseExternalTaskHandler {
 
         for (String caseId : caseIds.split(",")) {
             if (orgId != null) {
+                log.info("Start setting supplemenary data for CaseId: {}", caseId);
                 setSupplementaryData(parseLong(caseId.trim()), orgId);
+                log.info("Finish setting supplemenary data for CaseId: {}", caseId);
             } else {
                 try {
                     log.info("Retrigger CaseId: {} started", caseId);
