@@ -238,7 +238,6 @@ withPipeline(type, product, component) {
     env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.AAC_API_URL = "https://civil-service-manage-case-assignment-staging.aat.platform.hmcts.net"
     env.FT_TYPE = "CIVIL_FT"
-    yarnBuilder.yarn('yarn-update')
     yarnBuilder.yarn('install-dependencies')
   }
 
