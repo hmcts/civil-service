@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.dj;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,10 +16,6 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.dj.DjCreditHireDirectionsService;
-import uk.gov.hmcts.reform.civil.service.dj.DjBuildingDisputeDirectionsService;
-import uk.gov.hmcts.reform.civil.service.dj.DjClinicalDirectionsService;
-import uk.gov.hmcts.reform.civil.service.dj.DjRoadTrafficAccidentDirectionsService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -46,20 +43,7 @@ class DjTrialDirectionsServiceTest {
     void setUp() {
         DjDeadlineService djDeadlineService = new DjDeadlineService(workingDayIndicator, deadlinesCalculator);
         DjTrialNarrativeService trialNarrativeService = new DjTrialNarrativeService(djDeadlineService);
-        DjCreditHireDirectionsService creditHireDirectionsService = new DjCreditHireDirectionsService(djDeadlineService);
-        DjBuildingDisputeDirectionsService buildingDisputeDirectionsService =
-            new DjBuildingDisputeDirectionsService(djDeadlineService);
-        DjClinicalDirectionsService clinicalDirectionsService = new DjClinicalDirectionsService(djDeadlineService);
-        DjRoadTrafficAccidentDirectionsService roadTrafficAccidentDirectionsService =
-            new DjRoadTrafficAccidentDirectionsService(djDeadlineService);
-        DjSpecialistNarrativeService narrativeService = new DjSpecialistNarrativeService(
-            buildingDisputeDirectionsService,
-            clinicalDirectionsService,
-            roadTrafficAccidentDirectionsService,
-            creditHireDirectionsService
-        );
-        DjSpecialistDirectionsService specialistDirectionsService =
-            new DjSpecialistDirectionsService(narrativeService);
+        DjSpecialistDirectionsService specialistDirectionsService = getDjSpecialistDirectionsService(djDeadlineService);
         DjWelshLanguageService welshLanguageService = new DjWelshLanguageService();
         service = new DjTrialDirectionsService(
             trialNarrativeService,
@@ -76,6 +60,22 @@ class DjTrialDirectionsServiceTest {
                 int days = invocation.getArgument(1, Integer.class);
                 return date.plusDays(days);
             });
+    }
+
+    private static @NotNull DjSpecialistDirectionsService getDjSpecialistDirectionsService(DjDeadlineService djDeadlineService) {
+        DjCreditHireDirectionsService creditHireDirectionsService = new DjCreditHireDirectionsService(djDeadlineService);
+        DjBuildingDisputeDirectionsService buildingDisputeDirectionsService =
+            new DjBuildingDisputeDirectionsService(djDeadlineService);
+        DjClinicalDirectionsService clinicalDirectionsService = new DjClinicalDirectionsService(djDeadlineService);
+        DjRoadTrafficAccidentDirectionsService roadTrafficAccidentDirectionsService =
+            new DjRoadTrafficAccidentDirectionsService(djDeadlineService);
+        DjSpecialistNarrativeService narrativeService = new DjSpecialistNarrativeService(
+            buildingDisputeDirectionsService,
+            clinicalDirectionsService,
+            roadTrafficAccidentDirectionsService,
+            creditHireDirectionsService
+        );
+        return new DjSpecialistDirectionsService(narrativeService);
     }
 
     @Test

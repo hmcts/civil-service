@@ -116,10 +116,6 @@ public final class DirectionsOrderSpecialistTextLibrary {
             + "7 days of the date of this order.";
     public static final String FAST_TRACK_TRIAL_BUNDLE_NOTICE =
         "At least 7 days before the trial, the claimant must upload to the Digital Portal";
-    public static final String FAST_TRACK_DIGITAL_PORTAL_BUNDLE_WARNING =
-        "If by a date no later than 14 days before the Trial the claim is proceeding in the Digital Portal, then the "
-            + "following directions in this section will apply on the basis the bundle (\"bundle\") will be automatically "
-            + "generated in the Digital Portal for use by the parties and the Judge at the hearing.";
     public static final String FAST_TRACK_TRIAL_MANUAL_BUNDLE_GUIDANCE =
         "Not more than seven nor less than three clear days before the trial, the claimant must file at court and serve "
             + "an indexed and paginated bundle of documents which complies with the requirements of Rule 39.5 Civil "

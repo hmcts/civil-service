@@ -8,9 +8,6 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.SdoDJR2TrialCreditHire;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Trial-specific helper that exposes toggle and narrative checks for DJ templates.
- */
 @Service
 public class DjTrialTemplateFieldService {
 

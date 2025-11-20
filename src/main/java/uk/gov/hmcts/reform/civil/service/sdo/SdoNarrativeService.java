@@ -11,19 +11,19 @@ public class SdoNarrativeService {
 
     private static final String CONFIRMATION_HEADER = "# Your order has been issued"
         + "%n## Claim number: %s";
-    private static final String CONFIRMATION_SUMMARY_1v1 = "<br/>The Directions Order has been sent to:"
+    private static final String CONFIRMATION_SUMMARY_1V1 = "<br/>The Directions Order has been sent to:"
         + "<br/>%n%n<strong>Claimant 1</strong>%n"
         + "<br/>%s"
         + "<br/>%n%n<strong>Defendant 1</strong>%n"
         + "<br/>%s";
-    private static final String CONFIRMATION_SUMMARY_2v1 = "<br/>The Directions Order has been sent to:"
+    private static final String CONFIRMATION_SUMMARY_2V1 = "<br/>The Directions Order has been sent to:"
         + "<br/>%n%n<strong>Claimant 1</strong>%n"
         + "<br/>%s"
         + "<br/>%n%n<strong>Claimant 2</strong>%n"
         + "<br/>%s"
         + "<br/>%n%n<strong>Defendant 1</strong>%n"
         + "<br/>%s";
-    private static final String CONFIRMATION_SUMMARY_1v2 = "<br/>The Directions Order has been sent to:"
+    private static final String CONFIRMATION_SUMMARY_1V2 = "<br/>The Directions Order has been sent to:"
         + "<br/>%n%n<strong>Claimant 1</strong>%n"
         + "<br/>%s"
         + "<br/>%n%n<strong>Defendant 1</strong>%n"
@@ -41,21 +41,21 @@ public class SdoNarrativeService {
         Party respondent2 = caseData.getRespondent2();
 
         String confirmationSummary = format(
-            CONFIRMATION_SUMMARY_1v1,
+            CONFIRMATION_SUMMARY_1V1,
             applicant1.getPartyName(),
             respondent1.getPartyName()
         );
 
         if (applicant2 != null) {
             confirmationSummary = format(
-                CONFIRMATION_SUMMARY_2v1,
+                CONFIRMATION_SUMMARY_2V1,
                 applicant1.getPartyName(),
                 applicant2.getPartyName(),
                 respondent1.getPartyName()
             );
         } else if (respondent2 != null) {
             confirmationSummary = format(
-                CONFIRMATION_SUMMARY_1v2,
+                CONFIRMATION_SUMMARY_1V2,
                 applicant1.getPartyName(),
                 respondent1.getPartyName(),
                 respondent2.getPartyName()

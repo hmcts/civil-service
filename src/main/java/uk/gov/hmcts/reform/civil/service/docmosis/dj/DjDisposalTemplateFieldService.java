@@ -10,10 +10,6 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDispo
 
 import java.util.Optional;
 
-/**
- * Encapsulates disposal-hearing specific derived fields (location labels, attendance strings,
- * and duration text) so the docmosis template builder remains an orchestration layer only.
- */
 @Service
 public class DjDisposalTemplateFieldService {
 

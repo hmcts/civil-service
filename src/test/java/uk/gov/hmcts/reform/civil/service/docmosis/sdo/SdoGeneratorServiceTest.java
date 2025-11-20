@@ -120,7 +120,6 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CLINICAL_DOCUMENTS_HEADING;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CLINICAL_NOTES_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CLINICAL_PARTIES_SDO;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_DIGITAL_PORTAL_BUNDLE_WARNING;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FLIGHT_DELAY_LEGAL_ARGUMENTS_NOTICE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FLIGHT_DELAY_RELATED_CLAIMS_NOTICE;
 
@@ -428,8 +427,6 @@ public class SdoGeneratorServiceTest {
                 CLINICAL_NOTES_SDO,
                 CLINICAL_BUNDLE_SDO
             );
-        assertThat(form.getFastTrackDigitalPortalBundleWarning())
-            .isEqualTo(FAST_TRACK_DIGITAL_PORTAL_BUNDLE_WARNING);
         assertThat(form.isShowBundleInfo()).isTrue();
     }
 
@@ -540,7 +537,7 @@ public class SdoGeneratorServiceTest {
             .thenReturn(new DocmosisDocument(SDO_FAST_TRACK_NIHL.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_FAST);
-        List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+        List<FastTrack> fastTrackList = new ArrayList<>();
         fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -565,7 +562,7 @@ public class SdoGeneratorServiceTest {
             .thenReturn(new DocmosisDocument(SDO_FAST_TRACK_NIHL.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_FAST);
-        List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+        List<FastTrack> fastTrackList = new ArrayList<>();
         fastTrackList.add(FastTrack.fastClaimBuildingDispute);
         fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
 

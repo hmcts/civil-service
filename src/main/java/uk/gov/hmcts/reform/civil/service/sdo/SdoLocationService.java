@@ -89,8 +89,15 @@ public class SdoLocationService {
         return DynamicListUtils.trimToSelectedValue(list);
     }
 
-    public void updateWaLocationsIfRequired(CaseData.CaseDataBuilder<?, ?> builder, String authToken) {
-        updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(authToken, builder));
+    public void updateWaLocationsIfRequired(CaseData caseData,
+                                            CaseData.CaseDataBuilder<?, ?> builder,
+                                            String authToken) {
+        updateWaCourtLocationsService.ifPresent(service -> {
+            service.updateCourtListingWALocations(authToken, caseData);
+            builder.taskManagementLocations(caseData.getTaskManagementLocations())
+                .taskManagementLocationsTab(caseData.getTaskManagementLocationsTab())
+                .caseManagementLocationTab(caseData.getCaseManagementLocationTab());
+        });
     }
 
     public void clearWaLocationMetadata(CaseData.CaseDataBuilder<?, ?> builder) {

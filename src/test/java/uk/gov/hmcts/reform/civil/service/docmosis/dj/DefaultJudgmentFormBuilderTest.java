@@ -16,11 +16,10 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjWelshTextService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,18 +48,18 @@ class DefaultJudgmentFormBuilderTest {
         );
 
         when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder().name("org name")
-            .contactInformation(Arrays.asList(ContactInformation.builder()
-                .addressLine1("addressLine1")
-                .addressLine2("addressLine2")
-                .addressLine3("addressLine3")
-                .postCode("postCode")
-                .build())).build()));
+            .contactInformation(Collections.singletonList(ContactInformation.builder()
+                    .addressLine1("addressLine1")
+                    .addressLine2("addressLine2")
+                    .addressLine3("addressLine3")
+                    .postCode("postCode")
+                    .build())).build()));
     }
 
     @Test
     void shouldReturnDefaultJudgmentFormWithCorrectAmounts() {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .totalClaimAmount(new BigDecimal(1000.00))
+            .totalClaimAmount(new BigDecimal("1000.00"))
             .legacyCaseReference("12345")
             .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(1000)).build())
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
@@ -80,7 +79,7 @@ class DefaultJudgmentFormBuilderTest {
     @Test
     void shouldReturnAllocateDebtAmountToCostsIfDebtAmountAfterPartialPaymentIsNegative() {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .totalClaimAmount(new BigDecimal(1000.00))
+            .totalClaimAmount(new BigDecimal("1000.00"))
             .legacyCaseReference("12345")
             .partialPaymentAmount("200000")
             .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(1000)).build())

@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.directionsorder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -14,7 +13,7 @@ import uk.gov.hmcts.reform.civil.service.sdo.SdoLocationService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -68,9 +67,7 @@ class DirectionsOrderCaseProgressionServiceTest {
 
         service.updateWaLocationsIfEnabled(caseData, builder, AUTH);
 
-        ArgumentCaptor<CaseData.CaseDataBuilder<?, ?>> captor = ArgumentCaptor.forClass(CaseData.CaseDataBuilder.class);
-        verify(locationService).updateWaLocationsIfRequired(captor.capture(), eq(AUTH));
-        assertThat(captor.getValue()).isSameAs(builder);
+        verify(locationService).updateWaLocationsIfRequired(caseData, builder, AUTH);
     }
 
     @Test
@@ -81,7 +78,7 @@ class DirectionsOrderCaseProgressionServiceTest {
 
         service.updateWaLocationsIfEnabled(caseData, builder, AUTH);
 
-        verify(locationService, never()).updateWaLocationsIfRequired(any(), any());
+        verify(locationService, never()).updateWaLocationsIfRequired(any(), any(), anyString());
         verify(locationService).clearWaLocationMetadata(builder);
     }
 
@@ -94,7 +91,7 @@ class DirectionsOrderCaseProgressionServiceTest {
         service.updateWaLocationsIfEnabled(caseData, builder, AUTH, false);
 
         verify(locationService, never()).clearWaLocationMetadata(builder);
-        verify(locationService, never()).updateWaLocationsIfRequired(any(), any());
+        verify(locationService, never()).updateWaLocationsIfRequired(any(), any(), anyString());
     }
 
     @Test
@@ -106,9 +103,7 @@ class DirectionsOrderCaseProgressionServiceTest {
 
         service.applyCaseProgressionRouting(caseData, builder, AUTH);
 
-        ArgumentCaptor<CaseData.CaseDataBuilder<?, ?>> captor = ArgumentCaptor.forClass(CaseData.CaseDataBuilder.class);
-        verify(locationService).updateWaLocationsIfRequired(captor.capture(), eq(AUTH));
-        assertThat(captor.getValue()).isSameAs(builder);
+        verify(locationService).updateWaLocationsIfRequired(caseData, builder, AUTH);
         assertThat(builder.build().getEaCourtLocation()).isEqualTo(YesOrNo.YES);
     }
 
@@ -121,7 +116,7 @@ class DirectionsOrderCaseProgressionServiceTest {
         service.applyCaseProgressionRouting(caseData, builder, AUTH);
 
         verify(locationService).clearWaLocationMetadata(builder);
-        verify(locationService, never()).updateWaLocationsIfRequired(any(), any());
+        verify(locationService, never()).updateWaLocationsIfRequired(any(), any(), anyString());
     }
 
     @Test
@@ -133,6 +128,6 @@ class DirectionsOrderCaseProgressionServiceTest {
         service.applyCaseProgressionRouting(caseData, builder, AUTH, false);
 
         verify(locationService, never()).clearWaLocationMetadata(builder);
-        verify(locationService, never()).updateWaLocationsIfRequired(any(), any());
+        verify(locationService, never()).updateWaLocationsIfRequired(any(), any(), anyString());
     }
 }

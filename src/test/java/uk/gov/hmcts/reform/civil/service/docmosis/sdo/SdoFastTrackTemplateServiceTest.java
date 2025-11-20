@@ -17,8 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_DIGITAL_PORTAL_BUNDLE_WARNING;
-
 class SdoFastTrackTemplateServiceTest {
 
     private final DocumentHearingLocationHelper locationHelper = Mockito.mock(DocumentHearingLocationHelper.class);
@@ -60,7 +58,5 @@ class SdoFastTrackTemplateServiceTest {
         assertThat(result.isFastTrackWelshLanguageToggle()).isTrue();
         assertThat(result.getFastTrackAllocation()).isEqualTo("allocation text");
         assertThat(result.getHearingLocation()).isEqualTo(location);
-        assertThat(result.getFastTrackDigitalPortalBundleWarning())
-            .isEqualTo(FAST_TRACK_DIGITAL_PORTAL_BUNDLE_WARNING);
     }
 }

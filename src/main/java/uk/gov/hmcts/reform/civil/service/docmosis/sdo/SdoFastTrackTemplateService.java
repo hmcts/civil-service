@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormFast;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.sdo.FastTrackVariable;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
@@ -19,7 +20,6 @@ import java.util.Optional;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle.ADD;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_DIGITAL_PORTAL_BUNDLE_WARNING;
 
 @Service
 @RequiredArgsConstructor
@@ -61,9 +61,6 @@ public class SdoFastTrackTemplateService {
             .fastTrackSchedulesOfLoss(caseData.getFastTrackSchedulesOfLoss())
             .fastTrackTrial(caseData.getFastTrackTrial())
             .fastTrackTrialBundleTypeText(fastTrackTemplateFieldService.getTrialBundleTypeText(caseData))
-            .fastTrackDigitalPortalBundleWarning(
-                showBundleInfo ? FAST_TRACK_DIGITAL_PORTAL_BUNDLE_WARNING : null
-            )
             .fastTrackMethod(caseData.getFastTrackMethod())
             .fastTrackMethodInPerson(caseData.getFastTrackMethodInPerson())
             .fastTrackMethodTelephoneHearing(fastTrackTemplateFieldService.getMethodTelephoneHearingLabel(caseData))
@@ -95,7 +92,7 @@ public class SdoFastTrackTemplateService {
             .fastTrackHearingTimeEstimate(fastTrackTemplateFieldService.getHearingTimeLabel(caseData))
             .fastTrackWelshLanguageToggle(hasVariable(caseData, FastTrackVariable.WELSH_TOGGLE))
             .welshLanguageDescription(Optional.ofNullable(caseData.getSdoR2FastTrackUseOfWelshLanguage())
-                                          .map(value -> value.getDescription()).orElse(null))
+                                          .map(SdoR2WelshLanguageUsage::getDescription).orElse(null))
             .sdoR2WitnessesOfFact(caseData.getSdoR2FastTrackWitnessOfFact())
             .sdoR2FastTrackCreditHire(caseData.getSdoR2FastTrackCreditHire());
 

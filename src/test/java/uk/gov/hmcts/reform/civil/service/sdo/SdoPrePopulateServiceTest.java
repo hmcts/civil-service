@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderLifecycleStage;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
+import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -18,13 +19,6 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoChecklistService;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoDeadlineService;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoDrhFieldsService;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoFastTrackSpecialistDirectionsService;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoJudgementDeductionService;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoNihlFieldsService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -60,15 +54,10 @@ class SdoPrePopulateServiceTest {
     private CategoryService categoryService;
 
     private SdoPrePopulateService service;
-    private SdoTrackDefaultsService trackDefaultsService;
-    private SdoHearingPreparationService hearingPreparationService;
-    private SdoDeadlineService deadlineService;
-    private SdoDrhFieldsService drhFieldsService;
-    private SdoNihlFieldsService nihlFieldsService;
 
     @BeforeEach
     void setUp() {
-        deadlineService = new SdoDeadlineService(deadlinesCalculator);
+        SdoDeadlineService deadlineService = new SdoDeadlineService(deadlinesCalculator);
         SdoJourneyToggleService journeyToggleService = new SdoJourneyToggleService(featureToggleService);
         SdoChecklistService checklistService = new SdoChecklistService(journeyToggleService);
         SdoJudgementDeductionService judgementDeductionService = new SdoJudgementDeductionService();
@@ -90,33 +79,33 @@ class SdoPrePopulateServiceTest {
         SdoDisclosureOfDocumentsFieldsService disclosureOfDocumentsFieldsService =
             new SdoDisclosureOfDocumentsFieldsService(deadlineService);
 
-        trackDefaultsService = new SdoTrackDefaultsService(
-            journeyToggleService,
-            checklistService,
-            disposalOrderDefaultsService,
-            fastTrackOrderDefaultsService,
-            smallClaimsOrderDefaultsService,
-            expertEvidenceFieldsService,
-            disclosureOfDocumentsFieldsService,
-            judgementDeductionService
+        SdoTrackDefaultsService trackDefaultsService = new SdoTrackDefaultsService(
+                journeyToggleService,
+                checklistService,
+                disposalOrderDefaultsService,
+                fastTrackOrderDefaultsService,
+                smallClaimsOrderDefaultsService,
+                expertEvidenceFieldsService,
+                disclosureOfDocumentsFieldsService,
+                judgementDeductionService
         );
-        hearingPreparationService = new SdoHearingPreparationService(
-            locationHelper,
-            locationService,
-            categoryService
+        SdoHearingPreparationService hearingPreparationService = new SdoHearingPreparationService(
+                locationHelper,
+                locationService,
+                categoryService
         );
         hearingPreparationService.ccmccAmount = BigDecimal.valueOf(1000);
         hearingPreparationService.ccmccEpimsId = "EPIMS123";
 
-        drhFieldsService = new SdoDrhFieldsService(locationService, trackDefaultsService,
-            journeyToggleService, deadlineService);
-        nihlFieldsService = new SdoNihlFieldsService(locationService, new SdoNihlOrderService(deadlineService));
+        SdoDrhFieldsService drhFieldsService = new SdoDrhFieldsService(locationService, trackDefaultsService,
+                journeyToggleService, deadlineService);
+        SdoNihlFieldsService nihlFieldsService = new SdoNihlFieldsService(locationService, new SdoNihlOrderService(deadlineService));
 
         service = new SdoPrePopulateService(
-            trackDefaultsService,
-            hearingPreparationService,
-            drhFieldsService,
-            nihlFieldsService
+                trackDefaultsService,
+                hearingPreparationService,
+                drhFieldsService,
+                nihlFieldsService
         );
 
         when(deadlinesCalculator.calculateFirstWorkingDay(any(LocalDate.class)))

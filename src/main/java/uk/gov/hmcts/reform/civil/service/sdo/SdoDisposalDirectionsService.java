@@ -134,7 +134,7 @@ public class SdoDisposalDirectionsService {
         }
 
         if (minutes > 0) {
-            if (otherLength.length() > 0) {
+            if (!otherLength.isEmpty()) {
                 otherLength.append(" ");
             }
             otherLength.append(minutes).append(minutes == 1 ? " minute" : MINUTES);

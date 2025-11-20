@@ -3,9 +3,7 @@ package uk.gov.hmcts.reform.civil.service.sdo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.Captor;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -25,6 +23,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -42,9 +41,6 @@ class SdoLocationServiceTest {
 
     @Mock
     private UpdateWaCourtLocationsService updateWaCourtLocationsService;
-
-    @Captor
-    private ArgumentCaptor<CaseData.CaseDataBuilder<?, ?>> caseDataBuilderCaptor;
 
     private SdoLocationService service;
 
@@ -160,11 +156,24 @@ class SdoLocationServiceTest {
         CaseData caseData = CaseData.builder().build();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
-        service.updateWaLocationsIfRequired(builder, AUTH_TOKEN);
+        TaskManagementLocationTypes taskLocations = TaskManagementLocationTypes.builder().build();
+        TaskManagementLocationTab tab = TaskManagementLocationTab.builder().caseManagementLocation("CML").build();
 
-        verify(updateWaCourtLocationsService)
-            .updateCourtListingWALocations(eq(AUTH_TOKEN), caseDataBuilderCaptor.capture());
-        assertThat(caseDataBuilderCaptor.getValue()).isNotNull();
+        doAnswer(invocation -> {
+            CaseData updated = invocation.getArgument(1);
+            updated.setTaskManagementLocations(taskLocations);
+            updated.setTaskManagementLocationsTab(tab);
+            updated.setCaseManagementLocationTab(tab);
+            return null;
+        }).when(updateWaCourtLocationsService).updateCourtListingWALocations(eq(AUTH_TOKEN), eq(caseData));
+
+        service.updateWaLocationsIfRequired(caseData, builder, AUTH_TOKEN);
+
+        verify(updateWaCourtLocationsService).updateCourtListingWALocations(AUTH_TOKEN, caseData);
+        CaseData updatedCaseData = builder.build();
+        assertThat(updatedCaseData.getTaskManagementLocations()).isEqualTo(taskLocations);
+        assertThat(updatedCaseData.getTaskManagementLocationsTab()).isEqualTo(tab);
+        assertThat(updatedCaseData.getCaseManagementLocationTab()).isEqualTo(tab);
     }
 
     @Test
@@ -178,7 +187,7 @@ class SdoLocationServiceTest {
         CaseData caseData = CaseData.builder().build();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
-        service.updateWaLocationsIfRequired(builder, AUTH_TOKEN);
+        service.updateWaLocationsIfRequired(caseData, builder, AUTH_TOKEN);
 
         verify(updateWaCourtLocationsService, never()).updateCourtListingWALocations(eq(AUTH_TOKEN), any());
     }

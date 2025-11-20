@@ -9,11 +9,14 @@ import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgementDeductionValue;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgementDeductionValue;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgementDeductionValue;
 
+import java.util.Arrays;
+import java.util.function.Consumer;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
@@ -89,36 +92,45 @@ public class SdoOrderDetailsService {
             return;
         }
 
-        if (caseData.getHearingMethodValuesDisposalHearing() != null
-            && caseData.getHearingMethodValuesDisposalHearing().getValue() != null) {
-            String disposalHearingMethodLabel = caseData.getHearingMethodValuesDisposalHearing().getValue().getLabel();
-            if (disposalHearingMethodLabel.equals(HearingMethod.IN_PERSON.getLabel())) {
-                updatedData.disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson);
-            } else if (disposalHearingMethodLabel.equals(HearingMethod.VIDEO.getLabel())) {
-                updatedData.disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodVideoConferenceHearing);
-            } else if (disposalHearingMethodLabel.equals(HearingMethod.TELEPHONE.getLabel())) {
-                updatedData.disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodTelephoneHearing);
+        applyHearingMethod(caseData.getHearingMethodValuesDisposalHearing(), method -> {
+            switch (method) {
+                case IN_PERSON -> updatedData.disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson);
+                case VIDEO -> updatedData.disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodVideoConferenceHearing);
+                case TELEPHONE -> updatedData.disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodTelephoneHearing);
+                default -> { }
             }
-        } else if (caseData.getHearingMethodValuesFastTrack() != null
-            && caseData.getHearingMethodValuesFastTrack().getValue() != null) {
-            String fastTrackHearingMethodLabel = caseData.getHearingMethodValuesFastTrack().getValue().getLabel();
-            if (fastTrackHearingMethodLabel.equals(HearingMethod.IN_PERSON.getLabel())) {
-                updatedData.fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
-            } else if (fastTrackHearingMethodLabel.equals(HearingMethod.VIDEO.getLabel())) {
-                updatedData.fastTrackMethod(FastTrackMethod.fastTrackMethodVideoConferenceHearing);
-            } else if (fastTrackHearingMethodLabel.equals(HearingMethod.TELEPHONE.getLabel())) {
-                updatedData.fastTrackMethod(FastTrackMethod.fastTrackMethodTelephoneHearing);
+        });
+
+        applyHearingMethod(caseData.getHearingMethodValuesFastTrack(), method -> {
+            switch (method) {
+                case IN_PERSON -> updatedData.fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
+                case VIDEO -> updatedData.fastTrackMethod(FastTrackMethod.fastTrackMethodVideoConferenceHearing);
+                case TELEPHONE -> updatedData.fastTrackMethod(FastTrackMethod.fastTrackMethodTelephoneHearing);
+                default -> { }
             }
-        } else if (caseData.getHearingMethodValuesSmallClaims() != null
-            && caseData.getHearingMethodValuesSmallClaims().getValue() != null) {
-            String smallClaimsHearingMethodLabel = caseData.getHearingMethodValuesSmallClaims().getValue().getLabel();
-            if (smallClaimsHearingMethodLabel.equals(HearingMethod.IN_PERSON.getLabel())) {
-                updatedData.smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson);
-            } else if (smallClaimsHearingMethodLabel.equals(HearingMethod.VIDEO.getLabel())) {
-                updatedData.smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodVideoConferenceHearing);
-            } else if (smallClaimsHearingMethodLabel.equals(HearingMethod.TELEPHONE.getLabel())) {
-                updatedData.smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodTelephoneHearing);
+        });
+
+        applyHearingMethod(caseData.getHearingMethodValuesSmallClaims(), method -> {
+            switch (method) {
+                case IN_PERSON -> updatedData.smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson);
+                case VIDEO -> updatedData.smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodVideoConferenceHearing);
+                case TELEPHONE -> updatedData.smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodTelephoneHearing);
+                default -> { }
             }
+        });
+    }
+
+    private void applyHearingMethod(
+        DynamicList hearingMethodValues,
+        Consumer<HearingMethod> consumer
+    ) {
+        if (hearingMethodValues == null || hearingMethodValues.getValue() == null) {
+            return;
         }
+
+        Arrays.stream(HearingMethod.values())
+                .filter(value -> value.getLabel().equals(hearingMethodValues.getValue().getLabel()))
+                .findFirst().ifPresent(consumer);
+
     }
 }
