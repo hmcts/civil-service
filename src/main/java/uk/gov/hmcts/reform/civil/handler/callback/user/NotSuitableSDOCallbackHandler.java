@@ -64,24 +64,24 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse submitNotSuitableSDO(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder<?, ?> dataBuilder = getSharedData(callbackParams);
+        CaseData caseData = getSharedData(callbackParams);
         OtherDetails tempOtherDetails = OtherDetails.builder()
                 .notSuitableForSDO(YesOrNo.YES)
                 .build();
         if (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION) {
-            dataBuilder.notSuitableSdoOptions(NotSuitableSdoOptions.CHANGE_LOCATION);
+            caseData.setNotSuitableSdoOptions(NotSuitableSdoOptions.CHANGE_LOCATION);
             TransferCaseDetails transferCaseDetails = TransferCaseDetails.builder()
                     .reasonForTransferCaseTxt(callbackParams.getCaseData().getTocTransferCaseReason().getReasonForCaseTransferJudgeTxt())
                     .build();
-            dataBuilder.transferCaseDetails(transferCaseDetails).build();
+            caseData.setTransferCaseDetails(transferCaseDetails);
         } else {
-            dataBuilder.notSuitableSdoOptions(NotSuitableSdoOptions.OTHER_REASONS);
+            caseData.setNotSuitableSdoOptions(NotSuitableSdoOptions.OTHER_REASONS);
             tempOtherDetails.setReasonNotSuitableForSDO(callbackParams.getCaseData().getReasonNotSuitableSDO().getInput());
         }
 
-        dataBuilder.otherDetails(tempOtherDetails).build();
+        caseData.setOtherDetails(tempOtherDetails);
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(dataBuilder.build().toMap(objectMapper))
+                .data(caseData.toMap(objectMapper))
                 .build();
     }
 
@@ -114,24 +114,19 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse addUnsuitableSDODate(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder<?, ?> dataBuilder = callbackParams.getCaseData().toBuilder();
-
-        dataBuilder.unsuitableSDODate(time.now());
-
+        CaseData caseData = callbackParams.getCaseData();
+        caseData.setUnsuitableSDODate(time.now());
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(dataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
-    private CaseData.CaseDataBuilder<?, ?> getSharedData(CallbackParams callbackParams) {
+    private CaseData getSharedData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> dataBuilder = caseData.toBuilder();
-        if (isTransferOnlineCase(caseData)) {
-            return dataBuilder;
-        } else {
-            dataBuilder.businessProcess(BusinessProcess.ready(NotSuitable_SDO));
+        if (!isTransferOnlineCase(caseData)) {
+            caseData.setBusinessProcess(BusinessProcess.ready(NotSuitable_SDO));
         }
-        return dataBuilder;
+        return caseData;
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {

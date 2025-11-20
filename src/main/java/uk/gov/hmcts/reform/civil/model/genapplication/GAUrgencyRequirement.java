@@ -14,9 +14,9 @@ import java.time.LocalDate;
 @Builder(toBuilder = true)
 public class GAUrgencyRequirement {
 
-    private final YesOrNo generalAppUrgency;
-    private final String reasonsForUrgency;
-    private final LocalDate urgentAppConsiderationDate;
+    private YesOrNo generalAppUrgency;
+    private String reasonsForUrgency;
+    private LocalDate urgentAppConsiderationDate;
 
     @JsonCreator
     GAUrgencyRequirement(@JsonProperty("generalAppUrgency") YesOrNo generalAppUrgency,

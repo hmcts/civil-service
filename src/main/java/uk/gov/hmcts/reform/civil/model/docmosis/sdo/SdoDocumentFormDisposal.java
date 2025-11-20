@@ -1,10 +1,11 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.sdo;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.Builder;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -31,67 +32,65 @@ import java.util.List;
 
 @Getter
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
+@SuppressWarnings({"java:S1104", "java:S107", "common-java:DuplicatedBlocks", "java:S6539"})
 public class SdoDocumentFormDisposal implements MappableObject {
 
-    private final LocalDate currentDate;
+    private LocalDate currentDate;
+    private String caseNumber;
+    private String judgeName;
+    private JudgementSum drawDirectionsOrder;
+    private YesOrNo drawDirectionsOrderRequired;
+    private Party respondent1;
+    private Party respondent2;
+    private boolean hasRespondent2;
+    private Party applicant1;
+    private Party applicant2;
+    private boolean hasApplicant2;
 
-    private final String judgeName;
+    private DisposalHearingJudgesRecital disposalHearingJudgesRecital;
+    private DisposalHearingDisclosureOfDocuments disposalHearingDisclosureOfDocuments;
+    private DisposalHearingWitnessOfFact disposalHearingWitnessOfFact;
+    private DisposalHearingMedicalEvidence disposalHearingMedicalEvidence;
+    private DisposalHearingQuestionsToExperts disposalHearingQuestionsToExperts;
+    private DisposalHearingSchedulesOfLoss disposalHearingSchedulesOfLoss;
+    private DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearing;
+    private String disposalHearingFinalDisposalHearingTime;
+    private DisposalOrderWithoutHearing disposalOrderWithoutHearing;
+    private DisposalHearingHearingTime disposalHearingTime;
+    private String disposalHearingTimeEstimate;
 
-    private final String caseNumber;
+    private DisposalHearingMethod disposalHearingMethod;
+    private DynamicList disposalHearingMethodInPerson;
+    private String disposalHearingMethodTelephoneHearing;
+    private String disposalHearingMethodVideoConferenceHearing;
+    private LocationRefData hearingLocation;
+    private LocationRefData caseManagementLocation;
 
-    private final Party applicant1;
-    private final Party respondent1;
-    private final boolean hasApplicant2;
-    private final Party applicant2;
-    private final boolean hasRespondent2;
-    private final Party respondent2;
+    private DisposalHearingBundle disposalHearingBundle;
+    private String disposalHearingBundleTypeText;
 
-    private final YesOrNo drawDirectionsOrderRequired;
-    private final JudgementSum drawDirectionsOrder;
+    private boolean hasNewDirections;
+    private List<Element<DisposalHearingAddNewDirections>> disposalHearingAddNewDirections;
 
-    private final DisposalHearingJudgesRecital disposalHearingJudgesRecital;
-    private final DisposalHearingDisclosureOfDocuments disposalHearingDisclosureOfDocuments;
-    private final DisposalHearingWitnessOfFact disposalHearingWitnessOfFact;
-    private final DisposalHearingMedicalEvidence disposalHearingMedicalEvidence;
-    private final DisposalHearingQuestionsToExperts disposalHearingQuestionsToExperts;
-    private final DisposalHearingSchedulesOfLoss disposalHearingSchedulesOfLoss;
-    private final DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearing;
-    private final String disposalHearingFinalDisposalHearingTime;
-    private final DisposalOrderWithoutHearing disposalOrderWithoutHearing;
-    private final DisposalHearingHearingTime disposalHearingTime;
-    private final String disposalHearingTimeEstimate;
+    private DisposalHearingNotes disposalHearingNotes;
+    private String welshLanguageDescription;
 
-    private final DisposalHearingMethod disposalHearingMethod;
-    private final DynamicList disposalHearingMethodInPerson;
-    private final String disposalHearingMethodTelephoneHearing;
-    private final String disposalHearingMethodVideoConferenceHearing;
-    private final LocationRefData hearingLocation;
-    private final LocationRefData caseManagementLocation;
-
-    private final DisposalHearingBundle disposalHearingBundle;
-    private final String disposalHearingBundleTypeText;
-
-    private final boolean hasNewDirections;
-    private final List<Element<DisposalHearingAddNewDirections>> disposalHearingAddNewDirections;
-
-    private final DisposalHearingNotes disposalHearingNotes;
-    private final String welshLanguageDescription;
-
-    private final boolean disposalHearingDisclosureOfDocumentsToggle;
-    private final boolean disposalHearingWitnessOfFactToggle;
-    private final boolean disposalHearingMedicalEvidenceToggle;
-    private final boolean disposalHearingQuestionsToExpertsToggle;
-    private final boolean disposalHearingSchedulesOfLossToggle;
-    private final boolean disposalHearingFinalDisposalHearingToggle;
-    private final boolean disposalHearingMethodToggle;
-    private final boolean disposalHearingBundleToggle;
-    private final boolean disposalHearingClaimSettlingToggle;
-    private final boolean disposalHearingCostsToggle;
-    private final boolean writtenByJudge;
-    private final boolean hasDisposalWelshToggle;
+    private boolean disposalHearingDisclosureOfDocumentsToggle;
+    private boolean disposalHearingWitnessOfFactToggle;
+    private boolean disposalHearingMedicalEvidenceToggle;
+    private boolean disposalHearingQuestionsToExpertsToggle;
+    private boolean disposalHearingSchedulesOfLossToggle;
+    private boolean disposalHearingFinalDisposalHearingToggle;
+    private boolean disposalHearingMethodToggle;
+    private boolean disposalHearingBundleToggle;
+    private boolean disposalHearingClaimSettlingToggle;
+    private boolean disposalHearingCostsToggle;
+    private boolean writtenByJudge;
+    private boolean hasDisposalWelshToggle;
 
     @SuppressWarnings("unused")
     public boolean getDisposalHearingMethodToggle() {
