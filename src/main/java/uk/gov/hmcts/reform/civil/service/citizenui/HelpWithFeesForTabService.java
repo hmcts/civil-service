@@ -17,13 +17,12 @@ public class HelpWithFeesForTabService {
     private String hearingFee = "Hearing Fee";
     private String claimIssuedFee = "Claim Fee";
 
-    public CaseData setUpHelpWithFeeTab(CaseData caseData) {
+    public void setUpHelpWithFeeTab(CaseData caseData) {
         if (FeeType.CLAIMISSUED == caseData.getHwfFeeType()) {
             caseData.setClaimIssuedHwfForTab(setUpClaimIssuedHelpWithFeeTab(caseData));
         } else if (FeeType.HEARING == caseData.getHwfFeeType()) {
             caseData.setHearingHwfForTab(setUpHearingHelpWithFeeTab(caseData));
         }
-        return caseData;
     }
 
     public void setUpHelpWithFeeTab(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {

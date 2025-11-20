@@ -71,6 +71,7 @@ public class AmendPartyDetailsCallbackHandler extends CallbackHandler {
     private void setOrganisationPolicy(CaseData caseData) {
         if (caseData.getRespondent1OrganisationIDCopy() != null && caseData.getRespondent1OrganisationPolicy() != null) {
             caseData.setRespondent1OrganisationPolicy(
+                //Todo: Sumit check to Builder
                 caseData.getRespondent1OrganisationPolicy().toBuilder()
                     .organisation(Organisation.builder()
                                       .organisationID(caseData.getRespondent1OrganisationIDCopy())
@@ -81,6 +82,7 @@ public class AmendPartyDetailsCallbackHandler extends CallbackHandler {
 
         if (caseData.getRespondent2OrganisationIDCopy() != null && caseData.getRespondent2OrganisationPolicy() != null) {
             caseData.setRespondent2OrganisationPolicy(
+                //Todo: Sumit check to Builder
                 caseData.getRespondent2OrganisationPolicy().toBuilder()
                     .organisation(Organisation.builder()
                                       .organisationID(caseData.getRespondent2OrganisationIDCopy())

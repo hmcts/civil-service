@@ -25,7 +25,7 @@ public class CaseFlagsInitialiser {
 
     private final OrganisationService organisationService;
 
-    public CaseData initialiseCaseFlags(CaseEvent caseEvent, CaseData caseData) {
+    public void initialiseCaseFlags(CaseEvent caseEvent, CaseData caseData) {
         switch (caseEvent) {
             case CREATE_CLAIM, CREATE_CLAIM_SPEC, CREATE_LIP_CLAIM: {
                 initialiseApplicantAndRespondentFlags(caseData);
@@ -49,7 +49,6 @@ public class CaseFlagsInitialiser {
             }
             default:
         }
-        return caseData;
     }
 
     public void initialiseCaseFlags(CaseEvent caseEvent, CaseData.CaseDataBuilder<?, ?> dataBuilder) {

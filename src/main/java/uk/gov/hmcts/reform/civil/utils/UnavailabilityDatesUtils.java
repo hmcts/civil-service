@@ -219,6 +219,7 @@ public class UnavailabilityDatesUtils {
             copyDatesIntoListingTabFieldsForApplicant(caseData, true);
         }
 
+        //ToDo: caseData.getApplicant1UnavailableDatesForTab() == null is this correct?
         if (caseData.getApplicant2() != null
             && caseData.getApplicant2().getUnavailableDates() != null
             && caseData.getApplicant1UnavailableDatesForTab() == null) {
@@ -312,12 +313,12 @@ public class UnavailabilityDatesUtils {
             eventAdded = DJ_EVENT;
             dateAdded = caseData.getDefaultJudgmentDocuments().get(0).getValue().getCreatedDatetime().toLocalDate();
         }
-
+// Todo: dates only considered from applicant 1. is it correct?
         List<Element<UnavailableDate>> dates = getExistingDates(
-            caseData.getApplicant1().getUnavailableDates(),
-            eventAdded,
-            dateAdded
-        );
+                caseData.getApplicant1().getUnavailableDates(),
+                eventAdded,
+                dateAdded
+            );
 
         if (isApplicant1) {
             caseData.setApplicant1(caseData.getApplicant1().toBuilder().unavailableDates(dates).build());

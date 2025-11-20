@@ -60,9 +60,9 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
     private final UnavailableDateValidator unavailableDateValidator;
     private final ObjectMapper objectMapper;
     private final Time time;
-    static final String CLAIMANT = "Claimant";
-    static final String DEFENDANT = "Defendant";
-    static final String INVALID_PARTICIPANTS = "Invalid participants";
+    static final String claimant = "Claimant";
+    static final String defendant = "Defendant";
+    static final String invalidParticipants = "Invalid participants";
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -102,28 +102,28 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
 
         switch (multiPartyScenario) {
             case ONE_V_ONE: {
-                dynamicListOptions.add(CLAIMANT);
-                dynamicListOptions.add(DEFENDANT);
+                dynamicListOptions.add(claimant);
+                dynamicListOptions.add(defendant);
                 break;
             }
             case ONE_V_TWO_ONE_LEGAL_REP: {
-                dynamicListOptions.add(CLAIMANT);
+                dynamicListOptions.add(claimant);
                 dynamicListOptions.add("Defendants");
                 break;
             }
             case ONE_V_TWO_TWO_LEGAL_REP: {
-                dynamicListOptions.add(CLAIMANT);
+                dynamicListOptions.add(claimant);
                 dynamicListOptions.add("Defendant 1");
                 dynamicListOptions.add("Defendant 2");
                 break;
             }
             case TWO_V_ONE: {
                 dynamicListOptions.add("Claimants");
-                dynamicListOptions.add(DEFENDANT);
+                dynamicListOptions.add("Defendant");
                 break;
             }
             default: {
-                throw new CallbackException(INVALID_PARTICIPANTS);
+                throw new CallbackException(invalidParticipants);
             }
         }
 
@@ -157,7 +157,8 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
             && caseData.getUpdateDetailsForm().getPartyChosen().getValue() != null
         ) {
             // Admin Screens
-            addDatesAdminScenario(caseData.getUpdateDetailsForm().getPartyChosen().getValue().getLabel(), caseData);
+            addDatesAdminScenario(caseData.getUpdateDetailsForm().getPartyChosen().getValue().getLabel(),
+                                  caseData);
 
         } else {
             // Legal Rep Screens
@@ -176,7 +177,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
                 addDateToApplicant2(caseData);
             }
             // FALL-THROUGH
-            case (CLAIMANT): {
+            case (claimant): {
                 addDateToApplicant1(caseData);
                 break;
             }
@@ -184,7 +185,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
                 addDateToRespondent2(caseData);
             }
             // FALL-THROUGH
-            case (DEFENDANT), ("Defendant 1"): {
+            case (defendant), ("Defendant 1"): {
                 addDateToRespondent1(caseData);
                 break;
             }
@@ -193,7 +194,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
                 break;
             }
             default: {
-                throw new CallbackException(INVALID_PARTICIPANTS);
+                throw new CallbackException(invalidParticipants);
             }
         }
     }
@@ -249,7 +250,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
                 break;
             }
             default:
-                throw new CallbackException(INVALID_PARTICIPANTS);
+                throw new CallbackException(invalidParticipants);
         }
     }
 
@@ -290,7 +291,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
     private void addDateToApplicant1(CaseData caseData) {
         Optional.ofNullable(caseData.getApplicant1()).ifPresent(applicant1 -> {
             List<Element<UnavailableDate>> accumulatedDates =
-                addDatesToExistingDates(caseData, applicant1.getUnavailableDates());
+                addDatesToExistingDates(caseData, caseData.getApplicant1().getUnavailableDates());
 
             applicant1.setUnavailableDates(accumulatedDates);      // replace builder usage
             caseData.setApplicant1(applicant1);                    // preserve behaviour
@@ -301,7 +302,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
     private void addDateToApplicant2(CaseData caseData) {
         Optional.ofNullable(caseData.getApplicant2()).ifPresent(applicant2 -> {
             List<Element<UnavailableDate>> accumulatedDates =
-                addDatesToExistingDates(caseData, applicant2.getUnavailableDates());
+                addDatesToExistingDates(caseData, caseData.getApplicant2().getUnavailableDates());
 
             applicant2.setUnavailableDates(accumulatedDates);      // replaced builder
             caseData.setApplicant2(applicant2);                    // maintain same behaviour
@@ -312,7 +313,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
     private void addDateToRespondent1(CaseData caseData) {
         Optional.ofNullable(caseData.getRespondent1()).ifPresent(respondent1 -> {
             List<Element<UnavailableDate>> accumulatedDates =
-                addDatesToExistingDates(caseData, respondent1.getUnavailableDates());
+                addDatesToExistingDates(caseData, caseData.getRespondent1().getUnavailableDates());
 
             respondent1.setUnavailableDates(accumulatedDates);      // replace builder
             caseData.setRespondent1(respondent1);                   // maintain original behaviour
@@ -323,7 +324,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
     private void addDateToRespondent2(CaseData caseData) {
         Optional.ofNullable(caseData.getRespondent2()).ifPresent(respondent2 -> {
             List<Element<UnavailableDate>> accumulatedDates =
-                addDatesToExistingDates(caseData, respondent2.getUnavailableDates());
+                addDatesToExistingDates(caseData, caseData.getRespondent2().getUnavailableDates());
 
             respondent2.setUnavailableDates(accumulatedDates);
             caseData.setRespondent2(respondent2);

@@ -128,10 +128,10 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
                     .orElse(currentDateTime));
         }
 
-        caseData = caseFlagsInitialiser.initialiseCaseFlags(ADD_DEFENDANT_LITIGATION_FRIEND, caseData);
+        caseFlagsInitialiser.initialiseCaseFlags(ADD_DEFENDANT_LITIGATION_FRIEND, caseData);
         caseData.setIsRespondent1(null);
 
-        caseData = populateWithPartyIds(caseData);
+        populateWithPartyIds(caseData);
 
         caseData.setCaseNameHmctsInternal(CaseNameUtils.buildCaseName(caseData));
         caseData.setCaseNamePublic(CaseNameUtils.buildCaseName(caseData));

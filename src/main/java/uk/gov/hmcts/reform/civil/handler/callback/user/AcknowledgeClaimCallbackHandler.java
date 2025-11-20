@@ -190,7 +190,6 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             newDeadlineRespondent2 = deadlinesCalculator.plus14DaysDeadline(respondent2ResponseDeadline);
         }
 
-        String defaultCaseListReferences = getAllDefendantSolicitorReferences(caseData);
         /* for 1v1 */
         if (caseData.getAddApplicant2() != null && caseData.getAddApplicant2().equals(NO)
             && caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(NO)) {
@@ -201,12 +200,9 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             caseData.setRespondent1Copy(null);
             caseData.setSolicitorReferencesCopy(null);
             caseData.setNextDeadline(newDeadlineRespondent1.toLocalDate());
-            caseData.setCaseListDisplayDefendantSolicitorReferences(defaultCaseListReferences);
+            caseData.setCaseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(caseData));
         }
         //for 2v1
-        var respondentSolicitor2Reference = caseData.getRespondentSolicitor2Reference();
-        var solicitorReferencesCopy = caseData.getSolicitorReferencesCopy();
-        String solicitor1ReferenceFromCopy = solicitorReferencesCopy != null ? solicitorReferencesCopy.getRespondentSolicitor1Reference() : null;
         if (caseData.getAddApplicant2() != null && caseData.getAddApplicant2().equals(YES)) {
             caseData.setRespondent1AcknowledgeNotificationDate(time.now());
             caseData.setRespondent1ResponseDeadline(newDeadlineRespondent1);
@@ -218,7 +214,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             caseData.setRespondent1ClaimResponseIntentionTypeApplicant2(
                 caseData.getRespondent1ClaimResponseIntentionTypeApplicant2());
             caseData.setNextDeadline(newDeadlineRespondent1.toLocalDate());
-            caseData.setCaseListDisplayDefendantSolicitorReferences(defaultCaseListReferences);
+            caseData.setCaseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(caseData));
         } else if (caseData.getAddRespondent2() != null && caseData.getRespondent2() != null
             && respondent2HasSameLegalRep(caseData)) {
             //1v2 same
@@ -239,7 +235,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             caseData.setRespondent1ClaimResponseIntentionType(caseData.getRespondent1ClaimResponseIntentionType());
             caseData.setRespondent2ClaimResponseIntentionType(caseData.getRespondent2ClaimResponseIntentionType());
             caseData.setNextDeadline(newDeadlineRespondent1.toLocalDate());
-            caseData.setCaseListDisplayDefendantSolicitorReferences(defaultCaseListReferences);
+            caseData.setCaseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(caseData));
         } else if (caseData.getRespondent1() != null && caseData.getAddRespondent2() != null
             && caseData.getAddRespondent2().equals(YES)
             && respondent1Check.equals(YES) && !respondent2HasSameLegalRep(caseData)) {
@@ -247,7 +243,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
             caseData.setRespondent1AcknowledgeNotificationDate(time.now());
             caseData.setRespondent1(updatedRespondent1);
-            caseData.setSolicitorReferences(solicitorReferencesCopy);
+            caseData.setSolicitorReferences(caseData.getSolicitorReferencesCopy());
             caseData.setRespondent2(caseData.getRespondent2Copy());
             caseData.setRespondent1ClaimResponseIntentionType(caseData.getRespondent1ClaimResponseIntentionType());
             caseData.setBusinessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM));
@@ -255,12 +251,13 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             caseData.setRespondent1Copy(null);
             caseData.setSolicitorReferencesCopy(null);
             caseData.setIsRespondent1(null);
-            caseData.setCaseListDisplayDefendantSolicitorReferences(defaultCaseListReferences);
+            caseData.setCaseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(caseData));
             caseData.setNextDeadline(deadlinesCalculator.nextDeadline(
                 Arrays.asList(newDeadlineRespondent1, caseData.getRespondent2ResponseDeadline())).toLocalDate());
             caseData.setCaseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(
-                solicitor1ReferenceFromCopy,
-                respondentSolicitor2Reference));
+                caseData.getSolicitorReferencesCopy() != null
+                    ? caseData.getSolicitorReferencesCopy().getRespondentSolicitor1Reference() : null,
+                caseData.getRespondentSolicitor2Reference()));
 
         } else if (caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(YES)
             && respondent1Check.equals(NO) && !respondent2HasSameLegalRep(caseData)) {
@@ -270,7 +267,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             //1v2 diff login 2
             caseData.setRespondent2AcknowledgeNotificationDate(time.now());
             caseData.setRespondent2(updatedRespondent2);
-            caseData.setSolicitorReferences(solicitorReferencesCopy);
+            caseData.setSolicitorReferences(caseData.getSolicitorReferencesCopy());
             caseData.setRespondent1Copy(null);
             caseData.setRespondent2Copy(null);
             caseData.setBusinessProcess(BusinessProcess.ready(ACKNOWLEDGE_CLAIM));
@@ -281,8 +278,9 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             caseData.setNextDeadline(deadlinesCalculator.nextDeadline(
                 Arrays.asList(newDeadlineRespondent2, caseData.getRespondent1ResponseDeadline())).toLocalDate());
             caseData.setCaseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(
-                solicitor1ReferenceFromCopy,
-                respondentSolicitor2Reference));
+                caseData.getSolicitorReferencesCopy() != null
+                    ? caseData.getSolicitorReferencesCopy().getRespondentSolicitor1Reference() : null,
+                caseData.getRespondentSolicitor2Reference()));
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))

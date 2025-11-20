@@ -140,6 +140,7 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
                 .build();
             caseData.setRespondent2(updatedRespondent2);
             caseData.setRespondent2Copy(null);
+            //ToDo Sumit updatedRespondent2.toBuilder()
             caseData.setRespondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
         }
 

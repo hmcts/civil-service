@@ -46,7 +46,7 @@ public class ApplyHelpWithHearingFeeCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
 
         if (caseData.getHearingHelpFeesReferenceNumber() != null) {
-            caseData = setUpHelpWithFees(caseData);
+            setUpHelpWithFees(caseData);
         }
         caseData.setBusinessProcess(BusinessProcess.ready(APPLY_HELP_WITH_HEARING_FEE));
 
@@ -55,7 +55,7 @@ public class ApplyHelpWithHearingFeeCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private CaseData setUpHelpWithFees(CaseData caseData) {
-        return helpWithFeesForTabService.setUpHelpWithFeeTab(caseData);
+    private void setUpHelpWithFees(CaseData caseData) {
+        helpWithFeesForTabService.setUpHelpWithFeeTab(caseData);
     }
 }
