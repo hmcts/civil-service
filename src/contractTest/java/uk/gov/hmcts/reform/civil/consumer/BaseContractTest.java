@@ -23,7 +23,6 @@ public class BaseContractTest {
     @Autowired
     protected ObjectMapper objectMapper;
 
-
     protected String createJsonObject(Object obj) throws JSONException, IOException {
         return objectMapper.writeValueAsString(obj);
     }

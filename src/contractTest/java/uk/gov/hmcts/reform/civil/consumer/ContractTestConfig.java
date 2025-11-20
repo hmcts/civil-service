@@ -42,23 +42,23 @@ public class ContractTestConfig {
         return Mockito.mock(TaskItemTemplateRepository.class);
     }
 
-  @Bean
-  RoboticsNotificationService roboticsNotificationService() {
-    return Mockito.mock(RoboticsNotificationService.class);
-  }
+    @Bean
+    RoboticsNotificationService roboticsNotificationService() {
+        return Mockito.mock(RoboticsNotificationService.class);
+    }
 
-  @Bean(name = "dashboardScenarioTransactionalService")
-  IDashboardScenarioService dashboardScenarioTransactionalService() {
-    return Mockito.mock(IDashboardScenarioService.class);
-  }
+    @Bean(name = "dashboardScenarioTransactionalService")
+    IDashboardScenarioService dashboardScenarioTransactionalService() {
+        return Mockito.mock(IDashboardScenarioService.class);
+    }
 
-  @Bean
-  static BeanFactoryPostProcessor removeDashboardScenarioTransactionalService() {
-    return (ConfigurableListableBeanFactory beanFactory) -> {
-      if (beanFactory instanceof BeanDefinitionRegistry registry
-        && registry.containsBeanDefinition("dashboardScenarioTransactionalService")) {
-        registry.removeBeanDefinition("dashboardScenarioTransactionalService");
-      }
-    };
-  }
+    @Bean
+    static BeanFactoryPostProcessor removeDashboardScenarioTransactionalService() {
+        return (ConfigurableListableBeanFactory beanFactory) -> {
+            if (beanFactory instanceof BeanDefinitionRegistry registry
+                && registry.containsBeanDefinition("dashboardScenarioTransactionalService")) {
+                registry.removeBeanDefinition("dashboardScenarioTransactionalService");
+            }
+        };
+    }
 }
