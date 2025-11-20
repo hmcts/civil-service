@@ -7,6 +7,7 @@ import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
 import au.com.dius.pact.provider.junitsupport.loader.PactBrokerConsumerVersionSelectors;
+import au.com.dius.pact.provider.junitsupport.loader.PactFolder;
 import au.com.dius.pact.provider.junitsupport.loader.SelectorBuilder;
 import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -18,7 +19,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -35,6 +35,7 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -43,8 +44,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
     url = "${PACT_BROKER_FULL_URL:http://localhost:80}",
     providerBranch = "${pact.provider.branch}"
 )
+@PactFolder("src/contractTest/resources/pacts")
 @IgnoreNoPactsToVerify
-@EnabledIfEnvironmentVariable(named = "PACT_BROKER_FULL_URL", matches = ".+")
 class CivilCitizenUiProviderContractTest {
 
     private static final String AUTH_HEADER = "Bearer some-access-token";
@@ -70,6 +71,8 @@ class CivilCitizenUiProviderContractTest {
         String brokerUrl = System.getenv("PACT_BROKER_FULL_URL");
         if (brokerUrl != null && !brokerUrl.isBlank()) {
             System.setProperty("pactbroker.url", brokerUrl);
+        } else {
+            System.clearProperty("pactbroker.url");
         }
         mocks = MockitoAnnotations.openMocks(this);
         FeesPaymentController controller = new FeesPaymentController(feesPaymentService);
@@ -103,8 +106,8 @@ class CivilCitizenUiProviderContractTest {
     @State("Claim issue payment can be initiated for case 1234567890123456")
     void claimIssuePaymentExists() {
         when(feesPaymentService.createGovPaymentRequest(
-            FeeType.CLAIMISSUED,
-            CASE_REFERENCE,
+            eq(FeeType.CLAIMISSUED),
+            eq(CASE_REFERENCE),
             anyString()
         )).thenReturn(
             CardPaymentStatusResponse.builder()
@@ -120,9 +123,9 @@ class CivilCitizenUiProviderContractTest {
     @State("Payment status SUCCESS is available for payment RC-1701-0909-0602-0418")
     void paymentStatusSuccess() {
         when(feesPaymentService.getGovPaymentRequestStatus(
-            FeeType.CLAIMISSUED,
-            CASE_REFERENCE,
-            PAYMENT_REFERENCE,
+            eq(FeeType.CLAIMISSUED),
+            eq(CASE_REFERENCE),
+            eq(PAYMENT_REFERENCE),
             anyString()
         )).thenReturn(
             CardPaymentStatusResponse.builder()
