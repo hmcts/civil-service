@@ -227,8 +227,6 @@ class RespondentPartAdmissionStrategyTest {
         assertThat(history.getStatesPaid().get(0).getEventCode()).isEqualTo(EventType.STATES_PAID.getCode());
 
         assertThat(history.getReceiptOfPartAdmission()).isNullOrEmpty();
-        assertThat(history.getMiscellaneous())
-            .extracting(Event::getEventDetailsText)
-            .containsExactly(respondentResponseSupport.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true));
+        assertThat(history.getMiscellaneous()).isNullOrEmpty();
     }
 }

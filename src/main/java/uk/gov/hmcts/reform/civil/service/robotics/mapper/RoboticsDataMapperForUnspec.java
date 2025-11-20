@@ -6,8 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.LitigationFriend;
-import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.robotics.CaseHeader;
 import uk.gov.hmcts.reform.civil.model.robotics.ClaimDetails;
@@ -19,7 +18,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsCaseDataSuppor
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
-import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -156,18 +154,18 @@ public class RoboticsDataMapperForUnspec extends BaseRoboticsDataMapper {
 
     private List<Solicitor> buildSolicitors(CaseData caseData) {
         List<Solicitor> solicitorsList = new ArrayList<>();
-        solicitorsList.add(buildApplicantSolicitor(caseData, APPLICANT_SOLICITOR_ID));
-        ofNullable(buildRespondentSolicitor(caseData, RESPONDENT_SOLICITOR_ID))
+        solicitorsList.add(buildApplicantSolicitor(caseData));
+        ofNullable(buildRespondentSolicitor(caseData))
             .ifPresent(solicitorsList::add);
 
         if (YES == caseData.getRespondent2Represented() && YES != caseData.getRespondent2SameLegalRepresentative()) {
-            ofNullable(buildRespondent2Solicitor(caseData, RESPONDENT2_SOLICITOR_ID))
+            ofNullable(buildRespondent2Solicitor(caseData))
                 .ifPresent(solicitorsList::add);
         }
         return solicitorsList;
     }
 
-    private Solicitor buildRespondentSolicitor(CaseData caseData, String id) {
+    private Solicitor buildRespondentSolicitor(CaseData caseData) {
         String organisationId = OrgPolicyUtils.getRespondent1SolicitorOrgId(caseData);
         var organisationDetails = ofNullable(caseData.getRespondentSolicitor1OrganisationDetails());
         if (organisationId == null && organisationDetails.isEmpty()) {
@@ -176,7 +174,7 @@ public class RoboticsDataMapperForUnspec extends BaseRoboticsDataMapper {
 
         return caseDataSupport.buildSolicitor(
             RoboticsCaseDataSupport.SolicitorData.builder()
-                .id(id)
+                .id(RoboticsDataUtil.RESPONDENT_SOLICITOR_ID)
                 .isPayee(false)
                 .organisationId(organisationId)
                 .contactEmailAddress(caseData.getRespondentSolicitor1EmailAddress())
@@ -191,16 +189,16 @@ public class RoboticsDataMapperForUnspec extends BaseRoboticsDataMapper {
         );
     }
 
-    private Solicitor buildApplicantSolicitor(CaseData caseData, String id) {
+    private Solicitor buildApplicantSolicitor(CaseData caseData) {
         Optional<String> organisationId = getOrganisationId(caseData.getApplicant1OrganisationPolicy());
 
         return caseDataSupport.buildSolicitor(
             RoboticsCaseDataSupport.SolicitorData.builder()
-                .id(id)
+                .id(RoboticsDataUtil.APPLICANT_SOLICITOR_ID)
                 .isPayee(true)
                 .organisationId(organisationId.orElse(null))
                 .contactEmailAddress(ofNullable(caseData.getApplicantSolicitor1UserDetails())
-                    .map(user -> user.getEmail())
+                    .map(IdamUserDetails::getEmail)
                     .orElse(null))
                 .reference(ofNullable(caseData.getSolicitorReferences())
                     .map(SolicitorReferences::getApplicantSolicitor1Reference)
@@ -216,8 +214,7 @@ public class RoboticsDataMapperForUnspec extends BaseRoboticsDataMapper {
     private List<LitigiousParty> buildLitigiousParties(CaseData caseData) {
         String respondent1SolicitorId = caseData.getRespondent1Represented() == YES
             ? RESPONDENT_SOLICITOR_ID : null;
-        LocalDateTime notificationDateTime = caseData.getClaimDetailsNotificationDate();
-        LocalDateTime defaultDateTime = notificationDateTime;
+        LocalDateTime defaultDateTime = caseData.getClaimDetailsNotificationDate();
         var respondentParties = new ArrayList<>(List.of(
             caseDataSupport.buildLitigiousParty(
                 caseData.getApplicant1(),
@@ -275,7 +272,7 @@ public class RoboticsDataMapperForUnspec extends BaseRoboticsDataMapper {
         return respondentParties;
     }
 
-    private Solicitor buildRespondent2Solicitor(CaseData caseData, String id) {
+    private Solicitor buildRespondent2Solicitor(CaseData caseData) {
         String organisationId = OrgPolicyUtils.getRespondent2SolicitorOrgId(caseData);
 
         var organisationDetails = ofNullable(
@@ -286,7 +283,7 @@ public class RoboticsDataMapperForUnspec extends BaseRoboticsDataMapper {
         }
         return caseDataSupport.buildSolicitor(
             RoboticsCaseDataSupport.SolicitorData.builder()
-                .id(id)
+                .id(RoboticsDataUtil.RESPONDENT2_SOLICITOR_ID)
                 .isPayee(false)
                 .organisationId(organisationId)
                 .contactEmailAddress(caseData.getRespondentSolicitor2EmailAddress())

@@ -29,6 +29,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -132,6 +133,7 @@ class RespondentDivergentResponseStrategyTest {
             .containsExactly(13);
 
         assertThat(history.getMiscellaneous())
+            .filteredOn(event -> event.getEventCode() != null)
             .extracting(Event::getEventDetails)
             .extracting(EventDetails::getMiscText)
             .containsExactly(
@@ -148,7 +150,7 @@ class RespondentDivergentResponseStrategyTest {
         when(stateFlow.getState()).thenReturn(
             State.from(FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE.fullName())
         );
-        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(20, 21, 22);
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(20, 21, 22, 23);
 
         CaseData caseData = createSpecDivergentCase();
 
@@ -158,20 +160,28 @@ class RespondentDivergentResponseStrategyTest {
         strategy.contribute(builder, caseData, null);
 
         EventHistory history = builder.build();
-
         assertThat(history.getReceiptOfPartAdmission())
             .extracting(Event::getEventSequence)
             .containsExactly(20);
 
-        assertThat(history.getMiscellaneous()).isEmpty();
+        List<String> miscTexts = history.getMiscellaneous().stream()
+            .filter(event -> event != null && event.getEventCode() != null)
+            .map(Event::getEventDetailsText)
+            .collect(Collectors.toList());
+        assertThat(miscTexts)
+            .containsExactly(respondentResponseSupport.prepareRespondentResponseText(
+                caseData,
+                caseData.getRespondent1(),
+                true
+            ));
 
         assertThat(history.getDefenceFiled())
             .extracting(Event::getEventSequence)
-            .containsExactly(21);
+            .containsExactly(22);
 
         assertThat(history.getDirectionsQuestionnaireFiled())
-            .extracting(Event::getEventSequence)
-            .containsExactly(22);
+            .extracting(Event::getLitigiousPartyID)
+            .containsExactly("003");
     }
 
     @Test

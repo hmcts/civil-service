@@ -96,7 +96,7 @@ class RoboticsEventTextFormatterTest {
             "RPA Reason: Claimant(s) proceeds.",
             "RPA Reason: Claimant intends not to proceed.",
             "RPA Reason: Claimants intend not to proceed.",
-            "RPA Reason: Only one of the respondent is notified.",
+            "RPA Reason: Only one of the defendants is notified.",
             "RPA Reason: Case taken offline by staff.",
             "RPA Reason: Not suitable for SDO.",
             "RPA Reason: Judgement by Admission requested and claim moved offline.",

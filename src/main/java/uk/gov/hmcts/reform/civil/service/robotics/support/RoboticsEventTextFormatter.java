@@ -115,7 +115,7 @@ public class RoboticsEventTextFormatter {
     }
 
     public String onlyOneDefendantNotified() {
-        return withRpaPrefix("Only one of the respondent is notified.");
+        return withRpaPrefix("Only one of the defendants is notified.");
     }
 
     public String caseTakenOfflineByStaff() {

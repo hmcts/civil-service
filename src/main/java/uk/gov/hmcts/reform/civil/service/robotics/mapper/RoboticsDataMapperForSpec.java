@@ -2,10 +2,8 @@ package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.LitigationFriend;
-import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.robotics.CaseHeader;
 import uk.gov.hmcts.reform.civil.model.robotics.ClaimDetails;
@@ -16,7 +14,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsCaseDataSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil;
-import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -140,7 +137,6 @@ public class RoboticsDataMapperForSpec extends BaseRoboticsDataMapper {
     }
 
     private Solicitor buildRespondentSolicitor(CaseData caseData) {
-        Solicitor.SolicitorBuilder<?, ?> solicitorBuilder = Solicitor.builder();
         Optional<String> organisationId = getOrganisationId(caseData.getRespondent1OrganisationPolicy());
         var organisationDetails = ofNullable(
             caseData.getRespondentSolicitor1OrganisationDetails()
@@ -169,7 +165,6 @@ public class RoboticsDataMapperForSpec extends BaseRoboticsDataMapper {
     }
 
     private Solicitor buildRespondent2Solicitor(CaseData caseData) {
-        Solicitor.SolicitorBuilder<?, ?> solicitorBuilder = Solicitor.builder();
         Optional<String> organisationId = getOrganisationId(caseData.getRespondent2OrganisationPolicy());
 
         var organisationDetails = ofNullable(
@@ -207,7 +202,7 @@ public class RoboticsDataMapperForSpec extends BaseRoboticsDataMapper {
                 .isPayee(true)
                 .organisationId(organisationId.orElse(null))
                 .contactEmailAddress(ofNullable(caseData.getApplicantSolicitor1UserDetails())
-                    .map(user -> user.getEmail())
+                    .map(IdamUserDetails::getEmail)
                     .orElse(null))
                 .reference(ofNullable(caseData.getSolicitorReferences())
                     .map(SolicitorReferences::getApplicantSolicitor1Reference)

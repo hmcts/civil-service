@@ -90,6 +90,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.strategy.MediationEventStrateg
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentDivergentResponseStrategy;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentFullAdmissionStrategy;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentFullDefenceStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentCounterClaimStrategy;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentLitigationFriendStrategy;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentPartAdmissionStrategy;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.SdoNotDrawnStrategy;
@@ -208,6 +209,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     RespondentFullDefenceStrategy.class,
     RespondentFullAdmissionStrategy.class,
     RespondentPartAdmissionStrategy.class,
+    RespondentCounterClaimStrategy.class,
     RoboticsManualOfflineSupport.class
 })
 class EventHistoryMapperTest {
@@ -4127,7 +4129,6 @@ class EventHistoryMapperTest {
                 }
 
                 var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
-                System.out.println("Misc events: " + eventHistory.getMiscellaneous());
                 assertThat(eventHistory).isNotNull();
 
                 assertEmptyEvents(

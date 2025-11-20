@@ -139,7 +139,7 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
                 case FULL_DEFENCE_PROCEED, FULL_ADMIT_PROCEED, FULL_ADMIT_PAY_IMMEDIATELY, PART_ADMIT_PAY_IMMEDIATELY, PART_ADMIT_PROCEED ->
                     textFormatter.claimantsProceed();
                 case FULL_DEFENCE_NOT_PROCEED, FULL_ADMIT_NOT_PROCEED, PART_ADMIT_NOT_PROCEED ->
-                    textFormatter.claimantsIntendNotToProceed();
+                    "RPA Reason: Claimant(s) intends not to proceed.";
                 case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED, TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED ->
                     textFormatter.onlyOneDefendantNotified();
                 case TAKEN_OFFLINE_BY_STAFF -> textFormatter.caseTakenOfflineByStaff();

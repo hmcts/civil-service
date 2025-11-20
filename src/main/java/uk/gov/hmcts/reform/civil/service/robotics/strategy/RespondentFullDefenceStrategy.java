@@ -3,10 +3,11 @@ package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsRespondentResponseSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
@@ -28,8 +30,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -43,21 +45,13 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1v2SameSolicitorSameResponse;
+import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2DivergentResponseExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseExists;
 
 @Component
 @Order(42)
 @RequiredArgsConstructor
 public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
-
-    private static final Set<String> SUPPORTED_FLOW_STATES = Set.of(
-        FlowState.Main.FULL_DEFENCE.fullName(),
-        FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
-        FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName(),
-        FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE.fullName(),
-        FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE.fullName(),
-        FlowState.Main.COUNTER_CLAIM.fullName()
-    );
 
     private final RoboticsSequenceGenerator sequenceGenerator;
     private final RoboticsRespondentResponseSupport respondentResponseSupport;
@@ -70,14 +64,31 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
         }
 
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-        boolean hasState = stateFlow.getStateHistory().stream()
+
+        boolean awaitingResponsesState = stateFlow.getStateHistory().stream()
             .map(State::getName)
-            .anyMatch(SUPPORTED_FLOW_STATES::contains);
+            .anyMatch(name -> FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName().equals(name)
+                || FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName().equals(name));
 
-        boolean awaitingApplicantIntention = CaseState.AWAITING_APPLICANT_INTENTION.equals(caseData.getCcdState())
-            && hasFullDefenceResponse(caseData);
+        boolean hasFullDefenceResponse = hasFullDefenceResponse(caseData);
 
-        if (!hasState && !awaitingApplicantIntention) {
+        if (!hasFullDefenceResponse) {
+            return false;
+        }
+
+        boolean isUnspecClaim = CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory());
+        if (isUnspecClaim
+            && awaitingResponsesState
+            && !defendant2ResponseExists.test(caseData)
+            && !defendant1v2SameSolicitorSameResponse.test(caseData)
+            && !defendant2DivergentResponseExists.test(caseData)) {
+            return false;
+        }
+
+        boolean hasSecondRespondentResponse = caseData.getRespondent2() != null
+            && (caseData.getRespondent2ResponseDate() != null
+            || YesOrNo.YES.equals(caseData.getRespondent2SameLegalRepresentative()));
+        if (hasSecondRespondentResponse && !haveAllRespondentsFullDefence(caseData)) {
             return false;
         }
 
@@ -124,6 +135,10 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
             return;
         }
 
+        if (respondentLacksFullDefenceResponse(caseData, true)) {
+            return;
+        }
+
         LocalDateTime responseDate = caseData.getRespondent1ResponseDate();
         if (caseData.isLRvLipOneVOne() || caseData.isLipvLipOneVOne()) {
             addLipVsLipFullDefenceEvent(builder, caseData, buckets, responseDate);
@@ -154,11 +169,18 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
     private void processRespondent2(EventHistory.EventHistoryBuilder builder,
                                     CaseData caseData,
                                     EventBuckets buckets) {
-        if (!defendant2ResponseExists.test(caseData)) {
+        boolean sameSolicitorDifferentResponse = hasSameSolicitorDifferentResponse(caseData);
+        if (!defendant2ResponseExists.test(caseData) && !sameSolicitorDifferentResponse) {
             return;
         }
 
-        LocalDateTime responseDate = caseData.getRespondent2ResponseDate();
+        if (respondentLacksFullDefenceResponse(caseData, false)) {
+            return;
+        }
+
+        LocalDateTime responseDate = sameSolicitorDifferentResponse
+            ? respondentResponseSupport.resolveRespondent2ActualOrFallbackDate(caseData)
+            : caseData.getRespondent2ResponseDate();
         RespondToClaim respondToClaim = shouldUseRespondent1Response(caseData)
             ? caseData.getRespondToClaim()
             : caseData.getRespondToClaim2();
@@ -256,30 +278,6 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
         );
     }
 
-    private void addRespondentMiscEvent(EventHistory.EventHistoryBuilder builder,
-                                        CaseData caseData,
-                                        Party respondent,
-                                        boolean isRespondent1,
-                                        LocalDateTime responseDate) {
-        if (respondent == null || !shouldAddMiscEvent(caseData, isRespondent1)) {
-            return;
-        }
-        respondentResponseSupport.addRespondentMiscEvent(builder, sequenceGenerator, caseData, respondent, isRespondent1, responseDate);
-    }
-
-    private boolean shouldAddMiscEvent(CaseData caseData, boolean isRespondent1) {
-        if (caseData == null || CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            return false;
-        }
-        RespondentResponseType responseType = isRespondent1
-            ? caseData.getRespondent1ClaimResponseType()
-            : caseData.getRespondent2ClaimResponseType();
-        if (responseType == null) {
-            return true;
-        }
-        return responseType != RespondentResponseType.FULL_DEFENCE;
-    }
-
     private boolean isAllPaid(BigDecimal totalClaimAmount, RespondToClaim respondToClaim) {
         return totalClaimAmount != null
             && Optional.ofNullable(respondToClaim)
@@ -289,29 +287,66 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
     }
 
     private boolean hasFullDefenceResponse(CaseData caseData) {
-        return hasFullDefenceOrCounterClaimResponse(caseData);
-    }
-
-    private boolean hasFullDefenceOrCounterClaimResponse(CaseData caseData) {
         if (caseData == null) {
             return false;
         }
         if (CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            return isSpecFullDefenceOrCounterClaim(caseData.getRespondent1ClaimResponseTypeForSpec())
-                || isSpecFullDefenceOrCounterClaim(caseData.getRespondent2ClaimResponseTypeForSpec());
+            return hasSpecResponseOfType(caseData, RespondentResponseTypeSpec.FULL_DEFENCE)
+                || hasSpecResponseOfType(caseData, RespondentResponseTypeSpec.COUNTER_CLAIM);
         }
-        return isUnspecFullDefenceOrCounterClaim(caseData.getRespondent1ClaimResponseType())
-            || isUnspecFullDefenceOrCounterClaim(caseData.getRespondent2ClaimResponseType());
+        return RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
+            || RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType());
     }
 
-    private boolean isSpecFullDefenceOrCounterClaim(RespondentResponseTypeSpec responseType) {
-        return RespondentResponseTypeSpec.FULL_DEFENCE.equals(responseType)
-            || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(responseType);
+    private boolean respondentLacksFullDefenceResponse(CaseData caseData, boolean isRespondent1) {
+        if (caseData == null) {
+            return true;
+        }
+        if (!CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return !RespondentResponseType.FULL_DEFENCE.equals(
+                isRespondent1 ? caseData.getRespondent1ClaimResponseType() : caseData.getRespondent2ClaimResponseType()
+            );
+        }
+        RespondentResponseTypeSpec responseType = getSpecResponseType(caseData, isRespondent1);
+        return !(RespondentResponseTypeSpec.FULL_DEFENCE.equals(responseType)
+            || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(responseType));
     }
 
-    private boolean isUnspecFullDefenceOrCounterClaim(RespondentResponseType responseType) {
-        return RespondentResponseType.FULL_DEFENCE.equals(responseType)
-            || RespondentResponseType.COUNTER_CLAIM.equals(responseType);
+    private boolean haveAllRespondentsFullDefence(CaseData caseData) {
+        if (caseData == null) {
+            return false;
+        }
+        if (CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return haveAllSpecRespondentsFullDefence(caseData);
+        }
+        return haveAllUnspecRespondentsFullDefence(caseData);
+    }
+
+    private boolean haveAllSpecRespondentsFullDefence(CaseData caseData) {
+        boolean respondent1FullDefence = RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec());
+        if (caseData.getRespondent2() == null) {
+            return respondent1FullDefence;
+        }
+        boolean respondent2FullDefence = RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec());
+        if (!respondent2FullDefence && YesOrNo.YES.equals(caseData.getRespondentResponseIsSame())) {
+            respondent2FullDefence = respondent1FullDefence;
+        }
+        return respondent1FullDefence && respondent2FullDefence;
+    }
+
+    private boolean haveAllUnspecRespondentsFullDefence(CaseData caseData) {
+        RespondentResponseType respondent1Response = caseData.getRespondent1ClaimResponseType();
+        boolean respondent1FullDefence = isUnspecFullDefence(respondent1Response);
+        if (caseData.getRespondent2() == null) {
+            return respondent1FullDefence;
+        }
+        RespondentResponseType respondent2Response = caseData.getRespondent2ClaimResponseType();
+        boolean respondent2FullDefence = isUnspecFullDefence(respondent2Response);
+        return respondent1FullDefence && respondent2FullDefence;
+    }
+
+    private boolean isUnspecFullDefence(RespondentResponseType responseType) {
+        return RespondentResponseType.FULL_DEFENCE.equals(responseType);
     }
 
     private void addCounterClaimEventIfNeeded(EventHistory.EventHistoryBuilder builder,
@@ -333,9 +368,7 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
             return false;
         }
         if (CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            RespondentResponseTypeSpec responseType = isRespondent1
-                ? caseData.getRespondent1ClaimResponseTypeForSpec()
-                : caseData.getRespondent2ClaimResponseTypeForSpec();
+            RespondentResponseTypeSpec responseType = getSpecResponseType(caseData, isRespondent1);
             return RespondentResponseTypeSpec.COUNTER_CLAIM.equals(responseType);
         }
         RespondentResponseType responseType = isRespondent1
@@ -344,10 +377,74 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
         return RespondentResponseType.COUNTER_CLAIM.equals(responseType);
     }
 
+    private void addRespondentMiscEvent(EventHistory.EventHistoryBuilder builder,
+                                        CaseData caseData,
+                                        Party respondent,
+                                        boolean isRespondent1,
+                                        LocalDateTime responseDate) {
+        if (respondent == null) {
+            return;
+        }
+        if (isSpecCounterClaim(caseData, isRespondent1)) {
+            addSpecCounterClaimMiscEvent(builder, caseData, respondent, isRespondent1, responseDate);
+            return;
+        }
+        respondentResponseSupport.addRespondentMiscEvent(builder, sequenceGenerator, caseData, respondent, isRespondent1, responseDate);
+    }
+
+    private void addSpecCounterClaimMiscEvent(EventHistory.EventHistoryBuilder builder,
+                                              CaseData caseData,
+                                              Party respondent,
+                                              boolean isRespondent1,
+                                              LocalDateTime responseDate) {
+        String message = respondentResponseSupport.prepareRespondentResponseText(caseData, respondent, isRespondent1);
+        if (!StringUtils.hasText(message)) {
+            return;
+        }
+        RoboticsEventSupport.addRespondentMiscEvent(builder, sequenceGenerator, message, responseDate);
+    }
+
+    private boolean isSpecCounterClaim(CaseData caseData, boolean isRespondent1) {
+        return caseData != null
+            && CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && isCounterClaimResponse(caseData, isRespondent1);
+    }
+
+    private RespondentResponseTypeSpec getSpecResponseType(CaseData caseData, boolean isRespondent1) {
+        if (caseData == null || !CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return null;
+        }
+        RespondentResponseTypeSpec responseType = isRespondent1
+            ? caseData.getRespondent1ClaimResponseTypeForSpec()
+            : caseData.getRespondent2ClaimResponseTypeForSpec();
+        if (responseType != null) {
+            return responseType;
+        }
+        if (getMultiPartyScenario(caseData).equals(MultiPartyScenario.TWO_V_ONE)) {
+            return Optional.ofNullable(caseData.getClaimant1ClaimResponseTypeForSpec())
+                .orElse(caseData.getClaimant2ClaimResponseTypeForSpec());
+        }
+        return null;
+    }
+
+    private boolean hasSpecResponseOfType(CaseData caseData, RespondentResponseTypeSpec responseType) {
+        return responseType.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || responseType.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+            || responseType.equals(caseData.getClaimant1ClaimResponseTypeForSpec())
+            || responseType.equals(caseData.getClaimant2ClaimResponseTypeForSpec());
+    }
+
     private record EventBuckets(List<Event> defenceEvents,
                                 List<Event> statesPaidEvents,
                                 List<Event> directionsQuestionnaireEvents,
                                 List<Event> defenceAndCounterClaimEvents) {
+    }
+
+    private boolean hasSameSolicitorDifferentResponse(CaseData caseData) {
+        return caseData != null
+            && YesOrNo.YES.equals(caseData.getRespondent2SameLegalRepresentative())
+            && caseData.getRespondent1ResponseDate() != null
+            && YesOrNo.NO.equals(caseData.getRespondentResponseIsSame());
     }
 
 }

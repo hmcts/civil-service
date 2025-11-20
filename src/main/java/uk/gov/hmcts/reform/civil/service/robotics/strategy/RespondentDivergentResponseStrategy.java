@@ -26,10 +26,12 @@ import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.getPreferredCourtCode;
@@ -313,6 +315,24 @@ public class RespondentDivergentResponseStrategy implements EventHistoryStrategy
                                   Party respondent,
                                   boolean isRespondent1,
                                   LocalDateTime responseDate) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && (isSameSolicitorDivergent(caseData)
+            || ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData)))) {
+            respondentResponseSupport.addSpecDivergentRespondentMiscEvent(
+                builder,
+                sequenceGenerator,
+                caseData,
+                respondent,
+                isRespondent1,
+                responseDate
+            );
+            return;
+        }
         respondentResponseSupport.addRespondentMiscEvent(builder, sequenceGenerator, caseData, respondent, isRespondent1, responseDate);
+    }
+
+    private boolean isSameSolicitorDivergent(CaseData caseData) {
+        return ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+            && NO.equals(caseData.getRespondentResponseIsSame());
     }
 }

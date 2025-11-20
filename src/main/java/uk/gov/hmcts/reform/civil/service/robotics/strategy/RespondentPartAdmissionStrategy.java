@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
@@ -25,20 +24,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.getPreferredCourtCode;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.getRespondent1DQOrDefault;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.getRespondent2DQOrDefault;
-import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.isStayClaim;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildDirectionsQuestionnaireEvent;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildLipVsLrMiscEvent;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseTypeForRespondent;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1v2SameSolicitorSameResponse;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseExists;
@@ -88,7 +82,7 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
             .forEach(builder::directionsQuestionnaire);
 
         if (defendant1ResponseExists.test(caseData)) {
-            Respondent1DQ respondent1DQ = getRespondent1DQOrDefault(caseData);
+            final Respondent1DQ respondent1DQ = getRespondent1DQOrDefault(caseData);
             addLipVsLrMisc(builder, caseData);
 
             if (useStatesPaid(caseData)) {
@@ -198,19 +192,6 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
                                            DQ dq,
                                            Party respondent,
                                            boolean isRespondent1) {
-        String paginatedMessage = "";
-        MultiPartyScenario scenario = getMultiPartyScenario(caseData);
-        if (scenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
-            paginatedMessage = respondentResponseSupport.getPaginatedMessageFor1v2SameSolicitor(caseData, isRespondent1);
-        }
-
-        return format(
-            "%sDefendant: %s has responded: %s; preferredCourtCode: %s; stayClaim: %s",
-            paginatedMessage,
-            respondent.getPartyName(),
-            getResponseTypeForRespondent(caseData, respondent),
-            getPreferredCourtCode(dq),
-            isStayClaim(dq)
-        );
+        return respondentResponseSupport.prepareFullDefenceEventText(dq, caseData, isRespondent1, respondent);
     }
 }

@@ -31,8 +31,7 @@ public class CaseProceedsInCasemanStrategy implements EventHistoryStrategy {
         }
 
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-        boolean takenOfflineAfterSdoState = hasState(stateFlow, FlowState.Main.TAKEN_OFFLINE_AFTER_SDO)
-            && caseData.getTakenOfflineByStaffDate() == null;
+        boolean takenOfflineAfterSdoState = hasState(stateFlow);
 
         if (takenOfflineAfterSdoState) {
             return true;
@@ -43,8 +42,7 @@ public class CaseProceedsInCasemanStrategy implements EventHistoryStrategy {
             && !caseData.getOrderSDODocumentDJCollection().isEmpty());
 
         boolean takenOfflineAfterSdo = YesOrNo.NO.equals(caseData.getDrawDirectionsOrderRequired())
-            && caseData.getReasonNotSuitableSDO() == null
-            && caseData.getTakenOfflineByStaffDate() == null;
+            && caseData.getReasonNotSuitableSDO() == null;
 
         return sdoDrawnAndFiled || takenOfflineAfterSdo;
     }
@@ -58,12 +56,12 @@ public class CaseProceedsInCasemanStrategy implements EventHistoryStrategy {
         builder.miscellaneous(buildMiscEvent(builder, sequenceGenerator, message, caseData.getTakenOfflineDate()));
     }
 
-    private boolean hasState(StateFlow stateFlow, FlowState.Main state) {
+    private boolean hasState(StateFlow stateFlow) {
         if (stateFlow == null) {
             return false;
         }
         return stateFlow.getStateHistory().stream()
             .map(State::getName)
-            .anyMatch(state.fullName()::equals);
+            .anyMatch(FlowState.Main.TAKEN_OFFLINE_AFTER_SDO.fullName()::equals);
     }
 }

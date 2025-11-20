@@ -73,13 +73,13 @@ class CaseProceedsInCasemanStrategyTest {
     }
 
     @Test
-    void supportsReturnsFalseWhenTakenOfflineByStaff() {
+    void supportsReturnsTrueWhenTakenOfflineByStaffAfterSdoConditionsMet() {
         CaseData caseData = CaseData.builder()
             .takenOfflineDate(LocalDateTime.now())
             .takenOfflineByStaffDate(LocalDateTime.now())
             .drawDirectionsOrderRequired(YesOrNo.NO)
             .build();
-        assertThat(strategy.supports(caseData)).isFalse();
+        assertThat(strategy.supports(caseData)).isTrue();
     }
 
     @Test
@@ -119,14 +119,14 @@ class CaseProceedsInCasemanStrategyTest {
     }
 
     @Test
-    void supportsReturnsFalseWhenStateHistoryIndicatesTakenOfflineAfterSdoButStaffTookCaseOffline() {
+    void supportsReturnsTrueWhenStateHistoryIndicatesTakenOfflineAfterSdoEvenIfStaffAlsoRecorded() {
         when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.TAKEN_OFFLINE_AFTER_SDO.fullName())));
         CaseData caseData = CaseData.builder()
             .takenOfflineDate(LocalDateTime.now())
             .takenOfflineByStaffDate(LocalDateTime.now())
             .build();
 
-        assertThat(strategy.supports(caseData)).isFalse();
+        assertThat(strategy.supports(caseData)).isTrue();
     }
 
     @Test
