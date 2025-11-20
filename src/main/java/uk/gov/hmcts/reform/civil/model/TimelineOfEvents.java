@@ -9,7 +9,7 @@ import net.minidev.json.annotate.JsonIgnore;
 
 public class TimelineOfEvents {
 
-    private final TimelineOfEventDetails value;
+    private TimelineOfEventDetails value;
     @JsonIgnore
-    private final String id;
+    private String id;
 }

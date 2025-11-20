@@ -1825,40 +1825,42 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             LocalDateTime localDateTime = LocalDateTime.now();
             when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
-                    .thenReturn(localDateTime);
+                .thenReturn(localDateTime);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
 
             Party partyWithPrimaryAddress = PartyBuilder.builder().individual().build();
             partyWithPrimaryAddress.setPrimaryAddress(AddressBuilder.maximal()
-                    .addressLine1("address line 1")
-                    .addressLine2("address line 2")
-                    .addressLine3("address line 3")
-                    .build());
+                                                          .addressLine1("address line 1")
+                                                          .addressLine2("address line 2")
+                                                          .addressLine3("address line 3")
+                                                          .build());
 
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                    .respondent2DQ()
-                    .respondent1Copy(PartyBuilder.builder().individual().build())
-                    .addRespondent2(YES)
-                    .respondent2(PartyBuilder.builder().individual().build())
-                    .respondent2Copy(PartyBuilder.builder().individual().build())
-                    .atSpecAoSRespondent2HomeAddressRequired(NO)
-                    .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal()
-                            .addressLine1("new address line 1")
-                            .build())
-                    .build();
+                .respondent2DQ()
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             // When
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
 
             // Then
             assertThat(response.getData())
-                    .extracting("respondent2")
-                    .extracting("primaryAddress")
-                    .extracting("AddressLine1")
-                    .isEqualTo("new address line 1");
+                .extracting("respondent2").extracting("primaryAddress")
+                .extracting("AddressLine1").isEqualTo("address line 1");
+            assertThat(response.getData())
+                .extracting("respondent2").extracting("primaryAddress")
+                .extracting("AddressLine2").isEqualTo("address line 2");
+            assertThat(response.getData())
+                .extracting("respondent2").extracting("primaryAddress")
+                .extracting("AddressLine3").isEqualTo("address line 3");
+            assertThat(response.getData()).extracting("nextDeadline").isEqualTo(localDateTime.toLocalDate().toString());
         }
 
         @Test
@@ -2582,13 +2584,12 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void specificSummary_whenPartialAdmitPayImmediately() {
             // Given
             BigDecimal admitted = BigDecimal.valueOf(1000);
-            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+
             CaseData caseData = CaseDataBuilder.builder()
                     .totalClaimAmount(BigDecimal.valueOf(1000))
                     .atStateApplicantRespondToDefenceAndProceed()
                     .build().toBuilder()
-                    .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                            .whenWillThisAmountBePaid(whenWillPay).build())
+                    .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().build())
                     .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                     .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
                     .respondToAdmittedClaimOwingAmountPounds(admitted)
@@ -2600,8 +2601,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             assertThat(response.getConfirmationBody())
-                    .contains(caseData.getApplicant1().getPartyName())
-                    .contains(DateFormatHelper.formatLocalDate(whenWillPay, DATE));
+                    .contains(caseData.getApplicant1().getPartyName());
         }
 
         @Test

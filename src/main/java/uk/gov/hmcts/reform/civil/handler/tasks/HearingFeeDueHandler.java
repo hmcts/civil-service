@@ -45,19 +45,22 @@ public class HearingFeeDueHandler extends BaseExternalTaskHandler {
 
                 if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
                     if (caseData.getHearingDueDate() == null) {
-                        log.info("Current case status '{}'", caseDetails.getState());
+                        log.info("Publishing NoHearingFeeDueEvent current case status {}, Case Id {}",
+                                 caseDetails.getState(), caseDetails.getId());
                         applicationEventPublisher.publishEvent(new NoHearingFeeDueEvent(caseDetails.getId()));
                     } else {
                         if ((hearingFeePaymentDetails != null
                             && hearingFeePaymentDetails.getStatus() == PaymentStatus.SUCCESS)
                             && caseData.getHearingDueDate().isBefore(LocalDate.now())
                             || caseData.hearingFeePaymentDoneWithHWF()) {
-                            log.info("Current case status '{}'", caseDetails.getState());
+                            log.info("Publishing HearingFeePaidEvent current case status {}, Case Id {}",
+                                     caseDetails.getState(), caseDetails.getId());
                             applicationEventPublisher.publishEvent(new HearingFeePaidEvent(caseDetails.getId()));
                         } else if ((hearingFeePaymentDetails == null
                             || hearingFeePaymentDetails.getStatus() == PaymentStatus.FAILED)
                             && caseData.getHearingDueDate().isBefore(LocalDate.now())) {
-                            log.info("Current case status '{}'", caseDetails.getState());
+                            log.info("Publishing HearingFeeUnpaidEvent current case status {}, Case Id {}",
+                                     caseDetails.getState(), caseDetails.getId());
                             applicationEventPublisher.publishEvent(new HearingFeeUnpaidEvent(caseDetails.getId()));
                         }
                     }
@@ -79,12 +82,14 @@ public class HearingFeeDueHandler extends BaseExternalTaskHandler {
             && hearingFeePaymentDetails.getStatus() == PaymentStatus.SUCCESS)
             && caseData.getHearingDueDate().isBefore(LocalDate.now())
             || caseData.hearingFeePaymentDoneWithHWF()) {
-            log.info("Current case status '{}'", caseDetails.getState());
+            log.info("preMultiIntermediateClaimLogic publishing HearingFeePaidEvent current case status {}, Case Id {}",
+                     caseDetails.getState(), caseDetails.getId());
             applicationEventPublisher.publishEvent(new HearingFeePaidEvent(caseDetails.getId()));
         } else if ((hearingFeePaymentDetails == null
             || hearingFeePaymentDetails.getStatus() == PaymentStatus.FAILED)
             && caseData.getHearingDueDate().isBefore(LocalDate.now())) {
-            log.info("Current case status '{}'", caseDetails.getState());
+            log.info("preMultiIntermediateClaimLogic publishing HearingFeeUnpaidEvent current case status {}, Case Id {}",
+                     caseDetails.getState(), caseDetails.getId());
             applicationEventPublisher.publishEvent(new HearingFeeUnpaidEvent(caseDetails.getId()));
         }
     }

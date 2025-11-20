@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
@@ -28,6 +28,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,9 +45,6 @@ class NoOngoingBusinessProcessAspectTest {
 
     @InjectMocks
     private NoOngoingBusinessProcessAspect aspect;
-
-    @Mock
-    private FlowStateAllowedEventService flowStateAllowedEventService;
 
     @Mock
     private SimpleStateFlowEngine stateFlowEngine;
@@ -119,8 +117,11 @@ class NoOngoingBusinessProcessAspectTest {
                 .errors(List.of(ERROR_MESSAGE))
                 .build();
 
+            State mockState = mock(State.class);
+            when(mockState.getName()).thenReturn(FlowState.Main.DRAFT.fullName());
+            when(stateFlow.getState()).thenReturn(mockState);
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
-            when(stateFlow.getStateHistory()).thenReturn(List.of(State.from("state1")));
+            when(stateFlow.getStateHistory()).thenReturn(List.of(mockState));
 
             CallbackParams callbackParams = createCallbackParams(
                 CREATE_CLAIM.name(),
@@ -134,6 +135,7 @@ class NoOngoingBusinessProcessAspectTest {
 
             assertThat(result).isEqualTo(response);
             verify(proceedingJoinPoint, never()).proceed();
+            verify(stateFlow).getStateHistory();
         }
 
         @ParameterizedTest

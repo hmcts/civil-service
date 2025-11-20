@@ -42,15 +42,15 @@ public class ValidateDateOfBirth implements CaseTask {
 
         Party respondent = getRespondent(callbackParams);
         List<String> errors = dateOfBirthValidator.validate(respondent);
-        log.debug("CaseId {}: Date of birth validation errors: {}", callbackParams.getCaseData().getCcdCaseReference(), errors);
+        log.info("CaseId {}: Date of birth validation errors: {}", callbackParams.getCaseData().getCcdCaseReference(), errors);
 
         CaseData caseData = callbackParams.getCaseData();
         errors.addAll(correspondenceAddressCorrect(caseData));
-        log.debug("CaseId {}: Correspondence address validation errors: {}", caseData.getCcdCaseReference(), errors);
+        log.info("CaseId {}: Correspondence address validation errors: {}", caseData.getCcdCaseReference(), errors);
 
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
         updateSolicitorResponse(callbackParams, caseData, updatedData);
-        log.debug("CaseId {}: Solicitor response updated", caseData.getCcdCaseReference());
+        log.info("CaseId {}: Solicitor response updated", caseData.getCcdCaseReference());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedData.build().toMap(objectMapper))
@@ -64,9 +64,9 @@ public class ValidateDateOfBirth implements CaseTask {
         Party respondent = callbackParams.getCaseData().getRespondent1();
         if (respondent == null && callbackParams.getCaseData().getRespondent2() != null) {
             respondent = callbackParams.getCaseData().getRespondent2();
-            log.debug("CaseId {}: Respondent 1 is null, using Respondent 2", callbackParams.getCaseData().getCcdCaseReference());
+            log.info("CaseId {}: Respondent 1 is null, using Respondent 2", callbackParams.getCaseData().getCcdCaseReference());
         } else {
-            log.debug("CaseId {}: Using Respondent 1", callbackParams.getCaseData().getCcdCaseReference());
+            log.info("CaseId {}: Using Respondent 1", callbackParams.getCaseData().getCcdCaseReference());
         }
         return respondent;
     }
@@ -85,12 +85,12 @@ public class ValidateDateOfBirth implements CaseTask {
     }
 
     private boolean isTwoLegalRepsScenario(CaseData caseData) {
-        log.debug("Checking if caseId {} is a two legal representatives scenario", caseData.getCcdCaseReference());
+        log.info("Checking if caseId {} is a two legal representatives scenario", caseData.getCcdCaseReference());
         return ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData));
     }
 
     private boolean isOneLegalRepScenario(CaseData caseData) {
-        log.debug("Checking if caseId {} is a one legal representative scenario", caseData.getCcdCaseReference());
+        log.info("Checking if caseId {} is a one legal representative scenario", caseData.getCcdCaseReference());
         return ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData));
     }
 
@@ -98,10 +98,10 @@ public class ValidateDateOfBirth implements CaseTask {
         log.info("Validating correspondence address for caseId: {}", caseData.getCcdCaseReference());
 
         if (isCorrespondenceAddressRequired(caseData.getIsRespondent1(), caseData.getSpecAoSRespondentCorrespondenceAddressRequired())) {
-            log.debug("CaseId {}: Respondent 1 correspondence address validation required", caseData.getCcdCaseReference());
+            log.info("CaseId {}: Respondent 1 correspondence address validation required", caseData.getCcdCaseReference());
             return validatePostcode(caseData.getSpecAoSRespondentCorrespondenceAddressdetails());
         } else if (isCorrespondenceAddressRequired(caseData.getIsRespondent2(), caseData.getSpecAoSRespondent2CorrespondenceAddressRequired())) {
-            log.debug("CaseId {}: Respondent 2 correspondence address validation required", caseData.getCcdCaseReference());
+            log.info("CaseId {}: Respondent 2 correspondence address validation required", caseData.getCcdCaseReference());
             return validatePostcode(caseData.getSpecAoSRespondent2CorrespondenceAddressdetails());
         }
         return Collections.emptyList();

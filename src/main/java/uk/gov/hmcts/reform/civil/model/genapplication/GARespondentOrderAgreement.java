@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 @Builder(toBuilder = true)
 public class GARespondentOrderAgreement {
 
-    private final YesOrNo hasAgreed;
+    private YesOrNo hasAgreed;
 
     @JsonCreator
     GARespondentOrderAgreement(@JsonProperty("hasAgreed") YesOrNo hasAgreed) {

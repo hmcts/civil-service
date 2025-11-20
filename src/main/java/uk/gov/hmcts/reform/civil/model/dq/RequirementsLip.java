@@ -10,9 +10,9 @@ import java.util.List;
 @Builder(toBuilder = true)
 public class RequirementsLip {
 
-    private final String name;
-    private final List<SupportRequirements> requirements;
-    private final String signLanguageRequired;
-    private final String languageToBeInterpreted;
-    private final String otherSupport;
+    private String name;
+    private List<SupportRequirements> requirements;
+    private String signLanguageRequired;
+    private String languageToBeInterpreted;
+    private String otherSupport;
 }
