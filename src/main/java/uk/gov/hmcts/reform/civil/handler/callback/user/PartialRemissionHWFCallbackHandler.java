@@ -43,8 +43,7 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
     private final Map<String, Callback> callbackMap = java.util.Map.of(
         callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
         callbackKey(MID, "remission-amount"), this::validateRemissionAmount,
-        callbackKey(ABOUT_TO_SUBMIT),
-        this::partRemissionHWF,
+        callbackKey(ABOUT_TO_SUBMIT), this::partRemissionHWF,
         callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
     );
 
@@ -87,20 +86,22 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
     private CallbackResponse partRemissionHWF(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         caseData = hwfFeePaymentOutcomeService.updateOutstandingFee(caseData, callbackParams.getRequest().getEventId());
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
-            .businessProcess(BusinessProcess.ready(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME));
+
+        // Set business process using setter
+        caseData.setBusinessProcess(BusinessProcess.ready(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME));
 
         if (caseData.isHWFTypeHearing()) {
             HelpWithFeesDetails hearingFeeDetails = caseData.getHearingHwfDetails();
-            updatedData.hearingHwfDetails(hearingFeeDetails.toBuilder().hwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED).build());
+            hearingFeeDetails.setHwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED);
         }
+
         if (caseData.isHWFTypeClaimIssued()) {
-            updatedData.claimIssuedHwfDetails(caseData.getClaimIssuedHwfDetails().toBuilder().hwfCaseEvent(
-                PARTIAL_REMISSION_HWF_GRANTED).build());
+            HelpWithFeesDetails claimIssuedFeeDetails = caseData.getClaimIssuedHwfDetails();
+            claimIssuedFeeDetails.setHwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 }

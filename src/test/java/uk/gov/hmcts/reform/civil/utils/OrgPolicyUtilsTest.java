@@ -155,7 +155,12 @@ class OrgPolicyUtilsTest {
         void shouldPopulateGivenCaseDataBuilderWithExpectedRespondentOrgPolicies_whenBothDoNotExist() {
             var caseDataBuilder = CaseData.builder();
 
-            OrgPolicyUtils.addMissingOrgPolicies(caseDataBuilder);
+            var caseData = caseDataBuilder.build();
+            OrgPolicyUtils.addMissingOrgPolicies(caseData);
+
+            // Use setters to update the builder's internal state to match the modified caseData
+            caseDataBuilder.respondent1OrganisationPolicy(caseData.getRespondent1OrganisationPolicy());
+            caseDataBuilder.respondent2OrganisationPolicy(caseData.getRespondent2OrganisationPolicy());
             var actual = caseDataBuilder.build();
 
             assertEquals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName(),
@@ -170,7 +175,12 @@ class OrgPolicyUtilsTest {
                 CaseData.builder().respondent1OrganisationPolicy(
                     OrganisationPolicy.builder().orgPolicyCaseAssignedRole("[RES1-EXISTING]").build());
 
-            OrgPolicyUtils.addMissingOrgPolicies(caseDataBuilder);
+            var caseData = caseDataBuilder.build();
+            OrgPolicyUtils.addMissingOrgPolicies(caseData);
+
+            // Use setters to update the builder's internal state to match the modified caseData
+            caseDataBuilder.respondent1OrganisationPolicy(caseData.getRespondent1OrganisationPolicy());
+            caseDataBuilder.respondent2OrganisationPolicy(caseData.getRespondent2OrganisationPolicy());
             var actual = caseDataBuilder.build();
 
             assertEquals("[RES1-EXISTING]",
@@ -185,7 +195,12 @@ class OrgPolicyUtilsTest {
                 CaseData.builder().respondent2OrganisationPolicy(
                     OrganisationPolicy.builder().orgPolicyCaseAssignedRole("[RES2-EXISTING]").build());
 
-            OrgPolicyUtils.addMissingOrgPolicies(caseDataBuilder);
+            var caseData = caseDataBuilder.build();
+            OrgPolicyUtils.addMissingOrgPolicies(caseData);
+
+            // Use setters to update the builder's internal state to match the modified caseData
+            caseDataBuilder.respondent1OrganisationPolicy(caseData.getRespondent1OrganisationPolicy());
+            caseDataBuilder.respondent2OrganisationPolicy(caseData.getRespondent2OrganisationPolicy());
             var actual = caseDataBuilder.build();
 
             assertEquals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName(),
@@ -203,7 +218,12 @@ class OrgPolicyUtilsTest {
                     .respondent2OrganisationPolicy(
                         OrganisationPolicy.builder().orgPolicyCaseAssignedRole("[RES2-EXISTING]").build());
 
-            OrgPolicyUtils.addMissingOrgPolicies(caseDataBuilder);
+            var caseData = caseDataBuilder.build();
+            OrgPolicyUtils.addMissingOrgPolicies(caseData);
+
+            // Use setters to update the builder's internal state to match the modified caseData
+            caseDataBuilder.respondent1OrganisationPolicy(caseData.getRespondent1OrganisationPolicy());
+            caseDataBuilder.respondent2OrganisationPolicy(caseData.getRespondent2OrganisationPolicy());
             var actual = caseDataBuilder.build();
 
             assertEquals("[RES1-EXISTING]",
