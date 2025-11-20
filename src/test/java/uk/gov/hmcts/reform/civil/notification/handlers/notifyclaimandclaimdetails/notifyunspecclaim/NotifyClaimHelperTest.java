@@ -75,7 +75,7 @@ class NotifyClaimHelperTest {
 
     @Test
     void shouldReturnTrueWhenBothDefendantsSelected() {
-        DynamicListElement selected = DynamicListElement.builder().label("Both Defendants").build();
+        DynamicListElement selected = DynamicListElement.builder().label("Both").build();
         DynamicList list = DynamicList.builder().value(selected).build();
 
         CaseData caseData = CaseData.builder()

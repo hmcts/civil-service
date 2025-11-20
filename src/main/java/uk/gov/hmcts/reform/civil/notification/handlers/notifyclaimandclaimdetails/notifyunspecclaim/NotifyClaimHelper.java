@@ -10,8 +10,8 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import java.util.Map;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.BOTH_DEFENDANTS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_DETAILS_NOTIFICATION_DEADLINE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.NOTIFY_BOTH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
@@ -44,6 +44,6 @@ public class NotifyClaimHelper {
             .map(DynamicList::getValue)
             .map(DynamicListElement::getLabel)
             .orElse("");
-        return defendantNotifyClaimInfo.equals(defendantName) || BOTH_DEFENDANTS.equals(defendantNotifyClaimInfo);
+        return defendantNotifyClaimInfo.equals(defendantName) || NOTIFY_BOTH.equals(defendantNotifyClaimInfo);
     }
 }

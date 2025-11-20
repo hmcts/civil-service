@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import java.util.Map;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.BOTH_DEFENDANTS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.NOTIFY_BOTH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONSE_DEADLINE_PLUS_28;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -47,6 +47,6 @@ public class NotifyClaimDetailsHelper {
             .map(DynamicListElement::getLabel)
             .orElse("");
 
-        return defendantNotifyClaimDetails.equals(defendantName) || BOTH_DEFENDANTS.equals(defendantNotifyClaimDetails);
+        return defendantNotifyClaimDetails.equals(defendantName) || NOTIFY_BOTH.equals(defendantNotifyClaimDetails);
     }
 }
