@@ -25,10 +25,7 @@ spring:
   cache:
     cache-names: userInfoCache, accessTokenCache, courtVenueCache
     caffeine:
-      spec: |
-        userInfoCache=expireAfterWrite=3600s,
-        accessTokenCache=expireAfterWrite=1800s,
-        courtVenueCache=expireAfterWrite=86400s
+      spec: expireAfterWrite=3600s
   datasource:
     driverClassName: org.postgresql.Driver
     username: ${CMC_DB_USERNAME:-}
