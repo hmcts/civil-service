@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.List;
 import java.util.UUID;
@@ -54,7 +55,9 @@ public class ManageDocumentsHandlerTest extends BaseCallbackHandlerTest {
                     .documentLink(Document.builder().build())
                     .build()
             );
-            CaseData caseData = CaseData.builder().manageDocuments((List.of(document))).build();
+            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+                .manageDocuments(List.of(document))
+                .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
