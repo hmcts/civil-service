@@ -189,26 +189,23 @@ public class UnavailabilityDatesUtils {
     }
 
     public static CaseData copyDatesIntoListingTabFields(CaseData caseData) {
-        if (caseData.getApplicant1().getUnavailableDates() != null
-            && caseData.getApplicant1UnavailableDatesForTab() == null) {
+        if (caseData.getApplicant1() != null
+            && caseData.getApplicant1().getUnavailableDates() != null) {
             copyDatesIntoListingTabFieldsForApplicant(caseData, true);
         }
 
-        //ToDo: caseData.getApplicant1UnavailableDatesForTab() == null is this correct?
         if (caseData.getApplicant2() != null
-            && caseData.getApplicant2().getUnavailableDates() != null
-            && caseData.getApplicant1UnavailableDatesForTab() == null) {
+            && caseData.getApplicant2().getUnavailableDates() != null) {
             copyDatesIntoListingTabFieldsForApplicant(caseData, false);
         }
 
-        if (caseData.getRespondent1().getUnavailableDates() != null
-            && caseData.getRespondent1UnavailableDatesForTab() == null) {
+        if (caseData.getRespondent1() != null
+            && caseData.getRespondent1().getUnavailableDates() != null) {
             copyDatesIntoListingTabFieldsForRespondent1(caseData);
         }
 
         if (caseData.getRespondent2() != null
-            && caseData.getRespondent2().getUnavailableDates() != null
-            && caseData.getRespondent2UnavailableDatesForTab() == null) {
+            && caseData.getRespondent2().getUnavailableDates() != null) {
             copyDatesIntoListingTabFieldsForRespondent2(caseData);
         }
         return caseData;
