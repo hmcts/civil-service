@@ -40,7 +40,7 @@ public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
     }
 
     @Test
-    @PactTestFor(pactMethod = "referenceData_location")
+    @PactTestFor(pactMethod = "getAllCivilCourtVenues")
     public void verifyCourtVenue() {
         List<LocationRefData> response = locationReferenceDataApiClient.getAllCivilCourtVenues(
             SERVICE_AUTH_TOKEN,
