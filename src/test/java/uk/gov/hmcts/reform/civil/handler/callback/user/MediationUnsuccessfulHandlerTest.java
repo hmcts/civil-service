@@ -76,7 +76,7 @@ class MediationUnsuccessfulHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStatePendingClaimIssued()
                 .build()
-                .builder()
+                .toBuilder()
                 .mediation(Mediation
                                .builder()
                                .unsuccessfulMediationReason("PARTY_WITHDRAWS")
