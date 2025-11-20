@@ -11,8 +11,8 @@ import org.springframework.test.context.ActiveProfiles;
 import java.io.IOException;
 
 @ExtendWith(PactConsumerTestExt.class)
-@ActiveProfiles("integration-test")
-@SpringBootTest
+@ActiveProfiles("contract-test")
+@SpringBootTest(classes = {uk.gov.hmcts.reform.civil.Application.class, ContractTestConfig.class})
 public class BaseContractTest {
 
     protected static final String AUTHORIZATION_HEADER = "Authorization";
@@ -22,6 +22,7 @@ public class BaseContractTest {
 
     @Autowired
     protected ObjectMapper objectMapper;
+
 
     protected String createJsonObject(Object obj) throws JSONException, IOException {
         return objectMapper.writeValueAsString(obj);

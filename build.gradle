@@ -495,16 +495,34 @@ project.ext {
   pactVersion = getCheckedOutGitCommitHash()
 }
 
+def pactBrokerUrlEnv = System.getenv("PACT_BROKER_FULL_URL")
+def isPactBrokerConfigured = pactBrokerUrlEnv != null && !pactBrokerUrlEnv.trim().isEmpty()
+
 pact {
   broker {
-    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+    if (isPactBrokerConfigured) {
+      pactBrokerUrl = pactBrokerUrlEnv
+    } else {
+      logger.lifecycle("PACT_BROKER_FULL_URL not set - pact verification tasks will be skipped.")
+    }
   }
   publish {
     pactDirectory = 'pacts'
-    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+    if (isPactBrokerConfigured) {
+      pactBrokerUrl = pactBrokerUrlEnv
+    }
     tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
     consumerBranch = System.getenv("PACT_BRANCH_NAME") ?: 'Dev'
     version = project.pactVersion
+  }
+}
+
+tasks.withType(au.com.dius.pact.provider.gradle.PactVerificationTask).configureEach {
+  onlyIf {
+    if (!isPactBrokerConfigured) {
+      logger.lifecycle("Skipping ${name} because PACT_BROKER_FULL_URL is not set.")
+    }
+    isPactBrokerConfigured
   }
 }
 

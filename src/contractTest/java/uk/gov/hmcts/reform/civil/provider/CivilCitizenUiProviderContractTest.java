@@ -18,6 +18,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -42,6 +43,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
     providerBranch = "${pact.provider.branch}"
 )
 @IgnoreNoPactsToVerify
+@EnabledIfEnvironmentVariable(named = "PACT_BROKER_FULL_URL", matches = ".+")
 class CivilCitizenUiProviderContractTest {
 
     private static final String AUTH_HEADER = "Bearer some-access-token";
