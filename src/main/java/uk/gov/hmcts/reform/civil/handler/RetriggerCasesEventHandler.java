@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
@@ -82,12 +81,10 @@ public class RetriggerCasesEventHandler extends BaseExternalTaskHandler {
     }
 
     private void setSupplementaryData(Long caseId, String orgId) {
-        ObjectNode inner = mapper.createObjectNode();
-        inner.put(orgId, 1);
         Map<String, Map<String, Map<String, Object>>> supplementaryDataCivil = new HashMap<>();
         supplementaryDataCivil.put(
             "supplementary_data_updates",
-            singletonMap("$set", singletonMap("orgs_assigned_users", inner))
+            singletonMap("$set", singletonMap("orgs_assigned_users", singletonMap(orgId, 1)))
         );
         coreCaseDataService.setSupplementaryData(caseId, supplementaryDataCivil);
     }
