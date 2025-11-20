@@ -7,6 +7,7 @@ import au.com.dius.pact.consumer.junit5.PactTestFor;
 import au.com.dius.pact.core.model.RequestResponsePact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import org.apache.http.HttpStatus;
+import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -33,15 +34,35 @@ public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
     private LocationReferenceDataApiClient locationReferenceDataApiClient;
 
     @Pact(consumer = "civil_service")
-    public RequestResponsePact getAllCivilCourtVenuesPact(PactDslWithProvider builder) throws IOException {
+    public RequestResponsePact getAllCivilCourtVenues(PactDslWithProvider builder)
+        throws JSONException, IOException {
+        return buildCourtVenueResponsePact(builder);
+    }
+
+    @Test
+    @PactTestFor(pactMethod = "getCourtVenue")
+    public void verifyCourtVenue() {
+        List<LocationRefData> response = locationReferenceDataApiClient.getAllCivilCourtVenues(
+            SERVICE_AUTH_TOKEN,
+            AUTHORIZATION_TOKEN,
+            "courtTypeId",
+            "locationType"
+        );
+        assertThat(
+            response.get(0).getRegion(),
+            is(equalTo("regionTest123"))
+        );
+    }
+
+    private RequestResponsePact buildCourtVenueResponsePact(PactDslWithProvider builder) throws IOException {
         return builder
-            .given("Court locations exist")
-            .uponReceiving("A request for all civil court venues")
+            .given("There are court locations to be returned")
+            .uponReceiving("a location request")
             .path(ENDPOINT)
             .headers(SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN, AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
             .method(HttpMethod.GET.toString())
-            .matchQuery("court_type_id", "10", "10")
-            .matchQuery("location_type", "Court", "Court")
+            .matchQuery("court_type_id", "courtTypeId", "courtTypeId")
+            .matchQuery("location_type", "locationType", "locationType")
             .willRespondWith()
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .body(buildLocationRefDataResponseBody())
@@ -49,41 +70,26 @@ public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
             .toPact();
     }
 
-    @Test
-    @PactTestFor(pactMethod = "getAllCivilCourtVenuesPact")
-    public void verifyGetAllCivilCourtVenues() {
-        List<LocationRefData> response = locationReferenceDataApiClient.getAllCivilCourtVenues(
-            SERVICE_AUTH_TOKEN,
-            AUTHORIZATION_TOKEN,
-            "10",
-            "Court"
-        );
-
-        assertThat(response.size(), is(1));
-        assertThat(response.get(0).getRegion(), is(equalTo("regionTest123")));
-        assertThat(response.get(0).getCourtVenueId(), is(equalTo("courtVenueId123")));
-    }
-
-    private static DslPart buildLocationRefDataResponseBody() {
-        return newJsonArray(arr -> arr
-            .object(locationRefData -> locationRefData
-                .stringType("courtVenueId", "courtVenueId123")
-                .stringType("epimmsId", "epimmsIdTest123")
-                .stringType("siteName", "siteNameTest123")
-                .stringType("regionId", "regionIdTest123")
-                .stringType("region", "regionTest123")
-                .stringType("courtType", "courtTypeTest123")
-                .stringType("courtTypeId", "courtTypeIdTest123")
-                .stringType("courtAddress", "courtAddressTest123")
-                .stringType("postcode", "postcodeTest123")
-                .stringType("phoneNumber", "phoneNumberTest123")
-                .stringType("courtLocationCode", "courtLocationCodeTest123")
-                .stringType("courtStatus", "courtStatusTest123")
-                .stringType("courtName", "courtNameTest123")
-                .stringType("venueName", "venueNameTest123")
-                .stringType("locationType", "locationTypeTest123")
-                .stringType("parentLocation", "parentLocationTest123")
-            )
+    static DslPart buildLocationRefDataResponseBody() {
+        return newJsonArray(response ->
+                                response
+                                    .object(locationRefData -> locationRefData
+                                        .stringType("courtVenueId", "courtVenueId123")
+                                        .stringType("epimmsId", "epimmsIdTest123")
+                                        .stringType("siteName", "siteNameTest123")
+                                        .stringType("regionId", "regionIdTest123")
+                                        .stringType("region", "regionTest123")
+                                        .stringType("courtType", "courtTypeTest123")
+                                        .stringType("courtTypeId", "courtTypeIdTest123")
+                                        .stringType("courtAddress", "courtAddressTest123")
+                                        .stringType("postcode", "postcodeTest123")
+                                        .stringType("phoneNumber", "phoneNumberTest123")
+                                        .stringType("courtLocationCode", "courtLocationCodeTest123")
+                                        .stringType("courtStatus", "courtStatusTest123")
+                                        .stringType("courtName", "courtNameTest123")
+                                        .stringType("venueName", "venueNameTest123")
+                                        .stringType("locationType", "locationTypeTest123")
+                                        .stringType("parentLocation", "parentLocationTest123"))
         ).build();
     }
 }
