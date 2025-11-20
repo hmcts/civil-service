@@ -1463,13 +1463,119 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Nested
         class RetainFlags {
-            CaseData caseDataBefore = CaseDataBuilder.builder()
-                .atStateApplicantRespondToDefenceAndProceed()
+            Flags respondent1Flags = Flags.builder().partyName("respondent1name").roleOnCase("respondent1").build();
+            Flags respondent2Flags = Flags.builder().partyName("respondent2name").roleOnCase("respondent2").build();
+            Flags applicant1Flags = Flags.builder().partyName("applicant1name").roleOnCase("applicant1").build();
+            Flags applicant2Flags = Flags.builder().partyName("applicant2name").roleOnCase("applicant2").build();
+
+            CaseData caseDataBefore = CaseData.builder()
+                .applicant1(Party.builder().flags(applicant1Flags).build())
+                .applicant2(Party.builder().flags(applicant2Flags).build())
+                .respondent1(Party.builder().flags(respondent1Flags).build())
+                .respondent2(Party.builder().flags(respondent2Flags).build())
                 .build();
 
             @BeforeEach
             void setup() {
                 when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseDataBefore);
+            }
+
+            @ParameterizedTest
+            @ValueSource(strings = {CLAIMANT_ONE_ID, CLAIMANT_TWO_ID})
+            void shouldCopyFlagsForApplicants(String partyChosenId) {
+                // Fix: Include all parties with their types to avoid NullPointerException
+                CaseData caseData = CaseData.builder()
+                    .applicant1(Party.builder()
+                        .type(INDIVIDUAL)  // Using static import
+                        .individualFirstName("John")
+                        .individualLastName("Doe")
+                        .flags(applicant1Flags)
+                        .build())
+                    .applicant2(Party.builder()
+                        .type(COMPANY)  // Using static import
+                        .companyName("Test Company")
+                        .flags(applicant2Flags)
+                        .build())
+                    .respondent1(Party.builder()
+                        .type(INDIVIDUAL)  // Using static import
+                        .individualFirstName("Jane")
+                        .individualLastName("Smith")
+                        .flags(respondent1Flags)
+                        .build())
+                    .respondent2(Party.builder()
+                        .type(COMPANY)  // Using static import
+                        .companyName("Defendant Corp")
+                        .flags(respondent2Flags)
+                        .build())
+                    .updateDetailsForm(UpdateDetailsForm.builder()
+                        .partyChosen(DynamicList.builder()
+                            .value(DynamicListElement.builder()
+                                .code(partyChosenId)
+                                .build())
+                            .build())
+                        .partyChosenId(partyChosenId)
+                        .build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+                assertThat(responseCaseData.getApplicant1().getFlags()).isEqualTo(applicant1Flags);
+                assertThat(responseCaseData.getApplicant2().getFlags()).isEqualTo(applicant2Flags);
+                // Also verify respondent flags are preserved
+                assertThat(responseCaseData.getRespondent1().getFlags()).isEqualTo(respondent1Flags);
+                assertThat(responseCaseData.getRespondent2().getFlags()).isEqualTo(respondent2Flags);
+            }
+
+            @ParameterizedTest
+            @ValueSource(strings = {DEFENDANT_ONE_ID, DEFENDANT_TWO_ID})
+            void shouldCopyFlagsForRespondents(String partyChosenId) {
+                // Fix: Include all parties with their types to avoid NullPointerException
+                CaseData caseData = CaseData.builder()
+                    .applicant1(Party.builder()
+                        .type(INDIVIDUAL)  // Using static import
+                        .individualFirstName("John")
+                        .individualLastName("Doe")
+                        .flags(applicant1Flags)
+                        .build())
+                    .applicant2(Party.builder()
+                        .type(COMPANY)  // Using static import
+                        .companyName("Test Company")
+                        .flags(applicant2Flags)
+                        .build())
+                    .respondent1(Party.builder()
+                        .type(INDIVIDUAL)  // Using static import
+                        .individualFirstName("Jane")
+                        .individualLastName("Smith")
+                        .flags(respondent1Flags)
+                        .build())
+                    .respondent2(Party.builder()
+                        .type(COMPANY)  // Using static import
+                        .companyName("Defendant Corp")
+                        .flags(respondent2Flags)
+                        .build())
+                    .updateDetailsForm(UpdateDetailsForm.builder()
+                        .partyChosen(DynamicList.builder()
+                            .value(DynamicListElement.builder()
+                                .code(partyChosenId)
+                                .build())
+                            .build())
+                        .partyChosenId(partyChosenId)
+                        .build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+                // Also verify applicant flags are preserved
+                assertThat(responseCaseData.getApplicant1().getFlags()).isEqualTo(applicant1Flags);
+                assertThat(responseCaseData.getApplicant2().getFlags()).isEqualTo(applicant2Flags);
+                assertThat(responseCaseData.getRespondent1().getFlags()).isEqualTo(respondent1Flags);
+                assertThat(responseCaseData.getRespondent2().getFlags()).isEqualTo(respondent2Flags);
             }
 
             @Test
@@ -2754,11 +2860,13 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     "id").build();
                 UpdatePartyDetailsForm expert2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("Name2").build();
 
-                CaseData caseData = CaseDataBuilder.builder()
+                // Create CaseData - try using toBuilder() if available
+                CaseData caseData = CaseData.builder()
                     .updateDetailsForm(UpdateDetailsForm.builder()
                                            .updateExpertsDetailsForm(wrapElements(expert, expert2))
                                            .build())
                     .build();
+
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -2778,11 +2886,12 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 UpdatePartyDetailsForm expert2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("Name2").partyId(
                     "id").build();
 
-                CaseData caseData = CaseDataBuilder.builder()
+                CaseData caseData = CaseData.builder()
                     .updateDetailsForm(UpdateDetailsForm.builder()
                                            .updateExpertsDetailsForm(wrapElements(expert, expert2))
                                            .build())
                     .build();
+
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -2797,11 +2906,12 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     "id").build();
                 UpdatePartyDetailsForm expert2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("Name2").build();
 
-                CaseData caseData = CaseDataBuilder.builder()
+                CaseData caseData = CaseData.builder()
                     .updateDetailsForm(UpdateDetailsForm.builder()
                                            .updateExpertsDetailsForm(wrapElements(expert, expert2))
                                            .build())
                     .build();
+
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -2821,11 +2931,12 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     "id").build();
                 UpdatePartyDetailsForm party2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("Name2").build();
 
-                CaseData caseData = CaseDataBuilder.builder()
+                CaseData caseData = CaseData.builder()
                     .updateDetailsForm(UpdateDetailsForm.builder()
                                            .updateWitnessesDetailsForm(wrapElements(party, party2))
                                            .build())
                     .build();
+
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -2845,11 +2956,12 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 UpdatePartyDetailsForm party2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("Name2").partyId(
                     "id").build();
 
-                CaseData caseData = CaseDataBuilder.builder()
+                CaseData caseData = CaseData.builder()
                     .updateDetailsForm(UpdateDetailsForm.builder()
                                            .updateWitnessesDetailsForm(wrapElements(party, party2))
                                            .build())
                     .build();
+
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -2864,11 +2976,12 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     "id").build();
                 UpdatePartyDetailsForm party2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("Name2").build();
 
-                CaseData caseData = CaseDataBuilder.builder()
+                CaseData caseData = CaseData.builder()
                     .updateDetailsForm(UpdateDetailsForm.builder()
                                            .updateWitnessesDetailsForm(wrapElements(party, party2))
                                            .build())
                     .build();
+
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
