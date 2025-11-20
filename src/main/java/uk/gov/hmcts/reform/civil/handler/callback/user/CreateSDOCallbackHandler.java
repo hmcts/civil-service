@@ -910,9 +910,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         DynamicList courtList = getCourtLocationForSdoR2(preferredCourt.orElse(null), locationRefDataList);
         courtList.setValue(courtList.getListItems().get(0));
 
-        DynamicListElement hearingMethodTelephone = hearingMethodList.getListItems().stream().filter(elem -> elem.getLabel()
-            .equals(HearingMethod.TELEPHONE.getLabel())).findFirst().orElse(null);
-        hearingMethodList.setValue(hearingMethodTelephone);
+        hearingMethodList.setValue(hearingMethodList.getListItems().stream().filter(elem -> elem.getLabel()
+            .equals(HearingMethod.TELEPHONE.getLabel())).findFirst().orElse(null));
 
         updatedData.setSdoR2SmallClaimsJudgesRecital(SdoR2SmallClaimsJudgesRecital.builder().input(
             SdoR2UiConstantSmallClaim.JUDGE_RECITAL).build());
@@ -1579,7 +1578,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             CaseData.CaseDataBuilder<?, ?> dataBuilder = caseData.toBuilder();
             updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
                 callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                dataBuilder
+                caseData
             ));
             caseData = dataBuilder.build();
         }

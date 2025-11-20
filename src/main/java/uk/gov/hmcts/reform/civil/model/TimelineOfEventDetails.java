@@ -13,9 +13,9 @@ import java.time.LocalDate;
 public class TimelineOfEventDetails {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final LocalDate timelineDate;
+    private LocalDate timelineDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final String timelineDescription;
+    private String timelineDescription;
 
     @JsonCreator
     public TimelineOfEventDetails(@JsonProperty("timelineDate") LocalDate timelineDate,

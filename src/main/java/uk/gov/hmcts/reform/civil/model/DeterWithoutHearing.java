@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 @Builder
 public class DeterWithoutHearing {
 
-    private final String deterWithoutHearingLabel;
-    private final YesOrNo deterWithoutHearingYesNo;
-    private final String deterWithoutHearingWhyNot;
+    private String deterWithoutHearingLabel;
+    private YesOrNo deterWithoutHearingYesNo;
+    private String deterWithoutHearingWhyNot;
 }

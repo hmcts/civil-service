@@ -64,17 +64,17 @@ public class RespondToClaimSpecUtils {
     private final AssignCategoryId assignCategoryId;
     private final DQResponseDocumentUtils dqResponseDocumentUtils;
 
-    public static void addRespondentDocuments(CaseData.CaseDataBuilder<?, ?> updatedCaseData, List<Element<CaseDocument>> defendantUploads,
+    public static void addRespondentDocuments(CaseData caseData, List<Element<CaseDocument>> defendantUploads,
                                               ResponseDocument respondent1SpecDefenceResponseDocument, AssignCategoryId assignCategoryId) {
-        log.info("Adding respondent documents for caseId: {}", updatedCaseData.build().getCcdCaseReference());
+        log.info("Adding respondent documents for caseId: {}", caseData.getCcdCaseReference());
 
         if (respondent1SpecDefenceResponseDocument != null) {
             uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1ClaimDocument = respondent1SpecDefenceResponseDocument.getFile();
             if (respondent1ClaimDocument != null) {
-                log.debug("CaseId {}: Adding Respondent 1 claim document", updatedCaseData.build().getCcdCaseReference());
+                log.info("CaseId {}: Adding Respondent 1 claim document", caseData.getCcdCaseReference());
                 Element<CaseDocument> documentElement = buildElemCaseDocument(
                         respondent1ClaimDocument, "Defendant",
-                        updatedCaseData.build().getRespondent1ResponseDate(),
+                        caseData.getRespondent1ResponseDate(),
                         DocumentType.DEFENDANT_DEFENCE
                 );
                 assignCategoryId.assignCategoryIdToDocument(
@@ -85,7 +85,7 @@ public class RespondToClaimSpecUtils {
             }
         }
 
-        log.info("CaseId {}: Respondent documents addition complete", updatedCaseData.build().getCcdCaseReference());
+        log.info("CaseId {}: Respondent documents addition complete", caseData.getCcdCaseReference());
     }
 
     public boolean isRespondent2HasSameLegalRep(CaseData caseData) {
@@ -120,19 +120,19 @@ public class RespondToClaimSpecUtils {
 
         switch (mpScenario) {
             case ONE_V_ONE:
-                log.debug("CaseId {}: Handling ONE_V_ONE scenario", caseData.getCcdCaseReference());
+                log.info("CaseId {}: Handling ONE_V_ONE scenario", caseData.getCcdCaseReference());
                 handleOneVOneScenario(caseData, tags);
                 break;
             case TWO_V_ONE:
-                log.debug("CaseId {}: Handling TWO_V_ONE scenario", caseData.getCcdCaseReference());
+                log.info("CaseId {}: Handling TWO_V_ONE scenario", caseData.getCcdCaseReference());
                 handleTwoVOneScenario(caseData, tags);
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
-                log.debug("CaseId {}: Handling ONE_V_TWO_ONE_LEGAL_REP scenario", caseData.getCcdCaseReference());
+                log.info("CaseId {}: Handling ONE_V_TWO_ONE_LEGAL_REP scenario", caseData.getCcdCaseReference());
                 handleOneVTwoOneLegalRepScenario(caseData, tags);
                 break;
             case ONE_V_TWO_TWO_LEGAL_REP:
-                log.debug("CaseId {}: Handling ONE_V_TWO_TWO_LEGAL_REP scenario", caseData.getCcdCaseReference());
+                log.info("CaseId {}: Handling ONE_V_TWO_TWO_LEGAL_REP scenario", caseData.getCcdCaseReference());
                 handleOneVTwoTwoLegalRepScenario(caseData, tags);
                 break;
             default:
@@ -147,7 +147,7 @@ public class RespondToClaimSpecUtils {
     private void handleOneVOneScenario(CaseData caseData, Set<DefendantResponseShowTag> tags) {
         log.info("Handling ONE_V_ONE scenario for caseId: {}", caseData.getCcdCaseReference());
         if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-            log.debug("CaseId {}: Respondent 1 disputes in ONE_V_ONE scenario", caseData.getCcdCaseReference());
+            log.info("CaseId {}: Respondent 1 disputes in ONE_V_ONE scenario", caseData.getCcdCaseReference());
             tags.add(ONLY_RESPONDENT_1_DISPUTES);
         }
     }
@@ -159,7 +159,7 @@ public class RespondToClaimSpecUtils {
                 && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION)
                 || caseData.getClaimant1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
                 || caseData.getClaimant2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-            log.debug(ADDING_ONLY_RESPONDENT_1_DISPUTES_TAG, caseData.getCcdCaseReference());
+            log.info(ADDING_ONLY_RESPONDENT_1_DISPUTES_TAG, caseData.getCcdCaseReference());
             tags.add(ONLY_RESPONDENT_1_DISPUTES);
         }
     }
@@ -168,17 +168,17 @@ public class RespondToClaimSpecUtils {
         log.info("Handling ONE_V_TWO_ONE_LEGAL_REP scenario for caseId: {}", caseData.getCcdCaseReference());
 
         if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-            log.debug("CaseId {}: Respondent 1 disputes in ONE_V_TWO_ONE_LEGAL_REP scenario", caseData.getCcdCaseReference());
+            log.info("CaseId {}: Respondent 1 disputes in ONE_V_TWO_ONE_LEGAL_REP scenario", caseData.getCcdCaseReference());
             if (caseData.getRespondentResponseIsSame() == YES
                     || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-                log.debug("CaseId {}: Adding BOTH_RESPONDENTS_DISPUTE tag", caseData.getCcdCaseReference());
+                log.info("CaseId {}: Adding BOTH_RESPONDENTS_DISPUTE tag", caseData.getCcdCaseReference());
                 tags.add(DefendantResponseShowTag.BOTH_RESPONDENTS_DISPUTE);
             } else {
-                log.debug(ADDING_ONLY_RESPONDENT_1_DISPUTES_TAG, caseData.getCcdCaseReference());
+                log.info(ADDING_ONLY_RESPONDENT_1_DISPUTES_TAG, caseData.getCcdCaseReference());
                 tags.add(ONLY_RESPONDENT_1_DISPUTES);
             }
         } else if (caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-            log.debug(ADDING_ONLY_RESPONDENT_2_DISPUTES_TAG, caseData.getCcdCaseReference());
+            log.info(ADDING_ONLY_RESPONDENT_2_DISPUTES_TAG, caseData.getCcdCaseReference());
             tags.add(DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES);
         }
     }
@@ -188,11 +188,11 @@ public class RespondToClaimSpecUtils {
 
         if (caseData.getShowConditionFlags().contains(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1)
                 && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-            log.debug(ADDING_ONLY_RESPONDENT_1_DISPUTES_TAG, caseData.getCcdCaseReference());
+            log.info(ADDING_ONLY_RESPONDENT_1_DISPUTES_TAG, caseData.getCcdCaseReference());
             tags.add(ONLY_RESPONDENT_1_DISPUTES);
         } else if (caseData.getShowConditionFlags().contains(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2)
                 && caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-            log.debug(ADDING_ONLY_RESPONDENT_2_DISPUTES_TAG, caseData.getCcdCaseReference());
+            log.info(ADDING_ONLY_RESPONDENT_2_DISPUTES_TAG, caseData.getCcdCaseReference());
             tags.add(DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES);
         }
     }
@@ -218,59 +218,58 @@ public class RespondToClaimSpecUtils {
         )::contains);
     }
 
-    public void assembleResponseDocumentsSpec(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+    public void assembleResponseDocumentsSpec(CaseData caseData) {
         log.info("Assembling response documents for caseId: {}", caseData.getCcdCaseReference());
 
-        List<Element<CaseDocument>> defendantUploads = getDefendantUploads(caseData, updatedCaseData);
+        List<Element<CaseDocument>> defendantUploads = getDefendantUploads(caseData);
         log.debug("CaseId {}: Retrieved defendant uploads", caseData.getCcdCaseReference());
 
-        List<Element<CaseDocument>> additionalDocuments = dqResponseDocumentUtils.buildDefendantResponseDocuments(updatedCaseData.build());
+        List<Element<CaseDocument>> additionalDocuments = dqResponseDocumentUtils.buildDefendantResponseDocuments(caseData);
         log.debug("CaseId {}: Built additional response documents", caseData.getCcdCaseReference());
 
         defendantUploads.addAll(additionalDocuments);
         log.debug("CaseId {}: Added additional documents to defendant uploads", caseData.getCcdCaseReference());
 
         if (!defendantUploads.isEmpty()) {
-            updatedCaseData.defendantResponseDocuments(defendantUploads);
+            caseData.setDefendantResponseDocuments(defendantUploads);
             log.debug("CaseId {}: Updated case data with defendant response documents", caseData.getCcdCaseReference());
         }
 
         frcDocumentsUtils.assembleDefendantsFRCDocuments(caseData);
         log.debug("CaseId {}: Assembled defendants' FRC documents", caseData.getCcdCaseReference());
 
-        clearTempDocuments(updatedCaseData);
+        clearTempDocuments(caseData);
         log.info("CaseId {}: Response documents assembly complete", caseData.getCcdCaseReference());
     }
 
-    private List<Element<CaseDocument>> getDefendantUploads(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+    private List<Element<CaseDocument>> getDefendantUploads(CaseData caseData) {
         log.info("Retrieving defendant uploads for caseId: {}", caseData.getCcdCaseReference());
 
         List<Element<CaseDocument>> defendantUploads = nonNull(caseData.getDefendantResponseDocuments())
                 ? caseData.getDefendantResponseDocuments() : new ArrayList<>();
-        log.debug("CaseId {}: Initialized defendant uploads list", caseData.getCcdCaseReference());
+        log.info("CaseId {}: Initialized defendant uploads list", caseData.getCcdCaseReference());
 
-        addRespondent1Documents(caseData, updatedCaseData, defendantUploads);
-        log.debug("CaseId {}: Added Respondent 1 documents to defendant uploads", caseData.getCcdCaseReference());
+        addRespondent1Documents(caseData, defendantUploads);
+        log.info("CaseId {}: Added Respondent 1 documents to defendant uploads", caseData.getCcdCaseReference());
 
-        addRespondent2Documents(caseData, updatedCaseData, defendantUploads);
-        log.debug("CaseId {}: Added Respondent 2 documents to defendant uploads", caseData.getCcdCaseReference());
+        addRespondent2Documents(caseData, defendantUploads);
+        log.info("CaseId {}: Added Respondent 2 documents to defendant uploads", caseData.getCcdCaseReference());
 
         log.info("CaseId {}: Defendant uploads retrieval complete", caseData.getCcdCaseReference());
         return defendantUploads;
     }
 
-    private void addRespondent1Documents(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData, List<Element<CaseDocument>> defendantUploads) {
+    private void addRespondent1Documents(CaseData caseData, List<Element<CaseDocument>> defendantUploads) {
         log.info("Adding Respondent 1 documents for caseId: {}", caseData.getCcdCaseReference());
         ResponseDocument respondent1SpecDefenceResponseDocument = caseData.getRespondent1SpecDefenceResponseDocument();
-        addRespondentDocuments(
-                updatedCaseData,
+        addRespondentDocuments(caseData,
                 defendantUploads,
                 respondent1SpecDefenceResponseDocument,
                 assignCategoryId
         );
     }
 
-    private void addRespondent2Documents(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData, List<Element<CaseDocument>> defendantUploads) {
+    private void addRespondent2Documents(CaseData caseData, List<Element<CaseDocument>> defendantUploads) {
         log.info("Adding Respondent 2 documents for caseId: {}", caseData.getCcdCaseReference());
 
         ResponseDocument respondent2SpecDefenceResponseDocument = caseData.getRespondent2SpecDefenceResponseDocument();
@@ -281,7 +280,7 @@ public class RespondToClaimSpecUtils {
                 log.debug("CaseId {}: Adding Respondent 2 claim document", caseData.getCcdCaseReference());
                 Element<CaseDocument> documentElement = buildElemCaseDocument(
                         respondent2ClaimDocument, DEF2,
-                        updatedCaseData.build().getRespondent2ResponseDate(),
+                        caseData.getRespondent2ResponseDate(),
                         DocumentType.DEFENDANT_DEFENCE
                 );
                 assignCategoryId.assignCategoryIdToDocument(
@@ -302,23 +301,22 @@ public class RespondToClaimSpecUtils {
         }
     }
 
-    private void clearTempDocuments(CaseData.CaseDataBuilder<?, ?> builder) {
-        log.info("Clearing temporary documents for caseId: {}", builder.build().getCcdCaseReference());
+    private void clearTempDocuments(CaseData caseData) {
+        log.info("Clearing temporary documents for caseId: {}", caseData.getCcdCaseReference());
 
-        CaseData caseData = builder.build();
-        builder.respondent1SpecDefenceResponseDocument(null);
-        log.debug("CaseId {}: Cleared Respondent 1 Spec Defence Response Document", caseData.getCcdCaseReference());
+        caseData.setRespondent1SpecDefenceResponseDocument(null);
+        log.info("CaseId {}: Cleared Respondent 1 Spec Defence Response Document", caseData.getCcdCaseReference());
 
-        builder.respondent2SpecDefenceResponseDocument(null);
-        log.debug("CaseId {}: Cleared Respondent 2 Spec Defence Response Document", caseData.getCcdCaseReference());
+        caseData.setRespondent2SpecDefenceResponseDocument(null);
+        log.info("CaseId {}: Cleared Respondent 2 Spec Defence Response Document", caseData.getCcdCaseReference());
 
         if (nonNull(caseData.getRespondent1DQ())) {
-            builder.respondent1DQ(builder.build().getRespondent1DQ().toBuilder().respondent1DQDraftDirections(null).build());
-            log.debug("CaseId {}: Cleared Respondent 1 DQ Draft Directions", caseData.getCcdCaseReference());
+            caseData.setRespondent1DQ(caseData.getRespondent1DQ().toBuilder().respondent1DQDraftDirections(null).build());
+            log.info("CaseId {}: Cleared Respondent 1 DQ Draft Directions", caseData.getCcdCaseReference());
         }
         if (nonNull(caseData.getRespondent2DQ())) {
-            builder.respondent2DQ(builder.build().getRespondent2DQ().toBuilder().respondent2DQDraftDirections(null).build());
-            log.debug("CaseId {}: Cleared Respondent 2 DQ Draft Directions", caseData.getCcdCaseReference());
+            caseData.setRespondent2DQ(caseData.getRespondent2DQ().toBuilder().respondent2DQDraftDirections(null).build());
+            log.info("CaseId {}: Cleared Respondent 2 DQ Draft Directions", caseData.getCcdCaseReference());
         }
     }
 }

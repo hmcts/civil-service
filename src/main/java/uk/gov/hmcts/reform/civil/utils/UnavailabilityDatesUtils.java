@@ -31,10 +31,10 @@ public class UnavailabilityDatesUtils {
         //NO-OP
     }
 
-    public static void rollUpUnavailabilityDatesForRespondent(CaseData.CaseDataBuilder<?, ?> builder) {
-        CaseData caseData = builder.build();
+    public static void rollUpUnavailabilityDatesForRespondent(CaseData caseData) {
         if (caseData.getRespondent1DQ() != null && caseData.getRespondent1DQ().getHearing() != null
-            && caseData.getRespondent1DQ().getHearing().getUnavailableDates() != null) {
+            && caseData.getRespondent1DQ().getHearing().getUnavailableDates() != null
+            && caseData.getRespondent1ResponseDate() != null) {
 
             List<Element<UnavailableDate>> respondent1DQUnavailableDates = caseData.getRespondent1DQ().getHearing()
                 .getUnavailableDates();
@@ -47,18 +47,19 @@ public class UnavailabilityDatesUtils {
 
             Party.PartyBuilder resp1 = caseData.getRespondent1().toBuilder()
                 .unavailableDates(updatedUnavailableDates);
-            builder.respondent1(resp1.build())
-                .respondent1UnavailableDatesForTab(updatedUnavailableDates);
+            caseData.setRespondent1(resp1.build());
+            caseData.setRespondent1UnavailableDatesForTab(updatedUnavailableDates);
 
             if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
                 Party.PartyBuilder resp2 = caseData.getRespondent2().toBuilder()
                     .unavailableDates(updatedUnavailableDates);
-                builder.respondent2(resp2.build())
-                    .respondent2UnavailableDatesForTab(updatedUnavailableDates);
+                caseData.setRespondent2(resp2.build());
+                caseData.setRespondent2UnavailableDatesForTab(updatedUnavailableDates);
             }
         }
         if (caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getHearing() != null
-            && caseData.getRespondent2DQ().getHearing().getUnavailableDates() != null) {
+            && caseData.getRespondent2DQ().getHearing().getUnavailableDates() != null
+            && caseData.getRespondent2ResponseDate() != null) {
 
             List<Element<UnavailableDate>> respondent2DQUnavailableDates =
                 caseData.getRespondent2DQ().getHearing().getUnavailableDates();
@@ -70,15 +71,15 @@ public class UnavailabilityDatesUtils {
 
             Party.PartyBuilder resp2 = caseData.getRespondent2().toBuilder()
                 .unavailableDates(updatedUnavailableDates);
-            builder.respondent2(resp2.build())
-                .respondent2UnavailableDatesForTab(updatedUnavailableDates);
+            caseData.setRespondent2(resp2.build());
+            caseData.setRespondent2UnavailableDatesForTab(updatedUnavailableDates);
         }
     }
 
-    public static void rollUpUnavailabilityDatesForApplicant(CaseData.CaseDataBuilder<?, ?> builder) {
-        CaseData caseData = builder.build();
+    public static void rollUpUnavailabilityDatesForApplicant(CaseData caseData) {
         if (caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getHearing() != null
-            && caseData.getApplicant1DQ().getHearing().getUnavailableDates() != null) {
+            && caseData.getApplicant1DQ().getHearing().getUnavailableDates() != null
+            && caseData.getApplicant1ResponseDate() != null) {
 
             List<Element<UnavailableDate>> applicant1DQUnavailableDates =
                 caseData.getApplicant1DQ().getHearing().getUnavailableDates();
@@ -91,14 +92,14 @@ public class UnavailabilityDatesUtils {
 
             Party.PartyBuilder applicant1 = caseData.getApplicant1().toBuilder()
                 .unavailableDates(updatedUnavailableDates);
-            builder.applicant1(applicant1.build())
-                .applicant1UnavailableDatesForTab(updatedUnavailableDates);
+            caseData.setApplicant1(applicant1.build());
+            caseData.setApplicant1UnavailableDatesForTab(updatedUnavailableDates);
 
             if (caseData.getApplicant2() != null) {
                 Party.PartyBuilder applicant2 = caseData.getApplicant2().toBuilder()
                     .unavailableDates(updatedUnavailableDates);
-                builder.applicant2(applicant2.build())
-                    .applicant2UnavailableDatesForTab(updatedUnavailableDates);
+                caseData.setApplicant2(applicant2.build());
+                caseData.setApplicant2UnavailableDatesForTab(updatedUnavailableDates);
             }
         }
     }
@@ -221,7 +222,7 @@ public class UnavailabilityDatesUtils {
         LocalDate dateAdded = null;
 
         // Claimant event
-        if (isClaimantIntentionEvent(caseData)) {
+        if (isClaimantIntentionEvent(caseData) && caseData.getApplicant1ResponseDate() != null) {
             eventAdded = CLAIMANT_INTENTION_EVENT;
             dateAdded = caseData.getApplicant1ResponseDate().toLocalDate();
             // DJ event
@@ -255,7 +256,8 @@ public class UnavailabilityDatesUtils {
         // No DJ check because only claimant solicitor can run DJ
         if (caseData.getRespondent1DQ() != null
             && caseData.getRespondent1DQ().getHearing() != null
-            && YES.equals(caseData.getRespondent1DQ().getHearing().getUnavailableDatesRequired())) {
+            && YES.equals(caseData.getRespondent1DQ().getHearing().getUnavailableDatesRequired())
+            && caseData.getRespondent1ResponseDate() != null) {
             eventAdded = DEFENDANT_RESPONSE_EVENT;
             dateAdded = caseData.getRespondent1ResponseDate().toLocalDate();
         }
@@ -278,7 +280,8 @@ public class UnavailabilityDatesUtils {
         // No DJ check because only claimant solicitor can run DJ
         if (caseData.getRespondent2DQ() != null
             && caseData.getRespondent2DQ().getHearing() != null
-            && YES.equals(caseData.getRespondent2DQ().getHearing().getUnavailableDatesRequired())) {
+            && YES.equals(caseData.getRespondent2DQ().getHearing().getUnavailableDatesRequired())
+            && caseData.getRespondent2ResponseDate() != null) {
             eventAdded = DEFENDANT_RESPONSE_EVENT;
             dateAdded = caseData.getRespondent2ResponseDate().toLocalDate();
         }
@@ -296,7 +299,7 @@ public class UnavailabilityDatesUtils {
 
     public static void updateMissingUnavailableDatesForApplicants(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
         if (isClaimantIntentionEvent(caseData)) {
-            rollUpUnavailabilityDatesForApplicant(builder);
+            rollUpUnavailabilityDatesForApplicant(caseData);
         } else {
             rollUpUnavailabilityDatesForApplicantDJ(caseData);
         }

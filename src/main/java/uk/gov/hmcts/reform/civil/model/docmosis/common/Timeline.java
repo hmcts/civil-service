@@ -16,9 +16,9 @@ public class Timeline {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate timelineDate;
+    private LocalDate timelineDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final String timelineDescription;
+    private String timelineDescription;
 
     @JsonCreator
     public Timeline(@JsonProperty("timelineDate") LocalDate timelineDate,

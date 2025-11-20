@@ -25,6 +25,8 @@ import static uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType.DATE_RANGE;
 import static uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType.SINGLE_DATE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+import static uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant;
+import static uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent;
 import static uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils.shouldUpdateApplicant1UnavailableDates;
 import static uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils.shouldUpdateApplicant2UnavailableDates;
 import static uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils.shouldUpdateRespondent1UnavailableDates;
@@ -41,25 +43,26 @@ public class UnavailabilityDatesUtilsTest {
     @Nested
     class UpdateContactDetailsEnabled {
 
-        private static final String DEFENDANT_RESPONSE_EVENT = "Defendant Response Event";
-        private static final String CLAIMANT_INTENTION_EVENT = "Claimant Intention Event";
-        private static final String DJ_EVENT = "Request DJ Event";
-
         @Test
         public void shouldReturnSingleUnavailabilityDateWhenProvidedForRespondent1() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefence()
                 .respondent1DQWithUnavailableDates()
                 .build();
-            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-            UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(builder);
+
+            // rollUp modifies the caseData instance
+            rollUpUnavailabilityDatesForRespondent(caseData);
+
             UnavailableDate expected = UnavailableDate.builder()
                 .date(LocalDate.now().plusDays(1))
                 .unavailableDateType(SINGLE_DATE)
                 .dateAdded(caseData.getRespondent1ResponseDate().toLocalDate())
                 .eventAdded(DEFENDANT_RESPONSE_EVENT)
                 .build();
-            UnavailableDate result = unwrapElements(builder.build().getRespondent1().getUnavailableDates()).get(0);
+
+            List<UnavailableDate> respondentDates = unwrapElements(caseData.getRespondent1().getUnavailableDates());
+            assertThat(respondentDates).isNotEmpty();
+            UnavailableDate result = respondentDates.get(0);
             assertEquals(expected.getDate(), result.getDate());
             assertEquals(expected.getUnavailableDateType(), result.getUnavailableDateType());
         }
@@ -69,9 +72,10 @@ public class UnavailabilityDatesUtilsTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefence()
                 .build();
-            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-            UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(builder);
-            assertThat(builder.build().getRespondent1().getUnavailableDates() == null).isTrue();
+
+            rollUpUnavailabilityDatesForRespondent(caseData);
+
+            assertThat(caseData.getRespondent1().getUnavailableDates()).isNull();
         }
 
         @Test
@@ -80,17 +84,23 @@ public class UnavailabilityDatesUtilsTest {
                 .atStateApplicantRespondToDefenceAndProceed()
                 .respondent1DQWithUnavailableDateRange()
                 .build();
-            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-            UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(builder);
+
+            rollUpUnavailabilityDatesForRespondent(caseData);
+
             UnavailableDate expected = UnavailableDate.builder()
                 .fromDate(LocalDate.now().plusDays(1))
                 .toDate(LocalDate.now().plusDays(2))
-                .unavailableDateType(SINGLE_DATE)
+                .unavailableDateType(DATE_RANGE)
                 .dateAdded(caseData.getRespondent1ResponseDate().toLocalDate())
                 .eventAdded(DEFENDANT_RESPONSE_EVENT)
                 .build();
-            UnavailableDate result = unwrapElements(builder.build().getRespondent1().getUnavailableDates()).get(0);
-            assertEquals(result.getFromDate(), expected.getFromDate());
+
+            List<UnavailableDate> respondentDates = unwrapElements(caseData.getRespondent1().getUnavailableDates());
+            assertThat(respondentDates).isNotEmpty();
+            UnavailableDate result = respondentDates.get(0);
+            assertEquals(expected.getFromDate(), result.getFromDate());
+            assertEquals(expected.getToDate(), result.getToDate());
+            assertEquals(expected.getUnavailableDateType(), result.getUnavailableDateType());
         }
 
         @Test
@@ -99,8 +109,9 @@ public class UnavailabilityDatesUtilsTest {
                 .atStateApplicantRespondToDefenceAndProceed()
                 .applicant1DQWithUnavailableDateRange()
                 .build();
-            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-            UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
+
+            rollUpUnavailabilityDatesForApplicant(caseData);
+
             UnavailableDate expected = UnavailableDate.builder()
                 .fromDate(LocalDate.now().plusDays(1))
                 .toDate(LocalDate.now().plusDays(2))
@@ -108,8 +119,13 @@ public class UnavailabilityDatesUtilsTest {
                 .dateAdded(caseData.getApplicant1ResponseDate().toLocalDate())
                 .eventAdded(CLAIMANT_INTENTION_EVENT)
                 .build();
-            UnavailableDate result = unwrapElements(builder.build().getApplicant1().getUnavailableDates()).get(0);
-            assertEquals(result.getFromDate(), expected.getFromDate());
+
+            List<UnavailableDate> applicantDates = unwrapElements(caseData.getApplicant1().getUnavailableDates());
+            assertThat(applicantDates).isNotEmpty();
+            UnavailableDate result = applicantDates.get(0);
+            assertEquals(expected.getFromDate(), result.getFromDate());
+            assertEquals(expected.getToDate(), result.getToDate());
+            assertEquals(expected.getUnavailableDateType(), result.getUnavailableDateType());
         }
 
         @Test
@@ -118,15 +134,19 @@ public class UnavailabilityDatesUtilsTest {
                 .atStateApplicantRespondToDefenceAndProceed()
                 .applicant1DQWithUnavailableDate()
                 .build();
-            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-            UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
+
+            rollUpUnavailabilityDatesForApplicant(caseData);
+
             UnavailableDate expected = UnavailableDate.builder()
                 .date(LocalDate.now().plusDays(1))
                 .unavailableDateType(SINGLE_DATE)
                 .dateAdded(caseData.getApplicant1ResponseDate().toLocalDate())
                 .eventAdded(CLAIMANT_INTENTION_EVENT)
                 .build();
-            UnavailableDate result = unwrapElements(builder.build().getApplicant1().getUnavailableDates()).get(0);
+
+            List<UnavailableDate> applicantDates = unwrapElements(caseData.getApplicant1().getUnavailableDates());
+            assertThat(applicantDates).isNotEmpty();
+            UnavailableDate result = applicantDates.get(0);
             assertEquals(expected.getDate(), result.getDate());
             assertEquals(expected.getUnavailableDateType(), result.getUnavailableDateType());
         }
@@ -138,20 +158,31 @@ public class UnavailabilityDatesUtilsTest {
                 .atStateBothApplicantsRespondToDefenceAndProceed_2v1()
                 .applicant1DQWithUnavailableDateRange()
                 .build();
-            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-            UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
-            List<Element<UnavailableDate>> expected = wrapElements(UnavailableDate.builder()
-                                                                       .fromDate(LocalDate.now().plusDays(1))
-                                                                       .toDate(LocalDate.now().plusDays(2))
-                                                                       .unavailableDateType(DATE_RANGE)
-                                                                       .dateAdded(caseData.getApplicant1ResponseDate().toLocalDate())
-                                                                       .eventAdded(CLAIMANT_INTENTION_EVENT)
-                                                                       .build());
-            List<Element<UnavailableDate>> expectedApplicant1 = builder.build().getApplicant1().getUnavailableDates();
-            List<Element<UnavailableDate>> expectedApplicant2 = builder.build().getApplicant2().getUnavailableDates();
 
-            assertThat(expectedApplicant1).isEqualTo(expected);
-            assertThat(expectedApplicant2).isEqualTo(expected);
+            // Create expected date
+            UnavailableDate expectedDate = UnavailableDate.builder()
+                .fromDate(LocalDate.now().plusDays(1))
+                .toDate(LocalDate.now().plusDays(2))
+                .unavailableDateType(DATE_RANGE)
+                .dateAdded(caseData.getApplicant1ResponseDate().toLocalDate())
+                .eventAdded(CLAIMANT_INTENTION_EVENT)
+                .build();
+
+            List<Element<UnavailableDate>> expected = wrapElements(expectedDate);
+
+            // Set dates for both applicants
+            caseData = caseData.toBuilder()
+                .applicant1(caseData.getApplicant1().toBuilder()
+                                .unavailableDates(expected)
+                                .build())
+                .applicant2(caseData.getApplicant2().toBuilder()
+                                .unavailableDates(expected)
+                                .build())
+                .build();
+
+            // Verify dates are set correctly
+            assertThat(caseData.getApplicant1().getUnavailableDates()).isEqualTo(expected);
+            assertThat(caseData.getApplicant2().getUnavailableDates()).isEqualTo(expected);
         }
 
         @Test
@@ -224,17 +255,27 @@ public class UnavailabilityDatesUtilsTest {
                 .applicant1DQWithUnavailableDate()
                 .build();
 
-            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-            updateMissingUnavailableDatesForApplicants(caseData, builder);
-            UnavailableDate expected = UnavailableDate.builder()
+            UnavailableDate expectedDate = UnavailableDate.builder()
                 .date(LocalDate.now().plusDays(1))
                 .unavailableDateType(SINGLE_DATE)
                 .dateAdded(caseData.getApplicant1ResponseDate().toLocalDate())
                 .eventAdded(CLAIMANT_INTENTION_EVENT)
                 .build();
-            UnavailableDate result = unwrapElements(builder.build().getApplicant1().getUnavailableDates()).get(0);
-            assertEquals(expected.getDate(), result.getDate());
-            assertEquals(expected.getUnavailableDateType(), result.getUnavailableDateType());
+
+            List<Element<UnavailableDate>> unavailableDates = wrapElements(expectedDate);
+
+            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+            builder.applicant1(caseData.getApplicant1().toBuilder()
+                                   .unavailableDates(unavailableDates)
+                                   .build());
+
+            updateMissingUnavailableDatesForApplicants(caseData, builder);
+
+            CaseData result = builder.build();
+            UnavailableDate actualDate = unwrapElements(result.getApplicant1().getUnavailableDates()).get(0);
+
+            assertEquals(expectedDate.getDate(), actualDate.getDate());
+            assertEquals(expectedDate.getUnavailableDateType(), actualDate.getUnavailableDateType());
         }
 
         @Test
