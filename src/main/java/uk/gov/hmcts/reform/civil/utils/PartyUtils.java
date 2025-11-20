@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import org.apache.commons.lang.StringUtils;
+
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -161,6 +163,15 @@ public class PartyUtils {
         return stringBuilder.toString();
     }
 
+    public static String addTrialOrHearing(CaseData caseData) {
+
+        if (caseData.getAllocatedTrack() == AllocatedTrack.FAST_CLAIM) {
+            return "trial";
+        } else {
+            return "hearing";
+        }
+    }
+
     public static String buildClaimantReferenceOnly(CaseData caseData) {
         SolicitorReferences solicitorReferences = caseData.getSolicitorReferences();
         StringBuilder stringBuilder = new StringBuilder();
@@ -242,9 +253,13 @@ public class PartyUtils {
             //case where respondent 2 acknowledges first
             isAcknowledgeUserRespondentTwo = true;
         } else if (resp1AcknowledgedDate != null && resp2AcknowledgedDate != null) {
-            //case where respondent 2 acknowledges 2nd
-            //case where respondent 1 acknowledges 2nd
-            isAcknowledgeUserRespondentTwo = resp2AcknowledgedDate.isAfter(resp1AcknowledgedDate);
+            if (resp2AcknowledgedDate.isAfter(resp1AcknowledgedDate)) {
+                //case where respondent 2 acknowledges 2nd
+                isAcknowledgeUserRespondentTwo = true;
+            } else {
+                //case where respondent 1 acknowledges 2nd
+                isAcknowledgeUserRespondentTwo = false;
+            }
         } else {
             //case where respondent 1 acknowledges first
             isAcknowledgeUserRespondentTwo = false;
@@ -454,18 +469,6 @@ public class PartyUtils {
         caseData.setRespondent2LitigationFriend(appendWithNewPartyId(caseData.getRespondent2LitigationFriend()));
     }
 
-    public static CaseData populateWithPartyIds(CaseData caseData) {
-        caseData.setApplicant1(appendWithNewPartyId(caseData.getApplicant1()));
-        caseData.setApplicant2(appendWithNewPartyId(caseData.getApplicant2()));
-        caseData.setRespondent1(appendWithNewPartyId(caseData.getRespondent1()));
-        caseData.setRespondent2(appendWithNewPartyId(caseData.getRespondent2()));
-        caseData.setApplicant1LitigationFriend(appendWithNewPartyId(caseData.getApplicant1LitigationFriend()));
-        caseData.setApplicant2LitigationFriend(appendWithNewPartyId(caseData.getApplicant2LitigationFriend()));
-        caseData.setRespondent1LitigationFriend(appendWithNewPartyId(caseData.getRespondent1LitigationFriend()));
-        caseData.setRespondent2LitigationFriend(appendWithNewPartyId(caseData.getRespondent2LitigationFriend()));
-        return caseData;
-    }
-
     public static void populateWitnessAndExpertsPartyIds(CaseData.CaseDataBuilder<?, ?> builder) {
         CaseData caseData = builder.build();
         builder
@@ -486,36 +489,5 @@ public class PartyUtils {
         caseData.setApplicant2OrgIndividuals(appendWithNewPartyIds(caseData.getApplicant2OrgIndividuals()));
         caseData.setRespondent1OrgIndividuals(appendWithNewPartyIds(caseData.getRespondent1OrgIndividuals()));
         caseData.setRespondent2OrgIndividuals(appendWithNewPartyIds(caseData.getRespondent2OrgIndividuals()));
-    public static CaseData populateWitnessAndExpertsPartyIds(CaseData caseData) {
-        caseData.setApplicantExperts(appendWithNewPartyIds(caseData.getApplicantExperts()));
-        caseData.setRespondent1Experts(appendWithNewPartyIds(caseData.getRespondent1Experts()));
-        caseData.setRespondent2Experts(appendWithNewPartyIds(caseData.getRespondent2Experts()));
-        caseData.setApplicantWitnesses(appendWithNewPartyIds(caseData.getApplicantWitnesses()));
-        caseData.setRespondent1Witnesses(appendWithNewPartyIds(caseData.getRespondent1Witnesses()));
-        caseData.setRespondent2Witnesses(appendWithNewPartyIds(caseData.getRespondent2Witnesses()));
-        return caseData;
-    }
-
-    public static void populatePartyIndividuals(CaseData.CaseDataBuilder<?, ?> builder) {
-        CaseData caseData = builder.build();
-        builder
-            .applicant1LRIndividuals(appendWithNewPartyIds(caseData.getApplicant1LRIndividuals()))
-            .respondent1LRIndividuals(appendWithNewPartyIds(caseData.getRespondent1LRIndividuals()))
-            .respondent2LRIndividuals(appendWithNewPartyIds(caseData.getRespondent2LRIndividuals()))
-            .applicant1OrgIndividuals(appendWithNewPartyIds(caseData.getApplicant1OrgIndividuals()))
-            .applicant2OrgIndividuals(appendWithNewPartyIds(caseData.getApplicant2OrgIndividuals()))
-            .respondent1OrgIndividuals(appendWithNewPartyIds(caseData.getRespondent1OrgIndividuals()))
-            .respondent2OrgIndividuals(appendWithNewPartyIds(caseData.getRespondent2OrgIndividuals()));
-    }
-
-    public static CaseData populatePartyIndividuals(CaseData caseData) {
-        caseData.setApplicant1LRIndividuals(appendWithNewPartyIds(caseData.getApplicant1LRIndividuals()));
-        caseData.setRespondent1LRIndividuals(appendWithNewPartyIds(caseData.getRespondent1LRIndividuals()));
-        caseData.setRespondent2LRIndividuals(appendWithNewPartyIds(caseData.getRespondent2LRIndividuals()));
-        caseData.setApplicant1OrgIndividuals(appendWithNewPartyIds(caseData.getApplicant1OrgIndividuals()));
-        caseData.setApplicant2OrgIndividuals(appendWithNewPartyIds(caseData.getApplicant2OrgIndividuals()));
-        caseData.setRespondent1OrgIndividuals(appendWithNewPartyIds(caseData.getRespondent1OrgIndividuals()));
-        caseData.setRespondent2OrgIndividuals(appendWithNewPartyIds(caseData.getRespondent2OrgIndividuals()));
-        return caseData;
     }
 }

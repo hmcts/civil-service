@@ -316,21 +316,6 @@ public class CaseFlagUtils {
         }
     }
 
-    private static void updatePartyFlags(CaseData caseData, String partyChosen) {
-        if (CLAIMANT_ONE_ID.equals(partyChosen) && caseData.getApplicant1().getFlags() != null) {
-            caseData.setApplicant1(updatePartyNameForFlags(caseData.getApplicant1()));
-        }
-        if (CLAIMANT_TWO_ID.equals(partyChosen) && caseData.getApplicant2().getFlags() != null) {
-            caseData.setApplicant2(updatePartyNameForFlags(caseData.getApplicant2()));
-        }
-        if (DEFENDANT_ONE_ID.equals(partyChosen) && caseData.getRespondent1().getFlags() != null) {
-            caseData.setRespondent1(updatePartyNameForFlags(caseData.getRespondent1()));
-        }
-        if (DEFENDANT_TWO_ID.equals(partyChosen) && caseData.getRespondent2().getFlags() != null) {
-            caseData.setRespondent2(updatePartyNameForFlags(caseData.getRespondent2()));
-        }
-    }
-
     private static List<Element<PartyFlagStructure>> updatePartyNameForPartyFlagStructures(List<Element<PartyFlagStructure>> individuals,
                                                                                            String roleOnCase) {
         if (individuals != null && !individuals.isEmpty()) {

@@ -232,44 +232,6 @@ public class LocationHelper {
         return matchingLocation;
     }
 
-    /**
-     * The caseManagementLocation is given by the requestedCourt's caseLocation field. If there is a matching location,
-     * we can also populate the locationName field.
-     *
-     * @param caseData    data to update
-     * @param requestedCourt the requested court to be used for the case
-     * @param getLocations   how to get the list of locations
-     * @return matching location
-     */
-    public Optional<LocationRefData> updateCaseManagementLocation(CaseData caseData,
-                                                                  RequestedCourt requestedCourt,
-                                                                  Supplier<List<LocationRefData>> getLocations) {
-        Optional<LocationRefData> matchingLocation = getMatching(getLocations.get(), requestedCourt);
-        Long reference = caseData.getCcdCaseReference();
-        if (log.isInfoEnabled()) {
-            Optional.ofNullable(requestedCourt)
-                .map(RequestedCourt::getCaseLocation)
-                .map(CaseLocationCivil::getBaseLocation)
-                .ifPresentOrElse(baseLocation -> log.info("Case {}, requested court is {}", reference, baseLocation),
-                                 () -> log.info("Case {}, requested court or location is missing", reference)
-                );
-            log.info(
-                "Case {}, there {} a location matching to requested court",
-                reference,
-                matchingLocation.isPresent() ? "is" : "is not"
-            );
-        }
-        caseData.setCaseManagementLocation(Stream.of(
-                Optional.ofNullable(requestedCourt).map(RequestedCourt::getCaseLocation),
-                matchingLocation.map(LocationHelper::buildCaseLocation)
-            ).filter(Optional::isPresent)
-                                               .map(Optional::get)
-                                               .filter(this::isValidCaseLocation)
-                                               .findFirst().orElseGet(CaseLocationCivil::new));
-        matchingLocation.map(LocationRefData::getSiteName).ifPresent(caseData::setLocationName);
-        return matchingLocation;
-    }
-
     private boolean isValidCaseLocation(CaseLocationCivil caseLocation) {
         return caseLocation != null && StringUtils.isNotBlank(caseLocation.getBaseLocation())
             && StringUtils.isNotBlank(caseLocation.getRegion());

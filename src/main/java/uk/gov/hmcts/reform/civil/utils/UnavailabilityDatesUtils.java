@@ -104,32 +104,6 @@ public class UnavailabilityDatesUtils {
         }
     }
 
-    public static CaseData rollUpUnavailabilityDatesForApplicant(CaseData caseData) {
-        if (caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getHearing() != null
-            && caseData.getApplicant1DQ().getHearing().getUnavailableDates() != null) {
-
-            List<Element<UnavailableDate>> applicant1DQUnavailableDates =
-                caseData.getApplicant1DQ().getHearing().getUnavailableDates();
-
-            List<Element<UnavailableDate>> updatedUnavailableDates = addEventAndDate(
-                caseData.getApplicant1ResponseDate().toLocalDate(),
-                CLAIMANT_INTENTION_EVENT,
-                applicant1DQUnavailableDates
-            );
-
-            caseData.setApplicant1(caseData.getApplicant1().toBuilder()
-                                       .unavailableDates(updatedUnavailableDates).build());
-            caseData.setApplicant1UnavailableDatesForTab(updatedUnavailableDates);
-
-            if (caseData.getApplicant2() != null) {
-                caseData.setApplicant2(caseData.getApplicant2().toBuilder()
-                                           .unavailableDates(updatedUnavailableDates).build());
-                caseData.setApplicant2UnavailableDatesForTab(updatedUnavailableDates);
-            }
-        }
-        return caseData;
-    }
-
     public static void rollUpUnavailabilityDatesForApplicantDJ(CaseData.CaseDataBuilder<?, ?> builder) {
         CaseData caseData = builder.build();
         if (caseData.getHearingSupportRequirementsDJ() != null
@@ -314,7 +288,7 @@ public class UnavailabilityDatesUtils {
             eventAdded = DJ_EVENT;
             dateAdded = caseData.getDefaultJudgmentDocuments().get(0).getValue().getCreatedDatetime().toLocalDate();
         }
-// Todo: dates only considered from applicant 1. is it correct?
+        // Todo: dates only considered from applicant 1. is it correct?
         List<Element<UnavailableDate>> dates = getExistingDates(
                 caseData.getApplicant1().getUnavailableDates(),
                 eventAdded,
