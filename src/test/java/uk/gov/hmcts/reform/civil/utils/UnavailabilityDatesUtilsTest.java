@@ -264,15 +264,13 @@ public class UnavailabilityDatesUtilsTest {
 
             List<Element<UnavailableDate>> unavailableDates = wrapElements(expectedDate);
 
-            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-            builder.applicant1(caseData.getApplicant1().toBuilder()
+            caseData.setApplicant1(caseData.getApplicant1().toBuilder()
                                    .unavailableDates(unavailableDates)
                                    .build());
 
-            updateMissingUnavailableDatesForApplicants(caseData, builder);
+            updateMissingUnavailableDatesForApplicants(caseData);
 
-            CaseData result = builder.build();
-            UnavailableDate actualDate = unwrapElements(result.getApplicant1().getUnavailableDates()).get(0);
+            UnavailableDate actualDate = unwrapElements(caseData.getApplicant1().getUnavailableDates()).get(0);
 
             assertEquals(expectedDate.getDate(), actualDate.getDate());
             assertEquals(expectedDate.getUnavailableDateType(), actualDate.getUnavailableDateType());
@@ -287,8 +285,7 @@ public class UnavailabilityDatesUtilsTest {
 
             LocalDate dateAdded = LocalDate.now();
 
-            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-            updateMissingUnavailableDatesForApplicants(caseData, builder);
+            updateMissingUnavailableDatesForApplicants(caseData);
 
             UnavailableDate expectedSingleDate = UnavailableDate.builder()
                 .unavailableDateType(SINGLE_DATE)
@@ -307,7 +304,7 @@ public class UnavailabilityDatesUtilsTest {
 
             List<Element<UnavailableDate>> expected = wrapElements(List.of(expectedSingleDate, expectedDateRange));
 
-            assertThat(builder.build().getApplicant1().getUnavailableDates()).isEqualTo(expected);
+            assertThat(caseData.getApplicant1().getUnavailableDates()).isEqualTo(expected);
         }
 
         @Test

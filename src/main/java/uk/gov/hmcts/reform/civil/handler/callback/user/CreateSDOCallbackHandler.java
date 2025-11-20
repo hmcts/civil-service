@@ -1575,12 +1575,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
 
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-            CaseData.CaseDataBuilder<?, ?> dataBuilder = caseData.toBuilder();
             updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
                 callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
                 caseData
             ));
-            caseData = dataBuilder.build();
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

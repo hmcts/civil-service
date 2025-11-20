@@ -297,7 +297,7 @@ public class UnavailabilityDatesUtils {
             .respondent2UnavailableDatesForTab(dates);
     }
 
-    public static void updateMissingUnavailableDatesForApplicants(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+    public static void updateMissingUnavailableDatesForApplicants(CaseData caseData) {
         if (isClaimantIntentionEvent(caseData)) {
             rollUpUnavailabilityDatesForApplicant(caseData);
         } else {
