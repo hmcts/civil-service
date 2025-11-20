@@ -6,6 +6,8 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingOnRadioOptions;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2AddendumReport;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ApplicationToRelyOnFurther;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ApplicationToRelyOnFurtherDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2DisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FurtherAudiogram;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
@@ -126,8 +128,8 @@ public class SdoValidationService {
         var claimantExpert = caseData.getSdoR2QuestionsClaimantExpert();
         if (claimantExpert != null) {
             Optional.ofNullable(claimantExpert.getSdoApplicationToRelyOnFurther())
-                    .map(uk.gov.hmcts.reform.civil.model.sdo.SdoR2ApplicationToRelyOnFurther::getApplicationToRelyOnFurtherDetails)
-                    .map(uk.gov.hmcts.reform.civil.model.sdo.SdoR2ApplicationToRelyOnFurtherDetails::getApplicationToRelyDetailsDate).flatMap(this::validateFutureDate).ifPresent(errors::add);
+                    .map(SdoR2ApplicationToRelyOnFurther::getApplicationToRelyOnFurtherDetails)
+                    .map(SdoR2ApplicationToRelyOnFurtherDetails::getApplicationToRelyDetailsDate).flatMap(this::validateFutureDate).ifPresent(errors::add);
 
             validateDates(errors,
                 claimantExpert.getSdoQuestionsShallBeAnsweredDate(),
