@@ -40,7 +40,7 @@ public class NotifyClaimHelper {
     }
 
     protected boolean checkIfThisDefendantToBeNotified(final CaseData caseData, String defendantName) {
-        String defendantNotifyClaimInfo = Optional.ofNullable(caseData.getDefendantDetails())
+        String defendantNotifyClaimInfo = Optional.ofNullable(caseData.getDefendantSolicitorNotifyClaimOptions())
             .map(DynamicList::getValue)
             .map(DynamicListElement::getLabel)
             .orElse("");
