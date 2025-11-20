@@ -165,9 +165,8 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             ));
         }
 
-        if ((AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack())
-            || AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack()))
-            && featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+        if (AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack())
+            || AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())) {
             caseData.setIsMintiLipCase(YES);
         }
 

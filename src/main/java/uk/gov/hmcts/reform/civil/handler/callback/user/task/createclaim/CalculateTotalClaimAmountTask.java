@@ -7,22 +7,18 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class CalculateTotalClaimAmountTask {
 
-    private final FeatureToggleService featureToggleService;
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public CalculateTotalClaimAmountTask(FeatureToggleService featureToggleService, ObjectMapper objectMapper) {
-        this.featureToggleService = featureToggleService;
+    public CalculateTotalClaimAmountTask(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
@@ -47,15 +43,6 @@ public class CalculateTotalClaimAmountTask {
                 .append(" |\n");
         }
         totalAmount = totalAmount.concat(stringBuilder.toString());
-
-        List<String> errors = new ArrayList<>();
-        if (!featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
-            && MonetaryConversions.penniesToPounds(totalClaimAmount).doubleValue() > 25000) {
-            errors.add("Total Claim Amount cannot exceed £ 25,000");
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(errors)
-                .build();
-        }
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 

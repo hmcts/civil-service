@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGeneratorWithAuth;
@@ -27,9 +26,7 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V1_FAST_TRACK_INT;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V2_DS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V2_DS_FAST_TRACK_INT;
 
 @Slf4j
@@ -39,7 +36,6 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
-    protected final FeatureToggleService featureToggleService;
     protected final DQGeneratorFormBuilder dqGeneratorFormBuilder;
     private final RespondentTemplateForDQGenerator respondentTemplateForDQGenerator;
 
@@ -68,8 +64,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         DocmosisTemplates templateId;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             if (isClaimantResponse(caseData)) {
-                templateId = featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
-                    ? DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT : DocmosisTemplates.CLAIMANT_RESPONSE_SPEC;
+                templateId = DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT;
             } else {
                 templateId = DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_FAST_TRACK_INT;
             }
@@ -80,27 +75,23 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     }
 
     private DocmosisTemplates getDocmosisTemplate(CaseData caseData) {
-        boolean isMinti = featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
-        DocmosisTemplates templateId = isMinti ? DQ_RESPONSE_1V1_FAST_TRACK_INT : DQ_RESPONSE_1V1;
+        DocmosisTemplates templateId = DQ_RESPONSE_1V1_FAST_TRACK_INT;
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
                 if (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData)) {
-                    templateId = isMinti
-                        ? DQ_RESPONSE_1V2_DS_FAST_TRACK_INT : DQ_RESPONSE_1V2_DS;
+                    templateId = DQ_RESPONSE_1V2_DS_FAST_TRACK_INT;
                 }
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
-                    templateId = isMinti
-                        ? DocmosisTemplates.DQ_RESPONSE_1V2_SS_FAST_TRACK_INT : DocmosisTemplates.DQ_RESPONSE_1V2_SS;
+                    templateId = DocmosisTemplates.DQ_RESPONSE_1V2_SS_FAST_TRACK_INT;
                 }
                 break;
             case TWO_V_ONE:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
-                    templateId = isMinti
-                        ? DocmosisTemplates.DQ_RESPONSE_2V1_FAST_TRACK_INT : DocmosisTemplates.DQ_RESPONSE_2V1;
+                    templateId = DocmosisTemplates.DQ_RESPONSE_2V1_FAST_TRACK_INT;
                 }
                 break;
             default:
@@ -113,8 +104,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                                                               String respondent) {
         log.info("Starting 1v2 single-solicitor different-response DQ for caseId {} respondent {}", caseData.getCcdCaseReference(), respondent);
 
-        boolean isMinti = featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
-        DocmosisTemplates templateId = isMinti ? DQ_RESPONSE_1V1_FAST_TRACK_INT : DQ_RESPONSE_1V1;
+        DocmosisTemplates templateId = DQ_RESPONSE_1V1_FAST_TRACK_INT;
         DirectionsQuestionnaireForm templateData;
 
         if (respondent.equals("ONE")) {
@@ -142,8 +132,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     public Optional<CaseDocument> generateDQFor1v2DiffSol(CaseData caseData,
                                                           String authorisation,
                                                           String respondent) {
-        boolean isMinti = featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
-        DocmosisTemplates templateId = isMinti ? DQ_RESPONSE_1V1_FAST_TRACK_INT : DQ_RESPONSE_1V1;
+        DocmosisTemplates templateId = DQ_RESPONSE_1V1_FAST_TRACK_INT;
 
         log.info("Starting 1v2 different-solicitor DQ check for caseId {} respondent {}", caseData.getCcdCaseReference(), respondent);
         String fileName = getFileName(caseData, templateId);

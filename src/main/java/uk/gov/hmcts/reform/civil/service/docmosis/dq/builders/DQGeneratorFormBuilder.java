@@ -403,7 +403,7 @@ public class DQGeneratorFormBuilder {
     private boolean shouldDisplayDisclosureReport(CaseData caseData) {
         // This is to hide disclosure report from prod
         if (MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
-            return featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
+            return true;
         } else if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && FAST_CLAIM.equals(caseData.getAllocatedTrack())) {
             return false;

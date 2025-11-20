@@ -140,9 +140,8 @@ public class ClaimantResponseNotificationHandler extends DashboardCallbackHandle
     }
 
     private boolean isMintiApplicable(CaseData caseData) {
-        return getFeatureToggleService().isMultiOrIntermediateTrackEnabled(caseData)
-            && (AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
-            || AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack()));
+        return AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
+            || AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack());
     }
 
     private static boolean isCaseStateAwaitingApplicantIntention(CaseData caseData) {

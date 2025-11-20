@@ -20,6 +20,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_LI
 public class DirectionQuestionnaireLipResponseGenerator extends DirectionsQuestionnaireGenerator {
 
     private static final DQLipFormMapperFactory MAPPER_FACTORY = new DQLipFormMapperFactory();
+    private final FeatureToggleService featureToggleService;
 
     public DirectionQuestionnaireLipResponseGenerator(DocumentManagementService documentManagementService,
                                                       DocumentGeneratorService documentGeneratorService,
@@ -30,10 +31,10 @@ public class DirectionQuestionnaireLipResponseGenerator extends DirectionsQuesti
         super(
             documentManagementService,
             documentGeneratorService,
-            featureToggleService,
             dqGeneratorFormBuilder,
             respondentTemplateForDQGenerator
         );
+        this.featureToggleService = featureToggleService;
     }
 
     @Override

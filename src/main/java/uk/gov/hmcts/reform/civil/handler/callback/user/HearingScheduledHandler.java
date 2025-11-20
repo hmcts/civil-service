@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -45,7 +44,6 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.DECISION_OUTCOME;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
@@ -66,7 +64,6 @@ public class HearingScheduledHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final Time time;
     private final HearingFeesService hearingFeesService;
-    private final FeatureToggleService  featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -200,25 +197,8 @@ public class HearingScheduledHandler extends CallbackHandler {
         }
 
         CaseState caseState = caseDataBuilder.build().getCcdState();
-        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-            caseState = determinePostState(caseState, caseData);
-            calculateHearingFeeAndDueDate(caseDataBuilder, caseData, claimTrack);
-        } else {
-            // If hearing notice type if FAST or SMALL and it is a first time being listed, calculate fee and fee due date.
-            // If relisted, do not recalculate fee and fee due date, and move state to PREPARE_FOR_HEARING_CONDUCT_HEARING
-            if (!caseData.getHearingNoticeList().equals(HearingNoticeList.OTHER)) {
-                if (ListingOrRelisting.LISTING.equals(caseData.getListingOrRelisting())) {
-                    calculateHearingFeeAndDueDate(caseDataBuilder, caseData, claimTrack);
-                    caseState = caseState.equals(CASE_PROGRESSION) ? HEARING_READINESS : caseState;
-                } else {
-                    caseState = caseState.equals(CASE_PROGRESSION) ? PREPARE_FOR_HEARING_CONDUCT_HEARING : caseState;
-                }
-                // If hearing notice type is OTHER and is being listed, do not calculate fee and fee due date
-                // If relisted, again do not calculate fee and fee due date, but move state to PREPARE_FOR_HEARING_CONDUCT_HEARING
-            } else if (caseData.getHearingNoticeList().equals(HearingNoticeList.OTHER)) {
-                caseState = caseState.equals(CASE_PROGRESSION) ? PREPARE_FOR_HEARING_CONDUCT_HEARING : caseState;
-            }
-        }
+        caseState = determinePostState(caseState, caseData);
+        calculateHearingFeeAndDueDate(caseDataBuilder, caseData, claimTrack);
 
         caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
         caseDataBuilder.trialReadyNotified(null);
@@ -256,8 +236,7 @@ public class HearingScheduledHandler extends CallbackHandler {
         if (caseData.getHearingNoticeList().equals(HearingNoticeList.OTHER)) {
             return;
         }
-        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
-            && ListingOrRelisting.RELISTING.equals(caseData.getListingOrRelisting())) {
+        if (ListingOrRelisting.RELISTING.equals(caseData.getListingOrRelisting())) {
             caseDataBuilder.hearingDueDate(calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate()));
             return;
         }

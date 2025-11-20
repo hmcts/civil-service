@@ -2202,8 +2202,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                             .surname("Judy")
                                                                             .roles(Collections.emptyList()).build());
 
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-
             List<FinalOrderToggle> toggle = new ArrayList<>();
             toggle.add(FinalOrderToggle.SHOW);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -2236,8 +2234,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             handler = new GenerateDirectionOrderCallbackHandler(locationRefDataService, mapper, judgeFinalOrderGenerator,
                                                                 judgeOrderDownloadGenerator, locationHelper, theUserService,
                                                                 workingDayIndicator, featureToggleService, Optional.empty());
-
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
             List<FinalOrderToggle> toggle = new ArrayList<>();
             toggle.add(FinalOrderToggle.SHOW);

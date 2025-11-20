@@ -35,8 +35,6 @@ public class ClaimantIntendsToProceedMultiIntDefendantScenarioTest extends Dashb
             .responseClaimTrack(AllocatedTrack.INTERMEDIATE_CLAIM.name())
             .build();
 
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
@@ -67,8 +65,6 @@ public class ClaimantIntendsToProceedMultiIntDefendantScenarioTest extends Dashb
             .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
             .responseClaimTrack(AllocatedTrack.MULTI_CLAIM.name())
             .build();
-
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
         handler.handle(callbackParams(caseData));
 

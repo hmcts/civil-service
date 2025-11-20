@@ -130,10 +130,7 @@ public class DetermineNextState extends CallbackHandler {
 
     private String putCaseStateInJudicialReferral(CaseData caseData) {
         if (caseData.isRespondentResponseFullDefence()
-            && JudicialReferralUtils.shouldMoveToJudicialReferral(
-            caseData,
-            featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
-        )) {
+            && JudicialReferralUtils.shouldMoveToJudicialReferral(caseData)) {
             return CaseState.JUDICIAL_REFERRAL.name();
         }
         return null;
@@ -186,8 +183,7 @@ public class DetermineNextState extends CallbackHandler {
     }
 
     private boolean shouldNotChangeStateMinti(CaseData caseData) {
-        return featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
-            && CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+        return CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && isMultiOrIntermediateSpecClaim(caseData)
             && isLipCase(caseData)
             && (isClaimNotSettled(caseData)

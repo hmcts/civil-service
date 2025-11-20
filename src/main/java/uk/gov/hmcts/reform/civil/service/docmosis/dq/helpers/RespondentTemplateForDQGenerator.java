@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
@@ -54,7 +53,6 @@ public class RespondentTemplateForDQGenerator {
 
     private final SetApplicantsForDQGenerator setApplicantsForDQGenerator;
     private final GetRespondentsForDQGenerator respondentsForDQGenerator;
-    private final FeatureToggleService featureToggleService;
     private final LocationReferenceDataService locationRefDataService;
     static final String SMALL_CLAIM = "SMALL_CLAIM";
 
@@ -235,7 +233,7 @@ public class RespondentTemplateForDQGenerator {
     private boolean shouldDisplayDisclosureReport(CaseData caseData) {
         // This is to hide disclosure report from prod
         if (MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
-            return featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
+            return true;
         } else if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && FAST_CLAIM.equals(caseData.getAllocatedTrack())) {
             return false;

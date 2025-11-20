@@ -217,7 +217,6 @@ public class HearingFormGeneratorTest {
 
     @Test
     void shouldShowListingOrRelistingFeeDue_whenListing() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .listingOrRelisting(ListingOrRelisting.LISTING)
             .totalClaimAmount(new BigDecimal(2000))
@@ -235,7 +234,6 @@ public class HearingFormGeneratorTest {
 
     @Test
     void shouldShowListingOrRelistingFeeDue_whenRelistingNotPaid() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .listingOrRelisting(ListingOrRelisting.RELISTING)
             .totalClaimAmount(new BigDecimal(2000))
@@ -255,7 +253,6 @@ public class HearingFormGeneratorTest {
 
     @Test
     void shouldNotShowListingOrRelistingFeeDue_whenRelistingAndPaid() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .listingOrRelisting(ListingOrRelisting.RELISTING)
             .totalClaimAmount(new BigDecimal(2000))
@@ -322,7 +319,6 @@ public class HearingFormGeneratorTest {
         ", MINUTES_45 ,OTHER, SMALL_CLAIM"
     })
     void shouldGetHearingDuration(String mintiHearingDuration, String hearingDuration, String hearingNoticeType, String claimType) {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .listingOrRelisting(ListingOrRelisting.RELISTING)
             .totalClaimAmount(new BigDecimal(2000))
@@ -357,7 +353,6 @@ public class HearingFormGeneratorTest {
         "custom time duration, FAST_TRACK_TRIAL, MULTI_CLAIM",
     })
     void shouldGetHearingDuration_spec(String mintiHearingDuration, String hearingNoticeType, String claimType) {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .listingOrRelisting(ListingOrRelisting.RELISTING)
             .totalClaimAmount(new BigDecimal(2000))

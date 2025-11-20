@@ -5,21 +5,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.CalculateTotalClaimAmountTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakupDetails;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CalculateTotalClaimAmountTaskTest {
@@ -27,12 +24,9 @@ class CalculateTotalClaimAmountTaskTest {
     @InjectMocks
     private CalculateTotalClaimAmountTask calculateTotalClaimAmountTask;
 
-    @Mock
-    private FeatureToggleService featureToggleService;
-
     @BeforeEach
     public void setUp() {
-        calculateTotalClaimAmountTask = new CalculateTotalClaimAmountTask(featureToggleService, new ObjectMapper());
+        calculateTotalClaimAmountTask = new CalculateTotalClaimAmountTask(new ObjectMapper());
     }
 
     @Test
@@ -49,8 +43,6 @@ class CalculateTotalClaimAmountTaskTest {
         CaseData caseData = CaseData.builder()
             .claimAmountBreakup(claimAmountBreakup)
             .build();
-
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse)
             calculateTotalClaimAmountTask.calculateTotalClaimAmount(caseData);

@@ -2,12 +2,10 @@ package uk.gov.hmcts.reform.civil.notification.handlers.claimantresponseconfirms
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -23,15 +21,12 @@ public class ClaimantResponseConfirmsToProceedEmailHelperTest {
     @Mock
     private NotificationsProperties notificationsProperties;
 
-    @Mock
-    private FeatureToggleService featureToggleService;
-
-    @InjectMocks
     private ClaimantResponseConfirmsToProceedEmailHelper helper;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        helper = new ClaimantResponseConfirmsToProceedEmailHelper(notificationsProperties);
     }
 
     @Test
@@ -58,23 +53,6 @@ public class ClaimantResponseConfirmsToProceedEmailHelperTest {
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getClaimantSolicitorConfirmsToProceed()).thenReturn(expectedTemplateId);
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
-
-        String actualTemplateId = helper.getTemplate(caseData, false);
-
-        assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
-    }
-
-    @Test
-    void shouldReturnCorrectEmailTemplateWhenCaseIsUnspecAndMultiClaimAndNotMultiOrIntermediateTrackEnabled() {
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(UNSPEC_CLAIM)
-            .allocatedTrack(MULTI_CLAIM)
-            .build();
-        String expectedTemplateId = "template-id";
-
-        when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn(expectedTemplateId);
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
 
         String actualTemplateId = helper.getTemplate(caseData, false);
 

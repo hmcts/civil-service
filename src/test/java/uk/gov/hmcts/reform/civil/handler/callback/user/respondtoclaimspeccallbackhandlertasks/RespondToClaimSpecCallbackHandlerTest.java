@@ -370,7 +370,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         //Given
         when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
         when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
-        when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         when(time.now()).thenReturn(responseDate);
         when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(
                 any(LocalDateTime.class)
@@ -416,7 +415,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         //Given
         when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
         when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
-        when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         when(time.now()).thenReturn(responseDate);
         when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(
                 any(LocalDateTime.class)
@@ -453,7 +451,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         //Given
         when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
         when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
-        when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         when(time.now()).thenReturn(responseDate);
         when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(
                 any(LocalDateTime.class)
@@ -529,7 +526,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         //Given
         when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
         when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
-        when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         when(time.now()).thenReturn(responseDate);
         when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(
                 any(LocalDateTime.class)
@@ -1260,14 +1256,13 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors()).isNull();
 
             assertThat(response.getData()).isNotNull();
-            assertThat(response.getData()).containsEntry("responseClaimTrack", AllocatedTrack.MULTI_CLAIM.name());
+            assertThat(response.getData()).containsEntry("responseClaimTrack", AllocatedTrack.INTERMEDIATE_CLAIM.name());
         }
 
         @Test
         void shouldSetIntermediateAllocatedTrack_whenInvoked() {
             // New multi and intermediate track change track logic
             // total claim amount is 100000, so track is intermediate, as this is the upper limit
-            when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceFastTrack()
                     .totalClaimAmount(BigDecimal.valueOf(100000))
                     .build();
@@ -1283,7 +1278,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetMultiAllocatedTrack_whenInvoked() {
             // New multi and intermediate track change track logic
             // total claim amount is 100001, so track is multi
-            when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceFastTrack()
                     .totalClaimAmount(BigDecimal.valueOf(100001))
                     .build();

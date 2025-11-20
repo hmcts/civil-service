@@ -1661,7 +1661,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldAssignCategoryId_frc_whenInvoked() {
             // Given
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
             var caseData = CaseDataBuilder.builder()
                 .setIntermediateTrackClaim()
@@ -2038,7 +2037,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateMaintainLocationToCnbc_WhenMintiLip() {
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             // Given
             var caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()

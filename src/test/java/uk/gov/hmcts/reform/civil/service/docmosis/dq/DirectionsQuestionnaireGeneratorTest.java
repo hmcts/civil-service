@@ -91,13 +91,9 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V1_FAST_TRACK_INT;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V2_DS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V2_DS_FAST_TRACK_INT;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V2_SS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_1V2_SS_FAST_TRACK_INT;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_2V1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_RESPONSE_2V1_FAST_TRACK_INT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
@@ -120,11 +116,11 @@ class DirectionsQuestionnaireGeneratorTest {
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String REFERENCE_NUMBER = "000DC001";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
-    private static final String FILE_NAME_DEFENDANT = format(DQ_RESPONSE_1V1.getDocumentTitle(), "defendant", REFERENCE_NUMBER);
-    private static final String HNL_FILE_NAME_DEFENDANT = format(DQ_RESPONSE_1V1.getDocumentTitle(), "defendant", REFERENCE_NUMBER);
-    private static final String FILE_NAME_CLAIMANT = format(DQ_RESPONSE_1V1.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
-    private static final String HNL_FILE_NAME_CLAIMANT = format(DQ_RESPONSE_1V1.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
-    private static final String HNL_FILE_NAME_CLAIMANT_1v2 = format(DQ_RESPONSE_1V2_DS.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
+    private static final String FILE_NAME_DEFENDANT = format(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), "defendant", REFERENCE_NUMBER);
+    private static final String HNL_FILE_NAME_DEFENDANT = format(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), "defendant", REFERENCE_NUMBER);
+    private static final String FILE_NAME_CLAIMANT = format(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
+    private static final String HNL_FILE_NAME_CLAIMANT = format(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
+    private static final String HNL_FILE_NAME_CLAIMANT_1v2 = format(DQ_RESPONSE_1V2_DS_FAST_TRACK_INT.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
     private static final String FILE_NAME_CLAIMANT_1v2 = format(DQ_RESPONSE_1V2_DS_FAST_TRACK_INT.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
     private static final String FILE_NAME_CLAIMANT_1v2SS = format(DQ_RESPONSE_1V2_SS_FAST_TRACK_INT.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
     private static final CaseDocument CASE_DOCUMENT_DEFENDANT =
@@ -188,8 +184,8 @@ class DirectionsQuestionnaireGeneratorTest {
 
         @Test
         void shouldGenerateRespondentOneCertificateOfService_whenStateFlowIsFullDefence() {
-            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1)))
-                .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1.getDocumentTitle(), bytes));
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)))
+                .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), bytes));
             when(documentManagementService.uploadDocument(
                 BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
             ).thenReturn(CASE_DOCUMENT_DEFENDANT);
@@ -203,13 +199,13 @@ class DirectionsQuestionnaireGeneratorTest {
             verify(documentManagementService)
                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
             verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(
-                DQ_RESPONSE_1V1));
+                DQ_RESPONSE_1V1_FAST_TRACK_INT));
         }
 
         @Test
         void shouldGenerateClaimantCertificateOfService_whenStateFlowIsRespondToDefenceAndProceed() {
-            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1)))
-                .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1.getDocumentTitle(), bytes));
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)))
+                .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), bytes));
 
             when(documentManagementService.uploadDocument(
                 BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
@@ -227,13 +223,13 @@ class DirectionsQuestionnaireGeneratorTest {
             verify(documentManagementService)
                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
             verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(
-                DQ_RESPONSE_1V1));
+                DQ_RESPONSE_1V1_FAST_TRACK_INT));
         }
 
         @Test
         void shouldGenerateDQ_when2v1ScenarioWithFullDefence() {
-            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_2V1)))
-                .thenReturn(new DocmosisDocument(DQ_RESPONSE_2V1.getDocumentTitle(), bytes));
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_2V1_FAST_TRACK_INT)))
+                .thenReturn(new DocmosisDocument(DQ_RESPONSE_2V1_FAST_TRACK_INT.getDocumentTitle(), bytes));
 
             when(documentManagementService.uploadDocument(
                 BEARER_TOKEN, new PDF(HNL_FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
@@ -252,15 +248,15 @@ class DirectionsQuestionnaireGeneratorTest {
                 .uploadDocument(BEARER_TOKEN, new PDF(HNL_FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
             verify(documentGeneratorService).generateDocmosisDocument(
                 any(DirectionsQuestionnaireForm.class),
-                eq(DQ_RESPONSE_2V1)
+                eq(DQ_RESPONSE_2V1_FAST_TRACK_INT)
             );
         }
 
         @Test
         void shouldGenerateDQ_when1v2SameSolicitorScenarioWithFullDefence() {
             when(documentGeneratorService.generateDocmosisDocument(
-                any(MappableObject.class), eq(DQ_RESPONSE_1V2_SS)))
-                .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V2_SS.getDocumentTitle(), bytes));
+                any(MappableObject.class), eq(DQ_RESPONSE_1V2_SS_FAST_TRACK_INT)))
+                .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V2_SS_FAST_TRACK_INT.getDocumentTitle(), bytes));
 
             when(documentManagementService.uploadDocument(
                 BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
@@ -286,7 +282,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
             verify(documentGeneratorService).generateDocmosisDocument(
                 any(DirectionsQuestionnaireForm.class),
-                eq(DQ_RESPONSE_1V2_SS)
+                eq(DQ_RESPONSE_1V2_SS_FAST_TRACK_INT)
             );
         }
 
@@ -326,11 +322,11 @@ class DirectionsQuestionnaireGeneratorTest {
         @Test
         void shouldGenerateDQ_specClaimant() {
             when(documentGeneratorService.generateDocmosisDocument(
-                any(MappableObject.class), eq(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC)))
+                any(MappableObject.class), eq(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT)))
                 .thenReturn(new DocmosisDocument(
-                    DocmosisTemplates.CLAIMANT_RESPONSE_SPEC.getDocumentTitle(), bytes));
+                    DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT.getDocumentTitle(), bytes));
 
-            String expectedTitle = format(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC.getDocumentTitle(),
+            String expectedTitle = format(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT.getDocumentTitle(),
                 "claimant", REFERENCE_NUMBER
             );
             when(documentManagementService.uploadDocument(
@@ -358,7 +354,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 .uploadDocument(BEARER_TOKEN, new PDF(expectedTitle, bytes, DIRECTIONS_QUESTIONNAIRE));
             verify(documentGeneratorService).generateDocmosisDocument(
                 any(DirectionsQuestionnaireForm.class),
-                eq(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC)
+                eq(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT)
             );
         }
 
@@ -398,11 +394,11 @@ class DirectionsQuestionnaireGeneratorTest {
         @Test
         void specGenerateClaimantDQ() {
             when(documentGeneratorService.generateDocmosisDocument(
-                any(MappableObject.class), eq(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC)))
+                any(MappableObject.class), eq(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT)))
                 .thenReturn(new DocmosisDocument(
-                    DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_FAST_TRACK_INT.getDocumentTitle(), bytes));
+                    DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT.getDocumentTitle(), bytes));
 
-            String expectedTitle = format(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC.getDocumentTitle(),
+            String expectedTitle = format(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT.getDocumentTitle(),
                 "claimant", REFERENCE_NUMBER
             );
             when(documentManagementService.uploadDocument(
@@ -424,7 +420,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 .uploadDocument(BEARER_TOKEN, new PDF(expectedTitle, bytes, DIRECTIONS_QUESTIONNAIRE));
             verify(documentGeneratorService).generateDocmosisDocument(
                 any(DirectionsQuestionnaireForm.class),
-                eq(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC)
+                eq(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT)
             );
         }
 
@@ -432,7 +428,6 @@ class DirectionsQuestionnaireGeneratorTest {
         class MintiToggleIsOn {
             @BeforeEach
             void setup() {
-                when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             }
 
             @Test
@@ -1012,7 +1007,6 @@ class DirectionsQuestionnaireGeneratorTest {
 
             @Test
             void whenDisclosureReport_include_Minti() {
-                when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence()
                     .build();
@@ -1036,8 +1030,7 @@ class DirectionsQuestionnaireGeneratorTest {
             }
 
             @Test
-            void whenDisclosureReport_shouldNotinclude_Minti() {
-                when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(false);
+            void whenDisclosureReport_shouldInclude_ForMultiTrack() {
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence()
@@ -1056,12 +1049,14 @@ class DirectionsQuestionnaireGeneratorTest {
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 DisclosureReport extracted = templateData.getDisclosureReport();
-                assertThat(extracted).isEqualTo(null);
+                assertThat(extracted).isNotNull();
+                assertThat(extracted.getDraftOrderNumber()).isEqualTo(disclosureOrderNumber);
+                assertThat(extracted.getDisclosureProposalAgreed()).isEqualTo(YES);
+                assertThat(extracted.getDisclosureFormFiledAndServed()).isEqualTo(YES);
             }
 
             @Test
             void whenDisclosureReport_shouldNotinclude_UnspecFast() {
-                when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(false);
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence()
@@ -1617,8 +1612,8 @@ class DirectionsQuestionnaireGeneratorTest {
 
         @Test
         void shouldGenerateRespondentTwoCertificateOfService_whenStateFlowIsFullDefenceForBoth() {
-            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1)))
-                .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1.getDocumentTitle(), bytes));
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)))
+                .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), bytes));
             when(documentManagementService.uploadDocument(
                 BEARER_TOKEN, new PDF(HNL_FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
             ).thenReturn(HNL_CASE_DOCUMENT_DEFENDANT);
@@ -1641,13 +1636,13 @@ class DirectionsQuestionnaireGeneratorTest {
             verify(documentManagementService)
                 .uploadDocument(BEARER_TOKEN, new PDF(HNL_FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
             verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
-                eq(DQ_RESPONSE_1V1));
+                eq(DQ_RESPONSE_1V1_FAST_TRACK_INT));
         }
 
         @Test
         void shouldGenerateClaimantDQ_for1v2_DS() {
-            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V2_DS)))
-                .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V2_DS.getDocumentTitle(), bytes));
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V2_DS_FAST_TRACK_INT)))
+                .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V2_DS_FAST_TRACK_INT.getDocumentTitle(), bytes));
             when(documentManagementService.uploadDocument(
                 BEARER_TOKEN, new PDF(HNL_FILE_NAME_CLAIMANT_1v2, bytes, DIRECTIONS_QUESTIONNAIRE))
             ).thenReturn(HNL_CASE_DOCUMENT_DEFENDANT);
@@ -1674,13 +1669,13 @@ class DirectionsQuestionnaireGeneratorTest {
             verify(documentManagementService)
                 .uploadDocument(BEARER_TOKEN, new PDF(HNL_FILE_NAME_CLAIMANT_1v2, bytes, DIRECTIONS_QUESTIONNAIRE));
             verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
-                eq(DQ_RESPONSE_1V2_DS));
+                eq(DQ_RESPONSE_1V2_DS_FAST_TRACK_INT));
         }
 
         @Test
         void shouldGenerateClaimantCertificateOfService_whenStateFlowIsRespondToDefenceAndProceed() {
-            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1)))
-                .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1.getDocumentTitle(), bytes));
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)))
+                .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), bytes));
 
             when(documentManagementService.uploadDocument(
                 BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
@@ -1700,7 +1695,7 @@ class DirectionsQuestionnaireGeneratorTest {
             verify(documentManagementService)
                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
             verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(
-                DQ_RESPONSE_1V1));
+                DQ_RESPONSE_1V1_FAST_TRACK_INT));
         }
 
         @Nested
@@ -1813,8 +1808,8 @@ class DirectionsQuestionnaireGeneratorTest {
 
             @Test
             void when1v2SolRespondsTo2ndDefendantWithDivergentResponse_shouldGetRespondentDQData() {
-                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1)))
-                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1.getDocumentTitle(), bytes));
+                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)))
+                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), bytes));
                 when(documentManagementService.uploadDocument(
                     BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
                 ).thenReturn(CASE_DOCUMENT_DEFENDANT);
@@ -1847,15 +1842,15 @@ class DirectionsQuestionnaireGeneratorTest {
                     .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
                 verify(documentGeneratorService).generateDocmosisDocument(
                     any(DirectionsQuestionnaireForm.class),
-                    eq(DQ_RESPONSE_1V1)
+                    eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)
                 );
             }
 
             @Test
             void when1v2DiffSolRespondsTo2ndDefendantWithDivergentResponse_shouldGetRespondentDQData() {
 
-                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1)))
-                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1.getDocumentTitle(), bytes));
+                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)))
+                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), bytes));
                 when(documentManagementService.uploadDocument(
                     BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
                 ).thenReturn(CASE_DOCUMENT_DEFENDANT);
@@ -1889,15 +1884,15 @@ class DirectionsQuestionnaireGeneratorTest {
                     .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
                 verify(documentGeneratorService).generateDocmosisDocument(
                     any(DirectionsQuestionnaireForm.class),
-                    eq(DQ_RESPONSE_1V1)
+                    eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)
                 );
             }
 
             @Test
             void when1v2DiffSolRespondsTo1stDefendantWithDivergentResponse_shouldGetRespondentDQData() {
 
-                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1)))
-                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1.getDocumentTitle(), bytes));
+                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)))
+                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), bytes));
                 when(documentManagementService.uploadDocument(
                     BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
                 ).thenReturn(CASE_DOCUMENT_DEFENDANT);
@@ -1931,13 +1926,12 @@ class DirectionsQuestionnaireGeneratorTest {
                     .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
                 verify(documentGeneratorService).generateDocmosisDocument(
                     any(DirectionsQuestionnaireForm.class),
-                    eq(DQ_RESPONSE_1V1)
+                    eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)
                 );
             }
 
             @Test
             void when1v2DiffSolRespondsTo1stDefendantWithDivergentResponse_shouldGetRespondentDQData_Minti() {
-                when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
                 when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)))
                     .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), bytes));
                 when(documentManagementService.uploadDocument(
@@ -1980,8 +1974,8 @@ class DirectionsQuestionnaireGeneratorTest {
             @Test
             void when1v2DiffSolRespondsTo1stDefendantWithDivergentResponseSmallClaim_shouldGetRespondentDQData() {
 
-                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1)))
-                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1.getDocumentTitle(), bytes));
+                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)))
+                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), bytes));
                 when(documentManagementService.uploadDocument(
                     BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
                 ).thenReturn(CASE_DOCUMENT_DEFENDANT);
@@ -2019,15 +2013,15 @@ class DirectionsQuestionnaireGeneratorTest {
                     .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
                 verify(documentGeneratorService).generateDocmosisDocument(
                     any(DirectionsQuestionnaireForm.class),
-                    eq(DQ_RESPONSE_1V1)
+                    eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)
                 );
             }
 
             @Test
             void when1v2DiffSolRespondsTo2stDefendantWithDivergentResponse_shouldGetRespondentDQData() {
 
-                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1)))
-                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1.getDocumentTitle(), bytes));
+                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)))
+                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), bytes));
                 when(documentManagementService.uploadDocument(
                     BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
                 ).thenReturn(CASE_DOCUMENT_DEFENDANT);
@@ -2061,15 +2055,15 @@ class DirectionsQuestionnaireGeneratorTest {
                     .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
                 verify(documentGeneratorService).generateDocmosisDocument(
                     any(DirectionsQuestionnaireForm.class),
-                    eq(DQ_RESPONSE_1V1)
+                    eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)
                 );
             }
 
             @Test
             void when1v2DiffSolRespondsTo2ndDefendantWithDivergentResponseSmallClaim_shouldGetRespondentDQData() {
 
-                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1)))
-                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1.getDocumentTitle(), bytes));
+                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)))
+                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), bytes));
                 when(documentManagementService.uploadDocument(
                     BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
                 ).thenReturn(CASE_DOCUMENT_DEFENDANT);
@@ -2110,15 +2104,15 @@ class DirectionsQuestionnaireGeneratorTest {
                     .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
                 verify(documentGeneratorService).generateDocmosisDocument(
                     any(DirectionsQuestionnaireForm.class),
-                    eq(DQ_RESPONSE_1V1)
+                    eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)
                 );
             }
 
             @Test
             void when1v2DiffSol_shouldAcceptOneOrTwo() {
 
-                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1)))
-                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1.getDocumentTitle(), bytes));
+                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)))
+                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), bytes));
                 when(documentManagementService.uploadDocument(
                     BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
                 ).thenReturn(CASE_DOCUMENT_DEFENDANT);
@@ -2146,8 +2140,8 @@ class DirectionsQuestionnaireGeneratorTest {
             @Test
             void when1v2DiffSol2withoutResponseDate_shouldFail() {
 
-                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1)))
-                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1.getDocumentTitle(), bytes));
+                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)))
+                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), bytes));
                 when(documentManagementService.uploadDocument(
                     BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
                 ).thenReturn(CASE_DOCUMENT_DEFENDANT);
@@ -2173,8 +2167,8 @@ class DirectionsQuestionnaireGeneratorTest {
 
             @Test
             void when1v2DiffSolDocAlreadyGenerated_shouldNotRegenerate() {
-                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1)))
-                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1.getDocumentTitle(), bytes));
+                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)))
+                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), bytes));
                 when(documentManagementService.uploadDocument(
                     BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
                 ).thenReturn(CASE_DOCUMENT_DEFENDANT);
@@ -2196,7 +2190,7 @@ class DirectionsQuestionnaireGeneratorTest {
                         .createdDatetime(createdDate)
                         .documentName(
                             format(
-                                DQ_RESPONSE_1V1.getDocumentTitle(),
+                                DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(),
                                 "defendant",
                                 caseData.getLegacyCaseReference()
                             )
@@ -2211,8 +2205,8 @@ class DirectionsQuestionnaireGeneratorTest {
 
             @Test
             void when1v2SolRespondsTo1stDefendantWithDivergentResponse_shouldGetRespondentDQData() {
-                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1)))
-                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1.getDocumentTitle(), bytes));
+                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)))
+                    .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), bytes));
                 when(documentManagementService.uploadDocument(
                     BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
                 ).thenReturn(CASE_DOCUMENT_DEFENDANT);
@@ -2242,13 +2236,12 @@ class DirectionsQuestionnaireGeneratorTest {
                     .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
                 verify(documentGeneratorService).generateDocmosisDocument(
                     any(DirectionsQuestionnaireForm.class),
-                    eq(DQ_RESPONSE_1V1)
+                    eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)
                 );
             }
 
             @Test
             void when1v2SolRespondsTo1stDefendantWithDivergentResponse_shouldGetRespondentDQData_Minti() {
-                when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
                 when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)))
                     .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), bytes));
                 when(documentManagementService.uploadDocument(
@@ -2522,8 +2515,8 @@ class DirectionsQuestionnaireGeneratorTest {
 
         @Test
         void shouldGenerateResponseDocument_whenTwoApplicantRespondWithOnlyFirstIntendsToProceed() {
-            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1)))
-                .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1.getDocumentTitle(), bytes));
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)))
+                .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), bytes));
             when(documentManagementService.uploadDocument(
                 BEARER_TOKEN, new PDF(HNL_FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
             ).thenReturn(HNL_CASE_DOCUMENT_CLAIMANT);
@@ -2544,13 +2537,13 @@ class DirectionsQuestionnaireGeneratorTest {
             verify(documentManagementService)
                 .uploadDocument(BEARER_TOKEN, new PDF(HNL_FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
             verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
-                eq(DQ_RESPONSE_1V1));
+                eq(DQ_RESPONSE_1V1_FAST_TRACK_INT));
         }
 
         @Test
         void shouldGenerateResponseDocument_whenTwoApplicantRespondWithOnlySecondIntendsToProceed() {
-            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1)))
-                .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1.getDocumentTitle(), bytes));
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)))
+                .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), bytes));
             when(documentManagementService.uploadDocument(
                 BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
             ).thenReturn(CASE_DOCUMENT_CLAIMANT);
@@ -2573,13 +2566,13 @@ class DirectionsQuestionnaireGeneratorTest {
             verify(documentManagementService)
                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
             verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(
-                DQ_RESPONSE_1V1));
+                DQ_RESPONSE_1V1_FAST_TRACK_INT));
         }
 
         @Test
         void shouldGenerateResponseDocument_whenOneApplicantIntendsToProceedAgainstOnlyFirstDefendant() {
-            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1)))
-                .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1.getDocumentTitle(), bytes));
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)))
+                .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), bytes));
             when(documentManagementService.uploadDocument(
                 BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
             ).thenReturn(CASE_DOCUMENT_CLAIMANT);
@@ -2600,13 +2593,13 @@ class DirectionsQuestionnaireGeneratorTest {
             verify(documentManagementService)
                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
             verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(
-                DQ_RESPONSE_1V1));
+                DQ_RESPONSE_1V1_FAST_TRACK_INT));
         }
 
         @Test
         void shouldGenerateResponseDocument_whenOneApplicantIntendsToProceedAgainstOnlySecondDefendant() {
-            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1)))
-                .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1.getDocumentTitle(), bytes));
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DQ_RESPONSE_1V1_FAST_TRACK_INT)))
+                .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V1_FAST_TRACK_INT.getDocumentTitle(), bytes));
             when(documentManagementService.uploadDocument(
                 BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
             ).thenReturn(CASE_DOCUMENT_CLAIMANT);
@@ -2627,16 +2620,16 @@ class DirectionsQuestionnaireGeneratorTest {
             verify(documentManagementService)
                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
             verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class), eq(
-                DQ_RESPONSE_1V1));
+                DQ_RESPONSE_1V1_FAST_TRACK_INT));
         }
 
         @Test
         void shouldGenerateResponseDocument_whenOneApplicantIntendsToProceedAgainstBothDefendant() {
             when(documentGeneratorService.generateDocmosisDocument(
                 any(MappableObject.class),
-                eq(DQ_RESPONSE_1V2_SS)
+                eq(DQ_RESPONSE_1V2_SS_FAST_TRACK_INT)
             ))
-                .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V2_SS.getDocumentTitle(), bytes));
+                .thenReturn(new DocmosisDocument(DQ_RESPONSE_1V2_SS_FAST_TRACK_INT.getDocumentTitle(), bytes));
             when(documentManagementService.uploadDocument(
                 BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
             ).thenReturn(HNL_CASE_DOCUMENT_CLAIMANT);
@@ -2658,13 +2651,12 @@ class DirectionsQuestionnaireGeneratorTest {
                 .uploadDocument(BEARER_TOKEN, new PDF(HNL_FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
             verify(documentGeneratorService).generateDocmosisDocument(
                 any(DirectionsQuestionnaireForm.class),
-                eq(DQ_RESPONSE_1V2_SS)
+                eq(DQ_RESPONSE_1V2_SS_FAST_TRACK_INT)
             );
         }
 
         @Test
         void specGenerateClaimantDQ_MultiTrack_MintiEnabled() {
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             when(documentGeneratorService.generateDocmosisDocument(
                 any(MappableObject.class), eq(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT)))
                 .thenReturn(new DocmosisDocument(
@@ -2698,7 +2690,6 @@ class DirectionsQuestionnaireGeneratorTest {
 
         @Test
         void specGenerateClaimantDQ_IntTrack_MintiEnabled() {
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             when(documentGeneratorService.generateDocmosisDocument(
                 any(MappableObject.class), eq(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT)))
                 .thenReturn(new DocmosisDocument(
@@ -2794,7 +2785,6 @@ class DirectionsQuestionnaireGeneratorTest {
 
         @Test
         void shouldIncludeDisclosureDocInfo_ClaimantDQ_MultiTrack_Minti() {
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -2837,8 +2827,7 @@ class DirectionsQuestionnaireGeneratorTest {
         }
 
         @Test
-        void shouldNotIncludeDicslosureReport_ClaimantDQ_MultiTrack_MintiNotEnabled() {
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(false);
+        void shouldIncludeDicslosureReport_ClaimantDQ_MultiTrack() {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -2875,7 +2864,10 @@ class DirectionsQuestionnaireGeneratorTest {
             assertThat(disclosureElecDocs.getAgreementLikely()).isEqualTo(NO);
             assertThat(disclosureElecDocs.getReasonForNoAgreement()).isEqualTo("some reasons");
             assertThat(disclosureNonElecDocs.getBespokeDirections()).isEqualTo("non electric stuff");
-            assertThat(disclosureReport).isEqualTo(null);
+            assertThat(disclosureReport).isNotNull();
+            assertThat(disclosureReport.getDisclosureFormFiledAndServed()).isEqualTo(YES);
+            assertThat(disclosureReport.getDisclosureProposalAgreed()).isEqualTo(YES);
+            assertThat(disclosureReport.getDraftOrderNumber()).isEqualTo(disclosureOrderNumber);
         }
     }
 
