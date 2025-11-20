@@ -1930,13 +1930,21 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Nested
         class HandleCourtLocation {
+
             @Test
             void shouldHandleCourtLocationData() {
                 LocationRefData locationA = LocationRefData.builder()
-                    .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").build();
+                    .regionId("regionId1")
+                    .epimmsId("epimmsId1")
+                    .courtLocationCode("312")
+                    .siteName("Test Court")
+                    .build();
 
                 given(courtLocationUtility.findPreferredLocationData(any(), any(DynamicList.class)))
                     .willReturn(locationA);
+
+                given(locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(any(), any()))
+                    .willReturn(List.of(locationA));
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -1946,13 +1954,14 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData())
                     .extracting("courtLocation")
-                    .extracting("caseLocation")
-                    .extracting("region", "baseLocation")
-                    .containsExactly("regionId1", "epimmsId1");
+                    .extracting("applicantPreferredCourt")
+                    .isEqualTo("312");
 
                 assertThat(response.getData())
                     .extracting("courtLocation")
-                    .extracting("applicantPreferredCourt").isEqualTo("312");
+                    .extracting("caseLocation")
+                    .extracting("region", "baseLocation")
+                    .containsExactly("regionId1", "epimmsId1");
 
                 assertThat(response.getData())
                     .extracting("caseManagementLocation")
