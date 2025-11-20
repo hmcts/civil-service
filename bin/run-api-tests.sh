@@ -55,7 +55,7 @@ run_functional_tests() {
       yarn test:api
     fi
   elif [ -z "$PR_FT_GROUPS" ]; then
-    yarn test:api-nonprod
+    yarn test:e2e-nonprod
   else
     run_functional_test_groups
   fi
