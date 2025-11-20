@@ -47,6 +47,6 @@ public class NotifyClaimDetailsHelper {
             .map(DynamicListElement::getLabel)
             .orElse("");
 
-        return defendantNotifyClaimDetails.equals(defendantName) || NOTIFY_BOTH.equals(defendantNotifyClaimDetails);
+        return defendantNotifyClaimDetails.contains(defendantName) || NOTIFY_BOTH.equals(defendantNotifyClaimDetails);
     }
 }
