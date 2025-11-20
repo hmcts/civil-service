@@ -31,9 +31,8 @@ import uk.gov.hmcts.reform.civil.event.HearingFeePaidEvent;
 import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
 import uk.gov.hmcts.reform.civil.event.TrialReadyNotificationEvent;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseUserService;
-import uk.gov.hmcts.reform.civil.ga.service.GaOrganisationService;
 import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
+import uk.gov.hmcts.reform.civil.ga.stateflow.GaStateFlow;
 import uk.gov.hmcts.reform.civil.handler.event.HearingFeePaidEventHandler;
 import uk.gov.hmcts.reform.civil.handler.event.HearingFeeUnpaidEventHandler;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
@@ -47,7 +46,6 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BaseCaseData;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.StateFlowDTO;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -60,6 +58,7 @@ import uk.gov.hmcts.reform.civil.service.judgments.CjesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
 import java.util.List;
 import java.util.Objects;
@@ -95,9 +94,7 @@ public class TestingSupportController {
     private final CheckStayOrderDeadlineEndTaskHandler checkStayOrderDeadlineEndTaskHandler;
     private final CheckUnlessOrderDeadlineEndTaskHandler checkUnlessOrderDeadlineEndTaskHandler;
     private final OrganisationService organisationService;
-    private final GaOrganisationService gaOrganisationService;
     private final CoreCaseUserService coreCaseUserService;
-    private final GaCoreCaseUserService gaCoreCaseUserService;
     private final GAJudgeRevisitTaskHandler gaJudgeRevisitTaskHandler;
 
     private static final String BEARER_TOKEN = "Bearer Token";
@@ -168,17 +165,17 @@ public class TestingSupportController {
     @PostMapping(
         value = "/testing-support/flowstate",
         produces = "application/json")
-    public StateFlowDTO getFlowStateInformationForCaseData(
+    public StateFlow getFlowStateInformationForCaseData(
         @RequestBody CaseData caseData) {
-        return stateFlowEngine.evaluate(caseData).toStateFlowDTO();
+        return stateFlowEngine.evaluate(caseData);
     }
 
     @PostMapping(
         value = "/testing-support/flowstate/ga",
         produces = "application/json")
-    public StateFlowDTO getFlowStateInformationForGaCaseData(
+    public GaStateFlow getFlowStateInformationForGaCaseData(
         @RequestBody GeneralApplicationCaseData caseData) {
-        return gaStateFlowEngine.evaluate(caseData).toStateFlowDTO();
+        return gaStateFlowEngine.evaluate(caseData);
     }
 
     @PostMapping(
@@ -373,7 +370,7 @@ public class TestingSupportController {
     @Operation(summary = "user roles for the cases")
     public CaseAssignmentUserRolesResource getUserRoles(
         @PathVariable("caseId") String caseId) {
-        return gaCoreCaseUserService.getUserRoles(caseId);
+        return coreCaseUserService.getUserRoles(caseId);
     }
 
     @PostMapping(value = {"/assignCase/{caseId}", "/assignCase/{caseId}/{caseRole}"})
@@ -392,7 +389,7 @@ public class TestingSupportController {
     @Operation(summary = "Assign case to user")
     public String getOrgDetailsByUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation) {
         String userId = userService.getUserInfo(authorisation).getUid();
-        return gaOrganisationService.findOrganisationByUserId(userId)
+        return organisationService.findOrganisationByUserId(userId)
             .map(Organisation::getOrganisationIdentifier).orElse(null);
 
     }
