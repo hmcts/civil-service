@@ -92,12 +92,11 @@ class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder
                 .builder()
                 .atStatePendingClaimIssued()
-                .build()
-                .builder()
-                .systemGeneratedCaseDocuments(new ArrayList<>())
-                .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
-                .caseDataLiP(caseDataLiP)
                 .build();
+            caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+            caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+            caseData.setCaseDataLiP(caseDataLiP);
+
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

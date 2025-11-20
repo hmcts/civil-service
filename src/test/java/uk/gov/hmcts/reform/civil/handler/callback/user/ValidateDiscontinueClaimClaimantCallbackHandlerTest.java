@@ -266,21 +266,20 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
             respondentLiPResponse.setRespondent1ResponseLanguage("BOTH");
             CaseDataLiP caseDataLiP  = new CaseDataLiP();
             caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1(PartyBuilder.builder().individual().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1(PartyBuilder.builder().individual().build().toBuilder()
                                  .individualFirstName("John")
                                  .individualLastName("Doe")
-                                 .build())
-                .applicant1(PartyBuilder.builder().individual().build().toBuilder()
+                                 .build());
+            caseData.setApplicant1(PartyBuilder.builder().individual().build().toBuilder()
                                 .individualFirstName("Doe")
                                 .individualLastName("John")
-                                .build())
-                .respondent1Represented(YesOrNo.NO)
-                .typeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE)
-                .respondent1NoticeOfDiscontinueCWViewDoc(caseDocument)
-                .confirmOrderGivesPermission(ConfirmOrderGivesPermission.YES)
-                .caseDataLiP(caseDataLiP)
-                .build();
+                                .build());
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE);
+            caseData.setRespondent1NoticeOfDiscontinueCWViewDoc(caseDocument);
+            caseData.setConfirmOrderGivesPermission(ConfirmOrderGivesPermission.YES);
+            caseData.setCaseDataLiP(caseDataLiP);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().setEventId(GEN_NOTICE_OF_DISCONTINUANCE.name());

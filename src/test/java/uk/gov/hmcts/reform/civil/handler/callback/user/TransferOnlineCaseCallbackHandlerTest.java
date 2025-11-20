@@ -267,11 +267,10 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .caseManagementLocation(caseLocation)
                 .transferCourtLocationList(transferCourtList).build();
+            caseData.setApplicant1Represented(applicantRepresented);
+            caseData.setRespondent1Represented(respondent1Represented);
 
-            CallbackParams params = callbackParamsOf(caseData.toBuilder()
-                                                         .applicant1Represented(applicantRepresented)
-                                                         .respondent1Represented(respondent1Represented)
-                                                         .build(), ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
@@ -319,11 +318,10 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .caseManagementLocation(caseLocation)
                 .transferCourtLocationList(transferCourtList).build();
+            caseData.setApplicant1Represented(applicantRepresented);
+            caseData.setRespondent1Represented(respondent1Represented);
 
-            CallbackParams params = callbackParamsOf(caseData.toBuilder()
-                                                         .applicant1Represented(applicantRepresented)
-                                                         .respondent1Represented(respondent1Represented)
-                                                         .build(), ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
@@ -370,12 +368,11 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
             DynamicListElement transferCourtElement = new DynamicListElement(null, "Site 1 - Adr 1 - AAA 111");
             DynamicList transferCourtList = new DynamicList();
             transferCourtList.setValue(transferCourtElement);
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                .caseManagementLocation(caseLocation)
-                .respondent1Represented(respondent1Represented)
-                .applicant1Represented(applicant1Represented)
-                .transferCourtLocationList(transferCourtList)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData.setCaseManagementLocation(caseLocation);
+            caseData.setRespondent1Represented(respondent1Represented);
+            caseData.setApplicant1Represented(applicant1Represented);
+            caseData.setTransferCourtLocationList(transferCourtList);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             given(courtLocationUtils.findPreferredLocationData(any(), any()))
                 .willReturn(LocationRefData.builder().siteName("")

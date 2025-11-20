@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.citizenui.HelpWithFeesForTabService;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,12 +56,11 @@ class UpdateHelpWithFeeRefNumberHandlerTest extends BaseCallbackHandlerTest {
             helpWithFees.setHelpWithFeesReferenceNumber("23456");
             CaseDataLiP caseDataLiP = new CaseDataLiP();
             caseDataLiP.setHelpWithFees(helpWithFees);
-            CaseData caseData = CaseData.builder()
-                    .claimIssuedHwfDetails(claimIssuedDetails)
-                    .hwfFeeType(FeeType.CLAIMISSUED)
-                    .claimFee(claimFee)
-                    .caseDataLiP(caseDataLiP)
-                    .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setClaimIssuedHwfDetails(claimIssuedDetails);
+            caseData.setHwfFeeType(FeeType.CLAIMISSUED);
+            caseData.setClaimFee(claimFee);
+            caseData.setCaseDataLiP(caseDataLiP);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
@@ -80,12 +80,11 @@ class UpdateHelpWithFeeRefNumberHandlerTest extends BaseCallbackHandlerTest {
             hearingDetails.setHwfReferenceNumber("78905185430");
             Fee hearingFee = new Fee();
             hearingFee.setCode("CODE");
-            CaseData caseData = CaseData.builder()
-                    .hearingHwfDetails(hearingDetails)
-                    .hwfFeeType(FeeType.HEARING)
-                    .hearingFee(hearingFee)
-                    .hearingHelpFeesReferenceNumber("54376543219")
-                    .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setHearingHwfDetails(hearingDetails);
+            caseData.setHwfFeeType(FeeType.HEARING);
+            caseData.setHearingFee(hearingFee);
+            caseData.setHearingHelpFeesReferenceNumber("54376543219");
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
