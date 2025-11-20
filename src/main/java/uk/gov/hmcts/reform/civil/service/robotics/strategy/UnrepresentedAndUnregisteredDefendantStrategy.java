@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.EnumeratedMiscParams;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
@@ -64,11 +65,13 @@ public class UnrepresentedAndUnregisteredDefendantStrategy implements EventHisto
                 builder,
                 sequenceGenerator,
                 timelineHelper,
-                submittedDate,
-                index,
-                bodies.size(),
-                bodies.get(index),
-                textFormatter::unrepresentedAndUnregisteredCombined
+                new EnumeratedMiscParams(
+                    submittedDate,
+                    index,
+                    bodies.size(),
+                    bodies.get(index),
+                    textFormatter::unrepresentedAndUnregisteredCombined
+                )
             ))
             .forEach(builder::miscellaneous);
     }

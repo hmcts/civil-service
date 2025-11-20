@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import java.time.LocalDateTime;
-import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
@@ -84,22 +84,39 @@ public final class RoboticsEventSupport {
     public static Event buildEnumeratedMiscEvent(EventHistory.EventHistoryBuilder builder,
                                                  RoboticsSequenceGenerator sequenceGenerator,
                                                  RoboticsTimelineHelper timelineHelper,
-                                                 LocalDateTime dateReceived,
-                                                 int index,
-                                                 int total,
-                                                 String subject,
-                                                 BiFunction<String, String, String> messageResolver) {
-        String prefix = total > 1
-            ? String.format("[%d of %d - %s] ", index + 1, total, timelineHelper.now().toLocalDate())
+                                                 EnumeratedMiscParams params) {
+        String prefix = params.total > 1
+            ? String.format("[%d of %d - %s] ", params.index + 1, params.total, timelineHelper.now().toLocalDate())
             : "";
-        String details = messageResolver.apply(prefix, subject);
+        String details = params.messageResolver.apply(prefix, params.subject);
         return Event.builder()
             .eventSequence(sequenceGenerator.nextSequence(builder.build()))
             .eventCode(MISCELLANEOUS.getCode())
-            .dateReceived(dateReceived)
+            .dateReceived(params.dateReceived)
             .eventDetailsText(details)
             .eventDetails(EventDetails.builder().miscText(details).build())
             .build();
+    }
+
+    public static final class EnumeratedMiscParams {
+
+        private final LocalDateTime dateReceived;
+        private final int index;
+        private final int total;
+        private final String subject;
+        private final BinaryOperator<String> messageResolver;
+
+        public EnumeratedMiscParams(LocalDateTime dateReceived,
+                                    int index,
+                                    int total,
+                                    String subject,
+                                    BinaryOperator<String> messageResolver) {
+            this.dateReceived = dateReceived;
+            this.index = index;
+            this.total = total;
+            this.subject = subject;
+            this.messageResolver = messageResolver;
+        }
     }
 
     public static Event buildLipVsLrMiscEvent(EventHistory.EventHistoryBuilder builder,

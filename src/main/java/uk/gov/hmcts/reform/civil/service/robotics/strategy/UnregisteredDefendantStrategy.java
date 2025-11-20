@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.EnumeratedMiscParams;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
@@ -53,11 +54,13 @@ public class UnregisteredDefendantStrategy implements EventHistoryStrategy {
                 builder,
                 sequenceGenerator,
                 timelineHelper,
-                submittedDate,
-                index,
-                defendantNames.size(),
-                defendantNames.get(index),
-                textFormatter::unregisteredSolicitor
+                new EnumeratedMiscParams(
+                    submittedDate,
+                    index,
+                    defendantNames.size(),
+                    defendantNames.get(index),
+                    textFormatter::unregisteredSolicitor
+                )
             ))
             .forEach(builder::miscellaneous);
     }

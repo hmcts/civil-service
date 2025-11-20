@@ -29,7 +29,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -167,7 +166,7 @@ class RespondentDivergentResponseStrategyTest {
         List<String> miscTexts = history.getMiscellaneous().stream()
             .filter(event -> event != null && event.getEventCode() != null)
             .map(Event::getEventDetailsText)
-            .collect(Collectors.toList());
+            .toList();
         assertThat(miscTexts)
             .containsExactly(respondentResponseSupport.prepareRespondentResponseText(
                 caseData,
