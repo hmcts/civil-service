@@ -635,15 +635,13 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
-            DynamicList expected = DynamicList.builder()
-                .listItems(List.of(
-                               DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                               DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build(),
-                               DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                           )
-                )
-                .value(DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build())
-                .build();
+            DynamicListElement element1 = new DynamicListElement("00001", "court 1 - 1 address - Y01 7RB");
+            DynamicListElement element2 = new DynamicListElement(preSelectedCourt, "court 2 - 2 address - Y02 7RB");
+            DynamicListElement element3 = new DynamicListElement("00003", "court 3 - 3 address - Y03 7RB");
+            DynamicListElement selectedValue = new DynamicListElement(preSelectedCourt, "court 2 - 2 address - Y02 7RB");
+            DynamicList expected = new DynamicList();
+            expected.setListItems(List.of(element1, element2, element3));
+            expected.setValue(selectedValue);
 
             assertThat(responseCaseData.getTrialHearingMethodInPersonDJ()).isEqualTo(expected);
             assertThat(responseCaseData.getDisposalHearingMethodInPersonDJ()).isEqualTo(expected);
@@ -743,9 +741,9 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedTrialDJInPersonHearingNew().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            Document document = new Document("url", null, null, null, null, null);
+            CaseDocument order = new CaseDocument();
+            order.setDocumentLink(document);
             when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
@@ -757,9 +755,9 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedTrialSDOTelephoneHearingNew().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            Document document = new Document("url", null, null, null, null, null);
+            CaseDocument order = new CaseDocument();
+            order.setDocumentLink(document);
             when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
@@ -771,9 +769,9 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedTrialSDOVideoHearingNew().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            Document document = new Document("url", null, null, null, null, null);
+            CaseDocument order = new CaseDocument();
+            order.setDocumentLink(document);
             when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
@@ -785,9 +783,9 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedDisposalSDOInPerson().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            Document document = new Document("url", null, null, null, null, null);
+            CaseDocument order = new CaseDocument();
+            order.setDocumentLink(document);
             when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
@@ -799,9 +797,9 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedDisposalSDOTelephoneCall().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            Document document = new Document("url", null, null, null, null, null);
+            CaseDocument order = new CaseDocument();
+            order.setDocumentLink(document);
             when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
@@ -813,9 +811,9 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedDisposalDJVideoCallNew().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            Document document = new Document("url", null, null, null, null, null);
+            CaseDocument order = new CaseDocument();
+            order.setDocumentLink(document);
             when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
@@ -829,9 +827,11 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         void shouldFinishBusinessProcess() {
             List<String> items = List.of("label 1", "label 2", "label 3");
             DynamicList options = DynamicList.fromList(items, Object::toString, Object::toString, items.get(0), false);
+            CaseLocationCivil caseLocation = new CaseLocationCivil();
+            caseLocation.setBaseLocation("00000");
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
                 .toBuilder()
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
+                .caseManagementLocation(caseLocation)
                 .disposalHearingMethodInPersonDJ(options)
                 .trialHearingMethodInPersonDJ(options)
                 .build();
@@ -842,25 +842,24 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAssignCategoryId_whenInvoked() {
-            CaseDocument testDocument = CaseDocument.builder()
-                .createdBy("John")
-                .documentName("document name")
-                .documentSize(0L)
-                .documentType(ACKNOWLEDGEMENT_OF_CLAIM)
-                .createdDatetime(LocalDateTime.now())
-                .documentLink(Document.builder()
-                                  .documentUrl("fake-url")
-                                  .documentFileName("file-name")
-                                  .documentBinaryUrl("binary-url")
-                                  .build())
-                .build();
+            Document documentLink = new Document("fake-url", "binary-url", "file-name", null, null, null);
+            CaseDocument testDocument = new CaseDocument();
+            testDocument.setCreatedBy("John");
+            testDocument.setDocumentName("document name");
+            testDocument.setDocumentSize(0L);
+            testDocument.setDocumentType(ACKNOWLEDGEMENT_OF_CLAIM);
+            testDocument.setCreatedDatetime(LocalDateTime.now());
+            testDocument.setDocumentLink(documentLink);
             List<Element<CaseDocument>> documentList = new ArrayList<>();
             documentList.add(element(testDocument));
             List<String> items = List.of("label 1", "label 2", "label 3");
             DynamicList options = DynamicList.fromList(items, Object::toString, items.get(0), false);
             //Given
+            CaseLocationCivil caseLocation = new CaseLocationCivil();
+            caseLocation.setBaseLocation("1010101");
+            caseLocation.setRegion("orange");
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("1010101").region("orange").build())
+                .caseManagementLocation(caseLocation)
                 .trialHearingMethodInPersonDJ(options)
                 .disposalHearingMethodInPersonDJ(options)
                 .orderSDODocumentDJCollection(documentList)
@@ -901,13 +900,15 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             }
         }
+        DynamicListElement transferCourtElement = new DynamicListElement(null, "Site 1 - Adr 1 - AAA 111");
+        DynamicList transferCourtList = new DynamicList();
+        transferCourtList.setValue(transferCourtElement);
+        CaseLocationCivil caseLocation = new CaseLocationCivil();
+        caseLocation.setBaseLocation("111");
+        caseLocation.setRegion("2");
         CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .region("2")
-                                        .baseLocation("111")
-                                        .build())
-            .transferCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
-                                                                       .label("Site 1 - Adr 1 - AAA 111").build()).build()).build();
+            .caseManagementLocation(caseLocation)
+            .transferCourtLocationList(transferCourtList).build();
 
         CallbackParams params = callbackParamsOf(caseData.toBuilder()
                                                      .applicant1Represented(applicantRepresented)
@@ -953,13 +954,15 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         if (!isWelshEnabled && NO.equals(respondent1Represented)) {
             when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
         }
+        DynamicListElement transferCourtElement = new DynamicListElement(null, "Site 1 - Adr 1 - AAA 111");
+        DynamicList transferCourtList = new DynamicList();
+        transferCourtList.setValue(transferCourtElement);
+        CaseLocationCivil caseLocation = new CaseLocationCivil();
+        caseLocation.setBaseLocation("111");
+        caseLocation.setRegion("2");
         CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .region("2")
-                                        .baseLocation("111")
-                                        .build())
-            .transferCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
-                                                                       .label("Site 1 - Adr 1 - AAA 111").build()).build()).build();
+            .caseManagementLocation(caseLocation)
+            .transferCourtLocationList(transferCourtList).build();
 
         CallbackParams params = callbackParamsOf(caseData.toBuilder()
                                                      .applicant1Represented(applicantRepresented)
@@ -985,13 +988,13 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     void shouldSetEaCourtLocationYes_whenSpecClaimAndWelshEnabled() {
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
+        CaseLocationCivil caseLocation = new CaseLocationCivil();
+        caseLocation.setBaseLocation("111");
+        caseLocation.setRegion("2");
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
             .caseAccessCategory(SPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .region("2")
-                                        .baseLocation("111")
-                                        .build())
+            .caseManagementLocation(caseLocation)
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1006,15 +1009,15 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     void shouldSetEaCourtLocationYes_whenSpecClaimNonLipAndWelshDisabled() {
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
 
+        CaseLocationCivil caseLocation = new CaseLocationCivil();
+        caseLocation.setBaseLocation("111");
+        caseLocation.setRegion("2");
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
             .caseAccessCategory(SPEC_CLAIM)
             .applicant1Represented(YES)
             .respondent1Represented(YES)
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .region("2")
-                                        .baseLocation("111")
-                                        .build())
+            .caseManagementLocation(caseLocation)
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1027,15 +1030,15 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldSetEaCourtLocationNull_whenUnSpecClaim() {
+        CaseLocationCivil caseLocation = new CaseLocationCivil();
+        caseLocation.setBaseLocation("111");
+        caseLocation.setRegion("2");
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
             .caseAccessCategory(UNSPEC_CLAIM)
             .applicant1Represented(NO)
             .respondent1Represented(YES)
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .region("2")
-                                        .baseLocation("111")
-                                        .build())
+            .caseManagementLocation(caseLocation)
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1051,15 +1054,15 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
 
+        CaseLocationCivil caseLocation = new CaseLocationCivil();
+        caseLocation.setBaseLocation("111");
+        caseLocation.setRegion("2");
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
             .caseAccessCategory(SPEC_CLAIM)
             .applicant1Represented(NO) // LiP
             .respondent1Represented(YES)
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .region("2")
-                                        .baseLocation("111")
-                                        .build())
+            .caseManagementLocation(caseLocation)
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1078,8 +1081,10 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                                userService, assignCategoryId, categoryService, locationHelper,
                                                Optional.empty(), deadlinesCalculator, workingDayIndicator);
 
+        CaseLocationCivil caseLocation = new CaseLocationCivil();
+        caseLocation.setBaseLocation("123456");
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").build())
+            .caseManagementLocation(caseLocation)
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -1092,8 +1097,10 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     void shouldCallUpdateWaCourtLocationsServiceWhenPresent_AndMintiEnabled() {
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
+        CaseLocationCivil caseLocation = new CaseLocationCivil();
+        caseLocation.setBaseLocation("123456");
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").build())
+            .caseManagementLocation(caseLocation)
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 

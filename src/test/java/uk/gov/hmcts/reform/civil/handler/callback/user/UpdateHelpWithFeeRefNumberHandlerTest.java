@@ -46,16 +46,20 @@ class UpdateHelpWithFeeRefNumberHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldUpdateHwFReferenceNumberSuccessfully_FeeType_ClaimIssued() {
             //Given
+            HelpWithFeesDetails claimIssuedDetails = new HelpWithFeesDetails();
+            claimIssuedDetails.setHwfReferenceNumber("7890");
+            Fee claimFee = new Fee();
+            claimFee.setCode("CODE");
+            HelpWithFees helpWithFees = new HelpWithFees();
+            helpWithFees.setHelpWithFee(YesOrNo.YES);
+            helpWithFees.setHelpWithFeesReferenceNumber("23456");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setHelpWithFees(helpWithFees);
             CaseData caseData = CaseData.builder()
-                    .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
-                            .hwfReferenceNumber("7890").build())
+                    .claimIssuedHwfDetails(claimIssuedDetails)
                     .hwfFeeType(FeeType.CLAIMISSUED)
-                    .claimFee(Fee.builder().code("CODE").build())
-                    .caseDataLiP(CaseDataLiP.builder().helpWithFees(
-                            HelpWithFees.builder()
-                                    .helpWithFee(YesOrNo.YES)
-                                    .helpWithFeesReferenceNumber("23456")
-                                    .build()).build())
+                    .claimFee(claimFee)
+                    .caseDataLiP(caseDataLiP)
                     .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -72,11 +76,14 @@ class UpdateHelpWithFeeRefNumberHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldUpdateHwFReferenceNumberSuccessfully_FeeType_Hearing() {
             //Given
+            HelpWithFeesDetails hearingDetails = new HelpWithFeesDetails();
+            hearingDetails.setHwfReferenceNumber("78905185430");
+            Fee hearingFee = new Fee();
+            hearingFee.setCode("CODE");
             CaseData caseData = CaseData.builder()
-                    .hearingHwfDetails(HelpWithFeesDetails.builder()
-                            .hwfReferenceNumber("78905185430").build())
+                    .hearingHwfDetails(hearingDetails)
                     .hwfFeeType(FeeType.HEARING)
-                    .hearingFee(Fee.builder().code("CODE").build())
+                    .hearingFee(hearingFee)
                     .hearingHelpFeesReferenceNumber("54376543219")
                     .build();
 

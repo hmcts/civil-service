@@ -103,13 +103,15 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldGiveErrorIfSameCourtLocationSelected() {
 
+            CaseLocationCivil caseLocation = new CaseLocationCivil();
+            caseLocation.setRegion("2");
+            caseLocation.setBaseLocation("111");
+            DynamicListElement transferCourtElement = new DynamicListElement(null, "Site 1 - Adr 1 - AAA 111");
+            DynamicList transferCourtList = new DynamicList();
+            transferCourtList.setValue(transferCourtElement);
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .caseManagementLocation(CaseLocationCivil.builder()
-                                            .region("2")
-                                            .baseLocation("111")
-                                            .build())
-                .transferCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
-                                                                           .label("Site 1 - Adr 1 - AAA 111").build()).build()).build();
+                .caseManagementLocation(caseLocation)
+                .transferCourtLocationList(transferCourtList).build();
             given(courtLocationUtils.findPreferredLocationData(any(), any()))
                 .willReturn(LocationRefData.builder().siteName("")
                                 .epimmsId("111")
@@ -125,9 +127,11 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldGiveErrorIfNoCourtLocationSelected() {
 
+            DynamicListElement transferCourtElement = new DynamicListElement(null, "Site 1 - Adr 1 - AAA 111");
+            DynamicList transferCourtList = new DynamicList();
+            transferCourtList.setValue(transferCourtElement);
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .transferCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
-                                                                           .label("Site 1 - Adr 1 - AAA 111").build()).build()).build();
+                .transferCourtLocationList(transferCourtList).build();
             given(courtLocationUtils.findPreferredLocationData(any(), any()))
                 .willReturn(LocationRefData.builder().siteName("")
                                 .epimmsId("111")
@@ -143,13 +147,15 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotGiveErrorIfDifferentCourtLocationSelected() {
 
+            CaseLocationCivil caseLocation = new CaseLocationCivil();
+            caseLocation.setRegion("2");
+            caseLocation.setBaseLocation("111");
+            DynamicListElement transferCourtElement = new DynamicListElement(null, "Site 1 - Adr 1 - AAA 111");
+            DynamicList transferCourtList = new DynamicList();
+            transferCourtList.setValue(transferCourtElement);
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .caseManagementLocation(CaseLocationCivil.builder()
-                                            .region("2")
-                                            .baseLocation("111")
-                                            .build())
-                .transferCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
-                                                                           .label("Site 1 - Adr 1 - AAA 111").build()).build()).build();
+                .caseManagementLocation(caseLocation)
+                .transferCourtLocationList(transferCourtList).build();
 
             given(courtLocationUtils.findPreferredLocationData(any(), any()))
                 .willReturn(LocationRefData.builder().siteName("")
@@ -167,14 +173,16 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
         @Test
         void shouldPopulateCorrectCaseDataWhenSubmitted() {
+            CaseLocationCivil caseLocation = new CaseLocationCivil();
+            caseLocation.setRegion("2");
+            caseLocation.setBaseLocation("111");
+            DynamicListElement transferCourtElement = new DynamicListElement(null, "Site 1 - Adr 1 - AAA 111");
+            DynamicList transferCourtList = new DynamicList();
+            transferCourtList.setValue(transferCourtElement);
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .caseManagementLocation(CaseLocationCivil.builder()
-                                            .region("2")
-                                            .baseLocation("111")
-                                            .build())
+                .caseManagementLocation(caseLocation)
                 .reasonForTransfer("Reason")
-                .transferCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
-                                                                                   .label("Site 1 - Adr 1 - AAA 111").build()).build()).build();
+                .transferCourtLocationList(transferCourtList).build();
             given(courtLocationUtils.findPreferredLocationData(any(), any()))
                 .willReturn(LocationRefData.builder().siteName("")
                                 .epimmsId("222")
@@ -201,13 +209,15 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateCorrectCaseDataWhenSubmittedAndNoNewCourtLocation() {
+            CaseLocationCivil caseLocation = new CaseLocationCivil();
+            caseLocation.setRegion("2");
+            caseLocation.setBaseLocation("111");
+            DynamicListElement transferCourtElement = new DynamicListElement(null, "Site 1 - Adr 1 - AAA 111");
+            DynamicList transferCourtList = new DynamicList();
+            transferCourtList.setValue(transferCourtElement);
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .caseManagementLocation(CaseLocationCivil.builder()
-                                            .region("2")
-                                            .baseLocation("111")
-                                            .build())
-                .transferCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
-                                                                           .label("Site 1 - Adr 1 - AAA 111").build()).build()).build();
+                .caseManagementLocation(caseLocation)
+                .transferCourtLocationList(transferCourtList).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData())
@@ -248,13 +258,15 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .epimmsId("222")
                                 .siteName("Site 2").courtAddress("Adr 2").postcode("BBB 222")
                                 .courtLocationCode("other code").build());
+            CaseLocationCivil caseLocation = new CaseLocationCivil();
+            caseLocation.setRegion("2");
+            caseLocation.setBaseLocation("111");
+            DynamicListElement transferCourtElement = new DynamicListElement(null, "Site 1 - Adr 1 - AAA 111");
+            DynamicList transferCourtList = new DynamicList();
+            transferCourtList.setValue(transferCourtElement);
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .caseManagementLocation(CaseLocationCivil.builder()
-                                            .region("2")
-                                            .baseLocation("111")
-                                            .build())
-                .transferCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
-                                                                           .label("Site 1 - Adr 1 - AAA 111").build()).build()).build();
+                .caseManagementLocation(caseLocation)
+                .transferCourtLocationList(transferCourtList).build();
 
             CallbackParams params = callbackParamsOf(caseData.toBuilder()
                                                          .applicant1Represented(applicantRepresented)
@@ -298,13 +310,15 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .epimmsId("222")
                                 .siteName("Site 2").courtAddress("Adr 2").postcode("BBB 222")
                                 .courtLocationCode("other code").build());
+            CaseLocationCivil caseLocation = new CaseLocationCivil();
+            caseLocation.setRegion("2");
+            caseLocation.setBaseLocation("111");
+            DynamicListElement transferCourtElement = new DynamicListElement(null, "Site 1 - Adr 1 - AAA 111");
+            DynamicList transferCourtList = new DynamicList();
+            transferCourtList.setValue(transferCourtElement);
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .caseManagementLocation(CaseLocationCivil.builder()
-                                            .region("2")
-                                            .baseLocation("111")
-                                            .build())
-                .transferCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
-                                                                           .label("Site 1 - Adr 1 - AAA 111").build()).build()).build();
+                .caseManagementLocation(caseLocation)
+                .transferCourtLocationList(transferCourtList).build();
 
             CallbackParams params = callbackParamsOf(caseData.toBuilder()
                                                          .applicant1Represented(applicantRepresented)
@@ -324,13 +338,15 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .siteName("Site 2").courtAddress("Adr 2").postcode("BBB 222")
                                 .courtLocationCode("other code").build());
 
+            CaseLocationCivil caseLocation = new CaseLocationCivil();
+            caseLocation.setRegion("2");
+            caseLocation.setBaseLocation("111");
+            DynamicListElement transferCourtElement = new DynamicListElement(null, "Site 1 - Adr 1 - AAA 111");
+            DynamicList transferCourtList = new DynamicList();
+            transferCourtList.setValue(transferCourtElement);
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .caseManagementLocation(CaseLocationCivil.builder()
-                                            .region("2")
-                                            .baseLocation("111")
-                                            .build())
-                .transferCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
-                                                                           .label("Site 1 - Adr 1 - AAA 111").build()).build()).build();
+                .caseManagementLocation(caseLocation)
+                .transferCourtLocationList(transferCourtList).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
@@ -348,14 +364,17 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                        YesOrNo applicant1Represented,
                                                        YesOrNo respondent1Represented,
                                                        YesOrNo expectedEaCourtLocation) {
-            DynamicListElement selectedCourt = DynamicListElement.builder()
-                .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+            DynamicListElement selectedCourt = new DynamicListElement("00002", "court 2 - 2 address - Y02 7RB");
+            CaseLocationCivil caseLocation = new CaseLocationCivil();
+            caseLocation.setBaseLocation(selectedCourt.getCode());
+            DynamicListElement transferCourtElement = new DynamicListElement(null, "Site 1 - Adr 1 - AAA 111");
+            DynamicList transferCourtList = new DynamicList();
+            transferCourtList.setValue(transferCourtElement);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+                .caseManagementLocation(caseLocation)
                 .respondent1Represented(respondent1Represented)
                 .applicant1Represented(applicant1Represented)
-                .transferCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
-                                                                      .label("Site 1 - Adr 1 - AAA 111").build()).build())
+                .transferCourtLocationList(transferCourtList)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             given(courtLocationUtils.findPreferredLocationData(any(), any()))
@@ -380,13 +399,15 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .siteName("Site 2").courtAddress("Adr 2").postcode("BBB 222")
                                 .courtLocationCode("other code").build());
 
+            CaseLocationCivil caseLocation = new CaseLocationCivil();
+            caseLocation.setRegion("2");
+            caseLocation.setBaseLocation("111");
+            DynamicListElement transferCourtElement = new DynamicListElement(null, "Site 1 - Adr 1 - AAA 111");
+            DynamicList transferCourtList = new DynamicList();
+            transferCourtList.setValue(transferCourtElement);
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .caseManagementLocation(CaseLocationCivil.builder()
-                                            .region("2")
-                                            .baseLocation("111")
-                                            .build())
-                .transferCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
-                                                                           .label("Site 1 - Adr 1 - AAA 111").build()).build()).build();
+                .caseManagementLocation(caseLocation)
+                .transferCourtLocationList(transferCourtList).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -405,13 +426,15 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .siteName("Site 2").courtAddress("Adr 2").postcode("BBB 222")
                                 .courtLocationCode("other code").build());
 
+            CaseLocationCivil caseLocation = new CaseLocationCivil();
+            caseLocation.setRegion("2");
+            caseLocation.setBaseLocation("111");
+            DynamicListElement transferCourtElement = new DynamicListElement(null, "Site 1 - Adr 1 - AAA 111");
+            DynamicList transferCourtList = new DynamicList();
+            transferCourtList.setValue(transferCourtElement);
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .caseManagementLocation(CaseLocationCivil.builder()
-                                            .region("2")
-                                            .baseLocation("111")
-                                            .build())
-                .transferCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
-                                                                           .label("Site 1 - Adr 1 - AAA 111").build()).build()).build();
+                .caseManagementLocation(caseLocation)
+                .transferCourtLocationList(transferCourtList).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
