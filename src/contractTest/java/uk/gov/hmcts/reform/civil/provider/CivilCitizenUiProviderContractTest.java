@@ -17,6 +17,8 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,6 +27,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.civil.controllers.fees.FeesPaymentController;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
@@ -64,6 +67,14 @@ class CivilCitizenUiProviderContractTest {
             .matchingBranch()
             .mainBranch()
             .deployedOrReleased();
+    }
+
+    @BeforeAll
+    static void requirePactBroker() {
+        Assumptions.assumeTrue(
+            StringUtils.hasText(System.getenv("PACT_BROKER_FULL_URL")),
+            "PACT_BROKER_FULL_URL must be set to run provider verification tests"
+        );
     }
 
     @BeforeEach
