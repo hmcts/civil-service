@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.event;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import jakarta.persistence.EntityManager;
 
 @Service
+@ConditionalOnProperty(value = "app.jpa.enabled", havingValue = "true", matchIfMissing = true)
 @Slf4j
 public class DashboardScenarioTransactionalService implements IDashboardScenarioService {
 
@@ -46,4 +48,3 @@ public class DashboardScenarioTransactionalService implements IDashboardScenario
     }
 
 }
-
