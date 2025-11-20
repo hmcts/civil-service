@@ -66,7 +66,8 @@ public class PaymentRequestUpdateCallbackService {
 
         CaseDetails caseDetails = coreCaseDataService.getCase(caseId);
 
-        if (caseDetails.getCaseTypeId().equals(GENERALAPPLICATION_CASE_TYPE) && dto.getServiceRequestStatus().equalsIgnoreCase(PAID)) {
+        if (GENERALAPPLICATION_CASE_TYPE.equals(caseDetails.getCaseTypeId())
+            && dto.getServiceRequestStatus().equalsIgnoreCase(PAID)) {
             log.info("Processing payment callback for General Application Case details for caseId {}", caseId);
 
             GeneralApplicationCaseData caseData = caseDetailsConverter.toGeneralApplicationCaseData(caseDetails);
