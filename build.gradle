@@ -464,7 +464,6 @@ dependencies {
   testImplementation group: 'com.h2database', name: 'h2', version: '2.3.232'
   // dashboard specific changes ends
 
-
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
