@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -104,7 +105,7 @@ class CivilCitizenUiProviderContractTest {
         when(feesPaymentService.createGovPaymentRequest(
             FeeType.CLAIMISSUED,
             CASE_REFERENCE,
-            AUTH_HEADER
+            anyString()
         )).thenReturn(
             CardPaymentStatusResponse.builder()
                 .externalReference("2023-1701090705688")
@@ -122,7 +123,7 @@ class CivilCitizenUiProviderContractTest {
             FeeType.CLAIMISSUED,
             CASE_REFERENCE,
             PAYMENT_REFERENCE,
-            AUTH_HEADER
+            anyString()
         )).thenReturn(
             CardPaymentStatusResponse.builder()
                 .externalReference("2023-1701090705688")
