@@ -25,15 +25,6 @@ public class HelpWithFeesForTabService {
         }
     }
 
-    public void setUpHelpWithFeeTab(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
-        CaseData caseData = caseDataBuilder.build();
-        if (FeeType.CLAIMISSUED == caseData.getHwfFeeType()) {
-            caseDataBuilder.claimIssuedHwfForTab(setUpClaimIssuedHelpWithFeeTab(caseData));
-        } else if (FeeType.HEARING == caseData.getHwfFeeType()) {
-            caseDataBuilder.hearingHwfForTab(setUpHearingHelpWithFeeTab(caseData));
-        }
-    }
-
     private HelpWithFeesForTab setUpHearingHelpWithFeeTab(CaseData caseData) {
         return HelpWithFeesForTab.builder()
             .remissionAmount(Optional.ofNullable(caseData.getHearingHwfDetails())

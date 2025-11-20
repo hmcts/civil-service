@@ -26,6 +26,7 @@ public class CaseFlagsInitialiser {
     private final OrganisationService organisationService;
 
     public void initialiseCaseFlags(CaseEvent caseEvent, CaseData caseData) {
+
         switch (caseEvent) {
             case CREATE_CLAIM, CREATE_CLAIM_SPEC, CREATE_LIP_CLAIM: {
                 initialiseApplicantAndRespondentFlags(caseData);
@@ -36,98 +37,44 @@ public class CaseFlagsInitialiser {
                 break;
             }
             case DEFENDANT_RESPONSE_SPEC, DEFENDANT_RESPONSE, DEFENDANT_RESPONSE_CUI: {
-                CaseFlagUtils.addRespondentDQPartiesFlagStructure(caseData);
+                addRespondentDQPartiesFlagStructure(caseData);
                 break;
             }
             case CLAIMANT_RESPONSE, CLAIMANT_RESPONSE_SPEC, CLAIMANT_RESPONSE_CUI: {
-                CaseFlagUtils.addApplicantExpertAndWitnessFlagsStructure(caseData);
+                addApplicantExpertAndWitnessFlagsStructure(caseData);
                 break;
             }
             case MANAGE_CONTACT_INFORMATION: {
-                CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
+                createOrUpdateFlags(caseData, organisationService);
                 break;
             }
             default:
         }
     }
 
-    public void initialiseCaseFlags(CaseEvent caseEvent, CaseData.CaseDataBuilder<?, ?> dataBuilder) {
-
-        CaseData caseData = dataBuilder.build();
-        switch (caseEvent) {
-            case CREATE_CLAIM, CREATE_CLAIM_SPEC, CREATE_LIP_CLAIM: {
-                initialiseApplicantAndRespondentFlags(dataBuilder, caseData);
-                break;
-            }
-            case ADD_DEFENDANT_LITIGATION_FRIEND: {
-                initialiseRespondentLitigationFriendFlags(dataBuilder, caseData);
-                break;
-            }
-            case DEFENDANT_RESPONSE_SPEC, DEFENDANT_RESPONSE, DEFENDANT_RESPONSE_CUI: {
-                addRespondentDQPartiesFlagStructure(dataBuilder, caseData);
-                break;
-            }
-            case CLAIMANT_RESPONSE, CLAIMANT_RESPONSE_SPEC, CLAIMANT_RESPONSE_CUI: {
-                addApplicantExpertAndWitnessFlagsStructure(dataBuilder, caseData);
-                break;
-            }
-            case MANAGE_CONTACT_INFORMATION: {
-                createOrUpdateFlags(dataBuilder, caseData, organisationService);
-                break;
-            }
-            default:
-        }
-    }
-
-    public void initialiseMissingCaseFlags(CaseData.CaseDataBuilder<?, ?> dataBuilder) {
-        CaseData caseData = dataBuilder.build();
-        initialiseApplicantAndRespondentFlags(dataBuilder, caseData);
-        initialiseRespondentLitigationFriendFlags(dataBuilder, caseData);
+    public void initialiseMissingCaseFlags(CaseData caseData) {
+        initialiseApplicantAndRespondentFlags(caseData);
+        initialiseRespondentLitigationFriendFlags(caseData);
         if (shouldReinitialiseRespondentDQFlags(caseData)) {
-            addRespondentDQPartiesFlagStructure(dataBuilder, caseData);
+            addRespondentDQPartiesFlagStructure(caseData);
         }
         if (shouldReinitialiseApplicantDQFlags(caseData)) {
-            addApplicantExpertAndWitnessFlagsStructure(dataBuilder, caseData);
+            addApplicantExpertAndWitnessFlagsStructure(caseData);
         }
-    }
-
-    private void initialiseRespondentLitigationFriendFlags(CaseData.CaseDataBuilder<?, ?> dataBuilder, CaseData caseData) {
-        dataBuilder
-            .respondent1LitigationFriend(
-                CaseFlagUtils.updateLitFriend(
-                    RESPONDENT_ONE_LITIGATION_FRIEND,
-                    caseData.getRespondent1LitigationFriend()
-                ))
-            .respondent2LitigationFriend(
-                CaseFlagUtils.updateLitFriend(
-                    RESPONDENT_TWO_LITIGATION_FRIEND,
-                    caseData.getRespondent2LitigationFriend()
-                ));
     }
 
     private void initialiseRespondentLitigationFriendFlags(CaseData caseData) {
-        caseData.setRespondent1LitigationFriend(
-            CaseFlagUtils.updateLitFriend(
-                RESPONDENT_ONE_LITIGATION_FRIEND,
-                caseData.getRespondent1LitigationFriend()
-            ));
+        caseData
+            .setRespondent1LitigationFriend(
+                CaseFlagUtils.updateLitFriend(
+                    RESPONDENT_ONE_LITIGATION_FRIEND,
+                    caseData.getRespondent1LitigationFriend()
+                ));
         caseData.setRespondent2LitigationFriend(
             CaseFlagUtils.updateLitFriend(
                 RESPONDENT_TWO_LITIGATION_FRIEND,
                 caseData.getRespondent2LitigationFriend()
             ));
-    }
-
-    private void initialiseApplicantAndRespondentFlags(CaseData.CaseDataBuilder<?, ?> dataBuilder, CaseData caseData) {
-        dataBuilder
-            .applicant1(CaseFlagUtils.updateParty(APPLICANT_ONE, caseData.getApplicant1()))
-            .applicant2(CaseFlagUtils.updateParty(APPLICANT_TWO, caseData.getApplicant2()))
-            .respondent1(CaseFlagUtils.updateParty(RESPONDENT_ONE, caseData.getRespondent1()))
-            .respondent2(CaseFlagUtils.updateParty(RESPONDENT_TWO, caseData.getRespondent2()))
-            .applicant1LitigationFriend(CaseFlagUtils.updateLitFriend(
-                APPLICANT_ONE_LITIGATION_FRIEND, caseData.getApplicant1LitigationFriend()))
-            .applicant2LitigationFriend(CaseFlagUtils.updateLitFriend(
-                APPLICANT_TWO_LITIGATION_FRIEND, caseData.getApplicant2LitigationFriend()));
     }
 
     private void initialiseApplicantAndRespondentFlags(CaseData caseData) {

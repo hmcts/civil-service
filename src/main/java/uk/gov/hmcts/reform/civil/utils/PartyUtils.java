@@ -435,34 +435,23 @@ public class PartyUtils {
             .build() : null;
     }
 
-    public static void populateDQPartyIds(CaseData.CaseDataBuilder<?, ?> builder) {
-        CaseData caseData = builder.build();
-        builder
-            .applicant1DQ(appendWithNewPartyIds(caseData.getApplicant1DQ()))
-            .applicant2DQ(appendWithNewPartyIds(caseData.getApplicant2DQ()))
-            .respondent1DQ(appendWithNewPartyIds(caseData.getRespondent1DQ()))
-            .respondent2DQ(appendWithNewPartyIds(caseData.getRespondent2DQ()));
-    }
-
-    public static CaseData populateDQPartyIds(CaseData caseData) {
+    public static void populateDQPartyIds(CaseData caseData) {
         caseData.setApplicant1DQ(appendWithNewPartyIds(caseData.getApplicant1DQ()));
         caseData.setApplicant2DQ(appendWithNewPartyIds(caseData.getApplicant2DQ()));
         caseData.setRespondent1DQ(appendWithNewPartyIds(caseData.getRespondent1DQ()));
         caseData.setRespondent2DQ(appendWithNewPartyIds(caseData.getRespondent2DQ()));
-        return caseData;
     }
 
-    public static void populateWithPartyIds(CaseData.CaseDataBuilder<?, ?> builder) {
-        CaseData caseData = builder.build();
-        builder
-            .applicant1(appendWithNewPartyId(caseData.getApplicant1()))
-            .applicant2(appendWithNewPartyId(caseData.getApplicant2()))
-            .respondent1(appendWithNewPartyId(caseData.getRespondent1()))
-            .respondent2(appendWithNewPartyId(caseData.getRespondent2()))
-            .applicant1LitigationFriend(appendWithNewPartyId(caseData.getApplicant1LitigationFriend()))
-            .applicant2LitigationFriend(appendWithNewPartyId(caseData.getApplicant2LitigationFriend()))
-            .respondent1LitigationFriend(appendWithNewPartyId(caseData.getRespondent1LitigationFriend()))
-            .respondent2LitigationFriend(appendWithNewPartyId(caseData.getRespondent2LitigationFriend()));
+    @SuppressWarnings("unchecked")
+    public static void populateWithPartyIds(CaseData caseData) {
+        caseData.setApplicant1(appendWithNewPartyId(caseData.getApplicant1()));
+        caseData.setApplicant2(appendWithNewPartyId(caseData.getApplicant2()));
+        caseData.setRespondent1(appendWithNewPartyId(caseData.getRespondent1()));
+        caseData.setRespondent2(appendWithNewPartyId(caseData.getRespondent2()));
+        caseData.setApplicant1LitigationFriend(appendWithNewPartyId(caseData.getApplicant1LitigationFriend()));
+        caseData.setApplicant2LitigationFriend(appendWithNewPartyId(caseData.getApplicant2LitigationFriend()));
+        caseData.setRespondent1LitigationFriend(appendWithNewPartyId(caseData.getRespondent1LitigationFriend()));
+        caseData.setRespondent2LitigationFriend(appendWithNewPartyId(caseData.getRespondent2LitigationFriend()));
     }
 
     public static CaseData populateWithPartyIds(CaseData caseData) {
@@ -488,6 +477,15 @@ public class PartyUtils {
             .respondent2Witnesses(appendWithNewPartyIds(caseData.getRespondent2Witnesses()));
     }
 
+    @SuppressWarnings("unchecked")
+    public static void populatePartyIndividuals(CaseData caseData) {
+        caseData.setApplicant1LRIndividuals(appendWithNewPartyIds(caseData.getApplicant1LRIndividuals()));
+        caseData.setRespondent1LRIndividuals(appendWithNewPartyIds(caseData.getRespondent1LRIndividuals()));
+        caseData.setRespondent2LRIndividuals(appendWithNewPartyIds(caseData.getRespondent2LRIndividuals()));
+        caseData.setApplicant1OrgIndividuals(appendWithNewPartyIds(caseData.getApplicant1OrgIndividuals()));
+        caseData.setApplicant2OrgIndividuals(appendWithNewPartyIds(caseData.getApplicant2OrgIndividuals()));
+        caseData.setRespondent1OrgIndividuals(appendWithNewPartyIds(caseData.getRespondent1OrgIndividuals()));
+        caseData.setRespondent2OrgIndividuals(appendWithNewPartyIds(caseData.getRespondent2OrgIndividuals()));
     public static CaseData populateWitnessAndExpertsPartyIds(CaseData caseData) {
         caseData.setApplicantExperts(appendWithNewPartyIds(caseData.getApplicantExperts()));
         caseData.setRespondent1Experts(appendWithNewPartyIds(caseData.getRespondent1Experts()));

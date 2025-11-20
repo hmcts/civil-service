@@ -79,6 +79,7 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
             .toUpperCase();
 
         caseData.setLitigantFriendSelection(selectedOption);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
@@ -129,13 +130,13 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
         }
 
         caseFlagsInitialiser.initialiseCaseFlags(ADD_DEFENDANT_LITIGATION_FRIEND, caseData);
-        caseData.setIsRespondent1(null);
-
         populateWithPartyIds(caseData);
+        updateGaCaseName(caseData);
 
+        caseData.setIsRespondent1(null);
         caseData.setCaseNameHmctsInternal(CaseNameUtils.buildCaseName(caseData));
         caseData.setCaseNamePublic(CaseNameUtils.buildCaseName(caseData));
-        updateGaCaseName(caseData);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();

@@ -23,8 +23,6 @@ public class HWFFeePaymentOutcomeService {
     private final HelpWithFeesForTabService helpWithFeesForTabService;
 
     public CaseData updateHwfReferenceNumber(CaseData caseData) {
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
-
         if (Objects.nonNull(caseData.getFeePaymentOutcomeDetails())
             && caseData.getFeePaymentOutcomeDetails().getHwfNumberAvailable() == YesOrNo.YES) {
             if (caseData.isHWFTypeClaimIssued()) {
@@ -33,26 +31,24 @@ public class HWFFeePaymentOutcomeService {
                     .helpWithFee(YesOrNo.YES)
                     .helpWithFeesReferenceNumber(caseData.getFeePaymentOutcomeDetails().getHwfNumberForFeePaymentOutcome())
                     .build();
-                updatedData.caseDataLiP(caseDataLip.toBuilder().helpWithFees(helpWithFees).build());
-                helpWithFeesForTabService.setUpHelpWithFeeTab(updatedData);
+                caseData.setCaseDataLiP(caseDataLip.toBuilder().helpWithFees(helpWithFees).build());
+                helpWithFeesForTabService.setUpHelpWithFeeTab(caseData);
             }
             if (caseData.isHWFTypeHearing()) {
-                updatedData.hearingHelpFeesReferenceNumber(caseData.getFeePaymentOutcomeDetails().getHwfNumberForFeePaymentOutcome()).build();
+                caseData.setHearingHelpFeesReferenceNumber(caseData.getFeePaymentOutcomeDetails().getHwfNumberForFeePaymentOutcome());
             }
-            clearHwfReferenceProperties(updatedData);
+            clearHwfReferenceProperties(caseData);
         }
-        return updatedData.build();
+        return caseData;
     }
 
-    private void clearHwfReferenceProperties(CaseData.CaseDataBuilder caseDataBuilder) {
-        CaseData caseData = caseDataBuilder.build();
-        caseDataBuilder.feePaymentOutcomeDetails(caseData.getFeePaymentOutcomeDetails().toBuilder()
+    private void clearHwfReferenceProperties(CaseData caseData) {
+        caseData.setFeePaymentOutcomeDetails(caseData.getFeePaymentOutcomeDetails().toBuilder()
                                                      .hwfNumberAvailable(null)
                                                      .hwfNumberForFeePaymentOutcome(null).build());
     }
 
     public CaseData updateOutstandingFee(CaseData caseData, String caseEventId) {
-        var updatedData = caseData.toBuilder();
         BigDecimal claimIssuedRemissionAmount = NO_REMISSION_HWF == CaseEvent.valueOf(caseEventId)
             ? BigDecimal.ZERO
             : caseData.getClaimIssueRemissionAmount();
@@ -65,23 +61,23 @@ public class HWFFeePaymentOutcomeService {
 
         if (caseData.isHWFTypeClaimIssued() && BigDecimal.ZERO.compareTo(claimFeeAmount) != 0) {
             outstandingFeeAmount = claimFeeAmount.subtract(claimIssuedRemissionAmount);
-            updatedData.claimIssuedHwfDetails(
+            caseData.setClaimIssuedHwfDetails(
                 caseData.getClaimIssuedHwfDetails().toBuilder()
                     .remissionAmount(claimIssuedRemissionAmount)
                     .outstandingFeeInPounds(MonetaryConversions.penniesToPounds(outstandingFeeAmount))
                     .build()
             );
-            helpWithFeesForTabService.setUpHelpWithFeeTab(updatedData);
+            helpWithFeesForTabService.setUpHelpWithFeeTab(caseData);
         } else if (caseData.isHWFTypeHearing() && BigDecimal.ZERO.compareTo(hearingFeeAmount) != 0) {
             outstandingFeeAmount = hearingFeeAmount.subtract(hearingRemissionAmount);
-            updatedData.hearingHwfDetails(
+            caseData.setHearingHwfDetails(
                 caseData.getHearingHwfDetails().toBuilder()
                     .remissionAmount(hearingRemissionAmount)
                     .outstandingFeeInPounds(MonetaryConversions.penniesToPounds(outstandingFeeAmount))
                     .build()
             );
-            helpWithFeesForTabService.setUpHelpWithFeeTab(updatedData);
+            helpWithFeesForTabService.setUpHelpWithFeeTab(caseData);
         }
-        return updatedData.build();
+        return caseData;
     }
 }

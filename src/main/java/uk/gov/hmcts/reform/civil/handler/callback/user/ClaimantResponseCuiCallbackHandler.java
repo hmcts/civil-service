@@ -119,9 +119,9 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         caseData.setApplicant1ResponseDate(applicant1ResponseDate);
         caseData.setBusinessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI));
         caseData.setRespondent1RespondToSettlementAgreementDeadline(caseData.isClaimantBilingual()
-            || caseData.isRespondentResponseBilingual()
-            ? null
-            : getRespondToSettlementAgreementDeadline(caseData, applicant1ResponseDate));
+                                                                 || caseData.isRespondentResponseBilingual()
+                                                                 ? null
+                                                                 : getRespondToSettlementAgreementDeadline(caseData, applicant1ResponseDate));
         caseData.setNextDeadline(null);
 
         updateCaseManagementLocationDetailsService.updateCaseManagementDetails(caseData, callbackParams);
@@ -138,12 +138,12 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             LocalDate whenBePaid = paymentDateService.calculatePaymentDeadline();
             caseData.setWhenToBePaidText(whenBePaid.format(DATE_FORMATTER));
             caseData.setRespondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                .whenWillThisAmountBePaid(whenBePaid).build());
+                                                      .whenWillThisAmountBePaid(whenBePaid).build());
         }
 
-        //Todo: Sumit Need to check below 5 lines
         updateCcjRequestPaymentDetails(caseData);
         updateLanguagePreference(caseData);
+
         populateDQPartyIds(caseData);
         addEventAndDateAddedToApplicantExperts(caseData);
         addEventAndDateAddedToApplicantWitnesses(caseData);
@@ -151,6 +151,8 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_CUI, caseData);
 
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(caseData);
+
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicant(callbackParams, caseData);
 
         if (featureToggleService.isJudgmentOnlineLive() && JudgmentAdmissionUtils.getLIPJudgmentAdmission(caseData)) {
             JudgmentDetails activeJudgmentDetails = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
@@ -162,7 +164,6 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
                 true
             ));
         }
-        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicant(callbackParams, caseData);
 
         if ((AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack())
             || AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack()))
@@ -170,9 +171,11 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             caseData.setIsMintiLipCase(YES);
         }
 
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(objectMapper))
-            .build();
+        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
+            AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseData.toMap(objectMapper));
+
+        return response.build();
     }
 
     private LocalDateTime getRespondToSettlementAgreementDeadline(CaseData caseData, LocalDateTime responseDate) {
