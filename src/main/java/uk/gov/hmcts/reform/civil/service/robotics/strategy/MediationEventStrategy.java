@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimantResponseDetails;
@@ -21,7 +20,6 @@ import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSu
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 
 @Component
-@Order(30)
 @RequiredArgsConstructor
 public class MediationEventStrategy implements EventHistoryStrategy {
 

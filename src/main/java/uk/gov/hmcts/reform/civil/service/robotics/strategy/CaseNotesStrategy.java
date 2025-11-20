@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
@@ -17,7 +16,6 @@ import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSu
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 @Component
-@Order(85)
 @RequiredArgsConstructor
 public class CaseNotesStrategy implements EventHistoryStrategy {
 

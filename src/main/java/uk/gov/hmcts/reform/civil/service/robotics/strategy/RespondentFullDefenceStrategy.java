@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -40,7 +38,6 @@ import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirecti
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.getRespondent2DQOrDefault;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildDirectionsQuestionnaireEvent;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildDefenceOrStatesPaidEvent;
-import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildCounterClaimEvent;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseExists;
@@ -49,7 +46,6 @@ import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2Divergent
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseExists;
 
 @Component
-@Order(42)
 @RequiredArgsConstructor
 public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
 
@@ -146,7 +142,6 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
             addDefenceOrStatesPaid(builder, caseData, buckets, responseDate, RESPONDENT_ID, caseData.getRespondToClaim());
         }
         addCounterClaimEventIfNeeded(builder, caseData, buckets, responseDate, RESPONDENT_ID, true);
-        addRespondentMiscEvent(builder, caseData, caseData.getRespondent1(), true, responseDate);
 
         Respondent1DQ respondent1DQ = getRespondent1DQOrDefault(caseData);
         buckets.directionsQuestionnaireEvents.add(
@@ -187,7 +182,6 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
 
         addDefenceOrStatesPaid(builder, caseData, buckets, responseDate, RESPONDENT2_ID, respondToClaim);
         addCounterClaimEventIfNeeded(builder, caseData, buckets, responseDate, RESPONDENT2_ID, false);
-        addRespondentMiscEvent(builder, caseData, caseData.getRespondent2(), false, responseDate);
 
         Respondent2DQ respondent2DQ = getRespondent2DQOrDefault(caseData);
         buckets.directionsQuestionnaireEvents.add(
@@ -239,6 +233,7 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
             buckets.statesPaidEvents.add(buildDefenceOrStatesPaidEvent(builder, sequenceGenerator, respondent1ResponseDate, RESPONDENT2_ID, true));
         }
         buckets.defenceEvents.add(buildDefenceOrStatesPaidEvent(builder, sequenceGenerator, respondent2ResponseDate, RESPONDENT2_ID, false));
+        addCounterClaimEventIfNeeded(builder, caseData, buckets, respondent2ResponseDate, RESPONDENT2_ID, false);
 
         buckets.directionsQuestionnaireEvents.add(
             createDirectionsQuestionnaireEvent(
@@ -251,8 +246,6 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
                 true
             )
         );
-        addCounterClaimEventIfNeeded(builder, caseData, buckets, respondent2ResponseDate, RESPONDENT2_ID, false);
-        addRespondentMiscEvent(builder, caseData, caseData.getRespondent2(), false, respondent2ResponseDate);
     }
 
     private boolean shouldUseRespondent1Response(CaseData caseData) {
@@ -359,8 +352,19 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
             return;
         }
         buckets.defenceAndCounterClaimEvents.add(
-            buildCounterClaimEvent(builder, sequenceGenerator, responseDate, partyId)
+            RoboticsEventSupport.buildCounterClaimEvent(builder, sequenceGenerator, responseDate, partyId)
         );
+        Party respondent = isRespondent1 ? caseData.getRespondent1() : caseData.getRespondent2();
+        if (respondent != null) {
+            respondentResponseSupport.addRespondentMiscEvent(
+                builder,
+                sequenceGenerator,
+                caseData,
+                respondent,
+                isRespondent1,
+                responseDate
+            );
+        }
     }
 
     private boolean isCounterClaimResponse(CaseData caseData, boolean isRespondent1) {
@@ -377,37 +381,10 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
         return RespondentResponseType.COUNTER_CLAIM.equals(responseType);
     }
 
-    private void addRespondentMiscEvent(EventHistory.EventHistoryBuilder builder,
-                                        CaseData caseData,
-                                        Party respondent,
-                                        boolean isRespondent1,
-                                        LocalDateTime responseDate) {
-        if (respondent == null) {
-            return;
-        }
-        if (isSpecCounterClaim(caseData, isRespondent1)) {
-            addSpecCounterClaimMiscEvent(builder, caseData, respondent, isRespondent1, responseDate);
-            return;
-        }
-        respondentResponseSupport.addRespondentMiscEvent(builder, sequenceGenerator, caseData, respondent, isRespondent1, responseDate);
-    }
-
-    private void addSpecCounterClaimMiscEvent(EventHistory.EventHistoryBuilder builder,
-                                              CaseData caseData,
-                                              Party respondent,
-                                              boolean isRespondent1,
-                                              LocalDateTime responseDate) {
-        String message = respondentResponseSupport.prepareRespondentResponseText(caseData, respondent, isRespondent1);
-        if (!StringUtils.hasText(message)) {
-            return;
-        }
-        RoboticsEventSupport.addRespondentMiscEvent(builder, sequenceGenerator, message, responseDate);
-    }
-
-    private boolean isSpecCounterClaim(CaseData caseData, boolean isRespondent1) {
-        return caseData != null
-            && CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && isCounterClaimResponse(caseData, isRespondent1);
+    private record EventBuckets(List<Event> defenceEvents,
+                                List<Event> statesPaidEvents,
+                                List<Event> directionsQuestionnaireEvents,
+                                List<Event> defenceAndCounterClaimEvents) {
     }
 
     private RespondentResponseTypeSpec getSpecResponseType(CaseData caseData, boolean isRespondent1) {
@@ -432,12 +409,6 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
             || responseType.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
             || responseType.equals(caseData.getClaimant1ClaimResponseTypeForSpec())
             || responseType.equals(caseData.getClaimant2ClaimResponseTypeForSpec());
-    }
-
-    private record EventBuckets(List<Event> defenceEvents,
-                                List<Event> statesPaidEvents,
-                                List<Event> directionsQuestionnaireEvents,
-                                List<Event> defenceAndCounterClaimEvents) {
     }
 
     private boolean hasSameSolicitorDifferentResponse(CaseData caseData) {

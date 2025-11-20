@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
@@ -25,7 +24,6 @@ import java.util.List;
 import java.util.Set;
 
 @Component
-@Order(30)
 @RequiredArgsConstructor
 public class AcknowledgementOfServiceStrategy implements EventHistoryStrategy {
 

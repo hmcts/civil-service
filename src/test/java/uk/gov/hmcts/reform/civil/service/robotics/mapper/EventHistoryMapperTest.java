@@ -1804,8 +1804,8 @@ class EventHistoryMapperTest {
                     .dateReceived(caseData.getIssueDate().atStartOfDay())
                     .eventDetailsText("Claim issued in CCD.")
                     .eventDetails(EventDetails.builder()
-                                      .miscText("Claim issued in CCD.")
-                                      .build())
+                    .miscText("Claim issued in CCD.")
+                    .build())
                     .build();
 
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
@@ -1859,8 +1859,8 @@ class EventHistoryMapperTest {
                     .dateReceived(caseData.getIssueDate().atStartOfDay())
                     .eventDetailsText("Claim issued in CCD.")
                     .eventDetails(EventDetails.builder()
-                                      .miscText("Claim issued in CCD.")
-                                      .build())
+                    .miscText("Claim issued in CCD.")
+                    .build())
                     .build();
 
             List<Event> expectedDirectionsQuestionnaireFiled = List.of(

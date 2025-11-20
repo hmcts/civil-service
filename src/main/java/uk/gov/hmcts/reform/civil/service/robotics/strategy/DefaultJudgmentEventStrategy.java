@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
@@ -36,7 +35,6 @@ import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapp
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 
 @Component
-@Order(20)
 @RequiredArgsConstructor
 public class DefaultJudgmentEventStrategy implements EventHistoryStrategy {
 

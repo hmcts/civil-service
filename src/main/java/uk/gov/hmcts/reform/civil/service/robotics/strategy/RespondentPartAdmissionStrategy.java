@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -38,7 +37,6 @@ import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1v2SameSol
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseExists;
 
 @Component
-@Order(43)
 @RequiredArgsConstructor
 public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
 
@@ -177,6 +175,12 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
                                    Party respondent,
                                    boolean isRespondent1,
                                    LocalDateTime responseDate) {
+        if (useStatesPaid(caseData)) {
+            return;
+        }
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return;
+        }
         respondentResponseSupport.addRespondentMiscEvent(builder, sequenceGenerator, caseData, respondent, isRespondent1, responseDate);
     }
 

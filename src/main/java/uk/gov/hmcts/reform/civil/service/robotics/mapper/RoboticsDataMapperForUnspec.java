@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.robotics.CaseHeader;
 import uk.gov.hmcts.reform.civil.model.robotics.ClaimDetails;
@@ -197,9 +196,7 @@ public class RoboticsDataMapperForUnspec extends BaseRoboticsDataMapper {
                 .id(RoboticsDataUtil.APPLICANT_SOLICITOR_ID)
                 .isPayee(true)
                 .organisationId(organisationId.orElse(null))
-                .contactEmailAddress(ofNullable(caseData.getApplicantSolicitor1UserDetails())
-                    .map(IdamUserDetails::getEmail)
-                    .orElse(null))
+                .contactEmailAddress(caseData.getApplicantSolicitor1UserDetails().getEmail())
                 .reference(ofNullable(caseData.getSolicitorReferences())
                     .map(SolicitorReferences::getApplicantSolicitor1Reference)
                     .map(s -> s.substring(0, Math.min(s.length(), 24)))

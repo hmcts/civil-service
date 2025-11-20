@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -27,7 +26,6 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_STRUCK_
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.GENERAL_FORM_OF_APPLICATION;
 
 @Component
-@Order(35)
 @RequiredArgsConstructor
 public class GeneralApplicationStrikeOutStrategy implements EventHistoryStrategy {
 
