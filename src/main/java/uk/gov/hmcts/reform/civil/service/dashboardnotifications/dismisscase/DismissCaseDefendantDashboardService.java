@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.dashboardnotifications.casedismissed;
+package uk.gov.hmcts.reform.civil.service.dashboardnotifications.dismisscase;
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -14,13 +14,13 @@ import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 import java.util.Map;
 
 @Service
-public class CaseDismissDefendantDashboardService extends DashboardScenarioService {
+public class DismissCaseDefendantDashboardService extends DashboardScenarioService {
 
     private final DashboardNotificationService dashboardNotificationService;
     private final TaskListService taskListService;
     private final FeatureToggleService featureToggleService;
 
-    public CaseDismissDefendantDashboardService(DashboardScenariosService dashboardScenariosService,
+    public DismissCaseDefendantDashboardService(DashboardScenariosService dashboardScenariosService,
                                                 DashboardNotificationsParamsMapper mapper,
                                                 FeatureToggleService featureToggleService,
                                                 DashboardNotificationService dashboardNotificationService,

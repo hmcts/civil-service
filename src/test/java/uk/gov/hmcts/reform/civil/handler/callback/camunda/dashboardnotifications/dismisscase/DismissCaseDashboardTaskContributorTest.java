@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.casedismiss;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.dismisscase;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,19 +10,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(MockitoExtension.class)
-class CaseDismissDashboardTaskContributorTest {
+class DismissCaseDashboardTaskContributorTest {
 
     @Mock
-    private CaseDismissClaimantDashboardTask claimantTask;
+    private DismissCaseClaimantDashboardTask claimantTask;
     @Mock
-    private CaseDismissDefendantDashboardTask defendantTask;
+    private DismissCaseDefendantDashboardTask defendantTask;
 
     @Test
     void shouldExposeTaskIdAndHandlers() {
-        CaseDismissDashboardTaskContributor contributor =
-            new CaseDismissDashboardTaskContributor(claimantTask, defendantTask);
+        DismissCaseDashboardTaskContributor contributor =
+            new DismissCaseDashboardTaskContributor(claimantTask, defendantTask);
 
-        assertThat(contributor.taskId()).isEqualTo(DashboardTaskIds.CASE_DISMISSED);
+        assertThat(contributor.taskId()).isEqualTo(DashboardTaskIds.DISMISS_CASE);
         assertThat(contributor.dashboardTasks()).containsExactly(claimantTask, defendantTask);
         assertThatThrownBy(() -> contributor.dashboardTasks().add(claimantTask))
             .isInstanceOf(UnsupportedOperationException.class);

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.dashboardnotifications.casedismissed;
+package uk.gov.hmcts.reform.civil.service.dashboardnotifications.dismisscase;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_DEFENDANT;
 
 @ExtendWith(MockitoExtension.class)
-class CaseDismissDefendantDashboardServiceTest {
+class DismissCaseDefendantDashboardServiceTest {
 
     private static final String AUTH_TOKEN = "BEARER";
 
@@ -41,7 +41,7 @@ class CaseDismissDefendantDashboardServiceTest {
     private uk.gov.hmcts.reform.civil.service.FeatureToggleService toggleService;
 
     @InjectMocks
-    private CaseDismissDefendantDashboardService service;
+    private DismissCaseDefendantDashboardService service;
 
     @BeforeEach
     void setup() {

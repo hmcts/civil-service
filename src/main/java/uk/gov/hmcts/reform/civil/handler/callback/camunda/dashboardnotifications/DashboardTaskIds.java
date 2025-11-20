@@ -7,5 +7,5 @@ public final class DashboardTaskIds {
     }
 
     public static final String CASE_PROCEEDS_IN_CASEMAN = "GenerateDashboardNotificationsCaseProceedsInCaseman";
-    public static final String CASE_DISMISSED = "GenerateDashboardNotificationsCaseDismissed";
+    public static final String DISMISS_CASE = "GenerateDashboardNotificationsDismissCase";
 }

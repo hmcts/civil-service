@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.casedismiss;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.dismisscase;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,8 +7,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskContext;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.casedismissed.CaseDismissClaimantDashboardService;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.casedismissed.CaseDismissDefendantDashboardService;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.dismisscase.DismissCaseClaimantDashboardService;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.dismisscase.DismissCaseDefendantDashboardService;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -19,9 +19,9 @@ class CaseDismissDashboardTaskTest {
     private static final String AUTH_TOKEN = "Bearer token";
 
     @Mock
-    private CaseDismissClaimantDashboardService claimantDashboardService;
+    private DismissCaseClaimantDashboardService claimantDashboardService;
     @Mock
-    private CaseDismissDefendantDashboardService defendantDashboardService;
+    private DismissCaseDefendantDashboardService defendantDashboardService;
     @Mock
     private DashboardTaskContext context;
 
@@ -35,7 +35,7 @@ class CaseDismissDashboardTaskTest {
 
     @Test
     void claimantTaskShouldDelegateToDashboardService() {
-        CaseDismissClaimantDashboardTask task = new CaseDismissClaimantDashboardTask(claimantDashboardService);
+        DismissCaseClaimantDashboardTask task = new DismissCaseClaimantDashboardTask(claimantDashboardService);
 
         task.execute(context);
 
@@ -44,7 +44,7 @@ class CaseDismissDashboardTaskTest {
 
     @Test
     void defendantTaskShouldDelegateToDashboardService() {
-        CaseDismissDefendantDashboardTask task = new CaseDismissDefendantDashboardTask(defendantDashboardService);
+        DismissCaseDefendantDashboardTask task = new DismissCaseDefendantDashboardTask(defendantDashboardService);
 
         task.execute(context);
 
