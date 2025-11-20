@@ -10,11 +10,11 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
-import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -45,6 +45,7 @@ public class DefendantNocDashboardNotificationHandler extends CallbackHandler {
     private final DashboardNotificationService dashboardNotificationService;
     private final DashboardNotificationsParamsMapper mapper;
     private final FeatureToggleService featureToggleService;
+    private final SdoCaseClassificationService sdoCaseClassificationService;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -85,7 +86,7 @@ public class DefendantNocDashboardNotificationHandler extends CallbackHandler {
             );
         }
 
-        if (isNull(caseData.getTrialReadyApplicant()) && SdoHelper.isFastTrack(caseData)) {
+        if (isNull(caseData.getTrialReadyApplicant()) && sdoCaseClassificationService.isFastTrack(caseData)) {
             dashboardScenariosService.recordScenarios(
                 authToken,
                 SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_TRIAL_ARRANGEMENTS_TASK_LIST.getScenario(),

@@ -39,6 +39,8 @@ import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormDisposal;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormFast;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormSmall;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormSmallDrh;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2AddendumReport;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ApplicationToRelyOnFurther;
@@ -64,7 +66,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialWindow;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2UploadOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2VariationOfDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsFlightDelay;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
@@ -74,6 +75,18 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoDisposalDirectionsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoFastTrackDirectionsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoFastTrackSpecialistDirectionsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoFastTrackTemplateFieldService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoR2SmallClaimsDirectionsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoNihlTemplateFieldService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoR2TrialTemplateFieldService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsDirectionsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsTemplateFieldService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoMediationSectionService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoDeadlineService;
 import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -85,6 +98,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -98,10 +112,35 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_F
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_R2_DISPOSAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL_DRH;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL_R2;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.BUILDING_SCHEDULE_CLAIMANT_INSTRUCTION;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.BUILDING_SCHEDULE_COLUMNS_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.BUILDING_SCHEDULE_DEFENDANT_INSTRUCTION;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.BUILDING_SCHEDULE_INTRO_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CLINICAL_BUNDLE_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CLINICAL_DOCUMENTS_HEADING;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CLINICAL_NOTES_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CLINICAL_PARTIES_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FLIGHT_DELAY_LEGAL_ARGUMENTS_NOTICE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FLIGHT_DELAY_RELATED_CLAIMS_NOTICE;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     SdoGeneratorService.class,
+    SdoCaseClassificationService.class,
+    SdoDisposalDirectionsService.class,
+    SdoFastTrackDirectionsService.class,
+    SdoFastTrackTemplateFieldService.class,
+    SdoFastTrackTemplateService.class,
+    SdoNihlTemplateService.class,
+    SdoNihlTemplateFieldService.class,
+    SdoDisposalTemplateService.class,
+    SdoSmallClaimsDirectionsService.class,
+    SdoSmallClaimsTemplateFieldService.class,
+    SdoMediationSectionService.class,
+    SdoSmallClaimsDrhTemplateService.class,
+    SdoSmallClaimsTemplateService.class,
+    SdoR2TrialTemplateFieldService.class,
+    SdoR2SmallClaimsDirectionsService.class,
     JacksonAutoConfiguration.class
 })
 public class SdoGeneratorServiceTest {
@@ -242,16 +281,13 @@ public class SdoGeneratorServiceTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged()
             .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+            .atSmallSmallClaimsFlightDelayInputs()
             .build()
             .toBuilder()
             .drawDirectionsOrderRequired(YesOrNo.NO)
             .claimsTrack(ClaimsTrack.smallClaimsTrack)
             .smallClaims(List.of(SmallTrack.smallClaimFlightDelay))
             .smallClaimsFlightDelayToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
-            .smallClaimsFlightDelay(SmallClaimsFlightDelay.builder()
-                                        .relatedClaimsInput("Test Data 1")
-                                        .legalDocumentsInput("Test data 2")
-                                        .build())
             .build();
         when(documentHearingLocationHelper.getHearingLocation(locationLabel, caseData, BEARER_TOKEN))
             .thenReturn(locationRefData);
@@ -270,8 +306,10 @@ public class SdoGeneratorServiceTest {
         ArgumentCaptor<SdoDocumentFormSmall> argument = ArgumentCaptor.forClass(SdoDocumentFormSmall.class);
         verify(documentGeneratorService).generateDocmosisDocument(argument.capture(), any(DocmosisTemplates.class));
         assertThat(argument.getValue().getSmallClaimsFlightDelay()).isNotNull();
-        assertThat(argument.getValue().getSmallClaimsFlightDelay().getRelatedClaimsInput()).isEqualTo("Test Data 1");
-        assertThat(argument.getValue().getSmallClaimsFlightDelay().getLegalDocumentsInput()).isEqualTo("Test data 2");
+        assertThat(argument.getValue().getSmallClaimsFlightDelay().getRelatedClaimsInput())
+            .isEqualTo(FLIGHT_DELAY_RELATED_CLAIMS_NOTICE);
+        assertThat(argument.getValue().getSmallClaimsFlightDelay().getLegalDocumentsInput())
+            .isEqualTo(FLIGHT_DELAY_LEGAL_ARGUMENTS_NOTICE);
     }
 
     @Test
@@ -348,6 +386,66 @@ public class SdoGeneratorServiceTest {
                         templateData instanceof SdoDocumentFormFast),
             eq(SDO_FAST_FAST_TRACK_INT_R2)
         );
+    }
+
+    @Test
+    void shouldPropagateSpecialistTextIntoFastTrackDocmosisTemplate() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_FAST_FAST_TRACK_INT_R2)))
+            .thenReturn(new DocmosisDocument(SDO_FAST_FAST_TRACK_INT_R2.getDocumentTitle(), bytes));
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER)))
+            .thenReturn(CASE_DOCUMENT_FAST);
+
+        CaseData baseCase = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledged()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+            .atStateSdoFastTrackTrial()
+            .build();
+
+        CaseData caseData = fastTrackCasePopulatedBySpecialistService(baseCase);
+
+        generator.generate(caseData, BEARER_TOKEN);
+
+        ArgumentCaptor<SdoDocumentFormFast> captor = ArgumentCaptor.forClass(SdoDocumentFormFast.class);
+        verify(documentGeneratorService).generateDocmosisDocument(captor.capture(), eq(SDO_FAST_FAST_TRACK_INT_R2));
+        SdoDocumentFormFast form = captor.getValue();
+
+        assertThat(form.getFastTrackBuildingDispute())
+            .extracting(FastTrackBuildingDispute::getInput1, FastTrackBuildingDispute::getInput2,
+                FastTrackBuildingDispute::getInput3, FastTrackBuildingDispute::getInput4)
+            .containsExactly(
+                BUILDING_SCHEDULE_INTRO_SDO,
+                BUILDING_SCHEDULE_COLUMNS_SDO,
+                BUILDING_SCHEDULE_CLAIMANT_INSTRUCTION,
+                BUILDING_SCHEDULE_DEFENDANT_INSTRUCTION
+            );
+        assertThat(form.getFastTrackClinicalNegligence())
+            .extracting(FastTrackClinicalNegligence::getInput1, FastTrackClinicalNegligence::getInput2,
+                FastTrackClinicalNegligence::getInput3, FastTrackClinicalNegligence::getInput4)
+            .containsExactly(
+                CLINICAL_DOCUMENTS_HEADING,
+                CLINICAL_PARTIES_SDO,
+                CLINICAL_NOTES_SDO,
+                CLINICAL_BUNDLE_SDO
+            );
+        assertThat(form.isShowBundleInfo()).isTrue();
+    }
+
+    private CaseData fastTrackCasePopulatedBySpecialistService(CaseData baseCase) {
+        SdoDeadlineService deadlineService = Mockito.mock(SdoDeadlineService.class);
+        when(deadlineService.nextWorkingDayFromNowWeeks(anyInt()))
+            .thenAnswer(invocation -> LocalDate.of(2025, 1, 1)
+                .plusWeeks(invocation.getArgument(0, Integer.class)));
+
+        SdoFastTrackSpecialistDirectionsService specialistService =
+            new SdoFastTrackSpecialistDirectionsService(deadlineService);
+
+        CaseData.CaseDataBuilder<?, ?> builder = baseCase.toBuilder()
+            .drawDirectionsOrderRequired(YesOrNo.NO)
+            .claimsTrack(ClaimsTrack.fastTrack)
+            .fastTrackTrialBundleToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW));
+
+        specialistService.populateSpecialistDirections(builder);
+        return builder.build();
     }
 
     @Test
@@ -439,7 +537,7 @@ public class SdoGeneratorServiceTest {
             .thenReturn(new DocmosisDocument(SDO_FAST_TRACK_NIHL.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_FAST);
-        List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+        List<FastTrack> fastTrackList = new ArrayList<>();
         fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -464,7 +562,7 @@ public class SdoGeneratorServiceTest {
             .thenReturn(new DocmosisDocument(SDO_FAST_TRACK_NIHL.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_FAST);
-        List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+        List<FastTrack> fastTrackList = new ArrayList<>();
         fastTrackList.add(FastTrack.fastClaimBuildingDispute);
         fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
 
