@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
@@ -229,7 +230,7 @@ class SubmitClaimTaskTest {
     @Test
     void shouldCallPinToPostOnlyIfCaseMatched() {
         // Given
-        CaseData matchedCase = CaseData.builder()
+        final CaseData matchedCase = CaseData.builder()
             .applicant1(Party.builder()
                             .individualFirstName("Clay")
                             .individualLastName("Mint")
@@ -242,7 +243,7 @@ class SubmitClaimTaskTest {
                              .partyName("John Doe")
                              .type(Party.Type.INDIVIDUAL)
                              .build())
-            .respondent1Represented(NO)
+            .specRespondent1Represented(NO)
             .addRespondent2(NO)
             .addApplicant2(NO)
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("test@gmail.com").build())
@@ -251,6 +252,8 @@ class SubmitClaimTaskTest {
         // When
         when(userService.getUserDetails("authToken")).thenReturn(UserDetails.builder().id("userId").build());
         when(specReferenceNumberRepository.getSpecReferenceNumber()).thenReturn("12345");
+        when(defendantPinToPostLRspecService.buildDefendantPinToPost())
+            .thenReturn(DefendantPinToPostLRspec.builder().accessCode("12345").build());
 
         submitClaimTask.submitClaim(matchedCase, "eventId", "authToken", NO, null);
 
@@ -261,7 +264,7 @@ class SubmitClaimTaskTest {
     @Test
     void shouldNotCallPinToPostIfCaseNotMatched() {
         // Given
-        CaseData notMatchedCase = CaseData.builder()
+        final CaseData notMatchedCase = CaseData.builder()
             .applicant1(Party.builder()
                             .individualFirstName("Clay")
                             .individualLastName("Mint")
