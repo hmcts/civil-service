@@ -314,6 +314,11 @@ public class TestingSupportController {
         log.info("Get GA case reference for caseId: {}", caseId);
         GeneralApplicationCaseData caseData = caseDetailsConverter.toGeneralApplicationCaseData(coreCaseDataService.getCase(caseId));
 
+        if (caseData.getGeneralApplications() == null) {
+            log.info("No General Applications found for caseId: {}", caseId);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
         int size = caseData.getGeneralApplications().size();
 
         /*
