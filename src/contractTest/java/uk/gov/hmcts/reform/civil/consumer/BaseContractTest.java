@@ -11,7 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.io.IOException;
 
 @ExtendWith(PactConsumerTestExt.class)
-@ActiveProfiles("integration-test")
+@ActiveProfiles({"integration-test", "contract-test"})
 @SpringBootTest
 public class BaseContractTest {
 
