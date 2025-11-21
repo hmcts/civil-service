@@ -129,80 +129,70 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP && isConfirmationForLip(caseData)) {
             multiPartyScenario = null;
         }
-        CaseData updatedCaseData;
         LocalDate notificationDate = notificationDateTime.toLocalDate();
 
         //Set R1 and R2 response deadlines, as both are represented
         if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
-            updatedCaseData = caseData.toBuilder()
-                    .businessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS))
-                    .claimDetailsNotificationDate(currentDateTime)
-                    .addLegalRepDeadlineRes1(deadlinesCalculator.plus14DaysDeadline(notificationDateTime))
-                    .addLegalRepDeadlineRes2(deadlinesCalculator.plus14DaysDeadline(notificationDateTime))
-                    .respondent1ResponseDeadline(deadlinesCalculator.plus14DaysDeadline(notificationDateTime))
-                    .respondent2ResponseDeadline(deadlinesCalculator.plus14DaysDeadline(notificationDateTime))
-                    .nextDeadline(deadlinesCalculator.plus14DaysDeadline(notificationDateTime).toLocalDate())
-                    .claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
-                            6,
-                            notificationDate
-                    ))
-                    .build();
+            caseData.setBusinessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS));
+            caseData.setClaimDetailsNotificationDate(currentDateTime);
+            LocalDateTime plus14Days = deadlinesCalculator.plus14DaysDeadline(notificationDateTime);
+            caseData.setAddLegalRepDeadlineRes1(plus14Days);
+            caseData.setAddLegalRepDeadlineRes2(plus14Days);
+            caseData.setRespondent1ResponseDeadline(plus14Days);
+            caseData.setRespondent2ResponseDeadline(plus14Days);
+            caseData.setNextDeadline(plus14Days.toLocalDate());
+            caseData.setClaimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
+                6,
+                notificationDate
+            ));
         } else {
             //When CoS Enabled, this will return earlier date of CoS (also applicable for both LiP defendants)
             //these 2 fields are used for setting Deadlines
             notificationDateTime = getEarliestDateOfService(caseData);
             notificationDate = notificationDateTime.toLocalDate();
 
-            CaseData.CaseDataBuilder builder = caseData.toBuilder()
-                    .businessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS))
-                    .claimDetailsNotificationDate(currentDateTime)
-                    .nextDeadline(deadlinesCalculator.plus14DaysDeadline(notificationDateTime).toLocalDate())
-                    .claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
-                            6,
-                            notificationDate
-                    ));
+            caseData.setBusinessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS));
+            caseData.setClaimDetailsNotificationDate(currentDateTime);
+            caseData.setNextDeadline(deadlinesCalculator.plus14DaysDeadline(notificationDateTime).toLocalDate());
+            caseData.setClaimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
+                6,
+                notificationDate
+            ));
 
             if (Objects.nonNull(caseData.getRespondent1())) {
-                builder.respondent1ResponseDeadline(
-                        deadlinesCalculator.plus14DaysDeadline(notificationDateTime));
+                caseData.setRespondent1ResponseDeadline(deadlinesCalculator.plus14DaysDeadline(notificationDateTime));
             }
 
             if (Objects.nonNull(caseData.getRespondent1())
                 && NO.equals(caseData.getRespondent1Represented())) {
-                builder.addLegalRepDeadlineRes1(deadlinesCalculator.plus14DaysDeadline(notificationDateTime));
+                caseData.setAddLegalRepDeadlineRes1(deadlinesCalculator.plus14DaysDeadline(notificationDateTime));
             }
 
             if (Objects.nonNull(caseData.getRespondent2())
                 && YES.equals(caseData.getAddRespondent2())) {
-                builder.respondent2ResponseDeadline(
-                        deadlinesCalculator.plus14DaysDeadline(notificationDateTime));
+                caseData.setRespondent2ResponseDeadline(deadlinesCalculator.plus14DaysDeadline(notificationDateTime));
             }
 
             if (Objects.nonNull(caseData.getRespondent2())
-                   && YES.equals(caseData.getAddRespondent2())
+                && YES.equals(caseData.getAddRespondent2())
                 && NO.equals(caseData.getRespondent2Represented())) {
-                builder.addLegalRepDeadlineRes2(deadlinesCalculator.plus14DaysDeadline(notificationDateTime));
+                caseData.setAddLegalRepDeadlineRes2(deadlinesCalculator.plus14DaysDeadline(notificationDateTime));
             }
 
             if (areAnyRespondentsLitigantInPerson(caseData))  {
                 if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())) {
-                    builder
-                        .cosNotifyClaimDetails1(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDetails1()))
-                        .build();
+                    caseData.setCosNotifyClaimDetails1(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDetails1()));
                 }
                 if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())) {
-                    builder
-                        .cosNotifyClaimDetails2(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDetails2()))
-                        .build();
+                    caseData.setCosNotifyClaimDetails2(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDetails2()));
                 }
             }
-            updatedCaseData = builder.build();
         }
         //assign category ids to documents uploaded as part of notify claim details
         assignNotifyParticularOfClaimCategoryIds(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedCaseData.toMap(objectMapper))
+                .data(caseData.toMap(objectMapper))
                 .build();
     }
 
@@ -245,8 +235,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         if (Objects.nonNull(cosNotifyClaimDetails)) {
             cosNotifyClaimDetails.setCosDocSaved(YES);
             if (Objects.isNull(caseData.getServedDocumentFiles())) {
-                caseData = caseData.toBuilder()
-                        .servedDocumentFiles(ServedDocumentFiles.builder().build()).build();
+                caseData.setServedDocumentFiles(ServedDocumentFiles.builder().build());
             }
             if (Objects.isNull(caseData.getServedDocumentFiles().getOther())) {
                 caseData.getServedDocumentFiles().setOther(new ArrayList<>());
@@ -337,11 +326,10 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             dynamicListOptions.add("Defendant Two: " + caseData.getRespondent2().getPartyName());
         }
 
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.defendantSolicitorNotifyClaimDetailsOptions(DynamicList.fromList(dynamicListOptions));
+        caseData.setDefendantSolicitorNotifyClaimDetailsOptions(DynamicList.fromList(dynamicListOptions));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseDataBuilder.build().toMap(objectMapper))
+                .data(caseData.toMap(objectMapper))
                 .build();
     }
 
@@ -353,9 +341,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             warnings.add(WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR);
         }
 
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseDataBuilder.build().toMap(objectMapper))
+                .data(caseData.toMap(objectMapper))
                 .warnings(warnings)
                 .build();
     }
@@ -385,12 +372,10 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             errors.add(DOC_SERVED_MANDATORY);
         }
         CertificateOfService certificateOfService = caseData.getCosNotifyClaimDetails1();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.cosNotifyClaimDetails1(certificateOfService.toBuilder()
-                                                   .build());
+        caseData.setCosNotifyClaimDetails1(certificateOfService.toBuilder().build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .errors(errors)
             .build();
     }
@@ -413,12 +398,10 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             errors.add(DOC_SERVED_MANDATORY);
         }
         CertificateOfService certificateOfServiceDef2 = caseData.getCosNotifyClaimDetails2();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.cosNotifyClaimDetails2(certificateOfServiceDef2.toBuilder()
-                                                   .build());
+        caseData.setCosNotifyClaimDetails2(certificateOfServiceDef2.toBuilder().build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .errors(errors)
             .build();
     }
