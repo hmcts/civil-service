@@ -1847,7 +1847,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 response.getData().get("fastTrackPersonalInjury"),
                 FastTrackPersonalInjury.class
             );
-            assertThat(personalInjury.getInput1()).isEqualTo(PERSONAL_INJURY_PERMISSION_SDO);
+            assertThat(personalInjury.getInput1()).isEqualTo(
+                "The Claimant has permission to rely upon the written expert evidence already uploaded to the"
+                    + " Digital Portal with the particulars of claim"
+            );
 
             FastTrackRoadTrafficAccident fastTrackRoadTrafficAccident = objectMapper.convertValue(
                 response.getData().get("fastTrackRoadTrafficAccident"),
@@ -1951,11 +1954,14 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             );
 
             assertThat(personalInjury).isNotNull();
-            assertThat(personalInjury.getInput1()).isEqualTo(PERSONAL_INJURY_PERMISSION_SDO);
+            assertThat(personalInjury.getInput1()).isEqualTo(
+                "The Claimant has permission to rely upon the written expert evidence already uploaded to the"
+                    + " Digital Portal with the particulars of claim"
+            );
             assertThat(personalInjury.getDate1()).isNull();
             assertThat(personalInjury.getInput2())
-                .isEqualTo("The Defendant(s) may ask questions of the Claimant's " +
-                               "expert which must be sent to the expert directly and uploaded to the Digital Portal by 4pm on");
+                .isEqualTo("The Defendant(s) may ask questions of the Claimant's expert which must be sent to the expert "
+                    + "directly and uploaded to the Digital Portal by 4pm on");
             assertThat(personalInjury.getDate2()).isEqualTo(nextWorkingDayDate);
             assertThat(personalInjury.getInput3())
                 .isEqualTo("The answers to the questions shall be answered by the Expert by");

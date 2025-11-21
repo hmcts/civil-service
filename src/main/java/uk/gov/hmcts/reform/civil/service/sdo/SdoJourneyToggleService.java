@@ -70,7 +70,7 @@ public class SdoJourneyToggleService {
      * Determines whether EA court should be enabled for a SPEC claim, aligning the logic across
      * SDO and DJ submission/notification paths. Returns {@code null} when the case category is not SPEC.
      */
-    public YesOrNo resolveEaCourtLocation(CaseData caseData) {
+    public YesOrNo resolveEaCourtLocation(CaseData caseData, boolean allowLipvLrWithNoC) {
         if (!CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             return null;
         }
@@ -84,25 +84,23 @@ public class SdoJourneyToggleService {
             return YesOrNo.YES;
         }
 
-        return isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData) ? YesOrNo.YES : YesOrNo.NO;
+        return isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData, allowLipvLrWithNoC) ? YesOrNo.YES : YesOrNo.NO;
     }
 
-    private boolean isLipCaseWithProgressionEnabledAndCourtWhiteListed(CaseData caseData) {
+    private boolean isLipCaseWithProgressionEnabledAndCourtWhiteListed(CaseData caseData, boolean allowLipvLrWithNoC) {
         boolean eligibleLipConfiguration = caseData.isLipvLipOneVOne()
             || caseData.isLRvLipOneVOne()
-            || (caseData.isLipvLROneVOne() && sdoFeatureToggleService.isDefendantNoCOnlineForCase(caseData));
+            || (allowLipvLrWithNoC && caseData.isLipvLROneVOne() && sdoFeatureToggleService.isDefendantNoCOnlineForCase(caseData));
 
         if (!eligibleLipConfiguration) {
             return false;
         }
 
-        if (caseData.getCaseManagementLocation() == null
-            || caseData.getCaseManagementLocation().getBaseLocation() == null) {
-            return false;
-        }
+        // Mirror master behaviour: missing base location causes a failure rather than silently proceeding.
+        String baseLocation = caseData.getCaseManagementLocation().getBaseLocation();
 
         return sdoFeatureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(
-            caseData.getCaseManagementLocation().getBaseLocation()
+            baseLocation
         );
     }
 }

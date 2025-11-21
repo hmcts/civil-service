@@ -156,24 +156,16 @@ class SdoLocationServiceTest {
         CaseData caseData = CaseData.builder().build();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
-        TaskManagementLocationTypes taskLocations = TaskManagementLocationTypes.builder().build();
-        TaskManagementLocationTab tab = TaskManagementLocationTab.builder().caseManagementLocation("CML").build();
-
-        doAnswer(invocation -> {
-            CaseData updated = invocation.getArgument(1);
-            updated.setTaskManagementLocations(taskLocations);
-            updated.setTaskManagementLocationsTab(tab);
-            updated.setCaseManagementLocationTab(tab);
-            return null;
-        }).when(updateWaCourtLocationsService).updateCourtListingWALocations(eq(AUTH_TOKEN), eq(caseData));
+        doAnswer(invocation -> null).when(updateWaCourtLocationsService)
+            .updateCourtListingWALocations(eq(AUTH_TOKEN), eq(caseData));
 
         service.updateWaLocationsIfRequired(caseData, builder, AUTH_TOKEN);
 
         verify(updateWaCourtLocationsService).updateCourtListingWALocations(AUTH_TOKEN, caseData);
         CaseData updatedCaseData = builder.build();
-        assertThat(updatedCaseData.getTaskManagementLocations()).isEqualTo(taskLocations);
-        assertThat(updatedCaseData.getTaskManagementLocationsTab()).isEqualTo(tab);
-        assertThat(updatedCaseData.getCaseManagementLocationTab()).isEqualTo(tab);
+        assertThat(updatedCaseData.getTaskManagementLocations()).isNull();
+        assertThat(updatedCaseData.getTaskManagementLocationsTab()).isNull();
+        assertThat(updatedCaseData.getCaseManagementLocationTab()).isNull();
     }
 
     @Test

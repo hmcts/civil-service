@@ -5,11 +5,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPersonalInjury;
 
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_ANSWERS;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_DEFENDANT_QUESTIONS;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_PERMISSION_SDO;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_UPLOAD_BY_ASKING_PARTY;
-
 /**
  * Builds the default expert-evidence paragraph used when pre-populating the fast-track
  * section of the SDO.  Keeping the strings and deadline wiring here prevents
@@ -23,12 +18,14 @@ public class SdoExpertEvidenceFieldsService {
 
     public void populateFastTrackExpertEvidence(CaseData.CaseDataBuilder<?, ?> updatedData) {
         FastTrackPersonalInjury expertEvidence = FastTrackPersonalInjury.builder()
-            .input1(PERSONAL_INJURY_PERMISSION_SDO)
-            .input2(PERSONAL_INJURY_DEFENDANT_QUESTIONS)
+            .input1("The Claimant has permission to rely upon the written expert evidence already uploaded to the"
+                + " Digital Portal with the particulars of claim")
+            .input2("The Defendant(s) may ask questions of the Claimant's expert which must be sent to the expert "
+                + "directly and uploaded to the Digital Portal by 4pm on")
             .date2(sdoDeadlineService.nextWorkingDayFromNowDays(14))
-            .input3(PERSONAL_INJURY_ANSWERS)
+            .input3("The answers to the questions shall be answered by the Expert by")
             .date3(sdoDeadlineService.nextWorkingDayFromNowDays(42))
-            .input4(PERSONAL_INJURY_UPLOAD_BY_ASKING_PARTY)
+            .input4("and uploaded to the Digital Portal by the party who has asked the question by")
             .date4(sdoDeadlineService.nextWorkingDayFromNowDays(49))
             .build();
 

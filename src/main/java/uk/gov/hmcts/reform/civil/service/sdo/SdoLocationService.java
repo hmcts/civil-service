@@ -92,12 +92,7 @@ public class SdoLocationService {
     public void updateWaLocationsIfRequired(CaseData caseData,
                                             CaseData.CaseDataBuilder<?, ?> builder,
                                             String authToken) {
-        updateWaCourtLocationsService.ifPresent(service -> {
-            service.updateCourtListingWALocations(authToken, caseData);
-            builder.taskManagementLocations(caseData.getTaskManagementLocations())
-                .taskManagementLocationsTab(caseData.getTaskManagementLocationsTab())
-                .caseManagementLocationTab(caseData.getCaseManagementLocationTab());
-        });
+        updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(authToken, caseData));
     }
 
     public void clearWaLocationMetadata(CaseData.CaseDataBuilder<?, ?> builder) {

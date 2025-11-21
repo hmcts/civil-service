@@ -8,29 +8,21 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.Dir
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskSupport;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoDisposalGuardService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoPrePopulateService;
 
 import java.util.Collections;
-import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MINTI_DISPOSAL_NOT_ALLOWED;
 
 @Component
 @RequiredArgsConstructor
 public class SdoPrePopulateTask implements DirectionsOrderCallbackTask {
 
-    private final SdoDisposalGuardService sdoDisposalGuardService;
     private final SdoPrePopulateService sdoPrePopulateService;
 
     @Override
     public DirectionsOrderTaskResult execute(DirectionsOrderTaskContext context) {
         CaseData caseData = context.caseData();
-
-        if (sdoDisposalGuardService.shouldBlockPrePopulate(caseData)) {
-            return DirectionsOrderTaskResult.withErrors(caseData, List.of(ERROR_MINTI_DISPOSAL_NOT_ALLOWED));
-        }
 
         CaseData updatedCaseData = sdoPrePopulateService.prePopulate(context);
 

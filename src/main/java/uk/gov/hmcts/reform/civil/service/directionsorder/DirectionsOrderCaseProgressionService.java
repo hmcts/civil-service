@@ -20,8 +20,8 @@ public class DirectionsOrderCaseProgressionService {
     private final SdoFeatureToggleService featureToggleService;
     private final SdoLocationService sdoLocationService;
 
-    public void applyEaCourtLocation(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
-        YesOrNo resolvedEaCourt = sdoJourneyToggleService.resolveEaCourtLocation(caseData);
+    public void applyEaCourtLocation(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder, boolean allowLipvLrWithNoC) {
+        YesOrNo resolvedEaCourt = sdoJourneyToggleService.resolveEaCourtLocation(caseData, allowLipvLrWithNoC);
         if (resolvedEaCourt != null) {
             builder.eaCourtLocation(resolvedEaCourt);
         }
@@ -29,22 +29,24 @@ public class DirectionsOrderCaseProgressionService {
 
     public void applyCaseProgressionRouting(CaseData caseData,
                                             CaseData.CaseDataBuilder<?, ?> builder,
-                                            String authToken) {
-        applyCaseProgressionRouting(caseData, builder, authToken, true);
+                                            String authToken,
+                                            boolean allowLipvLrWithNoC) {
+        applyCaseProgressionRouting(caseData, builder, authToken, false, allowLipvLrWithNoC);
     }
 
     public void applyCaseProgressionRouting(CaseData caseData,
                                             CaseData.CaseDataBuilder<?, ?> builder,
                                             String authToken,
-                                            boolean clearWaMetadataWhenDisabled) {
-        applyEaCourtLocation(caseData, builder);
+                                            boolean clearWaMetadataWhenDisabled,
+                                            boolean allowLipvLrWithNoC) {
+        applyEaCourtLocation(caseData, builder, allowLipvLrWithNoC);
         updateWaLocationsIfEnabled(caseData, builder, authToken, clearWaMetadataWhenDisabled);
     }
 
     public void updateWaLocationsIfEnabled(CaseData caseData,
                                            CaseData.CaseDataBuilder<?, ?> builder,
                                            String authToken) {
-        updateWaLocationsIfEnabled(caseData, builder, authToken, true);
+        updateWaLocationsIfEnabled(caseData, builder, authToken, false);
     }
 
     public void updateWaLocationsIfEnabled(CaseData caseData,
