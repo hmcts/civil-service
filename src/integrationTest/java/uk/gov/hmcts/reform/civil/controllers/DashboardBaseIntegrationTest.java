@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -33,7 +33,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 @EnableFeignClients(defaultConfiguration = DashboardBaseIntegrationTest.MockMvcFeignConfiguration.class)
 public class DashboardBaseIntegrationTest extends BaseIntegrationTest {
 
-    @MockBean
+    @MockitoBean
     protected FeatureToggleService featureToggleService;
 
     @Autowired
@@ -45,10 +45,10 @@ public class DashboardBaseIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private NotificationActionRepository notificationActionRepository;
 
-    @MockBean
+    @MockitoBean
     protected LocationReferenceDataService locationRefDataService;
 
-    @MockBean
+    @MockitoBean
     protected CoreCaseUserService coreCaseUserService;
 
     public static class MockMvcFeignConfiguration {

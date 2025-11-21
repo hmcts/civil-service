@@ -23,5 +23,5 @@ public class Solicitor {
     private String preferredMethodOfCommunication;
     private String reference;
     @JsonProperty("isPayee")
-    private boolean isPayee;
+    private boolean payee;
 }

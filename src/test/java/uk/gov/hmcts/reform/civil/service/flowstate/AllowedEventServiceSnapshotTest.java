@@ -7,7 +7,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.yaml.snakeyaml.Yaml;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -19,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.wrapper.CaseDataDirector;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 
 import java.io.InputStream;
 import java.util.List;
@@ -51,10 +51,9 @@ class AllowedEventServiceSnapshotTest {
     @Autowired
     private AllowedEventService allowedEventService;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
-
-    @MockBean
+    @MockitoBean
     private CaseDetailsConverter caseDetailsConverter;
 
     private static List<CaseEvent> whitelistEvents;

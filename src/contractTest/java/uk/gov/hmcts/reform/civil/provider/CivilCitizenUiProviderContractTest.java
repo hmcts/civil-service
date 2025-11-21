@@ -7,6 +7,7 @@ import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
 import au.com.dius.pact.provider.junitsupport.loader.PactBrokerConsumerVersionSelectors;
+import au.com.dius.pact.provider.junitsupport.loader.PactFolder;
 import au.com.dius.pact.provider.junitsupport.loader.SelectorBuilder;
 import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -16,6 +17,8 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +27,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.civil.controllers.fees.FeesPaymentController;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
@@ -33,6 +37,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -41,6 +47,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
     url = "${PACT_BROKER_FULL_URL:http://localhost:80}",
     providerBranch = "${pact.provider.branch}"
 )
+@PactFolder("src/contractTest/resources/pacts")
 @IgnoreNoPactsToVerify
 class CivilCitizenUiProviderContractTest {
 
@@ -62,11 +69,21 @@ class CivilCitizenUiProviderContractTest {
             .deployedOrReleased();
     }
 
+    @BeforeAll
+    static void requirePactBroker() {
+        Assumptions.assumeTrue(
+            StringUtils.hasText(System.getenv("PACT_BROKER_FULL_URL")),
+            "PACT_BROKER_FULL_URL must be set to run provider verification tests"
+        );
+    }
+
     @BeforeEach
     void beforeEach(PactVerificationContext context) {
         String brokerUrl = System.getenv("PACT_BROKER_FULL_URL");
         if (brokerUrl != null && !brokerUrl.isBlank()) {
             System.setProperty("pactbroker.url", brokerUrl);
+        } else {
+            System.clearProperty("pactbroker.url");
         }
         mocks = MockitoAnnotations.openMocks(this);
         FeesPaymentController controller = new FeesPaymentController(feesPaymentService);
@@ -100,9 +117,9 @@ class CivilCitizenUiProviderContractTest {
     @State("Claim issue payment can be initiated for case 1234567890123456")
     void claimIssuePaymentExists() {
         when(feesPaymentService.createGovPaymentRequest(
-            FeeType.CLAIMISSUED,
-            CASE_REFERENCE,
-            AUTH_HEADER
+            eq(FeeType.CLAIMISSUED),
+            eq(CASE_REFERENCE),
+            anyString()
         )).thenReturn(
             CardPaymentStatusResponse.builder()
                 .externalReference("2023-1701090705688")
@@ -117,10 +134,10 @@ class CivilCitizenUiProviderContractTest {
     @State("Payment status SUCCESS is available for payment RC-1701-0909-0602-0418")
     void paymentStatusSuccess() {
         when(feesPaymentService.getGovPaymentRequestStatus(
-            FeeType.CLAIMISSUED,
-            CASE_REFERENCE,
-            PAYMENT_REFERENCE,
-            AUTH_HEADER
+            eq(FeeType.CLAIMISSUED),
+            eq(CASE_REFERENCE),
+            eq(PAYMENT_REFERENCE),
+            anyString()
         )).thenReturn(
             CardPaymentStatusResponse.builder()
                 .externalReference("2023-1701090705688")
