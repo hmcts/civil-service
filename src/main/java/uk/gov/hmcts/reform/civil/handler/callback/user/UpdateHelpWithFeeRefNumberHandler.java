@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.service.citizenui.HelpWithFeesForTabService;
 
@@ -59,12 +59,16 @@ public class UpdateHelpWithFeeRefNumberHandler extends CallbackHandler {
         caseData.setBusinessProcess(BusinessProcess.ready(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME));
 
         if (caseData.isHWFTypeHearing()) {
-            HelpWithFeesDetails hearingFeeDetails = caseData.getHearingHwfDetails();
-            caseData.setHearingHwfDetails(hearingFeeDetails.toBuilder().hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER).build());
+            HelpWithFeesDetails hearingFeeDetails = ofNullable(caseData.getHearingHwfDetails())
+                .orElseGet(HelpWithFeesDetails::new);
+            hearingFeeDetails.setHwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER);
+            caseData.setHearingHwfDetails(hearingFeeDetails);
         }
         if (caseData.isHWFTypeClaimIssued()) {
-            HelpWithFeesDetails claimIssuedHwfDetails = caseData.getClaimIssuedHwfDetails();
-            caseData.setClaimIssuedHwfDetails(claimIssuedHwfDetails.toBuilder().hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER).build());
+            HelpWithFeesDetails claimIssuedHwfDetails = ofNullable(caseData.getClaimIssuedHwfDetails())
+                .orElseGet(HelpWithFeesDetails::new);
+            claimIssuedHwfDetails.setHwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER);
+            caseData.setClaimIssuedHwfDetails(claimIssuedHwfDetails);
         }
         return caseData;
     }
@@ -72,16 +76,16 @@ public class UpdateHelpWithFeeRefNumberHandler extends CallbackHandler {
     private CaseData updateHwFReference(CaseData caseData) {
         if (caseData.isHWFTypeClaimIssued()) {
             ofNullable(caseData.getCaseDataLiP())
-                    .map(CaseDataLiP::getHelpWithFees)
-                    .ifPresent(hwf -> {
-                        var caseDataLip = caseData.getCaseDataLiP();
-                        caseData.setCaseDataLiP(caseDataLip.toBuilder().helpWithFees(
-                            hwf.toBuilder().helpWithFeesReferenceNumber(
-                                getHwFNewReferenceNumber(caseData.getClaimIssuedHwfDetails()))
-                                .build()).build());
-                    });
+                .ifPresent(caseDataLip -> {
+                    HelpWithFees helpWithFees = ofNullable(caseDataLip.getHelpWithFees())
+                        .orElseGet(HelpWithFees::new);
+                    helpWithFees.setHelpWithFeesReferenceNumber(
+                        getHwFNewReferenceNumber(caseData.getClaimIssuedHwfDetails()));
+                    caseDataLip.setHelpWithFees(helpWithFees);
+                    caseData.setCaseDataLiP(caseDataLip);
+                });
             if (caseData.getClaimIssuedHwfDetails() != null) {
-                caseData.setClaimIssuedHwfDetails(caseData.getClaimIssuedHwfDetails().toBuilder().hwfReferenceNumber(null).build());
+                caseData.getClaimIssuedHwfDetails().setHwfReferenceNumber(null);
             }
             helpWithFeesForTabService.setUpHelpWithFeeTab(caseData);
             return caseData;
@@ -89,7 +93,7 @@ public class UpdateHelpWithFeeRefNumberHandler extends CallbackHandler {
         if (caseData.isHWFTypeHearing()) {
             caseData.setHearingHelpFeesReferenceNumber(getHwFNewReferenceNumber(caseData.getHearingHwfDetails()));
             if (caseData.getHearingHwfDetails() != null) {
-                caseData.setHearingHwfDetails(caseData.getHearingHwfDetails().toBuilder().hwfReferenceNumber(null).build());
+                caseData.getHearingHwfDetails().setHwfReferenceNumber(null);
             }
             helpWithFeesForTabService.setUpHelpWithFeeTab(caseData);
             return caseData;
