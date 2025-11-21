@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,7 +35,9 @@ class ManageCaseFlagsHandlerTest extends BaseCallbackHandlerTest {
         //Given: Flag with urgent flag code and active status
         FlagDetail flagDetail = FlagDetail.builder().flagCode("CF0007").status("Active").build();
         Flags flags = Flags.builder().details(ElementUtils.wrapElements(flagDetail)).build();
-        CaseData caseData = CaseData.builder().caseFlags(flags).build();
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .caseFlags(flags)
+            .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         // When: handler is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -46,7 +49,9 @@ class ManageCaseFlagsHandlerTest extends BaseCallbackHandlerTest {
     void shouldNotUpdateUrgentFlagWhenActiveAndCodeMatches() {
         FlagDetail flagDetail = FlagDetail.builder().flagCode("CF0008").status("Active").build();
         Flags flags = Flags.builder().details(ElementUtils.wrapElements(flagDetail)).build();
-        CaseData caseData = CaseData.builder().caseFlags(flags).build();
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .caseFlags(flags)
+            .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

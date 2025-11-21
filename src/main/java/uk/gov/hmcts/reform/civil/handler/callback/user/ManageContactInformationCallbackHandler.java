@@ -130,7 +130,6 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
 
     private CallbackResponse showPartyField(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder builder = caseData.toBuilder();
 
         String partyChosen = caseData.getUpdateDetailsForm().getPartyChosen().getValue().getCode();
         String partyChosenType = null;
@@ -143,19 +142,19 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             partyChosenType = appendUserAndType(partyChosen, oldCaseData, isAdmin);
         }
 
-        UpdateDetailsForm.UpdateDetailsFormBuilder formBuilder = caseData.getUpdateDetailsForm().toBuilder()
-            .partyChosenId(partyChosen)
-            .partyChosenType(partyChosenType)
-            .updateExpertsDetailsForm(prepareExperts(partyChosen, caseData))
-            .updateWitnessesDetailsForm(prepareWitnesses(partyChosen, caseData))
-            .updateLRIndividualsForm(prepareLRIndividuals(partyChosen, caseData))
-            .updateOrgIndividualsForm(prepareOrgIndividuals(partyChosen, caseData))
-            .build().toBuilder();
+        UpdateDetailsForm updatedForm = caseData.getUpdateDetailsForm();
 
-        builder.updateDetailsForm(formBuilder.build());
+        updatedForm.setPartyChosenId(partyChosen);
+        updatedForm.setPartyChosenType(partyChosenType);
+        updatedForm.setUpdateExpertsDetailsForm(prepareExperts(partyChosen, caseData));
+        updatedForm.setUpdateWitnessesDetailsForm(prepareWitnesses(partyChosen, caseData));
+        updatedForm.setUpdateLRIndividualsForm(prepareLRIndividuals(partyChosen, caseData));
+        updatedForm.setUpdateOrgIndividualsForm(prepareOrgIndividuals(partyChosen, caseData));
+
+        caseData.setUpdateDetailsForm(updatedForm);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
