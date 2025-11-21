@@ -99,7 +99,7 @@ public class PopulateCaseDataTask implements CaseTask {
                 MonetaryConversions.penniesToPounds(howMuchWasPaidValue)));
 
             updatedCaseData.responseClaimTrack(AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(),
-                                                                                null, null, featureToggleService, caseData
+                                                                                null, null
             ).name());
         }
         populatePreviewDocuments(caseData, updatedCaseData);

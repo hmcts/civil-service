@@ -3,14 +3,10 @@ package uk.gov.hmcts.reform.civil.enums;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
@@ -85,21 +81,21 @@ class AllocatedTrackTest {
             assertThat(getAllocatedTrack(BigDecimal.valueOf(25000), claimType, null)).isEqualTo(FAST_CLAIM);
         }
 
-        @ParameterizedTest(name = "{0} has multi claim track when claim value is more than 25000")
+        @ParameterizedTest(name = "{0} has intermediate claim track when claim value is more than 25000")
         @EnumSource(
             value = ClaimType.class,
             names = {"PERSONAL_INJURY", "CLINICAL_NEGLIGENCE", "PROFESSIONAL_NEGLIGENCE"})
-        void shouldAllocatePersonalInjuryClaimTypesAbove25000ToMultiClaim(ClaimType claimType) {
-            assertThat(getAllocatedTrack(BigDecimal.valueOf(25001), claimType, null)).isEqualTo(MULTI_CLAIM);
+        void shouldAllocatePersonalInjuryClaimTypesAbove25000ToIntermediateClaim(ClaimType claimType) {
+            assertThat(getAllocatedTrack(BigDecimal.valueOf(25001), claimType, null)).isEqualTo(INTERMEDIATE_CLAIM);
         }
 
-        @ParameterizedTest(name = "{0} has multi claim track when claim value is more than 25000")
+        @ParameterizedTest(name = "{0} has intermediate claim track when claim value is more than 25000")
         @EnumSource(
             value = ClaimType.class,
             names = {"PERSONAL_INJURY", "CLINICAL_NEGLIGENCE", "PROFESSIONAL_NEGLIGENCE"})
-        void shouldReturnCorrectTrackForEmailMultiClaim(ClaimType claimType) {
+        void shouldReturnCorrectTrackForEmailIntermediateClaim(ClaimType claimType) {
             assertThat(toStringValueForEmail(getAllocatedTrack(BigDecimal.valueOf(25001), claimType, null)))
-                .isEqualTo("Multi Track");
+                .isEqualTo("Intermediate Track");
         }
 
         @ParameterizedTest(name = "{0} has fast track when NIHL type")
@@ -174,21 +170,21 @@ class AllocatedTrackTest {
             assertThat(getAllocatedTrack(BigDecimal.valueOf(25000), claimType, null)).isEqualTo(FAST_CLAIM);
         }
 
-        @ParameterizedTest(name = "{0} has multi claim track when claim value is more than 25000")
+        @ParameterizedTest(name = "{0} has intermediate claim track when claim value is more than 25000")
         @EnumSource(
             value = ClaimType.class,
             names = {"BREACH_OF_CONTRACT", "CONSUMER", "CONSUMER_CREDIT", "OTHER"})
-        void shouldAllocateOtherClaimTypesAbove25000ToMultiClaim(ClaimType claimType) {
-            assertThat(getAllocatedTrack(BigDecimal.valueOf(25001), claimType, null)).isEqualTo(MULTI_CLAIM);
+        void shouldAllocateOtherClaimTypesAbove25000ToIntermediateClaim(ClaimType claimType) {
+            assertThat(getAllocatedTrack(BigDecimal.valueOf(25001), claimType, null)).isEqualTo(INTERMEDIATE_CLAIM);
         }
 
-        @ParameterizedTest(name = "{0} has multi claim track when claim value is more than 25000")
+        @ParameterizedTest(name = "{0} has intermediate claim track when claim value is more than 25000")
         @EnumSource(
             value = ClaimType.class,
             names = {"BREACH_OF_CONTRACT", "CONSUMER", "CONSUMER_CREDIT", "OTHER"})
-        void shouldReturnCorrectTrackForEmailMultiClaim(ClaimType claimType) {
+        void shouldReturnCorrectTrackForEmailIntermediateClaim(ClaimType claimType) {
             assertThat(toStringValueForEmail(getAllocatedTrack(BigDecimal.valueOf(25001), claimType, null)))
-                .isEqualTo("Multi Track");
+                .isEqualTo("Intermediate Track");
         }
 
         @ParameterizedTest(name = "{0} has small track when Flight Delay type is less than 10000")
@@ -199,29 +195,25 @@ class AllocatedTrackTest {
             assertThat(getAllocatedTrack(BigDecimal.valueOf(9999), claimType, null)).isEqualTo(SMALL_CLAIM);
         }
 
-        @ParameterizedTest(name = "{0} has intermediate track when unspecified and over 25000, less than 10000")
+        @ParameterizedTest(name = "{0} has intermediate track when unspecified and over 25000, less than 100000")
         @EnumSource(
             value = ClaimType.class,
             names = {"PERSONAL_INJURY", "CLINICAL_NEGLIGENCE", "PROFESSIONAL_NEGLIGENCE", "BREACH_OF_CONTRACT", "CONSUMER",
                 "CONSUMER_CREDIT", "OTHER"})
         void shouldReturnCorrectTrackWhenOver25000LessThan100000AndUnspecified(ClaimType claimType) {
-            FeatureToggleService toggleService = mock(FeatureToggleService.class);
-            when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-            assertThat(getAllocatedTrack(BigDecimal.valueOf(25001), claimType, null, toggleService, any())).isEqualTo(INTERMEDIATE_CLAIM);
-            assertThat(getAllocatedTrack(BigDecimal.valueOf(25000), claimType, null, toggleService, any())).isNotEqualTo(INTERMEDIATE_CLAIM);
+            assertThat(getAllocatedTrack(BigDecimal.valueOf(25001), claimType, null)).isEqualTo(INTERMEDIATE_CLAIM);
+            assertThat(getAllocatedTrack(BigDecimal.valueOf(25000), claimType, null)).isNotEqualTo(INTERMEDIATE_CLAIM);
 
         }
 
-        @ParameterizedTest(name = "{0} has multi track when unspecified and over 25000, less than 10000")
+        @ParameterizedTest(name = "{0} has multi track when unspecified and over 100000")
         @EnumSource(
             value = ClaimType.class,
             names = {"PERSONAL_INJURY", "CLINICAL_NEGLIGENCE", "PROFESSIONAL_NEGLIGENCE", "BREACH_OF_CONTRACT", "CONSUMER",
                 "CONSUMER_CREDIT", "OTHER"})
         void shouldReturnCorrectTrackWhenOver100000AndUnspecified(ClaimType claimType) {
-            FeatureToggleService toggleService = mock(FeatureToggleService.class);
-            when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-            assertThat(getAllocatedTrack(BigDecimal.valueOf(100001), claimType, null, toggleService, any())).isEqualTo(MULTI_CLAIM);
-            assertThat(getAllocatedTrack(BigDecimal.valueOf(99999), claimType, null, toggleService, any())).isNotEqualTo(MULTI_CLAIM);
+            assertThat(getAllocatedTrack(BigDecimal.valueOf(100001), claimType, null)).isEqualTo(MULTI_CLAIM);
+            assertThat(getAllocatedTrack(BigDecimal.valueOf(99999), claimType, null)).isNotEqualTo(MULTI_CLAIM);
         }
     }
 }

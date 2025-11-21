@@ -1209,7 +1209,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldCalculateAmount_AndReturnNoErrorWhenAbove25kAndToggleActive() {
             // Given
-            when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             List<ClaimAmountBreakup> claimAmountBreakup = new ArrayList<>();
             claimAmountBreakup.add(ClaimAmountBreakup.builder()
                                        .value(ClaimAmountBreakupDetails.builder()

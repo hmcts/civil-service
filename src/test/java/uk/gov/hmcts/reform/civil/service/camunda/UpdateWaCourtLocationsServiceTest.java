@@ -33,7 +33,6 @@ import java.util.Objects;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -161,7 +160,6 @@ class UpdateWaCourtLocationsServiceTest {
     @ParameterizedTest
     @ValueSource(strings = {"fast, small"})
     void shouldNotEvaluateWALocations_andShouldClearAnyPreviousEvaluatedCourtLocations(String track) {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").region("1").build())
             .allocatedTrack(Objects.equals(track, "fast") ? AllocatedTrack.FAST_CLAIM : AllocatedTrack.SMALL_CLAIM)
@@ -176,7 +174,6 @@ class UpdateWaCourtLocationsServiceTest {
 
     @Test
     void shouldNotUpdateCourtListingWALocations_whenCourtNotFound() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         Map<String, Object> emptyMap = new HashMap<>();
         when(camundaClient.getEvaluatedDmnCourtLocations(anyString(), anyString())).thenReturn(emptyMap);
         when(objectMapper.convertValue(emptyMap, DmnListingLocations.class)).thenReturn(null);
@@ -193,7 +190,6 @@ class UpdateWaCourtLocationsServiceTest {
 
     @Test
     void shouldThrowError_whenCourtNotFoundInHearingList() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         List<LocationRefData> locations = List.of(
             LocationRefData.builder().epimmsId("xxxxx").region("south").regionId("1").siteName("london somewhere").build(),
             LocationRefData.builder().epimmsId("yyyyy").region("north").regionId("2").siteName("liverpool somewhere").build(),
@@ -213,7 +209,6 @@ class UpdateWaCourtLocationsServiceTest {
 
     @Test
     void shouldUpdateCourtListingWALocations_whenCourtFound_Unspec() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").region("1").build())
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
@@ -227,7 +222,6 @@ class UpdateWaCourtLocationsServiceTest {
 
     @Test
     void shouldUpdateCourtListingWALocations_whenCourtFound_Spec() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").region("1").build())
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
@@ -241,7 +235,6 @@ class UpdateWaCourtLocationsServiceTest {
 
     @Test
     void shouldPopulateCnbcDetails_whenCourtFoundIsCnbc() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
         Map<String, Object> testCnbcMap = new HashMap<>();
         testCnbcMap.put("Trial", Map.of(
@@ -290,7 +283,6 @@ class UpdateWaCourtLocationsServiceTest {
 
     @Test
     void shouldPopulateCcmccDetails_whenCourtFoundIsCcmcc() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
         Map<String, Object> testCnbcMap = new HashMap<>();
         testCnbcMap.put("Trial", Map.of(

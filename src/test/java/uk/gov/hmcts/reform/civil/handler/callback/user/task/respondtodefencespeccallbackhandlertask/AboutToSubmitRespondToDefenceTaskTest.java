@@ -222,7 +222,6 @@ class AboutToSubmitRespondToDefenceTaskTest {
 
     @Test
     void shouldCallUpdateWaCourtLocationsServiceWhenPresent_AndMintiEnabled() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1DQWithExperts()
@@ -239,7 +238,6 @@ class AboutToSubmitRespondToDefenceTaskTest {
 
     @Test
     void shouldNotCallUpdateWaCourtLocationsServiceWhenNotPresent_AndMintiEnabled() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
         task = new AboutToSubmitRespondToDefenceTask(objectMapper, time, locationRefDataService,
                                                      courtLocationUtils, featureToggleService,

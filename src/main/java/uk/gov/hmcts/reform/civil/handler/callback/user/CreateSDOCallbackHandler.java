@@ -1582,12 +1582,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             dataBuilder.sdoR2Trial(sdoR2Trial);
         }
 
-        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-            updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
-                callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                caseData
-            ));
-        }
+        updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
+            callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
+            caseData
+        ));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
@@ -1804,8 +1802,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private boolean isMultiOrIntermediateTrackClaim(CaseData caseData) {
-        return featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
-            && (AllocatedTrack.INTERMEDIATE_CLAIM.equals(caseData.getAllocatedTrack())
+        return (AllocatedTrack.INTERMEDIATE_CLAIM.equals(caseData.getAllocatedTrack())
             || AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
             || AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())
             || AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack()));

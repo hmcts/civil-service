@@ -488,7 +488,6 @@ class SendAndReplyCallbackHandlerTest {
         void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_MessageIsSentToDistrictJudge_Intermediate_TotalClaimAmount() {
             String messageContent = "Message Content";
             SendMessageMetadata messageMetaData = SendMessageMetadata.builder().build();
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
             Message expectedMessage = Message.builder()
                 .messageContent(messageContent)
@@ -529,7 +528,6 @@ class SendAndReplyCallbackHandlerTest {
         void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_MessageIsSentToDistrictJudge_Multi_TotalClaimAmount() {
             String messageContent = "Message Content";
             SendMessageMetadata messageMetaData = SendMessageMetadata.builder().build();
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
             Message expectedMessage = Message.builder()
                 .messageContent(messageContent)

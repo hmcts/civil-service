@@ -99,8 +99,7 @@ public class HandleAdmitPartOfClaim implements CaseTask {
 
     private AllocatedTrack getAllocatedTrack(CaseData caseData) {
         log.info("Determining allocated track for caseId: {}", caseData.getCcdCaseReference());
-        return AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null,
-                featureToggleService, caseData);
+        return AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null);
     }
 
     private void validateAdmittedClaimOwingAmount(List<String> errors, CaseData caseData) {

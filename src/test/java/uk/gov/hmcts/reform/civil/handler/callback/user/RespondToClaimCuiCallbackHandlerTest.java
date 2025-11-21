@@ -151,7 +151,6 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateBusinessProcessAndClaimStatus_when_is_multi_track() {
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
@@ -179,7 +178,6 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldExtendDeadline() {
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             when(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(36, LocalDate.now()))
                 .thenReturn(LocalDateTime.now().plusMonths(36));
 

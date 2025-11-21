@@ -627,9 +627,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         caseData.setAllocatedTrack(getAllocatedTrack(
             caseData.getClaimValue().toPounds(),
             claimType,
-            caseData.getPersonalInjuryType(),
-            toggleService,
-            caseData
+            caseData.getPersonalInjuryType()
         ));
 
         caseData.setSubmittedDate(time.now());
