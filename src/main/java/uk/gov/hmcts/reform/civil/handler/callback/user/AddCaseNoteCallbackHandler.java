@@ -62,16 +62,15 @@ public class AddCaseNoteCallbackHandler extends CallbackHandler {
 
         List<Element<CaseNote>> caseNotes = caseNoteService.addNoteToListStart(caseNote, caseData.getCaseNotes());
 
-        CaseData.CaseDataBuilder updatedCaseDataBuilder = caseData.toBuilder()
-            .caseNotes(caseNotes)
-            .caseNote(null);
+        caseData.setCaseNotes(caseNotes);
+        caseData.setCaseNote(null);
 
         if (!ccdEventsServiceBusEnabled) {
-            updatedCaseDataBuilder.businessProcess(BusinessProcess.ready(ADD_CASE_NOTE));
+            caseData.setBusinessProcess(BusinessProcess.ready(ADD_CASE_NOTE));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 }
