@@ -30,6 +30,7 @@ public class CourtVenueService {
         String serviceAuth,
         String auth
     ) {
+        log.info("[CourtVenueService] Cache MISS → calling Location Reference Data API to fetch all courts");
         return locationRefDataApiClient.getAllCivilCourtVenues(serviceAuth, auth, CIVIL_COURT_TYPE_ID, LOCATION_TYPE);
     }
 
