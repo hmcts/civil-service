@@ -13,15 +13,18 @@ import java.util.List;
 
 abstract class ApplicationsProceedOfflineDashboardService {
 
+    private final DashboardScenariosService dashboardScenariosService;
+    private final DashboardNotificationService dashboardNotificationService;
+    private final DashboardNotificationsParamsMapper mapper;
+
     private static final List<String> NON_LIVE_STATES = List.of(
         "Application Closed",
         "Order Made",
         "Application Dismissed"
     );
 
-    private final DashboardScenariosService dashboardScenariosService;
-    private final DashboardNotificationService dashboardNotificationService;
-    private final DashboardNotificationsParamsMapper mapper;
+    protected static final String CLAIMANT_LABEL = "Claimant";
+    protected static final String DEFENDANT_LABEL = "Defendant";
 
     ApplicationsProceedOfflineDashboardService(DashboardScenariosService dashboardScenariosService,
                                                DashboardNotificationService dashboardNotificationService,

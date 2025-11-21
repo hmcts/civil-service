@@ -78,7 +78,11 @@ class CaseProceedOfflineDefendantScenarioServiceTest {
             .previousCCDState(CaseState.CASE_PROGRESSION)
             .build();
 
-        assertThat(service.shouldRecordScenarioInCaseProgression(eligible, true)).isTrue();
-        assertThat(service.shouldRecordScenarioInCaseProgression(eligible, false)).isFalse();
+        CaseData ineligible = eligible.toBuilder()
+            .respondent1Represented(YesOrNo.YES)
+            .build();
+
+        assertThat(service.shouldRecordScenarioInCaseProgression(eligible)).isTrue();
+        assertThat(service.shouldRecordScenarioInCaseProgression(ineligible)).isFalse();
     }
 }

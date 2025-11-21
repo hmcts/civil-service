@@ -12,6 +12,7 @@ import java.util.Map;
 @Service
 public class CaseProceedOfflineClaimantDashboardService extends CaseProceedOfflineDashboardService {
 
+    protected static final String CLAIMANT_ROLE = "CLAIMANT";
     private final CaseProceedOfflineClaimantScenarioService scenarioService;
 
     public CaseProceedOfflineClaimantDashboardService(DashboardScenariosService dashboardScenariosService,
@@ -44,7 +45,7 @@ public class CaseProceedOfflineClaimantDashboardService extends CaseProceedOffli
 
     @Override
     protected String citizenRole() {
-        return "CLAIMANT";
+        return CLAIMANT_ROLE;
     }
 
     @Override

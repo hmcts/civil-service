@@ -37,7 +37,7 @@ public class ApplicationsProceedOfflineClaimantDashboardService extends Applicat
 
     @Override
     protected String partyLabel() {
-        return "Claimant";
+        return CLAIMANT_LABEL;
     }
 
     @Override

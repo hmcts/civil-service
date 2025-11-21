@@ -16,6 +16,9 @@ public abstract class DashboardScenarioService {
     protected final DashboardScenariosService dashboardScenariosService;
     protected final DashboardNotificationsParamsMapper mapper;
 
+    protected static final String DEFENDANT_ROLE = "DEFENDANT";
+    protected static final String CLAIMANT_ROLE = "CLAIMANT";
+
     protected DashboardScenarioService(DashboardScenariosService dashboardScenariosService,
                                        DashboardNotificationsParamsMapper mapper) {
         this.dashboardScenariosService = dashboardScenariosService;

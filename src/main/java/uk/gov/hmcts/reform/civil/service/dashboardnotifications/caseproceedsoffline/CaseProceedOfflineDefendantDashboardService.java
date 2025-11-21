@@ -13,6 +13,7 @@ import java.util.Map;
 @Service
 public class CaseProceedOfflineDefendantDashboardService extends CaseProceedOfflineDashboardService {
 
+    protected static final String DEFENDANT_ROLE = "DEFENDANT";
     private final CaseProceedOfflineDefendantScenarioService scenarioService;
 
     public CaseProceedOfflineDefendantDashboardService(DashboardScenariosService dashboardScenariosService,
@@ -41,7 +42,7 @@ public class CaseProceedOfflineDefendantDashboardService extends CaseProceedOffl
 
     @Override
     protected String citizenRole() {
-        return "DEFENDANT";
+        return DEFENDANT_ROLE;
     }
 
     @Override
@@ -56,7 +57,6 @@ public class CaseProceedOfflineDefendantDashboardService extends CaseProceedOffl
 
     @Override
     protected boolean shouldRecordScenarioInCaseProgression(CaseData caseData) {
-        boolean isLipVLipOrLRvLip = caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne();
-        return scenarioService.shouldRecordScenarioInCaseProgression(caseData, isLipVLipOrLRvLip);
+        return scenarioService.shouldRecordScenarioInCaseProgression(caseData);
     }
 }

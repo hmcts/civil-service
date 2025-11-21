@@ -56,8 +56,8 @@ public class DismissCaseClaimantDashboardService extends DashboardScenarioServic
     @Override
     protected void beforeRecordScenario(CaseData caseData, String authToken) {
         String caseId = String.valueOf(caseData.getCcdCaseReference());
-        dashboardNotificationService.deleteByReferenceAndCitizenRole(caseId, "CLAIMANT");
-        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(caseId, "CLAIMANT");
+        dashboardNotificationService.deleteByReferenceAndCitizenRole(caseId, CLAIMANT_ROLE);
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(caseId, CLAIMANT_ROLE);
     }
 
     private boolean claimantQueryAwaitingResponse(CaseData caseData) {

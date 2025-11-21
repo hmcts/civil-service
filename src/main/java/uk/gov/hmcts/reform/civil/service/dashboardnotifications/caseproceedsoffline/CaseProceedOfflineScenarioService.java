@@ -5,6 +5,9 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
+import java.util.Map;
+
+import static java.util.Map.entry;
 
 public abstract class CaseProceedOfflineScenarioService {
 
@@ -25,5 +28,25 @@ public abstract class CaseProceedOfflineScenarioService {
     protected boolean inCaseProgressionState(CaseData caseData) {
         return caseData.getPreviousCCDState() != null
             && CASE_PROGRESSION_STATES.contains(caseData.getPreviousCCDState());
+    }
+
+    protected Map<String, Boolean> additionalScenarios(CaseData caseData,
+                                                       String inactiveScenario,
+                                                       String availableScenario,
+                                                       String queryScenario) {
+        return Map.ofEntries(
+            entry(inactiveScenario, true),
+            entry(
+                availableScenario,
+                caseData.getGeneralApplications() != null && !caseData.getGeneralApplications().isEmpty()
+            ),
+            entry(queryScenario, queryAwaitingResponse(caseData))
+        );
+    }
+
+    protected boolean queryAwaitingResponse(CaseData caseData) {
+        return featureToggleService.isPublicQueryManagementEnabled(caseData)
+            && caseData.getQueries() != null
+            && caseData.getQueries().hasAQueryAwaitingResponse();
     }
 }
