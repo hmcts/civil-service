@@ -46,11 +46,10 @@ public class CreateClaimSpecAfterPaymentCallbackHandler extends CallbackHandler 
 
     private CallbackResponse changeStateToCaseIssued(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
-        dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC_AFTER_PAYMENT));
+        caseData.setBusinessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC_AFTER_PAYMENT));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(dataBuilder.build().toMap(objectMapper))
+                .data(caseData.toMap(objectMapper))
                 .build();
     }
 

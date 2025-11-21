@@ -187,10 +187,9 @@ public class LocationHelper {
      * @param builder  (mandatory) to build a case data
      * @param location (mandatory) what to update with
      */
-    public static void updateWithLocation(CaseData.CaseDataBuilder<?, ?> builder, LocationRefData location) {
-        builder
-            .caseManagementLocation(buildCaseLocation(location))
-            .locationName(location.getSiteName());
+    public static void updateWithLocation(CaseData builder, LocationRefData location) {
+        builder.setCaseManagementLocation(buildCaseLocation(location));
+        builder.setLocationName(location.getSiteName());
     }
 
     /**

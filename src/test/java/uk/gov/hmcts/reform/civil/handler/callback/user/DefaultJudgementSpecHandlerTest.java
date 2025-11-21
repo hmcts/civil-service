@@ -156,7 +156,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
-            assertThat(response.getData().get("defendantDetailsSpec")).isNotNull();
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getDefendantDetailsSpec()).isNotNull();
         }
 
         @Test
@@ -176,7 +177,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
-            assertThat(response.getData().get("defendantDetailsSpec")).isNotNull();
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getDefendantDetailsSpec()).isNotNull();
         }
 
         @Test
@@ -251,7 +253,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData().get("bothDefendantsSpec")).isEqualTo("Both");
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getBothDefendantsSpec()).isEqualTo("Both");
         }
 
         @Test
@@ -270,7 +273,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData().get("bothDefendantsSpec")).isEqualTo("One");
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getBothDefendantsSpec()).isEqualTo("One");
         }
 
         @Test
@@ -286,7 +290,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData().get("currentDefendant"))
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getCurrentDefendant())
                 .isEqualTo("Has Test User paid some of the amount owed?");
         }
 
@@ -308,7 +313,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData().get("currentDefendant"))
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getCurrentDefendant())
                 .isEqualTo("Have the defendants paid some of the amount owed?");
         }
 
@@ -330,7 +336,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData().get("currentDefendantName"))
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getCurrentDefendantName())
                 .isEqualTo("both defendants");
         }
 
@@ -350,11 +357,11 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData().get("currentDefendantName"))
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getCurrentDefendantName())
                 .isEqualTo("Steve Rodgers");
-            //
-            assertThat(response.getData().get("registrationTypeRespondentOne")).isNull();
-            assertThat(response.getData().get("registrationTypeRespondentTwo")).isNull();
+            assertThat(updatedData.getRegistrationTypeRespondentOne()).isNull();
+            assertThat(updatedData.getRegistrationTypeRespondentTwo()).isNull();
         }
 
         @Test
@@ -1408,8 +1415,9 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).extracting("businessProcess").isNotNull();
-            assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_SPEC.name());
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getBusinessProcess()).isNotNull();
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(DEFAULT_JUDGEMENT_SPEC.name());
             assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
             assertInterestIsPopulated(response, 0);
         }
@@ -1453,9 +1461,11 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).extracting("businessProcess").isNotNull();
-            assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getBusinessProcess()).isNotNull();
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
             assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+            // Use Map-based verification for activeJudgment due to complex nested objects
             assertThat(response.getData()).extracting("activeJudgment").isNotNull();
             assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("ISSUED");
             assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo("DEFAULT_JUDGMENT");
@@ -1511,8 +1521,9 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).extracting("businessProcess").isNotNull();
-            assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getBusinessProcess()).isNotNull();
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
             assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
             assertThat(response.getData()).extracting("activeJudgment").isNotNull();
             assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("ISSUED");

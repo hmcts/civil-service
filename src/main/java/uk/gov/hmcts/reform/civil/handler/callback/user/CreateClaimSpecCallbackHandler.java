@@ -186,9 +186,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse interestFromDefault(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE.equals(caseData.getInterestClaimFrom())) {
-            caseData = caseData.toBuilder()
-                .interestClaimUntil(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE)
-                .build();
+            caseData.setInterestClaimUntil(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE);
             CallbackParams callbackParamsWithUpdatedCaseData = callbackParams.toBuilder()
                 .caseData(caseData)
                 .build();
@@ -275,12 +273,12 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse getIdamEmail(CallbackParams callbackParams) {
         UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
-        CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder()
-            .applicantSolicitor1CheckEmail(CorrectEmail.builder().email(userDetails.getEmail()).build())
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().build());
+        CaseData caseData = callbackParams.getCaseData();
+        caseData.setApplicantSolicitor1CheckEmail(CorrectEmail.builder().email(userDetails.getEmail()).build());
+        caseData.setApplicantSolicitor1UserDetails(IdamUserDetails.builder().build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
@@ -434,32 +432,29 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse calculateInterest(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount().add(interest);
 
         String calculatedInterest = " | Description | Amount | \n |---|---| \n | Claim amount | £ "
             + caseData.getTotalClaimAmount().setScale(2)
             + " | \n | Interest amount | £ " + interest.setScale(2) + " | \n | Total amount | £ " + totalAmountWithInterest.setScale(2) + " |";
-        caseDataBuilder.calculatedInterest(calculatedInterest);
+        caseData.setCalculatedInterest(calculatedInterest);
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
     private CallbackResponse specCalculateInterest(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount();
 
         String calculateInterest = " | Description | Amount | \n |---|---| \n | Claim amount | £ "
             + caseData.getTotalClaimAmount().setScale(2)
             + " | \n | Interest amount | £ " + "0" + " | \n | Total amount | £ " + totalAmountWithInterest.setScale(2) + " |";
-        caseDataBuilder.calculatedInterest(calculateInterest);
+        caseData.setCalculatedInterest(calculateInterest);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
@@ -512,7 +507,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private CallbackResponse validateFlightDelayDate(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
+        CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
         if (callbackParams.getCaseData().getIsFlightDelayClaim().equals(YES)) {
             LocalDate today = LocalDate.now();
@@ -523,21 +518,21 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .errors(errors)
             .build();
     }
 
     private CallbackResponse setRespondent2SameLegalRepToNo(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder();
+        CaseData caseData = callbackParams.getCaseData();
 
         // only default this to NO if respondent 1 isn't represented
         if (callbackParams.getCaseData().getSpecRespondent1Represented().equals(NO)) {
-            caseDataBuilder.respondent2SameLegalRepresentative(NO);
+            caseData.setRespondent2SameLegalRepresentative(NO);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

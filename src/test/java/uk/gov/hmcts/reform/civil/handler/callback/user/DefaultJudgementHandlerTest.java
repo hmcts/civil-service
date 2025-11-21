@@ -4,12 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -47,19 +46,22 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 @ExtendWith(MockitoExtension.class)
 public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
-    @InjectMocks
     private DefaultJudgementHandler handler;
-
-    @Spy
-    private ObjectMapper mapper = new ObjectMapper()
-        .registerModule(new JavaTimeModule())
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    private ObjectMapper mapper;
 
     @Mock
     private LocationReferenceDataService locationRefDataService;
 
     @Mock
     private DeadlinesCalculator deadlinesCalculator;
+
+    @BeforeEach
+    void setUp() {
+        mapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        handler = new DefaultJudgementHandler(mapper, locationRefDataService, deadlinesCalculator);
+    }
 
     @Nested
     class AboutToStartCallback {
@@ -320,7 +322,11 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
                 assertThat(response.getErrors()).isNull();
+                assertThat(updatedData.getCaseManagementLocation()).isNotNull();
+                assertThat(updatedData.getLocationName()).isEqualTo("Loc");
             }
         }
 
@@ -337,7 +343,10 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                assertThat(updatedData.getBusinessProcess()).isNotNull();
                 assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo("DEFAULT_JUDGEMENT");
+                assertThat(updatedData.getSetRequestDJDamagesFlagForWA()).isEqualTo(YesOrNo.YES);
+                //assertThat(updatedData.getClaimDismissedDeadline()).isNotNull();
             }
 
             @Test
@@ -360,9 +369,12 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                assertThat(updatedData.getCaseManagementLocation()).isNotNull();
                 assertThat(updatedData.getCaseManagementLocation().getRegion()).isEqualTo("2");
                 assertThat(updatedData.getCaseManagementLocation().getBaseLocation()).isEqualTo("123456");
+                assertThat(updatedData.getBusinessProcess()).isNotNull();
                 assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo("DEFAULT_JUDGEMENT");
+                assertThat(updatedData.getSetRequestDJDamagesFlagForWA()).isEqualTo(YesOrNo.YES);
             }
         }
 

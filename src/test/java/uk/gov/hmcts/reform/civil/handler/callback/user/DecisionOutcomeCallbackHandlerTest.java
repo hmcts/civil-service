@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -27,18 +28,24 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MOVE_TO_DECISION_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_DASHBOARD_TASK_LIST_DEFENDANT_DECISION_OUTCOME;
+import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 
 @ExtendWith(MockitoExtension.class)
 class DecisionOutcomeCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @InjectMocks
     private DecisionOutcomeCallbackHandler handler;
 
-    @Mock
     private ObjectMapper objectMapper;
 
     @Mock
     private FeatureToggleService featureToggleService;
+
+    @BeforeEach
+    void setUp() {
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        handler = new DecisionOutcomeCallbackHandler(objectMapper, featureToggleService);
+    }
 
     @Test
     void shouldReturnNoError_WhenAboutToSubmitIsInvoked() {
@@ -62,8 +69,12 @@ class DecisionOutcomeCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
             .handle(params);
+        CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
 
         assertThat(response.getErrors()).isNull();
+        assertThat(updatedData.getBusinessProcess()).isNotNull();
+        assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(MOVE_TO_DECISION_OUTCOME.name());
+        assertThat(updatedData.getBusinessProcess().getStatus()).isEqualTo(READY);
     }
 
     @Test
