@@ -88,9 +88,9 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
             userInfo.getUid()
         );
         if (isRespondentSolicitorOne(roles) || isRespondentSolicitorTwo(roles) || isApplicantSolicitorOne(roles)) {
-            caseData.setUpdateDetailsForm(UpdateDetailsForm.builder()
-                                            .hidePartyChoice(YES)
-                                            .build());
+            UpdateDetailsForm updateDetailsForm = new UpdateDetailsForm();
+            updateDetailsForm.setHidePartyChoice(YES);
+            caseData.setUpdateDetailsForm(updateDetailsForm);
 
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseData.toMap(objectMapper))
@@ -127,10 +127,10 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
             }
         }
 
-        caseData.setUpdateDetailsForm(UpdateDetailsForm.builder()
-                                        .hidePartyChoice(YesOrNo.NO)
-                                        .partyChosen(DynamicList.fromList(dynamicListOptions))
-                                        .build());
+        UpdateDetailsForm updateDetailsForm = new UpdateDetailsForm();
+        updateDetailsForm.setHidePartyChoice(YesOrNo.NO);
+        updateDetailsForm.setPartyChosen(DynamicList.fromList(dynamicListOptions));
+        caseData.setUpdateDetailsForm(updateDetailsForm);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))

@@ -107,13 +107,11 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
                 .map(SolicitorReferences::getRespondentSolicitor2Reference)
                 .orElse(null)
         );
-        caseData.setSolicitorReferencesCopy(
-            SolicitorReferences.builder()
-                .applicantSolicitor1Reference(applicantReference)
-                .respondentSolicitor1Reference(respondent1Reference)
-                .respondentSolicitor2Reference(respondent2Reference)
-                .build()
-        );
+        SolicitorReferences solicitorReferencesCopy = new SolicitorReferences();
+        solicitorReferencesCopy.setApplicantSolicitor1Reference(applicantReference);
+        solicitorReferencesCopy.setRespondentSolicitor1Reference(respondent1Reference);
+        solicitorReferencesCopy.setRespondentSolicitor2Reference(respondent2Reference);
+        caseData.setSolicitorReferencesCopy(solicitorReferencesCopy);
         Optional.ofNullable(caseData.getApplicant1OrganisationPolicy())
             .ifPresent(policy -> policy.setOrgPolicyReference(applicantReference));
         Optional.ofNullable(caseData.getRespondent1OrganisationPolicy())
@@ -225,11 +223,11 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
             caseData.setRespondentSolicitor2ServiceAddress(caseData.getRespondentSolicitor1ServiceAddress());
             caseData.setRespondentSolicitor2EmailAddress(caseData.getRespondentSolicitor1EmailAddress());
             if (caseData.getRespondent1OrganisationPolicy() != null) {
-                caseData.setRespondent2OrganisationPolicy(OrganisationPolicy.builder()
-                    .organisation(caseData.getRespondent1OrganisationPolicy().getOrganisation())
-                    .orgPolicyReference(caseData.getRespondent1OrganisationPolicy().getOrgPolicyReference())
-                    .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName())
-                    .build());
+                OrganisationPolicy respondent2Policy = new OrganisationPolicy();
+                respondent2Policy.setOrganisation(caseData.getRespondent1OrganisationPolicy().getOrganisation());
+                respondent2Policy.setOrgPolicyReference(caseData.getRespondent1OrganisationPolicy().getOrgPolicyReference());
+                respondent2Policy.setOrgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName());
+                caseData.setRespondent2OrganisationPolicy(respondent2Policy);
             }
         }
     }
@@ -288,9 +286,9 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
                 );
             }
 
-            caseData.setApplicantSolicitor1ServiceAddress(Address.builder().build());
-            caseData.setRespondentSolicitor1ServiceAddress(Address.builder().build());
-            caseData.setRespondentSolicitor2ServiceAddress(Address.builder().build());
+            caseData.setApplicantSolicitor1ServiceAddress(new Address());
+            caseData.setRespondentSolicitor1ServiceAddress(new Address());
+            caseData.setRespondentSolicitor2ServiceAddress(new Address());
         }
     }
 
@@ -314,7 +312,7 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
                 caseData.getApplicant1OrganisationPolicy(),
                 newReference -> {
                     SolicitorReferences references = Optional.ofNullable(caseData.getSolicitorReferences())
-                        .orElse(SolicitorReferences.builder().build());
+                        .orElse(new SolicitorReferences());
                     references.setApplicantSolicitor1Reference(newReference);
                     caseData.setSolicitorReferences(references);
                 }
@@ -327,7 +325,7 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
                 caseData.getRespondent1OrganisationPolicy(),
                 newReference -> {
                     SolicitorReferences references = Optional.ofNullable(caseData.getSolicitorReferences())
-                        .orElse(SolicitorReferences.builder().build());
+                        .orElse(new SolicitorReferences());
                     references.setRespondentSolicitor1Reference(newReference);
                     caseData.setSolicitorReferences(references);
                 }
@@ -340,14 +338,14 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
                 caseData.getRespondent2OrganisationPolicy(),
                 newReference -> {
                     SolicitorReferences references = Optional.ofNullable(caseData.getSolicitorReferences())
-                        .orElse(SolicitorReferences.builder().build());
+                        .orElse(new SolicitorReferences());
                     references.setRespondentSolicitor2Reference(newReference);
                     caseData.setSolicitorReferences(references);
                     caseData.setRespondentSolicitor2Reference(newReference);
                 }
             );
         }
-        caseData.setSolicitorReferencesCopy(SolicitorReferences.builder().build());
+        caseData.setSolicitorReferencesCopy(new SolicitorReferences());
     }
 
     private static void updateReference(String oldReference, OrganisationPolicy policy, Consumer<String> ifDifferent) {
@@ -418,11 +416,11 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
         caseData.setIsRespondent2(null);
         if (caseData.getCaseAccessCategory() != CaseCategory.SPEC_CLAIM) {
             caseData.setSpecApplicantCorrespondenceAddressRequired(NO);
-            caseData.setSpecApplicantCorrespondenceAddressdetails(Address.builder().build());
+            caseData.setSpecApplicantCorrespondenceAddressdetails(new Address());
             caseData.setSpecRespondentCorrespondenceAddressRequired(NO);
-            caseData.setSpecRespondentCorrespondenceAddressdetails(Address.builder().build());
+            caseData.setSpecRespondentCorrespondenceAddressdetails(new Address());
             caseData.setSpecRespondent2CorrespondenceAddressRequired(NO);
-            caseData.setSpecRespondent2CorrespondenceAddressdetails(Address.builder().build());
+            caseData.setSpecRespondent2CorrespondenceAddressdetails(new Address());
         }
     }
 

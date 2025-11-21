@@ -337,10 +337,10 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             String address = "test address";
             var expectedAddress = AddressBuilder.defaults().addressLine1(address).build();
-            caseData = caseData.toBuilder()
-                .respondent1Copy(caseData.getRespondent1().toBuilder().primaryAddress(expectedAddress).build())
-                .respondent2Copy(caseData.getRespondent2().toBuilder().primaryAddress(expectedAddress).build())
-                .build();
+            caseData.getRespondent1().setPrimaryAddress(expectedAddress);
+            caseData.setRespondent1Copy(caseData.getRespondent1());
+            caseData.getRespondent2().setPrimaryAddress(expectedAddress);
+            caseData.setRespondent2Copy(caseData.getRespondent2());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -418,8 +418,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateNotificationAcknowledged()
                 .respondent1Copy(PartyBuilder.builder().individual().build())
                 .respondent2Copy(PartyBuilder.builder().individual().build())
-                .multiPartyClaimTwoDefendantSolicitors().build().toBuilder()
-                .build();
+                .multiPartyClaimTwoDefendantSolicitors().build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -520,11 +519,10 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateNotificationAcknowledged()
                 .respondent1Copy(PartyBuilder.builder().individual().build())
                 .respondent2Copy(PartyBuilder.builder().individual().build())
-                .multiPartyClaimTwoDefendantSolicitors().build().toBuilder()
-                .solicitorReferencesCopy(SolicitorReferences.builder()
-                .respondentSolicitor1Reference("abc")
-                    .build())
-                .build();
+                .multiPartyClaimTwoDefendantSolicitors().build();
+            SolicitorReferences solicitorReferencesCopy = new SolicitorReferences();
+            solicitorReferencesCopy.setRespondentSolicitor1Reference("abc");
+            caseData.setSolicitorReferencesCopy(solicitorReferencesCopy);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 

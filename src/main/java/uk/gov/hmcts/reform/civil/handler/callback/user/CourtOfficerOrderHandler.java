@@ -108,14 +108,14 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
     private CallbackResponse prePopulateValues(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        List<LocationRefData> locations = (locationRefDataService.getHearingCourtLocations(authToken));
 
-        caseData.setCourtOfficerFurtherHearingComplex(FinalOrderFurtherHearing.builder()
-            .datesToAvoidDateDropdown(DatesFinalOrders.builder()
-                .datesToAvoidDates(workingDayIndicator
-                    .getNextWorkingDay(LocalDate.now().plusDays(7))).build())
-            .hearingLocationList(populateCurrentHearingLocation(caseData, authToken))
-            .alternativeHearingList(getLocationsFromList(locations)).build());
+        DatesFinalOrders datesFinalOrders = new DatesFinalOrders();
+        datesFinalOrders.setDatesToAvoidDates(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(7)));
+        FinalOrderFurtherHearing finalOrderFurtherHearing = new FinalOrderFurtherHearing();
+        finalOrderFurtherHearing.setDatesToAvoidDateDropdown(datesFinalOrders);
+        finalOrderFurtherHearing.setHearingLocationList(populateCurrentHearingLocation(caseData, authToken));
+        finalOrderFurtherHearing.setAlternativeHearingList(getLocationsFromList(locationRefDataService.getHearingCourtLocations(authToken)));
+        caseData.setCourtOfficerFurtherHearingComplex(finalOrderFurtherHearing);
         caseData.setCourtOfficerGiveReasonsYesNo(YesOrNo.NO);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
