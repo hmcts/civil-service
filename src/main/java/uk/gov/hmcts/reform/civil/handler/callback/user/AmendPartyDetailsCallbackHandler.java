@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -69,27 +70,33 @@ public class AmendPartyDetailsCallbackHandler extends CallbackHandler {
     }
 
     private void setOrganisationPolicy(CaseData caseData) {
-        if (caseData.getRespondent1OrganisationIDCopy() != null && caseData.getRespondent1OrganisationPolicy() != null) {
-            caseData.setRespondent1OrganisationPolicy(
-                //Todo: Sumit check to Builder
-                caseData.getRespondent1OrganisationPolicy().toBuilder()
-                    .organisation(Organisation.builder()
-                                      .organisationID(caseData.getRespondent1OrganisationIDCopy())
-                                      .build())
-                    .build()
-            );
+        updateOrganisationPolicy(caseData.getRespondent1OrganisationPolicy(),
+                                 caseData.getRespondent1OrganisationIDCopy());
+
+        var respondent2Policy = caseData.getRespondent2OrganisationPolicy();
+
+        if (caseData.getRespondent2OrganisationIDCopy() != null && respondent2Policy != null) {
+            // Avoid modifying same object reference as respondent1 policy
+            if (respondent2Policy == caseData.getRespondent1OrganisationPolicy()) {
+                respondent2Policy = objectMapper.convertValue(respondent2Policy, OrganisationPolicy.class);
+                caseData.setRespondent2OrganisationPolicy(respondent2Policy);
+            }
+
+            updateOrganisationPolicy(respondent2Policy, caseData.getRespondent2OrganisationIDCopy());
+        }
+    }
+
+    private void updateOrganisationPolicy(OrganisationPolicy policy, String orgIdCopy) {
+        if (orgIdCopy == null || policy == null) {
+            return;
         }
 
-        if (caseData.getRespondent2OrganisationIDCopy() != null && caseData.getRespondent2OrganisationPolicy() != null) {
-            caseData.setRespondent2OrganisationPolicy(
-                //Todo: Sumit check to Builder
-                caseData.getRespondent2OrganisationPolicy().toBuilder()
-                    .organisation(Organisation.builder()
-                                      .organisationID(caseData.getRespondent2OrganisationIDCopy())
-                                      .build())
-                    .build()
-            );
-        }
+        Organisation organisation = policy.getOrganisation() == null
+            ? new Organisation()
+            : objectMapper.convertValue(policy.getOrganisation(), Organisation.class);  // defensive copy
+
+        organisation.setOrganisationID(orgIdCopy);
+        policy.setOrganisation(organisation);
     }
 
     private CallbackResponse buildConfirmation(CallbackParams callbackParams) {

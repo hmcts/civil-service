@@ -115,14 +115,11 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
                 .build()
         );
         Optional.ofNullable(caseData.getApplicant1OrganisationPolicy())
-            .map(op -> op.toBuilder().orgPolicyReference(applicantReference).build())
-            .ifPresent(caseData::setApplicant1OrganisationPolicy);
+            .ifPresent(policy -> policy.setOrgPolicyReference(applicantReference));
         Optional.ofNullable(caseData.getRespondent1OrganisationPolicy())
-            .map(op -> op.toBuilder().orgPolicyReference(respondent1Reference).build())
-            .ifPresent(caseData::setRespondent1OrganisationPolicy);
+            .ifPresent(policy -> policy.setOrgPolicyReference(respondent1Reference));
         Optional.ofNullable(caseData.getRespondent2OrganisationPolicy())
-            .map(op -> op.toBuilder().orgPolicyReference(respondent2Reference).build())
-            .ifPresent(caseData::setRespondent2OrganisationPolicy);
+            .ifPresent(policy -> policy.setOrgPolicyReference(respondent2Reference));
 
         prepareCorrespondenceAddresses(caseData);
 

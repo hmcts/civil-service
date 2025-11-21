@@ -162,12 +162,11 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse setNewResponseDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        LocalDateTime respondent1ResponseDeadline = caseData.getRespondent1ResponseDeadline();
-        LocalDateTime respondent2ResponseDeadline = caseData.getRespondent2ResponseDeadline();
 
-        final var updatedRespondent1 = caseData.getRespondent1().toBuilder()
-            .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
-            .build();
+        final var updatedRespondent1 = caseData.getRespondent1();
+        if (caseData.getRespondent1Copy() != null) {
+            updatedRespondent1.setPrimaryAddress(caseData.getRespondent1Copy().getPrimaryAddress());
+        }
 
         // casefileview changes need to assign documents into specific folders, this is help determine
         // which user is "creating" the document and therefore which folder to move the documents
@@ -181,9 +180,10 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             caseData.setRespondent2DocumentGeneration("userRespondent2");
         }
 
+        LocalDateTime respondent1ResponseDeadline = caseData.getRespondent1ResponseDeadline();
         LocalDateTime newDeadlineRespondent1 = deadlinesCalculator.plus14DaysDeadline(respondent1ResponseDeadline);
         LocalDateTime newDeadlineRespondent2 = null;
-
+        LocalDateTime respondent2ResponseDeadline = caseData.getRespondent2ResponseDeadline();
         var respondent1Check = YES;
         if (solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
             respondent1Check = NO;
@@ -218,9 +218,10 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         } else if (caseData.getAddRespondent2() != null && caseData.getRespondent2() != null
             && respondent2HasSameLegalRep(caseData)) {
             //1v2 same
-            var updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
-                .build();
+            var updatedRespondent2 = caseData.getRespondent2();
+            if (caseData.getRespondent2Copy() != null) {
+                updatedRespondent2.setPrimaryAddress(caseData.getRespondent2Copy().getPrimaryAddress());
+            }
 
             caseData.setRespondent1AcknowledgeNotificationDate(time.now());
             caseData.setRespondent2AcknowledgeNotificationDate(time.now());
@@ -262,9 +263,13 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
         } else if (caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(YES)
             && respondent1Check.equals(NO) && !respondent2HasSameLegalRep(caseData)) {
-            var updatedRespondent2 = caseData.getRespondent2Copy().toBuilder()
-                .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
-                .build();
+            var updatedRespondent2 = caseData.getRespondent2Copy();
+            if (updatedRespondent2 == null) {
+                updatedRespondent2 = caseData.getRespondent2();
+            }
+            if (caseData.getRespondent2Copy() != null) {
+                updatedRespondent2.setPrimaryAddress(caseData.getRespondent2Copy().getPrimaryAddress());
+            }
             //1v2 diff login 2
 
             String defendantSolicitorReferences = getAllDefendantSolicitorReferences(

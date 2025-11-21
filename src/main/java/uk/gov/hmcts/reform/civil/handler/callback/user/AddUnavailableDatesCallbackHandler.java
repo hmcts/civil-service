@@ -280,9 +280,10 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
         }
 
         for (Element<UnavailableDate> newDate : newUnavailableDates) {
-            updatedUnavailableDates.addAll(wrapElements(newDate.getValue().toBuilder()
-                                                            .dateAdded(time.now().toLocalDate())
-                                                            .eventAdded(ADD_UNAVAILABLE_DATES_EVENT).build()));
+            UnavailableDate unavailableDate = newDate.getValue();
+            unavailableDate.setDateAdded(time.now().toLocalDate());
+            unavailableDate.setEventAdded(ADD_UNAVAILABLE_DATES_EVENT);
+            updatedUnavailableDates.addAll(wrapElements(unavailableDate));
         }
 
         return updatedUnavailableDates;

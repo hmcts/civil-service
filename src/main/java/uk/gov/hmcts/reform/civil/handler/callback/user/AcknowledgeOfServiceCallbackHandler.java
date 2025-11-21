@@ -118,9 +118,10 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
         LocalDateTime newResponseDate = deadlinesCalculator.plus14DaysAt4pmDeadline(responseDeadline);
-        var updatedRespondent1 = caseData.getRespondent1().toBuilder()
-            .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
-            .build();
+        var updatedRespondent1 = caseData.getRespondent1();
+        if (caseData.getRespondent1Copy() != null) {
+            updatedRespondent1.setPrimaryAddress(caseData.getRespondent1Copy().getPrimaryAddress());
+        }
 
         caseData.setRespondent1AcknowledgeNotificationDate(time.now());
         caseData.setRespondent1ResponseDeadline(newResponseDate);
@@ -135,13 +136,12 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
         // if present, persist the 2nd respondent address in the same fashion as above, i.e ignore for 1v1
         if (ofNullable(caseData.getRespondent2()).isPresent()
             && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
-            var updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
-                .build();
+            var updatedRespondent2 = caseData.getRespondent2();
+            updatedRespondent2.setPrimaryAddress(caseData.getRespondent2Copy().getPrimaryAddress());
             caseData.setRespondent2(updatedRespondent2);
             caseData.setRespondent2Copy(null);
-            //ToDo Sumit updatedRespondent2.toBuilder()
-            caseData.setRespondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
+            updatedRespondent2.setFlags(null);
+            caseData.setRespondent2DetailsForClaimDetailsTab(updatedRespondent2);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
