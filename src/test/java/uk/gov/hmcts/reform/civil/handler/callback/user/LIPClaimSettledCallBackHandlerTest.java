@@ -59,8 +59,7 @@ public class LIPClaimSettledCallBackHandlerTest extends BaseCallbackHandlerTest 
             caseData.setSpecRespondent1Represented(YesOrNo.YES);
             caseData.setApplicant1Represented(YesOrNo.NO);
             caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
-            CaseData updatedCaseData = caseData;
-            CallbackParams params = callbackParamsOf(updatedCaseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
