@@ -122,8 +122,8 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build().toBuilder()
                 .specRespondentCorrespondenceAddressRequired(YesOrNo.YES)
                 .specRespondentCorrespondenceAddressdetails(Address.builder()
-                                                                .postCode("mail post code")
-                                                                .addressLine1("mail line 1")
+                .postCode("mail post code")
+                .addressLine1("mail line 1")
                                                                 .build())
                 .build();
             params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -225,8 +225,8 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondentSolicitor1EmailAddress("respondent1solicitor@gmail.com")
                 .build().toBuilder()
                 .respondent2(Party.builder()
-                                 .companyName("c3")
-                                 .type(Party.Type.COMPANY)
+                .companyName("c3")
+                .type(Party.Type.COMPANY)
                                  .build())
                 .respondent2SameLegalRepresentative(YesOrNo.YES)
                 .build();
@@ -286,8 +286,8 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .applicantSolicitor1ServiceAddressRequired(YesOrNo.YES)
                 .applicantSolicitor1ServiceAddress(Address.builder()
-                                                       .addressLine1("mail line 1")
-                                                       .postCode("mail post code")
+                .addressLine1("mail line 1")
+                .postCode("mail post code")
                                                        .build()
                 )
                 .build();
@@ -317,8 +317,8 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .respondentSolicitor1ServiceAddressRequired(YesOrNo.YES)
                 .respondentSolicitor1ServiceAddress(Address.builder()
-                                                       .addressLine1("mail line 1")
-                                                       .postCode("mail post code")
+                .addressLine1("mail line 1")
+                .postCode("mail post code")
                                                        .build()
                 )
                 .build();
@@ -348,8 +348,8 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .respondentSolicitor2ServiceAddressRequired(YesOrNo.YES)
                 .respondentSolicitor2ServiceAddress(Address.builder()
-                                                       .addressLine1("mail line 1")
-                                                       .postCode("mail post code")
+                .addressLine1("mail line 1")
+                .postCode("mail post code")
                                                        .build()
                 )
                 .build();
@@ -380,8 +380,8 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondentSolicitor2ServiceAddressRequired(YesOrNo.NO)
                 .respondentSolicitor2ServiceAddress(null)
                 .specRespondent2CorrespondenceAddressdetails(Address.builder()
-                                                                 .addressLine1("mail line 1")
-                                                                 .postCode("mail post code")
+                .addressLine1("mail line 1")
+                .postCode("mail post code")
                                                                  .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -408,16 +408,16 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build()
                 .toBuilder()
                 .respondent2(Party.builder()
-                                 .type(Party.Type.COMPANY)
-                                 .companyName("c3")
+                .type(Party.Type.COMPANY)
+                .companyName("c3")
                                  .build())
                 .respondent2SameLegalRepresentative(YesOrNo.YES)
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .respondentSolicitor1ServiceAddressRequired(YesOrNo.NO)
                 .respondentSolicitor1ServiceAddress(null)
                 .specRespondentCorrespondenceAddressdetails(Address.builder()
-                                                                 .addressLine1("mail line 1")
-                                                                 .postCode("mail post code")
+                .addressLine1("mail line 1")
+                .postCode("mail post code")
                                                                  .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

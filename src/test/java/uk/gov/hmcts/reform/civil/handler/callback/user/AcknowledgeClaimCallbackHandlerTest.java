@@ -522,7 +522,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2Copy(PartyBuilder.builder().individual().build())
                 .multiPartyClaimTwoDefendantSolicitors().build().toBuilder()
                 .solicitorReferencesCopy(SolicitorReferences.builder()
-                    .respondentSolicitor1Reference("abc")
+                .respondentSolicitor1Reference("abc")
                     .build())
                 .build();
 
