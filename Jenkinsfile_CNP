@@ -121,7 +121,7 @@ def getCivilCcdDefinitionBranch() {
 
 def getGenAppsCcdDefinitionBranch() {
   def githubApi = new GithubAPI(this)
-  for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "generalApplicationDefinitionBranch:")) {
+  for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "gaDefinitionBranch:")) {
     return label.minus("generalApplicationDefinitionBranch:").trim()
   }
   return "master"
