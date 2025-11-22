@@ -1,26 +1,31 @@
 package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.ccd.model.PreviousOrganisation;
 import uk.gov.hmcts.reform.ccd.model.PreviousOrganisationCollectionItem;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
+import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.NoticeOfChange;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsCaseDataSupport;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -28,15 +33,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static java.time.format.DateTimeFormatter.ISO_DATE;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 class RoboticsDataMapperForSpecTest {
 
-    @InjectMocks
     private RoboticsDataMapperForSpec mapper;
 
-    @Mock
-    private RoboticsAddressMapper addressMapper;
     @Mock
     private EventHistoryMapper eventHistoryMapper;
     @Mock
@@ -44,6 +48,22 @@ class RoboticsDataMapperForSpecTest {
     @Mock
     private FeatureToggleService featureToggleService;
     private static final String BEARER_TOKEN = "Bearer Token";
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
+        RoboticsCaseDataSupport caseDataSupport =
+            new RoboticsCaseDataSupport(addressMapper, new RoboticsPartyLookup());
+        mapper = new RoboticsDataMapperForSpec(
+            addressMapper,
+            eventHistoryMapper,
+            organisationService,
+            featureToggleService,
+            caseDataSupport
+        );
+        when(eventHistoryMapper.buildEvents(any(), any())).thenReturn(EventHistory.builder().build());
+    }
 
     @Test
     void whenSpecEnabled_includeBS() {
@@ -55,10 +75,12 @@ class RoboticsDataMapperForSpecTest {
             .applicant1(Party.builder()
                 .type(Party.Type.COMPANY)
                 .companyName("company 1")
+                .primaryAddress(defaultAddress())
                 .build())
             .respondent1(Party.builder()
                 .type(Party.Type.COMPANY)
                 .companyName("company 2")
+                .primaryAddress(defaultAddress())
                 .build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build())
             .breathing(BreathingSpaceInfo.builder()
@@ -95,10 +117,12 @@ class RoboticsDataMapperForSpecTest {
             .applicant1(Party.builder()
                 .type(Party.Type.COMPANY)
                 .companyName("company 1")
+                .primaryAddress(defaultAddress())
                 .build())
             .respondent1(Party.builder()
                 .type(Party.Type.COMPANY)
                 .companyName("company 2")
+                .primaryAddress(defaultAddress())
                 .build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build())
             .breathing(BreathingSpaceInfo.builder()
@@ -153,10 +177,12 @@ class RoboticsDataMapperForSpecTest {
             .applicant1(Party.builder()
                 .type(Party.Type.COMPANY)
                 .companyName("company 1")
+                .primaryAddress(defaultAddress())
                 .build())
             .respondent1(Party.builder()
                 .type(Party.Type.COMPANY)
                 .companyName("company 2")
+                .primaryAddress(defaultAddress())
                 .build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build())
             .breathing(BreathingSpaceInfo.builder()
@@ -207,10 +233,12 @@ class RoboticsDataMapperForSpecTest {
             .applicant1(Party.builder()
                 .type(Party.Type.COMPANY)
                 .companyName("company 1")
+                .primaryAddress(defaultAddress())
                 .build())
             .respondent1(Party.builder()
                 .type(Party.Type.COMPANY)
                 .companyName("company 2")
+                .primaryAddress(defaultAddress())
                 .build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build())
             .breathing(BreathingSpaceInfo.builder()
@@ -243,10 +271,12 @@ class RoboticsDataMapperForSpecTest {
             .applicant1(Party.builder()
                             .type(Party.Type.COMPANY)
                             .companyName("Applicant")
+                            .primaryAddress(defaultAddress())
                             .build())
             .respondent1(Party.builder()
                              .type(Party.Type.COMPANY)
                              .companyName("Respondent")
+                             .primaryAddress(defaultAddress())
                              .build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@email.com").build())
             .build();
@@ -265,8 +295,8 @@ class RoboticsDataMapperForSpecTest {
                           .calculatedAmountInPence(BigDecimal.valueOf(10000)) // £100
                           .build())
             .totalClaimAmount(BigDecimal.valueOf(5000))
-            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant").build())
-            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent").build())
+            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant").primaryAddress(defaultAddress()).build())
+            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent").primaryAddress(defaultAddress()).build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@email.com").build())
             .build();
 
@@ -289,8 +319,8 @@ class RoboticsDataMapperForSpecTest {
                                        .remissionAmount(fullFee)
                                        .build())
             .totalClaimAmount(BigDecimal.valueOf(5000))
-            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant").build())
-            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent").build())
+            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant").primaryAddress(defaultAddress()).build())
+            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent").primaryAddress(defaultAddress()).build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@email.com").build())
             .build();
 
@@ -311,8 +341,8 @@ class RoboticsDataMapperForSpecTest {
                                        .outstandingFeeInPounds(BigDecimal.valueOf(120))
                                        .build())
             .totalClaimAmount(BigDecimal.valueOf(5000))
-            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant").build())
-            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent").build())
+            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant").primaryAddress(defaultAddress()).build())
+            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent").primaryAddress(defaultAddress()).build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@email.com").build())
             .build();
 
@@ -336,13 +366,22 @@ class RoboticsDataMapperForSpecTest {
                                        .remissionAmount(remission)
                                        .build())
             .totalClaimAmount(BigDecimal.valueOf(5000))
-            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant").build())
-            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent").build())
+            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant").primaryAddress(defaultAddress()).build())
+            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent").primaryAddress(defaultAddress()).build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@email.com").build())
             .build();
 
         RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
         Assertions.assertEquals(0, roboticsCaseData.getClaimDetails().getCourtFee().compareTo(BigDecimal.valueOf(250)));
+    }
+
+    private Address defaultAddress() {
+        return Address.builder()
+            .addressLine1("1 High Street")
+            .postTown("London")
+            .postCode("SW1A 1AA")
+            .country("UK")
+            .build();
     }
 }
