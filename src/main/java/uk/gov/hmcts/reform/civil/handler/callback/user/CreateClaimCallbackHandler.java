@@ -712,6 +712,13 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                     .applicantPreferredCourtLocationList(null)
                     .build()
             );
+
+            List<LocationRefData> locations = (locationRefDataService
+                .getCourtLocationsByEpimmsIdAndCourtType(callbackParams.getParams().get(BEARER_TOKEN).toString(), epimmsId));
+            if (!locations.isEmpty()) {
+                LocationRefData locationRefData = locations.get(0);
+                caseData.setLocationName(locationRefData.getSiteName());
+            }
         }
     }
 
