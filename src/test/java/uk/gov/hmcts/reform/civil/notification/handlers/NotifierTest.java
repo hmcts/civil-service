@@ -1,18 +1,5 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
-import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.claimdismissed.ClaimDismissedAllLegalRepsEmailGenerator;
-import uk.gov.hmcts.reform.civil.notify.NotificationException;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
-import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
-
-import java.util.Map;
-import java.util.Set;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -26,6 +13,20 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.notification.handlers.claimantresponsecui.confirmproceed.ClaimantConfirmProceedDefendantEmailDTOGenerator.NO_EMAIL_OPERATION;
+
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notification.handlers.claimdismissed.ClaimDismissedAllLegalRepsEmailGenerator;
+import uk.gov.hmcts.reform.civil.notify.NotificationException;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
+
+import java.util.Map;
+import java.util.Set;
+
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockitoAnnotations;
 
 class NotifierTest {
 
@@ -46,7 +47,7 @@ class NotifierTest {
     CaseData caseData;
     String taskId = "taskId";
 
-    private class TestNotifier extends Notifier {
+    private static class TestNotifier extends Notifier {
         public TestNotifier(NotificationService notificationService,
                             CaseTaskTrackingService caseTaskTrackingService,
                             PartiesEmailGenerator emailGenerator) {
