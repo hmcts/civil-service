@@ -487,31 +487,12 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         }
 
         @Test
-        void whenSubmittedWithCreateGeneralOrder_thenIncludeHeader() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .build().toBuilder().systemGeneratedCaseDocuments(sdoDocList).upholdingPreviousOrderReason(
-                    UpholdingPreviousOrderReason.builder()
-                        .reasonForReconsiderationTxtYes("Reason1").build()).decisionOnRequestReconsiderationOptions(
-                    DecisionOnRequestReconsiderationOptions.CREATE_GENERAL_ORDER).build();
-            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
-            CallbackParams params = CallbackParams.builder()
-                .caseData(caseData)
-                .type(CallbackType.SUBMITTED)
-                .build();
-            SubmittedCallbackResponse response =
-                (SubmittedCallbackResponse) handler.handle(params);
-            assertThat(response.getConfirmationHeader()).isEqualTo(CONFIRMATION_HEADER);
-            assertThat(response.getConfirmationBody()).isEqualTo(CONFIRMATION_BODY_CREATE_GENERAL_ORDER);
-        }
-
-        @Test
         void whenSubmittedWithCreateGeneralOrderCP_thenIncludeHeader() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder().systemGeneratedCaseDocuments(sdoDocList).upholdingPreviousOrderReason(
                     UpholdingPreviousOrderReason.builder()
                         .reasonForReconsiderationTxtYes("Reason1").build()).decisionOnRequestReconsiderationOptions(
                     DecisionOnRequestReconsiderationOptions.CREATE_GENERAL_ORDER).build();
-            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
             CallbackParams params = CallbackParams.builder()
                 .caseData(caseData)
                 .type(CallbackType.SUBMITTED)

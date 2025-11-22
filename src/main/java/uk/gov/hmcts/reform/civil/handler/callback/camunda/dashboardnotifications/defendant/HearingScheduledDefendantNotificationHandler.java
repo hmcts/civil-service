@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -39,14 +38,11 @@ public class HearingScheduledDefendantNotificationHandler extends CallbackHandle
     public static final String TASK_ID = "GenerateDashboardNotificationHearingScheduledDefendant";
     private final DashboardScenariosService dashboardScenariosService;
     private final DashboardNotificationsParamsMapper mapper;
-    private final FeatureToggleService toggleService;
     private final LocationReferenceDataService locationRefDataService;
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return toggleService.isCaseProgressionEnabled()
-            ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForHearingScheduled)
-            : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
+        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForHearingScheduled);
     }
 
     @Override

@@ -40,9 +40,7 @@ public class SendHearingToLiPCallbackHandler extends CallbackHandler {
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return featureToggleService.isCaseProgressionEnabled()
-            ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::sendHearingLetter)
-            : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
+        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::sendHearingLetter);
     }
 
     @Override
