@@ -43,7 +43,8 @@ public class NotifyClaimRespOneSolEmailDTOGenerator extends RespSolOneEmailDTOGe
         }
 
         if (isOneVTwoTwoLegalRep(caseData)) {
-            return notifyClaimHelper.checkIfThisDefendantToBeNotified(caseData, respondentName);
+            return notifyClaimHelper
+                .checkIfThisDefendantToBeNotified(caseData, respondentName);
         }
 
         return true;
