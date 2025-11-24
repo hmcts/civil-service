@@ -335,35 +335,29 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
     @Nested
     class AboutToSubmitCallback {
 
-        private static final UploadMediationDocumentsForm EXPECTED_FORM =
-            UploadMediationDocumentsForm.builder().build();
+        private static final UploadMediationDocumentsForm EXPECTED_FORM = new UploadMediationDocumentsForm();
 
         @Nested
         class MediationNonAttendanceDocumentOption {
 
             private MediationNonAttendanceStatement getExpectedMediationNonattendanceDocOne(String categoryId) {
-
-                return MediationNonAttendanceStatement.builder()
-                    .yourName("My name")
-                    .documentDate(LocalDate.of(2023, 4, 2))
-                    .document(Document.builder()
-                                  .documentFileName("Mediation non attendance")
-                                  .categoryID(categoryId)
-                                  .build())
-                    .documentUploadedDatetime(DOCUMENT_UPLOADED_DATE)
-                    .build();
+                MediationNonAttendanceStatement statement = new MediationNonAttendanceStatement();
+                statement.setYourName("My name");
+                statement.setDocumentDate(LocalDate.of(2023, 4, 2));
+                Document document = new Document(null, null, "Mediation non attendance", null, categoryId, null);
+                statement.setDocument(document);
+                statement.setDocumentUploadedDatetime(DOCUMENT_UPLOADED_DATE);
+                return statement;
             }
 
             private MediationNonAttendanceStatement getExpectedMediationNonattendanceDocTwo(String categoryId) {
 
-                return MediationNonAttendanceStatement.builder()
-                    .yourName("name")
-                    .document(Document.builder()
-                                  .documentFileName("Mediation non attendance 2")
-                                  .categoryID(categoryId)
-                                  .build())
-                    .documentUploadedDatetime(DOCUMENT_UPLOADED_DATE)
-                    .build();
+                MediationNonAttendanceStatement statement = new MediationNonAttendanceStatement();
+                statement.setYourName("name");
+                Document document = new Document(null, null, "Mediation non attendance 2", null, categoryId, null);
+                statement.setDocument(document);
+                statement.setDocumentUploadedDatetime(DOCUMENT_UPLOADED_DATE);
+                return statement;
             }
 
             @Test
@@ -387,7 +381,8 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                     CLAIMANT_ONE_ID,
                     MEDIATION_NON_ATTENDANCE_OPTION
                 );
-                CaseData secondEventData = updatedData.toBuilder().uploadMediationDocumentsForm(uploadMediationDocumentsForm).build();
+                updatedData.setUploadMediationDocumentsForm(uploadMediationDocumentsForm);
+                CaseData secondEventData = updatedData;
 
                 params = callbackParamsOf(secondEventData, ABOUT_TO_SUBMIT);
 
@@ -422,7 +417,8 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                     CLAIMANT_TWO_ID,
                     MEDIATION_NON_ATTENDANCE_OPTION
                 );
-                CaseData secondEventData = updatedData.toBuilder().uploadMediationDocumentsForm(uploadMediationDocumentsForm).build();
+                updatedData.setUploadMediationDocumentsForm(uploadMediationDocumentsForm);
+                CaseData secondEventData = updatedData;
 
                 params = callbackParamsOf(secondEventData, ABOUT_TO_SUBMIT);
 
@@ -459,7 +455,8 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                     CLAIMANTS_ID,
                     MEDIATION_NON_ATTENDANCE_OPTION
                 );
-                CaseData secondEventData = updatedData.toBuilder().uploadMediationDocumentsForm(uploadMediationDocumentsForm).build();
+                updatedData.setUploadMediationDocumentsForm(uploadMediationDocumentsForm);
+                CaseData secondEventData = updatedData;
 
                 params = callbackParamsOf(secondEventData, ABOUT_TO_SUBMIT);
 
@@ -496,7 +493,8 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                     DEFENDANT_ONE_ID,
                     MEDIATION_NON_ATTENDANCE_OPTION
                 );
-                CaseData secondEventData = updatedData.toBuilder().uploadMediationDocumentsForm(uploadMediationDocumentsForm).build();
+                updatedData.setUploadMediationDocumentsForm(uploadMediationDocumentsForm);
+                CaseData secondEventData = updatedData;
 
                 params = callbackParamsOf(secondEventData, ABOUT_TO_SUBMIT);
 
@@ -530,7 +528,8 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                     DEFENDANT_TWO_ID,
                     MEDIATION_NON_ATTENDANCE_OPTION
                 );
-                CaseData secondEventData = updatedData.toBuilder().uploadMediationDocumentsForm(uploadMediationDocumentsForm).build();
+                updatedData.setUploadMediationDocumentsForm(uploadMediationDocumentsForm);
+                CaseData secondEventData = updatedData;
 
                 params = callbackParamsOf(secondEventData, ABOUT_TO_SUBMIT);
 
@@ -567,7 +566,8 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                     DEFENDANTS_ID,
                     MEDIATION_NON_ATTENDANCE_OPTION
                 );
-                CaseData secondEventData = updatedData.toBuilder().uploadMediationDocumentsForm(uploadMediationDocumentsForm).build();
+                updatedData.setUploadMediationDocumentsForm(uploadMediationDocumentsForm);
+                CaseData secondEventData = updatedData;
 
                 params = callbackParamsOf(secondEventData, ABOUT_TO_SUBMIT);
 
@@ -587,27 +587,22 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
         @Nested
         class DocumentsReferredOption {
             private MediationDocumentsReferredInStatement getExpectedReferredDocsOne(String categoryId) {
-                return MediationDocumentsReferredInStatement.builder()
-                    .documentType("type")
-                    .document(Document.builder()
-                                  .documentFileName("Referred documents")
-                                  .categoryID(categoryId)
-                                  .build())
-                    .documentDate(LocalDate.of(2023, 4, 2))
-                    .documentUploadedDatetime(DOCUMENT_UPLOADED_DATE)
-                    .build();
+                MediationDocumentsReferredInStatement statement = new MediationDocumentsReferredInStatement();
+                statement.setDocumentType("type");
+                Document document = new Document(null, null, "Referred documents", null, categoryId, null);
+                statement.setDocument(document);
+                statement.setDocumentDate(LocalDate.of(2023, 4, 2));
+                statement.setDocumentUploadedDatetime(DOCUMENT_UPLOADED_DATE);
+                return statement;
             }
 
             private MediationDocumentsReferredInStatement getExpectedReferredDocsTwo(String categoryId) {
-                return MediationDocumentsReferredInStatement.builder()
-                    .documentUploadedDatetime(DOCUMENT_UPLOADED_DATE)
-                    .documentType("another type")
-                    .document(Document.builder()
-                                  .documentFileName("Referred documents 2")
-                                  .categoryID(categoryId)
-                                  .build()
-                    )
-                    .build();
+                MediationDocumentsReferredInStatement statement = new MediationDocumentsReferredInStatement();
+                statement.setDocumentUploadedDatetime(DOCUMENT_UPLOADED_DATE);
+                statement.setDocumentType("another type");
+                Document document = new Document(null, null, "Referred documents 2", null, categoryId, null);
+                statement.setDocument(document);
+                return statement;
             }
 
             @Test
@@ -631,7 +626,8 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                     CLAIMANT_ONE_ID,
                     DOCUMENTS_REFERRED_OPTION
                 );
-                CaseData secondEventData = updatedData.toBuilder().uploadMediationDocumentsForm(uploadMediationDocumentsForm).build();
+                updatedData.setUploadMediationDocumentsForm(uploadMediationDocumentsForm);
+                CaseData secondEventData = updatedData;
 
                 params = callbackParamsOf(secondEventData, ABOUT_TO_SUBMIT);
 
@@ -666,7 +662,8 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                     CLAIMANT_ONE_ID,
                     DOCUMENTS_REFERRED_OPTION
                 );
-                CaseData secondEventData = updatedData.toBuilder().uploadMediationDocumentsForm(uploadMediationDocumentsForm).build();
+                updatedData.setUploadMediationDocumentsForm(uploadMediationDocumentsForm);
+                CaseData secondEventData = updatedData;
 
                 params = callbackParamsOf(secondEventData, ABOUT_TO_SUBMIT);
 
@@ -701,7 +698,8 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                     CLAIMANT_TWO_ID,
                     DOCUMENTS_REFERRED_OPTION
                 );
-                CaseData secondEventData = updatedData.toBuilder().uploadMediationDocumentsForm(uploadMediationDocumentsForm).build();
+                updatedData.setUploadMediationDocumentsForm(uploadMediationDocumentsForm);
+                CaseData secondEventData = updatedData;
 
                 params = callbackParamsOf(secondEventData, ABOUT_TO_SUBMIT);
 
@@ -738,7 +736,8 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                     CLAIMANTS_ID,
                     DOCUMENTS_REFERRED_OPTION
                 );
-                CaseData secondEventData = updatedData.toBuilder().uploadMediationDocumentsForm(uploadMediationDocumentsForm).build();
+                updatedData.setUploadMediationDocumentsForm(uploadMediationDocumentsForm);
+                CaseData secondEventData = updatedData;
 
                 params = callbackParamsOf(secondEventData, ABOUT_TO_SUBMIT);
 
@@ -776,7 +775,8 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                     DEFENDANT_ONE_ID,
                     DOCUMENTS_REFERRED_OPTION
                 );
-                CaseData secondEventData = updatedData.toBuilder().uploadMediationDocumentsForm(uploadMediationDocumentsForm).build();
+                updatedData.setUploadMediationDocumentsForm(uploadMediationDocumentsForm);
+                CaseData secondEventData = updatedData;
 
                 params = callbackParamsOf(secondEventData, ABOUT_TO_SUBMIT);
 
@@ -810,7 +810,8 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                     DEFENDANT_ONE_ID,
                     DOCUMENTS_REFERRED_OPTION
                 );
-                CaseData secondEventData = updatedData.toBuilder().uploadMediationDocumentsForm(uploadMediationDocumentsForm).build();
+                updatedData.setUploadMediationDocumentsForm(uploadMediationDocumentsForm);
+                CaseData secondEventData = updatedData;
 
                 params = callbackParamsOf(secondEventData, ABOUT_TO_SUBMIT);
 
@@ -845,7 +846,8 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                     DEFENDANT_TWO_ID,
                     DOCUMENTS_REFERRED_OPTION
                 );
-                CaseData secondEventData = updatedData.toBuilder().uploadMediationDocumentsForm(uploadMediationDocumentsForm).build();
+                updatedData.setUploadMediationDocumentsForm(uploadMediationDocumentsForm);
+                CaseData secondEventData = updatedData;
 
                 params = callbackParamsOf(secondEventData, ABOUT_TO_SUBMIT);
 
@@ -882,7 +884,8 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                     DEFENDANTS_ID,
                     DOCUMENTS_REFERRED_OPTION
                 );
-                CaseData secondEventData = updatedData.toBuilder().uploadMediationDocumentsForm(uploadMediationDocumentsForm).build();
+                updatedData.setUploadMediationDocumentsForm(uploadMediationDocumentsForm);
+                CaseData secondEventData = updatedData;
 
                 params = callbackParamsOf(secondEventData, ABOUT_TO_SUBMIT);
 
@@ -1049,38 +1052,34 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
         List<Element<MediationNonAttendanceStatement>> mediationNonAttendanceStatement;
         List<Element<MediationDocumentsReferredInStatement>> documentsReferred;
         if (documentType.contains(NON_ATTENDANCE_STATEMENT)) {
-            mediationNonAttendanceStatement = wrapElements(MediationNonAttendanceStatement.builder()
-                                                               .documentUploadedDatetime(DOCUMENT_UPLOADED_DATE)
-                                                               .yourName("name")
-                                                               .document(Document.builder()
-                                                                             .documentFileName("Mediation non attendance 2")
-                                                                             .build())
-                                                               .build());
+            MediationNonAttendanceStatement statement = new MediationNonAttendanceStatement();
+            statement.setDocumentUploadedDatetime(DOCUMENT_UPLOADED_DATE);
+            statement.setYourName("name");
+            Document document = new Document(null, null, "Mediation non attendance 2", null, null, null);
+            statement.setDocument(document);
+            mediationNonAttendanceStatement = wrapElements(statement);
         } else {
             mediationNonAttendanceStatement = null;
         }
         if (documentType.contains(REFERRED_DOCUMENTS)) {
-            documentsReferred = wrapElements(MediationDocumentsReferredInStatement.builder()
-                                                 .documentUploadedDatetime(DOCUMENT_UPLOADED_DATE)
-                                                 .documentType("another type")
-                                                 .document(Document.builder()
-                                                               .documentFileName("Referred documents 2")
-                                                               .build())
-                                                 .build());
+            MediationDocumentsReferredInStatement referredInStatement = new MediationDocumentsReferredInStatement();
+            referredInStatement.setDocumentUploadedDatetime(DOCUMENT_UPLOADED_DATE);
+            referredInStatement.setDocumentType("another type");
+            Document document = new Document(null, null, "Referred documents 2", null, null, null);
+            referredInStatement.setDocument(document);
+            documentsReferred = wrapElements(referredInStatement);
         } else {
             documentsReferred = null;
         }
 
-        return UploadMediationDocumentsForm.builder()
-            .mediationDocumentsType(documentType)
-            .uploadMediationDocumentsPartyChosen(DynamicList.builder()
-                                                     .value(
-                                                         DynamicListElement.builder()
-                                                             .code(partyChosen)
-                                                             .build())
-                                                     .build())
-            .nonAttendanceStatementForm(mediationNonAttendanceStatement)
-            .documentsReferredForm(documentsReferred)
-            .build();
+        UploadMediationDocumentsForm form = new UploadMediationDocumentsForm();
+        form.setMediationDocumentsType(documentType);
+        DynamicListElement partyElement = new DynamicListElement(partyChosen, null);
+        DynamicList partyList = new DynamicList();
+        partyList.setValue(partyElement);
+        form.setUploadMediationDocumentsPartyChosen(partyList);
+        form.setNonAttendanceStatementForm(mediationNonAttendanceStatement);
+        form.setDocumentsReferredForm(documentsReferred);
+        return form;
     }
 }

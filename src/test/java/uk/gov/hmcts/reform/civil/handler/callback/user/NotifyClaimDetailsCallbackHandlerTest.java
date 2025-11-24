@@ -137,12 +137,10 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
     class MidEventParticularsOfClaimCallback {
 
         private final String pageId = "particulars-of-claim";
-        private final CaseData.CaseDataBuilder caseDataBuilder =
-            CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder();
 
         @Test
         void shouldReturnErrors_whenNoDocuments() {
-            CaseData caseData = caseDataBuilder.build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -152,7 +150,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnErrors_whenNoDocumentsBackwardsCompatible() {
-            CaseData caseData = caseDataBuilder.build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -162,7 +160,8 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnErrors_whenParticularsOfClaimFieldsAreInErrorState() {
-            CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder().build()).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData.setServedDocumentFiles(ServedDocumentFiles.builder().build());
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -172,7 +171,8 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnErrors_whenParticularsOfClaimFieldsAreInErrorStateBackwardsCompatible() {
-            CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder().build()).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData.setServedDocumentFiles(ServedDocumentFiles.builder().build());
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -182,9 +182,10 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoErrors_whenParticularOfClaimsFieldsAreValid() {
-            CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder()
-                                                                        .particularsOfClaimText("Some string")
-                                                                        .build()).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData.setServedDocumentFiles(ServedDocumentFiles.builder()
+                .particularsOfClaimText("Some string")
+                .build());
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -194,9 +195,10 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoErrors_whenParticularOfClaimsFieldsAreValidBackwardsCompatible() {
-            CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder()
-                                                                        .particularsOfClaimText("Some string")
-                                                                        .build()).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData.setServedDocumentFiles(ServedDocumentFiles.builder()
+                .particularsOfClaimText("Some string")
+                .build());
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -402,12 +404,11 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .certificateOfSuitability(documentList)
                 .other(documentList).build();
 
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData.setUploadParticularsOfClaim(YES);
+            caseData.setServedDocumentFiles(documentToUpload);
             return Stream.of(
-                arguments(CaseDataBuilder.builder().atStateClaimDraft()
-                              .build().toBuilder()
-                              .uploadParticularsOfClaim(YES)
-                              .servedDocumentFiles(documentToUpload)
-                              .build())
+                arguments(caseData)
             );
         }
 
