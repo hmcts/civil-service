@@ -72,22 +72,20 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
         );
 
         CaseData postDecisionCaseData = objectMapper.convertValue(applyDecision.getData(), CaseData.class);
-        CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder = postDecisionCaseData.toBuilder();
 
-        setAddLegalRepDeadlinesToNull(updatedCaseDataBuilder, caseRole);
+        setAddLegalRepDeadlinesToNull(postDecisionCaseData, caseRole);
 
         updateChangeOrganisationRequestFieldAfterNoCDecisionApplied(
-            updatedCaseDataBuilder,
+            postDecisionCaseData,
             preDecisionCaseData.getChangeOrganisationRequestField()
         );
 
-        updatedCaseDataBuilder
-            .businessProcess(BusinessProcess.ready(getBusinessProcessEvent(postDecisionCaseData, caseRole)))
-            .changeOfRepresentation(getChangeOfRepresentation(
-                callbackParams.getCaseData().getChangeOrganisationRequestField(), postDecisionCaseData));
+        postDecisionCaseData.setBusinessProcess(BusinessProcess.ready(getBusinessProcessEvent(postDecisionCaseData, caseRole)));
+        postDecisionCaseData.setChangeOfRepresentation(getChangeOfRepresentation(
+            callbackParams.getCaseData().getChangeOrganisationRequestField(), postDecisionCaseData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseDataBuilder.build().toMap(objectMapper)).build();
+            .data(postDecisionCaseData.toMap(objectMapper)).build();
     }
 
     private ChangeOfRepresentation getChangeOfRepresentation(ChangeOrganisationRequest corFieldBeforeNoC,
@@ -118,18 +116,17 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
      *
      * <p>This value will be deleted in the next callback UpdateCaseDetailsAfterNoCHandler</p>
      *
-     * @param updatedCaseDataBuilder updatedcaseDataBuilder
-     * @param changeOrganisationRequest preDecisionCor
+     * @param caseData caseData
+     * @param preDecisionCor preDecisionCor
      */
     private void updateChangeOrganisationRequestFieldAfterNoCDecisionApplied(
-        CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder,
+        CaseData caseData,
         ChangeOrganisationRequest preDecisionCor) {
-        updatedCaseDataBuilder
-                .changeOrganisationRequestField(
-                    ChangeOrganisationRequest.builder()
-                        .createdBy(preDecisionCor.getCreatedBy())
-                        .organisationToAdd(
-                            Organisation.builder().organisationID(ORG_ID_FOR_AUTO_APPROVAL).build()).build());
+        caseData.setChangeOrganisationRequestField(
+            ChangeOrganisationRequest.builder()
+                .createdBy(preDecisionCor.getCreatedBy())
+                .organisationToAdd(
+                    Organisation.builder().organisationID(ORG_ID_FOR_AUTO_APPROVAL).build()).build());
 
     }
 
@@ -182,27 +179,21 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
     private String getOrgIdCopyIfExists(CaseDetails caseDetails, String caseRole) {
         if (!isApplicant(caseRole)) {
             if (caseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
-                String respondent1OrganisationIDCopy = objectMapper.convertValue(caseDetails.getData().get(
+                return objectMapper.convertValue(caseDetails.getData().get(
                     "respondent1OrganisationIDCopy"), String.class);
-                if (respondent1OrganisationIDCopy != null) {
-                    return respondent1OrganisationIDCopy;
-                }
             } else if (caseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
-                String respondent2OrganisationIDCopy = objectMapper.convertValue(caseDetails.getData().get(
+                return objectMapper.convertValue(caseDetails.getData().get(
                     "respondent2OrganisationIDCopy"), String.class);
-                if (respondent2OrganisationIDCopy != null) {
-                    return respondent2OrganisationIDCopy;
-                }
             }
         }
         return null;
     }
 
-    private void setAddLegalRepDeadlinesToNull(CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder, String caseRole) {
+    private void setAddLegalRepDeadlinesToNull(CaseData caseData, String caseRole) {
         if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(caseRole)) {
-            updatedCaseDataBuilder.addLegalRepDeadlineRes1(null);
+            caseData.setAddLegalRepDeadlineRes1(null);
         } else if (CaseRole.RESPONDENTSOLICITORTWO.getFormattedName().equals(caseRole)) {
-            updatedCaseDataBuilder.addLegalRepDeadlineRes2(null);
+            caseData.setAddLegalRepDeadlineRes2(null);
         }
     }
 

@@ -81,13 +81,11 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
         caseData.setActiveJudgment(paidInFullJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(caseData.getActiveJudgment(), interest));
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder
-            .businessProcess(BusinessProcess.ready(JUDGMENT_PAID_IN_FULL))
-            .joCoscRpaStatus(JudgmentState.CANCELLED.equals(caseData.getActiveJudgment().getState()) ? CANCELLED : SATISFIED)
-            .joMarkedPaidInFullIssueDate(LocalDateTime.now());
+        caseData.setBusinessProcess(BusinessProcess.ready(JUDGMENT_PAID_IN_FULL));
+        caseData.setJoCoscRpaStatus(JudgmentState.CANCELLED.equals(caseData.getActiveJudgment().getState()) ? CANCELLED : SATISFIED);
+        caseData.setJoMarkedPaidInFullIssueDate(LocalDateTime.now());
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

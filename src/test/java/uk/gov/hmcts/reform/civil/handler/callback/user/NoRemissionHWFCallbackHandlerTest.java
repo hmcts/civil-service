@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.citizen.HWFFeePaymentOutcomeService;
 
 import java.math.BigDecimal;
@@ -54,12 +55,10 @@ public class NoRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .noRemissionDetails("no remission")
                 .noRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET).build();
 
-            CaseData caseData = CaseData.builder()
-                .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
-                .claimIssuedHwfDetails(hwfeeDetails)
-                .hwfFeeType(
-                    FeeType.CLAIMISSUED)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setClaimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build());
+            caseData.setClaimIssuedHwfDetails(hwfeeDetails);
+            caseData.setHwfFeeType(FeeType.CLAIMISSUED);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             //When
             when(hwfService.updateOutstandingFee(any(), any())).thenReturn(caseData);
@@ -76,12 +75,10 @@ public class NoRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .noRemissionDetails("no remission")
                 .noRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET).build();
 
-            CaseData caseData = CaseData.builder()
-                .hearingHwfDetails(hwfeeDetails)
-                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
-                .hwfFeeType(
-                    FeeType.HEARING)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setHearingHwfDetails(hwfeeDetails);
+            caseData.setHearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build());
+            caseData.setHwfFeeType(FeeType.HEARING);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             //When
             when(hwfService.updateOutstandingFee(any(), any())).thenReturn(caseData);

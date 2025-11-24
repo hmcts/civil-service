@@ -170,9 +170,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             String suppliedValuePennies = "12345";
             String expectedValuePounds = "123.45";
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-            caseData = caseData.toBuilder()
-                .respondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(new BigDecimal(suppliedValuePennies)).build())
-                .build();
+            caseData.setRespondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(new BigDecimal(suppliedValuePennies)).build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -194,16 +192,14 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateBusinessProcess() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .caseDataLip(
-                    CaseDataLiP.builder()
-                        .applicant1ClaimMediationSpecRequiredLip(
-                            ClaimantMediationLip.builder()
-                                .hasAgreedFreeMediation(MediationDecision.Yes)
-                                .build())
-                        .build())
-                .atStateClaimIssued()
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setCaseDataLiP(
+                CaseDataLiP.builder()
+                    .applicant1ClaimMediationSpecRequiredLip(
+                        ClaimantMediationLip.builder()
+                            .hasAgreedFreeMediation(MediationDecision.Yes)
+                            .build())
+                    .build());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -255,17 +251,15 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                                    .build())
                                                  .build())
                 .build();
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued()
-                .applicant1PartAdmitConfirmAmountPaidSpec(NO)
-                .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
-                .applicant1DQ(applicant1DQ)
-                .respondent1DQ(respondent1DQ)
-                .applicant1AcceptAdmitAmountPaidSpec(NO)
-                .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
-                        MediationDecision.No).build())
-                                 .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(NO);
+            caseData.setApplicant1PartAdmitIntentionToSettleClaimSpec(NO);
+            caseData.setApplicant1DQ(applicant1DQ);
+            caseData.setRespondent1DQ(respondent1DQ);
+            caseData.setApplicant1AcceptAdmitAmountPaidSpec(NO);
+            caseData.setCaseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
+                    MediationDecision.No).build())
+                             .build());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -313,17 +307,15 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                                         .caseLocation(CaseLocationCivil.builder()
                                                                                           .build())
                                                                         .build()).build();
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued()
-                .applicant1PartAdmitConfirmAmountPaidSpec(NO)
-                .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
-                .applicant1DQ(applicant1DQ)
-                .respondent1DQ(respondent1DQ)
-                .applicant1AcceptAdmitAmountPaidSpec(NO)
-                .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
-                        MediationDecision.No).build())
-                                 .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(NO);
+            caseData.setApplicant1PartAdmitIntentionToSettleClaimSpec(NO);
+            caseData.setApplicant1DQ(applicant1DQ);
+            caseData.setRespondent1DQ(respondent1DQ);
+            caseData.setApplicant1AcceptAdmitAmountPaidSpec(NO);
+            caseData.setCaseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
+                    MediationDecision.No).build())
+                             .build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -349,17 +341,15 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             Respondent1DQ respondent1DQ =
                 Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder()
                                                                         .build()).build();
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued()
-                .applicant1PartAdmitConfirmAmountPaidSpec(NO)
-                .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
-                .applicant1DQ(applicant1DQ)
-                .respondent1DQ(respondent1DQ)
-                .applicant1AcceptAdmitAmountPaidSpec(NO)
-                .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
-                        MediationDecision.No).build())
-                                 .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(NO);
+            caseData.setApplicant1PartAdmitIntentionToSettleClaimSpec(NO);
+            caseData.setApplicant1DQ(applicant1DQ);
+            caseData.setRespondent1DQ(respondent1DQ);
+            caseData.setApplicant1AcceptAdmitAmountPaidSpec(NO);
+            caseData.setCaseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
+                    MediationDecision.No).build())
+                             .build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -403,23 +393,22 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
                 .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
                 .build();
-            CaseData caseData = CaseDataBuilder.builder()
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_INDIVIDUAL").build())
-                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("RESPONDENT_INDIVIDUAL").build())
-                .caseDataLip(
-                    CaseDataLiP.builder()
-                        .applicant1LiPResponse(ClaimantLiPResponse.builder().applicant1ChoosesHowToProceed(
-                            ChooseHowToProceed.REQUEST_A_CCJ).build())
-                        .build())
-                .respondent1Represented(NO)
-                .specRespondent1Represented(NO)
-                .applicant1Represented(NO)
-                .totalClaimAmount(BigDecimal.valueOf(1000))
-                .ccjPaymentDetails(ccjPaymentDetails)
-                .claimFee(Fee.builder()
-                    .calculatedAmountInPence(BigDecimal.valueOf(10000))
-                    .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setApplicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_INDIVIDUAL").build());
+            caseData.setRespondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("RESPONDENT_INDIVIDUAL").build());
+            caseData.setCaseDataLiP(
+                CaseDataLiP.builder()
+                    .applicant1LiPResponse(ClaimantLiPResponse.builder().applicant1ChoosesHowToProceed(
+                        ChooseHowToProceed.REQUEST_A_CCJ).build())
+                    .build());
+            caseData.setRespondent1Represented(NO);
+            caseData.setSpecRespondent1Represented(NO);
+            caseData.setApplicant1Represented(NO);
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(1000));
+            caseData.setCcjPaymentDetails(ccjPaymentDetails);
+            caseData.setClaimFee(Fee.builder()
+                .calculatedAmountInPence(BigDecimal.valueOf(10000))
+                .build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CCJPaymentDetails ccjResponseForJudgement =
@@ -442,33 +431,32 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAddTheCaseFlagIntialiazerForClaimant() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
-                .respondent1(Party.builder()
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName("CLAIMANT_NAME")
-                                 .build())
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQExperts(Experts.builder()
-                                                           .expertRequired(YES)
-                                                           .details(wrapElements(Expert.builder()
-                                                                                     .name(
-                                                                                         "John Smith")
-                                                                                     .firstName("Jane")
-                                                                                     .lastName("Smith")
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setApplicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build());
+            caseData.setRespondent1(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .partyName("CLAIMANT_NAME")
+                             .build());
+            caseData.setApplicant1DQ(Applicant1DQ.builder()
+                              .applicant1DQExperts(Experts.builder()
+                                                       .expertRequired(YES)
+                                                       .details(wrapElements(Expert.builder()
+                                                                                 .name(
+                                                                                     "John Smith")
+                                                                                 .firstName("Jane")
+                                                                                 .lastName("Smith")
 
-                                                                                     .build()))
-                                                           .build())
-                                  .applicant1DQWitnesses(Witnesses.builder().witnessesToAppear(YES)
-                                                             .details(wrapElements(Witness.builder()
-                                                                                       .name(
-                                                                                           "John Smith")
-                                                                                       .firstName("Jane")
-                                                                                       .lastName("Smith")
+                                                                                 .build()))
+                                                       .build())
+                              .applicant1DQWitnesses(Witnesses.builder().witnessesToAppear(YES)
+                                                         .details(wrapElements(Witness.builder()
+                                                                                   .name(
+                                                                                       "John Smith")
+                                                                                   .firstName("Jane")
+                                                                                   .lastName("Smith")
 
-                                                                                       .build())).build())
-                                  .build())
-                .build();
+                                                                                   .build())).build())
+                              .build());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -487,13 +475,11 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
                 .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
                 .build();
-            caseData = caseData.toBuilder()
-                .isFlightDelayClaim(YES)
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .flightDelayDetails(FlightDelayDetails.builder()
-                    .nameOfAirline("Sri Lankan")
-                    .build())
-                .build();
+            caseData.setIsFlightDelayClaim(YES);
+            caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
+            caseData.setFlightDelayDetails(FlightDelayDetails.builder()
+                .nameOfAirline("Sri Lankan")
+                .build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedCaseData = getCaseData(response);
@@ -511,13 +497,11 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
                 .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
                 .build();
-            caseData = caseData.toBuilder()
-                .isFlightDelayClaim(YES)
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .flightDelayDetails(FlightDelayDetails.builder()
-                    .nameOfAirline("INVALID_AIRLINE")
-                    .build())
-                .build();
+            caseData.setIsFlightDelayClaim(YES);
+            caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
+            caseData.setFlightDelayDetails(FlightDelayDetails.builder()
+                .nameOfAirline("INVALID_AIRLINE")
+                .build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedCaseData = getCaseData(response);
