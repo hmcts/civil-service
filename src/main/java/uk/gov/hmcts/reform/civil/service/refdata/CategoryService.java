@@ -4,6 +4,7 @@ import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.crd.client.ListOfValuesApi;
@@ -11,9 +12,10 @@ import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 
 import java.util.Optional;
 
-@Service
 @RequiredArgsConstructor
 @Slf4j
+@Service("refdataCategoryService")
+@Primary
 public class CategoryService {
 
     private final ListOfValuesApi listOfValuesApi;
