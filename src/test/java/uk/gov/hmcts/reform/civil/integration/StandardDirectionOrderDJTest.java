@@ -1067,8 +1067,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldNotCallUpdateWaCourtLocationsServiceWhenNotPresent_AndMintiEnabled() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-
         handler = new StandardDirectionOrderDJ(mapper, defaultJudgmentOrderFormGenerator, locationRefDataService, featureToggleService,
                                                userService, assignCategoryId, categoryService, locationHelper,
                                                Optional.empty(), deadlinesCalculator, workingDayIndicator);
@@ -1086,8 +1084,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldCallUpdateWaCourtLocationsServiceWhenPresent_AndMintiEnabled() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-
         CaseLocationCivil caseLocation = new CaseLocationCivil();
         caseLocation.setBaseLocation("123456");
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
