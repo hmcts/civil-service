@@ -6,7 +6,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class CacheConfigUnitTest {
+class CacheConfigTest {
 
     @Test
     void shouldCreateAllCaches() {
