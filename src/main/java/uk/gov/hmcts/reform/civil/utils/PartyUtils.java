@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import org.apache.commons.lang.StringUtils;
+
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -132,7 +133,7 @@ public class PartyUtils {
 
         Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor1Reference)
             .ifPresent(ref -> {
-                if (stringBuilder.length() > 0) {
+                if (!stringBuilder.isEmpty()) {
                     stringBuilder.append("\n");
                 }
                 stringBuilder.append(hasRespondent2Reference ? "Defendant 1 reference: " : "Defendant reference: ");
@@ -140,7 +141,7 @@ public class PartyUtils {
             });
 
         if (hasRespondent2Reference) {
-            if (stringBuilder.length() > 0) {
+            if (!stringBuilder.isEmpty()) {
                 stringBuilder.append("\n");
             }
             stringBuilder.append("Defendant 2 reference: ");
@@ -215,7 +216,7 @@ public class PartyUtils {
             .build();
     }
 
-    private static Predicate<CaseData> defendantSolicitor2Reference = caseData -> caseData
+    private static final Predicate<CaseData> defendantSolicitor2Reference = caseData -> caseData
         .getRespondentSolicitor2Reference() != null;
 
     public static RespondentResponseType getResponseTypeForRespondent(CaseData caseData, Party respondent) {
@@ -468,8 +469,7 @@ public class PartyUtils {
         caseData.setRespondent2LitigationFriend(appendWithNewPartyId(caseData.getRespondent2LitigationFriend()));
     }
 
-    @SuppressWarnings("unchecked")
-    public static void populateWitnessAndExpertsPartyIds(CaseData.CaseDataBuilder builder) {
+    public static void populateWitnessAndExpertsPartyIds(CaseData.CaseDataBuilder<?, ?> builder) {
         CaseData caseData = builder.build();
         builder
             .applicantExperts(appendWithNewPartyIds(caseData.getApplicantExperts()))

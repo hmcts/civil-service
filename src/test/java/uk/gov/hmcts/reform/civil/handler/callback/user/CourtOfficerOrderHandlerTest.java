@@ -258,11 +258,9 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
         void shouldHideDocumentIfClaimantWelsh_onAboutToSubmit() {
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             // Given
-            caseData = caseData.toBuilder()
-                .previewCourtOfficerOrder(courtOfficerOrder)
-                .preTranslationDocuments(new ArrayList<>())
-                .claimantBilingualLanguagePreference("BOTH")
-                .build();
+            caseData.setPreviewCourtOfficerOrder(courtOfficerOrder);
+            caseData.setPreTranslationDocuments(new ArrayList<>());
+            caseData.setClaimantBilingualLanguagePreference("BOTH");
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -277,11 +275,9 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
         void shouldAddADocumentInCollectionWhenWelshFTisOn_onAboutToSubmit() {
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             // Given
-            caseData = caseData.toBuilder()
-                .previewCourtOfficerOrder(courtOfficerOrder)
-                .courtOfficersOrders(new ArrayList<>())
-                .claimantBilingualLanguagePreference("ENGLISH")
-                .build();
+            caseData.setPreviewCourtOfficerOrder(courtOfficerOrder);
+            caseData.setCourtOfficersOrders(new ArrayList<>());
+            caseData.setClaimantBilingualLanguagePreference("ENGLISH");
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -296,11 +292,9 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotHideDocumentIfWelshDisabled_onAboutToSubmit() {
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             // Given
-            caseData = caseData.toBuilder()
-                .previewCourtOfficerOrder(courtOfficerOrder)
-                .preTranslationDocuments(new ArrayList<>())
-                .claimantBilingualLanguagePreference("BOTH")
-                .build();
+            caseData.setPreviewCourtOfficerOrder(courtOfficerOrder);
+            caseData.setPreTranslationDocuments(new ArrayList<>());
+            caseData.setClaimantBilingualLanguagePreference("BOTH");
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -315,13 +309,13 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
         void shouldHideDocumentIfDefendantWelsh_onAboutToSubmit() {
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             // Given
-            caseData = caseData.toBuilder()
-                .previewCourtOfficerOrder(courtOfficerOrder)
-                .preTranslationDocuments(new ArrayList<>())
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                             .respondent1ResponseLanguage("WELSH").build()).build())
-                .build();
+            caseData.setPreviewCourtOfficerOrder(courtOfficerOrder);
+            caseData.setPreTranslationDocuments(new ArrayList<>());
+            CaseDataLiP caseDataLiP = caseData.getCaseDataLiP() != null ? caseData.getCaseDataLiP() : new CaseDataLiP();
+            RespondentLiPResponse respondent1LiPResponse = new RespondentLiPResponse();
+            respondent1LiPResponse.setRespondent1ResponseLanguage("WELSH");
+            caseDataLiP.setRespondent1LiPResponse(respondent1LiPResponse);
+            caseData.setCaseDataLiP(caseDataLiP);
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

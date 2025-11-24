@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -61,7 +62,6 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
     private final UserService userService;
     private final AssignCategoryId assignCategoryId;
     private final FeatureToggleService featureToggleService;
-    private String ext = "";
 
     public static final String HEADER = "## Your order has been issued \n ### Case number \n ### #%s";
 
@@ -82,46 +82,44 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
 
     private CallbackResponse handleAboutToSubmit(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (featureToggleService.isWelshEnabledForMainCase()
             && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
-            List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
+            List<Element<CaseDocument>> preTranslationDocuments = Optional
+                .ofNullable(caseData.getPreTranslationDocuments())
+                .orElseGet(ArrayList::new);
+
             preTranslationDocuments.add(element(caseData.getPreviewCourtOfficerOrder()));
-            caseDataBuilder.bilingualHint(YesOrNo.YES);
-            caseDataBuilder.previewCourtOfficerOrder(null);
-            caseDataBuilder.preTranslationDocuments(preTranslationDocuments);
-            caseDataBuilder.urgentFlag(YesOrNo.YES);
+            caseData.setBilingualHint(YesOrNo.YES);
+            caseData.setPreviewCourtOfficerOrder(null);
+            caseData.setPreTranslationDocuments(preTranslationDocuments);
+            caseData.setUrgentFlag(YesOrNo.YES);
         } else {
             if (featureToggleService.isWelshEnabledForMainCase() && caseData.getPreviewCourtOfficerOrder() != null) {
-                caseDataBuilder.build().getCourtOfficersOrders().add(element(caseData.getPreviewCourtOfficerOrder()));
-                caseDataBuilder.previewCourtOfficerOrder(null);
+                caseData.getCourtOfficersOrders().add(element(caseData.getPreviewCourtOfficerOrder()));
+                caseData.setPreviewCourtOfficerOrder(null);
             }
-            caseDataBuilder.businessProcess(BusinessProcess.ready(COURT_OFFICER_ORDER));
+            caseData.setBusinessProcess(BusinessProcess.ready(COURT_OFFICER_ORDER));
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
     private CallbackResponse prePopulateValues(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        List<LocationRefData> locations = (locationRefDataService.getHearingCourtLocations(authToken));
 
-        caseDataBuilder
-            .courtOfficerFurtherHearingComplex(FinalOrderFurtherHearing.builder()
-                                                   .datesToAvoidDateDropdown(DatesFinalOrders.builder()
-                                                                 .datesToAvoidDates(workingDayIndicator
-                                                                                        .getNextWorkingDay(
-                                                                                            LocalDate.now().plusDays(
-                                                                                                7))).build())
-                                                   .hearingLocationList(populateCurrentHearingLocation(caseData, authToken))
-                                                   .alternativeHearingList(getLocationsFromList(locations)).build())
-            .courtOfficerGiveReasonsYesNo(YesOrNo.NO);
+        DatesFinalOrders datesFinalOrders = new DatesFinalOrders();
+        datesFinalOrders.setDatesToAvoidDates(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(7)));
+        FinalOrderFurtherHearing finalOrderFurtherHearing = new FinalOrderFurtherHearing();
+        finalOrderFurtherHearing.setDatesToAvoidDateDropdown(datesFinalOrders);
+        finalOrderFurtherHearing.setHearingLocationList(populateCurrentHearingLocation(caseData, authToken));
+        finalOrderFurtherHearing.setAlternativeHearingList(getLocationsFromList(locationRefDataService.getHearingCourtLocations(authToken)));
+        caseData.setCourtOfficerFurtherHearingComplex(finalOrderFurtherHearing);
+        caseData.setCourtOfficerGiveReasonsYesNo(YesOrNo.NO);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
@@ -166,15 +164,15 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
         assignCategoryId.assignCategoryIdToCaseDocument(courtOfficerDocument, "caseManagementOrders");
 
         StringBuilder updatedFileName = new StringBuilder();
-        ext = FilenameUtils.getExtension(courtOfficerDocument.getDocumentLink().getDocumentFileName());
+        final String ext = FilenameUtils.getExtension(courtOfficerDocument.getDocumentLink().getDocumentFileName());
         courtOfficerDocument.getDocumentLink().setDocumentFileName(updatedFileName
                                                                       .append(courtOfficerDocument.getCreatedDatetime().toLocalDate().toString())
-                                                                      .append("_").append(officerName).append(".").append(ext).toString());
+                                                                      .append("_").append(officerName).append(".").append(
+                ext).toString());
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.previewCourtOfficerOrder(courtOfficerDocument);
+        caseData.setPreviewCourtOfficerOrder(courtOfficerDocument);
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .errors(errors)
             .build();
     }
