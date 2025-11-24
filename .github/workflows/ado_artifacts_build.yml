@@ -1,4 +1,3 @@
-
 name: Publish to Azure Artifacts
 
 on:
