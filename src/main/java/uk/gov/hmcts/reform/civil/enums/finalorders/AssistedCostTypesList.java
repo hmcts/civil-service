@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum AssistedCostTypesList {
+    COSTS_IN_THE_CASE("Costs in the case"),
     COSTS_IN_CASE("Costs in the case"),
     NO_ORDER_TO_COST("No order as to costs"),
     COSTS_RESERVED("Costs reserved"),
