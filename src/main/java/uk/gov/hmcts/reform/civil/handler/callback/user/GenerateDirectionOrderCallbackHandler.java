@@ -388,16 +388,17 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     }
 
     private void populateFreeFormFields(CaseData caseData) {
-        caseData.setOrderOnCourtInitiative(FreeFormOrderValues.builder()
-            .onInitiativeSelectionTextArea(ON_INITIATIVE_SELECTION_TEXT)
-            .onInitiativeSelectionDate(workingDayIndicator
-                .getNextWorkingDay(LocalDate.now().plusDays(7)))
-            .build());
-        caseData.setOrderWithoutNotice(FreeFormOrderValues.builder()
-            .withoutNoticeSelectionTextArea(WITHOUT_NOTICE_SELECTION_TEXT)
-            .withoutNoticeSelectionDate(workingDayIndicator
-                .getNextWorkingDay(LocalDate.now().plusDays(7)))
-            .build());
+        FreeFormOrderValues orderOnCourtInitiative = new FreeFormOrderValues();
+        orderOnCourtInitiative.setOnInitiativeSelectionTextArea(ON_INITIATIVE_SELECTION_TEXT);
+        orderOnCourtInitiative.setOnInitiativeSelectionDate(workingDayIndicator
+            .getNextWorkingDay(LocalDate.now().plusDays(7)));
+        caseData.setOrderOnCourtInitiative(orderOnCourtInitiative);
+
+        FreeFormOrderValues orderWithoutNotice = new FreeFormOrderValues();
+        orderWithoutNotice.setWithoutNoticeSelectionTextArea(WITHOUT_NOTICE_SELECTION_TEXT);
+        orderWithoutNotice.setWithoutNoticeSelectionDate(workingDayIndicator
+            .getNextWorkingDay(LocalDate.now().plusDays(7)));
+        caseData.setOrderWithoutNotice(orderWithoutNotice);
     }
 
     private void populateDownloadTemplateOptions(CaseData caseData) {
@@ -445,68 +446,79 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private void populateFields(
         CaseData caseData, List<LocationRefData> locations, String authToken) {
         populateClaimant2Defendant2PartyNames(caseData);
-        caseData.setFinalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders
-            .builder().singleDate(workingDayIndicator
-                .getNextWorkingDay(LocalDate.now()))
-            .build()).build());
-        caseData.setFinalOrderRepresentation(FinalOrderRepresentation.builder()
-            .typeRepresentationComplex(ClaimantAndDefendantHeard
-                .builder()
-                .typeRepresentationClaimantOneDynamic(caseData.getApplicant1().getPartyName())
-                .typeRepresentationDefendantOneDynamic(caseData.getRespondent1().getPartyName())
-                .typeRepresentationDefendantTwoDynamic(defendantTwoPartyName)
-                .typeRepresentationClaimantTwoDynamic(claimantTwoPartyName)
-                .build()).build());
-        caseData.setFinalOrderFurtherHearingComplex(
-            FinalOrderFurtherHearing.builder()
-                .hearingLocationList(populateCurrentHearingLocation(caseData, authToken))
-                .alternativeHearingList(getLocationsFromList(locations))
-                .datesToAvoidDateDropdown(DatesFinalOrders.builder()
-                    .datesToAvoidDates(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(7))).build()).build());
-        caseData.setOrderMadeOnDetailsOrderCourt(
-            OrderMadeOnDetails.builder().ownInitiativeDate(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(7)))
-                .ownInitiativeText(ON_INITIATIVE_SELECTION_TEXT).build());
-        caseData.setOrderMadeOnDetailsOrderWithoutNotice(
-            OrderMadeOnDetailsOrderWithoutNotice.builder().withOutNoticeDate(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(7)))
-                .withOutNoticeText(WITHOUT_NOTICE_SELECTION_TEXT).build());
-        caseData.setAssistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
-            .assistedOrderCostsFirstDropdownDate(workingDayIndicator
-                .getNextWorkingDay(LocalDate.now().plusDays(14)))
-            .assistedOrderAssessmentThirdDropdownDate(workingDayIndicator
-                .getNextWorkingDay(LocalDate.now().plusDays(14)))
-            .makeAnOrderForCostsYesOrNo(NO)
-            .makeAnOrderForCostsList(CLAIMANT)
-            .assistedOrderClaimantDefendantFirstDropdown(SUBJECT_DETAILED_ASSESSMENT)
-            .assistedOrderAssessmentSecondDropdownList1(STANDARD_BASIS)
-            .assistedOrderAssessmentSecondDropdownList2(CostEnums.NO)
-            .build());
-        caseData.setPublicFundingCostsProtection(NO);
-        caseData.setFinalOrderAppealComplex(FinalOrderAppeal.builder()
-            .appealGrantedDropdown(AppealGrantedRefused.builder()
-                .appealChoiceSecondDropdownA(
-                    AppealChoiceSecondDropdown.builder()
-                        .appealGrantedRefusedDate(workingDayIndicator
-                            .getNextWorkingDay(LocalDate.now().plusDays(21)))
-                        .build())
-                .appealChoiceSecondDropdownB(
-                    AppealChoiceSecondDropdown.builder()
-                        .appealGrantedRefusedDate(workingDayIndicator
-                            .getNextWorkingDay(LocalDate.now().plusDays(21)))
-                        .build())
-                .build())
-            .appealRefusedDropdown(AppealGrantedRefused.builder()
-                .appealChoiceSecondDropdownA(
-                    AppealChoiceSecondDropdown.builder()
-                        .appealGrantedRefusedDate(workingDayIndicator
-                            .getNextWorkingDay(LocalDate.now().plusDays(21)))
-                        .build())
-                .appealChoiceSecondDropdownB(
-                    AppealChoiceSecondDropdown.builder()
-                        .appealGrantedRefusedDate(workingDayIndicator
-                            .getNextWorkingDay(LocalDate.now().plusDays(21)))
-                        .build())
 
-                .build()).build());
+        DatesFinalOrders singleDateSelection = new DatesFinalOrders();
+        singleDateSelection.setSingleDate(workingDayIndicator.getNextWorkingDay(LocalDate.now()));
+        OrderMade finalOrderDateHeardComplex = new OrderMade();
+        finalOrderDateHeardComplex.setSingleDateSelection(singleDateSelection);
+        caseData.setFinalOrderDateHeardComplex(finalOrderDateHeardComplex);
+
+        ClaimantAndDefendantHeard typeRepresentationComplex = new ClaimantAndDefendantHeard();
+        typeRepresentationComplex.setTypeRepresentationClaimantOneDynamic(caseData.getApplicant1().getPartyName());
+        typeRepresentationComplex.setTypeRepresentationDefendantOneDynamic(caseData.getRespondent1().getPartyName());
+        typeRepresentationComplex.setTypeRepresentationDefendantTwoDynamic(defendantTwoPartyName);
+        typeRepresentationComplex.setTypeRepresentationClaimantTwoDynamic(claimantTwoPartyName);
+        FinalOrderRepresentation finalOrderRepresentation = new FinalOrderRepresentation();
+        finalOrderRepresentation.setTypeRepresentationComplex(typeRepresentationComplex);
+        caseData.setFinalOrderRepresentation(finalOrderRepresentation);
+
+        DatesFinalOrders datesToAvoidDateDropdown = new DatesFinalOrders();
+        datesToAvoidDateDropdown.setDatesToAvoidDates(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(7)));
+        FinalOrderFurtherHearing finalOrderFurtherHearingComplex = new FinalOrderFurtherHearing();
+        finalOrderFurtherHearingComplex.setHearingLocationList(populateCurrentHearingLocation(caseData, authToken));
+        finalOrderFurtherHearingComplex.setAlternativeHearingList(getLocationsFromList(locations));
+        finalOrderFurtherHearingComplex.setDatesToAvoidDateDropdown(datesToAvoidDateDropdown);
+        caseData.setFinalOrderFurtherHearingComplex(finalOrderFurtherHearingComplex);
+
+        OrderMadeOnDetails orderMadeOnDetailsOrderCourt = new OrderMadeOnDetails();
+        orderMadeOnDetailsOrderCourt.setOwnInitiativeDate(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(7)));
+        orderMadeOnDetailsOrderCourt.setOwnInitiativeText(ON_INITIATIVE_SELECTION_TEXT);
+        caseData.setOrderMadeOnDetailsOrderCourt(orderMadeOnDetailsOrderCourt);
+
+        OrderMadeOnDetailsOrderWithoutNotice orderMadeOnDetailsOrderWithoutNotice = new OrderMadeOnDetailsOrderWithoutNotice();
+        orderMadeOnDetailsOrderWithoutNotice.setWithOutNoticeDate(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(7)));
+        orderMadeOnDetailsOrderWithoutNotice.setWithOutNoticeText(WITHOUT_NOTICE_SELECTION_TEXT);
+        caseData.setOrderMadeOnDetailsOrderWithoutNotice(orderMadeOnDetailsOrderWithoutNotice);
+
+        AssistedOrderCostDetails assistedOrderMakeAnOrderForCosts = new AssistedOrderCostDetails();
+        assistedOrderMakeAnOrderForCosts.setAssistedOrderCostsFirstDropdownDate(workingDayIndicator
+            .getNextWorkingDay(LocalDate.now().plusDays(14)));
+        assistedOrderMakeAnOrderForCosts.setAssistedOrderAssessmentThirdDropdownDate(workingDayIndicator
+            .getNextWorkingDay(LocalDate.now().plusDays(14)));
+        assistedOrderMakeAnOrderForCosts.setMakeAnOrderForCostsYesOrNo(NO);
+        assistedOrderMakeAnOrderForCosts.setMakeAnOrderForCostsList(CLAIMANT);
+        assistedOrderMakeAnOrderForCosts.setAssistedOrderClaimantDefendantFirstDropdown(SUBJECT_DETAILED_ASSESSMENT);
+        assistedOrderMakeAnOrderForCosts.setAssistedOrderAssessmentSecondDropdownList1(STANDARD_BASIS);
+        assistedOrderMakeAnOrderForCosts.setAssistedOrderAssessmentSecondDropdownList2(CostEnums.NO);
+        caseData.setAssistedOrderMakeAnOrderForCosts(assistedOrderMakeAnOrderForCosts);
+
+        caseData.setPublicFundingCostsProtection(NO);
+
+        AppealChoiceSecondDropdown appealChoiceSecondDropdownA1 = new AppealChoiceSecondDropdown();
+        appealChoiceSecondDropdownA1.setAppealGrantedRefusedDate(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(21)));
+
+        AppealChoiceSecondDropdown appealChoiceSecondDropdownB1 = new AppealChoiceSecondDropdown();
+        appealChoiceSecondDropdownB1.setAppealGrantedRefusedDate(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(21)));
+
+        AppealGrantedRefused appealGrantedDropdown = new AppealGrantedRefused();
+        appealGrantedDropdown.setAppealChoiceSecondDropdownA(appealChoiceSecondDropdownA1);
+        appealGrantedDropdown.setAppealChoiceSecondDropdownB(appealChoiceSecondDropdownB1);
+
+        AppealChoiceSecondDropdown appealChoiceSecondDropdownA2 = new AppealChoiceSecondDropdown();
+        appealChoiceSecondDropdownA2.setAppealGrantedRefusedDate(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(21)));
+
+        AppealChoiceSecondDropdown appealChoiceSecondDropdownB2 = new AppealChoiceSecondDropdown();
+        appealChoiceSecondDropdownB2.setAppealGrantedRefusedDate(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(21)));
+
+        AppealGrantedRefused appealRefusedDropdown = new AppealGrantedRefused();
+        appealRefusedDropdown.setAppealChoiceSecondDropdownA(appealChoiceSecondDropdownA2);
+        appealRefusedDropdown.setAppealChoiceSecondDropdownB(appealChoiceSecondDropdownB2);
+
+        FinalOrderAppeal finalOrderAppealComplex = new FinalOrderAppeal();
+        finalOrderAppealComplex.setAppealGrantedDropdown(appealGrantedDropdown);
+        finalOrderAppealComplex.setAppealRefusedDropdown(appealRefusedDropdown);
+        caseData.setFinalOrderAppealComplex(finalOrderAppealComplex);
+
         caseData.setFinalOrderGiveReasonsYesNo(NO);
     }
 
@@ -653,16 +665,16 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             if (caseData.getFinalOrderSelection().equals(ASSISTED_ORDER)) {
                 if (caseData.getFinalOrderFurtherHearingComplex() != null
                     && caseData.getFinalOrderFurtherHearingComplex().getHearingNotesText() != null) {
-                    caseData.setHearingNotes(HearingNotes.builder()
-                        .date(LocalDate.now())
-                        .notes(caseData.getFinalOrderFurtherHearingComplex().getHearingNotesText())
-                        .build());
+                    HearingNotes hearingNotes = new HearingNotes();
+                    hearingNotes.setDate(LocalDate.now());
+                    hearingNotes.setNotes(caseData.getFinalOrderFurtherHearingComplex().getHearingNotesText());
+                    caseData.setHearingNotes(hearingNotes);
                 }
             } else if (nonNull(caseData.getFreeFormHearingNotes())) {
-                caseData.setHearingNotes(HearingNotes.builder()
-                    .date(LocalDate.now())
-                    .notes(caseData.getFreeFormHearingNotes())
-                    .build());
+                HearingNotes hearingNotes = new HearingNotes();
+                hearingNotes.setDate(LocalDate.now());
+                hearingNotes.setNotes(caseData.getFreeFormHearingNotes());
+                caseData.setHearingNotes(hearingNotes);
             }
         }
 

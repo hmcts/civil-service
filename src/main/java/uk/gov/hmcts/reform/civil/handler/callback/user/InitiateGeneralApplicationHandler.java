@@ -146,12 +146,10 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             }
         }
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        caseData.setGeneralAppHearingDetails(
-            GAHearingDetails
-                .builder()
-                .hearingPreferredLocation(getLocationsFromList(locationRefDataService
-                    .getCourtLocationsForGeneralApplication(authToken)))
-                .build());
+        GAHearingDetails generalAppHearingDetails = new GAHearingDetails();
+        generalAppHearingDetails.setHearingPreferredLocation(getLocationsFromList(locationRefDataService
+            .getCourtLocationsForGeneralApplication(authToken)));
+        caseData.setGeneralAppHearingDetails(generalAppHearingDetails);
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)
                 .data(caseData.toMap(objectMapper))
@@ -222,8 +220,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         if (generalAppTypes.size() == 1
             && generalAppTypes.contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {
             caseData.setGeneralAppVaryJudgementType(YesOrNo.YES);
-            caseData.setGeneralAppInformOtherParty(
-                GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build());
+            GAInformOtherParty generalAppInformOtherParty = new GAInformOtherParty();
+            generalAppInformOtherParty.setIsWithNotice(YesOrNo.YES);
+            caseData.setGeneralAppInformOtherParty(generalAppInformOtherParty);
         } else {
             caseData.setGeneralAppVaryJudgementType(YesOrNo.NO);
         }
@@ -286,10 +285,10 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         }
         caseData = setWithNoticeByType(caseData);
         Fee feeForGA = feesService.getFeeForGA(caseData);
-        caseData.setGeneralAppPBADetails(GAPbaDetails.builder()
-                .generalAppFeeToPayInText(POUND_SYMBOL + feeForGA.toPounds().toString())
-                .fee(feeForGA)
-                .build());
+        GAPbaDetails generalAppPBADetails = new GAPbaDetails();
+        generalAppPBADetails.setGeneralAppFeeToPayInText(POUND_SYMBOL + feeForGA.toPounds().toString());
+        generalAppPBADetails.setFee(feeForGA);
+        caseData.setGeneralAppPBADetails(generalAppPBADetails);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseData.toMap(objectMapper))
@@ -311,7 +310,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         final CaseData.CaseDataBuilder<?, ?> dataBuilder = getSharedData(callbackParams);
 
         if (caseData.getGeneralAppPBADetails() == null) {
-            GAPbaDetails generalAppPBADetails = GAPbaDetails.builder().build();
+            GAPbaDetails generalAppPBADetails = new GAPbaDetails();
             caseData.setGeneralAppPBADetails(generalAppPBADetails);
         }
         if (caseData.getGeneralAppPBADetails().getFee() == null) {
@@ -334,7 +333,8 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             caseData.setGeneralAppParentClaimantIsApplicant(null);
         } else {
             GAHearingDetails generalAppHearingDetails = caseData.getGeneralAppHearingDetails();
-            generalAppHearingDetails.setHearingPreferredLocation(DynamicList.builder().build());
+            DynamicList dynamicList = new DynamicList();
+            generalAppHearingDetails.setHearingPreferredLocation(dynamicList);
             caseData.setGeneralAppParentClaimantIsApplicant(null);
         }
         if (caseData.getGeneralAppTypeLR() != null && isCoscEnabledAndUserNotLip(callbackParams)) {
@@ -363,9 +363,10 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
     private CaseData setWithNoticeByType(CaseData caseData) {
         if (isSingleAppTypeVaryJudgment(caseData)) {
-            return caseData.toBuilder()
-                    .generalAppInformOtherParty(
-                            GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build()).build();
+            GAInformOtherParty generalAppInformOtherParty = new GAInformOtherParty();
+            generalAppInformOtherParty.setIsWithNotice(YesOrNo.YES);
+            caseData.setGeneralAppInformOtherParty(generalAppInformOtherParty);
+            return caseData;
         }
         return caseData;
     }

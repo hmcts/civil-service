@@ -64,11 +64,10 @@ public class FullRemissionHWFCallbackHandler extends CallbackHandler {
                         claimIssuedHwfDetails.setHwfCaseEvent(FULL_REMISSION_HWF);
                     },
                     () -> {
-                        HelpWithFeesDetails newDetails = HelpWithFeesDetails.builder()
-                            .remissionAmount(claimFeeAmount)
-                            .outstandingFeeInPounds(BigDecimal.ZERO)
-                            .hwfCaseEvent(FULL_REMISSION_HWF)
-                            .build();
+                        HelpWithFeesDetails newDetails = new HelpWithFeesDetails();
+                        newDetails.setRemissionAmount(claimFeeAmount);
+                        newDetails.setOutstandingFeeInPounds(BigDecimal.ZERO);
+                        newDetails.setHwfCaseEvent(FULL_REMISSION_HWF);
                         caseData.setClaimIssuedHwfDetails(newDetails);
                     }
                 );
@@ -81,10 +80,9 @@ public class FullRemissionHWFCallbackHandler extends CallbackHandler {
                         hearingHwfDetails.setHwfCaseEvent(FULL_REMISSION_HWF);
                     },
                     () -> {
-                        HelpWithFeesDetails newDetails = HelpWithFeesDetails.builder()
-                            .remissionAmount(hearingFeeAmount)
-                            .hwfCaseEvent(FULL_REMISSION_HWF)
-                            .build();
+                        HelpWithFeesDetails newDetails = new HelpWithFeesDetails();
+                        newDetails.setRemissionAmount(hearingFeeAmount);
+                        newDetails.setHwfCaseEvent(FULL_REMISSION_HWF);
                         caseData.setHearingHwfDetails(newDetails);
                     }
                 );
