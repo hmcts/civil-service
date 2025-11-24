@@ -37,7 +37,7 @@ public class CourtVenueService {
     }
 
     /**
-     * Helper to filter cached court data
+     * Helper to filter cached court data.
      */
     private List<LocationRefData> filterCachedCourts(String serviceAuth, String auth, Predicate<LocationRefData> predicate) {
         return fetchAllCivilCourts(serviceAuth, auth).stream()
@@ -53,8 +53,8 @@ public class CourtVenueService {
     public List<LocationRefData> getCMLCourtByEpimmsId(String serviceAuth, String auth, String epimmsId) {
         log.info("Fetching CML courts by epimms id: {}", epimmsId);
         return filterCachedCourts(serviceAuth, auth, c ->
-            epimmsId.equals(c.getEpimmsId()) &&
-                IS_CASE_MANAGEMENT_LOCATION.equals(c.getIsCaseManagementLocation())
+            epimmsId.equals(c.getEpimmsId())
+                && IS_CASE_MANAGEMENT_LOCATION.equals(c.getIsCaseManagementLocation())
         );
     }
 
@@ -81,9 +81,9 @@ public class CourtVenueService {
     public List<LocationRefData> getCourtVenueByLocationCode(String serviceAuth, String auth, String threeDigitCode) {
         log.info("Fetching courts by court location three digit code: {}", threeDigitCode);
         return filterCachedCourts(serviceAuth, auth, c ->
-            threeDigitCode.equalsIgnoreCase(c.getCourtLocationCode()) &&
-                COURT_STATUS.equalsIgnoreCase(c.getCourtStatus()) &&
-                IS_CASE_MANAGEMENT_LOCATION.equalsIgnoreCase(c.getIsCaseManagementLocation())
+            threeDigitCode.equalsIgnoreCase(c.getCourtLocationCode())
+                && COURT_STATUS.equalsIgnoreCase(c.getCourtStatus())
+                && IS_CASE_MANAGEMENT_LOCATION.equalsIgnoreCase(c.getIsCaseManagementLocation())
         );
     }
 
@@ -101,7 +101,7 @@ public class CourtVenueService {
     }
 
     private boolean isCMLAndHL(LocationRefData court) {
-        return IS_CASE_MANAGEMENT_LOCATION.equalsIgnoreCase(court.getIsCaseManagementLocation()) &&
-            IS_HEARING_LOCATION.equalsIgnoreCase(court.getIsHearingLocation());
+        return IS_CASE_MANAGEMENT_LOCATION.equalsIgnoreCase(court.getIsCaseManagementLocation())
+            && IS_HEARING_LOCATION.equalsIgnoreCase(court.getIsHearingLocation());
     }
 }
