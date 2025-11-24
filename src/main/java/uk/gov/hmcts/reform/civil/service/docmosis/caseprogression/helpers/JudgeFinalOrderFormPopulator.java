@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.model.referencedata.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 @Component
@@ -57,6 +57,6 @@ public class JudgeFinalOrderFormPopulator {
     private String getHearingLocationText(CaseData caseData,
                                           LocationRefData caseManagementLocationDetails) {
         return caseData.getHearingLocationText() != null ? caseData.getHearingLocationText()
-            : LocationRefDataService.getDisplayEntry(caseManagementLocationDetails);
+            : LocationReferenceDataService.getDisplayEntry(caseManagementLocationDetails);
     }
 }

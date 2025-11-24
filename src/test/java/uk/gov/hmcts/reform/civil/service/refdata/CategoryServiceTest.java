@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service;
+package uk.gov.hmcts.reform.civil.service.refdata;
 
 import feign.FeignException;
 import feign.Request;
@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.crd.client.ListOfValuesApi;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
@@ -36,12 +37,14 @@ class CategoryServiceTest {
     private final FeignException notFoundFeignException = new FeignException.NotFound(
         "not found message",
         Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
-        "not found response body".getBytes(UTF_8));
+        "not found response body".getBytes(UTF_8),
+        Collections.emptyMap());
 
     private final FeignException forbiddenException = new FeignException.Forbidden(
         "forbidden message",
         Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
-        "forbidden response body".getBytes(UTF_8));
+        "forbidden response body".getBytes(UTF_8),
+        Collections.emptyMap());
 
     private final CategorySearchResult categorySearchResult = CategorySearchResult.builder().build();
 
