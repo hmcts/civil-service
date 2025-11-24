@@ -97,11 +97,9 @@ class SettleClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void should_disable_task_list_items() {
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
-            caseData = caseData.toBuilder()
-                .ccdCaseReference(1234L)
-                .applicant1Represented(YesOrNo.NO)
-                .respondent1Represented(YesOrNo.NO)
-                .build();
+            caseData.setCcdCaseReference(1234L);
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setRespondent1Represented(YesOrNo.NO);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler
@@ -124,11 +122,9 @@ class SettleClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void should_not_disable_task_list_items_when_qmlr_is_on_and_eacourt() {
             when(featureToggleService.isLocationWhiteListed(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
-            caseData = caseData.toBuilder()
-                .ccdCaseReference(1234L)
-                .applicant1Represented(YesOrNo.NO)
-                .respondent1Represented(YesOrNo.NO)
-                .build();
+            caseData.setCcdCaseReference(1234L);
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setRespondent1Represented(YesOrNo.NO);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler
@@ -151,11 +147,9 @@ class SettleClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void should_disable_task_list_items_when_qmlr_is_on_and_non_eaCourt() {
             when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
-            caseData = caseData.toBuilder()
-                .ccdCaseReference(1234L)
-                .applicant1Represented(YesOrNo.NO)
-                .respondent1Represented(YesOrNo.NO)
-                .build();
+            caseData.setCcdCaseReference(1234L);
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setRespondent1Represented(YesOrNo.NO);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler
