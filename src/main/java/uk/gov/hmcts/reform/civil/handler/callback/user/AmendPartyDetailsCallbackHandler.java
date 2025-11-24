@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -48,7 +49,6 @@ public class AmendPartyDetailsCallbackHandler extends CallbackHandler {
 
     private CallbackResponse validateUpdatedDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         List<String> errors = new ArrayList<>();
         if (caseData.isApplicantRepresented() || caseData.getApplicantSolicitor1UserDetails() != null && caseData.getApplicantSolicitor1UserDetails().getEmail() != null) {
@@ -61,34 +61,42 @@ public class AmendPartyDetailsCallbackHandler extends CallbackHandler {
 
         // set organisation policy after removing it in claim issue
         // workaround for hiding cases in CAA list before case notify
-        setOrganisationPolicy(caseData, caseDataBuilder);
+        setOrganisationPolicy(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .errors(!errors.isEmpty() ? errors : null)
             .build();
     }
 
-    private void setOrganisationPolicy(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
-        if (caseData.getRespondent1OrganisationIDCopy() != null) {
-            caseDataBuilder.respondent1OrganisationPolicy(
-                caseData.getRespondent1OrganisationPolicy().toBuilder()
-                    .organisation(Organisation.builder()
-                                      .organisationID(caseData.getRespondent1OrganisationIDCopy())
-                                      .build())
-                    .build()
-            );
+    private void setOrganisationPolicy(CaseData caseData) {
+        updateOrganisationPolicy(caseData.getRespondent1OrganisationPolicy(),
+                                 caseData.getRespondent1OrganisationIDCopy());
+
+        var respondent2Policy = caseData.getRespondent2OrganisationPolicy();
+
+        if (caseData.getRespondent2OrganisationIDCopy() != null && respondent2Policy != null) {
+            // Avoid modifying same object reference as respondent1 policy
+            if (respondent2Policy == caseData.getRespondent1OrganisationPolicy()) {
+                respondent2Policy = objectMapper.convertValue(respondent2Policy, OrganisationPolicy.class);
+                caseData.setRespondent2OrganisationPolicy(respondent2Policy);
+            }
+
+            updateOrganisationPolicy(respondent2Policy, caseData.getRespondent2OrganisationIDCopy());
+        }
+    }
+
+    private void updateOrganisationPolicy(OrganisationPolicy policy, String orgIdCopy) {
+        if (orgIdCopy == null || policy == null) {
+            return;
         }
 
-        if (caseData.getRespondent2OrganisationIDCopy() != null) {
-            caseDataBuilder.respondent2OrganisationPolicy(
-                caseData.getRespondent2OrganisationPolicy().toBuilder()
-                    .organisation(Organisation.builder()
-                                      .organisationID(caseData.getRespondent2OrganisationIDCopy())
-                                      .build())
-                    .build()
-            );
-        }
+        Organisation organisation = policy.getOrganisation() == null
+            ? new Organisation()
+            : objectMapper.convertValue(policy.getOrganisation(), Organisation.class);  // defensive copy
+
+        organisation.setOrganisationID(orgIdCopy);
+        policy.setOrganisation(organisation);
     }
 
     private CallbackResponse buildConfirmation(CallbackParams callbackParams) {

@@ -188,6 +188,29 @@ public class UnavailabilityDatesUtils {
         }
     }
 
+    public static CaseData copyDatesIntoListingTabFields(CaseData caseData) {
+        if (caseData.getApplicant1() != null
+            && caseData.getApplicant1().getUnavailableDates() != null) {
+            copyDatesIntoListingTabFieldsForApplicant(caseData, true);
+        }
+
+        if (caseData.getApplicant2() != null
+            && caseData.getApplicant2().getUnavailableDates() != null) {
+            copyDatesIntoListingTabFieldsForApplicant(caseData, false);
+        }
+
+        if (caseData.getRespondent1() != null
+            && caseData.getRespondent1().getUnavailableDates() != null) {
+            copyDatesIntoListingTabFieldsForRespondent1(caseData);
+        }
+
+        if (caseData.getRespondent2() != null
+            && caseData.getRespondent2().getUnavailableDates() != null) {
+            copyDatesIntoListingTabFieldsForRespondent2(caseData);
+        }
+        return caseData;
+    }
+
     private static List<Element<UnavailableDate>> getExistingDates(List<Element<UnavailableDate>> partyDates, String event, LocalDate date) {
         List<Element<UnavailableDate>> existingUnavailableDates = ofNullable(partyDates).orElse(newArrayList());
         List<Element<UnavailableDate>> updatedUnavailableDates = new ArrayList<>();
@@ -250,6 +273,34 @@ public class UnavailabilityDatesUtils {
         }
     }
 
+    private static void copyDatesIntoListingTabFieldsForApplicant(CaseData caseData, boolean isApplicant1) {
+        String eventAdded = null;
+        LocalDate dateAdded = null;
+
+        if (isClaimantIntentionEvent(caseData)) {
+            eventAdded = CLAIMANT_INTENTION_EVENT;
+            dateAdded = caseData.getApplicant1ResponseDate().toLocalDate();
+        } else if (caseData.getHearingSupportRequirementsDJ() != null
+            && YES.equals(caseData.getHearingSupportRequirementsDJ().getHearingUnavailableDates())) {
+            eventAdded = DJ_EVENT;
+            dateAdded = caseData.getDefaultJudgmentDocuments().get(0).getValue().getCreatedDatetime().toLocalDate();
+        }
+        // Todo: dates only considered from applicant 1. is it correct?
+        List<Element<UnavailableDate>> dates = getExistingDates(
+                caseData.getApplicant1().getUnavailableDates(),
+                eventAdded,
+                dateAdded
+            );
+
+        if (isApplicant1) {
+            caseData.setApplicant1(caseData.getApplicant1().toBuilder().unavailableDates(dates).build());
+            caseData.setApplicant1UnavailableDatesForTab(dates);
+        } else {
+            caseData.setApplicant2(caseData.getApplicant2().toBuilder().unavailableDates(dates).build());
+            caseData.setApplicant2UnavailableDatesForTab(dates);
+        }
+    }
+
     private static void copyDatesIntoListingTabFieldsForRespondent1(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
         String eventAdded = null;
         LocalDate dateAdded = null;
@@ -274,6 +325,27 @@ public class UnavailabilityDatesUtils {
             .respondent1UnavailableDatesForTab(dates);
     }
 
+    private static void copyDatesIntoListingTabFieldsForRespondent1(CaseData caseData) {
+        String eventAdded = null;
+        LocalDate dateAdded = null;
+
+        if (caseData.getRespondent1DQ() != null
+            && caseData.getRespondent1DQ().getHearing() != null
+            && YES.equals(caseData.getRespondent1DQ().getHearing().getUnavailableDatesRequired())) {
+            eventAdded = DEFENDANT_RESPONSE_EVENT;
+            dateAdded = caseData.getRespondent1ResponseDate().toLocalDate();
+        }
+
+        List<Element<UnavailableDate>> dates = getExistingDates(
+            caseData.getRespondent1().getUnavailableDates(),
+            eventAdded,
+            dateAdded
+        );
+
+        caseData.setRespondent1(caseData.getRespondent1().toBuilder().unavailableDates(dates).build());
+        caseData.setRespondent1UnavailableDatesForTab(dates);
+    }
+
     private static void copyDatesIntoListingTabFieldsForRespondent2(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
         String eventAdded = null;
         LocalDate dateAdded = null;
@@ -296,6 +368,27 @@ public class UnavailabilityDatesUtils {
         updatedData
             .respondent2(caseData.getRespondent2().toBuilder().unavailableDates(dates).build())
             .respondent2UnavailableDatesForTab(dates);
+    }
+
+    private static void copyDatesIntoListingTabFieldsForRespondent2(CaseData caseData) {
+        String eventAdded = null;
+        LocalDate dateAdded = null;
+
+        if (caseData.getRespondent2DQ() != null
+            && caseData.getRespondent2DQ().getHearing() != null
+            && YES.equals(caseData.getRespondent2DQ().getHearing().getUnavailableDatesRequired())) {
+            eventAdded = DEFENDANT_RESPONSE_EVENT;
+            dateAdded = caseData.getRespondent2ResponseDate().toLocalDate();
+        }
+
+        List<Element<UnavailableDate>> dates = getExistingDates(
+            caseData.getRespondent2().getUnavailableDates(),
+            eventAdded,
+            dateAdded
+        );
+
+        caseData.setRespondent2(caseData.getRespondent2().toBuilder().unavailableDates(dates).build());
+        caseData.setRespondent2UnavailableDatesForTab(dates);
     }
 
     public static void updateMissingUnavailableDatesForApplicants(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
