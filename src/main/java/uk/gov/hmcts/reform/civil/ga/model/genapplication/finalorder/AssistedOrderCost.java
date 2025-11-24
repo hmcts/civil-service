@@ -20,7 +20,7 @@ public class AssistedOrderCost {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal costAmount;
-    private final LocalDate costPaymentDeadLine;
+    private LocalDate costPaymentDeadLine;
     private YesOrNo isPartyCostProtection;
     private LocalDate assistedOrderCostsFirstDropdownDate;
     private LocalDate assistedOrderAssessmentThirdDropdownDate;

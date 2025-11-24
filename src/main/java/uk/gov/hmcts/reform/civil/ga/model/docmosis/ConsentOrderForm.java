@@ -18,20 +18,20 @@ import java.time.LocalDate;
 @EqualsAndHashCode
 public class ConsentOrderForm implements MappableObject {
 
-    private final String claimNumber;
-    private final YesOrNo isMultiParty;
-    private final String defendant1Name;
-    private final String defendant2Name;
-    private final String claimant1Name;
-    private final String claimant2Name;
-    private final String consentOrder;
+    private String claimNumber;
+    private YesOrNo isMultiParty;
+    private String defendant1Name;
+    private String defendant2Name;
+    private String claimant1Name;
+    private String claimant2Name;
+    private String consentOrder;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate orderDate;
-    private final String courtName;
-    private final String locationName;
-    private final String siteName;
-    private final String address;
-    private final String postcode;
+    private LocalDate orderDate;
+    private String courtName;
+    private String locationName;
+    private String siteName;
+    private String address;
+    private String postcode;
 
 }

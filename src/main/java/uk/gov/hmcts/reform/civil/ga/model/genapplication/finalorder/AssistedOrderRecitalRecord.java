@@ -11,7 +11,7 @@ import lombok.Setter;
 @Builder(toBuilder = true)
 public class AssistedOrderRecitalRecord {
 
-    private final String text;
+    private String text;
 
     @JsonCreator
     AssistedOrderRecitalRecord(@JsonProperty("text") String text) {

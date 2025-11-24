@@ -12,8 +12,8 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 @Builder(toBuilder = true)
 public class UploadDocumentByType {
 
-    private final String documentType;
-    private final Document additionalDocument;
+    private String documentType;
+    private Document additionalDocument;
 
     @JsonCreator
     UploadDocumentByType(@JsonProperty("typeOfDocument") String documentType,

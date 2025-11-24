@@ -18,112 +18,112 @@ import java.time.LocalDate;
 @EqualsAndHashCode
 public class AssistedOrderForm implements MappableObject {
 
-    private final String caseNumber;
+    private String caseNumber;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate receivedDate;
-    private final String claimantReference;
-    private final String defendantReference;
-    private final YesOrNo isMultiParty;
-    private final String claimant1Name;
-    private final String claimant2Name;
-    private final String defendant1Name;
-    private final String defendant2Name;
-    private final String judgeNameTitle;
-    private final String courtLocation;
-    private final String siteName;
-    private final String postcode;
-    private final String address;
+    private LocalDate receivedDate;
+    private String claimantReference;
+    private String defendantReference;
+    private YesOrNo isMultiParty;
+    private String claimant1Name;
+    private String claimant2Name;
+    private String defendant1Name;
+    private String defendant2Name;
+    private String judgeNameTitle;
+    private String courtLocation;
+    private String siteName;
+    private String postcode;
+    private String address;
     //Order Made
-    private final YesOrNo isOrderMade;
-    private final Boolean isSingleDate;
+    private YesOrNo isOrderMade;
+    private Boolean isSingleDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate orderMadeSingleDate;
-    private final Boolean isDateRange;
+    private LocalDate orderMadeSingleDate;
+    private Boolean isDateRange;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate orderMadeDateRangeFrom;
+    private LocalDate orderMadeDateRangeFrom;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate orderMadeDateRangeTo;
-    private final Boolean isBeSpokeRange;
-    private final String orderMadeBeSpokeText;
+    private LocalDate orderMadeDateRangeTo;
+    private Boolean isBeSpokeRange;
+    private String orderMadeBeSpokeText;
     //Judge HeardFrom Section
-    private final Boolean judgeHeardFromShowHide;
-    private final String judgeHeardSelection;
-    private final String claimantRepresentation;
-    private final String defendantRepresentation;
-    private final String defendantTwoRepresentation;
-    private final Boolean isOtherRepresentation;
-    private final String otherRepresentationText;
-    private final String heardClaimantNotAttend;
-    private final String heardDefendantNotAttend;
-    private final Boolean isDefendantTwoExists;
-    private final String heardDefendantTwoNotAttend;
-    private final Boolean isJudgeConsidered;
+    private Boolean judgeHeardFromShowHide;
+    private String judgeHeardSelection;
+    private String claimantRepresentation;
+    private String defendantRepresentation;
+    private String defendantTwoRepresentation;
+    private Boolean isOtherRepresentation;
+    private String otherRepresentationText;
+    private String heardClaimantNotAttend;
+    private String heardDefendantNotAttend;
+    private Boolean isDefendantTwoExists;
+    private String heardDefendantTwoNotAttend;
+    private Boolean isJudgeConsidered;
     //Ordered
-    private final String orderedText;
+    private String orderedText;
     //Recitals
-    private final Boolean showRecitals;
-    private final String recitalRecordedText;
+    private Boolean showRecitals;
+    private String recitalRecordedText;
     //Further Hearing
-    private final Boolean showFurtherHearing;
-    private final YesOrNo checkListToDate;
+    private Boolean showFurtherHearing;
+    private YesOrNo checkListToDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate furtherHearingListFromDate;
+    private LocalDate furtherHearingListFromDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate furtherHearingListToDate;
-    private final String furtherHearingDuration;
-    private final Boolean checkDatesToAvoid;
+    private LocalDate furtherHearingListToDate;
+    private String furtherHearingDuration;
+    private Boolean checkDatesToAvoid;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate furtherHearingDatesToAvoid;
-    private final String furtherHearingLocation;
-    private final String furtherHearingMethod;
+    private LocalDate furtherHearingDatesToAvoid;
+    private String furtherHearingLocation;
+    private String furtherHearingMethod;
     //Costs
-    private final String costSelection;
-    private final String costsReservedText;
-    private final String summarilyAssessed;
+    private String costSelection;
+    private String costsReservedText;
+    private String summarilyAssessed;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate summarilyAssessedDate;
-    private final String detailedAssessment;
-    private final String interimPayment;
+    private LocalDate summarilyAssessedDate;
+    private String detailedAssessment;
+    private String interimPayment;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate interimPaymentDate;
-    private final String beSpokeCostsText;
-    private final YesOrNo costsProtection;
-    private final String beSpokeCostDetailsText;
-    private final Boolean isQocsProtectionEnabled;
+    private LocalDate interimPaymentDate;
+    private String beSpokeCostsText;
+    private YesOrNo costsProtection;
+    private String beSpokeCostDetailsText;
+    private Boolean isQocsProtectionEnabled;
     //Appeal
-    private final Boolean showAppeal;
-    private final String claimantOrDefendantAppeal;
-    private final Boolean isAppealGranted;
-    private final String tableAorB;
+    private Boolean showAppeal;
+    private String claimantOrDefendantAppeal;
+    private Boolean isAppealGranted;
+    private String tableAorB;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate appealDate;
+    private LocalDate appealDate;
     //Order Made
-    private final Boolean showInitiativeOrWithoutNotice;
-    private final Boolean showInitiative;
-    private final String orderMadeOnText;
+    private Boolean showInitiativeOrWithoutNotice;
+    private Boolean showInitiative;
+    private String orderMadeOnText;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate initiativeDate;
+    private LocalDate initiativeDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate withoutNoticeDate;
+    private LocalDate withoutNoticeDate;
     //Reasons
-    private final String reasonsText;
+    private String reasonsText;
 
-    private final String partyName;
-    private final String partyAddressAddressLine1;
-    private final String partyAddressAddressLine2;
-    private final String partyAddressAddressLine3;
-    private final String partyAddressPostTown;
-    private final String partyAddressPostCode;
+    private String partyName;
+    private String partyAddressAddressLine1;
+    private String partyAddressAddressLine2;
+    private String partyAddressAddressLine3;
+    private String partyAddressPostTown;
+    private String partyAddressPostCode;
 }

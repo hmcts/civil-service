@@ -62,12 +62,16 @@ public class EndGeneralAppBusinessProcessCallbackHandler extends CallbackHandler
     }
 
     private CallbackResponse endGeneralApplicationBusinessProcess(CallbackParams callbackParams) {
-        log.info("End general application business process for caseId: {}",
-                 ((GeneralApplicationCaseData)callbackParams.getBaseCaseData()).getCcdCaseReference());
+        Long caseId = callbackParams.getGeneralApplicationCaseData().getCcdCaseReference();
+        log.info("End general application business process for caseId: {}", caseId);
         GeneralApplicationCaseData data = caseDetailsConverter.toGeneralApplicationCaseData(callbackParams.getRequest().getCaseDetails());
 
         if (!gaForLipService.isGaForLip(data)
             && (data.getCcdState().equals(AWAITING_APPLICATION_PAYMENT) || isFreeFeeCode(data))) {
+
+            log.info("Updating Judge And Respondent Collection After Payment, not gaForLipService, ccdState: {}, caseId: {}",
+                     AWAITING_APPLICATION_PAYMENT,
+                     caseId);
 
             parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(data);
         }
@@ -80,6 +84,10 @@ public class EndGeneralAppBusinessProcessCallbackHandler extends CallbackHandler
         if (gaForLipService.isGaForLip(data)
             && (isLipPaymentViaServiceRequest(data) || isLipPaymentViaHelpWithFees(data)
             || isFreeFeeCode(data))) {
+
+            log.info("Updating Judge And Respondent Collection After Payment, gaForLipService, ccdState: {}, caseId: {}",
+                     data.getCcdState().name(),
+                     caseId);
 
             parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(data);
         }
@@ -95,6 +103,10 @@ public class EndGeneralAppBusinessProcessCallbackHandler extends CallbackHandler
              * */
             if (gaForLipService.isGaForLip(data) && Objects.nonNull(data.getGeneralAppHelpWithFees())
                 && data.getGeneralAppHelpWithFees().getHelpWithFee().equals(YesOrNo.YES)) {
+
+                log.info("Updating Master Collection For Hwf, gaForLipService, newState: {}, caseId: {}",
+                         newState.name(),
+                         caseId);
 
                 parentCaseUpdateHelper.updateMasterCollectionForHwf(data);
             }
@@ -126,6 +138,11 @@ public class EndGeneralAppBusinessProcessCallbackHandler extends CallbackHandler
         if (!(data.getCcdState().equals(AWAITING_DIRECTIONS_ORDER_DOCS)
             || data.getCcdState().equals(AWAITING_ADDITIONAL_INFORMATION)
             || data.getCcdState().equals(AWAITING_WRITTEN_REPRESENTATIONS))) {
+
+            log.info("Updating Parent With GA State, newState: {}, caseId: {}",
+                     newState.name(),
+                     caseId);
+
             parentCaseUpdateHelper.updateParentWithGAState(data, newState.getDisplayedValue());
         } else {
             newState = data.getCcdState();
@@ -135,8 +152,10 @@ public class EndGeneralAppBusinessProcessCallbackHandler extends CallbackHandler
 
     private CallbackResponse evaluateReady(CallbackParams callbackParams,
                                            CaseState newState) {
-        log.info("Evaluate ready for caseId: {}",
-                 ((GeneralApplicationCaseData)callbackParams.getBaseCaseData()).getCcdCaseReference());
+        log.info("Evaluate ready, newState: {}, for caseId: {}",
+                 newState.name(),
+                 callbackParams.getGeneralApplicationCaseData().getCcdCaseReference());
+
         Map<String, Object> output = callbackParams.getRequest().getCaseDetails().getData();
 
         return AboutToStartOrSubmitCallbackResponse.builder()

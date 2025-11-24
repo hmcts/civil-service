@@ -11,7 +11,7 @@ import lombok.Setter;
 @Builder(toBuilder = true)
 public class DetailText {
 
-    private final String detailText;
+    private String detailText;
 
     @JsonCreator
     DetailText(@JsonProperty("detailsRepresentationText") String detailText

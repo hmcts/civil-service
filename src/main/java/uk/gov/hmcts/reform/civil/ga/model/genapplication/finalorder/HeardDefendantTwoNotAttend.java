@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.civil.ga.enums.dq.ClaimantDefendantNotAttendingType;
 @Builder(toBuilder = true)
 public class HeardDefendantTwoNotAttend {
 
-    private final ClaimantDefendantNotAttendingType listDefTwo;
+    private ClaimantDefendantNotAttendingType listDefTwo;
 
     @JsonCreator
     HeardDefendantTwoNotAttend(@JsonProperty("listDefTwo") ClaimantDefendantNotAttendingType listDefTwo) {

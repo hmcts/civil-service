@@ -11,9 +11,9 @@ import lombok.Setter;
 @Builder(toBuilder = true)
 public class HearingLength {
 
-    private final int lengthListOtherDays;
-    private final int lengthListOtherHours;
-    private final int lengthListOtherMinutes;
+    private int lengthListOtherDays;
+    private int lengthListOtherHours;
+    private int lengthListOtherMinutes;
 
     @JsonCreator
     HearingLength(@JsonProperty("lengthListOtherDays") int lengthListOtherDays,

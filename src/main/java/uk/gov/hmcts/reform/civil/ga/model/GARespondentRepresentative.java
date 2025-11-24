@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 @Builder(toBuilder = true)
 public class GARespondentRepresentative {
 
-    private final YesOrNo generalAppRespondent1Representative;
+    private YesOrNo generalAppRespondent1Representative;
 
     @JsonCreator
     GARespondentRepresentative(@JsonProperty("hasAgreed")

@@ -13,28 +13,28 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 @EqualsAndHashCode
 public class FreeFormOrder implements MappableObject {
 
-    private final String caseNumber;
-    private final String caseName;
-    private final String receivedDate;
-    private final String freeFormRecitalText;
-    private final String freeFormOrderedText;
-    private final String freeFormOrderValue;
-    private final String courtName;
-    private final String locationName;
-    private final String siteName;
-    private final String address;
-    private final String postcode;
-    private final YesOrNo isMultiParty;
-    private final String judgeNameTitle;
-    private final String defendant1Name;
-    private final String defendant2Name;
-    private final String claimant1Name;
-    private final String claimant2Name;
+    private String caseNumber;
+    private String caseName;
+    private String receivedDate;
+    private String freeFormRecitalText;
+    private String freeFormOrderedText;
+    private String freeFormOrderValue;
+    private String courtName;
+    private String locationName;
+    private String siteName;
+    private String address;
+    private String postcode;
+    private YesOrNo isMultiParty;
+    private String judgeNameTitle;
+    private String defendant1Name;
+    private String defendant2Name;
+    private String claimant1Name;
+    private String claimant2Name;
 
-    private final String partyName;
-    private final String partyAddressAddressLine1;
-    private final String partyAddressAddressLine2;
-    private final String partyAddressAddressLine3;
-    private final String partyAddressPostTown;
-    private final String partyAddressPostCode;
+    private String partyName;
+    private String partyAddressAddressLine1;
+    private String partyAddressAddressLine2;
+    private String partyAddressAddressLine3;
+    private String partyAddressPostTown;
+    private String partyAddressPostCode;
 }

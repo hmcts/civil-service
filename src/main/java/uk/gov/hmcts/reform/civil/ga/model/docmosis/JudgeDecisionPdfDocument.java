@@ -16,71 +16,71 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class JudgeDecisionPdfDocument implements MappableObject {
 
-    private final String claimNumber;
-    private final String claimantName;
-    private final String defendantName;
-    private final String applicationType;
-    private final String judicialByCourtsInitiative;
-    private final String locationName;
-    private final String courtName;
-    private final String courtNameCy;
-    private final String judgeHearingLocation;
-    private final String siteName;
-    private final String address;
-    private final String postcode;
-    private final YesOrNo reasonAvailable;
+    private String claimNumber;
+    private String claimantName;
+    private String defendantName;
+    private String applicationType;
+    private String judicialByCourtsInitiative;
+    private String locationName;
+    private String courtName;
+    private String courtNameCy;
+    private String judgeHearingLocation;
+    private String siteName;
+    private String address;
+    private String postcode;
+    private YesOrNo reasonAvailable;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate receivedDate;
-    private final String partyName;
-    private final String partyAddressAddressLine1;
-    private final String partyAddressAddressLine2;
-    private final String partyAddressAddressLine3;
-    private final String partyAddressPostTown;
-    private final String partyAddressPostCode;
+    private LocalDate receivedDate;
+    private String partyName;
+    private String partyAddressAddressLine1;
+    private String partyAddressAddressLine2;
+    private String partyAddressAddressLine3;
+    private String partyAddressPostTown;
+    private String partyAddressPostCode;
 
-    private final String judicialByCourtsInitiativeListForHearing;
-    private final String judicialByCourtsInitiativeForWrittenRep;
-    private final String applicantName;
-    private final String judgeDirection;
-    private final String dismissalOrder;
-    private final String generalOrder;
-    private final String requestOrder;
-    private final String writtenOrder;
-    private final String hearingPrefType;
-    private final String estimatedHearingLength;
-    private final String reasonForDecision;
-    private final String judgeRecital;
-    private final String hearingOrder;
-    private final String judgeComments;
-    private final String judgeNameTitle;
-    private final YesOrNo isMultiParty;
-    private final String defendant1Name;
-    private final String defendant2Name;
-    private final String claimant1Name;
-    private final String claimant2Name;
-    private final String additionalApplicationFee;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
-    @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate dateBy;
+    private String judicialByCourtsInitiativeListForHearing;
+    private String judicialByCourtsInitiativeForWrittenRep;
+    private String applicantName;
+    private String judgeDirection;
+    private String dismissalOrder;
+    private String generalOrder;
+    private String requestOrder;
+    private String writtenOrder;
+    private String hearingPrefType;
+    private String estimatedHearingLength;
+    private String reasonForDecision;
+    private String judgeRecital;
+    private String hearingOrder;
+    private String judgeComments;
+    private String judgeNameTitle;
+    private YesOrNo isMultiParty;
+    private String defendant1Name;
+    private String defendant2Name;
+    private String claimant1Name;
+    private String claimant2Name;
+    private String additionalApplicationFee;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate uploadDeadlineDate;
+    private LocalDate dateBy;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate  responseDeadlineDate;
+    private LocalDate uploadDeadlineDate;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate submittedOn;
+    private LocalDate  responseDeadlineDate;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate applicationCreatedDate;
+    private LocalDate submittedOn;
 
-    private final String applicationCreatedDateCy;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
+    @JsonSerialize(using = LocalDateSerializer.class)
+    private LocalDate applicationCreatedDate;
+
+    private String applicationCreatedDateCy;
 }

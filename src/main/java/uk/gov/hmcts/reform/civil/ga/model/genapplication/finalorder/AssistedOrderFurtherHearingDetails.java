@@ -21,7 +21,7 @@ public class AssistedOrderFurtherHearingDetails {
     private LocalDate listFromDate;
     private LocalDate listToDate;
     private LengthOfHearing lengthOfNewHearing;
-    private final HearingLength lengthOfHearingOther;
+    private HearingLength lengthOfHearingOther;
     private DynamicList alternativeHearingLocation;
     private GAJudicialHearingType hearingMethods;
     private String hearingNotesText;

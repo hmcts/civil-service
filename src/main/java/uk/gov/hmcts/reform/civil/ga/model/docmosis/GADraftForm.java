@@ -19,113 +19,113 @@ import java.util.List;
 @EqualsAndHashCode
 public class GADraftForm implements MappableObject {
 
-    private final String claimNumber;
-    private final String claimantName;
-    private final String defendantName;
-    private final String claimantReference;
-    private final String defendantReference;
+    private String claimNumber;
+    private String claimantName;
+    private String defendantName;
+    private String claimantReference;
+    private String defendantReference;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate date;
+    private LocalDate date;
 
-    private final String applicantPartyName;
-    private final YesOrNo hasAgreed;
-    private final YesOrNo isWithNotice;
-    private final String reasonsForWithoutNotice;
-    private final YesOrNo generalAppUrgency;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
-    @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate urgentAppConsiderationDate;
-
-    private final String reasonsForUrgency;
-    private final String generalAppType;
-    private final String generalAppDetailsOfOrder;
-    private final String generalAppReasonsOfOrder;
-    private final YesOrNo hearingYesorNo;
+    private String applicantPartyName;
+    private YesOrNo hasAgreed;
+    private YesOrNo isWithNotice;
+    private String reasonsForWithoutNotice;
+    private YesOrNo generalAppUrgency;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate hearingDate;
+    private LocalDate urgentAppConsiderationDate;
 
-    private final String hearingPreferencesPreferredType;
-    private final String reasonForPreferredHearingType;
-    private final String hearingPreferredLocation;
-    private final String hearingDetailsTelephoneNumber;
-    private final String hearingDetailsEmailId;
-    private final YesOrNo unavailableTrialRequiredYesOrNo;
-    private final List<UnavailableDates> unavailableTrialDates;
-
-    private final YesOrNo vulnerabilityQuestionsYesOrNo;
-    private final String supportRequirement;
-    private final String supportRequirementSignLanguage;
-    private final Boolean isSignLanguageExists;
-    private final String supportRequirementLanguageInterpreter;
-    private final Boolean isLanguageInterpreterExists;
-    private final String supportRequirementOther;
-    private final Boolean isOtherSupportExists;
-    private final String name;
-    private final String role;
-    private final String responseSotName;
-    private final String responseSotRole;
-
-    private final YesOrNo resp1HasAgreed;
-    private final YesOrNo gaResp1Consent;
-    private final String resp1DebtorOffer;
-    private final String resp1DeclineReason;
-    private final YesOrNo resp1HearingYesOrNo;
+    private String reasonsForUrgency;
+    private String generalAppType;
+    private String generalAppDetailsOfOrder;
+    private String generalAppReasonsOfOrder;
+    private YesOrNo hearingYesorNo;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate resp1Hearingdate;
+    private LocalDate hearingDate;
 
-    private final String resp1HearingPreferredType;
-    private final String resp1ReasonForPreferredType;
-    private final String resp1PreferredLocation;
-    private final String resp1PreferredTelephone;
-    private final String resp1PreferredEmail;
-    private final YesOrNo resp1UnavailableTrialRequired;
+    private String hearingPreferencesPreferredType;
+    private String reasonForPreferredHearingType;
+    private String hearingPreferredLocation;
+    private String hearingDetailsTelephoneNumber;
+    private String hearingDetailsEmailId;
+    private YesOrNo unavailableTrialRequiredYesOrNo;
+    private List<UnavailableDates> unavailableTrialDates;
+
+    private YesOrNo vulnerabilityQuestionsYesOrNo;
+    private String supportRequirement;
+    private String supportRequirementSignLanguage;
+    private Boolean isSignLanguageExists;
+    private String supportRequirementLanguageInterpreter;
+    private Boolean isLanguageInterpreterExists;
+    private String supportRequirementOther;
+    private Boolean isOtherSupportExists;
+    private String name;
+    private String role;
+    private String responseSotName;
+    private String responseSotRole;
+
+    private YesOrNo resp1HasAgreed;
+    private YesOrNo gaResp1Consent;
+    private String resp1DebtorOffer;
+    private String resp1DeclineReason;
+    private YesOrNo resp1HearingYesOrNo;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
+    @JsonSerialize(using = LocalDateSerializer.class)
+    private LocalDate resp1Hearingdate;
+
+    private String resp1HearingPreferredType;
+    private String resp1ReasonForPreferredType;
+    private String resp1PreferredLocation;
+    private String resp1PreferredTelephone;
+    private String resp1PreferredEmail;
+    private YesOrNo resp1UnavailableTrialRequired;
     private List<UnavailableDates> resp1UnavailableTrialDates;
 
-    private final YesOrNo resp1VulnerableQuestions;
-    private final String resp1SupportRequirement;
-    private final String resp1SignLanguage;
-    private final String resp1LanguageInterpreter;
-    private final String resp1Other;
-    private final YesOrNo isOneVTwoApp;
-    private final YesOrNo isConsentOrderApp;
-    private final YesOrNo isVaryJudgmentApp;
-    private final Boolean isResp1SignLanguageExists;
-    private final Boolean isResp1LanguageInterpreterExists;
-    private final Boolean isResp1OtherSupportExists;
+    private YesOrNo resp1VulnerableQuestions;
+    private String resp1SupportRequirement;
+    private String resp1SignLanguage;
+    private String resp1LanguageInterpreter;
+    private String resp1Other;
+    private YesOrNo isOneVTwoApp;
+    private YesOrNo isConsentOrderApp;
+    private YesOrNo isVaryJudgmentApp;
+    private Boolean isResp1SignLanguageExists;
+    private Boolean isResp1LanguageInterpreterExists;
+    private Boolean isResp1OtherSupportExists;
 
-    private final YesOrNo resp2HasAgreed;
-    private final YesOrNo gaResp2Consent;
-    private final String resp2DebtorOffer;
-    private final YesOrNo resp2HearingYesOrNo;
-    private final String resp2DeclineReason;
+    private YesOrNo resp2HasAgreed;
+    private YesOrNo gaResp2Consent;
+    private String resp2DebtorOffer;
+    private YesOrNo resp2HearingYesOrNo;
+    private String resp2DeclineReason;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate resp2Hearingdate;
+    private LocalDate resp2Hearingdate;
 
-    private final String resp2HearingPreferredType;
-    private final String resp2ReasonForPreferredType;
-    private final String resp2PreferredLocation;
-    private final String resp2PreferredTelephone;
-    private final String resp2PreferredEmail;
-    private final YesOrNo resp2UnavailableTrialRequired;
+    private String resp2HearingPreferredType;
+    private String resp2ReasonForPreferredType;
+    private String resp2PreferredLocation;
+    private String resp2PreferredTelephone;
+    private String resp2PreferredEmail;
+    private YesOrNo resp2UnavailableTrialRequired;
     private List<UnavailableDates> resp2UnavailableTrialDates;
 
-    private final YesOrNo resp2VulnerableQuestions;
-    private final String resp2SupportRequirement;
-    private final String resp2SignLanguage;
-    private final String resp2LanguageInterpreter;
-    private final String resp2Other;
-    private final Boolean isResp2SignLanguageExists;
-    private final Boolean isResp2LanguageInterpreterExists;
-    private final Boolean isResp2OtherSupportExists;
-    private final Boolean isCasePastDueDate;
-    private final YesOrNo isLipCase;
+    private YesOrNo resp2VulnerableQuestions;
+    private String resp2SupportRequirement;
+    private String resp2SignLanguage;
+    private String resp2LanguageInterpreter;
+    private String resp2Other;
+    private Boolean isResp2SignLanguageExists;
+    private Boolean isResp2LanguageInterpreterExists;
+    private Boolean isResp2OtherSupportExists;
+    private Boolean isCasePastDueDate;
+    private YesOrNo isLipCase;
 }
