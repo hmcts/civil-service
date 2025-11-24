@@ -377,7 +377,13 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 .data(data).build();
     }
 
-    private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
+    private CallbackResponse buildConfirmation(CallbackParams callbackParams) {
+
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+        if (caseEvent == INITIATE_GENERAL_APPLICATION_COSC) {
+            return emptySubmittedCallbackResponse(callbackParams);
+        }
+
         CaseData caseData = callbackParams.getCaseData();
         Long ccdCaseReference = caseData.getCcdCaseReference();
         List<Element<GeneralApplication>> generalApplications = caseData.getGeneralApplications();

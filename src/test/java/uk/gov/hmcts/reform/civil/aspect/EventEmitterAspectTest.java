@@ -35,7 +35,6 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION_COSC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MAKE_DECISION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESPOND_TO_APPLICATION;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
@@ -213,25 +212,6 @@ class EventEmitterAspectTest {
             caseId,
             generalApplication,
             INITIATE_GENERAL_APPLICATION
-        );
-
-        aspect.emitBusinessProcessEvent(proceedingJoinPoint, callbackParams);
-
-        verify(gaEventEmitterService).emitBusinessProcessCamundaEvent(caseId, generalApplication, false);
-        verify(proceedingJoinPoint).proceed();
-    }
-
-    @SneakyThrows
-    @Test
-    void shouldEmitBusinessProcessCamundaEvent_whenCallbackIsSubmittedAndEventIsInitiateGeneralApplicationCosc() {
-        final Long caseId = 1L;
-        final GeneralApplication generalApplication = GeneralApplication.builder()
-            .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION_COSC))
-            .build();
-        final CallbackParams callbackParams = callbackParamsForSubmittedCivilCase(
-            caseId,
-            generalApplication,
-            INITIATE_GENERAL_APPLICATION_COSC
         );
 
         aspect.emitBusinessProcessEvent(proceedingJoinPoint, callbackParams);
