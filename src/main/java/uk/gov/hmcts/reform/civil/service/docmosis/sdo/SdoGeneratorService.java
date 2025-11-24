@@ -58,6 +58,12 @@ public class SdoGeneratorService {
                 .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
         }
 
+        log.info("Selecting SDO template for caseId {} (track: {}, drhSmallClaim: {}, nihlFastTrack: {}, fastTrack: {})",
+                 caseData.getCcdCaseReference(),
+                 caseData.getAllocatedTrack(),
+                 sdoCaseClassificationService.isDrhSmallClaim(caseData),
+                 sdoCaseClassificationService.isNihlFastTrack(caseData),
+                 sdoCaseClassificationService.isFastTrack(caseData));
         if (sdoCaseClassificationService.isDrhSmallClaim(caseData)) {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL_DRH;
             templateData = sdoSmallClaimsDrhTemplateService.buildTemplate(caseData, judgeName, isJudge, authorisation);
@@ -74,7 +80,8 @@ public class SdoGeneratorService {
             docmosisTemplate =  DocmosisTemplates.SDO_R2_DISPOSAL;
             templateData = sdoDisposalTemplateService.buildTemplate(caseData, judgeName, isJudge, authorisation);
         }
-        log.info("SDO docmosisTemplate: {} for caseId {} legacyCaseReference{}", docmosisTemplate.getTemplate(), caseData.getCcdCaseReference(), caseData.getLegacyCaseReference());
+        log.info("SDO docmosisTemplate: {} for caseId {} legacyCaseReference{}",
+                 docmosisTemplate.getTemplate(), caseData.getCcdCaseReference(), caseData.getLegacyCaseReference());
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             templateData,
             docmosisTemplate

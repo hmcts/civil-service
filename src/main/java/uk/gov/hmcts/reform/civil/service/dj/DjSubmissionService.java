@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.dj;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -13,6 +14,7 @@ import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DjSubmissionService {
 
     private static final String CASE_MANAGEMENT_CATEGORY = "caseManagementOrders";
@@ -21,6 +23,7 @@ public class DjSubmissionService {
     private final DirectionsOrderCaseProgressionService directionsOrderCaseProgressionService;
 
     public CaseData prepareSubmission(CaseData caseData, String authToken) {
+        log.info("Preparing DJ submission payload for caseId {}", caseData.getCcdCaseReference());
         CaseDataBuilder<?, ?> builder = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(STANDARD_DIRECTION_ORDER_DJ))
             .hearingNotes(getHearingNotes(caseData));
@@ -40,6 +43,7 @@ public class DjSubmissionService {
 
     private void removePreviewDocument(CaseData caseData, CaseDataBuilder<?, ?> builder) {
         if (caseData.getOrderSDODocumentDJ() != null) {
+            log.info("Removing DJ preview document before submission for caseId {}", caseData.getCcdCaseReference());
             builder.orderSDODocumentDJ(null);
         }
     }

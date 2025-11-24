@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.sdo;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -20,6 +21,7 @@ import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.CARM
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SdoJourneyToggleService {
 
     static final String SMALL_CLAIMS_MEDIATION_TEXT = "If you failed to attend a mediation appointment, then the judge "
@@ -37,6 +39,10 @@ public class SdoJourneyToggleService {
         if (sdoFeatureToggleService.isWelshJourneyEnabled(caseData)) {
             updatedData.bilingualHint(YesOrNo.YES);
         }
+        log.debug("Applied journey flags for caseId {} (CARM={}, bilingualHint={})",
+                  caseData.getCcdCaseReference(),
+                  updatedData.build().getShowCarmFields(),
+                  updatedData.build().getBilingualHint());
     }
 
     public void applySmallClaimsChecklistToggle(CaseData caseData,
@@ -55,6 +61,7 @@ public class SdoJourneyToggleService {
             updatedData.sdoR2SmallClaimsMediationSectionStatement(SdoR2SmallClaimsMediation.builder()
                                                                       .input(CARM_MEDIATION_TEXT)
                                                                       .build());
+            log.debug("Applied R2 small claims mediation defaults for caseId {}", caseData.getCcdCaseReference());
         }
     }
 
@@ -63,6 +70,7 @@ public class SdoJourneyToggleService {
             updatedData.smallClaimsMediationSectionStatement(SmallClaimsMediation.builder()
                                                               .input(SMALL_CLAIMS_MEDIATION_TEXT)
                                                               .build());
+            log.debug("Applied small claims mediation statement for caseId {}", caseData.getCcdCaseReference());
         }
     }
 

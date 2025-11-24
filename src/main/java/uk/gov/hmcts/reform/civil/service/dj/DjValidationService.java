@@ -1,12 +1,14 @@
 package uk.gov.hmcts.reform.civil.service.dj;
 
 import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 public class DjValidationService {
 
     private static final String ERROR_NUMBER_LESS_THAN_ZERO = "The number entered cannot be less than zero";
@@ -20,6 +22,7 @@ public class DjValidationService {
             validateNegativeWitness(inputValue1, inputValue2).ifPresent(errors::add);
         }
 
+        log.info("DJ validation complete for caseId {}, total errors {}", caseData.getCcdCaseReference(), errors.size());
         return errors;
     }
 
@@ -38,4 +41,3 @@ public class DjValidationService {
         return java.util.Optional.empty();
     }
 }
-

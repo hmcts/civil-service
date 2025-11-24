@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.sdo;
 
 import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
@@ -14,6 +15,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Service
+@Slf4j
 public class SdoCaseClassificationService {
 
     public boolean isSmallClaimsTrack(CaseData caseData) {

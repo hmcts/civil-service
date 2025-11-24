@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.pipeline;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderCallbackTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderLifecycleStage;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class DirectionsOrderCallbackPipeline {
 
     private final List<DirectionsOrderCallbackTask> tasks;
@@ -19,6 +21,12 @@ public class DirectionsOrderCallbackPipeline {
     public DirectionsOrderTaskResult run(DirectionsOrderTaskContext context, DirectionsOrderLifecycleStage stage) {
         return tasks.stream()
             .filter(task -> supports(task, context, stage))
+            .peek(task -> log.debug(
+                "Executing task {} for stage {} and caseId {}",
+                task.getClass().getSimpleName(),
+                stage,
+                context.caseData().getCcdCaseReference()
+            ))
             .map(task -> task.execute(context))
             .reduce(DirectionsOrderTaskResult.empty(context.caseData()), this::mergeResults);
     }
@@ -48,6 +56,9 @@ public class DirectionsOrderCallbackPipeline {
         var caseData = current.updatedCaseData() != null
             ? current.updatedCaseData()
             : previous.updatedCaseData();
+        if (!errors.isEmpty()) {
+            log.debug("Aggregated {} error(s) while merging task results for caseId {}", errors.size(), caseData.getCcdCaseReference());
+        }
         return new DirectionsOrderTaskResult(caseData, errors, response);
     }
 }

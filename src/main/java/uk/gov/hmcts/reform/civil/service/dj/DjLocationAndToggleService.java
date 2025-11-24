@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.dj;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
@@ -56,6 +57,7 @@ public class DjLocationAndToggleService {
         builder.disposalHearingMethodInPersonDJ(locationsList);
         builder.trialHearingMethodInPersonDJ(locationsList);
 
+        log.info("Prepared DJ locations/toggles for caseId {}", caseData.getCcdCaseReference());
         if (V_1.equals(callbackParams.getVersion())) {
             DynamicList hearingMethods = buildHearingMethods(callbackParams, journeyPrimedCaseData);
             builder.hearingMethodValuesDisposalHearingDJ(hearingMethods);

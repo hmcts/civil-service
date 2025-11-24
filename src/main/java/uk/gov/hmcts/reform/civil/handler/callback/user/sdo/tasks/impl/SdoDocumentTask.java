@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderCallbackTask;
@@ -19,6 +20,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class SdoDocumentTask implements DirectionsOrderCallbackTask {
 
     private final SdoDocumentService sdoDocumentService;
@@ -27,6 +29,7 @@ public class SdoDocumentTask implements DirectionsOrderCallbackTask {
     public DirectionsOrderTaskResult execute(DirectionsOrderTaskContext context) {
         CaseData caseData = context.caseData();
         String authToken = context.callbackParams().getParams().get(BEARER_TOKEN).toString();
+        log.info("Generating SDO document for caseId {}", caseData.getCcdCaseReference());
         Optional<CaseDocument> document = sdoDocumentService.generateSdoDocument(caseData, authToken);
 
         if (document.isPresent()) {
@@ -35,9 +38,11 @@ public class SdoDocumentTask implements DirectionsOrderCallbackTask {
             CaseData updatedCaseData = caseData.toBuilder()
                 .sdoOrderDocument(generatedDocument)
                 .build();
+            log.info("Generated SDO document for caseId {}", caseData.getCcdCaseReference());
             return new DirectionsOrderTaskResult(updatedCaseData, Collections.emptyList(), null);
         }
 
+        log.info("No SDO document generated for caseId {}", caseData.getCcdCaseReference());
         return DirectionsOrderTaskResult.empty(caseData);
     }
 

@@ -76,6 +76,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     // Then any changes to fields in ccd will persist in ccd regardless of backwards or forwards page navigation.
     private CallbackResponse prePopulateOrderDetailsPages(CallbackParams callbackParams) {
         CaseData originalCaseData = callbackParams.getCaseData();
+        log.info("Pre-populating SDO for caseId {}", originalCaseData.getCcdCaseReference());
         DirectionsOrderTaskResult prePopulateResult =
             runStage(originalCaseData, callbackParams, DirectionsOrderLifecycleStage.PRE_POPULATE);
         List<String> prePopulateErrors = extractErrors(prePopulateResult);
@@ -86,6 +87,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private CallbackResponse setOrderDetailsFlags(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        log.info("Setting SDO order detail flags for caseId {}", caseData.getCcdCaseReference());
         DirectionsOrderTaskResult taskResult =
             runStage(caseData, callbackParams, DirectionsOrderLifecycleStage.ORDER_DETAILS);
         List<String> errors = extractErrors(taskResult);
@@ -108,6 +110,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private CallbackResponse submitSDO(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        log.info("Submitting SDO for caseId {}", caseData.getCcdCaseReference());
         DirectionsOrderTaskResult submissionResult =
             runStage(caseData, callbackParams, DirectionsOrderLifecycleStage.SUBMISSION);
 
@@ -125,6 +128,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        log.info("Building SDO confirmation for caseId {}", caseData.getCcdCaseReference());
         DirectionsOrderTaskResult confirmationResult =
             runStage(caseData, callbackParams, DirectionsOrderLifecycleStage.CONFIRMATION);
 

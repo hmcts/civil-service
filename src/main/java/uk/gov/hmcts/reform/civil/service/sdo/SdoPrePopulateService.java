@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.sdo;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
@@ -16,6 +17,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SdoPrePopulateService {
 
     private final SdoTrackDefaultsService sdoTrackDefaultsService;
@@ -27,6 +29,7 @@ public class SdoPrePopulateService {
         CaseData caseData = context.caseData();
         CallbackParams callbackParams = context.callbackParams();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        log.info("Pre-populating SDO defaults for caseId {}", caseData.getCcdCaseReference());
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
         sdoTrackDefaultsService.applyBaseTrackDefaults(caseData, updatedData);

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.dj.tasks.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderCallbackTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderLifecycleStage;
@@ -16,6 +17,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_OR
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class DjPrePopulateTask implements DirectionsOrderCallbackTask {
 
     private final DirectionsOrderParticipantService participantService;
@@ -23,6 +25,7 @@ public class DjPrePopulateTask implements DirectionsOrderCallbackTask {
     @Override
     public DirectionsOrderTaskResult execute(DirectionsOrderTaskContext context) {
         CaseData caseData = context.caseData();
+        log.info("DJ pre-populate task for caseId {}", caseData.getCcdCaseReference());
         CaseData updated = caseData.toBuilder()
             .applicantVRespondentText(participantService.buildApplicantVRespondentText(caseData))
             .build();

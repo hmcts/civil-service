@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.sdo;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingOnRadioOptions;
@@ -20,6 +21,7 @@ import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SdoValidationService {
 
     private static final String ERROR_NUMBER_LESS_THAN_ZERO = "The number entered cannot be less than zero";
@@ -46,6 +48,7 @@ public class SdoValidationService {
             errors.addAll(validateNihl(caseData));
         }
 
+        log.info("Validation complete for caseId {}, total errors {}", caseData.getCcdCaseReference(), errors.size());
         return errors;
     }
 

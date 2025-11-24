@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderCallbackTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderLifecycleStage;
@@ -16,6 +17,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class SdoPrePopulateTask implements DirectionsOrderCallbackTask {
 
     private final SdoPrePopulateService sdoPrePopulateService;
@@ -23,6 +25,7 @@ public class SdoPrePopulateTask implements DirectionsOrderCallbackTask {
     @Override
     public DirectionsOrderTaskResult execute(DirectionsOrderTaskContext context) {
         CaseData caseData = context.caseData();
+        log.info("SDO pre-populate task for caseId {}", caseData.getCcdCaseReference());
 
         CaseData updatedCaseData = sdoPrePopulateService.prePopulate(context);
 

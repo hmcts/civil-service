@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.dj.tasks.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderCallbackTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderLifecycleStage;
@@ -13,16 +14,17 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_OR
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class DjValidationTask implements DirectionsOrderCallbackTask {
 
     private final DjValidationService djValidationService;
 
     @Override
     public DirectionsOrderTaskResult execute(DirectionsOrderTaskContext context) {
-        return DirectionsOrderTaskResult.withErrors(
-            context.caseData(),
-            djValidationService.validate(context.caseData())
-        );
+        var caseData = context.caseData();
+        var errors = djValidationService.validate(caseData);
+        log.info("DJ validation found {} issue(s) for caseId {}", errors.size(), caseData.getCcdCaseReference());
+        return DirectionsOrderTaskResult.withErrors(caseData, errors);
     }
 
     @Override

@@ -33,6 +33,7 @@ public class SdoSubmissionService {
     private final SdoCaseClassificationService caseClassificationService;
 
     public CaseData prepareSubmission(CaseData caseData, String authToken) {
+        log.info("Preparing SDO submission payload for caseId {}", caseData.getCcdCaseReference());
         CaseDataBuilder<?, ?> builder = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(CaseEvent.CREATE_SDO))
             .hearingNotes(getHearingNotes(caseData));
@@ -54,11 +55,13 @@ public class SdoSubmissionService {
         }
 
         if (featureToggleService.isWelshJourneyEnabled(caseData)) {
+            log.info("Moving SDO document to pre-translation for caseId {}", caseData.getCcdCaseReference());
             List<uk.gov.hmcts.reform.civil.model.common.Element<CaseDocument>> preTranslation =
                 new ArrayList<>(Optional.ofNullable(caseData.getPreTranslationDocuments()).orElseGet(ArrayList::new));
             preTranslation.add(ElementUtils.element(document));
             builder.preTranslationDocuments(preTranslation);
         } else {
+            log.info("Moving SDO document to system generated collection for caseId {}", caseData.getCcdCaseReference());
             List<uk.gov.hmcts.reform.civil.model.common.Element<CaseDocument>> generatedDocuments =
                 new ArrayList<>(Optional.ofNullable(caseData.getSystemGeneratedCaseDocuments()).orElseGet(ArrayList::new));
             generatedDocuments.add(ElementUtils.element(document));
@@ -78,6 +81,7 @@ public class SdoSubmissionService {
         Optional.ofNullable(caseData.getSmallClaimsMethodInPerson())
             .map(sdoLocationService::trimListItems)
             .ifPresent(builder::smallClaimsMethodInPerson);
+        log.info("Trimmed hearing method locations for caseId {}", caseData.getCcdCaseReference());
     }
 
     private void updateSmallClaimsHearing(CaseData caseData, CaseDataBuilder<?, ?> builder) {

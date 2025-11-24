@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.pipeline.DirectionsOrderCallbackPipeline;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class DirectionsOrderStageExecutor {
 
     private static final List<DirectionsOrderLifecycleStage> ORDER_GENERATION_SEQUENCE = List.of(
@@ -39,6 +41,7 @@ public class DirectionsOrderStageExecutor {
         CaseData currentCaseData = caseData;
 
         for (DirectionsOrderLifecycleStage stage : stages) {
+            log.info("Running {} stage for caseId {}", stage, currentCaseData.getCcdCaseReference());
             DirectionsOrderTaskResult stageResult = directionsOrderCallbackPipeline.run(
                 new DirectionsOrderTaskContext(currentCaseData, callbackParams, stage),
                 stage
@@ -53,6 +56,7 @@ public class DirectionsOrderStageExecutor {
                 : stageResult.errors();
 
             if (!errors.isEmpty()) {
+                log.warn("Stage {} returned {} error(s) for caseId {}", stage, errors.size(), currentCaseData.getCcdCaseReference());
                 return new DirectionsOrderStageExecutionResult(currentCaseData, errors);
             }
         }

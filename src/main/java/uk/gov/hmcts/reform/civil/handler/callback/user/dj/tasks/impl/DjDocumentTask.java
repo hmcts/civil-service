@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.dj.tasks.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderCallbackTask;
@@ -22,6 +23,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class DjDocumentTask implements DirectionsOrderCallbackTask {
 
     private final DjDocumentService djDocumentService;
@@ -31,6 +33,7 @@ public class DjDocumentTask implements DirectionsOrderCallbackTask {
     public DirectionsOrderTaskResult execute(DirectionsOrderTaskContext context) {
         CaseData caseData = context.caseData();
         String authToken = context.callbackParams().getParams().get(BEARER_TOKEN).toString();
+        log.info("Generating DJ order document for caseId {}", caseData.getCcdCaseReference());
         return djDocumentService.generateOrder(caseData, authToken)
             .map(document -> buildResult(caseData, document))
             .orElseGet(() -> DirectionsOrderTaskResult.empty(caseData));
@@ -48,6 +51,7 @@ public class DjDocumentTask implements DirectionsOrderCallbackTask {
 
     private DirectionsOrderTaskResult buildResult(CaseData caseData, CaseDocument document) {
         djDocumentService.assignCategory(document, "caseManagementOrders");
+        log.info("Generated DJ order document for caseId {}", caseData.getCcdCaseReference());
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
             .orderSDODocumentDJ(document.getDocumentLink())
             .orderSDODocumentDJCollection(List.of(toElement(document)))

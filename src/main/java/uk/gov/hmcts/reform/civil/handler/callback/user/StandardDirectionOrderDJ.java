@@ -61,6 +61,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
     private CallbackResponse initiateSDO(CallbackParams callbackParams) {
         CaseData originalCaseData = callbackParams.getCaseData();
+        log.info("DJ initiate SDO for caseId {}", originalCaseData.getCcdCaseReference());
         DirectionsOrderTaskResult prePopulateResult = runStage(
             originalCaseData,
             callbackParams,
@@ -79,6 +80,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
     private CallbackResponse populateDisposalTrialScreen(CallbackParams callbackParams) {
         CaseData originalCaseData = callbackParams.getCaseData();
+        log.info("DJ populate trial/disposal screen for caseId {}", originalCaseData.getCcdCaseReference());
         DirectionsOrderTaskResult result = runStage(
             originalCaseData,
             callbackParams,
@@ -91,6 +93,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
     private CallbackResponse generateSDONotifications(CallbackParams callbackParams) {
         CaseData originalCaseData = callbackParams.getCaseData();
+        log.info("DJ generate notifications for caseId {}", originalCaseData.getCcdCaseReference());
         DirectionsOrderTaskResult submissionResult =
             runStage(originalCaseData, callbackParams, DirectionsOrderLifecycleStage.SUBMISSION);
 
@@ -118,10 +121,12 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             return confirmationResult.submittedCallbackResponse();
         }
 
+        log.info("DJ confirmation built with default response for caseId {}", caseData.getCcdCaseReference());
         return SubmittedCallbackResponse.builder().build();
     }
 
     private CallbackResponse createOrderScreen(CallbackParams callbackParams) {
+        log.info("DJ create order screen flow for caseId {}", callbackParams.getCaseData().getCcdCaseReference());
         DirectionsOrderStageExecutionResult executionResult = directionsOrderStageExecutor.runOrderGenerationStages(
             callbackParams.getCaseData(),
             callbackParams

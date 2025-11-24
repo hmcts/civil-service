@@ -7,10 +7,6 @@ import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 
 import java.time.LocalDate;
 
-/**
- * Centralises the working-day aware date maths shared across the DJ disposal, trial, and specialist
- * direction builders so each collaborator can focus on narrative construction.
- */
 @Service
 @RequiredArgsConstructor
 public class DjDeadlineService {

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.sdo;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -20,6 +21,7 @@ import static uk.gov.hmcts.reform.civil.model.common.DynamicListElement.dynamicE
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SdoLocationService {
 
     private final LocationReferenceDataService locationReferenceDataService;
@@ -92,10 +94,12 @@ public class SdoLocationService {
     public void updateWaLocationsIfRequired(CaseData caseData,
                                             CaseData.CaseDataBuilder<?, ?> builder,
                                             String authToken) {
+        log.info("Updating WA court locations if required for caseId {}", caseData.getCcdCaseReference());
         updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(authToken, caseData));
     }
 
     public void clearWaLocationMetadata(CaseData.CaseDataBuilder<?, ?> builder) {
+        log.info("Clearing WA location metadata");
         builder.taskManagementLocations(null)
             .taskManagementLocationsTab(null)
             .caseManagementLocationTab(null);

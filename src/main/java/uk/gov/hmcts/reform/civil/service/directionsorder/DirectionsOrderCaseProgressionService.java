@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.directionsorder;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.reform.civil.service.sdo.SdoLocationService;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DirectionsOrderCaseProgressionService {
 
     private final SdoJourneyToggleService sdoJourneyToggleService;
@@ -23,6 +25,7 @@ public class DirectionsOrderCaseProgressionService {
     public void applyEaCourtLocation(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder, boolean allowLipvLrWithNoC) {
         YesOrNo resolvedEaCourt = sdoJourneyToggleService.resolveEaCourtLocation(caseData, allowLipvLrWithNoC);
         if (resolvedEaCourt != null) {
+            log.info("Setting EA court location={} for caseId {}", resolvedEaCourt, caseData.getCcdCaseReference());
             builder.eaCourtLocation(resolvedEaCourt);
         }
     }
@@ -55,10 +58,12 @@ public class DirectionsOrderCaseProgressionService {
                                            boolean clearWaMetadataWhenDisabled) {
         if (!featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
             if (clearWaMetadataWhenDisabled) {
+                log.info("Clearing WA location metadata for caseId {}", caseData.getCcdCaseReference());
                 sdoLocationService.clearWaLocationMetadata(builder);
             }
             return;
         }
+        log.info("Updating WA locations for caseId {}", caseData.getCcdCaseReference());
         sdoLocationService.updateWaLocationsIfRequired(caseData, builder, authToken);
     }
 }

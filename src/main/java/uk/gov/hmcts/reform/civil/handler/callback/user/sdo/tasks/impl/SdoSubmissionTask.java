@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.sdo.tasks.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderCallbackTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderLifecycleStage;
@@ -15,6 +16,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class SdoSubmissionTask implements DirectionsOrderCallbackTask {
 
     private final SdoSubmissionService submissionService;
@@ -23,6 +25,7 @@ public class SdoSubmissionTask implements DirectionsOrderCallbackTask {
     public DirectionsOrderTaskResult execute(DirectionsOrderTaskContext context) {
         CaseData caseData = context.caseData();
         String authToken = context.callbackParams().getParams().get(BEARER_TOKEN).toString();
+        log.info("Preparing SDO submission for caseId {}", caseData.getCcdCaseReference());
         CaseData updatedCaseData = submissionService.prepareSubmission(caseData, authToken);
         return DirectionsOrderTaskResult.empty(updatedCaseData);
     }
