@@ -39,13 +39,6 @@ public class SdoOrderDetailsService {
         applyTrackFlags(caseData, updatedData);
         mapHearingMethodFields(caseData, updatedData, context.callbackParams().getVersion());
 
-        log.info(
-            "Updated SDO order details flags for caseId {} (smallClaims={}, fastTrack={}, r2Screen={})",
-            caseData.getCcdCaseReference(),
-            updatedData.build().getSmallClaimsFlag(),
-            updatedData.build().getFastTrackFlag(),
-            updatedData.build().getIsSdoR2NewScreen()
-        );
         return updatedData.build();
     }
 

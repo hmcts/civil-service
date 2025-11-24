@@ -54,14 +54,10 @@ public class SdoValidationService {
 
     private Optional<String> validateNegativeWitness(String first, String second) {
         if (first != null && second != null) {
-            try {
-                int number1 = Integer.parseInt(first);
-                int number2 = Integer.parseInt(second);
-                if (number1 < 0 || number2 < 0) {
-                    return Optional.of(ERROR_NUMBER_LESS_THAN_ZERO);
-                }
-            } catch (NumberFormatException ignored) {
-                // CCD should enforce numeric values; if it does not, fall through without blocking submission.
+            int number1 = Integer.parseInt(first);
+            int number2 = Integer.parseInt(second);
+            if (number1 < 0 || number2 < 0) {
+                return Optional.of(ERROR_NUMBER_LESS_THAN_ZERO);
             }
         }
         return Optional.empty();

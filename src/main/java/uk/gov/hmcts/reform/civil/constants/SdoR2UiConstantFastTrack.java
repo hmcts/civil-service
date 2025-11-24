@@ -32,8 +32,6 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_UPLOAD_TO_DIGITAL_PORTAL;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_WRITTEN_QUESTIONS;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.NIHL_WRITTEN_QUESTIONS_UPLOAD;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_WITNESS_DEADLINE;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_WITNESS_LATE_WARNING;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_COUNT_LIMIT_NOTE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_PAGE_LIMIT_PREFIX;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_PAGE_LIMIT_SUFFIX;
@@ -78,10 +76,12 @@ public final class SdoR2UiConstantFastTrack {
     public static final String REQUEST_COMPILED_WITH = "within 7 days of receipt.";
     public static final String STATEMENT_WITNESS = "Each party must upload to the Digital Portal copies of the" +
         " statements of all witnesses of fact on whom they intend to rely.";
-    public static final String DEADLINE = SMALL_CLAIMS_WITNESS_DEADLINE;
-    public static final String DEADLINE_EVIDENCE = SMALL_CLAIMS_WITNESS_LATE_WARNING;
+    public static final String DEADLINE = "Witness statements shall be uploaded to the Digital Portal by 4pm on";
+    public static final String DEADLINE_EVIDENCE = "Evidence will not be permitted at trial from a witness whose "
+        + "statement has not been uploaded in accordance with the Order, except with permission from the Court.";
     public static final String SCHEDULE_OF_LOSS_CLAIMANT = FAST_TRACK_SCHEDULE_CLAIMANT_UPLOAD;
-    public static final String SCHEDULE_OF_LOSS_DEFENDANT = FAST_TRACK_SCHEDULE_DEFENDANT_UPLOAD;
+    public static final String SCHEDULE_OF_LOSS_DEFENDANT = "In the event of a challenge to the updated schedule of "
+        + "loss, a defendant shall upload to the Digital Portal a counter-schedule by 4pm on";
     public static final String IMPORTANT_NOTES = "This Order has been made without hearing. Each party has the " +
         "right to apply to have this Order set aside or varied. Any such application must be received " +
         "by the Court (together with the appropriate fee) by 4pm on";

@@ -22,6 +22,7 @@ import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.REST
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT2;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.RESTRICT_WITNESS_TEXT;
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.WITNESS_DESCRIPTION_TEXT;
+import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.WITNESS_STATEMENT_TEXT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.JUDGES_RECITAL_STATEMENTS_OF_CASE_WITH_COMMA;
@@ -66,7 +67,7 @@ public class SdoSmallClaimsNarrativeService {
 
     public void applyWitnessStatements(CaseData.CaseDataBuilder<?, ?> updatedData) {
         updatedData.sdoR2SmallClaimsWitnessStatementOther(SdoR2SmallClaimsWitnessStatements.builder()
-                .sdoStatementOfWitness(SMALL_CLAIMS_WITNESS_STATEMENTS_UPLOAD)
+                .sdoStatementOfWitness(WITNESS_STATEMENT_TEXT)
                 .isRestrictWitness(NO)
                 .sdoR2SmallClaimsRestrictWitness(SdoR2SmallClaimsRestrictWitness.builder()
                                                      .noOfWitnessClaimant(2)

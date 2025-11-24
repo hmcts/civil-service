@@ -990,10 +990,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(data.getSdoR2SmallClaimsWitnessStatementOther().getText()).isEqualTo(SdoR2UiConstantSmallClaim.WITNESS_DESCRIPTION_TEXT);
             assertThat(data.getSdoR2SmallClaimsWitnessStatementOther().getSdoStatementOfWitness())
-                .isEqualTo(
-                    "Each party must upload to the Digital Portal copies of all witness statements of the witnesses"
-                        + " upon whose evidence they intend to rely at the hearing not less than 21 days before"
-                        + " the hearing.");
+                .isEqualTo(SdoR2UiConstantSmallClaim.WITNESS_STATEMENT_TEXT);
             assertThat(data.getSdoR2SmallClaimsWitnessStatementOther().getIsRestrictWitness()).isEqualTo(NO);
             assertThat(data.getSdoR2SmallClaimsWitnessStatementOther().getIsRestrictPages()).isEqualTo(NO);
             assertThat(data.getSdoR2SmallClaimsWitnessStatementOther().getSdoR2SmallClaimsRestrictWitness()

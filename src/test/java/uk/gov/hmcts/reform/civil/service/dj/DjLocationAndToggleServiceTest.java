@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderLifecycleStage;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -26,8 +25,6 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoFeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoJourneyToggleService;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 
 import java.util.List;
@@ -55,22 +52,16 @@ class DjLocationAndToggleServiceTest {
     private CategoryService categoryService;
     @Mock
     private LocationHelper locationHelper;
-    @Mock
-    private SdoFeatureToggleService sdoFeatureToggleService;
 
     private DjLocationAndToggleService service;
 
     @BeforeEach
     void setUp() {
-        SdoJourneyToggleService journeyToggleService = new SdoJourneyToggleService(sdoFeatureToggleService);
         service = new DjLocationAndToggleService(
             locationReferenceDataService,
             categoryService,
-            locationHelper,
-            journeyToggleService
+            locationHelper
         );
-        lenient().when(sdoFeatureToggleService.isCarmEnabled(any())).thenReturn(false);
-        lenient().when(sdoFeatureToggleService.isWelshJourneyEnabled(any())).thenReturn(false);
     }
 
     @Test
@@ -161,24 +152,6 @@ class DjLocationAndToggleServiceTest {
         CaseData result = service.applyHearingSelections(caseData, V_2);
 
         assertThat(result).isSameAs(caseData);
-    }
-
-    @Test
-    void shouldApplyJourneyFlagsWhenFeaturesEnabled() {
-        when(sdoFeatureToggleService.isCarmEnabled(any())).thenReturn(true);
-        when(sdoFeatureToggleService.isWelshJourneyEnabled(any())).thenReturn(true);
-        stubLocationMocks("789");
-        stubHearingCategories();
-
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .caseManagementOrderSelection(DISPOSAL_HEARING)
-            .build();
-
-        CaseData result = service.prepareLocationsAndToggles(buildContext(caseData, V_1));
-
-        assertThat(result.getShowCarmFields()).isEqualTo(YesOrNo.YES);
-        assertThat(result.getBilingualHint()).isEqualTo(YesOrNo.YES);
     }
 
     @Test
