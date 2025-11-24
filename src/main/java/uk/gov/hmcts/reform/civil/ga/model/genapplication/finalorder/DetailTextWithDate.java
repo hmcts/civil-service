@@ -13,8 +13,8 @@ import java.time.LocalDate;
 @Builder(toBuilder = true)
 public class DetailTextWithDate {
 
-    private final String detailText;
-    private final LocalDate date;
+    private String detailText;
+    private LocalDate date;
 
     @JsonCreator
     DetailTextWithDate(@JsonProperty("detailText") String detailText,

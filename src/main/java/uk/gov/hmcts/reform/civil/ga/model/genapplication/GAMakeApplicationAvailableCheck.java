@@ -14,7 +14,7 @@ import java.util.List;
 @Builder(toBuilder = true)
 public class GAMakeApplicationAvailableCheck {
 
-    private final List<MakeAppAvailableCheckGAspec> makeAppAvailableCheck;
+    private List<MakeAppAvailableCheckGAspec> makeAppAvailableCheck;
 
     @JsonCreator
     GAMakeApplicationAvailableCheck(@JsonProperty("makeAppAvailableCheck") List<MakeAppAvailableCheckGAspec>

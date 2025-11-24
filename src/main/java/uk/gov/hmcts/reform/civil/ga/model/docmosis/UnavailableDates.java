@@ -14,8 +14,8 @@ public class UnavailableDates {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate unavailableTrialDateFrom;
+    private LocalDate unavailableTrialDateFrom;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate unavailableTrialDateTo;
+    private LocalDate unavailableTrialDateTo;
 }

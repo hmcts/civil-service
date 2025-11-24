@@ -13,11 +13,11 @@ import uk.gov.hmcts.reform.civil.ga.enums.dq.PermissionToAppealTypes;
 @Builder(toBuilder = true)
 public class AssistedOrderAppealDetails {
 
-    private final AppealOriginTypes appealOrigin;
-    private final String otherOriginText;
-    private final PermissionToAppealTypes permissionToAppeal;
-    private final AppealTypeChoices appealTypeChoicesForGranted;
-    private final AppealTypeChoices appealTypeChoicesForRefused;
+    private AppealOriginTypes appealOrigin;
+    private String otherOriginText;
+    private PermissionToAppealTypes permissionToAppeal;
+    private AppealTypeChoices appealTypeChoicesForGranted;
+    private AppealTypeChoices appealTypeChoicesForRefused;
 
     @JsonCreator
     AssistedOrderAppealDetails(@JsonProperty("appealOrigin") AppealOriginTypes appealOrigin,

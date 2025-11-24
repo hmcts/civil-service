@@ -17,14 +17,14 @@ import java.time.LocalDate;
 @EqualsAndHashCode
 public class PostOrderCoverLetter implements MappableObject {
 
-    private final String caseNumber;
+    private String caseNumber;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate receivedDate;
-    private final String partyName;
-    private final String partyAddressAddressLine1;
-    private final String partyAddressAddressLine2;
-    private final String partyAddressAddressLine3;
-    private final String partyAddressPostTown;
-    private final String partyAddressPostCode;
+    private LocalDate receivedDate;
+    private String partyName;
+    private String partyAddressAddressLine1;
+    private String partyAddressAddressLine2;
+    private String partyAddressAddressLine3;
+    private String partyAddressPostTown;
+    private String partyAddressPostCode;
 }

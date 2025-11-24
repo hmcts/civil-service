@@ -13,9 +13,9 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 public class GARespondentResponse implements MappableObject {
 
     private GAHearingDetails gaHearingDetails;
-    private final YesOrNo generalAppRespondent1Representative;
-    private final String gaRespondentDetails;
-    private final String gaRespondentResponseReason;
+    private YesOrNo generalAppRespondent1Representative;
+    private String gaRespondentDetails;
+    private String gaRespondentResponseReason;
 
     @JsonCreator
     GARespondentResponse(@JsonProperty("gaHearingDetails") GAHearingDetails gaHearingDetails,

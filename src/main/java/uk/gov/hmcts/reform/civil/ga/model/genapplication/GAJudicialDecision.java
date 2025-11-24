@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeDecisionOption;
 @Builder(toBuilder = true)
 public class GAJudicialDecision {
 
-    private final GAJudgeDecisionOption decision;
+    private GAJudgeDecisionOption decision;
 
     @JsonCreator
     public GAJudicialDecision(@JsonProperty("decision") GAJudgeDecisionOption decision) {

@@ -11,7 +11,7 @@ import lombok.Setter;
 @Builder(toBuilder = true)
 public class BeSpokeCostDetailText {
 
-    private final String detailText;
+    private String detailText;
 
     @JsonCreator
     BeSpokeCostDetailText(@JsonProperty("beSpokeCostDetailsText") String detailText) {

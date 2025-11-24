@@ -11,7 +11,7 @@ import lombok.Setter;
 @Builder(toBuilder = true)
 public class AssistedOrderGiveReasonsDetails {
 
-    private final String reasonsText;
+    private String reasonsText;
 
     @JsonCreator
     AssistedOrderGiveReasonsDetails(@JsonProperty("reasonsText") String reasonsText) {

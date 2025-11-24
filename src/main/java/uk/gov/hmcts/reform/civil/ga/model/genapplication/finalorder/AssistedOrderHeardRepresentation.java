@@ -12,9 +12,9 @@ import uk.gov.hmcts.reform.civil.ga.enums.dq.HeardFromRepresentationTypes;
 @Builder(toBuilder = true)
 public class AssistedOrderHeardRepresentation {
 
-    private final HeardFromRepresentationTypes representationType;
-    private final ClaimantDefendantRepresentation claimantDefendantRepresentation;
-    private final DetailText otherRepresentation;
+    private HeardFromRepresentationTypes representationType;
+    private ClaimantDefendantRepresentation claimantDefendantRepresentation;
+    private DetailText otherRepresentation;
 
     @JsonCreator
     AssistedOrderHeardRepresentation(@JsonProperty("representationType")
