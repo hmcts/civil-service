@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.model.referencedata.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
 import java.util.List;

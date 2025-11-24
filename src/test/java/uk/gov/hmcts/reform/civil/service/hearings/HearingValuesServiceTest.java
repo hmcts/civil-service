@@ -51,7 +51,7 @@ import uk.gov.hmcts.reform.civil.model.hearingvalues.VocabularyModel;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.CategoryService;
+import uk.gov.hmcts.reform.civil.service.refdata.CategoryService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.EarlyAdoptersService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;

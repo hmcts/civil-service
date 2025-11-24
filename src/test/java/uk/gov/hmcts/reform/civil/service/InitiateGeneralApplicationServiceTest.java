@@ -37,7 +37,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.model.referencedata.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;

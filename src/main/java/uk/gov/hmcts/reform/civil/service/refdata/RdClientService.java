@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.client.LocationReferenceDataApiClient;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.model.referencedata.LocationRefData;
 
 import java.util.List;
 

@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataException;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.model.referencedata.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.refdata.CourtVenueService;
 
 import java.util.ArrayList;
