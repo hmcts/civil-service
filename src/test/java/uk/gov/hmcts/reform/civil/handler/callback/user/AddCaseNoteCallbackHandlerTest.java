@@ -88,17 +88,18 @@ class AddCaseNoteCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .caseNote("Example case note")
                 .caseNotes(wrapElements(caseNote))
                 .build();
+            List<Element<CaseNote>> existingCaseNotes = caseData.getCaseNotes();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             when(caseNoteService.buildCaseNote(params.getParams().get(BEARER_TOKEN).toString(), "Example case note"))
                 .thenReturn(expectedCaseNote);
-            when(caseNoteService.addNoteToListStart(expectedCaseNote, caseData.getCaseNotes())).thenReturn(updatedCaseNotes);
+            when(caseNoteService.addNoteToListStart(expectedCaseNote, existingCaseNotes)).thenReturn(updatedCaseNotes);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(caseNoteService).buildCaseNote(params.getParams().get(BEARER_TOKEN).toString(), "Example case note");
-            verify(caseNoteService).addNoteToListStart(expectedCaseNote, caseData.getCaseNotes());
+            verify(caseNoteService).addNoteToListStart(expectedCaseNote, existingCaseNotes);
 
             assertThat(response.getData())
                 .doesNotHaveToString("caseNote");
@@ -128,17 +129,18 @@ class AddCaseNoteCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .caseNote("Example case note")
                 .caseNotes(wrapElements(caseNote))
                 .build();
+            List<Element<CaseNote>> existingCaseNotes = caseData.getCaseNotes();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             when(caseNoteService.buildCaseNote(params.getParams().get(BEARER_TOKEN).toString(), "Example case note"))
                 .thenReturn(expectedCaseNote);
-            when(caseNoteService.addNoteToListStart(expectedCaseNote, caseData.getCaseNotes())).thenReturn(updatedCaseNotes);
+            when(caseNoteService.addNoteToListStart(expectedCaseNote, existingCaseNotes)).thenReturn(updatedCaseNotes);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(caseNoteService).buildCaseNote(params.getParams().get(BEARER_TOKEN).toString(), "Example case note");
-            verify(caseNoteService).addNoteToListStart(expectedCaseNote, caseData.getCaseNotes());
+            verify(caseNoteService).addNoteToListStart(expectedCaseNote, existingCaseNotes);
 
             assertThat(response.getData())
                 .doesNotHaveToString("caseNote");

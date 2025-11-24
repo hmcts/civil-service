@@ -216,10 +216,14 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
 
         @NotNull
         private CaseDetails caseDetailsAfterNoCApplied(CaseDetails caseDetails, String applicantOrRespondentOrgPolicy) {
-            caseDetails.getData().put(CHANGE_ORGANISATION_REQUEST_FIELD,
-                                      ChangeOrganisationRequest.builder().createdBy(REQUESTER_EMAIL).build());
-            caseDetails.getData().put(applicantOrRespondentOrgPolicy, OrganisationPolicy.builder()
-                .organisation(Organisation.builder().organisationID(NEW_ORG_ID).build()).build());
+            ChangeOrganisationRequest changeOrganisationRequest = new ChangeOrganisationRequest();
+            changeOrganisationRequest.setCreatedBy(REQUESTER_EMAIL);
+            caseDetails.getData().put(CHANGE_ORGANISATION_REQUEST_FIELD, changeOrganisationRequest);
+            Organisation organisation = new Organisation();
+            organisation.setOrganisationID(NEW_ORG_ID);
+            OrganisationPolicy organisationPolicy = new OrganisationPolicy();
+            organisationPolicy.setOrganisation(organisation);
+            caseDetails.getData().put(applicantOrRespondentOrgPolicy, organisationPolicy);
             return caseDetails;
         }
 
