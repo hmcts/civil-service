@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -17,7 +16,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 
@@ -32,8 +30,6 @@ class MoreInformationHwfCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private MoreInformationHwfCallbackHandler handler;
     private ObjectMapper objectMapper;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @BeforeEach
     void setUp() {
@@ -48,12 +44,11 @@ class MoreInformationHwfCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldValidationMoreInformationClaimIssued_withInvalidDate() {
             //Given
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-                .helpWithFeesMoreInformationClaimIssue(
-                    HelpWithFeesMoreInformation.builder()
-                        .hwFMoreInfoDocumentDate(LocalDate.now())
-                        .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setHelpWithFeesMoreInformationClaimIssue(
+                HelpWithFeesMoreInformation.builder()
+                    .hwFMoreInfoDocumentDate(LocalDate.now())
+                    .build());
             //When
             CallbackParams params = callbackParamsOf(caseData, MID, "more-information-hwf");
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -64,13 +59,12 @@ class MoreInformationHwfCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldValidationMoreInformationHearing_withInvalidDate() {
             //Given
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-                .hwfFeeType(FeeType.HEARING)
-                .helpWithFeesMoreInformationHearing(
-                    HelpWithFeesMoreInformation.builder()
-                        .hwFMoreInfoDocumentDate(LocalDate.now())
-                        .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setHwfFeeType(FeeType.HEARING);
+            caseData.setHelpWithFeesMoreInformationHearing(
+                HelpWithFeesMoreInformation.builder()
+                    .hwFMoreInfoDocumentDate(LocalDate.now())
+                    .build());
             //When
             CallbackParams params = callbackParamsOf(caseData, MID, "more-information-hwf");
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -87,10 +81,9 @@ class MoreInformationHwfCallbackHandlerTest extends BaseCallbackHandlerTest {
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
                 .hwfCaseEvent(MORE_INFORMATION_HWF)
                 .noRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET).build();
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-                .claimIssuedHwfDetails(hwfeeDetails)
-                .hwfFeeType(FeeType.CLAIMISSUED)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setClaimIssuedHwfDetails(hwfeeDetails);
+            caseData.setHwfFeeType(FeeType.CLAIMISSUED);
             //When
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -108,10 +101,9 @@ class MoreInformationHwfCallbackHandlerTest extends BaseCallbackHandlerTest {
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
                 .hwfCaseEvent(MORE_INFORMATION_HWF)
                 .noRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET).build();
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-                .hearingHwfDetails(hwfeeDetails)
-                .hwfFeeType(FeeType.HEARING)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setHearingHwfDetails(hwfeeDetails);
+            caseData.setHwfFeeType(FeeType.HEARING);
             //When
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

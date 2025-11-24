@@ -66,7 +66,7 @@ class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
         void shouldReturnNoErrors_whenParticularOfClaimsFieldsAreValid() {
             CaseData caseData = caseDataBuilder
                 .servedDocumentFiles(ServedDocumentFiles.builder()
-                                         .particularsOfClaimText("Some string")
+                .particularsOfClaimText("Some string")
                                          .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -80,8 +80,8 @@ class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
         void shouldReturnError_whenParticularOfClaimsTextAndDocumentSubmitted() {
             CaseData caseData = caseDataBuilder
                 .servedDocumentFiles(ServedDocumentFiles.builder()
-                                         .particularsOfClaimText("Some string")
-                                         .particularsOfClaimDocument(wrapElements(Document.builder().build()))
+                .particularsOfClaimText("Some string")
+                .particularsOfClaimDocument(wrapElements(Document.builder().build()))
                                          .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -98,7 +98,7 @@ class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
         void shouldReturnNoErrors_whenOnlyParticularOfClaimsTextSubmitted() {
             CaseData caseData = caseDataBuilder
                 .servedDocumentFiles(ServedDocumentFiles.builder()
-                                         .particularsOfClaimText("Some string")
+                .particularsOfClaimText("Some string")
                                          .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
