@@ -55,11 +55,10 @@ public class NoRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .noRemissionDetails("no remission")
                 .noRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET).build();
 
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-                .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
-                .claimIssuedHwfDetails(hwfeeDetails)
-                .hwfFeeType(FeeType.CLAIMISSUED)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setClaimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build());
+            caseData.setClaimIssuedHwfDetails(hwfeeDetails);
+            caseData.setHwfFeeType(FeeType.CLAIMISSUED);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             //When
             when(hwfService.updateOutstandingFee(any(), any())).thenReturn(caseData);
@@ -76,11 +75,10 @@ public class NoRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .noRemissionDetails("no remission")
                 .noRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET).build();
 
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-                .hearingHwfDetails(hwfeeDetails)
-                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
-                .hwfFeeType(FeeType.HEARING)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setHearingHwfDetails(hwfeeDetails);
+            caseData.setHearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build());
+            caseData.setHwfFeeType(FeeType.HEARING);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             //When
             when(hwfService.updateOutstandingFee(any(), any())).thenReturn(caseData);
