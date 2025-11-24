@@ -65,7 +65,7 @@ class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, CaseData.builder().build())
+            .of(ABOUT_TO_SUBMIT, CaseDataBuilder.builder().build())
             .build();
 
         handler.handle(callbackParams);
@@ -127,10 +127,10 @@ class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
         // given
         CaseDataLiP caseDataLiP = CaseDataLiP.builder()
             .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build();
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
-            .caseDataLiP(caseDataLiP)
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(HEARING_FORM).build()))
-            .respondent1Represented(YesOrNo.NO).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setSystemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(HEARING_FORM).build()));
+        caseData.setRespondent1Represented(YesOrNo.NO);
 ;
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_HEARING_TO_LIP_DEFENDANT_HMC.name());
@@ -150,8 +150,8 @@ class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(HEARING_FORM).build()))
             .applicant1Represented(YesOrNo.NO)
-            .claimantBilingualLanguagePreference(Language.BOTH.toString()).build().toBuilder()
-            .hearingDocumentsWelsh(wrapElements(caseDocument)).build();
+            .claimantBilingualLanguagePreference(Language.BOTH.toString()).build();
+        caseData.setHearingDocumentsWelsh(wrapElements(caseDocument));
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_HEARING_TO_LIP_CLAIMANT_HMC.name());
         // when

@@ -57,7 +57,7 @@ class SendFinalOrderToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, CaseData.builder().build())
+            .of(ABOUT_TO_SUBMIT, CaseDataBuilder.builder().build())
             .build();
 
         handler.handle(callbackParams);

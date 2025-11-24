@@ -80,8 +80,10 @@ class TriggerApplicationClosureCallbackHandlerTest extends BaseCallbackHandlerTe
 
     @Test
     void triggerGeneralApplicationEventThrowsException_HandleFailure() {
+        CaseData baseCaseData = CaseDataBuilder.builder().build();
+        baseCaseData.setCcdCaseReference(1234L);
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDetails(CaseData.builder().ccdCaseReference(1234L).build(),
+            .getTestCaseDataWithDetails(baseCaseData,
                                         true,
                                         true,
                                         true, true,

@@ -58,8 +58,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     private GenAppStateHelperService helperService;
     @Mock
     private FeatureToggleService featureToggleService;
-    private static final String authToken = "Bearer TestAuthToken";
-
     private ObjectMapper mapper;
 
     @Nested
@@ -287,8 +285,10 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
         @Test
         void triggerGeneralApplicationEventThrowsException_HandleFailure() {
+            CaseData baseCaseData = CaseData.builder().build();
+            baseCaseData.setCcdCaseReference(1234L);
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseData.builder().ccdCaseReference(1234L).build(),
+                .getTestCaseDataWithDetails(baseCaseData,
                                             true,
                                             true,
                                             true, true,

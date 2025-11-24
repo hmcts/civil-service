@@ -51,21 +51,18 @@ public class UpdateClaimantIntentionClaimStateCallbackHandler extends CallbackHa
 
     private CallbackResponse updateCaseState(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.featureToggleWA(toggleConfiguration.getFeatureToggle());
-        caseDataBuilder.previousCCDState(caseData.getCcdState());
-        CaseData updatedData = caseDataBuilder.build();
+        caseData.setFeatureToggleWA(toggleConfiguration.getFeatureToggle());
+        caseData.setPreviousCCDState(caseData.getCcdState());
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
             AboutToStartOrSubmitCallbackResponse.builder();
-        if (hasClaimantSignedSettlementAgreement(updatedData)) {
-            String newState = updateClaimStateService.setUpCaseState(updatedData);
+        if (hasClaimantSignedSettlementAgreement(caseData)) {
+            String newState = updateClaimStateService.setUpCaseState(caseData);
             response.state(newState);
             if (PROCEEDS_IN_HERITAGE_SYSTEM.name().equals(newState)) {
-                updatedData = updatedData.toBuilder().takenOfflineDate(LocalDateTime.now()).build();
+                caseData.setTakenOfflineDate(LocalDateTime.now());
             }
         }
-        response.data(updatedData.toMap(objectMapper));
+        response.data(caseData.toMap(objectMapper));
         return response.build();
     }
 
