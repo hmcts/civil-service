@@ -80,7 +80,7 @@ class CourtVenueServiceTest {
 
     @Test
     void shouldReturnAllCivilCourts() {
-        List<LocationRefData> result = courtVenueService.getAllCivilCourts(serviceAuth, auth);
+        List<LocationRefData> result = courtVenueService.fetchAllCivilCourts(serviceAuth, auth);
         assertThat(result).containsExactlyInAnyOrder(court1, court2, court3);
 
         verify(locationRefDataApiClient, times(1))
