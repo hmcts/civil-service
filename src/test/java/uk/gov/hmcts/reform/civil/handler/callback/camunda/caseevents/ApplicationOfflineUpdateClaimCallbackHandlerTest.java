@@ -39,9 +39,6 @@ class ApplicationOfflineUpdateClaimCallbackHandlerTest extends BaseCallbackHandl
     @InjectMocks
     private ApplicationOfflineUpdateClaimCallbackHandler handler;
 
-    @InjectMocks
-    private ObjectMapper mapper;
-
     @Mock
     private GenAppStateHelperService helperService;
 

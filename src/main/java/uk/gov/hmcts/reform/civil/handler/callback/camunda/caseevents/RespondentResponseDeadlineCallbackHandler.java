@@ -22,13 +22,12 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SET_LIP_RESPONDENT_RE
 
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings("unchecked")
 public class RespondentResponseDeadlineCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(SET_LIP_RESPONDENT_RESPONSE_DEADLINE);
 
     public static final String TASK_ID = "SetRespondent1Deadline";
-    private Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::updateRespondentDeadlineDate);
+    private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::updateRespondentDeadlineDate);
     private final ObjectMapper objectMapper;
     private final DeadlinesCalculator deadlinesCalculator;
 

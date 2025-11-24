@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SendFinalOrderBulkPrintService;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,8 +41,6 @@ class SendFinalOrderToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
     private SendFinalOrderToLiPCallbackHandler handler;
     @Mock
     private SendFinalOrderBulkPrintService sendFinalOrderBulkPrintService;
-    @Mock
-    private DocumentDownloadService documentDownloadService;
     @Mock
     private FeatureToggleService featureToggleService;
     @Mock

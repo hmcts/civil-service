@@ -29,7 +29,7 @@ public class UpdateClaimantIntentionClaimStateCallbackHandler extends CallbackHa
     private static final List<CaseEvent> EVENTS = Collections.singletonList(UPDATE_CLAIMANT_INTENTION_CLAIM_STATE);
 
     public static final String TASK_ID = "updateClaimantIntentionClaimStateID";
-    private Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::updateCaseState);
+    private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::updateCaseState);
     private final ObjectMapper objectMapper;
     private final UpdateClaimStateService updateClaimStateService;
     private final ToggleConfiguration toggleConfiguration;

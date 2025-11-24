@@ -26,7 +26,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CLAIM_STATE_AF
 public class UpdateClaimStateAfterUploadingTranslatedDocuments extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(UPDATE_CLAIM_STATE_AFTER_DOC_UPLOADED);
-    private Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::updateClaimState);
+    private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::updateClaimState);
     private static final String TASK_ID = "updateClaimStateAfterTranslateDocumentUploadedID";
     private final ObjectMapper objectMapper;
     private final UpdateClaimStateService updateClaimStateService;

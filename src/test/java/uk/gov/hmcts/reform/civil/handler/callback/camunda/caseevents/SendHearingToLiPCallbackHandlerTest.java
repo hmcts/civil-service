@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SendHearingBulkPrintService;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,8 +46,6 @@ class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
     private SendHearingToLiPCallbackHandler handler;
     @Mock
     private SendHearingBulkPrintService sendHearingBulkPrintService;
-    @Mock
-    private DocumentDownloadService documentDownloadService;
     @Mock
     private FeatureToggleService featureToggleService;
     @Mock
@@ -131,7 +128,7 @@ class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
         caseData.setCaseDataLiP(caseDataLiP);
         caseData.setSystemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(HEARING_FORM).build()));
         caseData.setRespondent1Represented(YesOrNo.NO);
-;
+
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_HEARING_TO_LIP_DEFENDANT_HMC.name());
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
