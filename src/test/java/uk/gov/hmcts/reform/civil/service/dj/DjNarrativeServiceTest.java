@@ -31,8 +31,9 @@ class DjNarrativeServiceTest {
 
         String body = service.buildConfirmationBody(caseData);
 
-        assertThat(body).contains("Claimant 1").contains("Defendant 1");
-        assertThat(body).doesNotContain("Defendant 2");
+        assertThat(body)
+            .contains("Claimant 1", "Defendant 1")
+            .doesNotContain("Defendant 2");
     }
 
     @Test
@@ -47,8 +48,9 @@ class DjNarrativeServiceTest {
 
         String body = service.buildConfirmationBody(caseData);
 
-        assertThat(body).contains("Claimant 1");
-        assertThat(body).doesNotContain("## Claimant 2");
+        assertThat(body)
+            .contains("Claimant 1")
+            .doesNotContain("## Claimant 2");
     }
 
     @Test

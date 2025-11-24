@@ -70,10 +70,11 @@ class DjNotificationPropertiesServiceTest {
 
         Map<String, String> properties = service.buildClaimantProperties(caseData);
 
-        assertThat(properties).containsEntry("LegalOrgName", "Applicant Org");
-        assertThat(properties).containsEntry("claimnumber", caseData.getCcdCaseReference().toString());
-        assertThat(properties).containsEntry("casemanRef", caseData.getLegacyCaseReference());
-        assertThat(properties).containsEntry("hmctsSignature", "HMCTS");
+        assertThat(properties)
+            .containsEntry("LegalOrgName", "Applicant Org")
+            .containsEntry("claimnumber", caseData.getCcdCaseReference().toString())
+            .containsEntry("casemanRef", caseData.getLegacyCaseReference())
+            .containsEntry("hmctsSignature", "HMCTS");
     }
 
     @Test

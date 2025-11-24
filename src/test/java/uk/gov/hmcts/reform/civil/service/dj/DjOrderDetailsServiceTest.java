@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -66,9 +65,9 @@ class DjOrderDetailsServiceTest {
 
         service.populateTrialDisposalScreen(context);
 
-        ArgumentCaptor<CaseData.CaseDataBuilder<?, ?>> builderCaptor = ArgumentCaptor.forClass(CaseData.CaseDataBuilder.class);
-        verify(disposalDirectionsService).populateDisposalDirections(builderCaptor.capture(), eq(JUDGE));
-        verify(trialDirectionsService).populateTrialDirections(builderCaptor.capture(), eq(JUDGE));
+        ArgumentCaptor<CaseData.CaseDataBuilder> builderCaptor = ArgumentCaptor.forClass(CaseData.CaseDataBuilder.class);
+        verify(disposalDirectionsService).populateDisposalDirections(builderCaptor.capture(), org.mockito.Mockito.eq(JUDGE));
+        verify(trialDirectionsService).populateTrialDirections(builderCaptor.capture(), org.mockito.Mockito.eq(JUDGE));
         assertThat(builderCaptor.getAllValues()).hasSize(2);
     }
 
@@ -79,6 +78,6 @@ class DjOrderDetailsServiceTest {
 
         service.applyHearingSelections(caseData, params.getVersion());
 
-        verify(locationAndToggleService).applyHearingSelections(eq(caseData), eq(params.getVersion()));
+        verify(locationAndToggleService).applyHearingSelections(caseData, params.getVersion());
     }
 }

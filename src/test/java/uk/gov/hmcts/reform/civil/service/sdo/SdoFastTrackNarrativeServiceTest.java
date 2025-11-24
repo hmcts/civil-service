@@ -6,6 +6,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -50,24 +54,23 @@ class SdoFastTrackNarrativeServiceTest {
         CaseData result = builder.build();
         assertThat(result.getFastTrackJudgesRecital().getInput())
             .isEqualTo(JUDGES_RECITAL_STATEMENTS_OF_CASE_WITH_COMMA);
-        assertThat(result.getFastTrackDisclosureOfDocuments().getInput1())
-            .isEqualTo(FAST_TRACK_DISCLOSURE_STANDARD_SDO);
-        assertThat(result.getFastTrackDisclosureOfDocuments().getDate1())
-            .isEqualTo(workingDayBase.plusWeeks(4));
+        assertThat(result.getFastTrackDisclosureOfDocuments())
+            .extracting(FastTrackDisclosureOfDocuments::getInput1, FastTrackDisclosureOfDocuments::getDate1)
+            .containsExactly(FAST_TRACK_DISCLOSURE_STANDARD_SDO, workingDayBase.plusWeeks(4));
         assertThat(result.getSdoR2FastTrackWitnessOfFact().getSdoWitnessDeadlineDate())
             .isEqualTo(calendarBase.plusDays(70));
-        assertThat(result.getFastTrackSchedulesOfLoss().getDate1())
-            .isEqualTo(workingDayBase.plusWeeks(10));
-        assertThat(result.getFastTrackSchedulesOfLoss().getDate2())
-            .isEqualTo(workingDayBase.plusWeeks(12));
-        assertThat(result.getFastTrackTrial().getDate1())
-            .isEqualTo(calendarBase.plusDays(22 * 7));
-        assertThat(result.getFastTrackTrial().getDate2())
-            .isEqualTo(calendarBase.plusDays(30 * 7));
-        assertThat(result.getFastTrackHearingTime().getDateFrom())
-            .isEqualTo(calendarBase.plusDays(22 * 7));
-        assertThat(result.getFastTrackHearingTime().getDateTo())
-            .isEqualTo(calendarBase.plusDays(30 * 7));
+        assertThat(result.getFastTrackSchedulesOfLoss())
+            .extracting(
+                FastTrackSchedulesOfLoss::getDate1,
+                FastTrackSchedulesOfLoss::getDate2
+            )
+            .containsExactly(workingDayBase.plusWeeks(10), workingDayBase.plusWeeks(12));
+        assertThat(result.getFastTrackTrial())
+            .extracting(FastTrackTrial::getDate1, FastTrackTrial::getDate2)
+            .containsExactly(calendarBase.plusDays(22 * 7), calendarBase.plusDays(30 * 7));
+        assertThat(result.getFastTrackHearingTime())
+            .extracting(FastTrackHearingTime::getDateFrom, FastTrackHearingTime::getDateTo)
+            .containsExactly(calendarBase.plusDays(22 * 7), calendarBase.plusDays(30 * 7));
         assertThat(result.getFastTrackNotes().getDate())
             .isEqualTo(workingDayBase.plusWeeks(1));
     }

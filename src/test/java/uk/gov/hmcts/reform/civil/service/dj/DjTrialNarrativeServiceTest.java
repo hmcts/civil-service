@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_TRIAL_MANUAL_BUNDLE_GUIDANCE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_WITNESS_LATE_WARNING;
@@ -48,9 +47,9 @@ class DjTrialNarrativeServiceTest {
         LocalDate fourWeeks = LocalDate.of(2025, 1, 1);
         LocalDate sixWeeks = LocalDate.of(2025, 1, 8);
         LocalDate eightWeeks = LocalDate.of(2025, 1, 15);
-        when(deadlineService.nextWorkingDayInWeeks(eq(4))).thenReturn(fourWeeks);
-        when(deadlineService.nextWorkingDayInWeeks(eq(6))).thenReturn(sixWeeks);
-        when(deadlineService.nextWorkingDayInWeeks(eq(8))).thenReturn(eightWeeks);
+        when(deadlineService.nextWorkingDayInWeeks(4)).thenReturn(fourWeeks);
+        when(deadlineService.nextWorkingDayInWeeks(6)).thenReturn(sixWeeks);
+        when(deadlineService.nextWorkingDayInWeeks(8)).thenReturn(eightWeeks);
 
         TrialHearingDisclosureOfDocuments result = service.buildDisclosureOfDocuments();
 
@@ -63,8 +62,8 @@ class DjTrialNarrativeServiceTest {
     void shouldBuildTrialHearingTimeWithToggleDefaults() {
         LocalDate twentyTwoWeeks = LocalDate.of(2025, 6, 1);
         LocalDate thirtyWeeks = LocalDate.of(2025, 7, 27);
-        when(deadlineService.weeksFromNow(eq(22))).thenReturn(twentyTwoWeeks);
-        when(deadlineService.weeksFromNow(eq(30))).thenReturn(thirtyWeeks);
+        when(deadlineService.weeksFromNow(22)).thenReturn(twentyTwoWeeks);
+        when(deadlineService.weeksFromNow(30)).thenReturn(thirtyWeeks);
 
         TrialHearingTimeDJ result = service.buildTrialHearingTime();
 
@@ -77,7 +76,7 @@ class DjTrialNarrativeServiceTest {
     @Test
     void shouldBuildTrialHearingNotesWithDeadline() {
         LocalDate oneWeek = LocalDate.of(2025, 2, 1);
-        when(deadlineService.nextWorkingDayInWeeks(eq(1))).thenReturn(oneWeek);
+        when(deadlineService.nextWorkingDayInWeeks(1)).thenReturn(oneWeek);
 
         TrialHearingNotes result = service.buildTrialHearingNotes();
 
@@ -87,7 +86,7 @@ class DjTrialNarrativeServiceTest {
     @Test
     void shouldBuildWitnessOfFactWithSharedText() {
         LocalDate eightWeeks = LocalDate.of(2025, 3, 1);
-        when(deadlineService.nextWorkingDayInWeeks(eq(8))).thenReturn(eightWeeks);
+        when(deadlineService.nextWorkingDayInWeeks(8)).thenReturn(eightWeeks);
 
         TrialHearingWitnessOfFact result = service.buildWitnessOfFact();
 

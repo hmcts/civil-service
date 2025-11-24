@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_DISCLOSURE_INSPECTION;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_DISCLOSURE_REQUESTS_WITHIN_SEVEN_DAYS_SDO;
@@ -37,9 +36,9 @@ class SdoDisclosureOfDocumentsFieldsServiceTest {
         LocalDate date4Weeks = LocalDate.of(2024, 9, 1);
         LocalDate date5Weeks = LocalDate.of(2024, 9, 8);
         LocalDate date8Weeks = LocalDate.of(2024, 9, 29);
-        when(deadlineService.nextWorkingDayFromNowWeeks(eq(4))).thenReturn(date4Weeks);
-        when(deadlineService.nextWorkingDayFromNowWeeks(eq(5))).thenReturn(date5Weeks);
-        when(deadlineService.nextWorkingDayFromNowWeeks(eq(8))).thenReturn(date8Weeks);
+        when(deadlineService.nextWorkingDayFromNowWeeks(4)).thenReturn(date4Weeks);
+        when(deadlineService.nextWorkingDayFromNowWeeks(5)).thenReturn(date5Weeks);
+        when(deadlineService.nextWorkingDayFromNowWeeks(8)).thenReturn(date8Weeks);
 
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder().build().toBuilder();
 

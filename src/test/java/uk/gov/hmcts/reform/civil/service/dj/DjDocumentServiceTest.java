@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -51,6 +50,6 @@ class DjDocumentServiceTest {
     void shouldAssignCategoryToDocument() {
         service.assignCategory(document, CATEGORY);
 
-        verify(assignCategoryId).assignCategoryIdToCaseDocument(eq(document), eq(CATEGORY));
+        verify(assignCategoryId).assignCategoryIdToCaseDocument(document, CATEGORY);
     }
 }

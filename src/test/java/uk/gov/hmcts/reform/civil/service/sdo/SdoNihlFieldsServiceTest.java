@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -54,8 +55,8 @@ class SdoNihlFieldsServiceTest {
         verify(orderService).populateStandardDirections(
             org.mockito.Mockito.eq(builder),
             hearingCaptor.capture(),
-            org.mockito.Mockito.any(DynamicList.class),
-            org.mockito.Mockito.any(DynamicList.class)
+            Mockito.any(DynamicList.class),
+            Mockito.any(DynamicList.class)
         );
 
         DynamicList forwarded = hearingCaptor.getValue();

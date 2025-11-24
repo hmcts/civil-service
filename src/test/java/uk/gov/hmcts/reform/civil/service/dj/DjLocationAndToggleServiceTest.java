@@ -32,7 +32,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
@@ -278,6 +277,6 @@ class DjLocationAndToggleServiceTest {
 
         when(locationReferenceDataService.getCourtLocationsForDefaultJudgments(AUTH_TOKEN)).thenReturn(locations);
         when(locationHelper.getCaseManagementLocation(any())).thenReturn(Optional.of(requestedCourt));
-        when(locationHelper.getMatching(eq(locations), eq(requestedCourt))).thenReturn(Optional.of(location));
+        when(locationHelper.getMatching(locations, requestedCourt)).thenReturn(Optional.of(location));
     }
 }

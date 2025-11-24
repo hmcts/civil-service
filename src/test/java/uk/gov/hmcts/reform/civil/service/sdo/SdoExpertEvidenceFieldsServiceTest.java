@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPersonalInjury;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,9 +31,9 @@ class SdoExpertEvidenceFieldsServiceTest {
         LocalDate date14 = LocalDate.of(2024, 10, 1);
         LocalDate date42 = LocalDate.of(2024, 11, 1);
         LocalDate date49 = LocalDate.of(2024, 11, 8);
-        when(deadlineService.nextWorkingDayFromNowDays(eq(14))).thenReturn(date14);
-        when(deadlineService.nextWorkingDayFromNowDays(eq(42))).thenReturn(date42);
-        when(deadlineService.nextWorkingDayFromNowDays(eq(49))).thenReturn(date49);
+        when(deadlineService.nextWorkingDayFromNowDays(14)).thenReturn(date14);
+        when(deadlineService.nextWorkingDayFromNowDays(42)).thenReturn(date42);
+        when(deadlineService.nextWorkingDayFromNowDays(49)).thenReturn(date49);
 
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder().build().toBuilder();
 
