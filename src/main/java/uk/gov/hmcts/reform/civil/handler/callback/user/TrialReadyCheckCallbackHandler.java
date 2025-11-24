@@ -36,10 +36,9 @@ public class TrialReadyCheckCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse setTrialReadyChecked(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData().toBuilder()
-            .trialReadyChecked(YES)
-            .businessProcess(BusinessProcess.ready(TRIAL_READY_CHECK))
-            .build();
+        CaseData caseData = callbackParams.getCaseData();
+        caseData.setTrialReadyChecked(YES);
+        caseData.setBusinessProcess(BusinessProcess.ready(TRIAL_READY_CHECK));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(mapper))

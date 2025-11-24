@@ -52,10 +52,9 @@ public class MediationSuccessfulCallbackHandler extends CallbackHandler {
         List<Element<ManageDocument>> updatedManageDocumentsList =
             updateManageDocumentsListWithMediationAgreementDocument(callbackParams);
 
-        CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
-            .businessProcess(BusinessProcess.ready(MEDIATION_SUCCESSFUL))
-            .manageDocuments(updatedManageDocumentsList)
-            .build();
+        CaseData caseDataUpdated = callbackParams.getCaseData();
+        caseDataUpdated.setBusinessProcess(BusinessProcess.ready(MEDIATION_SUCCESSFUL));
+        caseDataUpdated.setManageDocuments(updatedManageDocumentsList);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.toMap(objectMapper))
