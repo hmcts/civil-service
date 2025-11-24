@@ -162,12 +162,12 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("previewCourtOfficerOrder")
                 .extracting("documentLink")
-                .extracting("documentFileName")
+                .extracting("document_filename")
                 .isEqualTo(fileName);
             assertThat(response.getData())
                 .extracting("previewCourtOfficerOrder")
                 .extracting("documentLink")
-                .extracting("categoryID")
+                .extracting("category_id")
                 .isEqualTo("caseManagementOrders");
         }
 

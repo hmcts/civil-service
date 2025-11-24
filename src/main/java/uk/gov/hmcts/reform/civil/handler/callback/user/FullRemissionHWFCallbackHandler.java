@@ -58,33 +58,35 @@ public class FullRemissionHWFCallbackHandler extends CallbackHandler {
         if (caseData.isHWFTypeClaimIssued() && claimFeeAmount.compareTo(BigDecimal.ZERO) != 0) {
             Optional.ofNullable(caseData.getClaimIssuedHwfDetails())
                 .ifPresentOrElse(
-                    claimIssuedHwfDetails -> caseData.setClaimIssuedHwfDetails(
-                        claimIssuedHwfDetails.toBuilder().remissionAmount(claimFeeAmount)
+                    claimIssuedHwfDetails -> {
+                        claimIssuedHwfDetails.setRemissionAmount(claimFeeAmount);
+                        claimIssuedHwfDetails.setOutstandingFeeInPounds(BigDecimal.ZERO);
+                        claimIssuedHwfDetails.setHwfCaseEvent(FULL_REMISSION_HWF);
+                    },
+                    () -> {
+                        HelpWithFeesDetails newDetails = HelpWithFeesDetails.builder()
+                            .remissionAmount(claimFeeAmount)
                             .outstandingFeeInPounds(BigDecimal.ZERO)
                             .hwfCaseEvent(FULL_REMISSION_HWF)
-                            .build()
-                    ),
-                    () -> caseData.setClaimIssuedHwfDetails(
-                        HelpWithFeesDetails.builder().remissionAmount(claimFeeAmount)
-                            .outstandingFeeInPounds(BigDecimal.ZERO)
-                            .hwfCaseEvent(FULL_REMISSION_HWF)
-                            .build()
-                    )
+                            .build();
+                        caseData.setClaimIssuedHwfDetails(newDetails);
+                    }
                 );
         } else if (caseData.isHWFTypeHearing() && hearingFeeAmount.compareTo(BigDecimal.ZERO) != 0) {
             Optional.ofNullable(caseData.getHearingHwfDetails())
                 .ifPresentOrElse(
-                    hearingHwfDetails -> caseData.setHearingHwfDetails(
-                        HelpWithFeesDetails.builder().remissionAmount(hearingFeeAmount)
-                            .outstandingFeeInPounds(BigDecimal.ZERO)
+                    hearingHwfDetails -> {
+                        hearingHwfDetails.setRemissionAmount(hearingFeeAmount);
+                        hearingHwfDetails.setOutstandingFeeInPounds(BigDecimal.ZERO);
+                        hearingHwfDetails.setHwfCaseEvent(FULL_REMISSION_HWF);
+                    },
+                    () -> {
+                        HelpWithFeesDetails newDetails = HelpWithFeesDetails.builder()
+                            .remissionAmount(hearingFeeAmount)
                             .hwfCaseEvent(FULL_REMISSION_HWF)
-                            .build()
-                    ),
-                    () -> caseData.setHearingHwfDetails(
-                        HelpWithFeesDetails.builder().remissionAmount(hearingFeeAmount)
-                            .hwfCaseEvent(FULL_REMISSION_HWF)
-                            .build()
-                    )
+                            .build();
+                        caseData.setHearingHwfDetails(newDetails);
+                    }
                 );
         }
         helpWithFeesForTabService.setUpHelpWithFeeTab(caseData);

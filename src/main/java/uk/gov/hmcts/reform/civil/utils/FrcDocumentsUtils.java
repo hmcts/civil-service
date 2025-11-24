@@ -32,7 +32,7 @@ public class FrcDocumentsUtils {
             .map(FixedRecoverableCosts::getFrcSupportingDocument).isPresent()) {
 
             Document respondent1FrcSupportingDocument = caseData
-                .getRespondent1DQ().getRespondent1DQFixedRecoverableCostsIntermediate().getFrcSupportingDocument();
+                .getRespondent1DQ().getFixedRecoverableCostsIntermediate().getFrcSupportingDocument();
 
             assignCategoryId.assignCategoryIdToDocument(respondent1FrcSupportingDocument,
                                                         DocCategory.DQ_DEF1.getValue());
@@ -43,7 +43,7 @@ public class FrcDocumentsUtils {
             .map(FixedRecoverableCosts::getFrcSupportingDocument).isPresent()) {
 
             Document respondent2FrcSupportingDocument = caseData
-                .getRespondent2DQ().getRespondent2DQFixedRecoverableCostsIntermediate().getFrcSupportingDocument();
+                .getRespondent2DQ().getFixedRecoverableCostsIntermediate().getFrcSupportingDocument();
 
             assignCategoryId.assignCategoryIdToDocument(respondent2FrcSupportingDocument,
                                                         DocCategory.DQ_DEF2.getValue());

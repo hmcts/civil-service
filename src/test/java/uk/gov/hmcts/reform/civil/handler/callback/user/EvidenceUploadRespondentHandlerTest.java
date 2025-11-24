@@ -1177,12 +1177,14 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         Document testDocument = new Document("testurl",
             "testBinUrl", "A Fancy Name",
             "hash", null, UPLOAD_TIMESTAMP);
-        var documentUpload = UploadEvidenceDocumentType.builder()
-            .documentIssuedDate(LocalDate.of(2022, 2, 10))
-            .createdDatetime(LocalDateTime.of(2022, 05, 10, 12, 13, 12))
-            .documentUpload(testDocument).build();
+        UploadEvidenceDocumentType documentUpload = new UploadEvidenceDocumentType();
+        documentUpload.setDocumentIssuedDate(LocalDate.of(2022, 2, 10));
+        documentUpload.setCreatedDatetime(LocalDateTime.of(2022, 05, 10, 12, 13, 12));
+        documentUpload.setDocumentUpload(testDocument);
         List<Element<UploadEvidenceDocumentType>> documentList = new ArrayList<>();
-        documentList.add(Element.<UploadEvidenceDocumentType>builder().value(documentUpload).build());
+        Element<UploadEvidenceDocumentType> element = new Element<>();
+        element.setValue(documentUpload);
+        documentList.add(element);
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .addRespondent2(YES)
@@ -1204,12 +1206,14 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         Document testDocument = new Document("testurl",
             "testBinUrl", "A Fancy Name",
             "hash", null, UPLOAD_TIMESTAMP);
-        var documentUpload = UploadEvidenceDocumentType.builder()
-            .documentIssuedDate(LocalDate.of(2022, 2, 10))
-            .createdDatetime(LocalDateTime.of(2022, 05, 10, 12, 13, 12))
-            .documentUpload(testDocument).build();
+        UploadEvidenceDocumentType documentUpload = new UploadEvidenceDocumentType();
+        documentUpload.setDocumentIssuedDate(LocalDate.of(2022, 2, 10));
+        documentUpload.setCreatedDatetime(LocalDateTime.of(2022, 05, 10, 12, 13, 12));
+        documentUpload.setDocumentUpload(testDocument);
         List<Element<UploadEvidenceDocumentType>> documentList = new ArrayList<>();
-        documentList.add(Element.<UploadEvidenceDocumentType>builder().value(documentUpload).build());
+        Element<UploadEvidenceDocumentType> element = new Element<>();
+        element.setValue(documentUpload);
+        documentList.add(element);
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .addRespondent2(YES)
@@ -1231,12 +1235,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         Document testDocument = new Document("testurl",
             "testBinUrl", "A Fancy Name",
             "hash", null, UPLOAD_TIMESTAMP);
-        var documentUpload = UploadEvidenceExpert.builder()
-            .expertDocument(testDocument)
-            .createdDatetime(LocalDateTime.of(2022, 05, 10, 12, 13, 12))
-            .build();
+        UploadEvidenceExpert documentUpload = new UploadEvidenceExpert();
+        documentUpload.setExpertDocument(testDocument);
+        documentUpload.setCreatedDatetime(LocalDateTime.of(2022, 05, 10, 12, 13, 12));
         List<Element<UploadEvidenceExpert>> documentList = new ArrayList<>();
-        documentList.add(Element.<UploadEvidenceExpert>builder().value(documentUpload).build());
+        Element<UploadEvidenceExpert> element = new Element<>();
+        element.setValue(documentUpload);
+        documentList.add(element);
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .addRespondent2(NO)
@@ -1259,12 +1264,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         Document testDocument = new Document("testurl",
             "testBinUrl", "A Fancy Name",
             "hash", null, UPLOAD_TIMESTAMP);
-        var documentUpload = UploadEvidenceExpert.builder()
-            .expertDocument(testDocument)
-            .createdDatetime(LocalDateTime.of(2022, 05, 10, 12, 13, 12))
-            .build();
+        UploadEvidenceExpert documentUpload = new UploadEvidenceExpert();
+        documentUpload.setExpertDocument(testDocument);
+        documentUpload.setCreatedDatetime(LocalDateTime.of(2022, 05, 10, 12, 13, 12));
         List<Element<UploadEvidenceExpert>> documentList = new ArrayList<>();
-        documentList.add(Element.<UploadEvidenceExpert>builder().value(documentUpload).build());
+        Element<UploadEvidenceExpert> element = new Element<>();
+        element.setValue(documentUpload);
+        documentList.add(element);
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .addRespondent2(NO)
@@ -1853,34 +1859,43 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         assertThat(updatedData.getNotificationText()).isEqualTo("\nDefendant 1 - Witness summary");
     }
 
+    private Document createDocument(String url, String fileName) {
+        return new Document(null, url, fileName, null, null, null);
+    }
+
+    private Document createDocumentWithUrl(String url, String uniqueUrl, String fileName) {
+        return new Document(uniqueUrl, url, fileName, null, null, null);
+    }
+
     @Test
     void should_compareAndCopy() {
         List<Element<Object>> before = null;
         List<Element<Object>> after = null;
         List<Element<Object>> target = null;
         assertThat(handler.compareAndCopy(before, after, target)).isNull();
-        Element<Object> e1 = Element.builder().id(UUID.randomUUID()).value("1").build();
+        Element<Object> e1 = new Element<>();
+        e1.setId(UUID.randomUUID());
+        e1.setValue("1");
         after = List.of(e1);
         assertThat(handler.compareAndCopy(before, after, target)).hasSize(1);
         before = List.of(e1);
         assertThat(handler.compareAndCopy(before, after, target)).isEmpty();
-        Element<Object> e2 = Element.builder().id(UUID.randomUUID()).value("2").build();
+        Element<Object> e2 = new Element<>();
+        e2.setId(UUID.randomUUID());
+        e2.setValue("2");
         after = List.of(e1, e2);
         assertThat(handler.compareAndCopy(before, after, target)).hasSize(1);
     }
 
     private List<Element<UploadEvidenceDocumentType>> createEvidenceDocs(String name, String type, LocalDate issuedDate) {
-        Document document = Document.builder().documentBinaryUrl(
-                TEST_URL)
-            .documentFileName(TEST_FILE_NAME).build();
+        Document document = createDocument(TEST_URL, TEST_FILE_NAME);
+        UploadEvidenceDocumentType uploadEvidence = new UploadEvidenceDocumentType();
+        uploadEvidence.setWitnessOptionName(name);
+        uploadEvidence.setTypeOfDocument(type);
+        uploadEvidence.setDocumentIssuedDate(issuedDate);
+        uploadEvidence.setDocumentUpload(document);
         List<Element<UploadEvidenceDocumentType>> evidenceDocs = new ArrayList<>();
-        evidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
-            .builder()
-            .witnessOptionName(name)
-            .typeOfDocument(type)
-            .documentIssuedDate(issuedDate)
-            .documentUpload(document)
-            .build()));
+        evidenceDocs.add(ElementUtils.element(uploadEvidence));
         return evidenceDocs;
     }
 
@@ -1891,36 +1906,32 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
                                                                  String otherParty,
                                                                  String question,
                                                                  String answer) {
-        Document document = Document.builder().documentBinaryUrl(
-                TEST_URL)
-            .documentFileName(TEST_FILE_NAME).build();
+        Document document = createDocument(TEST_URL, TEST_FILE_NAME);
+        UploadEvidenceExpert uploadEvidence = new UploadEvidenceExpert();
+        uploadEvidence.setExpertDocument(document);
+        uploadEvidence.setExpertOptionName(expertName);
+        uploadEvidence.setExpertOptionExpertise(expertise);
+        uploadEvidence.setExpertOptionExpertises(expertises);
+        uploadEvidence.setExpertOptionOtherParty(otherParty);
+        uploadEvidence.setExpertDocumentQuestion(question);
+        uploadEvidence.setExpertDocumentAnswer(answer);
+        uploadEvidence.setExpertOptionUploadDate(dateUpload);
         List<Element<UploadEvidenceExpert>> expertEvidenceDocs = new ArrayList<>();
-        expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
-            .builder()
-            .expertDocument(document)
-            .expertOptionName(expertName)
-            .expertOptionExpertise(expertise)
-            .expertOptionExpertises(expertises)
-            .expertOptionOtherParty(otherParty)
-            .expertDocumentQuestion(question)
-            .expertDocumentAnswer(answer)
-            .expertOptionUploadDate(dateUpload).build()));
+        expertEvidenceDocs.add(ElementUtils.element(uploadEvidence));
         return expertEvidenceDocs;
     }
 
     private List<Element<UploadEvidenceWitness>> createWitnessDocs(String witnessName,
                                                                    LocalDateTime createdDate,
                                                                    LocalDate dateMade) {
-        Document document = Document.builder().documentBinaryUrl(
-                TEST_URL)
-            .documentFileName(TEST_FILE_NAME).build();
+        Document document = createDocument(TEST_URL, TEST_FILE_NAME);
+        UploadEvidenceWitness uploadEvidence = new UploadEvidenceWitness();
+        uploadEvidence.setWitnessOptionDocument(document);
+        uploadEvidence.setWitnessOptionName(witnessName);
+        uploadEvidence.setCreatedDatetime(createdDate);
+        uploadEvidence.setWitnessOptionUploadDate(dateMade);
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
-        witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
-            .builder()
-            .witnessOptionDocument(document)
-            .witnessOptionName(witnessName)
-            .createdDatetime(createdDate)
-            .witnessOptionUploadDate(dateMade).build()));
+        witnessEvidenceDocs.add(ElementUtils.element(uploadEvidence));
         return witnessEvidenceDocs;
     }
 
@@ -1935,42 +1946,36 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     }
 
     private List<Element<UploadEvidenceWitness>> getWitnessDocs(LocalDateTime uploadedDate, String uniqueUrl) {
+        Document document = createDocumentWithUrl(TEST_URL, uniqueUrl, TEST_FILE_NAME);
+        UploadEvidenceWitness uploadEvidence = new UploadEvidenceWitness();
+        uploadEvidence.setWitnessOptionDocument(document);
+        uploadEvidence.setWitnessOptionName("FirstName LastName");
+        uploadEvidence.setCreatedDatetime(uploadedDate);
+        uploadEvidence.setWitnessOptionUploadDate(LocalDate.of(2023, 2, 10));
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
-        witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
-            .builder()
-            .witnessOptionDocument(Document.builder().documentBinaryUrl(
-                    TEST_URL)
-                .documentUrl(uniqueUrl)
-                .documentFileName(TEST_FILE_NAME).build())
-            .witnessOptionName("FirstName LastName")
-            .createdDatetime(uploadedDate)
-            .witnessOptionUploadDate(LocalDate.of(2023, 2, 10)).build()));
+        witnessEvidenceDocs.add(ElementUtils.element(uploadEvidence));
         return witnessEvidenceDocs;
     }
 
     private List<Element<UploadEvidenceExpert>> getExpertDocs(LocalDateTime uploadedDate, String uniqueUrl) {
+        Document document = createDocumentWithUrl(TEST_URL, uniqueUrl, TEST_FILE_NAME);
+        UploadEvidenceExpert uploadEvidence = new UploadEvidenceExpert();
+        uploadEvidence.setExpertOptionUploadDate(LocalDate.now());
+        uploadEvidence.setCreatedDatetime(uploadedDate);
+        uploadEvidence.setExpertDocument(document);
         List<Element<UploadEvidenceExpert>> expertEvidenceDocs = new ArrayList<>();
-        expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
-            .builder()
-            .expertOptionUploadDate(LocalDate.now())
-            .createdDatetime(uploadedDate)
-            .expertDocument(Document.builder().documentBinaryUrl(TEST_URL)
-                .documentUrl(uniqueUrl)
-                .documentFileName(TEST_FILE_NAME).build()).build()));
-
+        expertEvidenceDocs.add(ElementUtils.element(uploadEvidence));
         return expertEvidenceDocs;
     }
 
     private List<Element<UploadEvidenceDocumentType>> getUploadEvidenceDocumentTypeDocs(LocalDateTime uploadedDate, String uniqueUrl) {
+        Document document = createDocumentWithUrl(TEST_URL, uniqueUrl, TEST_FILE_NAME);
+        UploadEvidenceDocumentType uploadEvidence = new UploadEvidenceDocumentType();
+        uploadEvidence.setDocumentIssuedDate(LocalDate.now());
+        uploadEvidence.setCreatedDatetime(uploadedDate);
+        uploadEvidence.setDocumentUpload(document);
         List<Element<UploadEvidenceDocumentType>> uploadEvidenceDocs = new ArrayList<>();
-        uploadEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
-            .builder()
-            .documentIssuedDate(LocalDate.now())
-            .createdDatetime(uploadedDate)
-            .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
-                .documentUrl(uniqueUrl)
-                .documentFileName(TEST_FILE_NAME).build()).build()));
-
+        uploadEvidenceDocs.add(ElementUtils.element(uploadEvidence));
         return uploadEvidenceDocs;
     }
 }

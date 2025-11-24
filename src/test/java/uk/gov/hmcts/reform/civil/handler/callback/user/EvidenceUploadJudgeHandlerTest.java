@@ -105,8 +105,12 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldCopyDocumentAndNameToAdd_whenDocumentWithNameIsNull() {
-            Document document = Document.builder().documentFileName("fileName").build();
-            DocumentWithName testDocument = DocumentWithName.builder().documentName("testDocument").document(document).createdBy("bill bob").build();
+            Document document = new Document();
+            document.setDocumentFileName("fileName");
+            DocumentWithName testDocument = new DocumentWithName();
+            testDocument.setDocumentName("testDocument");
+            testDocument.setDocument(document);
+            testDocument.setCreatedBy("bill bob");
             List<Element<DocumentWithName>> documentWithNameToAdd = wrapElements(testDocument);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .caseNoteType(CaseNoteType.DOCUMENT_ONLY)
@@ -124,8 +128,12 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAddDocument_whenDocumentWithNameIsNotNull() {
-            Document document = Document.builder().documentFileName("fileName").build();
-            DocumentWithName testDocument = DocumentWithName.builder().documentName("testDocument").document(document).createdBy("John Doe").build();
+            Document document = new Document();
+            document.setDocumentFileName("fileName");
+            DocumentWithName testDocument = new DocumentWithName();
+            testDocument.setDocumentName("testDocument");
+            testDocument.setDocument(document);
+            testDocument.setCreatedBy("John Doe");
             List<Element<DocumentWithName>> documentWithNameStart = wrapElements(testDocument);
             List<Element<DocumentWithName>> documentWithNameToAdd = wrapElements(testDocument);
             List<Element<DocumentWithName>> documentWithNameEnd = wrapElements(testDocument, testDocument);
@@ -146,8 +154,13 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAddNote_whenDocumentWithNoteIsNotNull() {
-            Document document = Document.builder().documentFileName("fileName").build();
-            DocumentAndNote testDocument = DocumentAndNote.builder().documentName("testDocument").document(document).documentNote("Note").createdBy("john smith").build();
+            Document document = new Document();
+            document.setDocumentFileName("fileName");
+            DocumentAndNote testDocument = new DocumentAndNote();
+            testDocument.setDocumentName("testDocument");
+            testDocument.setDocument(document);
+            testDocument.setDocumentNote("Note");
+            testDocument.setCreatedBy("john smith");
             List<Element<DocumentAndNote>> documentAndNoteToAdd = wrapElements(testDocument);
             List<Element<DocumentAndNote>> documentAndNoteStart = wrapElements(testDocument);
             List<Element<DocumentAndNote>> documentAndNoteEnd = wrapElements(testDocument, testDocument);
@@ -168,8 +181,13 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldCopyDocumentAndNoteToAdd_whenDocumentWithNoteIsNull() {
-            Document document = Document.builder().documentFileName("fileName").build();
-            DocumentAndNote testDocument = DocumentAndNote.builder().documentName("testDocument").document(document).documentNote("Note").createdBy("Jason Bourne").build();
+            Document document = new Document();
+            document.setDocumentFileName("fileName");
+            DocumentAndNote testDocument = new DocumentAndNote();
+            testDocument.setDocumentName("testDocument");
+            testDocument.setDocument(document);
+            testDocument.setDocumentNote("Note");
+            testDocument.setCreatedBy("Jason Bourne");
             List<Element<DocumentAndNote>> documentAndNoteToAdd = wrapElements(testDocument);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .caseNoteType(CaseNoteType.DOCUMENT_AND_NOTE)
@@ -198,7 +216,8 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
                                                  "testBinUrl",
                                                  "A Fancy Name",
                                                  "hash", null, UPLOAD_TIMESTAMP);
-            var documentAndNote = DocumentAndNote.builder().document(testDocument).build();
+            DocumentAndNote documentAndNote = new DocumentAndNote();
+            documentAndNote.setDocument(testDocument);
 
             List<Element<DocumentAndNote>> documentList = new ArrayList<>();
             documentList.add(Element.<DocumentAndNote>builder().value(documentAndNote).build());
@@ -227,7 +246,8 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
                                                  "testBinUrl",
                                                  "A Fancy Name",
                                                  "hash", null, UPLOAD_TIMESTAMP);
-            var documentAndNote = DocumentWithName.builder().document(testDocument).build();
+            DocumentWithName documentAndNote = new DocumentWithName();
+            documentAndNote.setDocument(testDocument);
 
             List<Element<DocumentWithName>> documentList = new ArrayList<>();
             documentList.add(Element.<DocumentWithName>builder().value(documentAndNote).build());
