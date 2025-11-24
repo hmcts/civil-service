@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.refdata;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.client.LocationReferenceDataApiClient;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import java.util.List;
@@ -14,33 +12,21 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CourtVenueService {
 
-    private final LocationReferenceDataApiClient locationRefDataApiClient;
+    private final RdClientService rdClientService;
 
-    private static final String CIVIL_COURT_TYPE_ID = "10";
     private static final String IS_HEARING_LOCATION = "Y";
     private static final String IS_CASE_MANAGEMENT_LOCATION = "Y";
-    private static final String LOCATION_TYPE = "Court";
     private static final String COURT_STATUS = "Open";
 
-    public CourtVenueService(LocationReferenceDataApiClient locationRefDataApiClient) {
-        this.locationRefDataApiClient = locationRefDataApiClient;
-    }
-
-    /**
-     * Public cached method that fetches all civil courts from the API.
-     * All filtering will use this cached data.
-     */
-    @Cacheable(value = "courtVenueCache", key = "'allLocations'")
-    public List<LocationRefData> fetchAllCivilCourts(String serviceAuth, String auth) {
-        log.info("[CourtVenueService] Cache MISS → calling Location Reference Data API to fetch all courts");
-        return locationRefDataApiClient.getAllCivilCourtVenues(serviceAuth, auth, CIVIL_COURT_TYPE_ID, LOCATION_TYPE);
+    public CourtVenueService(RdClientService rdClientService) {
+        this.rdClientService = rdClientService;
     }
 
     /**
      * Helper to filter cached court data.
      */
     private List<LocationRefData> filterCachedCourts(String serviceAuth, String auth, Predicate<LocationRefData> predicate) {
-        return fetchAllCivilCourts(serviceAuth, auth).stream()
+        return rdClientService.fetchAllCivilCourts(serviceAuth, auth).stream()
             .filter(predicate)
             .collect(Collectors.toList());
     }

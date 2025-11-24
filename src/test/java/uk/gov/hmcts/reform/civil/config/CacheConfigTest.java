@@ -16,7 +16,7 @@ class CacheConfigTest {
         assertNotNull(cacheManager.getCache("userInfoCache"));
         assertNotNull(cacheManager.getCache("accessTokenCache"));
         assertNotNull(cacheManager.getCache("courtVenueCache"));
-
+        assertNotNull(cacheManager.getCache("civilCaseCategoryCache"));
         context.close();
     }
 }

@@ -34,6 +34,11 @@ public class CacheConfig {
                               Caffeine.newBuilder()
                                   .expireAfterWrite(12, TimeUnit.HOURS)
                                   .build()
+            ),
+            new CaffeineCache("civilCaseCategoryCache",
+                              Caffeine.newBuilder()
+                                  .expireAfterWrite(12, TimeUnit.HOURS)
+                                  .build()
             )
         ));
 

@@ -5,21 +5,18 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.reform.civil.client.LocationReferenceDataApiClient;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class CourtVenueServiceTest {
 
     @Mock
-    private LocationReferenceDataApiClient locationRefDataApiClient;
+    private RdClientService rdClientService;
 
     @InjectMocks
     private CourtVenueService courtVenueService;
@@ -74,17 +71,8 @@ class CourtVenueServiceTest {
             .welshSiteName("Llys2")
             .build();
 
-        when(locationRefDataApiClient.getAllCivilCourtVenues(any(), any(), any(), any()))
+        when(rdClientService.fetchAllCivilCourts(any(), any()))
             .thenReturn(List.of(court1, court2, court3));
-    }
-
-    @Test
-    void shouldReturnAllCivilCourts() {
-        List<LocationRefData> result = courtVenueService.fetchAllCivilCourts(serviceAuth, auth);
-        assertThat(result).containsExactlyInAnyOrder(court1, court2, court3);
-
-        verify(locationRefDataApiClient, times(1))
-            .getAllCivilCourtVenues(serviceAuth, auth, "10", "Court");
     }
 
     @Test
