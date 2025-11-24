@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.HearingDay;
@@ -74,9 +75,11 @@ class UpdateHmcPartiesNotifiedHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldSuccessfullyUpdatePartiesNotified_whenServiceReturns200() throws JsonProcessingException {
         // Given
-        CaseData caseData = CaseData.builder().ccdCaseReference(12345L).build().toBuilder()
-            .businessProcess(BusinessProcess.builder().processInstanceId("").build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(12345L);
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setProcessInstanceId("");
+        caseData.setBusinessProcess(businessProcess);
         CallbackParams params = buildCallbackParams(caseData);
         HearingNoticeVariables camundaVars = sampleCamundaVars();
 
@@ -96,9 +99,11 @@ class UpdateHmcPartiesNotifiedHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldLogWarning_whenServiceReturnsNon2xx() throws JsonProcessingException {
-        CaseData caseData = CaseData.builder().ccdCaseReference(12345L).build().toBuilder()
-            .businessProcess(BusinessProcess.builder().processInstanceId("").build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(12345L);
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setProcessInstanceId("");
+        caseData.setBusinessProcess(businessProcess);
         CallbackParams params = buildCallbackParams(caseData);
         HearingNoticeVariables camundaVars = sampleCamundaVars();
 
@@ -116,9 +121,11 @@ class UpdateHmcPartiesNotifiedHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldHandleNullResponseGracefully() throws JsonProcessingException {
-        CaseData caseData = CaseData.builder().ccdCaseReference(12345L).build().toBuilder()
-            .businessProcess(BusinessProcess.builder().processInstanceId("").build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(12345L);
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setProcessInstanceId("");
+        caseData.setBusinessProcess(businessProcess);
         CallbackParams params = buildCallbackParams(caseData);
         HearingNoticeVariables camundaVars = sampleCamundaVars();
 
@@ -135,9 +142,11 @@ class UpdateHmcPartiesNotifiedHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldCatchRestClientException() {
-        CaseData caseData = CaseData.builder().ccdCaseReference(12345L).build().toBuilder()
-            .businessProcess(BusinessProcess.builder().processInstanceId("").build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(12345L);
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setProcessInstanceId("");
+        caseData.setBusinessProcess(businessProcess);
         CallbackParams params = buildCallbackParams(caseData);
         HearingNoticeVariables camundaVars = sampleCamundaVars();
 
@@ -153,9 +162,11 @@ class UpdateHmcPartiesNotifiedHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldCatchJsonProcessingException() throws Exception {
-        CaseData caseData = CaseData.builder().ccdCaseReference(12345L).build().toBuilder()
-            .businessProcess(BusinessProcess.builder().processInstanceId("").build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(12345L);
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setProcessInstanceId("");
+        caseData.setBusinessProcess(businessProcess);
         CallbackParams params = buildCallbackParams(caseData);
         HearingNoticeVariables camundaVars = sampleCamundaVars();
 
