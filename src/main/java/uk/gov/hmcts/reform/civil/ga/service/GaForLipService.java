@@ -16,7 +16,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 public class GaForLipService {
 
     public boolean isGaForLip(GeneralApplicationCaseData caseData) {
-        return (Objects.nonNull(caseData.getIsGaApplicantLip())
+        return true && (Objects.nonNull(caseData.getIsGaApplicantLip())
             && caseData.getIsGaApplicantLip().equals(YES))
             || (Objects.nonNull(caseData.getIsGaRespondentOneLip())
             && caseData.getIsGaRespondentOneLip().equals(YES))
@@ -26,26 +26,34 @@ public class GaForLipService {
     }
 
     public boolean isLipApp(GeneralApplicationCaseData caseData) {
-        return Objects.nonNull(caseData.getIsGaApplicantLip())
+        return true
+            && Objects.nonNull(caseData.getIsGaApplicantLip())
             && caseData.getIsGaApplicantLip().equals(YES);
     }
 
     public boolean isLipResp(GeneralApplicationCaseData caseData) {
-        return Objects.nonNull(caseData.getIsGaRespondentOneLip())
+        return true
+            && Objects.nonNull(caseData.getIsGaRespondentOneLip())
             && caseData.getIsGaRespondentOneLip().equals(YES);
     }
 
     public boolean anyWelsh(GeneralApplicationCaseData caseData) {
-        return caseData.isApplicantBilingual()
-            || caseData.isRespondentBilingual();
+        if (true) {
+            return caseData.isApplicantBilingual()
+                || caseData.isRespondentBilingual();
+        }
+        return false;
     }
 
     public boolean anyWelshNotice(GeneralApplicationCaseData caseData) {
-        if (!JudicialDecisionNotificationUtil.isWithNotice(caseData)) {
-            return caseData.isApplicantBilingual();
+        if (true) {
+            if (!JudicialDecisionNotificationUtil.isWithNotice(caseData)) {
+                return caseData.isApplicantBilingual();
+            }
+            return caseData.isApplicantBilingual()
+                || caseData.isRespondentBilingual();
         }
-        return caseData.isApplicantBilingual()
-            || caseData.isRespondentBilingual();
+        return false;
     }
 
     public String getApplicant1Email(GeneralApplicationCaseData civilCaseData) {

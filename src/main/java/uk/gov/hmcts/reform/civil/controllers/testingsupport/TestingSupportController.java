@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.civil.event.HearingFeePaidEvent;
 import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
 import uk.gov.hmcts.reform.civil.event.TrialReadyNotificationEvent;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
 import uk.gov.hmcts.reform.civil.ga.stateflow.GaStateFlow;
 import uk.gov.hmcts.reform.civil.handler.event.HearingFeePaidEventHandler;
@@ -74,6 +75,7 @@ public class TestingSupportController {
 
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
+    private final GaCoreCaseDataService gaCoreCaseDataService;
     private final CamundaRestEngineClient camundaRestEngineClient;
     private final FeatureToggleService featureToggleService;
     private final IStateFlowEngine stateFlowEngine;
@@ -103,6 +105,7 @@ public class TestingSupportController {
 
     @GetMapping("/testing-support/case/{caseId}/business-process")
     public ResponseEntity<BusinessProcessInfo> getBusinessProcess(@PathVariable("caseId") Long caseId) {
+        log.info("Get business process for caseId: {}", caseId);
         CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseId));
         var businessProcess = caseData.getBusinessProcess();
         var businessProcessInfo = new BusinessProcessInfo(businessProcess);
