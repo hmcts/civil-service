@@ -23,6 +23,7 @@ import java.util.Optional;
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION_COSC;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 
 @Slf4j
@@ -63,7 +64,8 @@ public class EventEmitterAspect {
     }
 
     private boolean isInitiateGeneralApplication(CallbackParams callbackParams) {
-        return Objects.equals(callbackParams.getRequest().getEventId(), INITIATE_GENERAL_APPLICATION.name());
+        return Objects.equals(callbackParams.getRequest().getEventId(), INITIATE_GENERAL_APPLICATION.name())
+            || Objects.equals(callbackParams.getRequest().getEventId(), INITIATE_GENERAL_APPLICATION_COSC.name());
     }
 
     private void processGeneralApplicationBusinessProcessEvent(GeneralApplicationCaseData caseData) {

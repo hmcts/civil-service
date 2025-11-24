@@ -1551,7 +1551,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getReadyTestCaseData(
                 CaseDataBuilder.builder().ccdCaseReference(CASE_ID).build(), true);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-            params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
             GeneralApplication genapp = caseData.getGeneralApplications().get(0).getValue();
             when(generalAppFeesService.isFreeGa(any())).thenReturn(false);
             String body = format(
@@ -1577,7 +1576,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getReadyTestCaseData(
                 CaseDataBuilder.builder().ccdCaseReference(CASE_ID).build(), true);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-            params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
             when(generalAppFeesService.isFreeGa(any())).thenReturn(true);
 
             var response = (SubmittedCallbackResponse) handler.handle(params);
@@ -1596,21 +1594,10 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotReturnBuildConfirmationIfGeneralApplicationIsEmpty() {
             CaseData caseData = getEmptyTestCase(CaseDataBuilder.builder().build());
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-            params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
 
             var response = (SubmittedCallbackResponse) handler.handle(params);
             assertThat(response).isNotNull();
             assertThat(response.getConfirmationBody()).isNull();
-        }
-
-        @Test
-        void shouldReturnEmptyResponseWhenEventIsInitiateGeneralApplicationCoscAndSubmitted() {
-            CaseData caseData = getEmptyTestCase(CaseDataBuilder.builder().build());
-            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-            params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION_COSC.name());
-
-            var response = (SubmittedCallbackResponse) handler.handle(params);
-            assertThat(response).isEqualTo(SubmittedCallbackResponse.builder().build());
         }
     }
 
