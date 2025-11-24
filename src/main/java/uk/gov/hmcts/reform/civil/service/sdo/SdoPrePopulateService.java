@@ -28,8 +28,8 @@ public class SdoPrePopulateService {
     public CaseData prePopulate(DirectionsOrderTaskContext context) {
         CaseData caseData = context.caseData();
         CallbackParams callbackParams = context.callbackParams();
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         log.info("Pre-populating SDO defaults for caseId {}", caseData.getCcdCaseReference());
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
         sdoTrackDefaultsService.applyBaseTrackDefaults(caseData, updatedData);

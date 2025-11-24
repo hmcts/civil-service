@@ -9,6 +9,9 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ApplicationToRelyOnFurther;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsClaimantExpert;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictPages;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictWitness;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ScheduleOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
 
@@ -49,7 +52,7 @@ public class SdoR2TrialTemplateFieldService {
     public boolean hasRestrictWitness(CaseData caseData) {
         return Optional.ofNullable(caseData.getSdoR2WitnessesOfFact())
             .map(SdoR2WitnessOfFact::getSdoR2RestrictWitness)
-            .map(restrict -> restrict.getIsRestrictWitness())
+            .map(SdoR2RestrictWitness::getIsRestrictWitness)
             .map(YesOrNo.YES::equals)
             .orElse(false);
     }
@@ -57,7 +60,7 @@ public class SdoR2TrialTemplateFieldService {
     public boolean hasRestrictPages(CaseData caseData) {
         return Optional.ofNullable(caseData.getSdoR2WitnessesOfFact())
             .map(SdoR2WitnessOfFact::getSdoRestrictPages)
-            .map(restrict -> restrict.getIsRestrictPages())
+            .map(SdoR2RestrictPages::getIsRestrictPages)
             .map(YesOrNo.YES::equals)
             .orElse(false);
     }
@@ -72,7 +75,7 @@ public class SdoR2TrialTemplateFieldService {
 
     public boolean hasClaimForPecuniaryLoss(CaseData caseData) {
         return Optional.ofNullable(caseData.getSdoR2ScheduleOfLoss())
-            .map(loss -> loss.getIsClaimForPecuniaryLoss())
+            .map(SdoR2ScheduleOfLoss::getIsClaimForPecuniaryLoss)
             .map(YesOrNo.YES::equals)
             .orElse(false);
     }

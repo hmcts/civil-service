@@ -99,7 +99,9 @@ public class SdoOrderDetailsService {
                 case IN_PERSON -> updatedData.disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson);
                 case VIDEO -> updatedData.disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodVideoConferenceHearing);
                 case TELEPHONE -> updatedData.disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodTelephoneHearing);
-                default -> { }
+                default -> {
+                    // No other values are expected;
+                }
             }
         });
 
@@ -108,7 +110,9 @@ public class SdoOrderDetailsService {
                 case IN_PERSON -> updatedData.fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
                 case VIDEO -> updatedData.fastTrackMethod(FastTrackMethod.fastTrackMethodVideoConferenceHearing);
                 case TELEPHONE -> updatedData.fastTrackMethod(FastTrackMethod.fastTrackMethodTelephoneHearing);
-                default -> { }
+                default -> {
+                    // No other values are expected;
+                }
             }
         });
 
@@ -117,7 +121,9 @@ public class SdoOrderDetailsService {
                 case IN_PERSON -> updatedData.smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson);
                 case VIDEO -> updatedData.smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodVideoConferenceHearing);
                 case TELEPHONE -> updatedData.smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodTelephoneHearing);
-                default -> { }
+                default -> {
+                    // No other values are expected;
+                }
             }
         });
     }
