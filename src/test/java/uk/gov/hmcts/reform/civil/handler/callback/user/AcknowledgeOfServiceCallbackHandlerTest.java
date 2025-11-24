@@ -124,12 +124,11 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void midSpecCorrespondenceAddress_checkAddressIfWasIncorrect() {
             String postCode = "postCode";
-            CaseData caseData = CaseData.builder()
-                .specAoSApplicantCorrespondenceAddressRequired(YesOrNo.NO)
-                .specAoSApplicantCorrespondenceAddressdetails(Address.builder()
-                                                                  .postCode(postCode)
-                                                                  .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setSpecAoSApplicantCorrespondenceAddressRequired(YesOrNo.NO);
+            Address address = new Address();
+            address.setPostCode(postCode);
+            caseData.setSpecAoSApplicantCorrespondenceAddressdetails(address);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "specCorrespondenceAddress");
             CallbackRequest request = CallbackRequest.builder()
                 .eventId("ACKNOWLEDGEMENT_OF_SERVICE")
@@ -210,16 +209,16 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void aboutToSubmit_NewResponseDeadline() {
+            Address address = new Address();
+            address.setAddressLine1("Triple street");
+            address.setPostCode("Postcode");
+            Party respondent1Copy = new Party();
+            respondent1Copy.setPartyName("Party 2");
+            respondent1Copy.setPrimaryAddress(address);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .respondent1Copy(Party.builder().partyName("Party 2").primaryAddress(
-                                                                        Address
-                                                                            .builder()
-                                                                            .addressLine1("Triple street")
-                                                                            .postCode("Postcode")
-                                                                            .build())
-                                     .build())
                 .build();
+            caseData.setRespondent1Copy(respondent1Copy);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             CallbackRequest request = CallbackRequest.builder()
                 .build();
@@ -242,24 +241,25 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void aboutToSubmit_NewResponseDeadline1v2() {
+            Address address1 = new Address();
+            address1.setAddressLine1("Triple street");
+            address1.setPostCode("Postcode");
+            Party respondent1Copy = new Party();
+            respondent1Copy.setPartyName("Party 2");
+            respondent1Copy.setPrimaryAddress(address1);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .respondent1Copy(Party.builder().partyName("Party 2").primaryAddress(
-                        Address
-                            .builder()
-                            .addressLine1("Triple street")
-                            .postCode("Postcode")
-                            .build())
-                                     .build())
-                .respondent2Copy(Party.builder().partyName("Respondent 2").primaryAddress(
-                        Address
-                            .builder()
-                            .addressLine1("Triple street")
-                            .postCode("Postcode")
-                            .build())
-                                     .build())
                 .build();
+            caseData.setRespondent1Copy(respondent1Copy);
+
+            Address address2 = new Address();
+            address2.setAddressLine1("Triple street");
+            address2.setPostCode("Postcode");
+            Party respondent2Copy = new Party();
+            respondent2Copy.setPartyName("Respondent 2");
+            respondent2Copy.setPrimaryAddress(address2);
+            caseData.setRespondent2Copy(respondent2Copy);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             CallbackRequest request = CallbackRequest.builder()
                 .build();

@@ -134,13 +134,12 @@ class AmendPartyDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldSetOrganisationPolicy_1v2() {
-                OrganisationPolicy expectedOrganisationPolicy2 = OrganisationPolicy.builder()
-                    .organisation(Organisation.builder()
-                                      .organisationID("QWERTY R2")
-                                      .build())
-                    .orgPolicyReference("orgreference")
-                    .orgPolicyCaseAssignedRole("orgassignedrole")
-                    .build();
+                Organisation expectedOrganisation2 = new Organisation();
+                expectedOrganisation2.setOrganisationID("QWERTY R2");
+                OrganisationPolicy expectedOrganisationPolicy2 = new OrganisationPolicy();
+                expectedOrganisationPolicy2.setOrganisation(expectedOrganisation2);
+                expectedOrganisationPolicy2.setOrgPolicyReference("orgreference");
+                expectedOrganisationPolicy2.setOrgPolicyCaseAssignedRole("orgassignedrole");
 
                 CaseData caseData = CaseData.builder()
                     .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(validEmail).build())
