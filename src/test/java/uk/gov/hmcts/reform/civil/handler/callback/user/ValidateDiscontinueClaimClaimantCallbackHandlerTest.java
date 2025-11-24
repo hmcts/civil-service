@@ -89,11 +89,11 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
         void shouldPopulateJudgeAndDateCopies_WhenAboutToStartIsInvoked() {
             objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
             //Given
+            PermissionGranted permissionGranted = new PermissionGranted();
+            permissionGranted.setPermissionGrantedJudge("Judge Name");
+            permissionGranted.setPermissionGrantedDate(LocalDate.parse("2022-02-01"));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-            caseData.setPermissionGrantedComplex(PermissionGranted.builder()
-                                                     .permissionGrantedJudge("Judge Name")
-                                                     .permissionGrantedDate(LocalDate.parse("2022-02-01"))
-                                                     .build());
+            caseData.setPermissionGrantedComplex(permissionGranted);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             //When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -129,8 +129,11 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
         @Test
         void shouldNotChangeCaseState_When1v2FullDiscontAgainstBothDefButNoPermissionAndAboutToSubmitIsInvoked() {
             //Given
+            Party party = new Party();
+            party.setPartyName("Resp2");
+            party.setType(Party.Type.INDIVIDUAL);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .respondent2(Party.builder().partyName("Resp2").type(Party.Type.INDIVIDUAL).build()).build();
+                .respondent2(party).build();
             caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE);
             caseData.setIsDiscontinuingAgainstBothDefendants(SettleDiscontinueYesOrNoList.YES);
             caseData.setConfirmOrderGivesPermission(ConfirmOrderGivesPermission.NO);
@@ -167,8 +170,11 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
         @Test
         void shouldUpdateCaseWithoutStateChange_When1v2FullDiscontinuanceAgainstOneDefAndAboutToSubmitIsInvoked() {
             //Given
+            Party party = new Party();
+            party.setPartyName("Resp2");
+            party.setType(Party.Type.INDIVIDUAL);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .respondent2(Party.builder().partyName("Resp2").type(Party.Type.INDIVIDUAL).build()).build();
+                .respondent2(party).build();
             caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE);
             caseData.setIsDiscontinuingAgainstBothDefendants(SettleDiscontinueYesOrNoList.NO);
             caseData.setConfirmOrderGivesPermission(ConfirmOrderGivesPermission.YES);
@@ -187,8 +193,11 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
         @Test
         void shouldDiscontinueCase_When1v2FullDiscontinuanceAgainstBothDefAndAboutToSubmitIsInvoked() {
             //Given
+            Party party = new Party();
+            party.setPartyName("Resp2");
+            party.setType(Party.Type.INDIVIDUAL);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .respondent2(Party.builder().partyName("Resp2").type(Party.Type.INDIVIDUAL).build()).build();
+                .respondent2(party).build();
             caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE);
             caseData.setIsDiscontinuingAgainstBothDefendants(SettleDiscontinueYesOrNoList.YES);
             caseData.setConfirmOrderGivesPermission(ConfirmOrderGivesPermission.YES);
@@ -242,35 +251,35 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
         @Test
         void shouldSetTheValuesInPreTranslationCollectionForWelshTranslation() {
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1(PartyBuilder.builder().individual().build().toBuilder()
+            Document document = new Document();
+            document.setDocumentUrl("fake-url");
+            document.setDocumentFileName("file-name");
+            document.setDocumentBinaryUrl("binary-url");
+            CaseDocument caseDocument = new CaseDocument();
+            caseDocument.setCreatedBy("John");
+            caseDocument.setDocumentName("document name");
+            caseDocument.setDocumentSize(0L);
+            caseDocument.setDocumentType(NOTICE_OF_DISCONTINUANCE);
+            caseDocument.setCreatedDatetime(LocalDateTime.now());
+            caseDocument.setDocumentLink(document);
+            RespondentLiPResponse respondentLiPResponse  = new RespondentLiPResponse();
+            respondentLiPResponse.setRespondent1ResponseLanguage("BOTH");
+            CaseDataLiP caseDataLiP  = new CaseDataLiP();
+            caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1(PartyBuilder.builder().individual().build().toBuilder()
                                  .individualFirstName("John")
                                  .individualLastName("Doe")
-                                 .build())
-                .applicant1(PartyBuilder.builder().individual().build().toBuilder()
+                                 .build());
+            caseData.setApplicant1(PartyBuilder.builder().individual().build().toBuilder()
                                 .individualFirstName("Doe")
                                 .individualLastName("John")
-                                .build())
-                .respondent1Represented(YesOrNo.NO)
-                .typeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE)
-                .respondent1NoticeOfDiscontinueCWViewDoc(CaseDocument.builder()
-                                                             .createdBy("John")
-                                                             .documentName("document name")
-                                                             .documentSize(0L)
-                                                             .documentType(NOTICE_OF_DISCONTINUANCE)
-                                                             .createdDatetime(LocalDateTime.now())
-                                                             .documentLink(Document.builder()
-                                                                               .documentUrl("fake-url")
-                                                                               .documentFileName("file-name")
-                                                                               .documentBinaryUrl("binary-url")
-                                                                               .build())
-                                                             .build())
-                .confirmOrderGivesPermission(ConfirmOrderGivesPermission.YES)
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                             .respondent1ResponseLanguage("BOTH")
-                                                             .build()).build())
-                .build();
+                                .build());
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE);
+            caseData.setRespondent1NoticeOfDiscontinueCWViewDoc(caseDocument);
+            caseData.setConfirmOrderGivesPermission(ConfirmOrderGivesPermission.YES);
+            caseData.setCaseDataLiP(caseDataLiP);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().setEventId(GEN_NOTICE_OF_DISCONTINUANCE.name());

@@ -65,7 +65,6 @@ public class SettleClaimMarkPaidFullCallbackHandler extends CallbackHandler {
 
     private CallbackResponse validateState(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        final var caseDataBuilder = caseData.toBuilder();
         List<String> errors = new ArrayList<>();
 
         SettleClaimHelper.checkState(caseData, errors);
@@ -73,28 +72,27 @@ public class SettleClaimMarkPaidFullCallbackHandler extends CallbackHandler {
             List<String> claimantNames = new ArrayList<>();
             claimantNames.add(caseData.getApplicant1().getPartyName());
             claimantNames.add(caseData.getApplicant2().getPartyName());
-            caseDataBuilder.claimantWhoIsSettling(DynamicList.fromList(claimantNames));
+            caseData.setClaimantWhoIsSettling(DynamicList.fromList(claimantNames));
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
     private CallbackResponse submitChanges(CallbackParams callbackParams) {
 
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         AboutToStartOrSubmitCallbackResponse
             .AboutToStartOrSubmitCallbackResponseBuilder aboutToStartOrSubmitCallbackResponseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder();
 
         if (caseData.getMarkPaidForAllClaimants() == null || YES.equals(caseData.getMarkPaidForAllClaimants())) {
-            caseDataBuilder.preStayState(caseData.getCcdState().toString());
-            caseDataBuilder.businessProcess(BusinessProcess.ready(SETTLE_CLAIM_MARKED_PAID_IN_FULL));
+            caseData.setPreStayState(caseData.getCcdState().toString());
+            caseData.setBusinessProcess(BusinessProcess.ready(SETTLE_CLAIM_MARKED_PAID_IN_FULL));
             aboutToStartOrSubmitCallbackResponseBuilder.state(CaseState.CASE_STAYED.name());
         }
-        return aboutToStartOrSubmitCallbackResponseBuilder.data(caseDataBuilder.build().toMap(objectMapper)).build();
+        return aboutToStartOrSubmitCallbackResponseBuilder.data(caseData.toMap(objectMapper)).build();
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
