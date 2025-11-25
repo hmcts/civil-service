@@ -6,16 +6,17 @@ import uk.gov.hmcts.reform.civil.service.flowstate.predicate.annotations.Busines
 
 import java.util.function.Predicate;
 
-public final class OutOfTimePredicate {
+@SuppressWarnings("java:S1214")
+public interface OutOfTimePredicate {
 
     @BusinessRule(
         group = "OutOfTime",
         summary = "Applicant out of time and not being taken offline",
         description = "Applicant response deadline passed, applicant has not responded and staff offline date does not exist"
     )
-    public static final Predicate<CaseData> notBeingTakenOffline =
+    Predicate<CaseData> notBeingTakenOffline =
         CaseDataPredicate.Applicant.hasPassedResponseDeadline
-            .and(CaseDataPredicate.Applicant.hasResponseDate.negate())
+            .and(CaseDataPredicate.Applicant.hasResponseDateApplicant1.negate())
             .and(CaseDataPredicate.TakenOffline.byStaffDateExists.negate());
 
     @BusinessRule(
@@ -23,8 +24,6 @@ public final class OutOfTimePredicate {
         summary = "Applicant out of time processed by Camunda",
         description = "Case has been taken offline (takenOffline date present) indicating automated processing of out-of-time cases"
     )
-    public static final Predicate<CaseData> processedByCamunda = CaseDataPredicate.TakenOffline.dateExists;
+    Predicate<CaseData> processedByCamunda = CaseDataPredicate.TakenOffline.dateExists;
 
-    private OutOfTimePredicate() {
-    }
 }
