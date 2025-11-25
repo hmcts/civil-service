@@ -239,7 +239,7 @@ class AllowedEventServiceSnapshotTest {
             .isEqualTo(expected);
     }
 
-    @ParameterizedTest(name = "FlowState CaseEvent 1v2 2LR UnSpec {0} {1}")
+    @ParameterizedTest(name = "FlowState CaseEvent 2v1 UnSpec {0} {1}")
     @MethodSource("flowStateCaseEventSnapshot")
     void flowStateCaseEvents_2v1_Unspec(FlowState.Main state, CaseEvent event,
                                         List<MultiPartyScenario> unspec, List<MultiPartyScenario> spec) {
@@ -256,7 +256,7 @@ class AllowedEventServiceSnapshotTest {
             .isEqualTo(expected);
     }
 
-    @ParameterizedTest(name = "FlowState CaseEvent 1v2 2LR Spec {0} {1}")
+    @ParameterizedTest(name = "FlowState CaseEvent 2v1 Spec {0} {1}")
     @MethodSource("flowStateCaseEventSnapshot")
     void flowStateCaseEvents_2v1_Spec(FlowState.Main state, CaseEvent event,
                                       List<MultiPartyScenario> unspec, List<MultiPartyScenario> spec) {
