@@ -3,7 +3,6 @@
 ccdRepoName="civil-general-apps-ccd-definition"
 directoryName="civil-ga-ccd-definition"
 branchName=$1
-functionalTestType=$2
 
 #Checkout specific branch of CCD definitions
 git clone https://github.com/hmcts/${ccdRepoName}.git
@@ -15,7 +14,7 @@ cd ..
 
 #Copy ccd definition files  to civil-ccd-def which contains ccd def files
 cp -r ./${ccdRepoName}/ga-ccd-definition .
-if [ "$functionalTestType" = "GENERAL_APPS_FT" ]; then
+if [ "$FT_TYPE" = "GENERAL_APPS_FT" ]; then
   cp -r ./${ccdRepoName}/e2e .
   cp -r ./${ccdRepoName}/package.json .
   cp -r ./${ccdRepoName}/yarn.lock .

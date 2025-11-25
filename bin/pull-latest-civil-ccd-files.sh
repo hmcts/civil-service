@@ -3,7 +3,6 @@
 ccdRepoName="civil-ccd-definition"
 directoryName="civil-test"
 branchName=$1
-functionalTestType=$2
 
 #Checkout specific branch of CCD definitions
 git clone https://github.com/hmcts/${ccdRepoName}.git
@@ -15,7 +14,7 @@ cd ..
 
 #Copy ccd definition files  to civil-ccd-def which contains ccd def files
 cp -r ./${ccdRepoName}/ccd-definition .
-if [ "$functionalTestType" = "CIVIL_FT" ]; then
+if [ "$FT_TYPE" = "CIVIL_FT" ]; then
   cp -r ./civil-ccd-definition/e2e .
   cp -r ./civil-ccd-definition/playwright-e2e .
   cp -r ./civil-ccd-definition/plugins .
