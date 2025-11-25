@@ -6,17 +6,18 @@ import uk.gov.hmcts.reform.civil.service.flowstate.predicate.annotations.Busines
 
 import java.util.function.Predicate;
 
-public final class RepaymentPredicate {
+@SuppressWarnings("java:S1214")
+public interface RepaymentPredicate {
 
     @BusinessRule(
         group = "Repayment",
         summary = "Repayment plan accepted",
         description = "Applicant has accepted the proposed repayment plan and case is not taken offline in LiP condition"
     )
-    public static final Predicate<CaseData> acceptRepaymentPlan =
+    Predicate<CaseData> acceptRepaymentPlan =
         CaseDataPredicate.RepaymentPlan.accepted.and(
-            (CaseDataPredicate.Lip.isLiPCase.and(CaseDataPredicate.TakenOffline.byStaffDateExists.negate()))
-                .or(CaseDataPredicate.Lip.isLiPCase.negate())
+            (CaseDataPredicate.Lip.isLiPvLipCase.and(CaseDataPredicate.TakenOffline.byStaffDateExists.negate()))
+                .or(CaseDataPredicate.Lip.isLiPvLipCase.negate())
         );
 
     @BusinessRule(
@@ -24,12 +25,11 @@ public final class RepaymentPredicate {
         summary = "Repayment plan rejected",
         description = "Applicant has rejected the proposed repayment plan and case is not taken offline in LiP condition"
     )
-    public static final Predicate<CaseData> rejectRepaymentPlan =
+    Predicate<CaseData> rejectRepaymentPlan =
         CaseDataPredicate.RepaymentPlan.rejected.and(
-            (CaseDataPredicate.Lip.isLiPCase.and(CaseDataPredicate.TakenOffline.byStaffDateExists.negate()))
-                .or(CaseDataPredicate.Lip.isLiPCase.negate())
+            (CaseDataPredicate.Lip.isLiPvLipCase.and(CaseDataPredicate.TakenOffline.byStaffDateExists.negate()))
+                .or(CaseDataPredicate.Lip.isLiPvLipCase.negate())
         );
 
-    private RepaymentPredicate() {
-    }
+
 }

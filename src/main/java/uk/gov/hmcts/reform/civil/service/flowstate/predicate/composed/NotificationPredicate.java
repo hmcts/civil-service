@@ -6,35 +6,43 @@ import uk.gov.hmcts.reform.civil.service.flowstate.predicate.annotations.Busines
 
 import java.util.function.Predicate;
 
-public final class NotificationPredicate {
+@SuppressWarnings("java:S1214")
+public interface NotificationPredicate {
 
     @BusinessRule(
-        group = "ClaimDetails",
+        group = "Notification",
         summary = "Respondent requested time extension before acknowledging",
         description = "Respondent has been granted a time extension but has not acknowledged the claim details notification"
     )
-    public static final Predicate<CaseData> notifiedTimeExtension =
-        CaseDataPredicate.ClaimDetails.hasTimeExtensionRespondent1
-            .and(CaseDataPredicate.ClaimDetails.acknowledgedNotificationRespondent1.negate());
+    Predicate<CaseData> notifiedTimeExtension =
+        CaseDataPredicate.Respondent.hasTimeExtensionRespondent1
+            .and(CaseDataPredicate.Respondent.hasAcknowledgedNotificationRespondent1.negate());
 
     @BusinessRule(
-        group = "ClaimDetails",
+        group = "Notification",
         summary = "Claim details notified to both",
         description = "Claim details notification option was set to 'Both' in the defendant notification options"
     )
-    public static final Predicate<CaseData> notifiedOptionsToBoth =
-        CaseDataPredicate.ClaimDetails.hasNotifyOptionsBoth;
+    Predicate<CaseData> hasNotifyOptionsBoth =
+        CaseDataPredicate.ClaimDetails.isNotifyOptionsBoth;
 
     @BusinessRule(
-        group = "ClaimDetails",
-        summary = "Claim details notification completed",
-        description = "Claim details notification date exists and notify options were set (not 'Both')"
+        group = "Notification",
+        summary = "Claim notified to both",
+        description = "Claim notification option was set to 'Both' in the defendant notification options"
     )
-    public static final Predicate<CaseData> afterNotifiedOptions =
-        CaseDataPredicate.ClaimDetails.hasNotificationDate
-            .and(CaseDataPredicate.ClaimDetails.hasNotifyOptions)
-            .and(CaseDataPredicate.ClaimDetails.hasNotifyOptionsBoth.negate());
+    Predicate<CaseData> hasClaimNotifiedToBoth =
+        CaseDataPredicate.Claim.hasNotificationDate
+            .and(CaseDataPredicate.Claim.hasNotifyOptions.negate()
+                     .or(CaseDataPredicate.Claim.isNotifyOptionsBoth));
 
-    private NotificationPredicate() {
-    }
+    @BusinessRule(
+        group = "Notification",
+        summary = "Claim details notified to both",
+        description = "Claim details notification option was set to 'Both' in the defendant notification options"
+    )
+    Predicate<CaseData> hasClaimDetailsNotifiedToBoth =
+        CaseDataPredicate.ClaimDetails.hasNotificationDate
+            .and(CaseDataPredicate.ClaimDetails.hasNotifyOptions.negate()
+                     .or(CaseDataPredicate.ClaimDetails.isNotifyOptionsBoth));
 }
