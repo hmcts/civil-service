@@ -204,12 +204,58 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
 public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String REFERENCE_NUMBER = "000DC001";
-    private static final DynamicList options = DynamicList.builder()
-        .listItems(List.of(
-            DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-            DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-            DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-        )).build();
+    private static final DynamicList options = buildOptions();
+
+    private static DynamicList buildOptions() {
+        DynamicListElement element1 = createDynamicListElement("00001", "court 1 - 1 address - Y01 7RB");
+        DynamicListElement element2 = createDynamicListElement("00002", "court 2 - 2 address - Y02 7RB");
+        DynamicListElement element3 = createDynamicListElement("00003", "court 3 - 3 address - Y03 7RB");
+        return createDynamicList(List.of(element1, element2, element3), null);
+    }
+
+    private static DynamicList createDynamicList(List<DynamicListElement> items, DynamicListElement value) {
+        DynamicList dynamicList = new DynamicList();
+        dynamicList.setListItems(items);
+        dynamicList.setValue(value);
+        return dynamicList;
+    }
+
+    private static DynamicListElement createDynamicListElement(String code, String label) {
+        return new DynamicListElement(code, label);
+    }
+
+    private static DynamicList createStandardCourtList(String preSelectedCourt) {
+        DynamicListElement element1 = createDynamicListElement("00001", "court 1 - 1 address - Y01 7RB");
+        DynamicListElement element2 = createDynamicListElement(preSelectedCourt, "court 2 - 2 address - Y02 7RB");
+        DynamicListElement element3 = createDynamicListElement("00003", "court 3 - 3 address - Y03 7RB");
+        return createDynamicList(List.of(element1, element2, element3), element2);
+    }
+
+    private static CaseDocument createCaseDocument(String documentUrl) {
+        Document document = new Document(documentUrl, null, null, null, null, null);
+        CaseDocument caseDocument = new CaseDocument();
+        caseDocument.setDocumentLink(document);
+        return caseDocument;
+    }
+
+    private static CaseLocationCivil createCaseLocation(String baseLocation, String region) {
+        CaseLocationCivil location = new CaseLocationCivil();
+        location.setBaseLocation(baseLocation);
+        location.setRegion(region);
+        return location;
+    }
+
+    private static CaseData withCaseManagementLocation(CaseData caseData, String baseLocation, String region) {
+        caseData.setCaseManagementLocation(createCaseLocation(baseLocation, region));
+        return caseData;
+    }
+
+    private static DynamicList cloneDynamicListWithValue(DynamicList source, DynamicListElement value) {
+        DynamicList clone = new DynamicList();
+        clone.setListItems(source.getListItems());
+        clone.setValue(value);
+        return clone;
+    }
 
     @MockBean
     private Time time;
@@ -288,23 +334,13 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            CaseDocument order = createCaseDocument("url");
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            DynamicList expected = DynamicList.builder()
-                .listItems(List.of(
-                               DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                               DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build(),
-                               DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                           )
-                )
-                .value(DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build())
-                .build();
+            DynamicList expected = createStandardCourtList(preSelectedCourt);
 
             assertThat(responseCaseData.getDisposalHearingMethodInPerson()).isEqualTo(expected);
             assertThat(responseCaseData.getFastTrackMethodInPerson()).isEqualTo(expected);
@@ -336,23 +372,13 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            CaseDocument order = createCaseDocument("url");
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            DynamicList expected = DynamicList.builder()
-                .listItems(List.of(
-                               DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                               DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build(),
-                               DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                           )
-                )
-                .value(DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build())
-                .build();
+            DynamicList expected = createStandardCourtList(preSelectedCourt);
 
             assertThat(responseCaseData.getDisposalHearingMethodInPerson()).isEqualTo(expected);
             assertThat(responseCaseData.getFastTrackMethodInPerson()).isEqualTo(expected);
@@ -378,34 +404,28 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+            RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
+            respondentLiPResponse.setRespondent1ResponseLanguage("BOTH");
+
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
+
             CaseData caseData = CaseDataBuilder.builder()
-                .caseDataLip(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                             .respondent1ResponseLanguage("BOTH").build()).build())
                 .atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing()
                 .claimantBilingualLanguagePreference("ENGLISH")
                 .caseAccessCategory(UNSPEC_CLAIM)
                 .build();
+            caseData.setCaseDataLiP(caseDataLiP);
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            CaseDocument order = createCaseDocument("url");
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            DynamicList expected = DynamicList.builder()
-                .listItems(List.of(
-                               DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                               DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build(),
-                               DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                           )
-                )
-                .value(DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build())
-                .build();
+            DynamicList expected = createStandardCourtList(preSelectedCourt);
 
             assertThat(responseCaseData.getDisposalHearingMethodInPerson()).isEqualTo(expected);
             assertThat(responseCaseData.getFastTrackMethodInPerson()).isEqualTo(expected);
@@ -431,34 +451,28 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+            RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
+            respondentLiPResponse.setRespondent1ResponseLanguage("BOTH");
+
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
+
             CaseData caseData = CaseDataBuilder.builder()
-                .caseDataLip(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                             .respondent1ResponseLanguage("BOTH").build()).build())
                 .atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing()
                 .claimantBilingualLanguagePreference("BOTH")
                 .caseAccessCategory(UNSPEC_CLAIM)
                 .build();
+            caseData.setCaseDataLiP(caseDataLiP);
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            CaseDocument order = createCaseDocument("url");
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            DynamicList expected = DynamicList.builder()
-                .listItems(List.of(
-                               DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                               DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build(),
-                               DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                           )
-                )
-                .value(DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build())
-                .build();
+            DynamicList expected = createStandardCourtList(preSelectedCourt);
 
             assertThat(responseCaseData.getDisposalHearingMethodInPerson()).isEqualTo(expected);
             assertThat(responseCaseData.getFastTrackMethodInPerson()).isEqualTo(expected);
@@ -484,34 +498,28 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+            RespondentLiPResponse lipResponse = new RespondentLiPResponse();
+            lipResponse.setRespondent1ResponseLanguage("ENGLISH");
+
+            CaseDataLiP respondentLipData = new CaseDataLiP();
+            respondentLipData.setRespondent1LiPResponse(lipResponse);
+
             CaseData caseData = CaseDataBuilder.builder()
-                .caseDataLip(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                             .respondent1ResponseLanguage("ENGLISH").build()).build())
                 .atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing()
                 .claimantBilingualLanguagePreference("ENGLISH")
                 .caseAccessCategory(UNSPEC_CLAIM)
                 .build();
+            caseData.setCaseDataLiP(respondentLipData);
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            CaseDocument order = createCaseDocument("url");
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            DynamicList expected = DynamicList.builder()
-                .listItems(List.of(
-                               DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                               DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build(),
-                               DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                           )
-                )
-                .value(DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build())
-                .build();
+            DynamicList expected = createStandardCourtList(preSelectedCourt);
 
             assertThat(responseCaseData.getDisposalHearingMethodInPerson()).isEqualTo(expected);
             assertThat(responseCaseData.getFastTrackMethodInPerson()).isEqualTo(expected);
@@ -531,9 +539,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            CaseDocument order = createCaseDocument("url");
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -562,53 +568,49 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldClearDataIfStateIsCaseProgression() {
+            DisposalHearingAddNewDirections disposalHearingAddNewDirections = new DisposalHearingAddNewDirections();
+            disposalHearingAddNewDirections.setDirectionComment("test");
+            Element<DisposalHearingAddNewDirections> disposalHearingAddNewDirectionsElement = new Element<>();
+            disposalHearingAddNewDirectionsElement.setValue(disposalHearingAddNewDirections);
+            SmallClaimsAddNewDirections smallClaimsAddNewDirections = new SmallClaimsAddNewDirections();
+            smallClaimsAddNewDirections.setDirectionComment("test");
+
+            Element<SmallClaimsAddNewDirections> smallClaimsAddNewDirectionsElement = new Element<>();
+            smallClaimsAddNewDirectionsElement.setValue(smallClaimsAddNewDirections);
+
+            FastTrackAddNewDirections fastTrackAddNewDirections = new FastTrackAddNewDirections();
+            fastTrackAddNewDirections.setDirectionComment("test");
+
+            Element<FastTrackAddNewDirections> fastTrackAddNewDirectionsElement = new Element<>();
+            fastTrackAddNewDirectionsElement.setValue(fastTrackAddNewDirections);
+
             List<FastTrack> directions = List.of(FastTrack.fastClaimBuildingDispute);
             List<SmallTrack> smallDirections = List.of(SmallTrack.smallClaimCreditHire);
-            DisposalHearingAddNewDirections disposalHearingAddNewDirections = DisposalHearingAddNewDirections.builder()
-                .directionComment("test")
-                .build();
-            Element<DisposalHearingAddNewDirections> disposalHearingAddNewDirectionsElement =
-                Element.<DisposalHearingAddNewDirections>builder()
-                    .value(disposalHearingAddNewDirections)
-                    .build();
-            SmallClaimsAddNewDirections smallClaimsAddNewDirections = SmallClaimsAddNewDirections.builder()
-                .directionComment("test")
-                .build();
-
-            Element<SmallClaimsAddNewDirections> smallClaimsAddNewDirectionsElement =
-                Element.<SmallClaimsAddNewDirections>builder()
-                    .value(smallClaimsAddNewDirections)
-                    .build();
-
-            FastTrackAddNewDirections fastTrackAddNewDirections = FastTrackAddNewDirections.builder()
-                .directionComment("test")
-                .build();
-
-            Element<FastTrackAddNewDirections> fastTrackAddNewDirectionsElement =
-                Element.<FastTrackAddNewDirections>builder()
-                    .value(fastTrackAddNewDirections)
-                    .build();
-
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .drawDirectionsOrderRequired(YES)
-                .drawDirectionsOrderSmallClaims(YES)
-                .fastClaims(directions)
-                .smallClaims(smallDirections)
-                .claimsTrack(ClaimsTrack.smallClaimsTrack)
-                .orderType(OrderType.DECIDE_DAMAGES)
-                .trialAdditionalDirectionsForFastTrack(directions)
-                .drawDirectionsOrderSmallClaimsAdditionalDirections(smallDirections)
-                .fastTrackAllocation(FastTrackAllocation.builder().assignComplexityBand(YES).build())
-                .disposalHearingAddNewDirections(List.of(disposalHearingAddNewDirectionsElement))
-                .smallClaimsAddNewDirections(List.of(smallClaimsAddNewDirectionsElement))
-                .fastTrackAddNewDirections(List.of(fastTrackAddNewDirectionsElement))
-                .sdoHearingNotes(SDOHearingNotes.builder().input("TEST").build())
-                .fastTrackHearingNotes(FastTrackHearingNotes.builder().input("TEST").build())
-                .disposalHearingHearingNotes("TEST")
-                .ccdState(CASE_PROGRESSION)
-                .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_SDO)
-                .isSdoR2NewScreen(NO)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setDrawDirectionsOrderRequired(YES);
+            caseData.setDrawDirectionsOrderSmallClaims(YES);
+            caseData.setFastClaims(directions);
+            caseData.setSmallClaims(smallDirections);
+            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+            caseData.setOrderType(OrderType.DECIDE_DAMAGES);
+            caseData.setTrialAdditionalDirectionsForFastTrack(directions);
+            caseData.setDrawDirectionsOrderSmallClaimsAdditionalDirections(smallDirections);
+            FastTrackAllocation fastTrackAllocation = new FastTrackAllocation();
+            fastTrackAllocation.setAssignComplexityBand(YES);
+            caseData.setFastTrackAllocation(fastTrackAllocation);
+            caseData.setDisposalHearingAddNewDirections(List.of(disposalHearingAddNewDirectionsElement));
+            caseData.setSmallClaimsAddNewDirections(List.of(smallClaimsAddNewDirectionsElement));
+            caseData.setFastTrackAddNewDirections(List.of(fastTrackAddNewDirectionsElement));
+            SDOHearingNotes sdoHearingNotes = new SDOHearingNotes();
+            sdoHearingNotes.setInput("TEST");
+            caseData.setSdoHearingNotes(sdoHearingNotes);
+            FastTrackHearingNotes fastTrackHearingNotes = new FastTrackHearingNotes();
+            fastTrackHearingNotes.setInput("TEST");
+            caseData.setFastTrackHearingNotes(fastTrackHearingNotes);
+            caseData.setDisposalHearingHearingNotes("TEST");
+            caseData.setCcdState(CASE_PROGRESSION);
+            caseData.setDecisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_SDO);
+            caseData.setIsSdoR2NewScreen(NO);
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -643,13 +645,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .siteName("court 3").courtAddress("3 address").postcode("Y03 7RB").build()
             );
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .fastClaims(List.of(FastTrack.fastClaimNoiseInducedHearingLoss))
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setFastClaims(List.of(FastTrack.fastClaimNoiseInducedHearingLoss));
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
 
@@ -657,25 +656,13 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            DynamicList altExpected = DynamicList.builder()
-                .listItems(List.of(
-                               DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                               DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build(),
-                               DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                           )
-                )
-                .build();
+            DynamicListElement locationOne = createDynamicListElement("00001", "court 1 - 1 address - Y01 7RB");
+            DynamicListElement locationTwo = createDynamicListElement(preSelectedCourt, "court 2 - 2 address - Y02 7RB");
+            DynamicListElement locationThree = createDynamicListElement("00003", "court 3 - 3 address - Y03 7RB");
+            DynamicList altExpected = createDynamicList(List.of(locationOne, locationTwo, locationThree), null);
 
-            DynamicList expected = DynamicList.builder()
-                .value(
-                    DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build()
-                )
-                .listItems(List.of(
-                               DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build(),
-                               DynamicListElement.builder().code("OTHER_LOCATION").label("Other location").build()
-                           )
-                )
-                .build();
+            DynamicListElement otherLocation = createDynamicListElement("OTHER_LOCATION", "Other location");
+            DynamicList expected = createDynamicList(List.of(locationTwo, otherLocation), locationTwo);
 
             assertThat(responseCaseData.getSdoR2Trial().getHearingCourtLocationList()).isEqualTo(expected);
             assertThat(responseCaseData.getSdoR2Trial().getAltHearingCourtLocationList()).isEqualTo(altExpected);
@@ -703,13 +690,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .fastClaims(fastTrackList)
-                .build();
+                .atStateClaimDraft().build();
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setFastClaims(fastTrackList);
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
 
@@ -970,11 +954,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateWelshSectionForSDOR2() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued()
-                .build()
-                .toBuilder()
-                .claimsTrack(ClaimsTrack.smallClaimsTrack)
-                .drawDirectionsOrderRequired(NO).build();
+                .atStateClaimIssued().build();
+            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+            caseData.setDrawDirectionsOrderRequired(NO);
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
 
@@ -995,39 +977,40 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateCaseManagementLocation_whenUnder1000SpecCcmcc() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
-                .caseAccessCategory(SPEC_CLAIM)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.ccmccEpimsId).region(
-                    "ccmcRegion").build())
-                .totalClaimAmount(BigDecimal.valueOf(999))
-                .claimsTrack(ClaimsTrack.smallClaimsTrack)
-                .applicant1(Party.builder()
-                                .type(Party.Type.INDIVIDUAL)
-                                .build())
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQRequestedCourt(
-                                      RequestedCourt.builder()
-                                          .caseLocation(CaseLocationCivil.builder()
-                                                            .baseLocation("app court requested epimm")
-                                                            .region("app court request region").build())
-                                          .responseCourtCode("123")
-                                          .build()
-                                  )
-                                  .build())
-                .respondent1(Party.builder()
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .build())
-                .respondent1DQ(Respondent1DQ.builder()
-                                   .respondent1DQRequestedCourt(
-                                       RequestedCourt.builder()
-                                           .caseLocation(CaseLocationCivil.builder()
-                                                             .baseLocation("def court requested epimm")
-                                                             .region("def court request region").build())
-                                           .responseCourtCode("321")
-                                           .build()
-                                   )
-                                   .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setCaseManagementLocation(createCaseLocation(handler.ccmccEpimsId, "ccmcRegion"));
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(999));
+            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+            Party applicant1 = new Party();
+            applicant1.setType(Party.Type.INDIVIDUAL);
+            caseData.setApplicant1(applicant1);
+
+            CaseLocationCivil applicantRequestedLocation = createCaseLocation(
+                "app court requested epimm",
+                "app court request region"
+            );
+            RequestedCourt applicantRequestedCourt = new RequestedCourt();
+            applicantRequestedCourt.setCaseLocation(applicantRequestedLocation);
+            applicantRequestedCourt.setResponseCourtCode("123");
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQRequestedCourt(applicantRequestedCourt);
+            caseData.setApplicant1DQ(applicant1DQ);
+
+            Party respondent1 = new Party();
+            respondent1.setType(Party.Type.INDIVIDUAL);
+            caseData.setRespondent1(respondent1);
+
+            CaseLocationCivil respondentRequestedLocation = createCaseLocation(
+                "def court requested epimm",
+                "def court request region"
+            );
+            RequestedCourt respondentRequestedCourt = new RequestedCourt();
+            respondentRequestedCourt.setCaseLocation(respondentRequestedLocation);
+            respondentRequestedCourt.setResponseCourtCode("321");
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQRequestedCourt(respondentRequestedCourt);
+            caseData.setRespondent1DQ(respondent1DQ);
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1039,38 +1022,41 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotUpdateCaseManagementLocation_whenNotUnder1000SpecCcmcc() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
-                .caseAccessCategory(SPEC_CLAIM)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("1010101").region("orange").build())
-                .totalClaimAmount(BigDecimal.valueOf(1999))
-                .claimsTrack(ClaimsTrack.smallClaimsTrack)
-                .applicant1(Party.builder()
-                                .type(Party.Type.INDIVIDUAL)
-                                .build())
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQRequestedCourt(
-                                      RequestedCourt.builder()
-                                          .caseLocation(CaseLocationCivil.builder()
-                                                            .baseLocation("app court requested epimm")
-                                                            .region("app court request region").build())
-                                          .responseCourtCode("123")
-                                          .build()
-                                  )
-                                  .build())
-                .respondent1(Party.builder()
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .build())
-                .respondent1DQ(Respondent1DQ.builder()
-                                   .respondent1DQRequestedCourt(
-                                       RequestedCourt.builder()
-                                           .caseLocation(CaseLocationCivil.builder()
-                                                             .baseLocation("def court requested epimm")
-                                                             .region("def court request region").build())
-                                           .responseCourtCode("321")
-                                           .build()
-                                   )
-                                   .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            CaseLocationCivil existingLocation = new CaseLocationCivil();
+            existingLocation.setBaseLocation("1010101");
+            existingLocation.setRegion("orange");
+            caseData.setCaseManagementLocation(existingLocation);
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(1999));
+            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+            Party applicant1 = new Party();
+            applicant1.setType(Party.Type.INDIVIDUAL);
+            caseData.setApplicant1(applicant1);
+
+            CaseLocationCivil applicantRequestedLocation = new CaseLocationCivil();
+            applicantRequestedLocation.setBaseLocation("app court requested epimm");
+            applicantRequestedLocation.setRegion("app court request region");
+            RequestedCourt applicantRequestedCourt = new RequestedCourt();
+            applicantRequestedCourt.setCaseLocation(applicantRequestedLocation);
+            applicantRequestedCourt.setResponseCourtCode("123");
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQRequestedCourt(applicantRequestedCourt);
+            caseData.setApplicant1DQ(applicant1DQ);
+
+            Party respondent1 = new Party();
+            respondent1.setType(Party.Type.INDIVIDUAL);
+            caseData.setRespondent1(respondent1);
+
+            CaseLocationCivil respondentRequestedLocation = new CaseLocationCivil();
+            respondentRequestedLocation.setBaseLocation("def court requested epimm");
+            respondentRequestedLocation.setRegion("def court request region");
+            RequestedCourt respondentRequestedCourt = new RequestedCourt();
+            respondentRequestedCourt.setCaseLocation(respondentRequestedLocation);
+            respondentRequestedCourt.setResponseCourtCode("321");
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQRequestedCourt(respondentRequestedCourt);
+            caseData.setRespondent1DQ(respondent1DQ);
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1096,14 +1082,12 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         void setup() {
             List<String> items = List.of("label 1", "label 2", "label 3");
             DynamicList localOptions = DynamicList.fromList(items, Object::toString, items.get(0), false);
-            caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-                .build().toBuilder()
-                .disposalHearingMethodInPerson(localOptions)
-                .fastTrackMethodInPerson(localOptions)
-                .smallClaimsMethodInPerson(localOptions)
-                .setFastTrackFlag(YES)
-                .build();
+            caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData.setCaseManagementLocation(createCaseLocation("00000", null));
+            caseData.setDisposalHearingMethodInPerson(localOptions);
+            caseData.setFastTrackMethodInPerson(localOptions);
+            caseData.setSmallClaimsMethodInPerson(localOptions);
+            caseData.setSetFastTrackFlag(YES);
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             userId = UUID.randomUUID().toString();
 
@@ -1114,13 +1098,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateBusinessProcess_whenInvoked() {
+            CaseData caseData = params.getCaseData();
+            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+            caseData.setDrawDirectionsOrderRequired(NO);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                params.toBuilder()
-                    .caseData(params.getCaseData().toBuilder()
-                                  .claimsTrack(ClaimsTrack.smallClaimsTrack)
-                                  .drawDirectionsOrderRequired(NO)
-                                  .build())
-                    .build()
+                params.toBuilder().caseData(caseData).build()
             );
 
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
@@ -1155,13 +1137,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 items.get(0),
                 false
             );
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-                .build().toBuilder()
-                .fastTrackMethodInPerson(localOptions)
-                .disposalHearingMethodInPerson(localOptions)
-                .smallClaimsMethodInPerson(localOptions)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData.setCaseManagementLocation(createCaseLocation("00000", null));
+            caseData.setFastTrackMethodInPerson(localOptions);
+            caseData.setDisposalHearingMethodInPerson(localOptions);
+            caseData.setSmallClaimsMethodInPerson(localOptions);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1188,14 +1168,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSaveDocumentToTempList_whenClaimantIsWelsh() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                .sdoOrderDocument(CaseDocument.builder().documentLink(
-                        Document.builder().documentUrl("url").build())
-                                      .build())
-                .claimantBilingualLanguagePreference("WELSH")
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-                .build().toBuilder()
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData.setSdoOrderDocument(createCaseDocument("url"));
+            caseData.setClaimantBilingualLanguagePreference("WELSH");
+            caseData.setCaseManagementLocation(createCaseLocation("00000", null));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1207,14 +1183,14 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSaveDocumentToTempList_whenDefendantIsWelsh() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                .sdoOrderDocument(CaseDocument.builder().documentLink(
-                        Document.builder().documentUrl("url").build())
-                                      .build())
-                .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-                .build().toBuilder()
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData.setSdoOrderDocument(createCaseDocument("url"));
+            RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
+            respondentLiPResponse.setRespondent1ResponseLanguage("BOTH");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
+            caseData.setCaseDataLiP(caseDataLiP);
+            caseData.setCaseManagementLocation(createCaseLocation("00000", null));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1228,29 +1204,23 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @ParameterizedTest
     @CsvSource({"true", "false"})
     void shouldSetEarlyAdoptersFlagToFalse_WhenLiP(Boolean isLocationWhiteListed) {
-        DynamicList localOptions = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            )
-            .build();
+        DynamicListElement optionOne = createDynamicListElement("00001", "court 1 - 1 address - Y01 7RB");
+        DynamicListElement optionTwo = createDynamicListElement("00002", "court 2 - 2 address - Y02 7RB");
+        DynamicListElement optionThree = createDynamicListElement("00003", "court 3 - 3 address - Y03 7RB");
+        DynamicList localOptions = createDynamicList(List.of(optionOne, optionTwo, optionThree), null);
 
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+        DynamicListElement selectedCourt = optionTwo;
 
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson)
-            .disposalHearingMethodInPerson(localOptions.toBuilder().value(selectedCourt).build())
-            .fastTrackMethodInPerson(localOptions)
-            .smallClaimsMethodInPerson(localOptions)
-            .disposalHearingMethodInPerson(localOptions.toBuilder().value(selectedCourt).build())
-            .disposalHearingMethodToggle(Collections.singletonList(OrderDetailsPagesSectionsToggle.SHOW))
-            .orderType(OrderType.DISPOSAL)
-            .respondent1Represented(NO)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+        caseData.setDisposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson);
+        caseData.setDisposalHearingMethodInPerson(cloneDynamicListWithValue(localOptions, selectedCourt));
+        caseData.setFastTrackMethodInPerson(localOptions);
+        caseData.setSmallClaimsMethodInPerson(localOptions);
+        caseData.setDisposalHearingMethodInPerson(cloneDynamicListWithValue(localOptions, selectedCourt));
+        caseData.setDisposalHearingMethodToggle(Collections.singletonList(OrderDetailsPagesSectionsToggle.SHOW));
+        caseData.setOrderType(OrderType.DISPOSAL);
+        caseData.setRespondent1Represented(NO);
+        caseData.setCaseManagementLocation(createCaseLocation(selectedCourt.getCode(), null));
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(featureToggleService.isLocationWhiteListedForCaseProgression(selectedCourt.getCode()))
@@ -1298,18 +1268,16 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isLocationWhiteListedForCaseProgression(any())).thenReturn(isCPAndWhitelisted);
         }
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(defendantNocOnline);
-        CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .region("2")
-                                        .baseLocation("111")
-                                        .build())
-            .transferCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
-                                                                       .label("Site 1 - Adr 1 - AAA 111").build()).build()).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+        DynamicListElement transferValue = createDynamicListElement(null, "Site 1 - Adr 1 - AAA 111");
+        DynamicList transferList = createDynamicList(null, transferValue);
+        caseData.setTransferCourtLocationList(transferList);
+        caseData.setCaseManagementLocation(createCaseLocation("111", "2"));
 
-        CallbackParams params = callbackParamsOf(caseData.toBuilder()
-                                                     .applicant1Represented(applicantRepresented)
-                                                     .respondent1Represented(respondent1Represented)
-                                                     .build(), ABOUT_TO_SUBMIT);
+        CaseData caseData2 = CaseDataBuilder.builder().build();
+        caseData2.setApplicant1Represented(applicantRepresented);
+        caseData2.setRespondent1Represented(respondent1Represented);
+        CallbackParams params = callbackParamsOf(caseData2, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
@@ -1328,9 +1296,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                         assignCategoryId, categoryService,
                                                         Optional.empty());
 
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+        caseData.setCaseManagementLocation(createCaseLocation("123456", null));
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1343,9 +1310,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     void shouldCallUpdateWaCourtLocationsServiceWhenPresent_AndMintiEnabled() {
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+        caseData.setCaseManagementLocation(createCaseLocation("123456", null));
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1389,11 +1355,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
          */
         @Test
         void shouldPrePopulateDisposalHearingPageSpec1() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
-                .toBuilder()
-                .caseAccessCategory(SPEC_CLAIM)
-                .totalClaimAmount(BigDecimal.valueOf(10000))
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(10000));
+
             given(locationRefDataService.getHearingCourtLocations(any()))
                 .willReturn(getSampleCourLocationsRefObject());
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
@@ -1423,17 +1388,12 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
          */
         @Test
         void shouldPrePopulateDisposalHearingPageSpec2() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
-                .toBuilder()
-                .caseAccessCategory(SPEC_CLAIM)
-                .totalClaimAmount(BigDecimal.valueOf(10000))
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQRequestedCourt(
-                                      RequestedCourt.builder()
-                                          .build()
-                                  )
-                                  .build())
-                .build();
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQRequestedCourt(new RequestedCourt());
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(10000));
+            caseData.setApplicant1DQ(applicant1DQ);
             given(locationRefDataService.getHearingCourtLocations(any()))
                 .willReturn(getSampleCourLocationsRefObject());
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
@@ -1463,22 +1423,17 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
          */
         @Test
         void shouldPrePopulateDisposalHearingPageSpec3() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
-                .toBuilder()
-                .caseAccessCategory(SPEC_CLAIM)
-                .totalClaimAmount(BigDecimal.valueOf(10000))
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQRequestedCourt(
-                                      RequestedCourt.builder()
-                                          .responseCourtCode("court3")
-                                          .caseLocation(
-                                              CaseLocationCivil.builder()
-                                                  .baseLocation("00000")
-                                                  .region("dummy region")
-                                                  .build()
-                                          ).build()
-                                  ).build()
-                ).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(10000));
+
+            CaseLocationCivil requestedLocation = createCaseLocation("00000", "dummy region");
+            RequestedCourt requestedCourt = new RequestedCourt();
+            requestedCourt.setResponseCourtCode("court3");
+            requestedCourt.setCaseLocation(requestedLocation);
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQRequestedCourt(requestedCourt);
+            caseData.setApplicant1DQ(applicant1DQ);
 
             given(locationRefDataService.getHearingCourtLocations(any()))
                 .willReturn(getSampleCourLocationsRefObject());
@@ -1518,79 +1473,87 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     static Stream<Arguments> testDataUnspec() {
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+        CaseData scenario1 = withCaseManagementLocation(
+            CaseDataBuilder.builder().atStateClaimDraft().build(),
+            "00000",
+            null
+        );
+        DynamicListElement selectedCourt = createDynamicListElement("00002", "court 2 - 2 address - Y02 7RB");
+        DynamicList fastTrackSelection = cloneDynamicListWithValue(options, selectedCourt);
+        scenario1.setCaseAccessCategory(UNSPEC_CLAIM);
+        scenario1.setAllocatedTrack(AllocatedTrack.SMALL_CLAIM);
+        scenario1.setFastTrackMethodInPerson(fastTrackSelection);
+        scenario1.setDrawDirectionsOrderRequired(NO);
+        scenario1.setClaimsTrack(ClaimsTrack.fastTrack);
+
+        CaseData scenario2 = withCaseManagementLocation(
+            CaseDataBuilder.builder().atStateClaimDraft().build(),
+            "00000",
+            null
+        );
+        scenario2.setCaseAccessCategory(UNSPEC_CLAIM);
+        scenario2.setAllocatedTrack(AllocatedTrack.SMALL_CLAIM);
+        scenario2.setFastTrackMethodInPerson(cloneDynamicListWithValue(options, selectedCourt));
+        scenario2.setDrawDirectionsOrderRequired(YES);
+        scenario2.setDrawDirectionsOrderSmallClaims(NO);
+        scenario2.setOrderType(OrderType.DECIDE_DAMAGES);
+
+        CaseData scenario3 = withCaseManagementLocation(
+            CaseDataBuilder.builder().atStateClaimDraft().build(),
+            "00000",
+            null
+        );
+        DynamicList disposalSelection = cloneDynamicListWithValue(options, selectedCourt);
+        scenario3.setCaseAccessCategory(UNSPEC_CLAIM);
+        scenario3.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
+        scenario3.setDisposalHearingMethodInPerson(disposalSelection);
+        scenario3.setDrawDirectionsOrderRequired(YES);
+        scenario3.setDrawDirectionsOrderSmallClaims(NO);
+        scenario3.setOrderType(OrderType.DISPOSAL);
+
+        CaseData scenario4 = withCaseManagementLocation(
+            CaseDataBuilder.builder().atStateClaimDraft().build(),
+            "00000",
+            null
+        );
+        DynamicList smallClaimsSelection = cloneDynamicListWithValue(options, selectedCourt);
+        scenario4.setCaseAccessCategory(UNSPEC_CLAIM);
+        scenario4.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
+        scenario4.setSmallClaimsMethodInPerson(smallClaimsSelection);
+        scenario4.setDrawDirectionsOrderRequired(NO);
+        scenario4.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+
+        CaseData scenario5 = withCaseManagementLocation(
+            CaseDataBuilder.builder().atStateClaimDraft().build(),
+            "00000",
+            null
+        );
+        scenario5.setCaseAccessCategory(UNSPEC_CLAIM);
+        scenario5.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
+        scenario5.setSmallClaimsMethodInPerson(cloneDynamicListWithValue(options, selectedCourt));
+        scenario5.setDrawDirectionsOrderRequired(YES);
+        scenario5.setDrawDirectionsOrderSmallClaims(YES);
+        scenario5.setOrderType(OrderType.DECIDE_DAMAGES);
+
+        CaseData scenario6 = withCaseManagementLocation(
+            CaseDataBuilder.builder().atStateClaimDraft().build(),
+            "00000",
+            null
+        );
+        scenario6.setCaseAccessCategory(UNSPEC_CLAIM);
+        scenario6.setAllocatedTrack(AllocatedTrack.SMALL_CLAIM);
+        scenario6.setDisposalHearingMethodInPerson(cloneDynamicListWithValue(options, selectedCourt));
+        scenario6.setDrawDirectionsOrderRequired(YES);
+        scenario6.setDrawDirectionsOrderSmallClaims(NO);
+        scenario6.setOrderType(OrderType.DISPOSAL);
+
         return Stream.of(
-            Arguments.of(
-                CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                    .caseAccessCategory(UNSPEC_CLAIM)
-                    .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
-                    .fastTrackMethodInPerson(options.toBuilder().value(selectedCourt).build())
-                    .drawDirectionsOrderRequired(NO)
-                    .claimsTrack(ClaimsTrack.fastTrack)
-                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-                    .build(),
-                AllocatedTrack.FAST_CLAIM
-            ),
-            Arguments.of(
-                CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                    .caseAccessCategory(UNSPEC_CLAIM)
-                    .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
-                    .fastTrackMethodInPerson(options.toBuilder().value(selectedCourt).build())
-                    .drawDirectionsOrderRequired(YES)
-                    .drawDirectionsOrderSmallClaims(NO)
-                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-                    .orderType(OrderType.DECIDE_DAMAGES)
-                    .build(),
-                AllocatedTrack.FAST_CLAIM
-            ),
-            Arguments.of(
-                CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                    .caseAccessCategory(UNSPEC_CLAIM)
-                    .allocatedTrack(AllocatedTrack.FAST_CLAIM)
-                    .disposalHearingMethodInPerson(options.toBuilder().value(selectedCourt).build())
-                    .drawDirectionsOrderRequired(YES)
-                    .drawDirectionsOrderSmallClaims(NO)
-                    .orderType(OrderType.DISPOSAL)
-                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-                    .build(),
-                AllocatedTrack.FAST_CLAIM
-            ),
-            Arguments.of(
-                CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                    .caseAccessCategory(UNSPEC_CLAIM)
-                    .allocatedTrack(AllocatedTrack.FAST_CLAIM)
-                    .smallClaimsMethodInPerson(options.toBuilder().value(selectedCourt).build())
-                    .drawDirectionsOrderRequired(NO)
-                    .claimsTrack(ClaimsTrack.smallClaimsTrack)
-                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-                    .build(),
-                AllocatedTrack.SMALL_CLAIM
-            ),
-            Arguments.of(
-                CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                    .caseAccessCategory(UNSPEC_CLAIM)
-                    .allocatedTrack(AllocatedTrack.FAST_CLAIM)
-                    .smallClaimsMethodInPerson(options.toBuilder().value(selectedCourt).build())
-                    .drawDirectionsOrderRequired(YES)
-                    .drawDirectionsOrderSmallClaims(YES)
-                    .orderType(OrderType.DECIDE_DAMAGES)
-                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-                    .build(),
-                AllocatedTrack.SMALL_CLAIM
-            ),
-            Arguments.of(
-                CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                    .caseAccessCategory(UNSPEC_CLAIM)
-                    .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
-                    .disposalHearingMethodInPerson(options.toBuilder().value(selectedCourt).build())
-                    .drawDirectionsOrderRequired(YES)
-                    .drawDirectionsOrderSmallClaims(NO)
-                    .orderType(OrderType.DISPOSAL)
-                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-                    .build(),
-                AllocatedTrack.SMALL_CLAIM
-            )
+            Arguments.of(scenario1, AllocatedTrack.FAST_CLAIM),
+            Arguments.of(scenario2, AllocatedTrack.FAST_CLAIM),
+            Arguments.of(scenario3, AllocatedTrack.FAST_CLAIM),
+            Arguments.of(scenario4, AllocatedTrack.SMALL_CLAIM),
+            Arguments.of(scenario5, AllocatedTrack.SMALL_CLAIM),
+            Arguments.of(scenario6, AllocatedTrack.SMALL_CLAIM)
         );
     }
 
@@ -1606,112 +1569,121 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     static Stream<Arguments> testDataSpec() {
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+        DynamicListElement selectedCourt = createDynamicListElement("00002", "court 2 - 2 address - Y02 7RB");
+
+        CaseData scenario1 = withCaseManagementLocation(
+            CaseDataBuilder.builder().atStateClaimDraft().build(),
+            "00000",
+            null
+        );
+        scenario1.setCaseAccessCategory(SPEC_CLAIM);
+        scenario1.setResponseClaimTrack("SMALL_CLAIM");
+        scenario1.setFastTrackMethodInPerson(cloneDynamicListWithValue(options, selectedCourt));
+        scenario1.setDrawDirectionsOrderRequired(NO);
+        scenario1.setClaimsTrack(ClaimsTrack.fastTrack);
+
+        CaseData scenario2 = withCaseManagementLocation(
+            CaseDataBuilder.builder().atStateClaimDraft().build(),
+            "00000",
+            null
+        );
+        scenario2.setCaseAccessCategory(SPEC_CLAIM);
+        scenario2.setResponseClaimTrack("SMALL_CLAIM");
+        scenario2.setFastTrackMethodInPerson(cloneDynamicListWithValue(options, selectedCourt));
+        scenario2.setDrawDirectionsOrderRequired(YES);
+        scenario2.setDrawDirectionsOrderSmallClaims(NO);
+        scenario2.setOrderType(OrderType.DECIDE_DAMAGES);
+
+        CaseData scenario3 = withCaseManagementLocation(
+            CaseDataBuilder.builder().atStateClaimDraft().build(),
+            "00000",
+            null
+        );
+        scenario3.setCaseAccessCategory(SPEC_CLAIM);
+        scenario3.setResponseClaimTrack("SMALL_CLAIM");
+        scenario3.setDrawDirectionsOrderRequired(YES);
+        scenario3.setDrawDirectionsOrderSmallClaims(NO);
+        scenario3.setOrderType(OrderType.DECIDE_DAMAGES);
+
+        CaseData scenario4 = withCaseManagementLocation(
+            CaseDataBuilder.builder().atStateClaimDraft().build(),
+            "00000",
+            null
+        );
+        scenario4.setCaseAccessCategory(SPEC_CLAIM);
+        scenario4.setResponseClaimTrack("FAST_CLAIM");
+        scenario4.setDisposalHearingMethodInPerson(cloneDynamicListWithValue(options, selectedCourt));
+        scenario4.setDrawDirectionsOrderRequired(YES);
+        scenario4.setDrawDirectionsOrderSmallClaims(NO);
+        scenario4.setOrderType(OrderType.DISPOSAL);
+
+        CaseData scenario5 = withCaseManagementLocation(
+            CaseDataBuilder.builder().atStateClaimDraft().build(),
+            "00000",
+            null
+        );
+        scenario5.setCaseAccessCategory(SPEC_CLAIM);
+        scenario5.setResponseClaimTrack("FAST_CLAIM");
+        scenario5.setDrawDirectionsOrderRequired(YES);
+        scenario5.setDrawDirectionsOrderSmallClaims(NO);
+        scenario5.setOrderType(OrderType.DISPOSAL);
+
+        CaseData scenario6 = withCaseManagementLocation(
+            CaseDataBuilder.builder().atStateClaimDraft().build(),
+            "00000",
+            null
+        );
+        scenario6.setCaseAccessCategory(SPEC_CLAIM);
+        scenario6.setResponseClaimTrack("FAST_CLAIM");
+        scenario6.setSmallClaimsMethodInPerson(cloneDynamicListWithValue(options, selectedCourt));
+        scenario6.setDrawDirectionsOrderRequired(NO);
+        scenario6.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+
+        CaseData scenario7 = withCaseManagementLocation(
+            CaseDataBuilder.builder().atStateClaimDraft().build(),
+            "00000",
+            null
+        );
+        scenario7.setCaseAccessCategory(SPEC_CLAIM);
+        scenario7.setResponseClaimTrack("FAST_CLAIM");
+        scenario7.setSmallClaimsMethodInPerson(cloneDynamicListWithValue(options, selectedCourt));
+        scenario7.setDrawDirectionsOrderRequired(YES);
+        scenario7.setDrawDirectionsOrderSmallClaims(YES);
+        scenario7.setOrderType(OrderType.DECIDE_DAMAGES);
+
+        CaseData scenario8 = withCaseManagementLocation(
+            CaseDataBuilder.builder().atStateClaimDraft().build(),
+            "00000",
+            null
+        );
+        scenario8.setCaseAccessCategory(SPEC_CLAIM);
+        scenario8.setResponseClaimTrack("FAST_CLAIM");
+        scenario8.setDrawDirectionsOrderRequired(YES);
+        scenario8.setDrawDirectionsOrderSmallClaims(YES);
+        scenario8.setOrderType(OrderType.DECIDE_DAMAGES);
+
+        CaseData scenario9 = withCaseManagementLocation(
+            CaseDataBuilder.builder().atStateClaimDraft().build(),
+            "00000",
+            null
+        );
+        scenario9.setCaseAccessCategory(SPEC_CLAIM);
+        scenario9.setResponseClaimTrack("SMALL_CLAIM");
+        scenario9.setDisposalHearingMethodInPerson(cloneDynamicListWithValue(options, selectedCourt));
+        scenario9.setDrawDirectionsOrderRequired(YES);
+        scenario9.setDrawDirectionsOrderSmallClaims(NO);
+        scenario9.setOrderType(OrderType.DISPOSAL);
+
         return Stream.of(
-            Arguments.of(
-                CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                    .caseAccessCategory(SPEC_CLAIM)
-                    .responseClaimTrack("SMALL_CLAIM")
-                    .fastTrackMethodInPerson(options.toBuilder().value(selectedCourt).build())
-                    .drawDirectionsOrderRequired(NO)
-                    .claimsTrack(ClaimsTrack.fastTrack)
-                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-                    .build(),
-                "FAST_CLAIM"
-            ),
-            Arguments.of(
-                CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                    .caseAccessCategory(SPEC_CLAIM)
-                    .responseClaimTrack("SMALL_CLAIM")
-                    .fastTrackMethodInPerson(options.toBuilder().value(selectedCourt).build())
-                    .drawDirectionsOrderRequired(YES)
-                    .drawDirectionsOrderSmallClaims(NO)
-                    .orderType(OrderType.DECIDE_DAMAGES)
-                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-                    .build(),
-                "FAST_CLAIM"
-            ),
-            Arguments.of(
-                CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                    .caseAccessCategory(SPEC_CLAIM)
-                    .responseClaimTrack("SMALL_CLAIM")
-                    .drawDirectionsOrderRequired(YES)
-                    .drawDirectionsOrderSmallClaims(NO)
-                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-                    .orderType(OrderType.DECIDE_DAMAGES)
-                    .build(),
-                "FAST_CLAIM"
-            ),
-            Arguments.of(
-                CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                    .caseAccessCategory(SPEC_CLAIM)
-                    .responseClaimTrack("FAST_CLAIM")
-                    .disposalHearingMethodInPerson(options.toBuilder().value(selectedCourt).build())
-                    .drawDirectionsOrderRequired(YES)
-                    .drawDirectionsOrderSmallClaims(NO)
-                    .orderType(OrderType.DISPOSAL)
-                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-                    .build(),
-                "FAST_CLAIM"
-            ),
-            Arguments.of(
-                CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                    .caseAccessCategory(SPEC_CLAIM)
-                    .responseClaimTrack("FAST_CLAIM")
-                    .drawDirectionsOrderRequired(YES)
-                    .drawDirectionsOrderSmallClaims(NO)
-                    .orderType(OrderType.DISPOSAL)
-                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-                    .build(),
-                "FAST_CLAIM"
-            ),
-            Arguments.of(
-                CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                    .caseAccessCategory(SPEC_CLAIM)
-                    .responseClaimTrack("FAST_CLAIM")
-                    .smallClaimsMethodInPerson(options.toBuilder().value(selectedCourt).build())
-                    .drawDirectionsOrderRequired(NO)
-                    .claimsTrack(ClaimsTrack.smallClaimsTrack)
-                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-                    .build(),
-                "SMALL_CLAIM"
-            ),
-            Arguments.of(
-                CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                    .caseAccessCategory(SPEC_CLAIM)
-                    .responseClaimTrack("FAST_CLAIM")
-                    .smallClaimsMethodInPerson(options.toBuilder().value(selectedCourt).build())
-                    .drawDirectionsOrderRequired(YES)
-                    .drawDirectionsOrderSmallClaims(YES)
-                    .orderType(OrderType.DECIDE_DAMAGES)
-                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-                    .build(),
-                "SMALL_CLAIM"
-            ),
-            Arguments.of(
-                CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                    .caseAccessCategory(SPEC_CLAIM)
-                    .responseClaimTrack("FAST_CLAIM")
-                    .drawDirectionsOrderRequired(YES)
-                    .drawDirectionsOrderSmallClaims(YES)
-                    .orderType(OrderType.DECIDE_DAMAGES)
-                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-                    .build(),
-                "SMALL_CLAIM"
-            ),
-            Arguments.of(
-                CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                    .caseAccessCategory(SPEC_CLAIM)
-                    .responseClaimTrack("SMALL_CLAIM")
-                    .disposalHearingMethodInPerson(options.toBuilder().value(selectedCourt).build())
-                    .drawDirectionsOrderRequired(YES)
-                    .drawDirectionsOrderSmallClaims(NO)
-                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-                    .orderType(OrderType.DISPOSAL)
-                    .build(),
-                "SMALL_CLAIM"
-            )
+            Arguments.of(scenario1, "FAST_CLAIM"),
+            Arguments.of(scenario2, "FAST_CLAIM"),
+            Arguments.of(scenario3, "FAST_CLAIM"),
+            Arguments.of(scenario4, "FAST_CLAIM"),
+            Arguments.of(scenario5, "FAST_CLAIM"),
+            Arguments.of(scenario6, "SMALL_CLAIM"),
+            Arguments.of(scenario7, "SMALL_CLAIM"),
+            Arguments.of(scenario8, "SMALL_CLAIM"),
+            Arguments.of(scenario9, "SMALL_CLAIM")
         );
     }
 
@@ -1742,8 +1714,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimDraft()
                 .totalClaimAmount(BigDecimal.valueOf(15000))
                 .applicant1DQWithLocation()
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                 .build();
+            caseData.setCaseManagementLocation(createCaseLocation("00000", null));
             given(locationRefDataService.getHearingCourtLocations(any()))
                 .willReturn(getSampleCourLocationsRefObjectToSort());
             Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
@@ -2322,14 +2294,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            DynamicList expected = DynamicList.builder()
-                .listItems(List.of(
-                               DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                               DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build(),
-                               DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                           )
-                )
-                .build();
+            DynamicListElement optionOne = createDynamicListElement("00001", "court 1 - 1 address - Y01 7RB");
+            DynamicListElement optionTwo = createDynamicListElement(preSelectedCourt, "court 2 - 2 address - Y02 7RB");
+            DynamicListElement optionThree = createDynamicListElement("00003", "court 3 - 3 address - Y03 7RB");
+            DynamicList expected = createDynamicList(List.of(optionOne, optionTwo, optionThree), null);
             CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(response.getData()).extracting("showCarmFields").isEqualTo("Yes");
@@ -2474,17 +2442,20 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void testSDOSortsLocationListThroughOrganisationPartyType() {
+            Party applicant1 = new Party();
+            applicant1.setType(Party.Type.ORGANISATION);
+            applicant1.setIndividualTitle("Mr.");
+            applicant1.setIndividualFirstName("Alex");
+            applicant1.setIndividualLastName("Richards");
+            applicant1.setPartyName("Mr. Alex Richards");
             CaseData caseData = CaseDataBuilder.builder()
                 .setClaimTypeToSpecClaim()
                 .atStateClaimDraft()
                 .totalClaimAmount(BigDecimal.valueOf(10000))
-                .respondent1DQWithLocation().applicant1DQWithLocation().applicant1(Party.builder()
-                                                                                       .type(Party.Type.ORGANISATION)
-                                                                                       .individualTitle("Mr.")
-                                                                                       .individualFirstName("Alex")
-                                                                                       .individualLastName("Richards")
-                                                                                       .partyName("Mr. Alex Richards")
-                                                                                       .build()).build();
+                .respondent1DQWithLocation()
+                .applicant1DQWithLocation()
+                .build();
+            caseData.setApplicant1(applicant1);
             given(locationRefDataService.getHearingCourtLocations(any()))
                 .willReturn(getSampleCourLocationsRefObjectToSort());
 
@@ -2509,16 +2480,21 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         void testSDOSortsLocationListThroughDecideDamagesOrderType() {
             given(locationRefDataService.getHearingCourtLocations(any()))
                 .willReturn(getSampleCourLocationsRefObjectToSort());
-            CaseData caseData = CaseDataBuilder.builder().respondent1DQWithLocation().applicant1DQWithLocation()
-                .setClaimTypeToSpecClaim().atStateClaimDraft()
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1DQWithLocation()
+                .applicant1DQWithLocation()
+                .setClaimTypeToSpecClaim()
+                .atStateClaimDraft()
                 .totalClaimAmount(BigDecimal.valueOf(10000))
-                .build().toBuilder().orderType(OrderType.DECIDE_DAMAGES).applicant1(Party.builder()
-                                                                                        .type(Party.Type.ORGANISATION)
-                                                                                        .individualTitle("Mr.")
-                                                                                        .individualFirstName("Alex")
-                                                                                        .individualLastName("Richards")
-                                                                                        .partyName("Mr. Alex Richards")
-                                                                                        .build()).build();
+                .build();
+            caseData.setOrderType(OrderType.DECIDE_DAMAGES);
+            Party applicant1 = new Party();
+            applicant1.setType(Party.Type.ORGANISATION);
+            applicant1.setIndividualTitle("Mr.");
+            applicant1.setIndividualFirstName("Alex");
+            applicant1.setIndividualLastName("Richards");
+            applicant1.setPartyName("Mr. Alex Richards");
+            caseData.setApplicant1(applicant1);
 
             // .respondent1DQWithLocation().applicant1DQWithLocation()
 
@@ -2541,16 +2517,13 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPrePopulateDisposalHearingJudgementDeductionValueWhenDrawDirectionsOrderIsNotNull() {
-            JudgementSum tempJudgementSum = JudgementSum.builder()
-                .judgementSum(12.0)
-                .build();
+            JudgementSum tempJudgementSum = new JudgementSum();
+            tempJudgementSum.setJudgementSum(12.0);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .drawDirectionsOrder(tempJudgementSum)
                 .build();
+            caseData.setDrawDirectionsOrder(tempJudgementSum);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
@@ -2574,12 +2547,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void showReturnError_whenUnspecIntermediateTrack() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build().toBuilder()
-                .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
-                .orderType(OrderType.DISPOSAL)
-                .ccdState(JUDICIAL_REFERRAL)
-                .build();
+                .atStateClaimDraft().build();
+            caseData.setAllocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM);
+            caseData.setOrderType(OrderType.DISPOSAL);
+            caseData.setCcdState(JUDICIAL_REFERRAL);
 
             when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
 
@@ -2594,12 +2565,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void showReturnError_whenUnspecMultiTrack() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build().toBuilder()
-                .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
-                .orderType(OrderType.DISPOSAL)
-                .ccdState(JUDICIAL_REFERRAL)
-                .build();
+                .atStateClaimDraft().build();
+            caseData.setAllocatedTrack(AllocatedTrack.MULTI_CLAIM);
+            caseData.setOrderType(OrderType.DISPOSAL);
+            caseData.setCcdState(JUDICIAL_REFERRAL);
 
             when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
 
@@ -2615,12 +2584,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         void showReturnError_whenSpecIntermediateTrack() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
-                .setClaimTypeToSpecClaim()
-                .build().toBuilder()
-                .responseClaimTrack(AllocatedTrack.INTERMEDIATE_CLAIM.name())
-                .orderType(OrderType.DISPOSAL)
-                .ccdState(JUDICIAL_REFERRAL)
-                .build();
+                .setClaimTypeToSpecClaim().build();
+            caseData.setResponseClaimTrack(AllocatedTrack.INTERMEDIATE_CLAIM.name());
+            caseData.setOrderType(OrderType.DISPOSAL);
+            caseData.setCcdState(JUDICIAL_REFERRAL);
 
             when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
 
@@ -2636,12 +2603,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         void showReturnError_whenSpecMultiTrack() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
-                .setClaimTypeToSpecClaim()
-                .build().toBuilder()
-                .responseClaimTrack(AllocatedTrack.MULTI_CLAIM.name())
-                .orderType(OrderType.DISPOSAL)
-                .ccdState(JUDICIAL_REFERRAL)
-                .build();
+                .setClaimTypeToSpecClaim().build();
+            caseData.setResponseClaimTrack(AllocatedTrack.MULTI_CLAIM.name());
+            caseData.setOrderType(OrderType.DISPOSAL);
+            caseData.setCcdState(JUDICIAL_REFERRAL);
 
             when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
 
@@ -2670,12 +2635,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void smallClaimsFlagSetToYesPathOne() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
-                .claimsTrack(ClaimsTrack.smallClaimsTrack)
-                .build();
+                .atStateClaimDraft().build();
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
+            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -2688,12 +2650,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void smallClaimsFlagSetToYesPathTwo() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.YES)
-                .drawDirectionsOrderSmallClaims(YesOrNo.YES)
-                .build();
+                .atStateClaimDraft().build();
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
+            caseData.setDrawDirectionsOrderSmallClaims(YesOrNo.YES);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -2706,13 +2665,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void fastTrackFlagSetToYesPathOne() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .fastClaims(List.of(FastTrack.fastClaimBuildingDispute))
-                .build();
+                .atStateClaimDraft().build();
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setFastClaims(List.of(FastTrack.fastClaimBuildingDispute));
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -2725,15 +2681,12 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void fastTrackFlagSetToYesPathTwo() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.YES)
-                .drawDirectionsOrderSmallClaims(YesOrNo.NO)
-                .orderType(OrderType.DECIDE_DAMAGES)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .fastClaims(List.of(FastTrack.fastClaimBuildingDispute))
-                .build();
+                .atStateClaimDraft().build();
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
+            caseData.setDrawDirectionsOrderSmallClaims(YesOrNo.NO);
+            caseData.setOrderType(OrderType.DECIDE_DAMAGES);
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setFastClaims(List.of(FastTrack.fastClaimBuildingDispute));
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -2751,15 +2704,12 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
 
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.YES)
-                .drawDirectionsOrderSmallClaims(YesOrNo.NO)
-                .orderType(OrderType.DECIDE_DAMAGES)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .trialAdditionalDirectionsForFastTrack(fastTrackList)
-                .build();
+                .atStateClaimDraft().build();
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
+            caseData.setDrawDirectionsOrderSmallClaims(YesOrNo.NO);
+            caseData.setOrderType(OrderType.DECIDE_DAMAGES);
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setTrialAdditionalDirectionsForFastTrack(fastTrackList);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -2777,13 +2727,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
 
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .fastClaims(fastTrackList)
-                .build();
+                .atStateClaimDraft().build();
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setFastClaims(fastTrackList);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -2797,13 +2744,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void smallClaimsSdoR2FlagSetToYesPathOne() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
-                .claimsTrack(ClaimsTrack.smallClaimsTrack)
-                .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
-                .build();
+                .atStateClaimDraft().build();
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
+            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+            caseData.setSmallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing));
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -2817,13 +2761,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void smallClaimsSdoR2FlagSetToYesPathTwo() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.YES)
-                .drawDirectionsOrderSmallClaims(YesOrNo.YES)
-                .drawDirectionsOrderSmallClaimsAdditionalDirections(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
-                .build();
+                .atStateClaimDraft().build();
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
+            caseData.setDrawDirectionsOrderSmallClaims(YesOrNo.YES);
+            caseData.setDrawDirectionsOrderSmallClaimsAdditionalDirections(List.of(SmallTrack.smallClaimDisputeResolutionHearing));
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -2845,9 +2786,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            CaseDocument order = createCaseDocument("url");
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
@@ -2859,9 +2798,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedDisposalHearingSDOTelephoneHearing().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            CaseDocument order = createCaseDocument("url");
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
@@ -2873,9 +2810,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedDisposalHearingSDOVideoHearing().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            CaseDocument order = createCaseDocument("url");
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
@@ -2887,9 +2822,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedFastTrackSDOInPersonHearing().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            CaseDocument order = createCaseDocument("url");
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
@@ -2901,9 +2834,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedFastTrackSDOTelephoneHearing().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            CaseDocument order = createCaseDocument("url");
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
@@ -2915,9 +2846,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedFastTrackSDOVideoHearing().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            CaseDocument order = createCaseDocument("url");
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
@@ -2929,9 +2858,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedSmallClaimsSDOInPersonHearing().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            CaseDocument order = createCaseDocument("url");
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
@@ -2943,9 +2870,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedSmallClaimsSDOTelephoneHearing().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            CaseDocument order = createCaseDocument("url");
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
@@ -2957,9 +2882,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedSmallClaimsSDOVideoHearing().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            CaseDocument order = createCaseDocument("url");
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
@@ -2970,9 +2893,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            CaseDocument order = createCaseDocument("url");
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
@@ -2987,17 +2908,13 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .fastClaims(fastTrackList)
                 .build();
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setFastClaims(fastTrackList);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            CaseDocument order = createCaseDocument("url");
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
@@ -3012,45 +2929,87 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
 
             LocalDate testDate = valid ? LocalDate.now().plusDays(1) : LocalDate.now();
+
+            SdoR2DisclosureOfDocuments disclosureOfDocuments = new SdoR2DisclosureOfDocuments();
+            disclosureOfDocuments.setStandardDisclosureDate(testDate);
+            disclosureOfDocuments.setInspectionDate(testDate);
+
+            SdoR2AddendumReport addendumReport = new SdoR2AddendumReport();
+            addendumReport.setSdoAddendumReportDate(testDate);
+
+            SdoR2FurtherAudiogram furtherAudiogram = new SdoR2FurtherAudiogram();
+            furtherAudiogram.setSdoClaimantShallUndergoDate(testDate);
+            furtherAudiogram.setSdoServiceReportDate(testDate);
+
+            SdoR2ApplicationToRelyOnFurtherDetails relyDetails = new SdoR2ApplicationToRelyOnFurtherDetails();
+            relyDetails.setApplicationToRelyDetailsDate(testDate);
+
+            SdoR2ApplicationToRelyOnFurther applicationToRely = new SdoR2ApplicationToRelyOnFurther();
+            applicationToRely.setApplicationToRelyOnFurtherDetails(relyDetails);
+
+            SdoR2QuestionsClaimantExpert questionsClaimant = new SdoR2QuestionsClaimantExpert();
+            questionsClaimant.setSdoDefendantMayAskDate(testDate);
+            questionsClaimant.setSdoQuestionsShallBeAnsweredDate(testDate);
+            questionsClaimant.setSdoApplicationToRelyOnFurther(applicationToRely);
+
+            SdoR2PermissionToRelyOnExpert permissionToRely = new SdoR2PermissionToRelyOnExpert();
+            permissionToRely.setSdoPermissionToRelyOnExpertDate(testDate);
+            permissionToRely.setSdoJointMeetingOfExpertsDate(testDate);
+
+            SdoR2EvidenceAcousticEngineer evidenceAcousticEngineer = new SdoR2EvidenceAcousticEngineer();
+            evidenceAcousticEngineer.setSdoInstructionOfTheExpertDate(testDate);
+            evidenceAcousticEngineer.setSdoExpertReportDate(testDate);
+            evidenceAcousticEngineer.setSdoWrittenQuestionsDate(testDate);
+            evidenceAcousticEngineer.setSdoRepliesDate(testDate);
+
+            SdoR2QuestionsToEntExpert questionsToEntExpert = new SdoR2QuestionsToEntExpert();
+            questionsToEntExpert.setSdoQuestionsShallBeAnsweredDate(testDate);
+            questionsToEntExpert.setSdoWrittenQuestionsDate(testDate);
+
+            SdoR2ScheduleOfLoss scheduleOfLoss = new SdoR2ScheduleOfLoss();
+            scheduleOfLoss.setSdoR2ScheduleOfLossClaimantDate(testDate);
+            scheduleOfLoss.setSdoR2ScheduleOfLossDefendantDate(testDate);
+
+            SdoR2TrialFirstOpenDateAfter trialFirstOpenDateAfter = new SdoR2TrialFirstOpenDateAfter();
+            trialFirstOpenDateAfter.setListFrom(testDate);
+
+            SdoR2TrialWindow trialWindow = new SdoR2TrialWindow();
+            trialWindow.setListFrom(testDate);
+            trialWindow.setDateTo(testDate);
+
+            SdoR2Trial sdoR2Trial = new SdoR2Trial();
+            sdoR2Trial.setSdoR2TrialFirstOpenDateAfter(trialFirstOpenDateAfter);
+            sdoR2Trial.setSdoR2TrialWindow(trialWindow);
+
             Integer testWitnesses = valid ? 0 : -1;
+            SdoR2RestrictNoOfWitnessDetails witnessDetails = new SdoR2RestrictNoOfWitnessDetails();
+            witnessDetails.setNoOfWitnessClaimant(testWitnesses);
+            witnessDetails.setNoOfWitnessDefendant(testWitnesses);
+
+            SdoR2RestrictWitness restrictWitness = new SdoR2RestrictWitness();
+            restrictWitness.setRestrictNoOfWitnessDetails(witnessDetails);
+
+            SdoR2WitnessOfFact witnessesOfFact =  new SdoR2WitnessOfFact();
+            witnessesOfFact.setSdoWitnessDeadlineDate(testDate);
+            witnessesOfFact.setSdoR2RestrictWitness(restrictWitness);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .drawDirectionsOrderRequired(NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .fastClaims(fastTrackList)
-                .sdoR2DisclosureOfDocuments(SdoR2DisclosureOfDocuments.builder().standardDisclosureDate(testDate).inspectionDate(
-                    testDate).build())
-                .sdoR2AddendumReport(SdoR2AddendumReport.builder().sdoAddendumReportDate(testDate).build())
-                .sdoR2FurtherAudiogram(SdoR2FurtherAudiogram.builder().sdoClaimantShallUndergoDate(testDate).sdoServiceReportDate(
-                    testDate).build())
-                .sdoR2QuestionsClaimantExpert(SdoR2QuestionsClaimantExpert.builder().sdoDefendantMayAskDate(testDate).sdoQuestionsShallBeAnsweredDate(
-                        testDate)
-                                                  .sdoApplicationToRelyOnFurther(SdoR2ApplicationToRelyOnFurther.builder().applicationToRelyOnFurtherDetails(
-                                                      SdoR2ApplicationToRelyOnFurtherDetails.builder().applicationToRelyDetailsDate(
-                                                          testDate).build()).build()).build())
-                .sdoR2PermissionToRelyOnExpert(SdoR2PermissionToRelyOnExpert.builder().sdoPermissionToRelyOnExpertDate(
-                    testDate).sdoJointMeetingOfExpertsDate(testDate).build())
-                .sdoR2EvidenceAcousticEngineer(SdoR2EvidenceAcousticEngineer.builder().sdoInstructionOfTheExpertDate(
-                        testDate).sdoExpertReportDate(testDate)
-                                                   .sdoWrittenQuestionsDate(testDate).sdoRepliesDate(testDate).build())
-                .sdoR2QuestionsToEntExpert(SdoR2QuestionsToEntExpert.builder().sdoQuestionsShallBeAnsweredDate(testDate).sdoWrittenQuestionsDate(
-                    testDate).build())
-                .sdoR2ScheduleOfLoss(SdoR2ScheduleOfLoss.builder().sdoR2ScheduleOfLossClaimantDate(testDate).sdoR2ScheduleOfLossDefendantDate(
-                    testDate).build())
-                .sdoR2Trial(SdoR2Trial.builder().sdoR2TrialFirstOpenDateAfter(SdoR2TrialFirstOpenDateAfter.builder().listFrom(
-                        testDate).build())
-                                .sdoR2TrialWindow(SdoR2TrialWindow.builder().listFrom(testDate).dateTo(testDate).build()).build())
-                .sdoR2ImportantNotesDate(testDate)
-                .sdoR2WitnessesOfFact(SdoR2WitnessOfFact.builder().sdoWitnessDeadlineDate(testDate)
-                                          .sdoR2RestrictWitness(SdoR2RestrictWitness.builder()
-                                                                    .restrictNoOfWitnessDetails(
-                                                                        SdoR2RestrictNoOfWitnessDetails.builder().noOfWitnessClaimant(
-                                                                                testWitnesses)
-                                                                            .noOfWitnessDefendant(testWitnesses).build()).build()).build())
                 .build();
+            caseData.setDrawDirectionsOrderRequired(NO);
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setFastClaims(fastTrackList);
+            caseData.setSdoR2DisclosureOfDocuments(disclosureOfDocuments);
+            caseData.setSdoR2AddendumReport(addendumReport);
+            caseData.setSdoR2FurtherAudiogram(furtherAudiogram);
+            caseData.setSdoR2QuestionsClaimantExpert(questionsClaimant);
+            caseData.setSdoR2PermissionToRelyOnExpert(permissionToRely);
+            caseData.setSdoR2EvidenceAcousticEngineer(evidenceAcousticEngineer);
+            caseData.setSdoR2QuestionsToEntExpert(questionsToEntExpert);
+            caseData.setSdoR2ScheduleOfLoss(scheduleOfLoss);
+            caseData.setSdoR2Trial(sdoR2Trial);
+            caseData.setSdoR2ImportantNotesDate(testDate);
+            caseData.setSdoR2WitnessesOfFact(witnessesOfFact);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -3069,17 +3028,13 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldGenerateAndSaveSdoOrder_whenDrhIsSelected() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .atStateClaimIssued()
-                .build()
-                .toBuilder()
-                .claimsTrack(ClaimsTrack.smallClaimsTrack)
-                .drawDirectionsOrderRequired(NO)
-                .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
                 .build();
+            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+            caseData.setDrawDirectionsOrderRequired(NO);
+            caseData.setSmallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing));
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            CaseDocument order = createCaseDocument("url");
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
@@ -3183,10 +3138,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atSmallClaimsWitnessStatementWithNegativeInputs()
-                .build()
-                .toBuilder()
-                .claimsTrack(ClaimsTrack.smallClaimsTrack)
                 .build();
+            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
 
@@ -3199,10 +3152,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atFastTrackWitnessOfFactWithNegativeInputs()
-                .build()
-                .toBuilder()
-                .claimsTrack(ClaimsTrack.fastTrack)
                 .build();
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
 
@@ -3215,10 +3166,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atSmallClaimsWitnessStatementWithPositiveInputs()
-                .build()
-                .toBuilder()
-                .claimsTrack(ClaimsTrack.smallClaimsTrack)
                 .build();
+            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
 
@@ -3232,10 +3181,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atFastTrackWitnessOfFactWithPositiveInputs()
-                .build()
-                .toBuilder()
-                .claimsTrack(ClaimsTrack.fastTrack)
                 .build();
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
 
@@ -3249,29 +3196,38 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @ValueSource(booleans = {true, false})
         void shouldValidateDRHFields(boolean valid) {
             LocalDate testDate = valid ? LocalDate.now().plusDays(1) : LocalDate.now().minusDays(2);
+            SdoR2SmallClaimsPPI smallClaimsPPI = new SdoR2SmallClaimsPPI();
+            smallClaimsPPI.setPpiDate(testDate);
+
+            SdoR2SmallClaimsHearingFirstOpenDateAfter firstOpenDateAfter = new SdoR2SmallClaimsHearingFirstOpenDateAfter();
+            firstOpenDateAfter.setListFrom(testDate);
+
+            SdoR2SmallClaimsHearing smallClaimsHearing = new SdoR2SmallClaimsHearing();
+            smallClaimsHearing.setTrialOnOptions(HearingOnRadioOptions.OPEN_DATE);
+            smallClaimsHearing.setSdoR2SmallClaimsHearingFirstOpenDateAfter(firstOpenDateAfter);
+
+            SdoR2SmallClaimsImpNotes impNotes = new SdoR2SmallClaimsImpNotes();
+            impNotes.setDate(testDate);
+
             int countWitness = valid ? 0 : -1;
+            SdoR2SmallClaimsRestrictWitness restrictWitness = new SdoR2SmallClaimsRestrictWitness();
+            restrictWitness.setNoOfWitnessClaimant(countWitness);
+            restrictWitness.setNoOfWitnessDefendant(countWitness);
+
+            SdoR2SmallClaimsWitnessStatements witnessStatements = new SdoR2SmallClaimsWitnessStatements();
+            witnessStatements.setIsRestrictWitness(YES);
+            witnessStatements.setSdoR2SmallClaimsRestrictWitness(restrictWitness);
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
-                .build()
-                .toBuilder()
-                .claimsTrack(ClaimsTrack.smallClaimsTrack)
-                .drawDirectionsOrderRequired(NO)
-                .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
-                .sdoR2SmallClaimsPPI(SdoR2SmallClaimsPPI.builder().ppiDate(testDate).build())
-                .sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder().trialOnOptions(HearingOnRadioOptions.OPEN_DATE)
-                                             .sdoR2SmallClaimsHearingFirstOpenDateAfter(
-                                                 SdoR2SmallClaimsHearingFirstOpenDateAfter.builder().listFrom(testDate).build()).build())
-                .sdoR2SmallClaimsImpNotes(SdoR2SmallClaimsImpNotes.builder().date(testDate).build())
-                .sdoR2SmallClaimsWitnessStatements(SdoR2SmallClaimsWitnessStatements.builder()
-                                                       .isRestrictWitness(YES)
-                                                       .sdoR2SmallClaimsRestrictWitness(SdoR2SmallClaimsRestrictWitness
-                                                                                            .builder().noOfWitnessClaimant(
-                                                               countWitness)
-                                                                                            .noOfWitnessDefendant(
-                                                                                                countWitness).build())
-                                                       .build())
-
                 .build();
+            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+            caseData.setDrawDirectionsOrderRequired(NO);
+            caseData.setSmallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing));
+            caseData.setSdoR2SmallClaimsPPI(smallClaimsPPI);
+            caseData.setSdoR2SmallClaimsHearing(smallClaimsHearing);
+            caseData.setSdoR2SmallClaimsImpNotes(impNotes);
+            caseData.setSdoR2SmallClaimsWitnessStatements(witnessStatements);
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
 
@@ -3285,15 +3241,16 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotThrowErrorIfDRHOptionalFieldsAreNull() {
+            SdoR2SmallClaimsImpNotes impNotes = new SdoR2SmallClaimsImpNotes();
+            impNotes.setDate(LocalDate.now().plusDays(2));
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
-                .build()
-                .toBuilder()
-                .claimsTrack(ClaimsTrack.smallClaimsTrack)
-                .drawDirectionsOrderRequired(NO)
-                .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
-                .sdoR2SmallClaimsImpNotes(SdoR2SmallClaimsImpNotes.builder().date(LocalDate.now().plusDays(2)).build())
                 .build();
+            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+            caseData.setDrawDirectionsOrderRequired(NO);
+            caseData.setSmallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing));
+            caseData.setSdoR2SmallClaimsImpNotes(impNotes);
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
 
@@ -3305,18 +3262,21 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @ValueSource(booleans = {true, false})
         void shouldThrowValidationErrorForDRHHearingWindow(boolean valid) {
             LocalDate testDate = valid ? LocalDate.now().plusDays(1) : LocalDate.now().minusDays(2);
+            SdoR2SmallClaimsHearingWindow hearingWindow = new SdoR2SmallClaimsHearingWindow();
+            hearingWindow.setListFrom(testDate);
+            hearingWindow.setDateTo(testDate);
+
+            SdoR2SmallClaimsHearing hearing = new SdoR2SmallClaimsHearing();
+            hearing.setTrialOnOptions(HearingOnRadioOptions.HEARING_WINDOW);
+            hearing.setSdoR2SmallClaimsHearingWindow(hearingWindow);
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
-                .build()
-                .toBuilder()
-                .claimsTrack(ClaimsTrack.smallClaimsTrack)
-                .drawDirectionsOrderRequired(NO)
-                .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
-                .sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder().trialOnOptions(HearingOnRadioOptions.HEARING_WINDOW)
-                                             .sdoR2SmallClaimsHearingWindow(
-                                                 SdoR2SmallClaimsHearingWindow.builder().listFrom(testDate)
-                                                     .dateTo(testDate).build()).build())
                 .build();
+            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+            caseData.setDrawDirectionsOrderRequired(NO);
+            caseData.setSmallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing));
+            caseData.setSdoR2SmallClaimsHearing(hearing);
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
 

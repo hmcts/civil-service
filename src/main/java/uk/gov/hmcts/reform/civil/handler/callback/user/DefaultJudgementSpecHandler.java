@@ -204,7 +204,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private CallbackResponse checkStatus(CallbackParams callbackParams) {
-        List<Element<RegistrationInformation>> registrationList = new ArrayList<>();
         var caseData = callbackParams.getCaseData();
         caseData.setBothDefendantsSpec("One");
         // populate the title of next screen if only one defendant chosen
@@ -218,11 +217,11 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             currentDefendantString = ("Have the defendants paid some of the amount owed?");
             currentDefendantName = ("both defendants");
         }
+        RegistrationInformation regInfo = new RegistrationInformation();
+        regInfo.setRegistrationType("R");
+        regInfo.setJudgmentDateTime(time.now());
 
-        var regInfo = RegistrationInformation.builder()
-            .registrationType("R")
-            .judgmentDateTime(time.now())
-            .build();
+        List<Element<RegistrationInformation>> registrationList = new ArrayList<>();
         if (MultiPartyScenario.getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_ONE
             || MultiPartyScenario.getMultiPartyScenario(caseData) == MultiPartyScenario.TWO_V_ONE) {
             registrationList.add(element(regInfo));

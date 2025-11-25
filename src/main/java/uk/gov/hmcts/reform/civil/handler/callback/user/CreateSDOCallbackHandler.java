@@ -305,92 +305,80 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         List<OrderDetailsPagesSectionsToggle> checkList = List.of(SHOW);
         setCheckList(caseData, checkList);
 
-        DisposalHearingJudgesRecital tempDisposalHearingJudgesRecital = DisposalHearingJudgesRecital.builder()
-            .input(UPON_CONSIDERING)
-            .build();
+        DisposalHearingJudgesRecital tempDisposalHearingJudgesRecital = new DisposalHearingJudgesRecital();
+        tempDisposalHearingJudgesRecital.setInput(UPON_CONSIDERING);
 
         caseData.setDisposalHearingJudgesRecital(tempDisposalHearingJudgesRecital);
 
         updateDeductionValue(caseData);
 
-        DisposalHearingDisclosureOfDocuments tempDisposalHearingDisclosureOfDocuments =
-            DisposalHearingDisclosureOfDocuments.builder()
-                .input1("The parties shall serve on each other copies of the documents upon which reliance is to be"
-                            + " placed at the disposal hearing by 4pm on")
-                .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
-                .input2("The parties must upload to the Digital Portal copies of those documents which they wish the "
-                            + "court to consider when deciding the amount of damages, by 4pm on")
-                .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
-                .build();
+        DisposalHearingDisclosureOfDocuments tempDisposalHearingDisclosureOfDocuments = new DisposalHearingDisclosureOfDocuments();
+        tempDisposalHearingDisclosureOfDocuments.setInput1("The parties shall serve on each other copies of the documents upon which reliance is to be"
+                            + " placed at the disposal hearing by 4pm on");
+        tempDisposalHearingDisclosureOfDocuments.setDate1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)));
+        tempDisposalHearingDisclosureOfDocuments.setInput2("The parties must upload to the Digital Portal copies of those documents which they wish the "
+                            + "court to consider when deciding the amount of damages, by 4pm on");
+        tempDisposalHearingDisclosureOfDocuments.setDate2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)));
 
         caseData.setDisposalHearingDisclosureOfDocuments(tempDisposalHearingDisclosureOfDocuments);
 
-        DisposalHearingWitnessOfFact tempDisposalHearingWitnessOfFact = DisposalHearingWitnessOfFact.builder()
-            .input3("The claimant must upload to the Digital Portal copies of the witness statements of all witnesses"
-                        + " of fact on whose evidence reliance is to be placed by 4pm on")
-            .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
-            .input4("The provisions of CPR 32.6 apply to such evidence.")
-            .input5("Any application by the defendant in relation to CPR 32.7 must be made by 4pm on")
-            .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
-            .input6("and must be accompanied by proposed directions for allocation and listing for trial on quantum. "
+        DisposalHearingWitnessOfFact tempDisposalHearingWitnessOfFact = new DisposalHearingWitnessOfFact();
+        tempDisposalHearingWitnessOfFact.setInput3("The claimant must upload to the Digital Portal copies of the witness statements of all witnesses"
+                        + " of fact on whose evidence reliance is to be placed by 4pm on");
+        tempDisposalHearingWitnessOfFact.setDate2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)));
+        tempDisposalHearingWitnessOfFact.setInput4("The provisions of CPR 32.6 apply to such evidence.");
+        tempDisposalHearingWitnessOfFact.setInput5("Any application by the defendant in relation to CPR 32.7 must be made by 4pm on");
+        tempDisposalHearingWitnessOfFact.setDate3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)));
+        tempDisposalHearingWitnessOfFact.setInput6("and must be accompanied by proposed directions for allocation and listing for trial on quantum. "
                         + "This is because cross-examination will cause the hearing to exceed the 30-minute "
-                        + "maximum time estimate for a disposal hearing.")
-            .build();
+                        + "maximum time estimate for a disposal hearing.");
 
         caseData.setDisposalHearingWitnessOfFact(tempDisposalHearingWitnessOfFact);
 
-        DisposalHearingMedicalEvidence tempDisposalHearingMedicalEvidence = DisposalHearingMedicalEvidence.builder()
-            .input("The claimant has permission to rely upon the written expert evidence already uploaded to the"
+        DisposalHearingMedicalEvidence tempDisposalHearingMedicalEvidence = new DisposalHearingMedicalEvidence();
+        tempDisposalHearingMedicalEvidence.setInput("The claimant has permission to rely upon the written expert evidence already uploaded to the"
                        + " Digital Portal with the particulars of claim and in addition has permission to rely upon"
                        + " any associated correspondence or updating report which is uploaded to the Digital Portal"
-                       + " by 4pm on")
-            .date(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
-            .build();
+                       + " by 4pm on");
+        tempDisposalHearingMedicalEvidence.setDate(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)));
 
         caseData.setDisposalHearingMedicalEvidence(tempDisposalHearingMedicalEvidence);
 
-        DisposalHearingQuestionsToExperts tempDisposalHearingQuestionsToExperts = DisposalHearingQuestionsToExperts
-            .builder()
-            .date(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
-            .build();
+        DisposalHearingQuestionsToExperts tempDisposalHearingQuestionsToExperts = new DisposalHearingQuestionsToExperts();
+        tempDisposalHearingQuestionsToExperts.setDate(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)));
 
         caseData.setDisposalHearingQuestionsToExperts(tempDisposalHearingQuestionsToExperts);
 
-        DisposalHearingSchedulesOfLoss tempDisposalHearingSchedulesOfLoss = DisposalHearingSchedulesOfLoss.builder()
-            .input2("If there is a claim for ongoing or future loss in the original schedule of losses, the claimant"
-                        + " must upload to the Digital Portal an up-to-date schedule of loss by 4pm on")
-            .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
-            .input3("If the defendant wants to challenge this claim, "
-                        + "they must send an up-to-date counter-schedule of loss to the claimant by 4pm on")
-            .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(12)))
-            .input4("If the defendant want to challenge the sums claimed in the schedule of loss they must upload"
-                        + " to the Digital Portal an updated counter schedule of loss by 4pm on")
-            .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(12)))
-            .build();
+        DisposalHearingSchedulesOfLoss tempDisposalHearingSchedulesOfLoss = new DisposalHearingSchedulesOfLoss();
+        tempDisposalHearingSchedulesOfLoss.setInput2("If there is a claim for ongoing or future loss in the original schedule of losses, the claimant"
+                        + " must upload to the Digital Portal an up-to-date schedule of loss by 4pm on");
+        tempDisposalHearingSchedulesOfLoss.setDate2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)));
+        tempDisposalHearingSchedulesOfLoss.setInput3("If the defendant wants to challenge this claim, "
+                        + "they must send an up-to-date counter-schedule of loss to the claimant by 4pm on");
+        tempDisposalHearingSchedulesOfLoss.setDate3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(12)));
+        tempDisposalHearingSchedulesOfLoss.setInput4("If the defendant want to challenge the sums claimed in the schedule of loss they must upload"
+                        + " to the Digital Portal an updated counter schedule of loss by 4pm on");
+        tempDisposalHearingSchedulesOfLoss.setDate4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(12)));
 
         caseData.setDisposalHearingSchedulesOfLoss(tempDisposalHearingSchedulesOfLoss);
 
-        DisposalHearingFinalDisposalHearing tempDisposalHearingFinalDisposalHearing =
-            DisposalHearingFinalDisposalHearing.builder()
-                .input("This claim will be listed for final disposal before a judge on the first available date after")
-                .date(LocalDate.now().plusWeeks(16))
-                .build();
+        DisposalHearingFinalDisposalHearing tempDisposalHearingFinalDisposalHearing = new DisposalHearingFinalDisposalHearing();
+        tempDisposalHearingFinalDisposalHearing.setInput("This claim will be listed for final disposal before a judge on the first available date after");
+        tempDisposalHearingFinalDisposalHearing.setDate(LocalDate.now().plusWeeks(16));
 
         caseData.setDisposalHearingFinalDisposalHearing(tempDisposalHearingFinalDisposalHearing);
 
         // updated Hearing time field copy of the above field, leaving above field in as requested to not break
         // existing cases
-        DisposalHearingHearingTime tempDisposalHearingHearingTime =
-            DisposalHearingHearingTime.builder()
-                .input(
-                    "This claim will be listed for final disposal before a judge on the first available date after")
-                .dateTo(LocalDate.now().plusWeeks(16))
-                .build();
+        DisposalHearingHearingTime tempDisposalHearingHearingTime = new DisposalHearingHearingTime();
+        tempDisposalHearingHearingTime.setInput(
+                    "This claim will be listed for final disposal before a judge on the first available date after");
+        tempDisposalHearingHearingTime.setDateTo(LocalDate.now().plusWeeks(16));
 
         caseData.setDisposalHearingHearingTime(tempDisposalHearingHearingTime);
 
-        DisposalOrderWithoutHearing disposalOrderWithoutHearing = DisposalOrderWithoutHearing.builder()
-            .input(String.format(
+        DisposalOrderWithoutHearing disposalOrderWithoutHearing = new DisposalOrderWithoutHearing();
+        disposalOrderWithoutHearing.setInput(String.format(
                 "This order has been made without hearing. "
                     + "Each party has the right to apply to have this Order set "
                     + "aside or varied. Any such application must be received "
@@ -398,91 +386,83 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                     + "by 4pm on %s.",
                 deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
                     .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))
-            )).build();
+            ));
         caseData.setDisposalOrderWithoutHearing(disposalOrderWithoutHearing);
 
-        DisposalHearingBundle tempDisposalHearingBundle = DisposalHearingBundle.builder()
-            .input("At least 7 days before the disposal hearing, the claimant must file and serve")
-            .build();
+        DisposalHearingBundle tempDisposalHearingBundle = new DisposalHearingBundle();
+        tempDisposalHearingBundle.setInput("At least 7 days before the disposal hearing, the claimant must file and serve");
 
         caseData.setDisposalHearingBundle(tempDisposalHearingBundle);
 
-        DisposalHearingNotes tempDisposalHearingNotes = DisposalHearingNotes.builder()
-            .input("This Order has been made without a hearing. Each party has the right to apply to have this Order"
+        DisposalHearingNotes tempDisposalHearingNotes = new DisposalHearingNotes();
+        tempDisposalHearingNotes.setInput("This Order has been made without a hearing. Each party has the right to apply to have this Order"
                        + " set aside or varied. Any such application must be uploaded to the Digital Portal"
-                       + " together with the appropriate fee, by 4pm on")
-            .date(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(1)))
-            .build();
+                       + " together with the appropriate fee, by 4pm on");
+        tempDisposalHearingNotes.setDate(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(1)));
 
         caseData.setDisposalHearingNotes(tempDisposalHearingNotes);
 
-        FastTrackJudgesRecital tempFastTrackJudgesRecital = FastTrackJudgesRecital.builder()
-            .input("Upon considering the statements of case and the information provided by the parties,")
-            .build();
+        FastTrackJudgesRecital tempFastTrackJudgesRecital = new FastTrackJudgesRecital();
+        tempFastTrackJudgesRecital.setInput("Upon considering the statements of case and the information provided by the parties,");
 
         caseData.setFastTrackJudgesRecital(tempFastTrackJudgesRecital);
 
-        FastTrackDisclosureOfDocuments tempFastTrackDisclosureOfDocuments = FastTrackDisclosureOfDocuments.builder()
-            .input1("Standard disclosure shall be provided by the parties by uploading to the Digital Portal their "
-                        + "list of documents by 4pm on")
-            .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
-            .input2("Any request to inspect a document, or for a copy of a document, shall be made directly to "
-                        + "the other party by 4pm on")
-            .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
-            .input3("Requests will be complied with within 7 days of the receipt of the request.")
-            .input4("Each party must upload to the Digital Portal copies of those documents on which they wish to"
-                        + " rely at trial by 4pm on")
-            .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-            .build();
+        FastTrackDisclosureOfDocuments tempFastTrackDisclosureOfDocuments = new FastTrackDisclosureOfDocuments();
+        tempFastTrackDisclosureOfDocuments.setInput1("Standard disclosure shall be provided by the parties by uploading to the Digital Portal their "
+                        + "list of documents by 4pm on");
+        tempFastTrackDisclosureOfDocuments.setDate1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)));
+        tempFastTrackDisclosureOfDocuments.setInput2("Any request to inspect a document, or for a copy of a document, shall be made directly to "
+                        + "the other party by 4pm on");
+        tempFastTrackDisclosureOfDocuments.setDate2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)));
+        tempFastTrackDisclosureOfDocuments.setInput3("Requests will be complied with within 7 days of the receipt of the request.");
+        tempFastTrackDisclosureOfDocuments.setInput4("Each party must upload to the Digital Portal copies of those documents on which they wish to"
+                        + " rely at trial by 4pm on");
+        tempFastTrackDisclosureOfDocuments.setDate3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)));
 
         caseData.setFastTrackDisclosureOfDocuments(tempFastTrackDisclosureOfDocuments);
         caseData.setSdoR2FastTrackWitnessOfFact(getSdoR2WitnessOfFact());
 
-        FastTrackSchedulesOfLoss tempFastTrackSchedulesOfLoss = FastTrackSchedulesOfLoss.builder()
-            .input1("The claimant must upload to the Digital Portal an up-to-date schedule of loss by 4pm on")
-            .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
-            .input2("If the defendant wants to challenge this claim, upload to the Digital Portal "
-                        + "counter-schedule of loss by 4pm on")
-            .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(12)))
-            .input3("If there is a claim for future pecuniary loss and the parties have not already set out "
+        FastTrackSchedulesOfLoss tempFastTrackSchedulesOfLoss = new FastTrackSchedulesOfLoss();
+        tempFastTrackSchedulesOfLoss.setInput1("The claimant must upload to the Digital Portal an up-to-date schedule of loss by 4pm on");
+        tempFastTrackSchedulesOfLoss.setDate1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)));
+        tempFastTrackSchedulesOfLoss.setInput2("If the defendant wants to challenge this claim, upload to the Digital Portal "
+                        + "counter-schedule of loss by 4pm on");
+        tempFastTrackSchedulesOfLoss.setDate2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(12)));
+        tempFastTrackSchedulesOfLoss.setInput3("If there is a claim for future pecuniary loss and the parties have not already set out "
                         + "their case on periodical payments, they must do so in the respective schedule and "
-                        + "counter-schedule.")
-            .build();
+                        + "counter-schedule.");
 
         caseData.setFastTrackSchedulesOfLoss(tempFastTrackSchedulesOfLoss);
 
-        FastTrackTrial tempFastTrackTrial = FastTrackTrial.builder()
-            .input1("The time provisionally allowed for this trial is")
-            .date1(LocalDate.now().plusWeeks(22))
-            .date2(LocalDate.now().plusWeeks(30))
-            .input2("If either party considers that the time estimate is insufficient, they must inform the court "
-                        + "within 7 days of the date stated on this order.")
-            .input3("At least 7 days before the trial, the claimant must upload to the Digital Portal")
-            .type(Collections.singletonList(FastTrackTrialBundleType.DOCUMENTS))
-            .build();
+        FastTrackTrial tempFastTrackTrial = new FastTrackTrial();
+        tempFastTrackTrial.setInput1("The time provisionally allowed for this trial is");
+        tempFastTrackTrial.setDate1(LocalDate.now().plusWeeks(22));
+        tempFastTrackTrial.setDate2(LocalDate.now().plusWeeks(30));
+        tempFastTrackTrial.setInput2("If either party considers that the time estimate is insufficient, they must inform the court "
+                        + "within 7 days of the date stated on this order.");
+        tempFastTrackTrial.setInput3("At least 7 days before the trial, the claimant must upload to the Digital Portal");
+        tempFastTrackTrial.setType(Collections.singletonList(FastTrackTrialBundleType.DOCUMENTS));
 
         caseData.setFastTrackTrial(tempFastTrackTrial);
 
-        FastTrackHearingTime tempFastTrackHearingTime = FastTrackHearingTime.builder()
-            .dateFrom(LocalDate.now().plusWeeks(22))
-            .dateTo(LocalDate.now().plusWeeks(30))
-            .dateToToggle(dateToShowTrue)
-            .helpText1("If either party considers that the time estimate is insufficient, "
-                           + "they must inform the court within 7 days of the date of this order.")
-            .build();
+        FastTrackHearingTime tempFastTrackHearingTime = new FastTrackHearingTime();
+        tempFastTrackHearingTime.setDateFrom(LocalDate.now().plusWeeks(22));
+        tempFastTrackHearingTime.setDateTo(LocalDate.now().plusWeeks(30));
+        tempFastTrackHearingTime.setDateToToggle(dateToShowTrue);
+        tempFastTrackHearingTime.setHelpText1("If either party considers that the time estimate is insufficient, "
+                           + "they must inform the court within 7 days of the date of this order.");
         caseData.setFastTrackHearingTime(tempFastTrackHearingTime);
 
-        FastTrackNotes tempFastTrackNotes = FastTrackNotes.builder()
-            .input("This Order has been made without a hearing. Each party has the right to apply to have this Order "
+        FastTrackNotes tempFastTrackNotes = new FastTrackNotes();
+        tempFastTrackNotes.setInput("This Order has been made without a hearing. Each party has the right to apply to have this Order "
                        + "set aside or varied. Any application must be received by the Court, "
-                       + "together with the appropriate fee by 4pm on")
-            .date(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(1)))
-            .build();
+                       + "together with the appropriate fee by 4pm on");
+        tempFastTrackNotes.setDate(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(1)));
 
         caseData.setFastTrackNotes(tempFastTrackNotes);
 
-        FastTrackOrderWithoutJudgement tempFastTrackOrderWithoutJudgement = FastTrackOrderWithoutJudgement.builder()
-            .input(String.format(
+        FastTrackOrderWithoutJudgement tempFastTrackOrderWithoutJudgement = new FastTrackOrderWithoutJudgement();
+        tempFastTrackOrderWithoutJudgement.setInput(String.format(
                 "This order has been made without hearing. "
                     + "Each party has the right to apply "
                     + "to have this Order set aside or varied. Any such application must be "
@@ -490,62 +470,57 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                     + "on %s.",
                 deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(LocalDateTime.now())
                     .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))
-            ))
-            .build();
+            ));
 
         caseData.setFastTrackOrderWithoutJudgement(tempFastTrackOrderWithoutJudgement);
 
-        FastTrackBuildingDispute tempFastTrackBuildingDispute = FastTrackBuildingDispute.builder()
-            .input1("The claimant must prepare a Scott Schedule of the defects, items of damage, "
-                        + "or any other relevant matters")
-            .input2("The columns should be headed:\n"
+        FastTrackBuildingDispute tempFastTrackBuildingDispute = new FastTrackBuildingDispute();
+        tempFastTrackBuildingDispute.setInput1("The claimant must prepare a Scott Schedule of the defects, items of damage, "
+                        + "or any other relevant matters");
+        tempFastTrackBuildingDispute.setInput2("The columns should be headed:\n"
                         + "  •  Item\n"
                         + "  •  Alleged defect\n"
                         + "  •  Claimant’s costing\n"
                         + "  •  Defendant’s response\n"
                         + "  •  Defendant’s costing\n"
-                        + "  •  Reserved for Judge’s use")
-            .input3("The claimant must upload to the Digital Portal the Scott Schedule with the relevant columns"
-                        + " completed by 4pm on")
-            .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
-            .input4("The defendant must upload to the Digital Portal an amended version of the Scott Schedule "
-                        + "with the relevant columns in response completed by 4pm on")
-            .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(12)))
-            .build();
+                        + "  •  Reserved for Judge’s use");
+        tempFastTrackBuildingDispute.setInput3("The claimant must upload to the Digital Portal the Scott Schedule with the relevant columns"
+                        + " completed by 4pm on");
+        tempFastTrackBuildingDispute.setDate1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)));
+        tempFastTrackBuildingDispute.setInput4("The defendant must upload to the Digital Portal an amended version of the Scott Schedule "
+                        + "with the relevant columns in response completed by 4pm on");
+        tempFastTrackBuildingDispute.setDate2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(12)));
 
         caseData.setFastTrackBuildingDispute(tempFastTrackBuildingDispute);
 
-        FastTrackClinicalNegligence tempFastTrackClinicalNegligence = FastTrackClinicalNegligence.builder()
-            .input1("Documents should be retained as follows:")
-            .input2("a) The parties must retain all electronically stored documents relating to the issues in this "
-                        + "claim.")
-            .input3("b) the defendant must retain the original clinical notes relating to the issues in this claim. "
+        FastTrackClinicalNegligence tempFastTrackClinicalNegligence = new FastTrackClinicalNegligence();
+        tempFastTrackClinicalNegligence.setInput1("Documents should be retained as follows:");
+        tempFastTrackClinicalNegligence.setInput2("a) The parties must retain all electronically stored documents relating to the issues in this "
+                        + "claim.");
+        tempFastTrackClinicalNegligence.setInput3("b) the defendant must retain the original clinical notes relating to the issues in this claim. "
                         + "The defendant must give facilities for inspection by the claimant, the claimant's legal "
-                        + "advisers and experts of these original notes on 7 days written notice.")
-            .input4("c) Legible copies of the medical and educational records of the claimant "
+                        + "advisers and experts of these original notes on 7 days written notice.");
+        tempFastTrackClinicalNegligence.setInput4("c) Legible copies of the medical and educational records of the claimant "
                         + "are to be placed in a separate paginated bundle by the claimant's "
                         + "solicitors and kept up to date. All references to medical notes are to be made by reference "
-                        + "to the pages in that bundle.")
-            .build();
+                        + "to the pages in that bundle.");
 
-        String partiesLiaseString = "The parties are to liaise and use reasonable endeavours to agree the basic hire rate no ";
         caseData.setFastTrackClinicalNegligence(tempFastTrackClinicalNegligence);
 
-        List<AddOrRemoveToggle> addOrRemoveToggleList = List.of(AddOrRemoveToggle.ADD);
-        SdoR2FastTrackCreditHireDetails tempSdoR2FastTrackCreditHireDetails = SdoR2FastTrackCreditHireDetails.builder()
-            .input2("The claimant must upload to the Digital Portal a witness statement addressing\n"
+        SdoR2FastTrackCreditHireDetails tempSdoR2FastTrackCreditHireDetails = new SdoR2FastTrackCreditHireDetails();
+        tempSdoR2FastTrackCreditHireDetails.setInput2("The claimant must upload to the Digital Portal a witness statement addressing\n"
                         + "a) the need to hire a replacement vehicle; and\n"
-                        + "b) impecuniosity")
-            .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
-            .input3("A failure to comply with the paragraph above will result in the claimant being debarred from "
+                        + "b) impecuniosity");
+        tempSdoR2FastTrackCreditHireDetails.setDate1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)));
+        tempSdoR2FastTrackCreditHireDetails.setInput3("A failure to comply with the paragraph above will result in the claimant being debarred from "
                         + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
-                        + "save with permission of the Trial Judge.")
-            .input4(partiesLiaseString + laterThanFourPmString)
-            .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
-            .build();
+                        + "save with permission of the Trial Judge.");
+        String partiesLiaseString = "The parties are to liaise and use reasonable endeavours to agree the basic hire rate no ";
+        tempSdoR2FastTrackCreditHireDetails.setInput4(partiesLiaseString + laterThanFourPmString);
+        tempSdoR2FastTrackCreditHireDetails.setDate2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)));
 
-        SdoR2FastTrackCreditHire tempSdoR2FastTrackCreditHire = SdoR2FastTrackCreditHire.builder()
-            .input1("If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
+        SdoR2FastTrackCreditHire tempSdoR2FastTrackCreditHire = new SdoR2FastTrackCreditHire();
+        tempSdoR2FastTrackCreditHire.setInput1("If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
                         + "disclosure as ordered earlier in this Order must include:\n"
                         + "a) Evidence of all income from all sources for a period of 3 months prior to the "
                         + "commencement of hire until the earlier of:\n "
@@ -555,25 +530,25 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                         + "prior to the commencement of hire until the earlier of:\n"
                         + "     i) 3 months after cessation of hire\n"
                         + "     ii) the repair or replacement of the claimant's vehicle\n"
-                        + "c) Evidence of any loan, overdraft or other credit facilities available to the claimant.")
-            .input5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
+                        + "c) Evidence of any loan, overdraft or other credit facilities available to the claimant.");
+        tempSdoR2FastTrackCreditHire.setInput5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
                         + "paragraph above, each party may rely upon written evidence by way of witness statement of "
                         + "one witness to provide evidence of basic hire rates available within the claimant's "
                         + "geographical location, from a mainstream supplier, or a local reputable supplier if none "
-                        + "is available.")
-            .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
-            .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-            .input7(claimantEvidenceString)
-            .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
-            .input8(witnessStatementString)
-            .detailsShowToggle(addOrRemoveToggleList)
-            .sdoR2FastTrackCreditHireDetails(tempSdoR2FastTrackCreditHireDetails)
-            .build();
+                        + "is available.");
+        tempSdoR2FastTrackCreditHire.setInput6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on");
+        tempSdoR2FastTrackCreditHire.setDate3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)));
+        tempSdoR2FastTrackCreditHire.setInput7(claimantEvidenceString);
+        tempSdoR2FastTrackCreditHire.setDate4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)));
+        tempSdoR2FastTrackCreditHire.setInput8(witnessStatementString);
+        List<AddOrRemoveToggle> addOrRemoveToggleList = List.of(AddOrRemoveToggle.ADD);
+        tempSdoR2FastTrackCreditHire.setDetailsShowToggle(addOrRemoveToggleList);
+        tempSdoR2FastTrackCreditHire.setSdoR2FastTrackCreditHireDetails(tempSdoR2FastTrackCreditHireDetails);
 
         caseData.setSdoR2FastTrackCreditHire(tempSdoR2FastTrackCreditHire);
 
-        FastTrackCreditHire tempFastTrackCreditHire = FastTrackCreditHire.builder()
-            .input1("If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
+        FastTrackCreditHire tempFastTrackCreditHire = new FastTrackCreditHire();
+        tempFastTrackCreditHire.setInput1("If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
                         + "disclosure as ordered earlier in this Order must include:\n"
                         + "a) Evidence of all income from all sources for a period of 3 months prior to the "
                         + "commencement of hire until the earlier of:\n "
@@ -583,112 +558,104 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                         + "prior to the commencement of hire until the earlier of:\n"
                         + "     i) 3 months after cessation of hire\n"
                         + "     ii) the repair or replacement of the claimant's vehicle\n"
-                        + "c) Evidence of any loan, overdraft or other credit facilities available to the claimant.")
-            .input2("The claimant must upload to the Digital Portal a witness statement addressing\n"
+                        + "c) Evidence of any loan, overdraft or other credit facilities available to the claimant.");
+        tempFastTrackCreditHire.setInput2("The claimant must upload to the Digital Portal a witness statement addressing\n"
                         + "a) the need to hire a replacement vehicle; and\n"
-                        + "b) impecuniosity")
-            .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
-            .input3("A failure to comply with the paragraph above will result in the claimant being debarred from "
+                        + "b) impecuniosity");
+        tempFastTrackCreditHire.setDate1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)));
+        tempFastTrackCreditHire.setInput3("A failure to comply with the paragraph above will result in the claimant being debarred from "
                         + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
-                        + "save with permission of the Trial Judge.")
-            .input4(partiesLiaseString + laterThanFourPmString)
-            .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
-            .input5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
+                        + "save with permission of the Trial Judge.");
+        tempFastTrackCreditHire.setInput4(partiesLiaseString + laterThanFourPmString);
+        tempFastTrackCreditHire.setDate2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)));
+        tempFastTrackCreditHire.setInput5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
                         + "paragraph above, each party may rely upon written evidence by way of witness statement of "
                         + "one witness to provide evidence of basic hire rates available within the claimant's "
                         + "geographical location, from a mainstream supplier, or a local reputable supplier if none "
-                        + "is available.")
-            .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
-            .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-            .input7(claimantEvidenceString)
-            .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
-            .input8(witnessStatementString)
-            .build();
+                        + "is available.");
+        tempFastTrackCreditHire.setInput6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on");
+        tempFastTrackCreditHire.setDate3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)));
+        tempFastTrackCreditHire.setInput7(claimantEvidenceString);
+        tempFastTrackCreditHire.setDate4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)));
+        tempFastTrackCreditHire.setInput8(witnessStatementString);
 
         caseData.setFastTrackCreditHire(tempFastTrackCreditHire);
 
-        FastTrackHousingDisrepair tempFastTrackHousingDisrepair = FastTrackHousingDisrepair.builder()
-            .input1("The claimant must prepare a Scott Schedule of the items in disrepair.")
-            .input2("The columns should be headed:\n"
+        FastTrackHousingDisrepair tempFastTrackHousingDisrepair = new FastTrackHousingDisrepair();
+        tempFastTrackHousingDisrepair.setInput1("The claimant must prepare a Scott Schedule of the items in disrepair.");
+        tempFastTrackHousingDisrepair.setInput2("The columns should be headed:\n"
                         + "  •  Item\n"
                         + "  •  Alleged disrepair\n"
                         + "  •  Defendant’s response\n"
-                        + "  •  Reserved for Judge’s use")
-            .input3("The claimant must upload to the Digital Portal the Scott Schedule with the relevant "
-                        + "columns completed by 4pm on")
-            .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
-            .input4("The defendant must upload to the Digital Portal the amended Scott Schedule with the "
-                        + "relevant columns in response completed by 4pm on")
-            .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(12)))
-            .build();
+                        + "  •  Reserved for Judge’s use");
+        tempFastTrackHousingDisrepair.setInput3("The claimant must upload to the Digital Portal the Scott Schedule with the relevant "
+                        + "columns completed by 4pm on");
+        tempFastTrackHousingDisrepair.setDate1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)));
+        tempFastTrackHousingDisrepair.setInput4("The defendant must upload to the Digital Portal the amended Scott Schedule with the "
+                        + "relevant columns in response completed by 4pm on");
+        tempFastTrackHousingDisrepair.setDate2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(12)));
 
         caseData.setFastTrackHousingDisrepair(tempFastTrackHousingDisrepair);
 
-        FastTrackPersonalInjury tempFastTrackPersonalInjury = FastTrackPersonalInjury.builder()
-            .input1("The claimant has permission to rely upon the written expert evidence already uploaded to "
+        FastTrackPersonalInjury tempFastTrackPersonalInjury = new FastTrackPersonalInjury();
+        tempFastTrackPersonalInjury.setInput1("The claimant has permission to rely upon the written expert evidence already uploaded to "
                         + "the Digital Portal with the particulars of claim and in addition has permission to rely upon"
                         + " any associated correspondence or updating report which is uploaded to the Digital Portal by"
-                        + " 4pm on")
-            .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
-            .input2("Any questions which are to be addressed to an expert must be sent to the expert directly "
-                        + "and uploaded to the Digital Portal by 4pm on")
-            .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
-            .input3("The answers to the questions shall be answered by the Expert by")
-            .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-            .input4("and uploaded to the Digital Portal by")
-            .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-            .build();
+                        + " 4pm on");
+        tempFastTrackPersonalInjury.setDate1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)));
+        tempFastTrackPersonalInjury.setInput2("Any questions which are to be addressed to an expert must be sent to the expert directly "
+                        + "and uploaded to the Digital Portal by 4pm on");
+        tempFastTrackPersonalInjury.setDate2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)));
+        tempFastTrackPersonalInjury.setInput3("The answers to the questions shall be answered by the Expert by");
+        tempFastTrackPersonalInjury.setDate3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)));
+        tempFastTrackPersonalInjury.setInput4("and uploaded to the Digital Portal by");
+        tempFastTrackPersonalInjury.setDate4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)));
 
         caseData.setFastTrackPersonalInjury(tempFastTrackPersonalInjury);
 
-        FastTrackRoadTrafficAccident tempFastTrackRoadTrafficAccident = FastTrackRoadTrafficAccident.builder()
-            .input("Photographs and/or a plan of the accident location shall be prepared and agreed by the "
-                       + "parties and uploaded to the Digital Portal by 4pm on")
-            .date(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-            .build();
+        FastTrackRoadTrafficAccident tempFastTrackRoadTrafficAccident = new FastTrackRoadTrafficAccident();
+        tempFastTrackRoadTrafficAccident.setInput("Photographs and/or a plan of the accident location shall be prepared and agreed by the "
+                       + "parties and uploaded to the Digital Portal by 4pm on");
+        tempFastTrackRoadTrafficAccident.setDate(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)));
 
         caseData.setFastTrackRoadTrafficAccident(tempFastTrackRoadTrafficAccident);
 
-        SmallClaimsJudgesRecital tempSmallClaimsJudgesRecital = SmallClaimsJudgesRecital.builder()
-            .input("Upon considering the statements of case and the information provided by the parties,")
-            .build();
+        SmallClaimsJudgesRecital tempSmallClaimsJudgesRecital = new SmallClaimsJudgesRecital();
+        tempSmallClaimsJudgesRecital.setInput("Upon considering the statements of case and the information provided by the parties,");
 
         caseData.setSmallClaimsJudgesRecital(tempSmallClaimsJudgesRecital);
 
-        SmallClaimsDocuments tempSmallClaimsDocuments = SmallClaimsDocuments.builder()
-            .input1("Each party must upload to the Digital Portal copies of all documents which they wish the court to"
-                        + " consider when reaching its decision not less than 21 days before the hearing.")
-            .input2("The court may refuse to consider any document which has not been uploaded to the "
-                        + "Digital Portal by the above date.")
-            .build();
+        SmallClaimsDocuments tempSmallClaimsDocuments = new SmallClaimsDocuments();
+        tempSmallClaimsDocuments.setInput1("Each party must upload to the Digital Portal copies of all documents which they wish the court to"
+                        + " consider when reaching its decision not less than 21 days before the hearing.");
+        tempSmallClaimsDocuments.setInput2("The court may refuse to consider any document which has not been uploaded to the "
+                        + "Digital Portal by the above date.");
 
         caseData.setSmallClaimsDocuments(tempSmallClaimsDocuments);
 
-        SdoR2SmallClaimsWitnessStatements tempSdoR2SmallClaimsWitnessStatements = SdoR2SmallClaimsWitnessStatements
-            .builder()
-            .sdoStatementOfWitness(
+        SdoR2SmallClaimsWitnessStatements tempSdoR2SmallClaimsWitnessStatements = new SdoR2SmallClaimsWitnessStatements();
+        tempSdoR2SmallClaimsWitnessStatements.setSdoStatementOfWitness(
                 "Each party must upload to the Digital Portal copies of all witness statements of the witnesses"
                     + " upon whose evidence they intend to rely at the hearing not less than 21 days before"
-                    + " the hearing.")
-            .isRestrictWitness(NO)
-            .sdoR2SmallClaimsRestrictWitness(SdoR2SmallClaimsRestrictWitness.builder()
-                                                 .noOfWitnessClaimant(2)
-                                                 .noOfWitnessDefendant(2)
-                                                 .partyIsCountedAsWitnessTxt(RESTRICT_WITNESS_TEXT)
-                                                 .build())
-            .isRestrictPages(NO)
-            .sdoR2SmallClaimsRestrictPages(SdoR2SmallClaimsRestrictPages.builder()
-                                               .witnessShouldNotMoreThanTxt(RESTRICT_NUMBER_PAGES_TEXT1)
-                                               .noOfPages(12)
-                                               .fontDetails(RESTRICT_NUMBER_PAGES_TEXT2)
-                                               .build())
-            .text(WITNESS_DESCRIPTION_TEXT)
-            .build();
+                    + " the hearing.");
+        tempSdoR2SmallClaimsWitnessStatements.setIsRestrictWitness(NO);
+        SdoR2SmallClaimsRestrictWitness sdoR2SmallClaimsRestrictWitness =  new SdoR2SmallClaimsRestrictWitness();
+        sdoR2SmallClaimsRestrictWitness.setNoOfWitnessClaimant(2);
+        sdoR2SmallClaimsRestrictWitness.setNoOfWitnessDefendant(2);
+        sdoR2SmallClaimsRestrictWitness.setPartyIsCountedAsWitnessTxt(RESTRICT_WITNESS_TEXT);
+        tempSdoR2SmallClaimsWitnessStatements.setSdoR2SmallClaimsRestrictWitness(sdoR2SmallClaimsRestrictWitness);
+        tempSdoR2SmallClaimsWitnessStatements.setIsRestrictPages(NO);
+        SdoR2SmallClaimsRestrictPages sdoR2SmallClaimsRestrictPages  = new SdoR2SmallClaimsRestrictPages();
+        sdoR2SmallClaimsRestrictPages.setWitnessShouldNotMoreThanTxt(RESTRICT_NUMBER_PAGES_TEXT1);
+        sdoR2SmallClaimsRestrictPages.setNoOfPages(12);
+        sdoR2SmallClaimsRestrictPages.setFontDetails(RESTRICT_NUMBER_PAGES_TEXT2);
+        tempSdoR2SmallClaimsWitnessStatements.setSdoR2SmallClaimsRestrictPages(sdoR2SmallClaimsRestrictPages);
+        tempSdoR2SmallClaimsWitnessStatements.setText(WITNESS_DESCRIPTION_TEXT);
         caseData.setSdoR2SmallClaimsWitnessStatementOther(tempSdoR2SmallClaimsWitnessStatements);
 
         if (featureToggleService.isCarmEnabledForCase(caseData)) {
-            caseData.setSmallClaimsMediationSectionStatement(SmallClaimsMediation.builder()
-                                                                 .input(
+            SmallClaimsMediation smallClaimsMediation  = new SmallClaimsMediation();
+            smallClaimsMediation.setInput(
                                                                      "If you failed to attend a mediation appointment,"
                                                                          + " then the judge at the hearing may impose a sanction. "
                                                                          + "This could require you to pay costs, or could result in your claim or defence being dismissed. "
@@ -697,37 +664,35 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                                                          + "Any other party who wishes to comment on the failure to attend the mediation appointment should "
                                                                          + "deliver their comments,"
                                                                          + " with any supporting documents, to all parties and to the court at least "
-                                                                         + "14 days before the hearing.")
-                                                                 .build());
+                    + "14 days before the hearing.");
+            caseData.setSmallClaimsMediationSectionStatement(smallClaimsMediation);
         }
 
-        SmallClaimsFlightDelay tempSmallClaimsFlightDelay = SmallClaimsFlightDelay.builder()
-            .smallClaimsFlightDelayToggle(checkList)
-            .relatedClaimsInput("In the event that the Claimant(s) or Defendant(s) are aware if other \n"
+        SmallClaimsFlightDelay tempSmallClaimsFlightDelay = new SmallClaimsFlightDelay();
+        tempSmallClaimsFlightDelay.setSmallClaimsFlightDelayToggle(checkList);
+        tempSmallClaimsFlightDelay.setRelatedClaimsInput("In the event that the Claimant(s) or Defendant(s) are aware if other \n"
                                     + "claims relating to the same flight they must notify the court \n"
                                     + "where the claim is being managed within 14 days of receipt of \n"
                                     + "this Order providing all relevant details of those claims including \n"
                                     + "case number(s), hearing date(s) and copy final substantive order(s) \n"
                                     + "if any, to assist the Court with ongoing case management which may \n"
-                                    + "include the cases being heard together.")
-            .legalDocumentsInput("Any arguments as to the law to be applied to this claim, together with \n"
+                                    + "include the cases being heard together.");
+        tempSmallClaimsFlightDelay.setLegalDocumentsInput("Any arguments as to the law to be applied to this claim, together with \n"
                                      + "copies of legal authorities or precedents relied on, shall be uploaded \n"
                                      + "to the Digital Portal not later than 3 full working days before the \n"
-                                     + "final hearing date.")
-            .build();
+                                     + "final hearing date.");
 
         caseData.setSmallClaimsFlightDelay(tempSmallClaimsFlightDelay);
 
-        SmallClaimsHearing tempSmallClaimsHearing = SmallClaimsHearing.builder()
-            .input1("The hearing of the claim will be on a date to be notified to you by a separate notification. "
-                        + "The hearing will have a time estimate of")
-            .input2(HEARING_TIME_TEXT_AFTER)
-            .build();
+        SmallClaimsHearing tempSmallClaimsHearing = new SmallClaimsHearing();
+        tempSmallClaimsHearing.setInput1("The hearing of the claim will be on a date to be notified to you by a separate notification. "
+                        + "The hearing will have a time estimate of");
+        tempSmallClaimsHearing.setInput2(HEARING_TIME_TEXT_AFTER);
 
         caseData.setSmallClaimsHearing(tempSmallClaimsHearing);
 
-        SmallClaimsNotes.SmallClaimsNotesBuilder tempSmallClaimsNotes = SmallClaimsNotes.builder();
-        tempSmallClaimsNotes.input("This order has been made without hearing. "
+        SmallClaimsNotes tempSmallClaimsNotes = new SmallClaimsNotes();
+        tempSmallClaimsNotes.setInput("This order has been made without hearing. "
                                        + "Each party has the right to apply to have this Order set aside or varied. "
                                        + "Any such application must be received by the Court "
                                        + "(together with the appropriate fee) by 4pm on "
@@ -735,10 +700,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5), DATE)
         );
 
-        caseData.setSmallClaimsNotes(tempSmallClaimsNotes.build());
+        caseData.setSmallClaimsNotes(tempSmallClaimsNotes);
 
-        SmallClaimsCreditHire tempSmallClaimsCreditHire = SmallClaimsCreditHire.builder()
-            .input1("If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
+        SmallClaimsCreditHire tempSmallClaimsCreditHire = new SmallClaimsCreditHire();
+        tempSmallClaimsCreditHire.setInput1("If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
                         + "disclosure as ordered earlier in this Order must include:\n"
                         + "a) Evidence of all income from all sources for a period of 3 months prior to the "
                         + "commencement of hire until the earlier of:\n "
@@ -748,40 +713,40 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                         + "prior to the commencement of hire until the earlier of:\n"
                         + "     i) 3 months after cessation of hire\n"
                         + "     ii) the repair or replacement of the claimant's vehicle\n"
-                        + "c) Evidence of any loan, overdraft or other credit facilities available to the claimant.")
-            .input2("The claimant must upload to the Digital Portal a witness statement addressing\n"
+                        + "c) Evidence of any loan, overdraft or other credit facilities available to the claimant.");
+        tempSmallClaimsCreditHire.setInput2("The claimant must upload to the Digital Portal a witness statement addressing\n"
                         + "a) the need to hire a replacement vehicle; and\n"
-                        + "b) impecuniosity")
-            .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
-            .input3("A failure to comply with the paragraph above will result in the claimant being debarred from "
+                        + "b) impecuniosity");
+        tempSmallClaimsCreditHire.setDate1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)));
+        tempSmallClaimsCreditHire.setInput3("A failure to comply with the paragraph above will result in the claimant being debarred from "
                         + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
-                        + "save with permission of the Trial Judge.")
-            .input4(partiesLiaseString + laterThanFourPmString)
-            .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
-            .input5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
+                        + "save with permission of the Trial Judge.");
+        tempSmallClaimsCreditHire.setInput4(partiesLiaseString + laterThanFourPmString);
+        tempSmallClaimsCreditHire.setDate2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)));
+        tempSmallClaimsCreditHire.setInput5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
                         + "paragraph above, each party may rely upon written evidence by way of witness statement of "
                         + "one witness to provide evidence of basic hire rates available within the claimant's "
                         + "geographical location, from a mainstream supplier, or a local reputable supplier if none "
-                        + "is available.")
-            .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
-            .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-            .input7(claimantEvidenceString)
-            .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
-            .input11(witnessStatementString)
-            .build();
+                        + "is available.");
+        tempSmallClaimsCreditHire.setInput6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on");
+        tempSmallClaimsCreditHire.setDate3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)));
+        tempSmallClaimsCreditHire.setInput7(claimantEvidenceString);
+        tempSmallClaimsCreditHire.setDate4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)));
+        tempSmallClaimsCreditHire.setInput11(witnessStatementString);
 
         caseData.setSmallClaimsCreditHire(tempSmallClaimsCreditHire);
 
-        SmallClaimsRoadTrafficAccident tempSmallClaimsRoadTrafficAccident = SmallClaimsRoadTrafficAccident.builder()
-            .input("Photographs and/or a plan of the accident location shall be prepared and agreed by the parties"
-                       + " and uploaded to the Digital Portal no later than 21 days before the hearing.")
-            .build();
+        SmallClaimsRoadTrafficAccident tempSmallClaimsRoadTrafficAccident = new SmallClaimsRoadTrafficAccident();
+        tempSmallClaimsRoadTrafficAccident.setInput("Photographs and/or a plan of the accident location shall be prepared and agreed by the parties"
+                       + " and uploaded to the Digital Portal no later than 21 days before the hearing.");
 
         caseData.setSmallClaimsRoadTrafficAccident(tempSmallClaimsRoadTrafficAccident);
 
         //This the flow after request for reconsideration
         if (CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(caseData.getDecisionOnRequestReconsiderationOptions())) {
+            FastTrackAllocation fastTrackAllocation = new FastTrackAllocation();
+            fastTrackAllocation.setAssignComplexityBand(null);
             caseData.setDrawDirectionsOrderRequired(null);
             caseData.setDrawDirectionsOrderSmallClaims(null);
             caseData.setFastClaims(null);
@@ -790,7 +755,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             caseData.setOrderType(null);
             caseData.setTrialAdditionalDirectionsForFastTrack(null);
             caseData.setDrawDirectionsOrderSmallClaimsAdditionalDirections(null);
-            caseData.setFastTrackAllocation(FastTrackAllocation.builder().assignComplexityBand(null).build());
+            caseData.setFastTrackAllocation(fastTrackAllocation);
             caseData.setDisposalHearingAddNewDirections(null);
             caseData.setSmallClaimsAddNewDirections(null);
             caseData.setFastTrackAddNewDirections(null);
@@ -815,12 +780,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         prePopulateNihlFields(caseData, hearingMethodList, preferredCourt, locationRefDataList);
         List<IncludeInOrderToggle> localIncludeInOrderToggle = List.of(IncludeInOrderToggle.INCLUDE);
         setCheckListNihl(caseData, localIncludeInOrderToggle);
-        caseData.setSdoR2FastTrackUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(
-            SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
-        caseData.setSdoR2SmallClaimsUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(
-            SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
-        caseData.setSdoR2DisposalHearingUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(
-            SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
+        SdoR2WelshLanguageUsage sdoR2WelshLanguageUsage  = new SdoR2WelshLanguageUsage();
+        sdoR2WelshLanguageUsage.setDescription(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION);
+        caseData.setSdoR2FastTrackUseOfWelshLanguage(sdoR2WelshLanguageUsage);
+        caseData.setSdoR2SmallClaimsUseOfWelshLanguage(sdoR2WelshLanguageUsage);
+        caseData.setSdoR2DisposalHearingUseOfWelshLanguage(sdoR2WelshLanguageUsage);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
@@ -845,61 +809,58 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private static SdoR2WitnessOfFact getSdoR2WitnessOfFact() {
-        return SdoR2WitnessOfFact.builder()
-            .sdoStatementOfWitness(SdoR2UiConstantFastTrack.STATEMENT_WITNESS)
-            .sdoR2RestrictWitness(SdoR2RestrictWitness.builder()
-                                      .isRestrictWitness(NO)
-                                      .restrictNoOfWitnessDetails(
-                                          SdoR2RestrictNoOfWitnessDetails.builder()
-                                              .noOfWitnessClaimant(3)
-                                              .noOfWitnessDefendant(3)
-                                              .partyIsCountedAsWitnessTxt(SdoR2UiConstantFastTrack.RESTRICT_WITNESS_TEXT)
-                                              .build())
-                                      .build())
-            .sdoRestrictPages(SdoR2RestrictPages.builder()
-                                  .isRestrictPages(NO)
-                                  .restrictNoOfPagesDetails(
-                                      SdoR2RestrictNoOfPagesDetails.builder()
-                                          .witnessShouldNotMoreThanTxt(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT1)
-                                          .noOfPages(12)
-                                          .fontDetails(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT2)
-                                          .build())
-                                  .build())
-            .sdoWitnessDeadline(SdoR2UiConstantFastTrack.DEADLINE)
-            .sdoWitnessDeadlineDate(LocalDate.now().plusDays(70))
-            .sdoWitnessDeadlineText(SdoR2UiConstantFastTrack.DEADLINE_EVIDENCE)
-            .build();
+        SdoR2RestrictNoOfWitnessDetails sdoR2RestrictNoOfWitnessDetails  = new SdoR2RestrictNoOfWitnessDetails();
+        sdoR2RestrictNoOfWitnessDetails.setNoOfWitnessClaimant(3);
+        sdoR2RestrictNoOfWitnessDetails.setNoOfWitnessDefendant(3);
+        sdoR2RestrictNoOfWitnessDetails.setPartyIsCountedAsWitnessTxt(SdoR2UiConstantFastTrack.RESTRICT_WITNESS_TEXT);
+        SdoR2RestrictWitness sdoR2RestrictWitness  = new SdoR2RestrictWitness();
+        sdoR2RestrictWitness.setIsRestrictWitness(NO);
+        sdoR2RestrictWitness.setRestrictNoOfWitnessDetails(sdoR2RestrictNoOfWitnessDetails);
+        SdoR2WitnessOfFact sdoR2WitnessOfFact = new SdoR2WitnessOfFact();
+        sdoR2WitnessOfFact.setSdoStatementOfWitness(SdoR2UiConstantFastTrack.STATEMENT_WITNESS);
+        sdoR2WitnessOfFact.setSdoR2RestrictWitness(sdoR2RestrictWitness);
+
+        SdoR2RestrictNoOfPagesDetails sdoR2RestrictNoOfPagesDetails  = new SdoR2RestrictNoOfPagesDetails();
+        sdoR2RestrictNoOfPagesDetails.setWitnessShouldNotMoreThanTxt(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT1);
+        sdoR2RestrictNoOfPagesDetails.setNoOfPages(12);
+        sdoR2RestrictNoOfPagesDetails.setFontDetails(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT2);
+        SdoR2RestrictPages sdoR2RestrictPages  = new SdoR2RestrictPages();
+        sdoR2RestrictPages.setIsRestrictPages(NO);
+        sdoR2RestrictPages.setRestrictNoOfPagesDetails(sdoR2RestrictNoOfPagesDetails);
+        sdoR2WitnessOfFact.setSdoRestrictPages(sdoR2RestrictPages);
+        sdoR2WitnessOfFact.setSdoWitnessDeadline(SdoR2UiConstantFastTrack.DEADLINE);
+        sdoR2WitnessOfFact.setSdoWitnessDeadlineDate(LocalDate.now().plusDays(70));
+        sdoR2WitnessOfFact.setSdoWitnessDeadlineText(SdoR2UiConstantFastTrack.DEADLINE_EVIDENCE);
+        return sdoR2WitnessOfFact;
     }
 
     private void updateExpertEvidenceFields(CaseData updatedData) {
-        FastTrackPersonalInjury tempFastTrackPersonalInjury = FastTrackPersonalInjury.builder()
-            .input1("The Claimant has permission to rely upon the written expert evidence already uploaded to the"
-                        + " Digital Portal with the particulars of claim")
-            .input2("The Defendant(s) may ask questions of the Claimant's expert which must be sent to the expert " +
-                        "directly and uploaded to the Digital Portal by 4pm on")
-            .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(14)))
-            .input3("The answers to the questions shall be answered by the Expert by")
-            .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(42)))
-            .input4("and uploaded to the Digital Portal by the party who has asked the question by")
-            .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(49)))
-            .build();
+        FastTrackPersonalInjury tempFastTrackPersonalInjury = new FastTrackPersonalInjury();
+        tempFastTrackPersonalInjury.setInput1("The Claimant has permission to rely upon the written expert evidence already uploaded to the"
+                        + " Digital Portal with the particulars of claim");
+        tempFastTrackPersonalInjury.setInput2("The Defendant(s) may ask questions of the Claimant's expert which must be sent to the expert " +
+                        "directly and uploaded to the Digital Portal by 4pm on");
+        tempFastTrackPersonalInjury.setDate2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(14)));
+        tempFastTrackPersonalInjury.setInput3("The answers to the questions shall be answered by the Expert by");
+        tempFastTrackPersonalInjury.setDate3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(42)));
+        tempFastTrackPersonalInjury.setInput4("and uploaded to the Digital Portal by the party who has asked the question by");
+        tempFastTrackPersonalInjury.setDate4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(49)));
 
         updatedData.setFastTrackPersonalInjury(tempFastTrackPersonalInjury);
     }
 
     private void updateDisclosureOfDocumentFields(CaseData updatedData) {
-        FastTrackDisclosureOfDocuments tempFastTrackDisclosureOfDocuments = FastTrackDisclosureOfDocuments.builder()
-            .input1("Standard disclosure shall be provided by the parties by uploading to the Digital Portal their "
-                        + "list of documents by 4pm on")
-            .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
-            .input2("Any request to inspect a document, or for a copy of a document, shall be made directly to "
-                        + "the other party by 4pm on")
-            .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(5)))
-            .input3("Requests will be complied with within 7 days of the receipt of the request.")
-            .input4("Each party must upload to the Digital Portal copies of those documents on which they wish to"
-                        + " rely at trial by 4pm on")
-            .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-            .build();
+        FastTrackDisclosureOfDocuments tempFastTrackDisclosureOfDocuments = new FastTrackDisclosureOfDocuments();
+        tempFastTrackDisclosureOfDocuments.setInput1("Standard disclosure shall be provided by the parties by uploading to the Digital Portal their "
+                        + "list of documents by 4pm on");
+        tempFastTrackDisclosureOfDocuments.setDate1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)));
+        tempFastTrackDisclosureOfDocuments.setInput2("Any request to inspect a document, or for a copy of a document, shall be made directly to "
+                        + "the other party by 4pm on");
+        tempFastTrackDisclosureOfDocuments.setDate2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(5)));
+        tempFastTrackDisclosureOfDocuments.setInput3("Requests will be complied with within 7 days of the receipt of the request.");
+        tempFastTrackDisclosureOfDocuments.setInput4("Each party must upload to the Digital Portal copies of those documents on which they wish to"
+                        + " rely at trial by 4pm on");
+        tempFastTrackDisclosureOfDocuments.setDate3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)));
 
         updatedData.setFastTrackDisclosureOfDocuments(tempFastTrackDisclosureOfDocuments);
     }
@@ -913,63 +874,79 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         hearingMethodList.setValue(hearingMethodList.getListItems().stream().filter(elem -> elem.getLabel()
             .equals(HearingMethod.TELEPHONE.getLabel())).findFirst().orElse(null));
 
-        updatedData.setSdoR2SmallClaimsJudgesRecital(SdoR2SmallClaimsJudgesRecital.builder().input(
-            SdoR2UiConstantSmallClaim.JUDGE_RECITAL).build());
-        updatedData.setSdoR2SmallClaimsPPI(SdoR2SmallClaimsPPI.builder().ppiDate(LocalDate.now().plusDays(21)).text(
-            SdoR2UiConstantSmallClaim.PPI_DESCRIPTION).build());
-        updatedData.setSdoR2SmallClaimsUploadDoc(SdoR2SmallClaimsUploadDoc.builder().sdoUploadOfDocumentsTxt(
-            SdoR2UiConstantSmallClaim.UPLOAD_DOC_DESCRIPTION).build());
-        updatedData.setSdoR2SmallClaimsWitnessStatements(SdoR2SmallClaimsWitnessStatements.builder()
-                                                          .sdoStatementOfWitness(SdoR2UiConstantSmallClaim.WITNESS_STATEMENT_TEXT)
-                                                          .isRestrictWitness(NO)
-                                                          .isRestrictPages(NO)
-                                                          .sdoR2SmallClaimsRestrictWitness(
-                                                              SdoR2SmallClaimsRestrictWitness
-                                                                  .builder()
-                                                                  .partyIsCountedAsWitnessTxt(SdoR2UiConstantSmallClaim.RESTRICT_WITNESS_TEXT)
-                                                                  .build())
-                                                          .sdoR2SmallClaimsRestrictPages(SdoR2SmallClaimsRestrictPages.builder()
-                                                                                             .fontDetails(
-                                                                                                 SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT2)
-                                                                                             .noOfPages(12)
-                                                                                             .witnessShouldNotMoreThanTxt(
-                                                                                                 SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT1)
-                                                                                             .build())
-                                                          .text(SdoR2UiConstantSmallClaim.WITNESS_DESCRIPTION_TEXT).build());
-        updatedData.setSdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder()
-                                                .trialOnOptions(HearingOnRadioOptions.OPEN_DATE)
-                                                .methodOfHearing(hearingMethodList)
-                                                .lengthList(SmallClaimsSdoR2TimeEstimate.THIRTY_MINUTES)
-                                                .physicalBundleOptions(SmallClaimsSdoR2PhysicalTrialBundleOptions.PARTY)
-                                                .sdoR2SmallClaimsHearingFirstOpenDateAfter(
-                                                    SdoR2SmallClaimsHearingFirstOpenDateAfter.builder()
-                                                        .listFrom(LocalDate.now().plusDays(56)).build())
-                                                .sdoR2SmallClaimsHearingWindow(SdoR2SmallClaimsHearingWindow.builder().dateTo(
-                                                        LocalDate.now().plusDays(70))
-                                                                                   .listFrom(LocalDate.now().plusDays(56)).build())
-                                                .hearingCourtLocationList(courtList)
-                                                .altHearingCourtLocationList(getLocationList(
+        SdoR2SmallClaimsJudgesRecital smallClaimsJudgesRecital = new SdoR2SmallClaimsJudgesRecital();
+        smallClaimsJudgesRecital.setInput(SdoR2UiConstantSmallClaim.JUDGE_RECITAL);
+        updatedData.setSdoR2SmallClaimsJudgesRecital(smallClaimsJudgesRecital);
+
+        SdoR2SmallClaimsPPI smallClaimsPpi = new SdoR2SmallClaimsPPI();
+        smallClaimsPpi.setPpiDate(LocalDate.now().plusDays(21));
+        smallClaimsPpi.setText(SdoR2UiConstantSmallClaim.PPI_DESCRIPTION);
+        updatedData.setSdoR2SmallClaimsPPI(smallClaimsPpi);
+
+        SdoR2SmallClaimsUploadDoc smallClaimsUploadDoc = new SdoR2SmallClaimsUploadDoc();
+        smallClaimsUploadDoc.setSdoUploadOfDocumentsTxt(SdoR2UiConstantSmallClaim.UPLOAD_DOC_DESCRIPTION);
+        updatedData.setSdoR2SmallClaimsUploadDoc(smallClaimsUploadDoc);
+
+        SdoR2SmallClaimsRestrictWitness restrictWitness = new SdoR2SmallClaimsRestrictWitness();
+        restrictWitness.setPartyIsCountedAsWitnessTxt(SdoR2UiConstantSmallClaim.RESTRICT_WITNESS_TEXT);
+
+        SdoR2SmallClaimsRestrictPages restrictPages = new SdoR2SmallClaimsRestrictPages();
+        restrictPages.setFontDetails(SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT2);
+        restrictPages.setNoOfPages(12);
+        restrictPages.setWitnessShouldNotMoreThanTxt(SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT1);
+
+        SdoR2SmallClaimsWitnessStatements witnessStatements = new SdoR2SmallClaimsWitnessStatements();
+        witnessStatements.setSdoStatementOfWitness(SdoR2UiConstantSmallClaim.WITNESS_STATEMENT_TEXT);
+        witnessStatements.setIsRestrictWitness(NO);
+        witnessStatements.setIsRestrictPages(NO);
+        witnessStatements.setSdoR2SmallClaimsRestrictWitness(restrictWitness);
+        witnessStatements.setSdoR2SmallClaimsRestrictPages(restrictPages);
+        witnessStatements.setText(SdoR2UiConstantSmallClaim.WITNESS_DESCRIPTION_TEXT);
+        updatedData.setSdoR2SmallClaimsWitnessStatements(witnessStatements);
+
+        SdoR2SmallClaimsHearingFirstOpenDateAfter firstOpenDateAfter = new SdoR2SmallClaimsHearingFirstOpenDateAfter();
+        firstOpenDateAfter.setListFrom(LocalDate.now().plusDays(56));
+
+        SdoR2SmallClaimsHearingWindow hearingWindow = new SdoR2SmallClaimsHearingWindow();
+        hearingWindow.setDateTo(LocalDate.now().plusDays(70));
+        hearingWindow.setListFrom(LocalDate.now().plusDays(56));
+
+        SdoR2SmallClaimsBundleOfDocs bundleOfDocs = new SdoR2SmallClaimsBundleOfDocs();
+        bundleOfDocs.setPhysicalBundlePartyTxt(SdoR2UiConstantSmallClaim.BUNDLE_TEXT);
+
+        SdoR2SmallClaimsHearing smallClaimsHearing = new SdoR2SmallClaimsHearing();
+        smallClaimsHearing.setTrialOnOptions(HearingOnRadioOptions.OPEN_DATE);
+        smallClaimsHearing.setMethodOfHearing(hearingMethodList);
+        smallClaimsHearing.setLengthList(SmallClaimsSdoR2TimeEstimate.THIRTY_MINUTES);
+        smallClaimsHearing.setPhysicalBundleOptions(SmallClaimsSdoR2PhysicalTrialBundleOptions.PARTY);
+        smallClaimsHearing.setSdoR2SmallClaimsHearingFirstOpenDateAfter(firstOpenDateAfter);
+        smallClaimsHearing.setSdoR2SmallClaimsHearingWindow(hearingWindow);
+        smallClaimsHearing.setHearingCourtLocationList(courtList);
+        smallClaimsHearing.setAltHearingCourtLocationList(getLocationList(
                                                     preferredCourt.orElse(null),
                                                     true,
                                                     locationRefDataList
-                                                ))
-                                                .sdoR2SmallClaimsBundleOfDocs(SdoR2SmallClaimsBundleOfDocs.builder()
-                                                                                  .physicalBundlePartyTxt(
-                                                                                      SdoR2UiConstantSmallClaim.BUNDLE_TEXT).build()).build());
-        updatedData.setSdoR2SmallClaimsImpNotes(SdoR2SmallClaimsImpNotes.builder()
-                                                 .text(SdoR2UiConstantSmallClaim.IMP_NOTES_TEXT)
-                                                 .date(LocalDate.now().plusDays(7)).build());
+        ));
+        smallClaimsHearing.setSdoR2SmallClaimsBundleOfDocs(bundleOfDocs);
+        updatedData.setSdoR2SmallClaimsHearing(smallClaimsHearing);
+
+        SdoR2SmallClaimsImpNotes importantNotes = new SdoR2SmallClaimsImpNotes();
+        importantNotes.setText(SdoR2UiConstantSmallClaim.IMP_NOTES_TEXT);
+        importantNotes.setDate(LocalDate.now().plusDays(7));
+        updatedData.setSdoR2SmallClaimsImpNotes(importantNotes);
         updatedData.setSdoR2SmallClaimsUploadDocToggle(includeInOrderToggle);
         updatedData.setSdoR2SmallClaimsHearingToggle(includeInOrderToggle);
         updatedData.setSdoR2SmallClaimsWitnessStatementsToggle(includeInOrderToggle);
-        updatedData.setSdoR2DrhUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
+        SdoR2WelshLanguageUsage smallClaimsWelshUsage = new SdoR2WelshLanguageUsage();
+        smallClaimsWelshUsage.setDescription(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION);
+        updatedData.setSdoR2DrhUseOfWelshLanguage(smallClaimsWelshUsage);
 
         CaseData caseData = callbackParams.getCaseData();
         if (featureToggleService.isCarmEnabledForCase(caseData)) {
             updatedData.setSdoR2SmallClaimsMediationSectionToggle(includeInOrderToggle);
-            updatedData.setSdoR2SmallClaimsMediationSectionStatement(SdoR2SmallClaimsMediation.builder()
-                                                                      .input(SdoR2UiConstantSmallClaim.CARM_MEDIATION_TEXT)
-                                                                      .build());
+            SdoR2SmallClaimsMediation mediationStatement = new SdoR2SmallClaimsMediation();
+            mediationStatement.setInput(SdoR2UiConstantSmallClaim.CARM_MEDIATION_TEXT);
+            updatedData.setSdoR2SmallClaimsMediationSectionStatement(mediationStatement);
         }
     }
 
@@ -980,141 +957,157 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         DynamicListElement hearingMethodInPerson = hearingMethodList.getListItems().stream().filter(elem -> elem.getLabel()
             .equals(HearingMethod.IN_PERSON.getLabel())).findFirst().orElse(null);
         hearingMethodList.setValue(hearingMethodInPerson);
-        updatedData.setSdoFastTrackJudgesRecital(FastTrackJudgesRecital.builder()
-                                                  .input(SdoR2UiConstantFastTrack.JUDGE_RECITAL).build());
-        updatedData.setSdoR2DisclosureOfDocuments(SdoR2DisclosureOfDocuments.builder()
-                                                   .standardDisclosureTxt(SdoR2UiConstantFastTrack.STANDARD_DISCLOSURE)
-                                                   .standardDisclosureDate(LocalDate.now().plusDays(28))
-                                                   .inspectionTxt(SdoR2UiConstantFastTrack.INSPECTION)
-                                                   .inspectionDate(LocalDate.now().plusDays(42))
-                                                   .requestsWillBeCompiledLabel(SdoR2UiConstantFastTrack.REQUEST_COMPILED_WITH)
-                                                   .build());
-        updatedData.setSdoR2WitnessesOfFact(SdoR2WitnessOfFact.builder()
-                                             .sdoStatementOfWitness(SdoR2UiConstantFastTrack.STATEMENT_WITNESS)
-                                             .sdoR2RestrictWitness(SdoR2RestrictWitness.builder()
-                                                                       .isRestrictWitness(NO)
-                                                                       .restrictNoOfWitnessDetails(
-                                                                           SdoR2RestrictNoOfWitnessDetails
-                                                                               .builder()
-                                                                               .noOfWitnessClaimant(3).noOfWitnessDefendant(
-                                                                                   3)
-                                                                               .partyIsCountedAsWitnessTxt(
-                                                                                   SdoR2UiConstantFastTrack.RESTRICT_WITNESS_TEXT)
-                                                                               .build())
-                                                                       .build())
-                                             .sdoRestrictPages(SdoR2RestrictPages.builder()
-                                                                   .isRestrictPages(NO)
-                                                                   .restrictNoOfPagesDetails(
-                                                                       SdoR2RestrictNoOfPagesDetails.builder()
-                                                                           .witnessShouldNotMoreThanTxt(
-                                                                               SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT1)
-                                                                           .noOfPages(12)
-                                                                           .fontDetails(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT2)
-                                                                           .build()).build())
-                                             .sdoWitnessDeadline(SdoR2UiConstantFastTrack.DEADLINE)
-                                             .sdoWitnessDeadlineDate(LocalDate.now().plusDays(70))
-                                             .sdoWitnessDeadlineText(SdoR2UiConstantFastTrack.DEADLINE_EVIDENCE)
-                                             .build());
-        updatedData.setSdoR2ScheduleOfLoss(SdoR2ScheduleOfLoss.builder().sdoR2ScheduleOfLossClaimantText(
-                SdoR2UiConstantFastTrack.SCHEDULE_OF_LOSS_CLAIMANT)
-                                            .isClaimForPecuniaryLoss(NO)
-                                            .sdoR2ScheduleOfLossClaimantDate(LocalDate.now().plusDays(364))
-                                            .sdoR2ScheduleOfLossDefendantText(SdoR2UiConstantFastTrack.SCHEDULE_OF_LOSS_DEFENDANT)
-                                            .sdoR2ScheduleOfLossDefendantDate(LocalDate.now().plusDays(378))
-                                            .sdoR2ScheduleOfLossPecuniaryLossTxt(SdoR2UiConstantFastTrack.PECUNIARY_LOSS)
-                                            .build());
-        updatedData.setSdoR2Trial(SdoR2Trial.builder()
-                                   .trialOnOptions(TrialOnRadioOptions.OPEN_DATE)
-                                   .lengthList(FastTrackHearingTimeEstimate.FIVE_HOURS)
-                                   .methodOfHearing(hearingMethodList)
-                                   .physicalBundleOptions(PhysicalTrialBundleOptions.PARTY)
-                                   .sdoR2TrialFirstOpenDateAfter(
-                                       SdoR2TrialFirstOpenDateAfter.builder()
-                                           .listFrom(LocalDate.now().plusDays(434)).build())
-                                   .sdoR2TrialWindow(SdoR2TrialWindow.builder()
-                                                         .listFrom(LocalDate.now().plusDays(434))
-                                                         .dateTo(LocalDate.now().plusDays(455))
-                                                         .build())
-                                   .hearingCourtLocationList(DynamicList.builder()
-                                                                 .listItems(getCourtLocationForSdoR2(
-                                                                     preferredCourt
-                                                                         .orElse(null),
-                                                                     locationRefDataList
-                                                                 ).getListItems())
-                                                                 .value(getCourtLocationForSdoR2(
-                                                                     preferredCourt
-                                                                         .orElse(null),
-                                                                     locationRefDataList
-                                                                 ).getListItems().get(0)).build())
+        FastTrackJudgesRecital fastTrackJudgesRecital = new FastTrackJudgesRecital();
+        fastTrackJudgesRecital.setInput(SdoR2UiConstantFastTrack.JUDGE_RECITAL);
+        updatedData.setSdoFastTrackJudgesRecital(fastTrackJudgesRecital);
 
-                                   .altHearingCourtLocationList(getAlternativeCourtLocationsForNihl(locationRefDataList))
-                                   .physicalBundlePartyTxt(SdoR2UiConstantFastTrack.PHYSICAL_TRIAL_BUNDLE)
-                                   .build());
+        SdoR2DisclosureOfDocuments disclosureOfDocuments = new SdoR2DisclosureOfDocuments();
+        disclosureOfDocuments.setStandardDisclosureTxt(SdoR2UiConstantFastTrack.STANDARD_DISCLOSURE);
+        disclosureOfDocuments.setStandardDisclosureDate(LocalDate.now().plusDays(28));
+        disclosureOfDocuments.setInspectionTxt(SdoR2UiConstantFastTrack.INSPECTION);
+        disclosureOfDocuments.setInspectionDate(LocalDate.now().plusDays(42));
+        disclosureOfDocuments.setRequestsWillBeCompiledLabel(SdoR2UiConstantFastTrack.REQUEST_COMPILED_WITH);
+        updatedData.setSdoR2DisclosureOfDocuments(disclosureOfDocuments);
+
+        SdoR2RestrictNoOfWitnessDetails restrictNoOfWitnessDetails = new SdoR2RestrictNoOfWitnessDetails();
+        restrictNoOfWitnessDetails.setNoOfWitnessClaimant(3);
+        restrictNoOfWitnessDetails.setNoOfWitnessDefendant(3);
+        restrictNoOfWitnessDetails.setPartyIsCountedAsWitnessTxt(SdoR2UiConstantFastTrack.RESTRICT_WITNESS_TEXT);
+
+        SdoR2RestrictWitness restrictWitness = new SdoR2RestrictWitness();
+        restrictWitness.setIsRestrictWitness(NO);
+        restrictWitness.setRestrictNoOfWitnessDetails(restrictNoOfWitnessDetails);
+
+        SdoR2RestrictNoOfPagesDetails restrictNoOfPagesDetails = new SdoR2RestrictNoOfPagesDetails();
+        restrictNoOfPagesDetails.setWitnessShouldNotMoreThanTxt(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT1);
+        restrictNoOfPagesDetails.setNoOfPages(12);
+        restrictNoOfPagesDetails.setFontDetails(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT2);
+
+        SdoR2RestrictPages restrictPages = new SdoR2RestrictPages();
+        restrictPages.setIsRestrictPages(NO);
+        restrictPages.setRestrictNoOfPagesDetails(restrictNoOfPagesDetails);
+
+        SdoR2WitnessOfFact witnessOfFact = new SdoR2WitnessOfFact();
+        witnessOfFact.setSdoStatementOfWitness(SdoR2UiConstantFastTrack.STATEMENT_WITNESS);
+        witnessOfFact.setSdoR2RestrictWitness(restrictWitness);
+        witnessOfFact.setSdoRestrictPages(restrictPages);
+        witnessOfFact.setSdoWitnessDeadline(SdoR2UiConstantFastTrack.DEADLINE);
+        witnessOfFact.setSdoWitnessDeadlineDate(LocalDate.now().plusDays(70));
+        witnessOfFact.setSdoWitnessDeadlineText(SdoR2UiConstantFastTrack.DEADLINE_EVIDENCE);
+        updatedData.setSdoR2WitnessesOfFact(witnessOfFact);
+
+        SdoR2ScheduleOfLoss scheduleOfLoss = new SdoR2ScheduleOfLoss();
+        scheduleOfLoss.setSdoR2ScheduleOfLossClaimantText(SdoR2UiConstantFastTrack.SCHEDULE_OF_LOSS_CLAIMANT);
+        scheduleOfLoss.setIsClaimForPecuniaryLoss(NO);
+        scheduleOfLoss.setSdoR2ScheduleOfLossClaimantDate(LocalDate.now().plusDays(364));
+        scheduleOfLoss.setSdoR2ScheduleOfLossDefendantText(SdoR2UiConstantFastTrack.SCHEDULE_OF_LOSS_DEFENDANT);
+        scheduleOfLoss.setSdoR2ScheduleOfLossDefendantDate(LocalDate.now().plusDays(378));
+        scheduleOfLoss.setSdoR2ScheduleOfLossPecuniaryLossTxt(SdoR2UiConstantFastTrack.PECUNIARY_LOSS);
+        updatedData.setSdoR2ScheduleOfLoss(scheduleOfLoss);
+
+        SdoR2TrialFirstOpenDateAfter trialFirstOpenDateAfter = new SdoR2TrialFirstOpenDateAfter();
+        trialFirstOpenDateAfter.setListFrom(LocalDate.now().plusDays(434));
+
+        SdoR2TrialWindow trialWindow = new SdoR2TrialWindow();
+        trialWindow.setListFrom(LocalDate.now().plusDays(434));
+        trialWindow.setDateTo(LocalDate.now().plusDays(455));
+
+        DynamicList baseCourtLocationList = getCourtLocationForSdoR2(preferredCourt.orElse(null), locationRefDataList);
+        DynamicList hearingCourtLocationList = new DynamicList();
+        hearingCourtLocationList.setListItems(baseCourtLocationList.getListItems());
+        if (!baseCourtLocationList.getListItems().isEmpty()) {
+            hearingCourtLocationList.setValue(baseCourtLocationList.getListItems().get(0));
+        }
+
+        SdoR2Trial trial = new SdoR2Trial();
+        trial.setTrialOnOptions(TrialOnRadioOptions.OPEN_DATE);
+        trial.setLengthList(FastTrackHearingTimeEstimate.FIVE_HOURS);
+        trial.setMethodOfHearing(hearingMethodList);
+        trial.setPhysicalBundleOptions(PhysicalTrialBundleOptions.PARTY);
+        trial.setSdoR2TrialFirstOpenDateAfter(trialFirstOpenDateAfter);
+        trial.setSdoR2TrialWindow(trialWindow);
+        trial.setHearingCourtLocationList(hearingCourtLocationList);
+        trial.setAltHearingCourtLocationList(getAlternativeCourtLocationsForNihl(locationRefDataList));
+        trial.setPhysicalBundlePartyTxt(SdoR2UiConstantFastTrack.PHYSICAL_TRIAL_BUNDLE);
+        updatedData.setSdoR2Trial(trial);
 
         updatedData.setSdoR2ImportantNotesTxt(SdoR2UiConstantFastTrack.IMPORTANT_NOTES);
         updatedData.setSdoR2ImportantNotesDate(LocalDate.now().plusDays(7));
 
-        updatedData.setSdoR2ExpertEvidence(SdoR2ExpertEvidence.builder()
-                                            .sdoClaimantPermissionToRelyTxt(SdoR2UiConstantFastTrack.CLAIMANT_PERMISSION_TO_RELY).build());
-        updatedData.setSdoR2AddendumReport(SdoR2AddendumReport.builder()
-                                            .sdoAddendumReportTxt(SdoR2UiConstantFastTrack.ADDENDUM_REPORT)
-                                            .sdoAddendumReportDate(LocalDate.now().plusDays(56)).build());
-        updatedData.setSdoR2FurtherAudiogram(SdoR2FurtherAudiogram.builder()
-                                              .sdoClaimantShallUndergoTxt(SdoR2UiConstantFastTrack.CLAIMANT_SHALL_UNDERGO)
-                                              .sdoServiceReportTxt(SdoR2UiConstantFastTrack.SERVICE_REPORT)
-                                              .sdoClaimantShallUndergoDate(LocalDate.now().plusDays(42))
-                                              .sdoServiceReportDate(LocalDate.now().plusDays(98)).build());
-        updatedData.setSdoR2QuestionsClaimantExpert(SdoR2QuestionsClaimantExpert.builder()
-                                                     .sdoDefendantMayAskTxt(SdoR2UiConstantFastTrack.DEFENDANT_MAY_ASK)
-                                                     .sdoDefendantMayAskDate(LocalDate.now().plusDays(126))
-                                                     .sdoQuestionsShallBeAnsweredTxt(SdoR2UiConstantFastTrack.QUESTIONS_SHALL_BE_ANSWERED)
-                                                     .sdoQuestionsShallBeAnsweredDate(LocalDate.now().plusDays(147))
-                                                     .sdoUploadedToDigitalPortalTxt(SdoR2UiConstantFastTrack.UPLOADED_TO_DIGITAL_PORTAL)
-                                                     .sdoApplicationToRelyOnFurther(
-                                                         SdoR2ApplicationToRelyOnFurther.builder()
-                                                             .doRequireApplicationToRely(NO)
-                                                             .applicationToRelyOnFurtherDetails(
-                                                                 SdoR2ApplicationToRelyOnFurtherDetails.builder()
-                                                                     .applicationToRelyDetailsTxt(
-                                                                         SdoR2UiConstantFastTrack.APPLICATION_TO_RELY_DETAILS)
-                                                                     .applicationToRelyDetailsDate(LocalDate.now().plusDays(
-                                                                         161)).build()).build())
-                                                     .build());
-        updatedData.setSdoR2PermissionToRelyOnExpert(SdoR2PermissionToRelyOnExpert.builder()
-                                                      .sdoPermissionToRelyOnExpertTxt(SdoR2UiConstantFastTrack.PERMISSION_TO_RELY_ON_EXPERT)
-                                                      .sdoPermissionToRelyOnExpertDate(LocalDate.now().plusDays(119))
-                                                      .sdoJointMeetingOfExpertsTxt(SdoR2UiConstantFastTrack.JOINT_MEETING_OF_EXPERTS)
-                                                      .sdoJointMeetingOfExpertsDate(LocalDate.now().plusDays(147))
-                                                      .sdoUploadedToDigitalPortalTxt(SdoR2UiConstantFastTrack.UPLOADED_TO_DIGITAL_PORTAL_7_DAYS)
-                                                      .build());
-        updatedData.setSdoR2EvidenceAcousticEngineer(SdoR2EvidenceAcousticEngineer.builder()
-                                                      .sdoEvidenceAcousticEngineerTxt(SdoR2UiConstantFastTrack.EVIDENCE_ACOUSTIC_ENGINEER)
-                                                      .sdoInstructionOfTheExpertTxt(SdoR2UiConstantFastTrack.INSTRUCTION_OF_EXPERT)
-                                                      .sdoInstructionOfTheExpertDate(LocalDate.now().plusDays(42))
-                                                      .sdoInstructionOfTheExpertTxtArea(SdoR2UiConstantFastTrack.INSTRUCTION_OF_EXPERT_TA)
-                                                      .sdoExpertReportTxt(SdoR2UiConstantFastTrack.EXPERT_REPORT)
-                                                      .sdoExpertReportDate(LocalDate.now().plusDays(280))
-                                                      .sdoExpertReportDigitalPortalTxt(SdoR2UiConstantFastTrack.EXPERT_REPORT_DIGITAL_PORTAL)
-                                                      .sdoWrittenQuestionsTxt(SdoR2UiConstantFastTrack.WRITTEN_QUESTIONS)
-                                                      .sdoWrittenQuestionsDate(LocalDate.now().plusDays(294))
-                                                      .sdoWrittenQuestionsDigitalPortalTxt(SdoR2UiConstantFastTrack.WRITTEN_QUESTIONS_DIGITAL_PORTAL)
-                                                      .sdoRepliesTxt(SdoR2UiConstantFastTrack.REPLIES)
-                                                      .sdoRepliesDate(LocalDate.now().plusDays(315))
-                                                      .sdoRepliesDigitalPortalTxt(SdoR2UiConstantFastTrack.REPLIES_DIGITAL_PORTAL)
-                                                      .sdoServiceOfOrderTxt(SdoR2UiConstantFastTrack.SERVICE_OF_ORDER)
-                                                      .build());
-        updatedData.setSdoR2QuestionsToEntExpert(SdoR2QuestionsToEntExpert.builder()
-                                                  .sdoWrittenQuestionsTxt(SdoR2UiConstantFastTrack.ENT_WRITTEN_QUESTIONS)
-                                                  .sdoWrittenQuestionsDate(LocalDate.now().plusDays(336))
-                                                  .sdoWrittenQuestionsDigPortalTxt(SdoR2UiConstantFastTrack.ENT_WRITTEN_QUESTIONS_DIG_PORTAL)
-                                                  .sdoQuestionsShallBeAnsweredTxt(SdoR2UiConstantFastTrack.ENT_QUESTIONS_SHALL_BE_ANSWERED)
-                                                  .sdoQuestionsShallBeAnsweredDate(LocalDate.now().plusDays(350))
-                                                  .sdoShallBeUploadedTxt(SdoR2UiConstantFastTrack.ENT_SHALL_BE_UPLOADED)
-                                                  .build());
-        updatedData.setSdoR2UploadOfDocuments(SdoR2UploadOfDocuments.builder()
-                                               .sdoUploadOfDocumentsTxt(SdoR2UiConstantFastTrack.UPLOAD_OF_DOCUMENTS)
-                                               .build());
-        updatedData.setSdoR2NihlUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
+        SdoR2ExpertEvidence expertEvidence = new SdoR2ExpertEvidence();
+        expertEvidence.setSdoClaimantPermissionToRelyTxt(SdoR2UiConstantFastTrack.CLAIMANT_PERMISSION_TO_RELY);
+        updatedData.setSdoR2ExpertEvidence(expertEvidence);
+
+        SdoR2AddendumReport addendumReport = new SdoR2AddendumReport();
+        addendumReport.setSdoAddendumReportTxt(SdoR2UiConstantFastTrack.ADDENDUM_REPORT);
+        addendumReport.setSdoAddendumReportDate(LocalDate.now().plusDays(56));
+        updatedData.setSdoR2AddendumReport(addendumReport);
+
+        SdoR2FurtherAudiogram furtherAudiogram = new SdoR2FurtherAudiogram();
+        furtherAudiogram.setSdoClaimantShallUndergoTxt(SdoR2UiConstantFastTrack.CLAIMANT_SHALL_UNDERGO);
+        furtherAudiogram.setSdoServiceReportTxt(SdoR2UiConstantFastTrack.SERVICE_REPORT);
+        furtherAudiogram.setSdoClaimantShallUndergoDate(LocalDate.now().plusDays(42));
+        furtherAudiogram.setSdoServiceReportDate(LocalDate.now().plusDays(98));
+        updatedData.setSdoR2FurtherAudiogram(furtherAudiogram);
+
+        SdoR2ApplicationToRelyOnFurtherDetails applicationDetails = new SdoR2ApplicationToRelyOnFurtherDetails();
+        applicationDetails.setApplicationToRelyDetailsTxt(SdoR2UiConstantFastTrack.APPLICATION_TO_RELY_DETAILS);
+        applicationDetails.setApplicationToRelyDetailsDate(LocalDate.now().plusDays(161));
+
+        SdoR2ApplicationToRelyOnFurther applicationToRelyOnFurther = new SdoR2ApplicationToRelyOnFurther();
+        applicationToRelyOnFurther.setDoRequireApplicationToRely(NO);
+        applicationToRelyOnFurther.setApplicationToRelyOnFurtherDetails(applicationDetails);
+
+        SdoR2QuestionsClaimantExpert questionsClaimantExpert = new SdoR2QuestionsClaimantExpert();
+        questionsClaimantExpert.setSdoDefendantMayAskTxt(SdoR2UiConstantFastTrack.DEFENDANT_MAY_ASK);
+        questionsClaimantExpert.setSdoDefendantMayAskDate(LocalDate.now().plusDays(126));
+        questionsClaimantExpert.setSdoQuestionsShallBeAnsweredTxt(SdoR2UiConstantFastTrack.QUESTIONS_SHALL_BE_ANSWERED);
+        questionsClaimantExpert.setSdoQuestionsShallBeAnsweredDate(LocalDate.now().plusDays(147));
+        questionsClaimantExpert.setSdoUploadedToDigitalPortalTxt(SdoR2UiConstantFastTrack.UPLOADED_TO_DIGITAL_PORTAL);
+        questionsClaimantExpert.setSdoApplicationToRelyOnFurther(applicationToRelyOnFurther);
+        updatedData.setSdoR2QuestionsClaimantExpert(questionsClaimantExpert);
+
+        SdoR2PermissionToRelyOnExpert permissionToRelyOnExpert = new SdoR2PermissionToRelyOnExpert();
+        permissionToRelyOnExpert.setSdoPermissionToRelyOnExpertTxt(SdoR2UiConstantFastTrack.PERMISSION_TO_RELY_ON_EXPERT);
+        permissionToRelyOnExpert.setSdoPermissionToRelyOnExpertDate(LocalDate.now().plusDays(119));
+        permissionToRelyOnExpert.setSdoJointMeetingOfExpertsTxt(SdoR2UiConstantFastTrack.JOINT_MEETING_OF_EXPERTS);
+        permissionToRelyOnExpert.setSdoJointMeetingOfExpertsDate(LocalDate.now().plusDays(147));
+        permissionToRelyOnExpert.setSdoUploadedToDigitalPortalTxt(SdoR2UiConstantFastTrack.UPLOADED_TO_DIGITAL_PORTAL_7_DAYS);
+        updatedData.setSdoR2PermissionToRelyOnExpert(permissionToRelyOnExpert);
+
+        SdoR2EvidenceAcousticEngineer evidenceAcousticEngineer = new SdoR2EvidenceAcousticEngineer();
+        evidenceAcousticEngineer.setSdoEvidenceAcousticEngineerTxt(SdoR2UiConstantFastTrack.EVIDENCE_ACOUSTIC_ENGINEER);
+        evidenceAcousticEngineer.setSdoInstructionOfTheExpertTxt(SdoR2UiConstantFastTrack.INSTRUCTION_OF_EXPERT);
+        evidenceAcousticEngineer.setSdoInstructionOfTheExpertDate(LocalDate.now().plusDays(42));
+        evidenceAcousticEngineer.setSdoInstructionOfTheExpertTxtArea(SdoR2UiConstantFastTrack.INSTRUCTION_OF_EXPERT_TA);
+        evidenceAcousticEngineer.setSdoExpertReportTxt(SdoR2UiConstantFastTrack.EXPERT_REPORT);
+        evidenceAcousticEngineer.setSdoExpertReportDate(LocalDate.now().plusDays(280));
+        evidenceAcousticEngineer.setSdoExpertReportDigitalPortalTxt(SdoR2UiConstantFastTrack.EXPERT_REPORT_DIGITAL_PORTAL);
+        evidenceAcousticEngineer.setSdoWrittenQuestionsTxt(SdoR2UiConstantFastTrack.WRITTEN_QUESTIONS);
+        evidenceAcousticEngineer.setSdoWrittenQuestionsDate(LocalDate.now().plusDays(294));
+        evidenceAcousticEngineer.setSdoWrittenQuestionsDigitalPortalTxt(SdoR2UiConstantFastTrack.WRITTEN_QUESTIONS_DIGITAL_PORTAL);
+        evidenceAcousticEngineer.setSdoRepliesTxt(SdoR2UiConstantFastTrack.REPLIES);
+        evidenceAcousticEngineer.setSdoRepliesDate(LocalDate.now().plusDays(315));
+        evidenceAcousticEngineer.setSdoRepliesDigitalPortalTxt(SdoR2UiConstantFastTrack.REPLIES_DIGITAL_PORTAL);
+        evidenceAcousticEngineer.setSdoServiceOfOrderTxt(SdoR2UiConstantFastTrack.SERVICE_OF_ORDER);
+        updatedData.setSdoR2EvidenceAcousticEngineer(evidenceAcousticEngineer);
+
+        SdoR2QuestionsToEntExpert questionsToEntExpert = new SdoR2QuestionsToEntExpert();
+        questionsToEntExpert.setSdoWrittenQuestionsTxt(SdoR2UiConstantFastTrack.ENT_WRITTEN_QUESTIONS);
+        questionsToEntExpert.setSdoWrittenQuestionsDate(LocalDate.now().plusDays(336));
+        questionsToEntExpert.setSdoWrittenQuestionsDigPortalTxt(SdoR2UiConstantFastTrack.ENT_WRITTEN_QUESTIONS_DIG_PORTAL);
+        questionsToEntExpert.setSdoQuestionsShallBeAnsweredTxt(SdoR2UiConstantFastTrack.ENT_QUESTIONS_SHALL_BE_ANSWERED);
+        questionsToEntExpert.setSdoQuestionsShallBeAnsweredDate(LocalDate.now().plusDays(350));
+        questionsToEntExpert.setSdoShallBeUploadedTxt(SdoR2UiConstantFastTrack.ENT_SHALL_BE_UPLOADED);
+        updatedData.setSdoR2QuestionsToEntExpert(questionsToEntExpert);
+
+        SdoR2UploadOfDocuments uploadOfDocuments = new SdoR2UploadOfDocuments();
+        uploadOfDocuments.setSdoUploadOfDocumentsTxt(SdoR2UiConstantFastTrack.UPLOAD_OF_DOCUMENTS);
+        updatedData.setSdoR2UploadOfDocuments(uploadOfDocuments);
+
+        SdoR2WelshLanguageUsage nihlWelshUsage = new SdoR2WelshLanguageUsage();
+        nihlWelshUsage.setDescription(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION);
+        updatedData.setSdoR2NihlUseOfWelshLanguage(nihlWelshUsage);
 
     }
 
@@ -1123,26 +1116,17 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .map(JudgementSum::getJudgementSum)
             .map(d -> d + "%")
             .ifPresent(deductionPercentage -> {
-                DisposalHearingJudgementDeductionValue tempDisposalHearingJudgementDeductionValue =
-                    DisposalHearingJudgementDeductionValue.builder()
-                        .value(deductionPercentage)
-                        .build();
+                DisposalHearingJudgementDeductionValue disposalValue = new DisposalHearingJudgementDeductionValue();
+                disposalValue.setValue(deductionPercentage);
+                caseData.setDisposalHearingJudgementDeductionValue(disposalValue);
 
-                caseData.setDisposalHearingJudgementDeductionValue(tempDisposalHearingJudgementDeductionValue);
+                FastTrackJudgementDeductionValue fastTrackValue = new FastTrackJudgementDeductionValue();
+                fastTrackValue.setValue(deductionPercentage);
+                caseData.setFastTrackJudgementDeductionValue(fastTrackValue);
 
-                FastTrackJudgementDeductionValue tempFastTrackJudgementDeductionValue =
-                    FastTrackJudgementDeductionValue.builder()
-                        .value(deductionPercentage)
-                        .build();
-
-                caseData.setFastTrackJudgementDeductionValue(tempFastTrackJudgementDeductionValue);
-
-                SmallClaimsJudgementDeductionValue tempSmallClaimsJudgementDeductionValue =
-                    SmallClaimsJudgementDeductionValue.builder()
-                        .value(deductionPercentage)
-                        .build();
-
-                caseData.setSmallClaimsJudgementDeductionValue(tempSmallClaimsJudgementDeductionValue);
+                SmallClaimsJudgementDeductionValue smallClaimsValue = new SmallClaimsJudgementDeductionValue();
+                smallClaimsValue.setValue(deductionPercentage);
+                caseData.setSmallClaimsJudgementDeductionValue(smallClaimsValue);
             });
     }
 
@@ -1564,12 +1548,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         if (caseData.getSdoR2Trial() != null) {
             SdoR2Trial sdoR2Trial = caseData.getSdoR2Trial();
             if (caseData.getSdoR2Trial().getHearingCourtLocationList() != null) {
-                sdoR2Trial.setHearingCourtLocationList(DynamicList.builder().value(
-                    caseData.getSdoR2Trial().getHearingCourtLocationList().getValue()).build());
+                DynamicList hearingList = new DynamicList();
+                hearingList.setValue(caseData.getSdoR2Trial().getHearingCourtLocationList().getValue());
+                sdoR2Trial.setHearingCourtLocationList(hearingList);
             }
             if (caseData.getSdoR2Trial().getAltHearingCourtLocationList() != null) {
-                sdoR2Trial.setAltHearingCourtLocationList(DynamicList.builder().value(
-                    caseData.getSdoR2Trial().getAltHearingCourtLocationList().getValue()).build());
+                DynamicList altHearingList = new DynamicList();
+                altHearingList.setValue(caseData.getSdoR2Trial().getAltHearingCourtLocationList().getValue());
+                sdoR2Trial.setAltHearingCourtLocationList(altHearingList);
             }
             caseData.setSdoR2Trial(sdoR2Trial);
         }
@@ -1636,7 +1622,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         if (isNull(list)) {
             return null;
         }
-        return DynamicList.builder().value(list.getValue()).build();
+        DynamicList cleanedList = new DynamicList();
+        cleanedList.setValue(list.getValue());
+        return cleanedList;
     }
 
     private boolean nonNull(Object object) {
@@ -1755,11 +1743,17 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         CaseData updatedData,
         List<IncludeInOrderToggle> includeInOrderToggle
     ) {
-        updatedData.setSdoAltDisputeResolution(SdoR2FastTrackAltDisputeResolution.builder().includeInOrderToggle(
-            includeInOrderToggle).build());
-        updatedData.setSdoVariationOfDirections(SdoR2VariationOfDirections.builder().includeInOrderToggle(
-            includeInOrderToggle).build());
-        updatedData.setSdoR2Settlement(SdoR2Settlement.builder().includeInOrderToggle(includeInOrderToggle).build());
+        SdoR2FastTrackAltDisputeResolution altDisputeResolution = new SdoR2FastTrackAltDisputeResolution();
+        altDisputeResolution.setIncludeInOrderToggle(includeInOrderToggle);
+        updatedData.setSdoAltDisputeResolution(altDisputeResolution);
+
+        SdoR2VariationOfDirections variationOfDirections = new SdoR2VariationOfDirections();
+        variationOfDirections.setIncludeInOrderToggle(includeInOrderToggle);
+        updatedData.setSdoVariationOfDirections(variationOfDirections);
+
+        SdoR2Settlement settlement = new SdoR2Settlement();
+        settlement.setIncludeInOrderToggle(includeInOrderToggle);
+        updatedData.setSdoR2Settlement(settlement);
         updatedData.setSdoR2DisclosureOfDocumentsToggle(includeInOrderToggle);
         updatedData.setSdoR2SeparatorWitnessesOfFactToggle(includeInOrderToggle);
         updatedData.setSdoR2SeparatorExpertEvidenceToggle(includeInOrderToggle);

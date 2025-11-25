@@ -91,17 +91,19 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldReturnExpectedAboutToSubmitResponseForLessThanThousandsPoundScenerio1() {
+            RequestedCourt requestedCourt = new RequestedCourt();
+            requestedCourt.setResponseCourtCode("123");
+            given(helper.getClaimantRequestedCourt(any()))
+                .willReturn(Optional.of(requestedCourt));
+
+            given(helper.getMatching(any(), any()))
+                .willReturn(Optional.of(LocationRefData.builder().courtLocationCode("123").build()));
+
             CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .atStateClaimSubmittedSmallClaim()
                 .setClaimTypeToUnspecClaim()
                 .respondent1(PartyBuilder.builder().individual().build().toBuilder().partyID("res-1-party-id").build())
                 .build();
-
-            given(helper.getClaimantRequestedCourt(any()))
-                .willReturn(Optional.of(RequestedCourt.builder().responseCourtCode("123").build()));
-
-            given(helper.getMatching(any(), any()))
-                .willReturn(Optional.of(LocationRefData.builder().courtLocationCode("123").build()));
 
             CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response =
@@ -114,17 +116,19 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldReturnExpectedAboutToSubmitResponseForLessThanThousandsPoundScenerio2() {
+            RequestedCourt requestedCourt = new RequestedCourt();
+            requestedCourt.setResponseCourtCode("123");
+            given(helper.getClaimantRequestedCourt(any()))
+                .willReturn(Optional.of(requestedCourt));
+
+            given(helper.getMatching(any(), any()))
+                .willReturn(Optional.of(LocationRefData.builder().courtLocationCode("123").build()));
+
             CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .atStateClaimSubmittedSmallClaim()
                 .setClaimTypeToUnspecClaim()
                 .respondent2(PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build())
                 .build();
-
-            given(helper.getClaimantRequestedCourt(any()))
-                .willReturn(Optional.of(RequestedCourt.builder().responseCourtCode("123").build()));
-
-            given(helper.getMatching(any(), any()))
-                .willReturn(Optional.of(LocationRefData.builder().courtLocationCode("123").build()));
 
             CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response =
@@ -159,12 +163,12 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             LocationHelper.updateWithLocation(updatedData, LocationRefData.builder()
                 .courtLocationCode("123").regionId("regionId").region("region name").epimmsId("epimms").build());
 
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setRegion("regionId");
+            caseLocationCivil.setBaseLocation("epimms");
             Assertions.assertThat(updatedData.getCaseManagementLocation())
                 .isNotNull()
-                .isEqualTo(CaseLocationCivil.builder()
-                               .region("regionId")
-                               .baseLocation("epimms")
-                               .build());
+                .isEqualTo(caseLocationCivil);
         }
 
         @Test

@@ -183,10 +183,9 @@ public class DefaultJudgementHandler extends CallbackHandler {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<LocationRefData> locations = (locationRefDataService
             .getCourtLocationsForDefaultJudgments(authToken));
-        caseData.setHearingSupportRequirementsDJ(
-            HearingSupportRequirementsDJ.builder()
-                .hearingTemporaryLocation(getLocationsFromList(locations))
-                .build());
+        HearingSupportRequirementsDJ hearingSupportRequirementsDJ = new HearingSupportRequirementsDJ();
+        hearingSupportRequirementsDJ.setHearingTemporaryLocation(getLocationsFromList(locations));
+        caseData.setHearingSupportRequirementsDJ(hearingSupportRequirementsDJ);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
@@ -241,8 +240,8 @@ public class DefaultJudgementHandler extends CallbackHandler {
         if (Objects.nonNull(caseData.getHearingSupportRequirementsDJ())) {
             DynamicList list = formatLocationList(caseData.getHearingSupportRequirementsDJ()
                                                       .getHearingTemporaryLocation());
-            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = caseData.getHearingSupportRequirementsDJ()
-                .toBuilder().hearingTemporaryLocation(list).build();
+            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = caseData.getHearingSupportRequirementsDJ();
+            hearingSupportRequirementsDJ.setHearingTemporaryLocation(list);
             caseData.setHearingSupportRequirementsDJ(hearingSupportRequirementsDJ);
             String code = list.getValue().getCode();
             final String epimId = code.substring(code.lastIndexOf("-") + 1).trim();
@@ -251,10 +250,10 @@ public class DefaultJudgementHandler extends CallbackHandler {
 
             if (!locations.isEmpty()) {
                 LocationRefData locationRefData = locations.get(0);
-                caseData.setCaseManagementLocation(CaseLocationCivil.builder()
-                                                           .region(locationRefData.getRegionId())
-                                                           .baseLocation(locationRefData.getEpimmsId())
-                                                           .build());
+                CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+                caseLocationCivil.setRegion(locationRefData.getRegionId());
+                caseLocationCivil.setBaseLocation(locationRefData.getEpimmsId());
+                caseData.setCaseManagementLocation(caseLocationCivil);
             }
         }
 
@@ -312,7 +311,10 @@ public class DefaultJudgementHandler extends CallbackHandler {
         List<DynamicListElement> list = locationList.getListItems()
             .stream()
             .filter(element -> checkLocationItemValue(element, locationList.getValue())).toList();
-        return DynamicList.builder().value(locationList.getValue()).listItems(list).build();
+        DynamicList dynamicList = new DynamicList();
+        dynamicList.setValue(locationList.getValue());
+        dynamicList.setListItems(list);
+        return dynamicList;
     }
 
     private boolean checkLocationItemValue(DynamicListElement element, DynamicListElement preferredLocation) {

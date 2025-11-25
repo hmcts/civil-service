@@ -89,7 +89,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @EnumSource(value = YesOrNo.class, names = {"YES", "NO"})
         void shouldPopulateIfRTLRadioDisplay(YesOrNo value) {
             //Given: Casedata in All_FINAL_ORDERS_ISSUED State
-            when(addressMapper.toRoboticsAddress(any())).thenReturn(RoboticsAddress.builder().build());
+            when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoIsRegisteredWithRTL(value);
             RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper(time, addressMapper);
@@ -115,20 +115,21 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(0)
                 );
-            when(addressMapper.toRoboticsAddress(any())).thenReturn(RoboticsAddress.builder().build());
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPaymentAmount("10")
-                .totalClaimAmount(BigDecimal.valueOf(1010))
-                .partialPayment(YES)
-                .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
-                .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("John Smith")
-                                                     .build())
-                                          .build())
-                .build();
+            when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPaymentAmount("10");
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(1010));
+            caseData.setPartialPayment(YES);
+            caseData.setPaymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY);
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("0123");
+            caseLocationCivil.setRegion("0321");
+            caseData.setCaseManagementLocation(caseLocationCivil);
+            DynamicListElement dynamicListElement = new DynamicListElement(null, "John Smith");
+            DynamicList defendantDetails = new DynamicList();
+            defendantDetails.setValue(dynamicListElement);
+            caseData.setDefendantDetailsSpec(defendantDetails);
             caseData.setActiveJudgment(defaultJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -146,7 +147,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateAllJudgmentFields_For_Pay_Instalment_WITH_RTL_YES_TO_YES() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State and RTL is Yes in active judgment
-            when(addressMapper.toRoboticsAddress(any())).thenReturn(RoboticsAddress.builder().build());
+            when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
             when(interestCalculator.calculateInterest(any())).thenReturn(BigDecimal.ZERO);
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoIsRegisteredWithRTL(YesOrNo.YES);
@@ -209,7 +210,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateAllJudgmentFields_For_Pay_Immediately_RTL_NO_TO_YES() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
-            when(addressMapper.toRoboticsAddress(any())).thenReturn(RoboticsAddress.builder().build());
+            when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
             when(interestCalculator.calculateInterest(any())).thenReturn(BigDecimal.ZERO);
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -254,7 +255,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateAllJudgmentFields_For_Pay_By_Date_RTL_NO_TO_NO() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
-            when(addressMapper.toRoboticsAddress(any())).thenReturn(RoboticsAddress.builder().build());
+            when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
             when(interestCalculator.calculateInterest(any())).thenReturn(BigDecimal.ZERO);
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
             caseData.setJoIsRegisteredWithRTL(YesOrNo.NO);
@@ -323,8 +324,10 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldValidatePaymentInstalmentDate() {
 
+            JudgmentInstalmentDetails judgmentInstalmentDetails = new JudgmentInstalmentDetails();
+            judgmentInstalmentDetails.setStartDate(LocalDate.now().minusDays(2));
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
-            caseData.setJoInstalmentDetails(JudgmentInstalmentDetails.builder().startDate(LocalDate.now().minusDays(2)).build());
+            caseData.setJoInstalmentDetails(judgmentInstalmentDetails);
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validateDates");
             //When: handler is called with MID event
@@ -357,11 +360,12 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotThrowErrorWhenAllDatesAreValid() {
 
+            JudgmentPaymentPlan judgmentPaymentPlan = new JudgmentPaymentPlan();
+            judgmentPaymentPlan.setType(PaymentPlanSelection.PAY_BY_DATE);
+            judgmentPaymentPlan.setPaymentDeadlineDate(LocalDate.now().plusDays(2));
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
             caseData.setJoOrderMadeDate(LocalDate.now().minusDays(2));
-            caseData.setJoPaymentPlan(JudgmentPaymentPlan.builder()
-                                          .type(PaymentPlanSelection.PAY_BY_DATE)
-                                          .paymentDeadlineDate(LocalDate.now().plusDays(2)).build());
+            caseData.setJoPaymentPlan(judgmentPaymentPlan);
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validateDates");
             //When: handler is called with MID event

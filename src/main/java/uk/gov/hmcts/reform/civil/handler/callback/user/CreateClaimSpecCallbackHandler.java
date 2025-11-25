@@ -272,10 +272,11 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     private CallbackResponse getIdamEmail(CallbackParams callbackParams) {
         UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
-
+        CorrectEmail correctEmail = new CorrectEmail();
+        correctEmail.setEmail(userDetails.getEmail());
         CaseData caseData = callbackParams.getCaseData();
-        caseData.setApplicantSolicitor1CheckEmail(CorrectEmail.builder().email(userDetails.getEmail()).build());
-        caseData.setApplicantSolicitor1UserDetails(IdamUserDetails.builder().build());
+        caseData.setApplicantSolicitor1CheckEmail(correctEmail);
+        caseData.setApplicantSolicitor1UserDetails(new IdamUserDetails());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
