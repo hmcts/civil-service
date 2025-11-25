@@ -150,9 +150,8 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             .atStateClaimIssued()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
             .caseManagementLocation(createCaseLocationCivil())
-            .build().toBuilder()
-            .ccdState(CaseState.CASE_DISCONTINUED)
-            .build();
+        .build();
+        caseData.setCcdState(CaseState.CASE_DISCONTINUED);
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
@@ -167,9 +166,8 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             .atStateClaimIssued()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
             .caseManagementLocation(createCaseLocationCivil())
-            .build().toBuilder()
-            .ccdState(CaseState.CASE_SETTLED)
             .build();
+        caseData.setCcdState(CaseState.CASE_SETTLED);
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
@@ -184,10 +182,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             .atStateClaimIssued()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
             .caseManagementLocation(createCaseLocationCivil())
-            .build().toBuilder()
-            .ccdState(CaseState.CASE_SETTLED)
-            .previousCCDState(CaseState.JUDICIAL_REFERRAL)
             .build();
+        caseData.setCcdState(CaseState.CASE_SETTLED);
+        caseData.setPreviousCCDState(CaseState.JUDICIAL_REFERRAL);
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
@@ -201,10 +198,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             .atStateClaimIssued()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
             .caseManagementLocation(createCaseLocationCivil())
-            .build().toBuilder()
-            .ccdState(CaseState.CASE_DISCONTINUED)
-            .previousCCDState(CaseState.JUDICIAL_REFERRAL)
             .build();
+        caseData.setCcdState(CaseState.CASE_DISCONTINUED);
+        caseData.setPreviousCCDState(CaseState.JUDICIAL_REFERRAL);
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
@@ -448,9 +444,8 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldNotThrowError_whenEpimsIdIsValidRegionPreSdoNationalRollout() {
         // National rollout applies to all courts pre sdo
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .ccdState(AWAITING_APPLICANT_INTENTION)
-            .caseManagementLocation(createCaseLocationCivil()).build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdState(AWAITING_APPLICANT_INTENTION);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
@@ -462,9 +457,8 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldNotThrowError_whenEpimsIdIsValidRegionPostSdoNationalRollout() {
         // National rollout applies to all courts  post sdo, except Birmingham
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .ccdState(CASE_PROGRESSION)
-            .caseManagementLocation(createCaseLocationCivil()).build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdState(CASE_PROGRESSION);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
@@ -713,10 +707,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT);
             CaseData caseData = CaseDataBuilder
                 .builder().generalAppType(createGAApplicationType(types))
-                .build().toBuilder()
-                .ccdCaseReference(1234L)
-                .generalAppRespondentAgreement(createRespondentNoAgreement())
                 .build();
+            caseData.setCcdCaseReference(1234L);
+            caseData.setGeneralAppRespondentAgreement(createRespondentNoAgreement());
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_CONSENT);
 
@@ -730,10 +723,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             List<GeneralApplicationTypes> types = List.of(SETTLE_BY_CONSENT);
             CaseData caseData = CaseDataBuilder
                 .builder().generalAppType(createGAApplicationType(types))
-                .build().toBuilder()
-                .ccdCaseReference(1234L)
-                .generalAppRespondentAgreement(createRespondentYesAgreement())
                 .build();
+            caseData.setCcdCaseReference(1234L);
+            caseData.setGeneralAppRespondentAgreement(createRespondentYesAgreement());
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_CONSENT);
 
@@ -747,10 +739,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             List<GeneralApplicationTypes> types = List.of(SETTLE_BY_CONSENT);
             CaseData caseData = CaseDataBuilder
                 .builder().generalAppType(createGAApplicationType(types))
-                .build().toBuilder()
-                .ccdCaseReference(1234L)
-                .generalAppRespondentAgreement(createRespondentNoAgreement())
                 .build();
+            caseData.setCcdCaseReference(1234L);
+            caseData.setGeneralAppRespondentAgreement(createRespondentNoAgreement());
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_CONSENT);
 
@@ -770,11 +761,10 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder
                 .builder()
                 .generalAppTypeLR(createGAApplicationTypeLR(typesLR))
-                .build().toBuilder()
-                .ccdCaseReference(1234L)
-                .generalAppRespondentAgreement(createRespondentNoAgreement())
-                .applicant1Represented(YES)
                 .build();
+            caseData.setCcdCaseReference(1234L);
+            caseData.setGeneralAppRespondentAgreement(createRespondentNoAgreement());
+            caseData.setApplicant1Represented(YES);
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_CONSENT);
 
@@ -795,10 +785,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                 .builder()
                 .ccdCaseReference(1234L)
                 .generalAppTypeLR(createGAApplicationTypeLR(typesLR))
-                .build().toBuilder()
-                .generalAppRespondentAgreement(createRespondentYesAgreement())
-                .applicant1Represented(YES)
                 .build();
+            caseData.setGeneralAppRespondentAgreement(createRespondentYesAgreement());
+            caseData.setApplicant1Represented(YES);
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_CONSENT);
 
@@ -819,10 +808,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                 .builder()
                 .ccdCaseReference(1234L)
                 .generalAppTypeLR(createGAApplicationTypeLR(typesLR))
-                .build().toBuilder()
-                .generalAppRespondentAgreement(createRespondentNoAgreement())
-                .applicant1Represented(YES)
                 .build();
+            caseData.setGeneralAppRespondentAgreement(createRespondentNoAgreement());
+            caseData.setApplicant1Represented(YES);
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_CONSENT);
 

@@ -157,12 +157,11 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void givenAboutToStart_assignCaseProgAllocatedTrackUnSpec() {
         // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .caseAccessCategory(UNSPEC_CLAIM)
-            .notificationText("NULLED")
-            .allocatedTrack(FAST_CLAIM)
-            .responseClaimTrack(null)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        caseData.setCaseAccessCategory(UNSPEC_CLAIM);
+        caseData.setNotificationText("NULLED");
+        caseData.setAllocatedTrack(FAST_CLAIM);
+        caseData.setResponseClaimTrack(null);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), any())).willReturn(false);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -177,12 +176,11 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void givenAboutToStart_assignCaseProgAllocatedTrackSpec() {
         // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .caseAccessCategory(SPEC_CLAIM)
-            .notificationText(null)
-            .allocatedTrack(null)
-            .responseClaimTrack("SMALL_CLAIM")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
+        caseData.setNotificationText(null);
+        caseData.setAllocatedTrack(null);
+        caseData.setResponseClaimTrack("SMALL_CLAIM");
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), any())).willReturn(false);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -197,15 +195,14 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void givenAboutToStart_1v2SameSolicitor_shouldShowOptions() {
         // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .notificationText("existing notification")
-            .claimType(null)
-            .totalClaimAmount(BigDecimal.valueOf(12500))
-            .addRespondent2(YES)
-            .respondent1(PartyBuilder.builder().individual().build())
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2SameLegalRepresentative(YES)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        caseData.setNotificationText("existing notification");
+        caseData.setClaimType(null);
+        caseData.setTotalClaimAmount(BigDecimal.valueOf(12500));
+        caseData.setAddRespondent2(YES);
+        caseData.setRespondent1(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2SameLegalRepresentative(YES);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -222,12 +219,11 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         List<String> options = List.of(EvidenceUploadHandlerBase.OPTION_DEF1,
             EvidenceUploadHandlerBase.OPTION_DEF2,
             EvidenceUploadHandlerBase.OPTION_DEF_BOTH);
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .addRespondent2(YES)
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2SameLegalRepresentative(YES)
-            .evidenceUploadOptions(DynamicList.fromList(options, Object::toString, options.get(Integer.parseInt(selected)), false))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        caseData.setAddRespondent2(YES);
+        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2SameLegalRepresentative(YES);
+        caseData.setEvidenceUploadOptions(DynamicList.fromList(options, Object::toString, options.get(Integer.parseInt(selected)), false));
         CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -243,11 +239,10 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void givenCreateShow_1v2DifferentSolicitorsWillChangeToRespondentTwoFlag() {
         // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .addRespondent2(YES)
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2SameLegalRepresentative(NO)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        caseData.setAddRespondent2(YES);
+        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2SameLegalRepresentative(NO);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
         CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
@@ -261,12 +256,11 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void givenCreateShow_1v2DifferentSolicitorsWillChangeToRespondentTwoFlagSpec() {
         // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .addRespondent2(YES)
-            .caseAccessCategory(SPEC_CLAIM)
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2SameLegalRepresentative(NO)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        caseData.setAddRespondent2(YES);
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
+        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2SameLegalRepresentative(NO);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
         CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
@@ -280,8 +274,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void givenCreateShow_1v1WillNotChangeToRespondentTwoFlag() {
         // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
         CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
@@ -297,11 +290,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         witnessList.add(WITNESS_STATEMENT);
         witnessList.add(WITNESS_SUMMARY);
         witnessList.add(DOCUMENTS_REFERRED);
+        CaseData caseData1 = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData1.setWitnessSelectionEvidenceRes(witnessList);
+        CaseData caseData2 = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData2.setWitnessSelectionEvidenceSmallClaimRes(witnessList);
         return Stream.of(
-            arguments(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .witnessSelectionEvidenceRes(witnessList).build()),
-            arguments(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .witnessSelectionEvidenceSmallClaimRes(witnessList).build())
+            arguments(caseData1),
+            arguments(caseData2)
         );
     }
 
@@ -309,11 +304,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         List<EvidenceUploadExpert> expertList = new ArrayList<>();
         expertList.add(EXPERT_REPORT);
         expertList.add(JOINT_STATEMENT);
+        CaseData caseData1 = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData1.setExpertSelectionEvidenceRes(expertList);
+        CaseData caseData2 = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData2.setExpertSelectionEvidenceSmallClaimRes(expertList);
         return Stream.of(
-            arguments(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .expertSelectionEvidenceRes(expertList).build()),
-            arguments(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .expertSelectionEvidenceSmallClaimRes(expertList).build())
+            arguments(caseData1),
+            arguments(caseData2)
         );
     }
 
@@ -322,19 +319,20 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         trialList.add(AUTHORITIES);
         trialList.add(DOCUMENTARY);
         trialList.add(COSTS);
+        CaseData caseData1 = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData1.setTrialSelectionEvidenceRes(trialList);
+        CaseData caseData2 = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData2.setTrialSelectionEvidenceSmallClaimRes(trialList);
         return Stream.of(
-            arguments(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .trialSelectionEvidenceRes(trialList).build()),
-            arguments(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .trialSelectionEvidenceSmallClaimRes(trialList).build())
+            arguments(caseData1),
+            arguments(caseData2)
         );
     }
 
     static Stream<Arguments> optionsNotSelected() {
-
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         return Stream.of(
-            arguments(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .build())
+            arguments(caseData)
         );
     }
 
@@ -427,27 +425,25 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "documentIssuedDate,documentForDisclosureRes",
-        "documentIssuedDate,documentReferredInStatementRes",
-        "documentIssuedDate,documentEvidenceForTrialRes",
+        "setDocumentIssuedDate,setDocumentForDisclosureRes",
+        "setDocumentIssuedDate,setDocumentReferredInStatementRes",
+        "setDocumentIssuedDate,setDocumentEvidenceForTrialRes",
     })
     void shouldNotReturnError_whenDocumentTypeUploadDatePastOneRespondent(String dateField, String collectionField) {
         // Given
         List<Element<UploadEvidenceDocumentType>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate3.toBuilder(), dateField, time
-            .toLocalDate().minusWeeks(1)).build()));
+        date.add(0, element(invoke(new UploadEvidenceDocumentType(), dateField, time
+            .toLocalDate().minusWeeks(1))));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-                                       .build().toBuilder(), collectionField, date)
-            .addRespondent2(NO)
-            .caseTypeFlag("do_not_show")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseData, collectionField, date);
+        caseData.setAddRespondent2(NO);
+        caseData.setCaseTypeFlag("do_not_show");
 
-        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .build().toBuilder(), collectionField, List.of())
-            .addRespondent2(NO)
-            .caseTypeFlag("do_not_show")
-            .build();
+        CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseDataBefore, collectionField, List.of());
+        caseDataBefore.setAddRespondent2(NO);
+        caseDataBefore.setCaseTypeFlag("do_not_show");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
                                                  PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
@@ -460,26 +456,24 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "documentIssuedDate,documentForDisclosureRes",
-        "documentIssuedDate,documentReferredInStatementRes",
-        "documentIssuedDate,documentEvidenceForTrialRes",
+        "setDocumentIssuedDate,setDocumentForDisclosureRes",
+        "setDocumentIssuedDate,setDocumentReferredInStatementRes",
+        "setDocumentIssuedDate,setDocumentEvidenceForTrialRes",
     })
     void shouldNotReturnError_whenDocumentTypeUploadDatePresentOneRespondent(String dateField, String collectionField) {
         // Given
         List<Element<UploadEvidenceDocumentType>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate3.toBuilder(), dateField, time
-            .toLocalDate()).build()));
+        date.add(0, element(invoke(new UploadEvidenceDocumentType(), dateField, time
+            .toLocalDate())));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .build().toBuilder(), collectionField, date)
-            .addRespondent2(NO)
-            .caseTypeFlag("do_not_show")
-            .build();
-        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-                                       .build().toBuilder(), collectionField, List.of())
-            .addRespondent2(NO)
-            .caseTypeFlag("do_not_show")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseData, collectionField, date);
+        caseData.setAddRespondent2(NO);
+        caseData.setCaseTypeFlag("do_not_show");
+        CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseDataBefore, collectionField, List.of());
+        caseDataBefore.setAddRespondent2(NO);
+        caseDataBefore.setCaseTypeFlag("do_not_show");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
                                                  PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
@@ -492,30 +486,28 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "documentIssuedDate,documentForDisclosureRes, Invalid date: \"Documents for disclosure\""
+        "setDocumentIssuedDate,setDocumentForDisclosureRes, Invalid date: \"Documents for disclosure\""
             + " date entered must not be in the future (1).",
-        "documentIssuedDate,documentForDisclosureRes, Invalid date: \"Documents for disclosure\""
+        "setDocumentIssuedDate,setDocumentForDisclosureRes, Invalid date: \"Documents for disclosure\""
             + " date entered must not be in the future (1).",
-        "documentIssuedDate,documentReferredInStatementRes, Invalid date: \"Documents referred to in the statement\""
+        "setDocumentIssuedDate,setDocumentReferredInStatementRes, Invalid date: \"Documents referred to in the statement\""
             + " date entered must not be in the future (5).",
     })
     void shouldReturnError_whenDocumentTypeUploadDateFutureOneRespondent(String dateField, String collectionField,
                                                                          String expectedErrorMessage) {
         // Given
         List<Element<UploadEvidenceDocumentType>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate3.toBuilder(), dateField, time
-            .toLocalDate().plusWeeks(1)).build()));
+        date.add(0, element(invoke(new UploadEvidenceDocumentType(), dateField, time
+            .toLocalDate().plusWeeks(1))));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .build().toBuilder(), collectionField, date)
-            .addRespondent2(NO)
-            .caseTypeFlag("do_not_show")
-            .build();
-        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-                                       .build().toBuilder(), collectionField, List.of())
-            .addRespondent2(NO)
-            .caseTypeFlag("do_not_show")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseData, collectionField, date);
+        caseData.setAddRespondent2(NO);
+        caseData.setCaseTypeFlag("do_not_show");
+        CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseDataBefore, collectionField, List.of());
+        caseDataBefore.setAddRespondent2(NO);
+        caseDataBefore.setCaseTypeFlag("do_not_show");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
                                                  PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
@@ -528,27 +520,25 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "expertOptionUploadDate,documentExpertReportRes",
-        "expertOptionUploadDate,documentJointStatementRes",
-        "expertOptionUploadDate,documentQuestionsRes",
-        "expertOptionUploadDate,documentAnswersRes",
+        "setExpertOptionUploadDate,setDocumentExpertReportRes",
+        "setExpertOptionUploadDate,setDocumentJointStatementRes",
+        "setExpertOptionUploadDate,setDocumentQuestionsRes",
+        "setExpertOptionUploadDate,setDocumentAnswersRes",
     })
     void shouldNotReturnError_whenExpert2OptionUploadDatePastOneRespondent(String dateField, String collectionField) {
         // Given
         List<Element<UploadEvidenceExpert>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time
-            .toLocalDate().minusWeeks(1)).build()));
+        date.add(0, element(invoke(new UploadEvidenceExpert(), dateField, time
+            .toLocalDate().minusWeeks(1))));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .build().toBuilder(), collectionField, date)
-            .addRespondent2(NO)
-            .caseTypeFlag("do_not_show")
-            .build();
-        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-                                       .build().toBuilder(), collectionField, List.of())
-            .addRespondent2(NO)
-            .caseTypeFlag("do_not_show")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseData, collectionField, date);
+        caseData.setAddRespondent2(NO);
+        caseData.setCaseTypeFlag("do_not_show");
+        CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseDataBefore, collectionField, List.of());
+        caseDataBefore.setAddRespondent2(NO);
+        caseDataBefore.setCaseTypeFlag("do_not_show");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
                                                  PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
@@ -561,27 +551,25 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "expertOptionUploadDate,documentExpertReportRes",
-        "expertOptionUploadDate,documentJointStatementRes",
-        "expertOptionUploadDate,documentQuestionsRes",
-        "expertOptionUploadDate,documentAnswersRes",
+        "setExpertOptionUploadDate,setDocumentExpertReportRes",
+        "setExpertOptionUploadDate,setDocumentJointStatementRes",
+        "setExpertOptionUploadDate,setDocumentQuestionsRes",
+        "setExpertOptionUploadDate,setDocumentAnswersRes",
     })
     void shouldNotReturnError_whenExpertOptionUploadDatePresentOneRespondent(String dateField, String collectionField) {
         // Given
         List<Element<UploadEvidenceExpert>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time
-            .toLocalDate()).build()));
+        date.add(0, element(invoke(new UploadEvidenceExpert(), dateField, time
+            .toLocalDate())));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .build().toBuilder(), collectionField, date)
-            .addRespondent2(NO)
-            .caseTypeFlag("do_not_show")
-            .build();
-        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-                                       .build().toBuilder(), collectionField, List.of())
-            .addRespondent2(NO)
-            .caseTypeFlag("do_not_show")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseData, collectionField, date);
+        caseData.setAddRespondent2(NO);
+        caseData.setCaseTypeFlag("do_not_show");
+        CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseDataBefore, collectionField, List.of());
+        caseDataBefore.setAddRespondent2(NO);
+        caseDataBefore.setCaseTypeFlag("do_not_show");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
                                                  PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
@@ -594,32 +582,30 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "expertOptionUploadDate,documentExpertReportRes,Invalid date: \"Expert's report\""
+        "setExpertOptionUploadDate,setDocumentExpertReportRes,Invalid date: \"Expert's report\""
             + " date entered must not be in the future (6).",
-        "expertOptionUploadDate,documentJointStatementRes,Invalid date: \"Joint statement of experts\" "
+        "setExpertOptionUploadDate,setDocumentJointStatementRes,Invalid date: \"Joint statement of experts\" "
             + "date entered must not be in the future (7).",
-        "expertOptionUploadDate,documentQuestionsRes,Invalid date: \"Questions for other party's expert "
+        "setExpertOptionUploadDate,setDocumentQuestionsRes,Invalid date: \"Questions for other party's expert "
             + "or joint experts\" expert statement date entered must not be in the future (8).",
-        "expertOptionUploadDate,documentAnswersRes,Invalid date: \"Answers to questions asked by the other party\" "
+        "setExpertOptionUploadDate,setDocumentAnswersRes,Invalid date: \"Answers to questions asked by the other party\" "
             + "date entered must not be in the future (9).",
     })
     void shouldReturnError_whenExpertOptionUploadDateFutureOneRespondent(String dateField, String collectionField,
                                                                          String expectedErrorMessage) {
         // Given
         List<Element<UploadEvidenceExpert>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time
-            .toLocalDate().plusWeeks(1)).build()));
+        date.add(0, element(invoke(new UploadEvidenceExpert(), dateField, time
+            .toLocalDate().plusWeeks(1))));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
-            collectionField, date)
-            .addRespondent2(NO)
-            .caseTypeFlag("do_not_show")
-            .build();
-        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
-                                   collectionField, List.of())
-            .addRespondent2(NO)
-            .caseTypeFlag("do_not_show")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseData, collectionField, date);
+        caseData.setAddRespondent2(NO);
+        caseData.setCaseTypeFlag("do_not_show");
+        CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseDataBefore, collectionField, List.of());
+        caseDataBefore.setAddRespondent2(NO);
+        caseDataBefore.setCaseTypeFlag("do_not_show");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
                                                  PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
@@ -632,30 +618,28 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "witnessOptionUploadDate,documentWitnessStatementRes,Invalid date: \"witness statement\" "
+        "setWitnessOptionUploadDate,setDocumentWitnessStatementRes,Invalid date: \"witness statement\" "
             + "date entered must not be in the future (2).",
-        "witnessOptionUploadDate,documentWitnessSummaryRes,Invalid date: \"witness summary\" "
+        "setWitnessOptionUploadDate,setDocumentWitnessSummaryRes,Invalid date: \"witness summary\" "
             + "date entered must not be in the future (3).",
-        "witnessOptionUploadDate,documentHearsayNoticeRes,Invalid date: \"Notice of the intention to rely on"
+        "setWitnessOptionUploadDate,setDocumentHearsayNoticeRes,Invalid date: \"Notice of the intention to rely on"
             + " hearsay evidence\" date entered must not be in the future (4).",
     })
     void shouldReturnError_whenWitnessOptionUploadDateInFutureOneRespondent(String dateField, String collectionField,
                                                                             String expectedErrorMessage) {
         // Given
         List<Element<UploadEvidenceWitness>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate2.toBuilder(), dateField,
-            time.toLocalDate().plusWeeks(1)).build()));
+        date.add(0, element(invoke(new UploadEvidenceWitness(), dateField,
+            time.toLocalDate().plusWeeks(1))));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
-            collectionField, date)
-            .addRespondent2(NO)
-            .caseTypeFlag("do_not_show")
-            .build();
-        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
-                                   collectionField, List.of())
-            .addRespondent2(NO)
-            .caseTypeFlag("do_not_show")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseData, collectionField, date);
+        caseData.setAddRespondent2(NO);
+        caseData.setCaseTypeFlag("do_not_show");
+        CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseDataBefore, collectionField, List.of());
+        caseDataBefore.setAddRespondent2(NO);
+        caseDataBefore.setCaseTypeFlag("do_not_show");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
                                                  PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
@@ -668,25 +652,23 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "witnessOptionUploadDate,documentWitnessStatementRes",
-        "witnessOptionUploadDate,documentHearsayNoticeRes",
+        "setWitnessOptionUploadDate,setDocumentWitnessStatementRes",
+        "setWitnessOptionUploadDate,setDocumentHearsayNoticeRes",
     })
     void shouldNotReturnError_whenWitnessOptionUploadDatePresentOneRespondent(String dateField, String collectionField) {
         // Given
         List<Element<UploadEvidenceWitness>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate2.toBuilder(), dateField,
-            time.toLocalDate()).build()));
+        date.add(0, element(invoke(new UploadEvidenceWitness(), dateField,
+            time.toLocalDate())));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
-            collectionField, date)
-            .addRespondent2(NO)
-            .caseTypeFlag("do_not_show")
-            .build();
-        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
-                                   collectionField, List.of())
-            .addRespondent2(NO)
-            .caseTypeFlag("do_not_show")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseData, collectionField, date);
+        caseData.setAddRespondent2(NO);
+        caseData.setCaseTypeFlag("do_not_show");
+        CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseDataBefore, collectionField, List.of());
+        caseDataBefore.setAddRespondent2(NO);
+        caseDataBefore.setCaseTypeFlag("do_not_show");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
                                                  PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
@@ -699,25 +681,23 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "witnessOptionUploadDate,documentWitnessStatementRes",
-        "witnessOptionUploadDate,documentHearsayNoticeRes",
+        "setWitnessOptionUploadDate,setDocumentWitnessStatementRes",
+        "setWitnessOptionUploadDate,setDocumentHearsayNoticeRes",
     })
     void shouldNotReturnError_whenWitnessOptionUploadDatePastOneRespondent(String dateField, String collectionField) {
         // Given
         List<Element<UploadEvidenceWitness>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate2.toBuilder(), dateField,
-            time.toLocalDate().minusWeeks(1)).build()));
+        date.add(0, element(invoke(new UploadEvidenceWitness(), dateField,
+            time.toLocalDate().minusWeeks(1))));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
-            collectionField, date)
-            .addRespondent2(NO)
-            .caseTypeFlag("do_not_show")
-            .build();
-        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
-                                   collectionField, List.of())
-            .addRespondent2(NO)
-            .caseTypeFlag("do_not_show")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseData, collectionField, date);
+        caseData.setAddRespondent2(NO);
+        caseData.setCaseTypeFlag("do_not_show");
+        CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseDataBefore, collectionField, List.of());
+        caseDataBefore.setAddRespondent2(NO);
+        caseDataBefore.setCaseTypeFlag("do_not_show");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
                                                  PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
@@ -730,11 +710,11 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "witnessOptionUploadDate,documentWitnessStatementRes,Invalid date: \"witness statement\" date entered must not be in the future (2).",
-        "witnessOptionUploadDate,documentHearsayNoticeRes,Invalid date: \"Notice of the intention to rely on hearsay evidence\" " +
+        "setWitnessOptionUploadDate,setDocumentWitnessStatementRes,Invalid date: \"witness statement\" date entered must not be in the future (2).",
+        "setWitnessOptionUploadDate,setDocumentHearsayNoticeRes,Invalid date: \"Notice of the intention to rely on hearsay evidence\" " +
             "date entered must not be in the future (4).",
-        "witnessOptionUploadDate,documentWitnessStatementRes,Invalid date: \"witness statement\" date entered must not be in the future (2).",
-        "witnessOptionUploadDate,documentHearsayNoticeRes,Invalid date: \"Notice of the intention to rely on hearsay evidence\" " +
+        "setWitnessOptionUploadDate,setDocumentWitnessStatementRes,Invalid date: \"witness statement\" date entered must not be in the future (2).",
+        "setWitnessOptionUploadDate,setDocumentHearsayNoticeRes,Invalid date: \"Notice of the intention to rely on hearsay evidence\" " +
             "date entered must not be in the future (4)."
     })
     void shouldReturnError_whenOneDateIsInFutureForWitnessStatementsOneRespondent(String dateField, String collectionField, String errorMessage) {
@@ -743,19 +723,19 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
         // Given
         List<Element<UploadEvidenceWitness>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate2.toBuilder(), dateField, time.toLocalDate().minusWeeks(1)).build()));
-        date.add(1, element(invoke(uploadEvidenceDate2.toBuilder(), dateField, time.toLocalDate().plusWeeks(1)).build()));
+        date.add(0, element(invoke(new UploadEvidenceWitness(), dateField, time.toLocalDate().minusWeeks(1))));
+        date.add(1, element(invoke(new UploadEvidenceWitness(), dateField, time.toLocalDate().plusWeeks(1))));
         //dates above represent valid past dates, date below represents invalid future date.
-        date.add(2, element(invoke(uploadEvidenceDate2.toBuilder(), dateField, time.toLocalDate().minusWeeks(1)).build()));
+        date.add(2, element(invoke(new UploadEvidenceWitness(), dateField, time.toLocalDate().minusWeeks(1))));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(), collectionField, date)
-            .addRespondent2(NO)
-            .caseTypeFlag("do_not_show")
-            .build();
-        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(), collectionField, List.of())
-            .addRespondent2(NO)
-            .caseTypeFlag("do_not_show")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseData, collectionField, date);
+        caseData.setAddRespondent2(NO);
+        caseData.setCaseTypeFlag("do_not_show");
+        CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseDataBefore, collectionField, List.of());
+        caseDataBefore.setAddRespondent2(NO);
+        caseDataBefore.setCaseTypeFlag("do_not_show");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
                                                  PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
@@ -768,30 +748,28 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "documentIssuedDate,documentForDisclosureRes2",
-        "documentIssuedDate,documentReferredInStatementRes2",
-        "documentIssuedDate,documentEvidenceForTrialRes2",
+        "setDocumentIssuedDate,setDocumentForDisclosureRes2",
+        "setDocumentIssuedDate,setDocumentReferredInStatementRes2",
+        "setDocumentIssuedDate,setDocumentEvidenceForTrialRes2",
     })
     void shouldNotReturnError_whenDocumentTypeUploadDatePastTwoRespondent(String dateField, String collectionField) {
         // Given
         List<Element<UploadEvidenceDocumentType>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate3.toBuilder(), dateField, time
-            .toLocalDate().minusWeeks(1)).build()));
+        date.add(0, element(invoke(new UploadEvidenceDocumentType(), dateField, time
+            .toLocalDate().minusWeeks(1))));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .build().toBuilder(), collectionField, date)
-            .addRespondent2(YES)
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2SameLegalRepresentative(NO)
-            .caseTypeFlag("RespondentTwoFields")
-            .build();
-        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-                                       .build().toBuilder(), collectionField, List.of())
-            .addRespondent2(YES)
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2SameLegalRepresentative(NO)
-            .caseTypeFlag("RespondentTwoFields")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseData, collectionField, date);
+        caseData.setAddRespondent2(YES);
+        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2SameLegalRepresentative(NO);
+        caseData.setCaseTypeFlag("RespondentTwoFields");
+        CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseDataBefore, collectionField, List.of());
+        caseDataBefore.setAddRespondent2(YES);
+        caseDataBefore.setRespondent2(PartyBuilder.builder().individual().build());
+        caseDataBefore.setRespondent2SameLegalRepresentative(NO);
+        caseDataBefore.setCaseTypeFlag("RespondentTwoFields");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
                                                  PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
@@ -804,30 +782,28 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "documentIssuedDate,documentForDisclosureRes2",
-        "documentIssuedDate,documentReferredInStatementRes2",
-        "documentIssuedDate,documentEvidenceForTrialRes2",
+        "setDocumentIssuedDate,setDocumentForDisclosureRes2",
+        "setDocumentIssuedDate,setDocumentReferredInStatementRes2",
+        "setDocumentIssuedDate,setDocumentEvidenceForTrialRes2",
     })
     void shouldNotReturnError_whenDocumentTypeUploadDatePresentTwoRespondent(String dateField, String collectionField) {
         // Given
         List<Element<UploadEvidenceDocumentType>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate3.toBuilder(), dateField, time
-            .toLocalDate()).build()));
+        date.add(0, element(invoke(new UploadEvidenceDocumentType(), dateField, time
+            .toLocalDate())));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .build().toBuilder(), collectionField, date)
-            .addRespondent2(YES)
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2SameLegalRepresentative(NO)
-            .caseTypeFlag("RespondentTwoFields")
-            .build();
-        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-                                       .build().toBuilder(), collectionField, List.of())
-            .addRespondent2(YES)
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2SameLegalRepresentative(NO)
-            .caseTypeFlag("RespondentTwoFields")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseData, collectionField, date);
+        caseData.setAddRespondent2(YES);
+        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2SameLegalRepresentative(NO);
+        caseData.setCaseTypeFlag("RespondentTwoFields");
+        CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseDataBefore, collectionField, List.of());
+        caseDataBefore.setAddRespondent2(YES);
+        caseDataBefore.setRespondent2(PartyBuilder.builder().individual().build());
+        caseDataBefore.setRespondent2SameLegalRepresentative(NO);
+        caseDataBefore.setCaseTypeFlag("RespondentTwoFields");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
                                                  PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
@@ -840,34 +816,32 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "documentIssuedDate,documentForDisclosureRes2, Invalid date: \"Documents for disclosure\""
+        "setDocumentIssuedDate,setDocumentForDisclosureRes2, Invalid date: \"Documents for disclosure\""
             + " date entered must not be in the future (1).",
-        "documentIssuedDate,documentReferredInStatementRes2, Invalid date: \"Documents referred to in the statement\""
+        "setDocumentIssuedDate,setDocumentReferredInStatementRes2, Invalid date: \"Documents referred to in the statement\""
             + " date entered must not be in the future (5).",
-        "documentIssuedDate,documentEvidenceForTrialRes2, Invalid date: \"Documentary evidence for trial\""
+        "setDocumentIssuedDate,setDocumentEvidenceForTrialRes2, Invalid date: \"Documentary evidence for trial\""
             + " date entered must not be in the future (10).",
     })
     void shouldReturnError_whenDocumentTypeUploadDateFutureTwoRespondent(String dateField, String collectionField,
                                                                          String expectedErrorMessage) {
         // Given
         List<Element<UploadEvidenceDocumentType>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate3.toBuilder(), dateField, time
-            .toLocalDate().plusWeeks(1)).build()));
+        date.add(0, element(invoke(new UploadEvidenceDocumentType(), dateField, time
+            .toLocalDate().plusWeeks(1))));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .build().toBuilder(), collectionField, date)
-            .addRespondent2(YES)
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2SameLegalRepresentative(NO)
-            .caseTypeFlag("RespondentTwoFields")
-            .build();
-        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-                                       .build().toBuilder(), collectionField, List.of())
-            .addRespondent2(YES)
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2SameLegalRepresentative(NO)
-            .caseTypeFlag("RespondentTwoFields")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseData, collectionField, date);
+        caseData.setAddRespondent2(YES);
+        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2SameLegalRepresentative(NO);
+        caseData.setCaseTypeFlag("RespondentTwoFields");
+        CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseDataBefore, collectionField, List.of());
+        caseDataBefore.setAddRespondent2(YES);
+        caseDataBefore.setRespondent2(PartyBuilder.builder().individual().build());
+        caseDataBefore.setRespondent2SameLegalRepresentative(NO);
+        caseDataBefore.setCaseTypeFlag("RespondentTwoFields");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
                                                  PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
@@ -880,31 +854,29 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "expertOptionUploadDate,documentExpertReportRes2",
-        "expertOptionUploadDate,documentJointStatementRes2",
-        "expertOptionUploadDate,documentQuestionsRes2",
-        "expertOptionUploadDate,documentAnswersRes2"
+        "setExpertOptionUploadDate,setDocumentExpertReportRes2",
+        "setExpertOptionUploadDate,setDocumentJointStatementRes2",
+        "setExpertOptionUploadDate,setDocumentQuestionsRes2",
+        "setExpertOptionUploadDate,setDocumentAnswersRes2"
     })
     void shouldNotReturnError_whenExpert2OptionUploadDatePastTwoRespondent(String dateField, String collectionField) {
         // Given
         List<Element<UploadEvidenceExpert>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time
-            .toLocalDate().minusWeeks(1)).build()));
+        date.add(0, element(invoke(new UploadEvidenceExpert(), dateField, time
+            .toLocalDate().minusWeeks(1))));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .build().toBuilder(), collectionField, date)
-            .addRespondent2(YES)
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2SameLegalRepresentative(NO)
-            .caseTypeFlag("RespondentTwoFields")
-            .build();
-        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-                                       .build().toBuilder(), collectionField, List.of())
-            .addRespondent2(YES)
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2SameLegalRepresentative(NO)
-            .caseTypeFlag("RespondentTwoFields")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseData, collectionField, date);
+        caseData.setAddRespondent2(YES);
+        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2SameLegalRepresentative(NO);
+        caseData.setCaseTypeFlag("RespondentTwoFields");
+        CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseDataBefore, collectionField, List.of());
+        caseDataBefore.setAddRespondent2(YES);
+        caseDataBefore.setRespondent2(PartyBuilder.builder().individual().build());
+        caseDataBefore.setRespondent2SameLegalRepresentative(NO);
+        caseDataBefore.setCaseTypeFlag("RespondentTwoFields");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
                                                  PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
         // When
@@ -916,31 +888,29 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "expertOptionUploadDate,documentExpertReportRes2",
-        "expertOptionUploadDate,documentJointStatementRes2",
-        "expertOptionUploadDate,documentQuestionsRes2",
-        "expertOptionUploadDate,documentAnswersRes2"
+        "setExpertOptionUploadDate,setDocumentExpertReportRes2",
+        "setExpertOptionUploadDate,setDocumentJointStatementRes2",
+        "setExpertOptionUploadDate,setDocumentQuestionsRes2",
+        "setExpertOptionUploadDate,setDocumentAnswersRes2"
     })
     void shouldNotReturnError_whenExpertOptionUploadDatePresentTwoRespondent(String dateField, String collectionField) {
         // Given
         List<Element<UploadEvidenceExpert>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time
-            .toLocalDate()).build()));
+        date.add(0, element(invoke(new UploadEvidenceExpert(), dateField, time
+            .toLocalDate())));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .build().toBuilder(), collectionField, date)
-            .addRespondent2(YES)
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2SameLegalRepresentative(NO)
-            .caseTypeFlag("RespondentTwoFields")
-            .build();
-        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-                                       .build().toBuilder(), collectionField, List.of())
-            .addRespondent2(YES)
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2SameLegalRepresentative(NO)
-            .caseTypeFlag("RespondentTwoFields")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseData, collectionField, date);
+        caseData.setAddRespondent2(YES);
+        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2SameLegalRepresentative(NO);
+        caseData.setCaseTypeFlag("RespondentTwoFields");
+        CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseDataBefore, collectionField, List.of());
+        caseDataBefore.setAddRespondent2(YES);
+        caseDataBefore.setRespondent2(PartyBuilder.builder().individual().build());
+        caseDataBefore.setRespondent2SameLegalRepresentative(NO);
+        caseDataBefore.setCaseTypeFlag("RespondentTwoFields");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
                                                  PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
@@ -953,36 +923,34 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "expertOptionUploadDate,documentExpertReportRes2,Invalid date: \"Expert's report\""
+        "setExpertOptionUploadDate,setDocumentExpertReportRes2,Invalid date: \"Expert's report\""
             + " date entered must not be in the future (6).",
-        "expertOptionUploadDate,documentJointStatementRes2,Invalid date: \"Joint statement of experts\" "
+        "setExpertOptionUploadDate,setDocumentJointStatementRes2,Invalid date: \"Joint statement of experts\" "
             + "date entered must not be in the future (7).",
-        "expertOptionUploadDate,documentQuestionsRes2,Invalid date: \"Questions for other party's expert "
+        "setExpertOptionUploadDate,setDocumentQuestionsRes2,Invalid date: \"Questions for other party's expert "
             + "or joint experts\" expert statement date entered must not be in the future (8).",
-        "expertOptionUploadDate,documentAnswersRes2,Invalid date: \"Answers to questions asked by the other party\" "
+        "setExpertOptionUploadDate,setDocumentAnswersRes2,Invalid date: \"Answers to questions asked by the other party\" "
             + "date entered must not be in the future (9)."
     })
     void shouldReturnError_whenExpertOptionUploadDateFuture(String dateField, String collectionField,
                                                             String expectedErrorMessage) {
         // Given
         List<Element<UploadEvidenceExpert>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time
-            .toLocalDate().plusWeeks(1)).build()));
+        date.add(0, element(invoke(new UploadEvidenceExpert(), dateField, time
+            .toLocalDate().plusWeeks(1))));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
-            collectionField, date)
-            .addRespondent2(YES)
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2SameLegalRepresentative(NO)
-            .caseTypeFlag("RespondentTwoFields")
-            .build();
-        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
-                                   collectionField, List.of())
-            .addRespondent2(YES)
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2SameLegalRepresentative(NO)
-            .caseTypeFlag("RespondentTwoFields")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseData, collectionField, date);
+        caseData.setAddRespondent2(YES);
+        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2SameLegalRepresentative(NO);
+        caseData.setCaseTypeFlag("RespondentTwoFields");
+        CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseDataBefore, collectionField, List.of());
+        caseDataBefore.setAddRespondent2(YES);
+        caseDataBefore.setRespondent2(PartyBuilder.builder().individual().build());
+        caseDataBefore.setRespondent2SameLegalRepresentative(NO);
+        caseDataBefore.setCaseTypeFlag("RespondentTwoFields");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
                                                  PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
@@ -995,36 +963,34 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "witnessOptionUploadDate,documentWitnessStatementRes2,Invalid date: \"witness statement\" "
+        "setWitnessOptionUploadDate,setDocumentWitnessStatementRes2,Invalid date: \"witness statement\" "
             + "date entered must not be in the future (2).",
-        "witnessOptionUploadDate,documentHearsayNoticeRes2,Invalid date: \"Notice of the intention to rely on"
+        "setWitnessOptionUploadDate,setDocumentHearsayNoticeRes2,Invalid date: \"Notice of the intention to rely on"
             + " hearsay evidence\" date entered must not be in the future (4).",
-        "witnessOptionUploadDate,documentWitnessStatementRes2,Invalid date: \"witness statement\" "
+        "setWitnessOptionUploadDate,setDocumentWitnessStatementRes2,Invalid date: \"witness statement\" "
             + "date entered must not be in the future (2).",
-        "witnessOptionUploadDate,documentHearsayNoticeRes2,Invalid date: \"Notice of the intention to rely on"
+        "setWitnessOptionUploadDate,setDocumentHearsayNoticeRes2,Invalid date: \"Notice of the intention to rely on"
             + " hearsay evidence\" date entered must not be in the future (4)."
     })
     void shouldReturnError_whenWitnessOptionUploadDateInFuture(String dateField, String collectionField,
                                                                String expectedErrorMessage) {
         // Given
         List<Element<UploadEvidenceWitness>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate2.toBuilder(), dateField,
-            time.toLocalDate().plusWeeks(1)).build()));
+        date.add(0, element(invoke(new UploadEvidenceWitness(), dateField,
+            time.toLocalDate().plusWeeks(1))));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
-            collectionField, date)
-            .addRespondent2(YES)
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2SameLegalRepresentative(NO)
-            .caseTypeFlag("RespondentTwoFields")
-            .build();
-        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
-                                   collectionField, List.of())
-            .addRespondent2(YES)
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2SameLegalRepresentative(NO)
-            .caseTypeFlag("RespondentTwoFields")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseData, collectionField, date);
+        caseData.setAddRespondent2(YES);
+        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2SameLegalRepresentative(NO);
+        caseData.setCaseTypeFlag("RespondentTwoFields");
+        CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseDataBefore, collectionField, List.of());
+        caseDataBefore.setAddRespondent2(YES);
+        caseDataBefore.setRespondent2(PartyBuilder.builder().individual().build());
+        caseDataBefore.setRespondent2SameLegalRepresentative(NO);
+        caseDataBefore.setCaseTypeFlag("RespondentTwoFields");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
                                                  PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
         // When
@@ -1036,31 +1002,27 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "witnessOptionUploadDate,documentWitnessStatementRes2",
-        "witnessOptionUploadDate,documentHearsayNoticeRes2",
-        "witnessOptionUploadDate,documentWitnessStatementRes2",
-        "witnessOptionUploadDate,documentHearsayNoticeRes2"
+        "setWitnessOptionUploadDate,setDocumentWitnessStatementRes2",
+        "setWitnessOptionUploadDate,setDocumentHearsayNoticeRes2"
     })
     void shouldNotReturnError_whenWitnessOptionUploadDatePresent(String dateField, String collectionField) {
         // Given
         List<Element<UploadEvidenceWitness>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate2.toBuilder(), dateField,
-            time.toLocalDate()).build()));
+        date.add(0, element(invoke(new UploadEvidenceWitness(), dateField,
+            time.toLocalDate())));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
-            collectionField, date)
-            .addRespondent2(YES)
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2SameLegalRepresentative(NO)
-            .caseTypeFlag("RespondentTwoFields")
-            .build();
-        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
-                                   collectionField, List.of())
-            .addRespondent2(YES)
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2SameLegalRepresentative(NO)
-            .caseTypeFlag("RespondentTwoFields")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseData, collectionField, date);
+        caseData.setAddRespondent2(YES);
+        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2SameLegalRepresentative(NO);
+        caseData.setCaseTypeFlag("RespondentTwoFields");
+        CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseDataBefore, collectionField, List.of());
+        caseDataBefore.setAddRespondent2(YES);
+        caseDataBefore.setRespondent2(PartyBuilder.builder().individual().build());
+        caseDataBefore.setRespondent2SameLegalRepresentative(NO);
+        caseDataBefore.setCaseTypeFlag("RespondentTwoFields");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
                                                  PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
@@ -1073,32 +1035,28 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "witnessOptionUploadDate,documentWitnessStatementRes2",
-        "witnessOptionUploadDate,documentHearsayNoticeRes2",
-        "witnessOptionUploadDate,documentWitnessStatementRes2",
-        "witnessOptionUploadDate,documentHearsayNoticeRes2"
+        "setWitnessOptionUploadDate,setDocumentWitnessStatementRes2",
+        "setWitnessOptionUploadDate,setDocumentHearsayNoticeRes2"
     })
     void shouldNotReturnError_whenWitnessOptionUploadDatePast(String dateField, String collectionField) {
         // Given
         List<Element<UploadEvidenceWitness>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate2.toBuilder(), dateField,
-            time.toLocalDate().minusWeeks(1)).build()));
+        date.add(0, element(invoke(new UploadEvidenceWitness(), dateField,
+            time.toLocalDate().minusWeeks(1))));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
-                                   collectionField, date)
-            .addRespondent2(YES)
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2SameLegalRepresentative(NO)
-            .caseTypeFlag("RespondentTwoFields")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseData, collectionField, date);
+        caseData.setAddRespondent2(YES);
+        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2SameLegalRepresentative(NO);
+        caseData.setCaseTypeFlag("RespondentTwoFields");
 
-        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
-            collectionField, List.of())
-            .addRespondent2(YES)
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2SameLegalRepresentative(NO)
-            .caseTypeFlag("RespondentTwoFields")
-            .build();
+        CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseDataBefore, collectionField, List.of());
+        caseDataBefore.setAddRespondent2(YES);
+        caseDataBefore.setRespondent2(PartyBuilder.builder().individual().build());
+        caseDataBefore.setRespondent2SameLegalRepresentative(NO);
+        caseDataBefore.setCaseTypeFlag("RespondentTwoFields");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
                                                  PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
@@ -1111,13 +1069,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "expertOptionUploadDate,documentExpertReportRes2,Invalid date: \"Expert's report\""
+        "setExpertOptionUploadDate,setDocumentExpertReportRes2,Invalid date: \"Expert's report\""
             + " date entered must not be in the future (6).",
-        "expertOptionUploadDate,documentAnswersRes2,Invalid date: \"Answers to questions asked by the other party\" "
+        "setExpertOptionUploadDate,setDocumentAnswersRes2,Invalid date: \"Answers to questions asked by the other party\" "
             + "date entered must not be in the future (9).",
-        "expertOptionUploadDate,documentQuestionsRes2,Invalid date: \"Questions for other party's expert "
+        "setExpertOptionUploadDate,setDocumentQuestionsRes2,Invalid date: \"Questions for other party's expert "
             + "or joint experts\" expert statement date entered must not be in the future (8).",
-        "expertOptionUploadDate,documentAnswersRes2,Invalid date: \"Answers to questions asked by the other party\" "
+        "setExpertOptionUploadDate,setDocumentAnswersRes2,Invalid date: \"Answers to questions asked by the other party\" "
             + "date entered must not be in the future (9)."
     })
     void shouldReturnError_whenOneDateIsInFutureForExpertStatementsTwoRespondents(String dateField, String collectionField, String errorMessage) {
@@ -1126,23 +1084,23 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
         // Given
         List<Element<UploadEvidenceExpert>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.toLocalDate().minusWeeks(1)).build()));
-        date.add(1, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.toLocalDate().plusWeeks(1)).build()));
+        date.add(0, element(invoke(new UploadEvidenceExpert(), dateField, time.toLocalDate().minusWeeks(1))));
+        date.add(1, element(invoke(new UploadEvidenceExpert(), dateField, time.toLocalDate().plusWeeks(1))));
         //dates above represent valid past dates, date below represents invalid future date.
-        date.add(2, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.toLocalDate().minusWeeks(1)).build()));
+        date.add(2, element(invoke(new UploadEvidenceExpert(), dateField, time.toLocalDate().minusWeeks(1))));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(), collectionField, date)
-            .addRespondent2(YES)
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2SameLegalRepresentative(NO)
-            .caseTypeFlag("RespondentTwoFields")
-            .build();
-        CaseData caseDataBefore = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(), collectionField, List.of())
-            .addRespondent2(YES)
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2SameLegalRepresentative(NO)
-            .caseTypeFlag("RespondentTwoFields")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseData, collectionField, date);
+        caseData.setAddRespondent2(YES);
+        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2SameLegalRepresentative(NO);
+        caseData.setCaseTypeFlag("RespondentTwoFields");
+        CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseDataBefore, collectionField, List.of());
+        caseDataBefore.setAddRespondent2(YES);
+        caseDataBefore.setRespondent2(PartyBuilder.builder().individual().build());
+        caseDataBefore.setRespondent2SameLegalRepresentative(NO);
+        caseDataBefore.setCaseTypeFlag("RespondentTwoFields");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
                                                  PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
 
@@ -1156,8 +1114,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldCallExternalTask_whenAboutToSubmit() {
         // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(true);
@@ -1186,10 +1143,9 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         element.setValue(documentUpload);
         documentList.add(element);
         // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .addRespondent2(YES)
-            .documentForDisclosureRes2(documentList)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setAddRespondent2(YES);
+        caseData.setDocumentForDisclosureRes2(documentList);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1215,10 +1171,9 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         element.setValue(documentUpload);
         documentList.add(element);
         // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .addRespondent2(YES)
-            .documentForDisclosureRes2(documentList)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setAddRespondent2(YES);
+        caseData.setDocumentForDisclosureRes2(documentList);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1243,10 +1198,9 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         element.setValue(documentUpload);
         documentList.add(element);
         // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .addRespondent2(NO)
-            .documentAnswersRes(documentList)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setAddRespondent2(NO);
+        caseData.setDocumentAnswersRes(documentList);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(true);
@@ -1272,10 +1226,9 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         element.setValue(documentUpload);
         documentList.add(element);
         // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .addRespondent2(NO)
-            .documentQuestionsRes(documentList)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setAddRespondent2(NO);
+        caseData.setDocumentQuestionsRes(documentList);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(true);
@@ -1291,9 +1244,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldNotAssignCategoryID_whenDocumentNotExistsTwoRespondent() {
         // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .addRespondent2(YES)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setAddRespondent2(YES);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1307,9 +1259,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldNotAssignCategoryID_whenDocumentNotExistsOneRespondent() {
         // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .addRespondent2(NO)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setAddRespondent2(NO);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(true);
@@ -1324,9 +1275,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldStartEvidenceUploadedBusinessProcess_whenCPIsEnabled() {
         // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .addRespondent2(YES)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setAddRespondent2(YES);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
@@ -1347,8 +1297,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         String header = "# Documents uploaded";
         String body = "You can continue uploading documents or return later. To upload more documents, "
             + "go to Next step and select \"Document Upload\".";
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
         // When
@@ -1374,8 +1323,9 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     }
 
     private <T, A> T invoke(T target, String method, A argument) {
+        Class<?> parameterType = argument instanceof List ? List.class : argument.getClass();
         ReflectionUtils.invokeMethod(ReflectionUtils.getRequiredMethod(target.getClass(),
-            method, argument.getClass()), target, argument);
+            method, parameterType), target, argument);
         return target;
     }
 
@@ -1386,14 +1336,14 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         document.setCreatedDatetime(LocalDateTime.now(ZoneId.of("Europe/London")));
         respondentDocsUploadedAfterBundle.add(ElementUtils.element(document));
         // Given caseBundles with bundle created date is before witness and expert doc created date
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            // populate respondentDocsUploadedAfterBundle with a default built element after a new bundle, it only
-            // contains createdDatetime and no document, so will be removed from final list
-            .respondentDocsUploadedAfterBundle(respondentDocsUploadedAfterBundle)
-            // added after trial bundle, so will  be added
-            .documentWitnessStatementRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url22"))
-            .documentExpertReportRes(getExpertDocs(LocalDateTime.of(2022, 06, 10, 12, 13, 12), "url44"))
-            .caseBundles(prepareCaseBundles(LocalDateTime.of(2022, 04, 10, 12, 12, 12))).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        // populate respondentDocsUploadedAfterBundle with a default built element after a new bundle, it only
+        // contains createdDatetime and no document, so will be removed from final list
+        caseData.setRespondentDocsUploadedAfterBundle(respondentDocsUploadedAfterBundle);
+        // added after trial bundle, so will  be added
+        caseData.setDocumentWitnessStatementRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url22"));
+        caseData.setDocumentExpertReportRes(getExpertDocs(LocalDateTime.of(2022, 06, 10, 12, 13, 12), "url44"));
+        caseData.setCaseBundles(prepareCaseBundles(LocalDateTime.of(2022, 04, 10, 12, 12, 12)));
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
@@ -1408,21 +1358,21 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldAddRespondentEvidenceDocWhenBundleCreatedDateIsBeforeEvidenceUploaded() {
         // Given caseBundles with bundle created date is before witness and expert doc created date
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            // populate respondentDocsUploadedAfterBundle with an existing upload
-            .respondentDocsUploadedAfterBundle(getUploadEvidenceDocumentTypeDocs(LocalDateTime.of(2022, 06, 10, 12, 13, 12), "url66"))
-            // added before trial bundle, so will not be added
-            .documentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 03, 10, 12, 13, 12), "url11"))
-            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 03, 10, 12, 13, 12), "url22"))
-            .documentQuestionsRes2(getExpertDocs(LocalDateTime.of(2022, 03, 10, 12, 13, 12), "url33"))
-            // added after trial bundle, so will  be added
-            .documentExpertReportRes(getExpertDocs(LocalDateTime.of(2022, 06, 10, 12, 13, 12), "url44"))
-            .documentWitnessSummaryRes2(getWitnessDocs(LocalDateTime.of(2022, 06, 10, 12, 13, 12), "url55"))
-            .documentWitnessStatementRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url22"))
-            .documentDisclosureListRes2(getUploadEvidenceDocumentTypeDocs(LocalDateTime.of(2022, 06, 10, 12, 13, 12), "url77"))
-            // this should not be added, as it has duplicate URL, indicating it already is in list, and should be skipped.
-            .documentDisclosureListRes(getUploadEvidenceDocumentTypeDocs(LocalDateTime.of(2022, 06, 10, 12, 13, 12), "url66"))
-            .caseBundles(prepareCaseBundles(LocalDateTime.of(2022, 04, 10, 12, 12, 12))).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        // populate respondentDocsUploadedAfterBundle with an existing upload
+        caseData.setRespondentDocsUploadedAfterBundle(getUploadEvidenceDocumentTypeDocs(LocalDateTime.of(2022, 06, 10, 12, 13, 12), "url66"));
+        // added before trial bundle, so will not be added
+        caseData.setDocumentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 03, 10, 12, 13, 12), "url11"));
+        caseData.setDocumentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 03, 10, 12, 13, 12), "url22"));
+        caseData.setDocumentQuestionsRes2(getExpertDocs(LocalDateTime.of(2022, 03, 10, 12, 13, 12), "url33"));
+        // added after trial bundle, so will  be added
+        caseData.setDocumentExpertReportRes(getExpertDocs(LocalDateTime.of(2022, 06, 10, 12, 13, 12), "url44"));
+        caseData.setDocumentWitnessSummaryRes2(getWitnessDocs(LocalDateTime.of(2022, 06, 10, 12, 13, 12), "url55"));
+        caseData.setDocumentWitnessStatementRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url22"));
+        caseData.setDocumentDisclosureListRes2(getUploadEvidenceDocumentTypeDocs(LocalDateTime.of(2022, 06, 10, 12, 13, 12), "url77"));
+        // this should not be added, as it has duplicate URL, indicating it already is in list, and should be skipped.
+        caseData.setDocumentDisclosureListRes(getUploadEvidenceDocumentTypeDocs(LocalDateTime.of(2022, 06, 10, 12, 13, 12), "url66"));
+        caseData.setCaseBundles(prepareCaseBundles(LocalDateTime.of(2022, 04, 10, 12, 12, 12)));
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
@@ -1437,68 +1387,68 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldNotAddRespondentEvidenceDocWhenBundleCreatedDateIsAfterEvidenceUploaded() {
         // Given caseBundles with bundle created date is after witness and expert doc created date
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .documentDisclosureListRes(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"))
-            .documentDisclosureListRes2(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url2"))
-            .documentForDisclosureRes(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url3"))
-            .documentForDisclosureRes2(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url4"))
-            .documentReferredInStatementRes(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url5"))
-            .documentReferredInStatementRes2(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url6"))
-            .documentCaseSummaryRes(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url7"))
-            .documentCaseSummaryRes2(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url8"))
-            .documentSkeletonArgumentRes(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url9"))
-            .documentSkeletonArgumentRes2(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url10"))
-            .documentAuthoritiesRes(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url11"))
-            .documentAuthoritiesRes2(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url12"))
-            .documentCostsRes(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url13"))
-            .documentCostsRes2(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url14"))
-            .documentHearsayNoticeRes(getWitnessDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url15"))
-            .documentHearsayNoticeRes2(getWitnessDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url16"))
-            .documentWitnessSummaryRes(getWitnessDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url17"))
-            .documentWitnessSummaryRes2(getWitnessDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url18"))
-            .documentQuestionsRes(getExpertDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url19"))
-            .documentQuestionsRes2(getExpertDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url20"))
-            .documentEvidenceForTrialRes(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url21"))
-            .documentEvidenceForTrialRes2(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url22"))
-            .documentAnswersRes(getExpertDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url23"))
-            .documentAnswersRes2(getExpertDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url24"))
-            .documentJointStatementRes(getExpertDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url25"))
-            .documentJointStatementRes2(getExpertDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url26"))
-            .documentExpertReportRes(getExpertDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url27"))
-            .documentExpertReportRes2(getExpertDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url28"))
-            .documentWitnessStatementRes(getWitnessDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url29"))
-            .documentWitnessStatementRes2(getWitnessDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url30"))
-            .caseBundles(prepareCaseBundles(LocalDateTime.of(2022, 05, 15, 12, 12, 12))).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setDocumentDisclosureListRes(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"));
+        caseData.setDocumentDisclosureListRes2(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url2"));
+        caseData.setDocumentForDisclosureRes(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url3"));
+        caseData.setDocumentForDisclosureRes2(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url4"));
+        caseData.setDocumentReferredInStatementRes(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url5"));
+        caseData.setDocumentReferredInStatementRes2(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url6"));
+        caseData.setDocumentCaseSummaryRes(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url7"));
+        caseData.setDocumentCaseSummaryRes2(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url8"));
+        caseData.setDocumentSkeletonArgumentRes(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url9"));
+        caseData.setDocumentSkeletonArgumentRes2(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url10"));
+        caseData.setDocumentAuthoritiesRes(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url11"));
+        caseData.setDocumentAuthoritiesRes2(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url12"));
+        caseData.setDocumentCostsRes(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url13"));
+        caseData.setDocumentCostsRes2(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url14"));
+        caseData.setDocumentHearsayNoticeRes(getWitnessDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url15"));
+        caseData.setDocumentHearsayNoticeRes2(getWitnessDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url16"));
+        caseData.setDocumentWitnessSummaryRes(getWitnessDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url17"));
+        caseData.setDocumentWitnessSummaryRes2(getWitnessDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url18"));
+        caseData.setDocumentQuestionsRes(getExpertDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url19"));
+        caseData.setDocumentQuestionsRes2(getExpertDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url20"));
+        caseData.setDocumentEvidenceForTrialRes(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url21"));
+        caseData.setDocumentEvidenceForTrialRes2(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url22"));
+        caseData.setDocumentAnswersRes(getExpertDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url23"));
+        caseData.setDocumentAnswersRes2(getExpertDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url24"));
+        caseData.setDocumentJointStatementRes(getExpertDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url25"));
+        caseData.setDocumentJointStatementRes2(getExpertDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url26"));
+        caseData.setDocumentExpertReportRes(getExpertDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url27"));
+        caseData.setDocumentExpertReportRes2(getExpertDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url28"));
+        caseData.setDocumentWitnessStatementRes(getWitnessDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url29"));
+        caseData.setDocumentWitnessStatementRes2(getWitnessDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url30"));
+        caseData.setCaseBundles(prepareCaseBundles(LocalDateTime.of(2022, 05, 15, 12, 12, 12)));
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
@@ -1516,11 +1466,11 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldAddAdditionalBundleDocuments_RespondentEvidenceDocWhenBundleCreatedDateIsBeforeEvidenceUploaded() {
         // Given caseBundles with bundle created date is before witness and expert doc created date
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .respondentDocsUploadedAfterBundle(getUploadEvidenceDocumentTypeDocs(
-                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"))
-            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url22"))
-            .caseBundles(prepareCaseBundles(LocalDateTime.of(2022, 05, 10, 12, 12, 12))).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setRespondentDocsUploadedAfterBundle(getUploadEvidenceDocumentTypeDocs(
+                LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"));
+        caseData.setDocumentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url22"));
+        caseData.setCaseBundles(prepareCaseBundles(LocalDateTime.of(2022, 05, 10, 12, 12, 12)));
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
@@ -1546,11 +1496,10 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .title("Trial Bundle")
             .build()));
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .documentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"))
-            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"))
-            .caseBundles(caseBundles)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setDocumentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"));
+        caseData.setDocumentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"));
+        caseData.setCaseBundles(caseBundles);
 
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(true);
@@ -1574,11 +1523,10 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .createdOn(Optional.ofNullable(null))
             .build()));
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .documentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"))
-            .documentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"))
-            .caseBundles(caseBundles)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setDocumentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"));
+        caseData.setDocumentWitnessSummaryRes(getWitnessDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"));
+        caseData.setCaseBundles(caseBundles);
 
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(true);
@@ -1602,34 +1550,32 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             EvidenceUploadHandlerBase.OPTION_DEF2,
             EvidenceUploadHandlerBase.OPTION_DEF_BOTH);
         LocalDate witnessDate = LocalDate.of(2023, 2, 10);
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .addRespondent2(YES)
-            .respondent1(PartyBuilder.builder().individual().build())
-            .respondent2(PartyBuilder.builder().individual().build())
-            .evidenceUploadOptions(DynamicList.fromList(options, Object::toString, options.get(Integer.parseInt(selected)), false))
-            .documentWitnessSummaryRes(
-                createWitnessDocs(witnessName, createdDate, witnessDate))
-            .documentWitnessStatementRes(
-                createWitnessDocs(witnessName, createdDate, witnessDate))
-            .documentHearsayNoticeRes(createWitnessDocs(witnessName, createdDate, witnessDate))
-            .documentExpertReportRes(createExpertDocs("expertName", witnessDate, "expertise", null, null, null, null))
-            .documentJointStatementRes(createExpertDocs("expertsName", witnessDate, null, "expertises", null, null, null))
-            .documentQuestionsRes(createExpertDocs("expertName", witnessDate, null, null, "other", "question", null))
-            .documentAnswersRes(createExpertDocs("expertName", witnessDate, null, null, "other", null, "answer"))
-            .documentForDisclosureRes(createEvidenceDocs(null, "typeDisclosure", witnessDate))
-            .documentReferredInStatementRes(createEvidenceDocs("witness", "typeReferred", witnessDate))
-            .documentEvidenceForTrialRes(createEvidenceDocs(null, "typeForTrial", witnessDate))
-            .documentDisclosureListRes(createEvidenceDocs(null, null, null))
-            .documentCaseSummaryRes(createEvidenceDocs(null, null, null))
-            .documentSkeletonArgumentRes(createEvidenceDocs(null, null, null))
-            .documentAuthoritiesRes(createEvidenceDocs(null, null, null))
-            .documentCostsRes(createEvidenceDocs(null, null, null))
-            .build();
-        CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .addRespondent2(YES)
-            .respondent1(PartyBuilder.builder().individual().build())
-            .respondent2(PartyBuilder.builder().individual().build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setAddRespondent2(YES);
+        caseData.setRespondent1(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setEvidenceUploadOptions(DynamicList.fromList(options, Object::toString, options.get(Integer.parseInt(selected)), false));
+        caseData.setDocumentWitnessSummaryRes(
+                createWitnessDocs(witnessName, createdDate, witnessDate));
+        caseData.setDocumentWitnessStatementRes(
+                createWitnessDocs(witnessName, createdDate, witnessDate));
+        caseData.setDocumentHearsayNoticeRes(createWitnessDocs(witnessName, createdDate, witnessDate));
+        caseData.setDocumentExpertReportRes(createExpertDocs("expertName", witnessDate, "expertise", null, null, null, null));
+        caseData.setDocumentJointStatementRes(createExpertDocs("expertsName", witnessDate, null, "expertises", null, null, null));
+        caseData.setDocumentQuestionsRes(createExpertDocs("expertName", witnessDate, null, null, "other", "question", null));
+        caseData.setDocumentAnswersRes(createExpertDocs("expertName", witnessDate, null, null, "other", null, "answer"));
+        caseData.setDocumentForDisclosureRes(createEvidenceDocs(null, "typeDisclosure", witnessDate));
+        caseData.setDocumentReferredInStatementRes(createEvidenceDocs("witness", "typeReferred", witnessDate));
+        caseData.setDocumentEvidenceForTrialRes(createEvidenceDocs(null, "typeForTrial", witnessDate));
+        caseData.setDocumentDisclosureListRes(createEvidenceDocs(null, null, null));
+        caseData.setDocumentCaseSummaryRes(createEvidenceDocs(null, null, null));
+        caseData.setDocumentSkeletonArgumentRes(createEvidenceDocs(null, null, null));
+        caseData.setDocumentAuthoritiesRes(createEvidenceDocs(null, null, null));
+        caseData.setDocumentCostsRes(createEvidenceDocs(null, null, null));
+        CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseDataBefore.setAddRespondent2(YES);
+        caseDataBefore.setRespondent1(PartyBuilder.builder().individual().build());
+        caseDataBefore.setRespondent2(PartyBuilder.builder().individual().build());
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, ABOUT_TO_SUBMIT);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
 
@@ -1745,25 +1691,22 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
         String witnessName = "ResTwoWitness";
         LocalDate witnessDate = LocalDate.of(2023, 2, 10);
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .documentWitnessSummaryRes2(
-                createWitnessDocs(witnessName, createdDate, witnessDate))
-            .documentWitnessStatementRes2(
-                createWitnessDocs(witnessName, createdDate, witnessDate))
-            .documentHearsayNoticeRes2(createWitnessDocs(witnessName, createdDate, witnessDate))
-            .documentExpertReportRes2(createExpertDocs("expertName", witnessDate, "expertise", null, null, null, null))
-            .documentJointStatementRes2(createExpertDocs("expertsName", witnessDate, null, "expertises", null, null, null))
-            .documentQuestionsRes2(createExpertDocs("expertName", witnessDate, null, null, "other", "question", null))
-            .documentAnswersRes2(createExpertDocs("expertName", witnessDate, null, null, "other", null, "answer"))
-            .documentForDisclosureRes2(createEvidenceDocs(null, "typeDisclosure", witnessDate))
-            .documentReferredInStatementRes2(createEvidenceDocs("witness", "typeReferred", witnessDate))
-            .documentEvidenceForTrialRes2(createEvidenceDocs(null, "typeForTrial", witnessDate))
-            .documentDisclosureListRes2(createEvidenceDocs(null, null, null))
-            .documentCaseSummaryRes2(createEvidenceDocs(null, null, null))
-            .documentSkeletonArgumentRes2(createEvidenceDocs(null, null, null))
-            .documentAuthoritiesRes2(createEvidenceDocs(null, null, null))
-            .documentCostsRes2(createEvidenceDocs(null, null, null))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setDocumentWitnessSummaryRes2(createWitnessDocs(witnessName, createdDate, witnessDate));
+        caseData.setDocumentWitnessStatementRes2(createWitnessDocs(witnessName, createdDate, witnessDate));
+        caseData.setDocumentHearsayNoticeRes2(createWitnessDocs(witnessName, createdDate, witnessDate));
+        caseData.setDocumentExpertReportRes2(createExpertDocs("expertName", witnessDate, "expertise", null, null, null, null));
+        caseData.setDocumentJointStatementRes2(createExpertDocs("expertsName", witnessDate, null, "expertises", null, null, null));
+        caseData.setDocumentQuestionsRes2(createExpertDocs("expertName", witnessDate, null, null, "other", "question", null));
+        caseData.setDocumentAnswersRes2(createExpertDocs("expertName", witnessDate, null, null, "other", null, "answer"));
+        caseData.setDocumentForDisclosureRes2(createEvidenceDocs(null, "typeDisclosure", witnessDate));
+        caseData.setDocumentReferredInStatementRes2(createEvidenceDocs("witness", "typeReferred", witnessDate));
+        caseData.setDocumentEvidenceForTrialRes2(createEvidenceDocs(null, "typeForTrial", witnessDate));
+        caseData.setDocumentDisclosureListRes2(createEvidenceDocs(null, null, null));
+        caseData.setDocumentCaseSummaryRes2(createEvidenceDocs(null, null, null));
+        caseData.setDocumentSkeletonArgumentRes2(createEvidenceDocs(null, null, null));
+        caseData.setDocumentAuthoritiesRes2(createEvidenceDocs(null, null, null));
+        caseData.setDocumentCostsRes2(createEvidenceDocs(null, null, null));
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
 
@@ -1815,12 +1758,11 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             EvidenceUploadHandlerBase.OPTION_DEF2,
             EvidenceUploadHandlerBase.OPTION_DEF_BOTH);
         LocalDate witnessDate = LocalDate.of(2023, 2, 10);
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .notificationText("Documentation that has been uploaded: \n\n Defendant 1 - Joint Statement of Experts / Single Joint Expert Report \n")
-            .applicant1(PartyBuilder.builder().individual().build())
-            .evidenceUploadOptions(DynamicList.fromList(options, Object::toString, options.get(0), false))
-            .documentJointStatementRes(createExpertDocs("expertsName", witnessDate, null, "expertises", null, null, null))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setNotificationText("Documentation that has been uploaded: \n\n Defendant 1 - Joint Statement of Experts / Single Joint Expert Report \n");
+        caseData.setApplicant1(PartyBuilder.builder().individual().build());
+        caseData.setEvidenceUploadOptions(DynamicList.fromList(options, Object::toString, options.get(0), false));
+        caseData.setDocumentJointStatementRes(createExpertDocs("expertsName", witnessDate, null, "expertises", null, null, null));
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(true);
@@ -1841,12 +1783,11 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             EvidenceUploadHandlerBase.OPTION_DEF_BOTH);
         LocalDate witnessDate = LocalDate.of(2023, 2, 10);
         String witnessName = "Witness";
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .notificationText(null)
-            .evidenceUploadOptions(DynamicList.fromList(options, Object::toString, options.get(0), false))
-            .documentWitnessStatementRes(createWitnessDocs(witnessName, LocalDateTime.now().minusDays(2), witnessDate))
-            .documentWitnessSummaryRes(createWitnessDocs(witnessName, LocalDateTime.now(), witnessDate))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setNotificationText(null);
+        caseData.setEvidenceUploadOptions(DynamicList.fromList(options, Object::toString, options.get(0), false));
+        caseData.setDocumentWitnessStatementRes(createWitnessDocs(witnessName, LocalDateTime.now().minusDays(2), witnessDate));
+        caseData.setDocumentWitnessSummaryRes(createWitnessDocs(witnessName, LocalDateTime.now(), witnessDate));
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(true);
