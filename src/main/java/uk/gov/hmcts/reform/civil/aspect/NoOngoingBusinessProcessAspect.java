@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -36,17 +37,22 @@ public class NoOngoingBusinessProcessAspect {
         ProceedingJoinPoint joinPoint,
         CallbackParams callbackParams
     ) throws Throwable {
+
+        if (callbackParams.isGeneralApplicationCaseType()) {
+            return checkOngoingBusinessProcessGa(joinPoint, callbackParams);
+        }
+
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         CaseData caseData = callbackParams.getCaseData();
 
         if (callbackParams.getType() == SUBMITTED
-            || callbackParams.isGeneralApplicationCaseType()
             || caseEvent.isCamundaEvent()
             || caseData.hasNoOngoingBusinessProcess()
             || (caseEvent.equals(CaseEvent.migrateCase) || caseEvent.equals(CaseEvent.UPDATE_CASE_DATA))
         ) {
             return joinPoint.proceed();
         }
+
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
         StringBuilder stateHistoryBuilder = new StringBuilder();
         stateFlow.getStateHistory().forEach(s -> {
@@ -66,6 +72,36 @@ public class NoOngoingBusinessProcessAspect {
         } catch (StateFlowException e) {
             log.warn("Error during state flow evaluation.", e);
         }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(List.of(ERROR_MESSAGE))
+            .build();
+    }
+
+    private Object checkOngoingBusinessProcessGa(
+        ProceedingJoinPoint joinPoint,
+        CallbackParams callbackParams
+    ) throws Throwable {
+
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
+
+        log.info(
+            "Entering checkOngoingBusinessProcess for case ID: {}, event: {}",
+            caseData.getCcdCaseReference(), caseEvent.name()
+        );
+
+        if (callbackParams.getType() == SUBMITTED
+            || caseEvent.isCamundaEvent()
+            || caseData.hasNoOngoingBusinessProcess()) {
+            return joinPoint.proceed();
+        }
+
+        log.info(format(
+            "%s is not allowed on the case %s due to ongoing business process",
+            caseEvent.name(),
+            caseData.getCcdCaseReference()
+        ));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(List.of(ERROR_MESSAGE))
