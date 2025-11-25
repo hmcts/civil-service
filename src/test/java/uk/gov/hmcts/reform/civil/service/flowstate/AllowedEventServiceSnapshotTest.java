@@ -224,7 +224,7 @@ class AllowedEventServiceSnapshotTest {
 
     @ParameterizedTest(name = "FlowState CaseEvent 1v2 2LR Spec {0} {1}")
     @MethodSource("flowStateCaseEventSnapshot")
-    void flowStateCaseEvents_1v1_2LR_Spec(FlowState.Main state, CaseEvent event,
+    void flowStateCaseEvents_1v2_2LR_Spec(FlowState.Main state, CaseEvent event,
                                           List<MultiPartyScenario> unspec, List<MultiPartyScenario> spec) {
         MultiPartyScenario party = ONE_V_TWO_TWO_LEGAL_REP;
         CaseCategory category = CaseCategory.SPEC_CLAIM;

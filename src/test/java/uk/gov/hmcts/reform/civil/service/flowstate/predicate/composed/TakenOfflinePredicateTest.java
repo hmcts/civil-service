@@ -8,6 +8,8 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
@@ -26,22 +28,14 @@ class TakenOfflinePredicateTest {
     private CaseData caseData;
 
     @Test
-    void should_return_true_for_bySystem_when_taken_offline_date_exists_and_no_change_of_representation() {
+    void should_return_true_for_bySystem_when_taken_offline_date_exists() {
         when(caseData.getTakenOfflineDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getChangeOfRepresentation()).thenReturn(null);
         assertTrue(TakenOfflinePredicate.bySystem.test(caseData));
     }
 
     @Test
     void should_return_false_for_bySystem_when_taken_offline_date_does_not_exist() {
         when(caseData.getTakenOfflineDate()).thenReturn(null);
-        assertFalse(TakenOfflinePredicate.bySystem.test(caseData));
-    }
-
-    @Test
-    void should_return_false_for_bySystem_when_change_of_representation_exists() {
-        when(caseData.getTakenOfflineDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getChangeOfRepresentation()).thenReturn(ChangeOfRepresentation.builder().build());
         assertFalse(TakenOfflinePredicate.bySystem.test(caseData));
     }
 
@@ -58,11 +52,9 @@ class TakenOfflinePredicateTest {
     }
 
     @Test
-    void should_return_true_for_afterSdo_when_draw_directions_order_required_and_not_suitable_sdo_negated_and_date_exists_and_by_staff_date_negated() {
+    void should_return_true_for_afterSdo_when_draw_directions_order_required_and_not_suitable_sdo_negated() {
         when(caseData.getDrawDirectionsOrderRequired()).thenReturn(YesOrNo.YES);
         when(caseData.getReasonNotSuitableSDO()).thenReturn(null);
-        when(caseData.getTakenOfflineDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getTakenOfflineByStaffDate()).thenReturn(null);
         assertTrue(TakenOfflinePredicate.afterSdo.test(caseData));
     }
 
@@ -80,27 +72,9 @@ class TakenOfflinePredicateTest {
     }
 
     @Test
-    void should_return_false_for_afterSdo_when_taken_offline_date_does_not_exist() {
-        when(caseData.getDrawDirectionsOrderRequired()).thenReturn(YesOrNo.YES);
-        when(caseData.getReasonNotSuitableSDO()).thenReturn(null);
-        when(caseData.getTakenOfflineDate()).thenReturn(null);
-        assertFalse(TakenOfflinePredicate.afterSdo.test(caseData));
-    }
-
-    @Test
-    void should_return_false_for_afterSdo_when_taken_offline_by_staff_date_exists() {
-        when(caseData.getDrawDirectionsOrderRequired()).thenReturn(YesOrNo.YES);
-        when(caseData.getReasonNotSuitableSDO()).thenReturn(null);
-        when(caseData.getTakenOfflineDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getTakenOfflineByStaffDate()).thenReturn(LocalDateTime.now());
-        assertFalse(TakenOfflinePredicate.afterSdo.test(caseData));
-    }
-
-    @Test
     void should_return_true_for_sdoNotDrawn_when_suitable_sdo_reason_exists_and_taken_offline_date_exists_and_by_staff_date_negated() {
         when(caseData.getReasonNotSuitableSDO()).thenReturn(ReasonNotSuitableSDO.builder().input("reason").build());
         when(caseData.getTakenOfflineDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getTakenOfflineByStaffDate()).thenReturn(null);
         assertTrue(TakenOfflinePredicate.sdoNotDrawn.test(caseData));
     }
 
@@ -118,114 +92,133 @@ class TakenOfflinePredicateTest {
 
     @Test
     void should_return_false_for_sdoNotDrawn_when_taken_offline_by_staff_date_exists() {
-        when(caseData.getReasonNotSuitableSDO()).thenReturn(ReasonNotSuitableSDO.builder().input("reason").build());
-        when(caseData.getTakenOfflineDate()).thenReturn(LocalDateTime.now());
         when(caseData.getTakenOfflineByStaffDate()).thenReturn(LocalDateTime.now());
-        assertFalse(TakenOfflinePredicate.sdoNotDrawn.test(caseData));
+        assertFalse(TakenOfflinePredicate.byStaff.negate().and(TakenOfflinePredicate.sdoNotDrawn).test(caseData));
     }
 
-    @Test
-    void should_return_true_for_afterClaimNotified_when_by_staff_date_exists_and_no_notification_date_and_no_acknowledgement_and_no_response_and_future_notification_deadline() {
-        when(caseData.getTakenOfflineByStaffDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getClaimDetailsNotificationDate()).thenReturn(null);
-        when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(null);
-        when(caseData.getRespondent1ResponseDate()).thenReturn(null);
-        when(caseData.getClaimDetailsNotificationDeadline()).thenReturn(LocalDateTime.now().plusDays(1));
-        assertTrue(TakenOfflinePredicate.afterClaimNotified.test(caseData));
-    }
 
     @Test
-    void should_return_false_for_afterClaimNotified_when_by_staff_date_does_not_exist() {
-        when(caseData.getTakenOfflineByStaffDate()).thenReturn(null);
-        assertFalse(TakenOfflinePredicate.afterClaimNotified.test(caseData));
-    }
-
-    @Test
-    void should_return_false_for_afterClaimNotified_when_notification_date_exists() {
-        when(caseData.getTakenOfflineByStaffDate()).thenReturn(LocalDateTime.now());
+    void should_return_true_for_afterNotifiedOptions_when_notified_and_options_not_both() {
         when(caseData.getClaimDetailsNotificationDate()).thenReturn(LocalDateTime.now());
-        assertFalse(TakenOfflinePredicate.afterClaimNotified.test(caseData));
-    }
-
-    @Test
-    void should_return_false_for_afterClaimNotified_when_acknowledgement_exists() {
-        when(caseData.getTakenOfflineByStaffDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getClaimDetailsNotificationDate()).thenReturn(null);
-        when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
-        assertFalse(TakenOfflinePredicate.afterClaimNotified.test(caseData));
-    }
-
-    @Test
-    void should_return_false_for_afterClaimNotified_when_response_date_exists() {
-        when(caseData.getTakenOfflineByStaffDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getClaimDetailsNotificationDate()).thenReturn(null);
-        when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(null);
-        when(caseData.getRespondent1ResponseDate()).thenReturn(LocalDateTime.now());
-        assertFalse(TakenOfflinePredicate.afterClaimNotified.test(caseData));
-    }
-
-    @Test
-    void should_return_false_for_afterClaimNotified_when_no_future_notification_deadline() {
-        when(caseData.getTakenOfflineByStaffDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getClaimDetailsNotificationDate()).thenReturn(null);
-        when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(null);
-        when(caseData.getRespondent1ResponseDate()).thenReturn(null);
-        when(caseData.getClaimDetailsNotificationDeadline()).thenReturn(LocalDateTime.now().minusDays(1));
-        assertFalse(TakenOfflinePredicate.afterClaimNotified.test(caseData));
-    }
-
-    @Test
-    void should_return_true_for_afterClaimDetailsNotified_when_by_staff_date_exists_and_no_acknowledgement_and_no_response_and_no_time_extension_and_not_multi_party() {
-        when(caseData.getTakenOfflineByStaffDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(null);
-        when(caseData.getRespondent1ResponseDate()).thenReturn(null);
-        when(caseData.getRespondent1TimeExtensionDate()).thenReturn(null);
-        when(caseData.getClaimDismissedDate()).thenReturn(null);
+        DynamicList dynamicList = DynamicList.builder()
+            .value(DynamicListElement.builder().label("Solicitor 1").build())
+            .build();
+        when(caseData.getDefendantSolicitorNotifyClaimDetailsOptions()).thenReturn(dynamicList);
         assertTrue(TakenOfflinePredicate.afterClaimDetailsNotified.test(caseData));
     }
 
     @Test
-    void should_return_false_for_afterClaimDetailsNotified_when_by_staff_date_does_not_exist() {
+    void should_return_false_for_afterNotifiedOptions_when_not_notified() {
+        when(caseData.getClaimDetailsNotificationDate()).thenReturn(null);
+
         assertFalse(TakenOfflinePredicate.afterClaimDetailsNotified.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_afterNotifiedOptions_when_no_notify_options() {
+        when(caseData.getClaimDetailsNotificationDate()).thenReturn(LocalDateTime.now());
+        when(caseData.getDefendantSolicitorNotifyClaimDetailsOptions()).thenReturn(null);
+        assertFalse(TakenOfflinePredicate.afterClaimDetailsNotified.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_afterNotifiedOptions_when_notify_options_is_both() {
+        when(caseData.getClaimDetailsNotificationDate()).thenReturn(LocalDateTime.now());
+        DynamicList dynamicList = DynamicList.builder()
+            .value(DynamicListElement.builder().label("Both").build())
+            .build();
+        when(caseData.getDefendantSolicitorNotifyClaimDetailsOptions()).thenReturn(dynamicList);
+        assertFalse(TakenOfflinePredicate.afterClaimDetailsNotified.test(caseData));
+    }
+
+    @Test
+    void should_return_true_for_afterClaimNotified_when_by_staff_date_exists_and_no_notification_date_and_no_acknowledgement_and_no_response_and_future_notification_deadline() {
+        when(caseData.getClaimDetailsNotificationDate()).thenReturn(null);
+        when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(null);
+        when(caseData.getRespondent1ResponseDate()).thenReturn(null);
+        when(caseData.getClaimDetailsNotificationDeadline()).thenReturn(LocalDateTime.now().plusDays(1));
+        assertTrue(TakenOfflinePredicate.afterClaimNotifiedFutureDeadline.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_afterClaimNotified_when_by_staff_date_does_not_exist() {
+        assertFalse(TakenOfflinePredicate.afterClaimNotifiedFutureDeadline.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_afterClaimNotified_when_notification_date_exists() {
+        when(caseData.getClaimDetailsNotificationDate()).thenReturn(LocalDateTime.now());
+        assertFalse(TakenOfflinePredicate.afterClaimNotifiedFutureDeadline.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_afterClaimNotified_when_acknowledgement_exists() {
+        when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
+        assertFalse(TakenOfflinePredicate.afterClaimNotifiedFutureDeadline.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_afterClaimNotified_when_response_date_exists() {
+        when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(null);
+        when(caseData.getRespondent1ResponseDate()).thenReturn(LocalDateTime.now());
+        assertFalse(TakenOfflinePredicate.afterClaimNotifiedFutureDeadline.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_afterClaimNotified_when_no_future_notification_deadline() {
+        when(caseData.getClaimDetailsNotificationDate()).thenReturn(null);
+        when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(null);
+        when(caseData.getRespondent1ResponseDate()).thenReturn(null);
+        when(caseData.getClaimDetailsNotificationDeadline()).thenReturn(LocalDateTime.now().minusDays(1));
+        assertFalse(TakenOfflinePredicate.afterClaimNotifiedFutureDeadline.test(caseData));
+    }
+
+    @Test
+    void should_return_true_for_afterClaimDetailsNotified_when_by_staff_date_exists_and_no_acknowledgement_and_no_response_and_no_time_extension_and_not_multi_party() {
+        when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(null);
+        when(caseData.getRespondent1ResponseDate()).thenReturn(null);
+        when(caseData.getRespondent1TimeExtensionDate()).thenReturn(null);
+        when(caseData.getClaimDismissedDate()).thenReturn(null);
+        assertTrue(TakenOfflinePredicate.afterClaimNotifiedNoAckNoResponseNoExtension.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_afterClaimDetailsNotified_when_by_staff_date_does_not_exist() {
+        assertFalse(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.afterClaimNotifiedNoAckNoResponseNoExtension).test(caseData));
     }
 
     @Test
     void should_return_false_for_afterClaimDetailsNotified_when_acknowledgement_exists() {
-        when(caseData.getTakenOfflineByStaffDate()).thenReturn(LocalDateTime.now());
         when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
-        assertFalse(TakenOfflinePredicate.afterClaimDetailsNotified.test(caseData));
+        assertFalse(TakenOfflinePredicate.afterClaimNotifiedNoAckNoResponseNoExtension.test(caseData));
     }
 
     @Test
     void should_return_false_for_afterClaimDetailsNotified_when_response_date_exists() {
-        when(caseData.getTakenOfflineByStaffDate()).thenReturn(LocalDateTime.now());
         when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(null);
         when(caseData.getRespondent1ResponseDate()).thenReturn(LocalDateTime.now());
-        assertFalse(TakenOfflinePredicate.afterClaimDetailsNotified.test(caseData));
+        assertFalse(TakenOfflinePredicate.afterClaimNotifiedNoAckNoResponseNoExtension.test(caseData));
     }
 
     @Test
     void should_return_false_for_afterClaimDetailsNotified_when_time_extension_exists() {
-        when(caseData.getTakenOfflineByStaffDate()).thenReturn(LocalDateTime.now());
         when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(null);
         when(caseData.getRespondent1ResponseDate()).thenReturn(null);
         when(caseData.getRespondent1TimeExtensionDate()).thenReturn(LocalDateTime.now());
-        assertFalse(TakenOfflinePredicate.afterClaimDetailsNotified.test(caseData));
+        assertFalse(TakenOfflinePredicate.afterClaimNotifiedNoAckNoResponseNoExtension.test(caseData));
     }
 
     @Test
     void should_return_false_for_afterClaimDetailsNotified_when_claim_dismissed_date_exists() {
-        when(caseData.getTakenOfflineByStaffDate()).thenReturn(LocalDateTime.now());
         when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(null);
         when(caseData.getRespondent1ResponseDate()).thenReturn(null);
         when(caseData.getRespondent1TimeExtensionDate()).thenReturn(null);
         when(caseData.getClaimDismissedDate()).thenReturn(LocalDateTime.now());
-        assertFalse(TakenOfflinePredicate.afterClaimDetailsNotified.test(caseData));
+        assertFalse(TakenOfflinePredicate.afterClaimNotifiedNoAckNoResponseNoExtension.test(caseData));
     }
 
     @Test
     void should_return_true_for_afterClaimDetailsNotified_when_one_v_two_two_legal_rep_and_no_r2_acknowledgement_response_or_time_extension() {
-        when(caseData.getTakenOfflineByStaffDate()).thenReturn(LocalDateTime.now());
         when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(null);
         when(caseData.getRespondent1ResponseDate()).thenReturn(null);
         when(caseData.getRespondent1TimeExtensionDate()).thenReturn(null);
@@ -234,7 +227,7 @@ class TakenOfflinePredicateTest {
         when(caseData.getRespondent2AcknowledgeNotificationDate()).thenReturn(null);
         when(caseData.getRespondent2ResponseDate()).thenReturn(null);
         when(caseData.getRespondent2TimeExtensionDate()).thenReturn(null);
-        assertTrue(TakenOfflinePredicate.afterClaimDetailsNotified.test(caseData));
+        assertTrue(TakenOfflinePredicate.afterClaimNotifiedNoAckNoResponseNoExtension.test(caseData));
     }
 
     @Test

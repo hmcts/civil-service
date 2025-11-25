@@ -33,7 +33,7 @@ class DismissedPredicateTest {
             when(caseData.getRespondent1ResponseDate()).thenReturn(null);
             when(caseData.getTakenOfflineByStaffDate()).thenReturn(null);
 
-            assertTrue(DismissedPredicate.dismissedAfterClaimDetailNotified.test(caseData));
+            assertTrue(DismissedPredicate.afterClaimDetailNotified.test(caseData));
         }
 
         @Test
@@ -52,27 +52,27 @@ class DismissedPredicateTest {
             when(caseData.getRespondent2ClaimResponseIntentionType()).thenReturn(null);
             when(caseData.getRespondent2ResponseDate()).thenReturn(null);
 
-            assertTrue(DismissedPredicate.dismissedAfterClaimDetailNotified.test(caseData));
+            assertTrue(DismissedPredicate.afterClaimDetailNotified.test(caseData));
         }
 
         @Test
         void should_return_false_for_dismissedAfterClaimDetailNotified_when_dismissal_deadline_has_not_passed() {
             when(caseData.getClaimDismissedDeadline()).thenReturn(LocalDateTime.now().plusDays(1));
-            assertFalse(DismissedPredicate.dismissedAfterClaimDetailNotified.test(caseData));
+            assertFalse(DismissedPredicate.afterClaimDetailNotified.test(caseData));
         }
 
         @Test
         void should_return_false_for_dismissedAfterClaimDetailNotified_when_respondent1_has_acknowledged() {
             when(caseData.getClaimDismissedDeadline()).thenReturn(LocalDateTime.now().minusDays(1));
             when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now().minusDays(2));
-            assertFalse(DismissedPredicate.dismissedAfterClaimDetailNotified.test(caseData));
+            assertFalse(DismissedPredicate.afterClaimDetailNotified.test(caseData));
         }
 
         @Test
         void should_return_false_for_dismissedAfterClaimDetailNotified_when_case_taken_offline() {
             when(caseData.getClaimDismissedDeadline()).thenReturn(LocalDateTime.now().minusDays(1));
             when(caseData.getTakenOfflineByStaffDate()).thenReturn(LocalDateTime.now().minusDays(2));
-            assertFalse(DismissedPredicate.dismissedAfterClaimDetailNotified.test(caseData));
+            assertFalse(DismissedPredicate.afterClaimDetailNotified.test(caseData));
         }
     }
 
@@ -107,13 +107,13 @@ class DismissedPredicateTest {
         @Test
         void should_return_true_for_claimDismissedByCamunda_when_claim_dismissed_date_is_present() {
             when(caseData.getClaimDismissedDate()).thenReturn(LocalDateTime.now());
-            assertTrue(DismissedPredicate.claimDismissedByCamunda.test(caseData));
+            assertTrue(DismissedPredicate.byCamunda.test(caseData));
         }
 
         @Test
         void should_return_false_for_claimDismissedByCamunda_when_claim_dismissed_date_is_not_present() {
             when(caseData.getClaimDismissedDate()).thenReturn(null);
-            assertFalse(DismissedPredicate.claimDismissedByCamunda.test(caseData));
+            assertFalse(DismissedPredicate.byCamunda.test(caseData));
         }
     }
 
@@ -123,13 +123,13 @@ class DismissedPredicateTest {
         @Test
         void should_return_true_for_caseDismissedPastHearingFeeDue_when_hearing_fee_due_date_is_present() {
             when(caseData.getCaseDismissedHearingFeeDueDate()).thenReturn(LocalDateTime.now());
-            assertTrue(DismissedPredicate.caseDismissedPastHearingFeeDue.test(caseData));
+            assertTrue(DismissedPredicate.pastHearingFeeDue.test(caseData));
         }
 
         @Test
         void should_return_false_for_caseDismissedPastHearingFeeDue_when_hearing_fee_due_date_is_not_present() {
             when(caseData.getCaseDismissedHearingFeeDueDate()).thenReturn(null);
-            assertFalse(DismissedPredicate.caseDismissedPastHearingFeeDue.test(caseData));
+            assertFalse(DismissedPredicate.pastHearingFeeDue.test(caseData));
         }
     }
 }
