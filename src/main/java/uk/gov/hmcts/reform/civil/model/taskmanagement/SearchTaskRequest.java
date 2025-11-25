@@ -15,11 +15,11 @@ import java.util.List;
 public class SearchTaskRequest {
 
     @JsonProperty("search_parameters")
-    private final List<SearchParameter<?>> searchParameters;
+    private List<SearchParameter<?>> searchParameters;
 
     @JsonProperty("sorting_parameters")
-    private final List<SortingParameter> sortingParameters;
+    private List<SortingParameter> sortingParameters;
 
     @JsonProperty("request_context")
-    private final RequestContext requestContext;
+    private RequestContext requestContext;
 }

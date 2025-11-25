@@ -312,7 +312,7 @@ class DocumentRemovalServiceTest {
                 .decisionOnReconsiderationDocument(buildCaseDocument(
                     "https://example1.com/123", "Decision On Reconsideration Doc.pdf", "https://example1.com/binary", null, "user"))
                 .respondent1GeneratedResponseDocument(buildCaseDocument(
-                    "https://example2.com/456", "Respondent1 Generated Response Doc.pdf", "https://example2.com/binary", null, "user"))
+                    "https://example2.com/456", " Respondent1 Generated Response Doc.pdf", "https://example2.com/binary", null, "user"))
                 .documentToKeepCollection(List.of(DocumentToKeepCollection.builder()
                     .value(DocumentToKeep.builder()
                         .documentId("456")
@@ -326,7 +326,7 @@ class DocumentRemovalServiceTest {
 
             assertNull(result.getCaseData().getDecisionOnReconsiderationDocument().getDocumentLink());
             assertNotNull(result.getCaseData().getRespondent1GeneratedResponseDocument());
-            assertEquals("Respondent1 Generated Response Doc.pdf",
+            assertEquals(" Respondent1 Generated Response Doc.pdf",
                 result.getCaseData().getRespondent1GeneratedResponseDocument().getDocumentLink().getDocumentFileName());
             assertNull(result.getCaseData().getDocumentToKeepCollection());
         }

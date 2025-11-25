@@ -168,11 +168,9 @@ class UpdateWaCourtLocationsServiceTest {
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
             .taskManagementLocations(testTaskManagementLocations)
             .build();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        updateWaCourtLocationsService.updateCourtListingWALocations("auth", caseDataBuilder);
-        CaseData updatedCaseData = caseDataBuilder.build();
+        updateWaCourtLocationsService.updateCourtListingWALocations("auth", caseData);
 
-        assertNull(updatedCaseData.getTaskManagementLocations());
+        assertNull(caseData.getTaskManagementLocations());
         verifyNoInteractions(camundaClient);
     }
 
@@ -186,12 +184,10 @@ class UpdateWaCourtLocationsServiceTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").region("1").build())
             .build();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        updateWaCourtLocationsService.updateCourtListingWALocations("auth", caseDataBuilder);
-        CaseData updatedCaseData = caseDataBuilder.build();
+        updateWaCourtLocationsService.updateCourtListingWALocations("auth", caseData);
 
-        assertNull(updatedCaseData.getTaskManagementLocations());
+        assertNull(caseData.getTaskManagementLocations());
 
     }
 
@@ -210,10 +206,9 @@ class UpdateWaCourtLocationsServiceTest {
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").region("1").build())
             .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
             .build();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         assertThrows(IllegalArgumentException.class, () -> updateWaCourtLocationsService
-            .updateCourtListingWALocations("auth", caseDataBuilder));
+            .updateCourtListingWALocations("auth", caseData));
     }
 
     @Test
@@ -224,12 +219,10 @@ class UpdateWaCourtLocationsServiceTest {
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
             .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
             .build();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        updateWaCourtLocationsService.updateCourtListingWALocations("auth", caseDataBuilder);
-        CaseData updatedCaseData = caseDataBuilder.build();
+        updateWaCourtLocationsService.updateCourtListingWALocations("auth", caseData);
 
-        assertEquals(updatedCaseData.getTaskManagementLocations(), testTaskManagementLocations);
+        assertEquals(testTaskManagementLocations, caseData.getTaskManagementLocations());
     }
 
     @Test
@@ -240,12 +233,10 @@ class UpdateWaCourtLocationsServiceTest {
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .responseClaimTrack("INTERMEDIATE_CLAIM")
             .build();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        updateWaCourtLocationsService.updateCourtListingWALocations("auth", caseDataBuilder);
-        CaseData updatedCaseData = caseDataBuilder.build();
+        updateWaCourtLocationsService.updateCourtListingWALocations("auth", caseData);
 
-        assertEquals(updatedCaseData.getTaskManagementLocations(), testTaskManagementLocations);
+        assertEquals(testTaskManagementLocations, caseData.getTaskManagementLocations());
     }
 
     @Test
@@ -292,11 +283,9 @@ class UpdateWaCourtLocationsServiceTest {
             .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
             .build();
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        updateWaCourtLocationsService.updateCourtListingWALocations("auth", caseDataBuilder);
-        CaseData updatedCaseData = caseDataBuilder.build();
+        updateWaCourtLocationsService.updateCourtListingWALocations("auth", caseData);
 
-        assertEquals(updatedCaseData.getTaskManagementLocations(), testCnbcOrCcmcTaskManagementLocations);
+        assertEquals(testCnbcOrCcmcTaskManagementLocations, caseData.getTaskManagementLocations());
     }
 
     @Test
@@ -343,11 +332,9 @@ class UpdateWaCourtLocationsServiceTest {
             .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
             .build();
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        updateWaCourtLocationsService.updateCourtListingWALocations("auth", caseDataBuilder);
-        CaseData updatedCaseData = caseDataBuilder.build();
+        updateWaCourtLocationsService.updateCourtListingWALocations("auth", caseData);
 
-        assertEquals(updatedCaseData.getTaskManagementLocations(), testCnbcOrCcmcTaskManagementLocations);
+        assertEquals(testCnbcOrCcmcTaskManagementLocations, caseData.getTaskManagementLocations());
     }
 
 }

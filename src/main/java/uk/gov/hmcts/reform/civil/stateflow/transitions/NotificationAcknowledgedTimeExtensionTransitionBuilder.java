@@ -54,6 +54,7 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilder extends MidT
                           .and(awaitingResponsesFullAdmitReceived), transitions)
             .moveTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED, transitions)
             .onlyWhen(notificationAcknowledged.and(respondentTimeExtension)
+                          .and(not(caseDismissedAfterClaimAcknowledgedExtension))
                           .and(awaitingResponsesNonFullDefenceOrFullAdmitReceived), transitions)
             .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions)
             .onlyWhen(takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension, transitions)

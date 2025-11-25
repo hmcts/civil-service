@@ -86,13 +86,13 @@ public class PopulateRespondent1Copy implements CaseTask {
                 .respondent2ClaimResponseTestForSpec(caseData.getRespondent2ClaimResponseTypeForSpec())
                 .showConditionFlags(initialShowTags);
 
-        log.debug("CaseId {}: Updating CARM fields", caseData.getCcdCaseReference());
+        log.info("CaseId {}: Updating CARM fields", caseData.getCcdCaseReference());
         updateCarmFields(caseData, updatedCaseData);
 
-        log.debug("CaseId {}: Updating respondent details", caseData.getCcdCaseReference());
+        log.info("CaseId {}: Updating respondent details", caseData.getCcdCaseReference());
         updateRespondentDetails(caseData, updatedCaseData);
 
-        log.debug("CaseId {}: Updating court location", caseData.getCcdCaseReference());
+        log.info("CaseId {}: Updating court location", caseData.getCcdCaseReference());
         updateCourtLocation(initialShowTags, updatedCaseData, callbackParams);
 
         log.info("CaseId {}: Case data update complete", caseData.getCcdCaseReference());

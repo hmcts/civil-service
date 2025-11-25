@@ -13,6 +13,6 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 @EqualsAndHashCode
 public class SdoCoverLetter implements MappableObject {
 
-    private final Party party;
-    private final String claimReferenceNumber;
+    private Party party;
+    private String claimReferenceNumber;
 }

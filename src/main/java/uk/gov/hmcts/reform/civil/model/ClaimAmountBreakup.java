@@ -9,7 +9,7 @@ import net.minidev.json.annotate.JsonIgnore;
 
 public class ClaimAmountBreakup {
 
-    private final ClaimAmountBreakupDetails value;
+    private ClaimAmountBreakupDetails value;
     @JsonIgnore
-    private final String id;
+    private String id;
 }
