@@ -17,8 +17,7 @@ public class CallbackParamsBuilder {
     private Map<CallbackParams.Params, Object> params;
     private CallbackVersion version;
     private String pageId;
-    private CaseData caseData;
-    private BaseCaseData baseCaseData;
+    private BaseCaseData caseData;
     private boolean isGeneralApplicationCase = false;
 
     public static CallbackParamsBuilder builder() {
@@ -39,7 +38,7 @@ public class CallbackParamsBuilder {
 
     public CallbackParamsBuilder of(CallbackType type, BaseCaseData caseData) {
         this.type = type;
-        this.baseCaseData = caseData;
+        this.caseData = caseData;
         this.request = CallbackRequest.builder()
             .caseDetails(CaseDetailsBuilder.builder()
                              .data(caseData)
@@ -94,8 +93,7 @@ public class CallbackParamsBuilder {
             .version(version)
             .pageId(pageId)
             .caseData(caseData)
-            .baseCaseData(baseCaseData)
-            .isGeneralApplicationCase(isGeneralApplicationCase)
+            .isGeneralApplicationCaseType(isGeneralApplicationCase)
             .build();
     }
 }

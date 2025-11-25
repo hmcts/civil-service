@@ -40,7 +40,7 @@ public class NoOngoingBusinessProcessAspect {
         CaseData caseData = callbackParams.getCaseData();
 
         if (callbackParams.getType() == SUBMITTED
-            || callbackParams.isGeneralApplicationCase()
+            || callbackParams.isGeneralApplicationCaseType()
             || caseEvent.isCamundaEvent()
             || caseData.hasNoOngoingBusinessProcess()
             || (caseEvent.equals(CaseEvent.migrateCase) || caseEvent.equals(CaseEvent.UPDATE_CASE_DATA))

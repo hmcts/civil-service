@@ -19,8 +19,6 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.ga.service.ParentCaseUpdateHelper;
 import uk.gov.hmcts.reform.civil.ga.utils.JudicialDecisionNotificationUtil;
 
-import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -76,11 +74,11 @@ public class EndHearingScheduledBusinessProcessCallbackHandlerTest extends Gener
                                            .caseDetails(CaseDetails.builder()
                                                             .data(objectMapper.convertValue(
                                                                 caseData,
-                                                                new TypeReference<Map<String, Object>>() {}))
+                                                                new TypeReference<>() {}))
                                                             .id(CASE_ID).build())
                                            .eventId("END_HEARING_SCHEDULED_PROCESS_GASPEC")
                                            .build())
-                              .baseCaseData(caseData)
+                              .caseData(caseData)
                               .version(null)
                               .params(null)
                               .build();

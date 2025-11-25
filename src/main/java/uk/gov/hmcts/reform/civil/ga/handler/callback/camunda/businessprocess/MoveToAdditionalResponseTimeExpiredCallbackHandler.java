@@ -46,7 +46,7 @@ public class MoveToAdditionalResponseTimeExpiredCallbackHandler extends Callback
     }
 
     private CallbackResponse changeApplicationState(CallbackParams callbackParams) {
-        Long caseId = ((GeneralApplicationCaseData)callbackParams.getBaseCaseData()).getCcdCaseReference();
+        Long caseId = callbackParams.getGeneralApplicationCaseData().getCcdCaseReference();
         log.info("Changing state to APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION for caseId: {}", caseId);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .state(ADDITIONAL_RESPONSE_TIME_EXPIRED.toString())

@@ -17,7 +17,7 @@ public class CaseTypeHandlerKeyFactory {
 
     public String createHandlerKey(CallbackParams callbackParams) {
         final String eventId = callbackParams.getRequest().getEventId();
-        return callbackParams.isGeneralApplicationCase()
+        return callbackParams.isGeneralApplicationCaseType()
             ? createGeneralApplicationHandlerKey(eventId)
             : eventId;
     }

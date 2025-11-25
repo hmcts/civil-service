@@ -60,7 +60,7 @@ public class MoveToJudicialDecisionStateEventCallbackHandler extends CallbackHan
     }
 
     private CallbackResponse changeApplicationState(CallbackParams callbackParams) {
-        Long caseId = ((GeneralApplicationCaseData)callbackParams.getBaseCaseData()).getCcdCaseReference();
+        Long caseId = callbackParams.getGeneralApplicationCaseData().getCcdCaseReference();
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         log.info("Changing state to APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION for caseId: {}", caseId);

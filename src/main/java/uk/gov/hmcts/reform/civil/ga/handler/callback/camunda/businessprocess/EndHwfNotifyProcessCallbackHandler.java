@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
-import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 
 import java.util.List;
@@ -40,8 +39,7 @@ public class EndHwfNotifyProcessCallbackHandler extends CallbackHandler implemen
 
     private CallbackResponse endHwfNotifyBusinessProcess(CallbackParams callbackParams) {
         log.info("End Hwf notify business process for caseId: {}",
-                 ((GeneralApplicationCaseData)callbackParams.getBaseCaseData()).getCcdCaseReference());
-        GeneralApplicationCaseData data = caseDetailsConverter.toGeneralApplicationCaseData(callbackParams.getRequest().getCaseDetails());
+                 callbackParams.getGeneralApplicationCaseData().getCcdCaseReference());
         return evaluateReady(callbackParams);
     }
 

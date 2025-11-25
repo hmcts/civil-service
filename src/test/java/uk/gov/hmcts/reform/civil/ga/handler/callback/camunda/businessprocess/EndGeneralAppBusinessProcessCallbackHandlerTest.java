@@ -474,7 +474,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder().caseDetails(caseDetails)
                              .build())
-                .baseCaseData(caseData)
+                .caseData(caseData)
                 .build();
         }
 
@@ -498,7 +498,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder().caseDetails(caseDetails)
                              .build())
-                .baseCaseData(caseData)
+                .caseData(caseData)
                 .build();
         }
 
@@ -524,7 +524,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder().caseDetails(caseDetails)
                              .build())
-                .baseCaseData(caseData)
+                .caseData(caseData)
                 .build();
         }
 
@@ -1504,7 +1504,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                                                   new TypeReference<Map<String, Object>>() {})).id(CASE_ID).build())
                              .eventId("END_BUSINESS_PROCESS_GASPEC")
                              .build())
-                .baseCaseData(getSampleGeneralApplicationCaseDataMulti(isConsented, isTobeNotified,
+                .caseData(getSampleGeneralApplicationCaseDataMulti(isConsented, isTobeNotified,
                                                                    respondentResponses, respondentDetails))
                 .version(null)
                 .params(null)
@@ -1523,7 +1523,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                                                   new TypeReference<Map<String, Object>>() {})).id(CASE_ID).build())
                              .eventId("END_BUSINESS_PROCESS_GASPEC")
                              .build())
-                .baseCaseData(getSampleGeneralApplicationCaseDataForVaryJudgement(isConsented, isTobeNotified, respondentsResponses))
+                .caseData(getSampleGeneralApplicationCaseDataForVaryJudgement(isConsented, isTobeNotified, respondentsResponses))
                 .version(null)
                 .params(null)
                 .build();
@@ -1540,7 +1540,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                                             new TypeReference<Map<String, Object>>() {})).id(CASE_ID).build())
                             .eventId("END_BUSINESS_PROCESS_GASPEC")
                             .build())
-                    .baseCaseData(getSampleGeneralApplicationCaseData(isConsented, isTobeNotified))
+                    .caseData(getSampleGeneralApplicationCaseData(isConsented, isTobeNotified))
                     .version(null)
                     .params(null)
                     .build();

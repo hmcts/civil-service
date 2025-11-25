@@ -41,7 +41,7 @@ public class EventEmitterAspect {
         throws Throwable {
 
         if (callbackParams.getType() == SUBMITTED) {
-            if (callbackParams.isGeneralApplicationCase() || isInitiateGeneralApplication(callbackParams)) {
+            if (callbackParams.isGeneralApplicationCaseType() || isInitiateGeneralApplication(callbackParams)) {
                 GeneralApplicationCaseData caseData = caseDetailsConverter.toGeneralApplicationCaseData(callbackParams.getRequest().getCaseDetails());
                 processGeneralApplicationBusinessProcessEvent(caseData);
             } else {

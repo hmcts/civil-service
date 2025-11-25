@@ -62,7 +62,7 @@ public class EventAllowedAspect {
             || gaFlowStateAllowedEventService.isAllowed(caseDetails, caseEvent)) {
             return joinPoint.proceed();
         } else {
-            if (callbackParams.isGeneralApplicationCase()) {
+            if (callbackParams.isGeneralApplicationCaseType()) {
                 evaluateGeneralApplicationFlowState(callbackParams, caseEvent, caseDetails);
             } else {
                 CaseData caseData = callbackParams.getCaseData();
