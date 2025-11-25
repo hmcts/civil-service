@@ -110,6 +110,20 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         }
 
         @Test
+        void shouldReturnErrorIfRequestForReconsiderationDeadlineHasPassed() {
+            CaseData caseData = mock(CaseData.class);
+
+            when(caseData.getRequestForReconsiderationDeadline()).thenReturn(LocalDateTime.now().minusDays(1));
+            when(caseData.getTotalClaimAmount()).thenReturn(BigDecimal.valueOf(800));
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors())
+                .containsExactly("You can no longer request a reconsideration because the deadline has expired");
+        }
+
+        @Test
         void shouldAllowRequestIfLessThan7DaysElapsedForLatestSDO() {
             //Given : Casedata containing two SDO order and latest created 6 days ago
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
