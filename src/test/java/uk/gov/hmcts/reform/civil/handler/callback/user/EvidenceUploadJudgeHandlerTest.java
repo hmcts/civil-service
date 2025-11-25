@@ -64,9 +64,8 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
     class AboutToStartCallback {
         @Test
         void aboutToStartCallback_placeholder() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .caseNoteType(CaseNoteType.NOTE_ONLY)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setCaseNoteType(CaseNoteType.NOTE_ONLY);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -82,10 +81,9 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateNoteDateTime_whenNoteIsAddedToCase() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .caseNoteType(CaseNoteType.NOTE_ONLY)
-                .caseNoteTA("test note")
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setCaseNoteType(CaseNoteType.NOTE_ONLY);
+            caseData.setCaseNoteTA("test note");
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             CaseNote expectedCaseNote = createCaseNote(time.now());
@@ -112,10 +110,9 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
             testDocument.setDocument(document);
             testDocument.setCreatedBy("bill bob");
             List<Element<DocumentWithName>> documentWithNameToAdd = wrapElements(testDocument);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .caseNoteType(CaseNoteType.DOCUMENT_ONLY)
-                .documentAndNameToAdd(documentWithNameToAdd)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setCaseNoteType(CaseNoteType.DOCUMENT_ONLY);
+            caseData.setDocumentAndNameToAdd(documentWithNameToAdd);
             when(caseNoteService.buildJudgeCaseNoteDocumentAndName(any(), any())).thenReturn(documentWithNameToAdd);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -136,12 +133,11 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
             testDocument.setCreatedBy("John Doe");
             List<Element<DocumentWithName>> documentWithNameStart = wrapElements(testDocument);
             List<Element<DocumentWithName>> documentWithNameToAdd = wrapElements(testDocument);
-            List<Element<DocumentWithName>> documentWithNameEnd = wrapElements(testDocument, testDocument);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .caseNoteType(CaseNoteType.DOCUMENT_ONLY)
-                .documentAndNameToAdd(documentWithNameToAdd)
-                .documentAndName(documentWithNameStart)
-                .build();
+            final List<Element<DocumentWithName>> documentWithNameEnd = wrapElements(testDocument, testDocument);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setCaseNoteType(CaseNoteType.DOCUMENT_ONLY);
+            caseData.setDocumentAndNameToAdd(documentWithNameToAdd);
+            caseData.setDocumentAndName(documentWithNameStart);
             when(caseNoteService.buildJudgeCaseNoteDocumentAndName(any(), any())).thenReturn(documentWithNameToAdd);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -163,12 +159,11 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
             testDocument.setCreatedBy("john smith");
             List<Element<DocumentAndNote>> documentAndNoteToAdd = wrapElements(testDocument);
             List<Element<DocumentAndNote>> documentAndNoteStart = wrapElements(testDocument);
-            List<Element<DocumentAndNote>> documentAndNoteEnd = wrapElements(testDocument, testDocument);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .caseNoteType(CaseNoteType.DOCUMENT_AND_NOTE)
-                .documentAndNoteToAdd(documentAndNoteToAdd)
-                .documentAndNote(documentAndNoteStart)
-                .build();
+            final List<Element<DocumentAndNote>> documentAndNoteEnd = wrapElements(testDocument, testDocument);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setCaseNoteType(CaseNoteType.DOCUMENT_AND_NOTE);
+            caseData.setDocumentAndNoteToAdd(documentAndNoteToAdd);
+            caseData.setDocumentAndNote(documentAndNoteStart);
             when(caseNoteService.buildJudgeCaseNoteAndDocument(any(), any())).thenReturn(documentAndNoteToAdd);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -189,10 +184,9 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
             testDocument.setDocumentNote("Note");
             testDocument.setCreatedBy("Jason Bourne");
             List<Element<DocumentAndNote>> documentAndNoteToAdd = wrapElements(testDocument);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .caseNoteType(CaseNoteType.DOCUMENT_AND_NOTE)
-                .documentAndNoteToAdd(documentAndNoteToAdd)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setCaseNoteType(CaseNoteType.DOCUMENT_AND_NOTE);
+            caseData.setDocumentAndNoteToAdd(documentAndNoteToAdd);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(caseNoteService.buildJudgeCaseNoteAndDocument(any(), any())).thenReturn(documentAndNoteToAdd);
 
@@ -209,8 +203,8 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateConfirmation_DocumentAndNote() {
-            String header = "# Document uploaded and note added \n # " + REFERENCE_NUMBER;
-            String body = "## You have uploaded: \n * A Fancy Name\n";
+            final String header = "# Document uploaded and note added \n # " + REFERENCE_NUMBER;
+            final String body = "## You have uploaded: \n * A Fancy Name\n";
 
             Document testDocument = new Document("testurl",
                                                  "testBinUrl",
@@ -222,10 +216,9 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
             List<Element<DocumentAndNote>> documentList = new ArrayList<>();
             documentList.add(Element.<DocumentAndNote>builder().value(documentAndNote).build());
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .documentAndNoteToAdd(documentList)
-                .caseNoteType(CaseNoteType.DOCUMENT_AND_NOTE)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setDocumentAndNoteToAdd(documentList);
+            caseData.setCaseNoteType(CaseNoteType.DOCUMENT_AND_NOTE);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.SUBMITTED);
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
@@ -239,8 +232,8 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void submittedCallback_documentOnly() {
-            String header = "# Document uploaded \n # " + REFERENCE_NUMBER;
-            String body = "## You have uploaded: \n * A Fancy Name\n";
+            final String header = "# Document uploaded \n # " + REFERENCE_NUMBER;
+            final String body = "## You have uploaded: \n * A Fancy Name\n";
 
             Document testDocument = new Document("testurl",
                                                  "testBinUrl",
@@ -252,10 +245,9 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
             List<Element<DocumentWithName>> documentList = new ArrayList<>();
             documentList.add(Element.<DocumentWithName>builder().value(documentAndNote).build());
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .documentAndNameToAdd(documentList)
-                .caseNoteType(CaseNoteType.DOCUMENT_ONLY)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setDocumentAndNameToAdd(documentList);
+            caseData.setCaseNoteType(CaseNoteType.DOCUMENT_ONLY);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.SUBMITTED);
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
@@ -270,9 +262,8 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
         void submittedCallback_noteOnly() {
             String header = "# Case note added \n # " + REFERENCE_NUMBER;
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .caseNoteType(CaseNoteType.NOTE_ONLY)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setCaseNoteType(CaseNoteType.NOTE_ONLY);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.SUBMITTED);
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
