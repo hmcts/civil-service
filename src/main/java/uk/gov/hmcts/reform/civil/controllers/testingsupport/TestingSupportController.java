@@ -306,14 +306,10 @@ public class TestingSupportController {
         return new ResponseEntity<>(response.getBody(), response.getStatusCode());
     }
 
-    /*
-     * Check if Camunda Event CREATE_GENERAL_APPLICATION_CASE is Finished
-     * if so, generalApplicationsDetails object will be populated with GA case references
-     */
     @GetMapping("/testing-support/case/{caseId}/business-process/ga")
     public ResponseEntity<BusinessProcessInfo> getGACaseReference(@PathVariable("caseId") Long caseId) {
-        log.info("Get GA case reference for caseId: {}", caseId);
-        GeneralApplicationCaseData caseData = caseDetailsConverter.toGeneralApplicationCaseData(coreCaseDataService.getCase(caseId));
+        log.info("Get GA case reference for parent caseId: {}", caseId);
+        CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseId));
 
         if (caseData.getGeneralApplications() == null) {
             log.info("No General Applications found for caseId: {}", caseId);
@@ -321,18 +317,14 @@ public class TestingSupportController {
         }
 
         int size = caseData.getGeneralApplications().size();
-
-        /*
-         * Check the business process status of latest GA case
-         * if caseData.getGeneralApplications() collection size is more than 1
-         */
-
         var generalApplication = caseData.getGeneralApplications().get(size - 1);
         var businessProcess = Objects.requireNonNull(generalApplication).getValue().getBusinessProcess();
         var businessProcessInfo = new BusinessProcessInfo(businessProcess);
 
-        log.info("GA Business process status: " + businessProcess.getStatus() + " Camunda Event: " + businessProcess
-            .getCamundaEvent());
+        log.info(
+            "GA Business process status: {} Camunda Event: {}", businessProcess.getStatus(), businessProcess
+                .getCamundaEvent()
+        );
 
         if (businessProcess.getStatus() == STARTED) {
             try {

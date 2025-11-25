@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 
 import java.util.List;
 
-import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 
 @Slf4j
@@ -61,14 +60,13 @@ public class NoOngoingBusinessProcessAspect {
         });
 
         try {
-            log.info(format(
-                "%s is not allowed on the case %s due to ongoing business process, current FlowState: %s, "
-                    + "stateFlowHistory: %s",
+            log.info(
+                "{} is not allowed on the case {} due to ongoing business process, current FlowState: {}, stateFlowHistory: {}",
                 caseEvent.name(),
                 caseData.getCcdCaseReference(),
                 FlowState.fromFullName(stateFlow.getState().getName()),
                 stateHistoryBuilder
-            ));
+            );
         } catch (StateFlowException e) {
             log.warn("Error during state flow evaluation.", e);
         }
@@ -86,22 +84,17 @@ public class NoOngoingBusinessProcessAspect {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
 
-        log.info(
-            "Entering checkOngoingBusinessProcess for case ID: {}, event: {}",
-            caseData.getCcdCaseReference(), caseEvent.name()
-        );
-
         if (callbackParams.getType() == SUBMITTED
             || caseEvent.isCamundaEvent()
             || caseData.hasNoOngoingBusinessProcess()) {
             return joinPoint.proceed();
         }
 
-        log.info(format(
-            "%s is not allowed on the case %s due to ongoing business process",
+        log.info(
+            "{} is not allowed on the case {} due to ongoing business process",
             caseEvent.name(),
             caseData.getCcdCaseReference()
-        ));
+        );
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(List.of(ERROR_MESSAGE))
