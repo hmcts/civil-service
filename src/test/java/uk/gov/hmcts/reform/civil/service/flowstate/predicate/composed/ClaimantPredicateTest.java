@@ -19,7 +19,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
-class ClaimantIntentionPredicateTest {
+class ClaimantPredicateTest {
 
     @Mock
     private CaseData caseData;
@@ -32,7 +32,7 @@ class ClaimantIntentionPredicateTest {
             when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
             when(caseData.getApplicant1ProceedWithClaim()).thenReturn(YES);
 
-            assertTrue(ClaimantIntentionPredicate.fullDefenceProceed.test(caseData));
+            assertTrue(ClaimantPredicate.fullDefenceProceed.test(caseData));
         }
 
         @Test
@@ -40,7 +40,7 @@ class ClaimantIntentionPredicateTest {
             when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
             when(caseData.getApplicant1ProceedWithClaim()).thenReturn(NO);
 
-            assertFalse(ClaimantIntentionPredicate.fullDefenceProceed.test(caseData));
+            assertFalse(ClaimantPredicate.fullDefenceProceed.test(caseData));
         }
 
         @Test
@@ -49,7 +49,7 @@ class ClaimantIntentionPredicateTest {
             when(caseData.getAddApplicant2()).thenReturn(YES);
             when(caseData.getApplicant1ProceedWithClaimSpec2v1()).thenReturn(YES);
 
-            assertTrue(ClaimantIntentionPredicate.fullDefenceProceed.test(caseData));
+            assertTrue(ClaimantPredicate.fullDefenceProceed.test(caseData));
         }
 
         @Test
@@ -58,14 +58,14 @@ class ClaimantIntentionPredicateTest {
             when(caseData.getAddApplicant2()).thenReturn(YES);
             when(caseData.getApplicant1ProceedWithClaimSpec2v1()).thenReturn(NO);
 
-            assertFalse(ClaimantIntentionPredicate.fullDefenceProceed.test(caseData));
+            assertFalse(ClaimantPredicate.fullDefenceProceed.test(caseData));
         }
 
         @Test
         void should_return_true_for_fullDefenceProceed_when_1v1_unspec_claim_and_applicant_will_proceed() {
             when(caseData.getApplicant1ProceedWithClaim()).thenReturn(YES);
 
-            assertTrue(ClaimantIntentionPredicate.fullDefenceProceed.test(caseData));
+            assertTrue(ClaimantPredicate.fullDefenceProceed.test(caseData));
         }
 
         @ParameterizedTest
@@ -76,9 +76,9 @@ class ClaimantIntentionPredicateTest {
             when(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2()).thenReturn(proceed);
 
             if (proceed == YES) {
-                assertTrue(ClaimantIntentionPredicate.fullDefenceProceed.test(caseData));
+                assertTrue(ClaimantPredicate.fullDefenceProceed.test(caseData));
             } else {
-                assertFalse(ClaimantIntentionPredicate.fullDefenceProceed.test(caseData));
+                assertFalse(ClaimantPredicate.fullDefenceProceed.test(caseData));
             }
         }
 
@@ -87,7 +87,7 @@ class ClaimantIntentionPredicateTest {
             when(caseData.getAddApplicant2()).thenReturn(YES);
             when(caseData.getApplicant1ProceedWithClaimMultiParty2v1()).thenReturn(YES);
 
-            assertTrue(ClaimantIntentionPredicate.fullDefenceProceed.test(caseData));
+            assertTrue(ClaimantPredicate.fullDefenceProceed.test(caseData));
         }
 
         @Test
@@ -95,7 +95,7 @@ class ClaimantIntentionPredicateTest {
             when(caseData.getAddApplicant2()).thenReturn(YES);
             when(caseData.getApplicant2ProceedWithClaimMultiParty2v1()).thenReturn(YES);
 
-            assertTrue(ClaimantIntentionPredicate.fullDefenceProceed.test(caseData));
+            assertTrue(ClaimantPredicate.fullDefenceProceed.test(caseData));
         }
     }
 
@@ -107,7 +107,7 @@ class ClaimantIntentionPredicateTest {
             when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
             when(caseData.getApplicant1ProceedWithClaim()).thenReturn(NO);
 
-            assertTrue(ClaimantIntentionPredicate.fullDefenceNotProceed.test(caseData));
+            assertTrue(ClaimantPredicate.fullDefenceNotProceed.test(caseData));
         }
 
         @Test
@@ -116,14 +116,14 @@ class ClaimantIntentionPredicateTest {
             when(caseData.getAddApplicant2()).thenReturn(YES);
             when(caseData.getApplicant1ProceedWithClaimSpec2v1()).thenReturn(NO);
 
-            assertTrue(ClaimantIntentionPredicate.fullDefenceNotProceed.test(caseData));
+            assertTrue(ClaimantPredicate.fullDefenceNotProceed.test(caseData));
         }
 
         @Test
         void should_return_true_for_fullDefenceNotProceed_when_1v1_unspec_claim_and_applicant_will_not_proceed() {
             when(caseData.getApplicant1ProceedWithClaim()).thenReturn(NO);
 
-            assertTrue(ClaimantIntentionPredicate.fullDefenceNotProceed.test(caseData));
+            assertTrue(ClaimantPredicate.fullDefenceNotProceed.test(caseData));
         }
 
         @Test
@@ -132,7 +132,7 @@ class ClaimantIntentionPredicateTest {
             when(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2()).thenReturn(NO);
             when(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2()).thenReturn(NO);
 
-            assertTrue(ClaimantIntentionPredicate.fullDefenceNotProceed.test(caseData));
+            assertTrue(ClaimantPredicate.fullDefenceNotProceed.test(caseData));
         }
 
         @Test
@@ -141,7 +141,7 @@ class ClaimantIntentionPredicateTest {
             when(caseData.getApplicant1ProceedWithClaimMultiParty2v1()).thenReturn(NO);
             when(caseData.getApplicant2ProceedWithClaimMultiParty2v1()).thenReturn(NO);
 
-            assertTrue(ClaimantIntentionPredicate.fullDefenceNotProceed.test(caseData));
+            assertTrue(ClaimantPredicate.fullDefenceNotProceed.test(caseData));
         }
     }
 }

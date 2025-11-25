@@ -19,13 +19,13 @@ class LipPredicateTest {
     @Test
     void should_return_true_for_isLipCase_when_case_data_is_lip_v_lip_one_v_one() {
         when(caseData.isLipvLipOneVOne()).thenReturn(true);
-        assertTrue(LipPredicate.isLipCase.test(caseData));
+        assertTrue(LipPredicate.isLiPvLiPCase.test(caseData));
     }
 
     @Test
     void should_return_false_for_isLipCase_when_case_data_is_not_lip_v_lip_one_v_one() {
         when(caseData.isLipvLipOneVOne()).thenReturn(false);
-        assertFalse(LipPredicate.isLipCase.test(caseData));
+        assertFalse(LipPredicate.isLiPvLiPCase.test(caseData));
     }
 
     @Test

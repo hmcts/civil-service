@@ -9,14 +9,31 @@ import java.util.function.Predicate;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 
-public final class ClaimantIntentionPredicate {
+@SuppressWarnings("java:S1214")
+public interface ClaimantPredicate {
 
     @BusinessRule(
-        group = "ClaimantIntention",
+        group = "Claimant",
+        summary = "Before applicant response",
+        description = "Determines whether the applicant(s) initial response date exists"
+    )
+    Predicate<CaseData> beforeResponse =
+        c -> {
+            if (CaseDataPredicate.Claim.isUnspecClaim
+                .and(CaseDataPredicate.Applicant.isAddApplicant2).test(c)
+            ) {
+                return CaseDataPredicate.Applicant.hasResponseDateApplicant1.negate()
+                    .and(CaseDataPredicate.Applicant.hasResponseDateApplicant2.negate()).test(c);
+            }
+            return CaseDataPredicate.Applicant.hasResponseDateApplicant1.negate().test(c);
+        };
+
+    @BusinessRule(
+        group = "Claimant",
         summary = "Applicant will proceed - full defence flow",
         description = "Determines whether the applicant(s) has decided to proceed with the claim in their multi-party scenario"
     )
-    public static final Predicate<CaseData> fullDefenceProceed =
+    Predicate<CaseData> fullDefenceProceed =
         c -> {
             if (CaseDataPredicate.Claim.isSpecClaim.test(c)) {
                 return getMultiPartyScenario(c) == TWO_V_ONE
@@ -46,11 +63,11 @@ public final class ClaimantIntentionPredicate {
         };
 
     @BusinessRule(
-        group = "ClaimantIntention",
+        group = "Claimant",
         summary = "Applicant will not proceed - full defence flow",
         description = "Determines whether the applicant(s) has decided not to proceed with the claim in their multi-party scenario"
     )
-    public static final Predicate<CaseData> fullDefenceNotProceed =
+    Predicate<CaseData> fullDefenceNotProceed =
         c -> {
             if (CaseDataPredicate.Claim.isSpecClaim.test(c)) {
                 return getMultiPartyScenario(c) == TWO_V_ONE
@@ -80,6 +97,4 @@ public final class ClaimantIntentionPredicate {
             }
         };
 
-    private ClaimantIntentionPredicate() {
-    }
 }

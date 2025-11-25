@@ -20,13 +20,13 @@ class LanguagePredicateTest {
     @Test
     void should_return_true_for_responseIsBilingual_when_case_data_is_bilingual() {
         when(caseData.isRespondentResponseBilingual()).thenReturn(true);
-        assertTrue(LanguagePredicate.responseIsBilingual.test(caseData));
+        assertTrue(LanguagePredicate.respondentIsBilingual.test(caseData));
     }
 
     @Test
     void should_return_false_for_responseIsBilingual_when_case_data_is_not_bilingual() {
         when(caseData.isRespondentResponseBilingual()).thenReturn(false);
-        assertFalse(LanguagePredicate.responseIsBilingual.test(caseData));
+        assertFalse(LanguagePredicate.respondentIsBilingual.test(caseData));
     }
 
     @Test

@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.service.flowstate.predicate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.annotations.BusinessRule;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.ClaimantIntentionPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.ClaimantPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.ClaimPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.DismissedPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.DivergencePredicate;
@@ -14,8 +14,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.Notificati
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.OutOfTimePredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.PaymentPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.RepaymentPredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.ResponsesPredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.ResponseTypePredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.ResponsePredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.TakenOfflinePredicate;
 
 import java.io.File;
@@ -36,7 +35,7 @@ class PredicateDocumentationTest {
 
         List<Class<?>> containers = List.of(
             CaseDataPredicate.class,
-            ClaimantIntentionPredicate.class,
+            ClaimantPredicate.class,
             ClaimPredicate.class,
             DismissedPredicate.class,
             DivergencePredicate.class,
@@ -47,8 +46,7 @@ class PredicateDocumentationTest {
             OutOfTimePredicate.class,
             PaymentPredicate.class,
             RepaymentPredicate.class,
-            ResponsesPredicate.class,
-            ResponseTypePredicate.class,
+            ResponsePredicate.class,
             TakenOfflinePredicate.class
         );
 
@@ -91,7 +89,7 @@ class PredicateDocumentationTest {
 
         List<Object> composedMembers = new ArrayList<>();
         List<Class<?>> composerToScan = List.of(
-            ClaimantIntentionPredicate.class,
+            ClaimantPredicate.class,
             ClaimPredicate.class,
             DismissedPredicate.class,
             DivergencePredicate.class,
@@ -102,8 +100,7 @@ class PredicateDocumentationTest {
             OutOfTimePredicate.class,
             PaymentPredicate.class,
             RepaymentPredicate.class,
-            ResponsesPredicate.class,
-            ResponseTypePredicate.class,
+            ResponsePredicate.class,
             TakenOfflinePredicate.class
         );
 
