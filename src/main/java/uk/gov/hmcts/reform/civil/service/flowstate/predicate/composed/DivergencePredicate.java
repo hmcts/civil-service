@@ -10,14 +10,15 @@ import java.util.function.Predicate;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 
-public final class DivergencePredicate {
+@SuppressWarnings("java:S1214")
+public interface DivergencePredicate {
 
     @BusinessRule(
         group = "Divergence",
         summary = "Divergent non-SPEC responses with DQ - go offline",
         description = "Detects differing non-SPEC responses across defendants where one returned FULL_DEFENCE causing divergence handling"
     )
-    public static final Predicate<CaseData> divergentRespondWithDQAndGoOffline =
+    Predicate<CaseData> divergentRespondWithDQAndGoOffline =
         c -> switch (getMultiPartyScenario(c)) {
             case ONE_V_TWO_ONE_LEGAL_REP -> CaseDataPredicate.Respondent.responsesDiffer.test(c)
                 && (CaseDataPredicate.Respondent.isTypeRespondent1(FULL_DEFENCE).test(c)
@@ -40,7 +41,7 @@ public final class DivergencePredicate {
         summary = "Divergent non-SPEC responses - go offline",
         description = "Detects differing responses where no defendant returned full defence and offline handling applies"
     )
-    public static final Predicate<CaseData> divergentRespondGoOffline =
+    Predicate<CaseData> divergentRespondGoOffline =
         c ->
             switch (getMultiPartyScenario(c)) {
                 case ONE_V_TWO_TWO_LEGAL_REP -> CaseDataPredicate.Respondent.responsesDiffer.test(c)
@@ -63,13 +64,13 @@ public final class DivergencePredicate {
         summary = "Spec divergence: DQ and offline",
         description = "SPEC cases where defendants' SPEC responses differ and divergence handling applies"
     )
-    public static final Predicate<CaseData> divergentRespondWithDQAndGoOfflineSpec =
+    Predicate<CaseData> divergentRespondWithDQAndGoOfflineSpec =
         CaseDataPredicate.Claim.isSpecClaim.and(c ->
           switch (getMultiPartyScenario(c)) {
               case ONE_V_TWO_ONE_LEGAL_REP ->
                   CaseDataPredicate.Respondent.isTypeSpecRespondent1(null).negate()
                       .and(CaseDataPredicate.Respondent.isTypeSpecRespondent2(null).negate())
-                      .and(CaseDataPredicate.Respondent.respondentsHaveSameResponseFlag.negate())
+                      .and(CaseDataPredicate.Respondent.isSameResponseFlag.negate())
                       .and(CaseDataPredicate.Respondent.responsesDifferSpec)
                       .and(CaseDataPredicate.Respondent.isTypeSpecRespondent1(
                               RespondentResponseTypeSpec.FULL_DEFENCE)
@@ -103,13 +104,13 @@ public final class DivergencePredicate {
         summary = "Spec divergence: offline",
         description = "SPEC cases where divergence does not involve full defence and offline handling applies"
     )
-    public static final Predicate<CaseData> divergentRespondGoOfflineSpec =
+    Predicate<CaseData> divergentRespondGoOfflineSpec =
         CaseDataPredicate.Claim.isSpecClaim.and(c ->
           switch (getMultiPartyScenario(c)) {
               case ONE_V_TWO_ONE_LEGAL_REP ->
                   CaseDataPredicate.Respondent.isTypeSpecRespondent1(null).negate()
                       .and(CaseDataPredicate.Respondent.isTypeSpecRespondent2(null).negate())
-                      .and(CaseDataPredicate.Respondent.respondentsHaveSameResponseFlag.negate())
+                      .and(CaseDataPredicate.Respondent.isSameResponseFlag.negate())
                       .and(CaseDataPredicate.Respondent.responsesDifferSpec)
                       .and(CaseDataPredicate.Respondent.isTypeSpecRespondent1(
                           RespondentResponseTypeSpec.FULL_DEFENCE).negate())
@@ -125,6 +126,4 @@ public final class DivergencePredicate {
               default -> false;
           });
 
-    private DivergencePredicate() {
-    }
 }

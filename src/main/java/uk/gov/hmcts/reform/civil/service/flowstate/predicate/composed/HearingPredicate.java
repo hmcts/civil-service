@@ -6,20 +6,19 @@ import uk.gov.hmcts.reform.civil.service.flowstate.predicate.annotations.Busines
 
 import java.util.function.Predicate;
 
-public final class HearingPredicate {
+@SuppressWarnings("java:S1214")
+public interface HearingPredicate {
 
     @BusinessRule(
         group = "Hearing",
         summary = "Case in hearing readiness",
         description = "Hearing reference present, hearing listed and case not dismissed or taken offline"
     )
-    public static final Predicate<CaseData> isInReadiness =
+    Predicate<CaseData> isInReadiness =
         CaseDataPredicate.Hearing.hasReference
             .and(CaseDataPredicate.Hearing.isListed)
             .and(CaseDataPredicate.Hearing.hasDismissedFeeDueDate.negate())
             .and(CaseDataPredicate.TakenOffline.dateExists.negate())
             .and(CaseDataPredicate.TakenOffline.byStaffDateExists.negate());
 
-    private HearingPredicate() {
-    }
 }
