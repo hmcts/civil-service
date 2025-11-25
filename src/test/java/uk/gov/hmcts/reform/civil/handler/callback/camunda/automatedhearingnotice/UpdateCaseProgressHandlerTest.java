@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
 
@@ -36,11 +37,10 @@ class UpdateCaseProgressHandlerTest extends BaseCallbackHandlerTest {
             .thenReturn(HearingNoticeVariables.builder()
                             .hearingType("AAA7-TRI")
                             .build());
-        CaseData caseData = CaseData.builder()
-            .businessProcess(BusinessProcess.builder()
-                                 .processInstanceId("PROCESS_ID")
-                                 .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setProcessInstanceId("PROCESS_ID");
+        caseData.setBusinessProcess(businessProcess);
 
         var params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
 
@@ -61,11 +61,10 @@ class UpdateCaseProgressHandlerTest extends BaseCallbackHandlerTest {
             .thenReturn(HearingNoticeVariables.builder()
                             .hearingType(hearingType)
                             .build());
-        CaseData caseData = CaseData.builder()
-            .businessProcess(BusinessProcess.builder()
-                                 .processInstanceId("PROCESS_ID")
-                                 .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setProcessInstanceId("PROCESS_ID");
+        caseData.setBusinessProcess(businessProcess);
 
         var params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
 
@@ -82,11 +81,10 @@ class UpdateCaseProgressHandlerTest extends BaseCallbackHandlerTest {
                 .thenReturn(HearingNoticeVariables.builder()
                         .hearingType("AAA7-DRH")
                         .build());
-        CaseData caseData = CaseData.builder()
-                .businessProcess(BusinessProcess.builder()
-                        .processInstanceId("PROCESS_ID")
-                        .build())
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setProcessInstanceId("PROCESS_ID");
+        caseData.setBusinessProcess(businessProcess);
 
         var params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
 

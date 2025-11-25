@@ -59,85 +59,86 @@ class StartGeneralApplicationBusinessProcessCallbackHandlerTest extends BaseCall
     private StartGeneralApplicationBusinessProcessCallbackHandler handler;
 
     private CaseData getTestCaseDataWithNullBusinessProcessGA(CaseData caseData) {
-        GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
-        GeneralApplication application = builder
-            .businessProcess(BusinessProcess.builder()
-                                 .processInstanceId(PROCESS_INSTANCE_ID)
-                                 .camundaEvent("INITIATE_GENERAL_APPLICATION")
-                                 .build()).build();
-        return caseData.toBuilder()
-            .generalApplications(wrapElements(application))
-            .generalAppHearingDetails(GAHearingDetails.builder()
-                                          .build())
-            .build();
+        GeneralApplication application = new GeneralApplication();
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setProcessInstanceId(PROCESS_INSTANCE_ID);
+        businessProcess.setCamundaEvent("INITIATE_GENERAL_APPLICATION");
+        application.setBusinessProcess(businessProcess);
+        caseData.setGeneralApplications(wrapElements(application));
+        GAHearingDetails hearingDetails = new GAHearingDetails();
+        caseData.setGeneralAppHearingDetails(hearingDetails);
+        return caseData;
     }
 
     private CaseData getBusinessProcessReadyTestCaseData(CaseData caseData) {
-        GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
-        GeneralApplication application = builder
-            .businessProcess(BusinessProcess.builder()
-                                 .status(BusinessProcessStatus.READY)
-                                 .processInstanceId(PROCESS_INSTANCE_ID)
-                                 .camundaEvent("INITIATE_GENERAL_APPLICATION")
-                                 .build()).build();
-        return caseData.toBuilder()
-            .generalApplications(wrapElements(application))
-            .generalAppHearingDetails(GAHearingDetails.builder()
-                                          .build())
-            .build();
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setStatus(BusinessProcessStatus.READY);
+        businessProcess.setProcessInstanceId(PROCESS_INSTANCE_ID);
+        businessProcess.setCamundaEvent("INITIATE_GENERAL_APPLICATION");
+        GeneralApplication application = new GeneralApplication();
+        application.setBusinessProcess(businessProcess);
+        caseData.setGeneralApplications(wrapElements(application));
+        GAHearingDetails hearingDetails = new GAHearingDetails();
+        caseData.setGeneralAppHearingDetails(hearingDetails);
+        return caseData;
     }
 
     private CaseData getBusinessProcessReadyForMultipleGA(CaseData caseData) {
-        GeneralApplication application = GeneralApplication.builder()
-            .businessProcess(BusinessProcess.builder()
-                                 .processInstanceId(PROCESS_INSTANCE_ID)
-                                 .camundaEvent("INITIATE_GENERAL_APPLICATION")
-                                 .status(BusinessProcessStatus.READY).build()).build();
+        BusinessProcess businessProcess1 = new BusinessProcess();
+        businessProcess1.setProcessInstanceId(PROCESS_INSTANCE_ID);
+        businessProcess1.setCamundaEvent("INITIATE_GENERAL_APPLICATION");
+        businessProcess1.setStatus(BusinessProcessStatus.READY);
 
-        GeneralApplication application2 = GeneralApplication.builder()
-            .businessProcess(BusinessProcess.builder()
-                                 .processInstanceId(PROCESS_INSTANCE_ID)
-                                 .camundaEvent("INITIATE_GENERAL_APPLICATION")
-                                 .status(BusinessProcessStatus.READY).build()).build();
+        GeneralApplication application = new GeneralApplication();
+        application.setBusinessProcess(businessProcess1);
 
-        GeneralApplication application3 = GeneralApplication.builder()
-            .businessProcess(BusinessProcess.builder()
-                                 .processInstanceId(PROCESS_INSTANCE_ID)
-                                 .camundaEvent("INITIATE_GENERAL_APPLICATION")
-                                 .status(BusinessProcessStatus.READY).build()).build();
+        BusinessProcess businessProcess2 = new BusinessProcess();
+        businessProcess2.setProcessInstanceId(PROCESS_INSTANCE_ID);
+        businessProcess2.setCamundaEvent("INITIATE_GENERAL_APPLICATION");
+        businessProcess2.setStatus(BusinessProcessStatus.READY);
+        GeneralApplication application2 = new GeneralApplication();
+        application2.setBusinessProcess(businessProcess2);
 
-        return caseData.toBuilder()
-            .generalApplications(wrapElements(application, application2, application3))
-            .generalAppHearingDetails(GAHearingDetails.builder()
-                                          .build())
-            .build();
+        BusinessProcess businessProcess3 = new BusinessProcess();
+        businessProcess3.setProcessInstanceId(PROCESS_INSTANCE_ID);
+        businessProcess3.setCamundaEvent("INITIATE_GENERAL_APPLICATION");
+        businessProcess3.setStatus(BusinessProcessStatus.READY);
+        GeneralApplication application3 = new GeneralApplication();
+        application3.setBusinessProcess(businessProcess3);
+
+        caseData.setGeneralApplications(wrapElements(application, application2, application3));
+        GAHearingDetails hearingDetails = new GAHearingDetails();
+        caseData.setGeneralAppHearingDetails(hearingDetails);
+        return caseData;
 
     }
 
     private CaseData getBusinessProcessForMultipleGA(CaseData caseData) {
-        GeneralApplication application = GeneralApplication.builder()
-            .businessProcess(BusinessProcess.builder()
-                                 .processInstanceId(PROCESS_INSTANCE_ID)
-                                 .camundaEvent("INITIATE_GENERAL_APPLICATION")
-                                 .status(BusinessProcessStatus.READY).build()).build();
+        BusinessProcess businessProcess1 = new BusinessProcess();
+        businessProcess1.setProcessInstanceId(PROCESS_INSTANCE_ID);
+        businessProcess1.setCamundaEvent("INITIATE_GENERAL_APPLICATION");
+        GeneralApplication application = new GeneralApplication();
+        businessProcess1.setStatus(BusinessProcessStatus.READY);
+        application.setBusinessProcess(businessProcess1);
 
-        GeneralApplication application2 = GeneralApplication.builder()
-            .businessProcess(BusinessProcess.builder()
-                                 .processInstanceId(PROCESS_INSTANCE_ID)
-                                 .camundaEvent("INITIATE_GENERAL_APPLICATION")
-                                 .status(BusinessProcessStatus.STARTED).build()).build();
+        BusinessProcess businessProcess2 = new BusinessProcess();
+        businessProcess2.setProcessInstanceId(PROCESS_INSTANCE_ID);
+        businessProcess2.setCamundaEvent("INITIATE_GENERAL_APPLICATION");
+        businessProcess2.setStatus(BusinessProcessStatus.STARTED);
+        GeneralApplication application2 = new GeneralApplication();
+        application2.setBusinessProcess(businessProcess2);
 
-        GeneralApplication application3 = GeneralApplication.builder()
-            .businessProcess(BusinessProcess.builder()
-                                 .processInstanceId(PROCESS_INSTANCE_ID)
-                                 .camundaEvent("INITIATE_GENERAL_APPLICATION")
-                                 .status(BusinessProcessStatus.FINISHED).build()).build();
+        BusinessProcess businessProcess3 = new BusinessProcess();
+        businessProcess3.setProcessInstanceId(PROCESS_INSTANCE_ID);
+        businessProcess3.setCamundaEvent("INITIATE_GENERAL_APPLICATION");
+        businessProcess3.setStatus(BusinessProcessStatus.FINISHED);
+        GeneralApplication application3 = new GeneralApplication();
+        application3.setBusinessProcess(businessProcess3);
 
-        return caseData.toBuilder()
-            .generalApplications(wrapElements(application, application2, application3))
-            .generalAppHearingDetails(GAHearingDetails.builder()
-                                          .build())
-            .build();
+        caseData.setGeneralApplications(wrapElements(application, application2, application3));
+        GAHearingDetails hearingDetails = new GAHearingDetails();
+        caseData.setGeneralAppHearingDetails(hearingDetails);
+        return caseData;
 
     }
 
