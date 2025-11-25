@@ -77,7 +77,6 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
         String selectedOption = Optional.of(caseData).map(CaseData::getSelectLitigationFriend)
             .map(DynamicList::getValue).map(DynamicListElement::getLabel).orElse("").split(":")[0]
             .toUpperCase();
-        caseData.setLitigantFriendSelection(selectedOption);
 
         caseData.setLitigantFriendSelection(selectedOption);
 
