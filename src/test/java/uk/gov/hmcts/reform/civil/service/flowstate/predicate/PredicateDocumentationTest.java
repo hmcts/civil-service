@@ -1,9 +1,22 @@
 package uk.gov.hmcts.reform.civil.service.flowstate.predicate;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.annotations.BusinessRule;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.ClaimantIntentionPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.ClaimPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.DismissedPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.DivergencePredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.HearingPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.LanguagePredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.LipPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.NotificationPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.OutOfTimePredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.PaymentPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.RepaymentPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.ResponsesPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.ResponseTypePredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.TakenOfflinePredicate;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -23,7 +36,7 @@ class PredicateDocumentationTest {
 
         List<Class<?>> containers = List.of(
             CaseDataPredicate.class,
-            ClaimantPredicate.class,
+            ClaimantIntentionPredicate.class,
             ClaimPredicate.class,
             DismissedPredicate.class,
             DivergencePredicate.class,
@@ -34,7 +47,8 @@ class PredicateDocumentationTest {
             OutOfTimePredicate.class,
             PaymentPredicate.class,
             RepaymentPredicate.class,
-            ResponsePredicate.class,
+            ResponsesPredicate.class,
+            ResponseTypePredicate.class,
             TakenOfflinePredicate.class
         );
 
@@ -64,7 +78,6 @@ class PredicateDocumentationTest {
             "The following predicates are missing @BusinessRule documentation:\n" + String.join("\n", undocumentedMembers));
     }
 
-    @Disabled("Used to manually generate business rule documentation")
     @Test
     void generateMarkdownReport() throws Exception {
         StringBuilder md = new StringBuilder();
@@ -78,7 +91,7 @@ class PredicateDocumentationTest {
 
         List<Object> composedMembers = new ArrayList<>();
         List<Class<?>> composerToScan = List.of(
-            ClaimantPredicate.class,
+            ClaimantIntentionPredicate.class,
             ClaimPredicate.class,
             DismissedPredicate.class,
             DivergencePredicate.class,
@@ -89,7 +102,8 @@ class PredicateDocumentationTest {
             OutOfTimePredicate.class,
             PaymentPredicate.class,
             RepaymentPredicate.class,
-            ResponsePredicate.class,
+            ResponsesPredicate.class,
+            ResponseTypePredicate.class,
             TakenOfflinePredicate.class
         );
 
@@ -123,7 +137,8 @@ class PredicateDocumentationTest {
         }));
 
         for (Object member : composedMembers) {
-            if (member instanceof Field field) {
+            if (member instanceof Field) {
+                Field field = (Field) member;
                 BusinessRule rule = field.getAnnotation(BusinessRule.class);
                 md.append(String.format("| **%s** | `%s` | %s |%n",
                                         rule.group(),
@@ -183,7 +198,8 @@ class PredicateDocumentationTest {
         }));
 
         for (Object member : atomicMembers) {
-            if (member instanceof Field field) {
+            if (member instanceof Field) {
+                Field field = (Field) member;
                 BusinessRule rule = field.getAnnotation(BusinessRule.class);
                 md.append(String.format("| **%s** | `%s` | %s |%n",
                                         rule.group(),
@@ -201,7 +217,7 @@ class PredicateDocumentationTest {
             }
         }
 
-        File targetDir = new File("docs");
+        File targetDir = new File("build/generated/documentation");
         boolean buildDirOk = targetDir.exists() || targetDir.mkdirs();
         Assertions.assertTrue(buildDirOk, "Failed to create build directory");
 
