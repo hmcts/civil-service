@@ -90,17 +90,23 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
         } else if (caseData.getEaCourtLocation() == YES && caseData.getIsReferToJudgeClaim() == YesOrNo.YES) {
             errors.add(ERROR_MESSAGE_EVENT_NOT_ALLOWED);
         } else {
-            Optional<Element<CaseDocument>> sdoDocLatest = callbackParams.getCaseData().getSystemGeneratedCaseDocuments()
-                .stream().filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
-                    .equals(DocumentType.SDO_ORDER))
-                .sorted(Comparator.comparing(
-                    caseDocumentElement -> caseDocumentElement.getValue().getCreatedDatetime(),
-                    Comparator.reverseOrder()
-                )).findFirst();
-            if (sdoDocLatest.isPresent()) {
-                LocalDateTime sdoDocLatestDate = sdoDocLatest.get().getValue().getCreatedDatetime();
-                if (LocalDateTime.now().isAfter(sdoDocLatestDate.plusDays(7))) {
+            if (caseData.getRequestForReconsiderationDeadline() != null) {
+                if (LocalDateTime.now().isAfter(caseData.getRequestForReconsiderationDeadline())) {
                     errors.add(ERROR_MESSAGE_DEADLINE_EXPIRED);
+                }
+            } else {
+                Optional<Element<CaseDocument>> sdoDocLatest = caseData.getSystemGeneratedCaseDocuments()
+                    .stream().filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
+                        .equals(DocumentType.SDO_ORDER))
+                    .sorted(Comparator.comparing(
+                        caseDocumentElement -> caseDocumentElement.getValue().getCreatedDatetime(),
+                        Comparator.reverseOrder()
+                    )).findFirst();
+                if (sdoDocLatest.isPresent()) {
+                    LocalDateTime sdoDocLatestDate = sdoDocLatest.get().getValue().getCreatedDatetime();
+                    if (LocalDateTime.now().isAfter(sdoDocLatestDate.plusDays(7))) {
+                        errors.add(ERROR_MESSAGE_DEADLINE_EXPIRED);
+                    }
                 }
             }
         }
