@@ -12,19 +12,11 @@ import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
-import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
-import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
-import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
-import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -49,18 +41,6 @@ class CaseDataPredicateTest {
         }
 
         @Test
-        void should_return_true_for_hasResponseDateApplicant2_when_present() {
-            when(caseData.getApplicant2ResponseDate()).thenReturn(LocalDateTime.now());
-            assertTrue(CaseDataPredicate.Applicant.hasResponseDateApplicant2.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_hasResponseDateApplicant2_when_absent() {
-            when(caseData.getApplicant2ResponseDate()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Applicant.hasResponseDateApplicant2.test(caseData));
-        }
-
-        @Test
         void should_return_false_for_isRepresented_when_applicant_is_not_represented() {
             when(caseData.isApplicantNotRepresented()).thenReturn(true);
             assertFalse(CaseDataPredicate.Applicant.isRepresented.test(caseData));
@@ -74,18 +54,18 @@ class CaseDataPredicateTest {
         @Test
         void should_return_true_for_hasResponseDate_when_present() {
             when(caseData.getApplicant1ResponseDate()).thenReturn(LocalDateTime.now());
-            assertTrue(CaseDataPredicate.Applicant.hasResponseDateApplicant1.test(caseData));
+            assertTrue(CaseDataPredicate.Applicant.hasResponseDate.test(caseData));
         }
 
         @Test
         void should_return_false_for_hasResponseDate_when_absent() {
             when(caseData.getApplicant1ResponseDate()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Applicant.hasResponseDateApplicant1.test(caseData));
+            assertFalse(CaseDataPredicate.Applicant.hasResponseDate.test(caseData));
         }
 
         @Test
         void should_return_false_for_hasResponseDate_when_case_data_is_null() {
-            assertFalse(CaseDataPredicate.Applicant.hasResponseDateApplicant1.test(null));
+            assertFalse(CaseDataPredicate.Applicant.hasResponseDate.test(null));
         }
 
         @Test
@@ -116,6 +96,7 @@ class CaseDataPredicateTest {
             // equality should not count as passed (predicate uses isBefore(now)).
             // set slightly in the future to avoid flakiness due to timing
             when(caseData.getApplicant1ResponseDeadline()).thenReturn(LocalDateTime.now().plusSeconds(1));
+
             assertFalse(CaseDataPredicate.Applicant.hasPassedResponseDeadline.test(caseData));
         }
 
@@ -342,54 +323,6 @@ class CaseDataPredicateTest {
         }
 
         @Test
-        void should_return_true_for_isUnspecClaim_when_case_is_unspec() {
-            when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.UNSPEC_CLAIM);
-            assertTrue(CaseDataPredicate.Claim.isUnspecClaim.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isUnspecClaim_when_case_category_null() {
-            when(caseData.getCaseAccessCategory()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Claim.isUnspecClaim.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_isMultiParty_when_applicant2_present() {
-            when(caseData.getApplicant2()).thenReturn(Party.builder().build());
-            assertTrue(CaseDataPredicate.Claim.isMultiParty.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_isMultiParty_when_respondent2_present() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
-            assertTrue(CaseDataPredicate.Claim.isMultiParty.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_hasSubmittedDate_when_present() {
-            when(caseData.getSubmittedDate()).thenReturn(LocalDateTime.now());
-            assertTrue(CaseDataPredicate.Claim.hasSubmittedDate.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_hasSubmittedDate_when_absent() {
-            when(caseData.getSubmittedDate()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Claim.hasSubmittedDate.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_hasIssueDate_when_present() {
-            when(caseData.getIssueDate()).thenReturn(LocalDate.now());
-            assertTrue(CaseDataPredicate.Claim.hasIssueDate.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_hasIssueDate_when_absent() {
-            when(caseData.getIssueDate()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Claim.hasIssueDate.test(caseData));
-        }
-
-        @Test
         void should_return_true_for_hasNotificationDeadline_when_present() {
             when(caseData.getClaimNotificationDeadline()).thenReturn(LocalDateTime.now());
             assertTrue(CaseDataPredicate.Claim.hasNotificationDeadline.test(caseData));
@@ -399,49 +332,6 @@ class CaseDataPredicateTest {
         void should_return_false_for_hasNotificationDeadline_when_absent() {
             when(caseData.getClaimNotificationDeadline()).thenReturn(null);
             assertFalse(CaseDataPredicate.Claim.hasNotificationDeadline.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isMultiParty_when_neither_second_party_present() {
-            when(caseData.getApplicant2()).thenReturn(null);
-            when(caseData.getRespondent2()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Claim.isMultiParty.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_hasPassedNotificationDeadline_when_deadline_in_past() {
-            when(caseData.getClaimNotificationDeadline()).thenReturn(LocalDateTime.now().minusDays(1));
-            assertTrue(CaseDataPredicate.Claim.hasPassedNotificationDeadline.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_hasPassedNotificationDeadline_when_deadline_seconds_in_past() {
-            when(caseData.getClaimNotificationDeadline()).thenReturn(LocalDateTime.now().minusSeconds(5));
-            assertTrue(CaseDataPredicate.Claim.hasPassedNotificationDeadline.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_hasPassedNotificationDeadline_when_deadline_in_future() {
-            when(caseData.getClaimNotificationDeadline()).thenReturn(LocalDateTime.now().plusDays(1));
-            assertFalse(CaseDataPredicate.Claim.hasPassedNotificationDeadline.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_hasFutureNotificationDeadline_when_deadline_in_future() {
-            when(caseData.getClaimNotificationDeadline()).thenReturn(LocalDateTime.now().plusDays(2));
-            assertTrue(CaseDataPredicate.Claim.hasFutureNotificationDeadline.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_hasFutureNotificationDeadline_when_deadline_seconds_in_future() {
-            when(caseData.getClaimNotificationDeadline()).thenReturn(LocalDateTime.now().plusSeconds(5));
-            assertTrue(CaseDataPredicate.Claim.hasFutureNotificationDeadline.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_hasFutureNotificationDeadline_when_deadline_in_past() {
-            when(caseData.getClaimNotificationDeadline()).thenReturn(LocalDateTime.now().minusDays(2));
-            assertFalse(CaseDataPredicate.Claim.hasFutureNotificationDeadline.test(caseData));
         }
 
         @Test
@@ -466,6 +356,18 @@ class CaseDataPredicateTest {
         void should_return_false_for_hasDismissedDate_when_absent() {
             when(caseData.getClaimDismissedDate()).thenReturn(null);
             assertFalse(CaseDataPredicate.Claim.hasDismissedDate.test(caseData));
+        }
+
+        @Test
+        void should_return_true_for_hasDismissalDeadline_when_present() {
+            when(caseData.getClaimDismissedDeadline()).thenReturn(LocalDateTime.now());
+            assertTrue(CaseDataPredicate.Claim.hasDismissalDeadline.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_hasDismissalDeadline_when_absent() {
+            when(caseData.getClaimDismissedDeadline()).thenReturn(null);
+            assertFalse(CaseDataPredicate.Claim.hasDismissalDeadline.test(caseData));
         }
 
         @Test
@@ -497,72 +399,89 @@ class CaseDataPredicateTest {
             when(caseData.getShowResponseOneVOneFlag()).thenReturn(null);
             assertFalse(CaseDataPredicate.Claim.hasOneVOneResponseFlag.test(caseData));
         }
-
-        @Test
-        void should_return_true_for_isType_factory_when_matches() {
-            when(caseData.getShowResponseOneVOneFlag()).thenReturn(ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE);
-            assertTrue(CaseDataPredicate.Claim.isType(ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE).test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_isType_factory_when_matches_part_admit_pay_immediately() {
-            when(caseData.getShowResponseOneVOneFlag()).thenReturn(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY);
-            assertTrue(CaseDataPredicate.Claim
-                .isType(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
-                .test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isType_factory_when_different() {
-            when(caseData.getShowResponseOneVOneFlag()).thenReturn(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY);
-            assertFalse(CaseDataPredicate.Claim.isType(ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE).test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_hasNotifyOptions_when_present() {
-            DynamicList list = new DynamicList(DynamicListElement.EMPTY, List.of());
-            when(caseData.getDefendantSolicitorNotifyClaimOptions()).thenReturn(list);
-            assertTrue(CaseDataPredicate.Claim.hasNotifyOptions.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_hasNotifyOptions_when_absent() {
-            when(caseData.getDefendantSolicitorNotifyClaimOptions()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Claim.hasNotifyOptions.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_isNotifyOptionsBoth_when_label_both() {
-            DynamicListElement element = DynamicListElement.builder().label("Both").build();
-            DynamicList list = new DynamicList(element, List.of(element));
-            when(caseData.getDefendantSolicitorNotifyClaimOptions()).thenReturn(list);
-            assertTrue(CaseDataPredicate.Claim.isNotifyOptionsBoth.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isNotifyOptionsBoth_when_label_not_both() {
-            DynamicListElement element = DynamicListElement.builder().label("Other").build();
-            DynamicList list = new DynamicList(element, List.of(element));
-            when(caseData.getDefendantSolicitorNotifyClaimOptions()).thenReturn(list);
-            assertFalse(CaseDataPredicate.Claim.isNotifyOptionsBoth.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_hasChangeOfRepresentation_when_present() {
-            when(caseData.getChangeOfRepresentation()).thenReturn(new ChangeOfRepresentation());
-            assertTrue(CaseDataPredicate.Claim.hasChangeOfRepresentation.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_hasChangeOfRepresentation_when_absent() {
-            when(caseData.getChangeOfRepresentation()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Claim.hasChangeOfRepresentation.test(caseData));
-        }
-
     }
 
     @Nested
     class ClaimDetails {
+
+        @Test
+        void should_return_true_for_hasTimeExtensionRespondent1_when_present() {
+            when(caseData.getRespondent1TimeExtensionDate()).thenReturn(LocalDateTime.now());
+
+            assertTrue(CaseDataPredicate.ClaimDetails.hasTimeExtensionRespondent1.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_hasTimeExtensionRespondent1_when_absent() {
+            when(caseData.getRespondent1TimeExtensionDate()).thenReturn(null);
+            assertFalse(CaseDataPredicate.ClaimDetails.hasTimeExtensionRespondent1.test(caseData));
+        }
+
+        @Test
+        void should_return_true_for_acknowledgedNotificationRespondent1_when_present() {
+            when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
+            assertTrue(CaseDataPredicate.ClaimDetails.acknowledgedNotificationRespondent1.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_acknowledgedNotificationRespondent1_when_absent() {
+            when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(null);
+            assertFalse(CaseDataPredicate.ClaimDetails.acknowledgedNotificationRespondent1.test(caseData));
+        }
+
+        @Test
+        void should_return_true_for_hasResponseDateRespondent1_when_present() {
+            when(caseData.getRespondent1ResponseDate()).thenReturn(LocalDateTime.now());
+            assertTrue(CaseDataPredicate.ClaimDetails.hasResponseDateRespondent1.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_hasResponseDateRespondent1_when_absent() {
+            when(caseData.getRespondent1ResponseDate()).thenReturn(null);
+            assertFalse(CaseDataPredicate.ClaimDetails.hasResponseDateRespondent1.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_hasResponseDateRespondent1_when_case_data_is_null() {
+            assertFalse(CaseDataPredicate.ClaimDetails.hasResponseDateRespondent1.test(null));
+        }
+
+        @Test
+        void should_return_true_for_hasResponseDateRespondent2_when_present() {
+            when(caseData.getRespondent2ResponseDate()).thenReturn(LocalDateTime.now());
+
+            assertTrue(CaseDataPredicate.ClaimDetails.hasResponseDateRespondent2.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_hasResponseDateRespondent2_when_absent() {
+            when(caseData.getRespondent2ResponseDate()).thenReturn(null);
+            assertFalse(CaseDataPredicate.ClaimDetails.hasResponseDateRespondent2.test(caseData));
+        }
+
+        @Test
+        void should_return_true_for_acknowledgedNotificationRespondent2_when_present() {
+            when(caseData.getRespondent2AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
+            assertTrue(CaseDataPredicate.ClaimDetails.acknowledgedNotificationRespondent2.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_acknowledgedNotificationRespondent2_when_absent() {
+            when(caseData.getRespondent2AcknowledgeNotificationDate()).thenReturn(null);
+            assertFalse(CaseDataPredicate.ClaimDetails.acknowledgedNotificationRespondent2.test(caseData));
+        }
+
+        @Test
+        void should_return_true_for_hasTimeExtensionRespondent2_when_present() {
+            when(caseData.getRespondent2TimeExtensionDate()).thenReturn(LocalDateTime.now());
+            assertTrue(CaseDataPredicate.ClaimDetails.hasTimeExtensionRespondent2.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_hasTimeExtensionRespondent2_when_absent() {
+            when(caseData.getRespondent2TimeExtensionDate()).thenReturn(null);
+            assertFalse(CaseDataPredicate.ClaimDetails.hasTimeExtensionRespondent2.test(caseData));
+        }
 
         @Test
         void should_return_true_for_hasNotificationDate_when_present() {
@@ -579,37 +498,37 @@ class CaseDataPredicateTest {
         @Test
         void should_return_true_for_hasPassedNotificationDeadline_when_past() {
             when(caseData.getClaimDetailsNotificationDeadline()).thenReturn(LocalDateTime.now().minusDays(1));
-            assertTrue(CaseDataPredicate.ClaimDetails.passedNotificationDeadline.test(caseData));
+            assertTrue(CaseDataPredicate.ClaimDetails.hasPassedNotificationDeadline.test(caseData));
         }
 
         @Test
         void should_return_false_for_hasPassedNotificationDeadline_when_future() {
             when(caseData.getClaimDetailsNotificationDeadline()).thenReturn(LocalDateTime.now().plusDays(1));
-            assertFalse(CaseDataPredicate.ClaimDetails.passedNotificationDeadline.test(caseData));
+            assertFalse(CaseDataPredicate.ClaimDetails.hasPassedNotificationDeadline.test(caseData));
         }
 
         @Test
         void should_return_false_for_hasPassedNotificationDeadline_when_absent() {
             when(caseData.getClaimDetailsNotificationDeadline()).thenReturn(null);
-            assertFalse(CaseDataPredicate.ClaimDetails.passedNotificationDeadline.test(caseData));
+            assertFalse(CaseDataPredicate.ClaimDetails.hasPassedNotificationDeadline.test(caseData));
         }
 
         @Test
         void should_return_true_for_hasFutureNotificationDeadline_when_future() {
             when(caseData.getClaimDetailsNotificationDeadline()).thenReturn(LocalDateTime.now().plusDays(1));
-            assertTrue(CaseDataPredicate.ClaimDetails.futureNotificationDeadline.test(caseData));
+            assertTrue(CaseDataPredicate.ClaimDetails.hasFutureNotificationDeadline.test(caseData));
         }
 
         @Test
         void should_return_false_for_hasFutureNotificationDeadline_when_past() {
             when(caseData.getClaimDetailsNotificationDeadline()).thenReturn(LocalDateTime.now().minusDays(1));
-            assertFalse(CaseDataPredicate.ClaimDetails.futureNotificationDeadline.test(caseData));
+            assertFalse(CaseDataPredicate.ClaimDetails.hasFutureNotificationDeadline.test(caseData));
         }
 
         @Test
         void should_return_false_for_hasFutureNotificationDeadline_when_null() {
             when(caseData.getClaimDetailsNotificationDeadline()).thenReturn(null);
-            assertFalse(CaseDataPredicate.ClaimDetails.futureNotificationDeadline.test(caseData));
+            assertFalse(CaseDataPredicate.ClaimDetails.hasFutureNotificationDeadline.test(caseData));
         }
 
         @Test
@@ -629,7 +548,7 @@ class CaseDataPredicateTest {
             DynamicListElement value = DynamicListElement.dynamicElement("Both");
             DynamicList dl = DynamicList.builder().value(value).listItems(List.of(value)).build();
             when(caseData.getDefendantSolicitorNotifyClaimDetailsOptions()).thenReturn(dl);
-            assertTrue(CaseDataPredicate.ClaimDetails.isNotifyOptionsBoth.test(caseData));
+            assertTrue(CaseDataPredicate.ClaimDetails.hasNotifyOptionsBoth.test(caseData));
         }
 
         @Test
@@ -637,13 +556,13 @@ class CaseDataPredicateTest {
             DynamicListElement value = DynamicListElement.dynamicElement("Other");
             DynamicList dl = DynamicList.builder().value(value).listItems(List.of(value)).build();
             when(caseData.getDefendantSolicitorNotifyClaimDetailsOptions()).thenReturn(dl);
-            assertFalse(CaseDataPredicate.ClaimDetails.isNotifyOptionsBoth.test(caseData));
+            assertFalse(CaseDataPredicate.ClaimDetails.hasNotifyOptionsBoth.test(caseData));
         }
 
         @Test
         void should_return_false_for_hasNotifyOptionsBoth_when_label_null() {
             when(caseData.getDefendantSolicitorNotifyClaimDetailsOptions()).thenReturn(null);
-            assertFalse(CaseDataPredicate.ClaimDetails.isNotifyOptionsBoth.test(caseData));
+            assertFalse(CaseDataPredicate.ClaimDetails.hasNotifyOptionsBoth.test(caseData));
         }
     }
 
@@ -727,6 +646,7 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_false_for_responsesDifferSpec_when_case_data_is_null() {
+            // ensure null-safe: predicate should return false when caseData is null
             assertFalse(CaseDataPredicate.Claimant.responsesDifferSpec.test(null));
         }
 
@@ -794,7 +714,7 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_isByAdmission_when_active_judgment_by_admission() {
-            uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails jd = new JudgmentDetails();
+            uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails jd = new uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails();
             jd.setType(uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType.JUDGMENT_BY_ADMISSION);
             when(caseData.getActiveJudgment()).thenReturn(jd);
             assertTrue(CaseDataPredicate.Judgment.isByAdmission.test(caseData));
@@ -802,7 +722,7 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_false_for_isByAdmission_when_no_active_judgment() {
-            uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails jd = new JudgmentDetails();
+            uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails jd = new uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails();
             jd.setType(uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType.DEFAULT_JUDGMENT);
             when(caseData.getActiveJudgment()).thenReturn(jd);
             assertFalse(CaseDataPredicate.Judgment.isByAdmission.test(caseData));
@@ -819,49 +739,17 @@ class CaseDataPredicateTest {
     class MultiParty {
 
         @Test
-        void should_return_true_for_isOneVOne_by_default() {
-            when(caseData.getRespondent2()).thenReturn(null);
-            assertTrue(CaseDataPredicate.MultiParty.isOneVOne.test(caseData));
-        }
-
-        @Test
         void should_return_true_for_isOneVTwoOneLegalRep_when_respondent2_present_and_same_legal_rep_yes() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(uk.gov.hmcts.reform.civil.model.Party.builder().build());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.YES);
             assertTrue(CaseDataPredicate.MultiParty.isOneVTwoOneLegalRep.test(caseData));
         }
 
         @Test
-        void should_return_false_for_isOneVTwoOneLegalRep_when_respondent2_present_and_same_legal_rep_no() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
-            when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.NO);
-            assertFalse(CaseDataPredicate.MultiParty.isOneVTwoOneLegalRep.test(caseData));
-        }
-
-        @Test
         void should_return_true_for_isOneVTwoTwoLegalRep_when_respondent2_present_and_same_legal_rep_no() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(uk.gov.hmcts.reform.civil.model.Party.builder().build());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.NO);
             assertTrue(CaseDataPredicate.MultiParty.isOneVTwoTwoLegalRep.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isOneVTwoTwoLegalRep_when_respondent2_present_and_same_legal_rep_yes() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
-            when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.YES);
-            assertFalse(CaseDataPredicate.MultiParty.isOneVTwoTwoLegalRep.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_isTwoVOne_when_AddApplicant2_yes() {
-            when(caseData.getAddApplicant2()).thenReturn(YesOrNo.YES);
-            assertTrue(CaseDataPredicate.MultiParty.isTwoVOne.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isTwoVOne_when_AddApplicant2_no() {
-            when(caseData.getAddApplicant2()).thenReturn(YesOrNo.NO);
-            assertFalse(CaseDataPredicate.MultiParty.isTwoVOne.test(caseData));
         }
     }
 
@@ -891,314 +779,9 @@ class CaseDataPredicateTest {
     class Respondent {
 
         @Test
-        void should_return_true_for_isRepresentedRespondent1_when_yes() {
-            when(caseData.getRespondent1Represented()).thenReturn(YesOrNo.YES);
-            assertTrue(CaseDataPredicate.Respondent.isRepresentedRespondent1.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isRepresentedRespondent1_when_no() {
-            when(caseData.getRespondent1Represented()).thenReturn(YesOrNo.NO);
-            assertFalse(CaseDataPredicate.Respondent.isRepresentedRespondent1.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isRepresentedRespondent1_when_null() {
-            when(caseData.getRespondent1Represented()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Respondent.isRepresentedRespondent1.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_isUnrepresentedRespondent1_when_no() {
-            when(caseData.getRespondent1Represented()).thenReturn(YesOrNo.NO);
-            assertTrue(CaseDataPredicate.Respondent.isUnrepresentedRespondent1.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isUnrepresentedRespondent1_when_yes() {
-            when(caseData.getRespondent1Represented()).thenReturn(YesOrNo.YES);
-            assertFalse(CaseDataPredicate.Respondent.isUnrepresentedRespondent1.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isUnrepresentedRespondent1_when_null() {
-            when(caseData.getRespondent1Represented()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Respondent.isUnrepresentedRespondent1.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_isRepresentedRespondent2_when_yes() {
-            when(caseData.getRespondent2Represented()).thenReturn(YesOrNo.YES);
-            assertTrue(CaseDataPredicate.Respondent.isRepresentedRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isRepresentedRespondent2_when_no() {
-            when(caseData.getRespondent2Represented()).thenReturn(YesOrNo.NO);
-            assertFalse(CaseDataPredicate.Respondent.isRepresentedRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isRepresentedRespondent2_when_null() {
-            when(caseData.getRespondent2Represented()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Respondent.isRepresentedRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_isUnrepresentedRespondent2_when_no() {
-            when(caseData.getRespondent2Represented()).thenReturn(YesOrNo.NO);
-            assertTrue(CaseDataPredicate.Respondent.isUnrepresentedRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isUnrepresentedRespondent2_when_yes() {
-            when(caseData.getRespondent2Represented()).thenReturn(YesOrNo.YES);
-            assertFalse(CaseDataPredicate.Respondent.isUnrepresentedRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isUnrepresentedRespondent2_when_null() {
-            when(caseData.getRespondent2Represented()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Respondent.isUnrepresentedRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_isOrgRegisteredRespondent1_when_yes() {
-            when(caseData.getRespondent1OrgRegistered()).thenReturn(YesOrNo.YES);
-            assertTrue(CaseDataPredicate.Respondent.isOrgRegisteredRespondent1.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_isNotOrgRegisteredRespondent1_when_no() {
-            when(caseData.getRespondent1OrgRegistered()).thenReturn(YesOrNo.NO);
-            assertTrue(CaseDataPredicate.Respondent.isNotOrgRegisteredRespondent1.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isOrgRegisteredRespondent1_when_no() {
-            when(caseData.getRespondent1OrgRegistered()).thenReturn(YesOrNo.NO);
-            assertFalse(CaseDataPredicate.Respondent.isOrgRegisteredRespondent1.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isOrgRegisteredRespondent1_when_null() {
-            when(caseData.getRespondent1OrgRegistered()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Respondent.isOrgRegisteredRespondent1.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isNotOrgRegisteredRespondent1_when_yes() {
-            when(caseData.getRespondent1OrgRegistered()).thenReturn(YesOrNo.YES);
-            assertFalse(CaseDataPredicate.Respondent.isNotOrgRegisteredRespondent1.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isNotOrgRegisteredRespondent1_when_null() {
-            when(caseData.getRespondent1OrgRegistered()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Respondent.isNotOrgRegisteredRespondent1.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_isRepresentedNotOrgRegisteredRespondent1_when_represented_and_not_registered() {
-            when(caseData.getRespondent1Represented()).thenReturn(YesOrNo.YES);
-            when(caseData.getRespondent1OrgRegistered()).thenReturn(YesOrNo.NO);
-            assertTrue(CaseDataPredicate.Respondent.isRepresentedNotOrgRegisteredRespondent1.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isRepresentedNotOrgRegisteredRespondent1_when_registered() {
-            when(caseData.getRespondent1Represented()).thenReturn(YesOrNo.YES);
-            when(caseData.getRespondent1OrgRegistered()).thenReturn(YesOrNo.YES);
-            assertFalse(CaseDataPredicate.Respondent.isRepresentedNotOrgRegisteredRespondent1.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isRepresentedNotOrgRegisteredRespondent1_when_not_represented() {
-            when(caseData.getRespondent1Represented()).thenReturn(YesOrNo.NO);
-            assertFalse(CaseDataPredicate.Respondent.isRepresentedNotOrgRegisteredRespondent1.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_isOrgRegisteredRespondent2_when_yes() {
-            when(caseData.getRespondent2OrgRegistered()).thenReturn(YesOrNo.YES);
-            assertTrue(CaseDataPredicate.Respondent.isOrgRegisteredRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_isNotOrgRegisteredRespondent2_when_no() {
-            when(caseData.getRespondent2OrgRegistered()).thenReturn(YesOrNo.NO);
-            assertTrue(CaseDataPredicate.Respondent.isNotOrgRegisteredRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isOrgRegisteredRespondent2_when_no() {
-            when(caseData.getRespondent2OrgRegistered()).thenReturn(YesOrNo.NO);
-            assertFalse(CaseDataPredicate.Respondent.isOrgRegisteredRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isOrgRegisteredRespondent2_when_null() {
-            when(caseData.getRespondent2OrgRegistered()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Respondent.isOrgRegisteredRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isNotOrgRegisteredRespondent2_when_yes() {
-            when(caseData.getRespondent2OrgRegistered()).thenReturn(YesOrNo.YES);
-            assertFalse(CaseDataPredicate.Respondent.isNotOrgRegisteredRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isNotOrgRegisteredRespondent2_when_null() {
-            when(caseData.getRespondent2OrgRegistered()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Respondent.isNotOrgRegisteredRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_isRepresentedNotOrgRegisteredRespondent2_when_represented_and_not_registered() {
-            when(caseData.getRespondent2Represented()).thenReturn(YesOrNo.YES);
-            when(caseData.getRespondent2OrgRegistered()).thenReturn(YesOrNo.NO);
-            assertTrue(CaseDataPredicate.Respondent.isRepresentedNotOrgRegisteredRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isRepresentedNotOrgRegisteredRespondent2_when_registered() {
-            when(caseData.getRespondent2Represented()).thenReturn(YesOrNo.YES);
-            when(caseData.getRespondent2OrgRegistered()).thenReturn(YesOrNo.YES);
-            assertFalse(CaseDataPredicate.Respondent.isRepresentedNotOrgRegisteredRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isRepresentedNotOrgRegisteredRespondent2_when_not_represented() {
-            when(caseData.getRespondent2Represented()).thenReturn(YesOrNo.NO);
-            assertFalse(CaseDataPredicate.Respondent.isRepresentedNotOrgRegisteredRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_hasRespondent2_when_present() {
-            when(caseData.getRespondent2()).thenReturn(uk.gov.hmcts.reform.civil.model.Party.builder().build());
-            assertTrue(CaseDataPredicate.Respondent.hasRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_hasRespondent2_when_absent() {
-            when(caseData.getRespondent2()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Respondent.hasRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_hasAddRespondent2_when_present() {
-            when(caseData.getAddRespondent2()).thenReturn(YesOrNo.YES);
-            assertTrue(CaseDataPredicate.Respondent.hasAddRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_hasAddRespondent2_when_absent() {
-            when(caseData.getAddRespondent2()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Respondent.hasAddRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_isAddRespondent2_when_yes() {
-            when(caseData.getAddRespondent2()).thenReturn(YesOrNo.YES);
-            assertTrue(CaseDataPredicate.Respondent.isAddRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_isNotAddRespondent2_when_no() {
-            when(caseData.getAddRespondent2()).thenReturn(YesOrNo.NO);
-            assertTrue(CaseDataPredicate.Respondent.isNotAddRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isAddRespondent2_and_isNotAddRespondent2_when_null() {
-            when(caseData.getAddRespondent2()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Respondent.isAddRespondent2.test(caseData));
-            assertFalse(CaseDataPredicate.Respondent.isNotAddRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_hasSameLegalRepresentative_when_present() {
-            when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.YES);
-            assertTrue(CaseDataPredicate.Respondent.hasSameLegalRepresentative.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_hasSameLegalRepresentative_when_absent() {
-            when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Respondent.hasSameLegalRepresentative.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_isSameLegalRepresentative_when_yes() {
-            when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.YES);
-            assertTrue(CaseDataPredicate.Respondent.isSameLegalRepresentative.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_isNotSameLegalRepresentative_when_no() {
-            when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.NO);
-            assertTrue(CaseDataPredicate.Respondent.isNotSameLegalRepresentative.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isSameLegalRepresentative_and_isNotSameLegalRepresentative_when_null() {
-            when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Respondent.isSameLegalRepresentative.test(caseData));
-            assertFalse(CaseDataPredicate.Respondent.isNotSameLegalRepresentative.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_hasResponseTypeSpecRespondent1_when_present() {
-            when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
-            assertTrue(CaseDataPredicate.Respondent.hasResponseTypeSpecRespondent1.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_hasResponseTypeSpecRespondent1_when_absent() {
-            when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Respondent.hasResponseTypeSpecRespondent1.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_hasResponseTypeSpecRespondent2_when_present() {
-            when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
-            assertTrue(CaseDataPredicate.Respondent.hasResponseTypeSpecRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_hasResponseTypeSpecRespondent2_when_absent() {
-            when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Respondent.hasResponseTypeSpecRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_hasTimeExtensionRespondent1_when_present() {
-            when(caseData.getRespondent1TimeExtensionDate()).thenReturn(LocalDateTime.now());
-            assertTrue(CaseDataPredicate.Respondent.hasTimeExtensionRespondent1.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_hasTimeExtensionRespondent1_when_absent() {
-            when(caseData.getRespondent1TimeExtensionDate()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Respondent.hasTimeExtensionRespondent1.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_acknowledgedNotificationRespondent1_when_present() {
-            when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
-            assertTrue(CaseDataPredicate.Respondent.hasAcknowledgedNotificationRespondent1.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_acknowledgedNotificationRespondent1_when_absent() {
-            when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Respondent.hasAcknowledgedNotificationRespondent1.test(caseData));
-        }
-
-        @Test
         void should_return_true_for_hasResponseDateRespondent1_when_present() {
             when(caseData.getRespondent1ResponseDate()).thenReturn(LocalDateTime.now());
+
             assertTrue(CaseDataPredicate.Respondent.hasResponseDateRespondent1.test(caseData));
         }
 
@@ -1223,30 +806,6 @@ class CaseDataPredicateTest {
         void should_return_false_for_hasResponseDateRespondent2_when_absent() {
             when(caseData.getRespondent2ResponseDate()).thenReturn(null);
             assertFalse(CaseDataPredicate.Respondent.hasResponseDateRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_acknowledgedNotificationRespondent2_when_present() {
-            when(caseData.getRespondent2AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
-            assertTrue(CaseDataPredicate.Respondent.hasAcknowledgedNotificationRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_acknowledgedNotificationRespondent2_when_absent() {
-            when(caseData.getRespondent2AcknowledgeNotificationDate()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Respondent.hasAcknowledgedNotificationRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_hasTimeExtensionRespondent2_when_present() {
-            when(caseData.getRespondent2TimeExtensionDate()).thenReturn(LocalDateTime.now());
-            assertTrue(CaseDataPredicate.Respondent.hasTimeExtensionRespondent2.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_hasTimeExtensionRespondent2_when_absent() {
-            when(caseData.getRespondent2TimeExtensionDate()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Respondent.hasTimeExtensionRespondent2.test(caseData));
         }
 
         @Test
@@ -1390,13 +949,13 @@ class CaseDataPredicateTest {
         @Test
         void should_return_true_for_respondentsHaveSameResponseFlag_when_yes() {
             when(caseData.getRespondentResponseIsSame()).thenReturn(YES);
-            assertTrue(CaseDataPredicate.Respondent.isSameResponseFlag.test(caseData));
+            assertTrue(CaseDataPredicate.Respondent.respondentsHaveSameResponseFlag.test(caseData));
         }
 
         @Test
         void should_return_false_for_respondentsHaveSameResponseFlag_when_null() {
             when(caseData.getRespondentResponseIsSame()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Respondent.isSameResponseFlag.test(caseData));
+            assertFalse(CaseDataPredicate.Respondent.respondentsHaveSameResponseFlag.test(caseData));
         }
 
         @Test
@@ -1528,83 +1087,11 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_false_for_claimIssuedPaymentSucceeded_when_payment_status_not_success() {
-            uk.gov.hmcts.reform.civil.model.PaymentDetails pd = PaymentDetails.builder()
+            uk.gov.hmcts.reform.civil.model.PaymentDetails pd = uk.gov.hmcts.reform.civil.model.PaymentDetails.builder()
                 .status(PaymentStatus.FAILED)
                 .build();
             when(caseData.getClaimIssuedPaymentDetails()).thenReturn(pd);
             assertFalse(CaseDataPredicate.Payment.claimIssuedPaymentSucceeded.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_isPayImmediately_when_caseData_reports_true() {
-            when(caseData.isPayImmediately()).thenReturn(true);
-            assertTrue(CaseDataPredicate.Payment.isPayImmediately.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isPayImmediately_when_caseData_reports_false() {
-            when(caseData.isPayImmediately()).thenReturn(false);
-            assertFalse(CaseDataPredicate.Payment.isPayImmediately.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_hasWhenToBePaid_when_text_present() {
-            when(caseData.getWhenToBePaidText()).thenReturn("Soon");
-            assertTrue(CaseDataPredicate.Payment.hasWhenToBePaid.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_hasWhenToBePaid_when_text_absent() {
-            when(caseData.getWhenToBePaidText()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Payment.hasWhenToBePaid.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_paymentDetailsFailed_when_status_failed() {
-            uk.gov.hmcts.reform.civil.model.PaymentDetails pd = PaymentDetails.builder()
-                .status(PaymentStatus.FAILED)
-                .build();
-            when(caseData.getPaymentDetails()).thenReturn(pd);
-            assertTrue(CaseDataPredicate.Payment.paymentDetailsFailed.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_claimIssuedPaymentFailed_when_status_failed() {
-            uk.gov.hmcts.reform.civil.model.PaymentDetails pd = PaymentDetails.builder()
-                .status(PaymentStatus.FAILED)
-                .build();
-            when(caseData.getClaimIssuedPaymentDetails()).thenReturn(pd);
-            assertTrue(CaseDataPredicate.Payment.claimIssuedPaymentFailed.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_paymentDetailsFailed_when_status_success() {
-            uk.gov.hmcts.reform.civil.model.PaymentDetails pd = PaymentDetails.builder()
-                .status(PaymentStatus.SUCCESS)
-                .build();
-            when(caseData.getPaymentDetails()).thenReturn(pd);
-            assertFalse(CaseDataPredicate.Payment.paymentDetailsFailed.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_paymentDetailsFailed_when_details_null() {
-            when(caseData.getPaymentDetails()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Payment.paymentDetailsFailed.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_claimIssuedPaymentFailed_when_status_success() {
-            uk.gov.hmcts.reform.civil.model.PaymentDetails pd = PaymentDetails.builder()
-                .status(PaymentStatus.SUCCESS)
-                .build();
-            when(caseData.getClaimIssuedPaymentDetails()).thenReturn(pd);
-            assertFalse(CaseDataPredicate.Payment.claimIssuedPaymentFailed.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_claimIssuedPaymentFailed_when_details_null() {
-            when(caseData.getClaimIssuedPaymentDetails()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Payment.claimIssuedPaymentFailed.test(caseData));
         }
     }
 
@@ -1613,7 +1100,7 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_hasSdoReasonNotSuitable_when_reason_and_input_present() {
-            ReasonNotSuitableSDO reason = ReasonNotSuitableSDO.builder().input("reason").build();
+            uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO reason = uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO.builder().input("reason").build();
             when(caseData.getReasonNotSuitableSDO()).thenReturn(reason);
             assertTrue(CaseDataPredicate.TakenOffline.hasSdoReasonNotSuitable.test(caseData));
         }
@@ -1626,7 +1113,7 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_false_for_hasSdoReasonNotSuitable_when_input_empty() {
-            ReasonNotSuitableSDO reason = ReasonNotSuitableSDO.builder().input(null).build();
+            uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO reason = uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO.builder().input(null).build();
             when(caseData.getReasonNotSuitableSDO()).thenReturn(reason);
             assertFalse(CaseDataPredicate.TakenOffline.hasSdoReasonNotSuitable.test(caseData));
         }
@@ -1656,6 +1143,18 @@ class CaseDataPredicateTest {
         }
 
         @Test
+        void should_return_true_for_hasChangeOfRepresentation_when_present() {
+            when(caseData.getChangeOfRepresentation()).thenReturn(new uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation());
+            assertTrue(CaseDataPredicate.TakenOffline.hasChangeOfRepresentation.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_hasChangeOfRepresentation_when_absent() {
+            when(caseData.getChangeOfRepresentation()).thenReturn(null);
+            assertFalse(CaseDataPredicate.TakenOffline.hasChangeOfRepresentation.test(caseData));
+        }
+
+        @Test
         void should_return_true_for_hasDrawDirectionsOrderRequired_when_yes() {
             when(caseData.getDrawDirectionsOrderRequired()).thenReturn(YesOrNo.YES);
             assertTrue(CaseDataPredicate.TakenOffline.hasDrawDirectionsOrderRequired.test(caseData));
@@ -1679,7 +1178,7 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_hasChangePreference_when_present() {
-            when(caseData.getChangeLanguagePreference()).thenReturn(new ChangeLanguagePreference());
+            when(caseData.getChangeLanguagePreference()).thenReturn(new uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference());
             assertTrue(CaseDataPredicate.Language.hasChangePreference.test(caseData));
         }
 
@@ -1692,13 +1191,13 @@ class CaseDataPredicateTest {
         @Test
         void should_return_true_for_isBilingualFlag_when_true() {
             when(caseData.isRespondentResponseBilingual()).thenReturn(true);
-            assertTrue(CaseDataPredicate.Language.isRespondentBilingual.test(caseData));
+            assertTrue(CaseDataPredicate.Language.isBilingualFlag.test(caseData));
         }
 
         @Test
         void should_return_false_for_isBilingualFlag_when_false() {
             when(caseData.isRespondentResponseBilingual()).thenReturn(false);
-            assertFalse(CaseDataPredicate.Language.isRespondentBilingual.test(caseData));
+            assertFalse(CaseDataPredicate.Language.isBilingualFlag.test(caseData));
         }
     }
 
@@ -1708,37 +1207,37 @@ class CaseDataPredicateTest {
         @Test
         void should_return_true_for_partyIsUnrepresented_when_true() {
             when(caseData.isLipCase()).thenReturn(true);
-            assertTrue(CaseDataPredicate.Lip.isPartyUnrepresented.test(caseData));
+            assertTrue(CaseDataPredicate.Lip.partyIsUnrepresented.test(caseData));
         }
 
         @Test
         void should_return_false_for_partyIsUnrepresented_when_false() {
             when(caseData.isLipCase()).thenReturn(false);
-            assertFalse(CaseDataPredicate.Lip.isPartyUnrepresented.test(caseData));
+            assertFalse(CaseDataPredicate.Lip.partyIsUnrepresented.test(caseData));
         }
 
         @Test
         void should_return_true_for_isLiPCase_when_true() {
             when(caseData.isLipvLipOneVOne()).thenReturn(true);
-            assertTrue(CaseDataPredicate.Lip.isLiPvLipCase.test(caseData));
+            assertTrue(CaseDataPredicate.Lip.isLiPCase.test(caseData));
         }
 
         @Test
         void should_return_false_for_isLiPCase_when_false() {
             when(caseData.isLipvLipOneVOne()).thenReturn(false);
-            assertFalse(CaseDataPredicate.Lip.isLiPvLipCase.test(caseData));
+            assertFalse(CaseDataPredicate.Lip.isLiPCase.test(caseData));
         }
 
         @Test
         void should_return_true_for_translatedResponseDocumentUploaded_when_true() {
             when(caseData.isTranslatedDocumentUploaded()).thenReturn(true);
-            assertTrue(CaseDataPredicate.Lip.translatedDocumentUploaded.test(caseData));
+            assertTrue(CaseDataPredicate.Lip.translatedResponseDocumentUploaded.test(caseData));
         }
 
         @Test
         void should_return_false_for_translatedResponseDocumentUploaded_when_false() {
             when(caseData.isTranslatedDocumentUploaded()).thenReturn(false);
-            assertFalse(CaseDataPredicate.Lip.translatedDocumentUploaded.test(caseData));
+            assertFalse(CaseDataPredicate.Lip.translatedResponseDocumentUploaded.test(caseData));
         }
 
         @Test
@@ -1787,18 +1286,6 @@ class CaseDataPredicateTest {
         void should_return_false_for_nocSubmittedForLiPDefendant_when_false() {
             when(caseData.nocApplyForLiPDefendant()).thenReturn(false);
             assertFalse(CaseDataPredicate.Lip.nocSubmittedForLiPDefendant.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_hasPinInPost_when_present() {
-            when(caseData.getRespondent1PinToPostLRspec()).thenReturn(new DefendantPinToPostLRspec());
-            assertTrue(CaseDataPredicate.Lip.hasPinInPost.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_hasPinInPost_when_absent() {
-            when(caseData.getRespondent1PinToPostLRspec()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Lip.hasPinInPost.test(caseData));
         }
 
         @Test
