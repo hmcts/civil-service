@@ -17,10 +17,10 @@ import java.util.UUID;
 @Jacksonized
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor()
+@NoArgsConstructor(force = true)
 public class DynamicListElement {
 
-    public static final DynamicListElement EMPTY = DynamicListElement.builder().build();
+    public static final DynamicListElement EMPTY = new DynamicListElement();
 
     /**
      * Property that maps to the value attribute of the option tag.

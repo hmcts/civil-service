@@ -62,19 +62,17 @@ public class DispatchBusinessProcessCallbackHandler extends CallbackHandler {
     private CallbackResponse dispatchBusinessProcess(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         BusinessProcess businessProcess = caseData.getBusinessProcess();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         if (businessProcess.getStatus() == READY) {
             log.info("Setting BusinessProcess.status to DISPATCHED to avoid another " +
                          "Poller execution pickup and Camunda execution");
-            caseDataBuilder
-                .businessProcess(BusinessProcess.builder()
-                                     .camundaEvent(businessProcess.getCamundaEvent())
-                                     .status(DISPATCHED)
-                                     .build());
+            BusinessProcess updatedBusinessProcess = caseData.getBusinessProcess();
+            updatedBusinessProcess.setCamundaEvent(businessProcess.getCamundaEvent());
+            updatedBusinessProcess.setStatus(DISPATCHED);
+            caseData.setBusinessProcess(updatedBusinessProcess);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 }

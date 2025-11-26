@@ -55,6 +55,7 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
         try {
+            log.info(externalTask.getActivityId());
             ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
             String caseId = ofNullable(variables.getCaseId())
                 .orElseThrow(() -> new InvalidCaseDataException("The caseId was not provided"));
@@ -155,6 +156,8 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
                     yield null;
                 }
             };
+        } else if (Objects.equals(eventId, CaseEvent.NOTIFY_EVENT.name())) {
+            return caseData.getBusinessProcess().getActivityId();
         }
         return null;
     }
