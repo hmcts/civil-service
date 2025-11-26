@@ -74,7 +74,6 @@ class DefendantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHandlerTe
                 CallbackRequest.builder().eventId(UPDATE_DASHBOARD_TASK_LIST_DEFENDANT_DECISION_OUTCOME.name()).build()
             ).build();
 
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             handler.handle(params);
@@ -100,7 +99,6 @@ class DefendantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHandlerTe
                 CallbackRequest.builder().eventId(UPDATE_DASHBOARD_TASK_LIST_DEFENDANT_DECISION_OUTCOME.name()).build()
             ).build();
 
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             handler.handle(params);
@@ -130,7 +128,6 @@ class DefendantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHandlerTe
             HashMap<String, Object> scenarioParams = new HashMap<>();
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
 
             handler.handle(params);
 

@@ -4,5 +4,5 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 
 public interface SetApplicantResponseDeadlineCaseDataUpdater {
 
-    void update(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData);
+    void update(CaseData caseData);
 }
