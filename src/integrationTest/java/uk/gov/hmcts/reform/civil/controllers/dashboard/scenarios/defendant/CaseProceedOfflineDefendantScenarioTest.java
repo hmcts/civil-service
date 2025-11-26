@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -56,10 +55,8 @@ public class CaseProceedOfflineDefendantScenarioTest extends DashboardBaseIntegr
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].reference").value(caseId.toString()),
-                jsonPath("$[0].taskNameEn").value(
-                    "<a>Upload hearing documents</a>"),
+                jsonPath("$[0].taskNameEn").value("Contact the court to request a change to my case"),
                 jsonPath("$[0].currentStatusEn").value("Inactive")
-
             );
     }
 
@@ -76,7 +73,6 @@ public class CaseProceedOfflineDefendantScenarioTest extends DashboardBaseIntegr
             .activeJudgment(JudgmentDetails.builder().state(JudgmentState.ISSUED).build())
             .previousCCDState(CaseState.All_FINAL_ORDERS_ISSUED)
             .build();
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
 
         handler.handle(callbackParams(caseData));
 

@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.helpers.bundle.PartyType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.bundle.BundlingRequestDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 
@@ -26,9 +25,6 @@ class DQMapperTest {
 
     @Mock
     private BundleDocumentsRetrieval bundleDocumentsRetrieval;
-
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @Mock
     private SystemGeneratedDocMapper systemGeneratedDocMapper;
@@ -48,7 +44,6 @@ class DQMapperTest {
         when(bundleDocumentsRetrieval.getDqByCategoryId(caseData, DocCategory.DEF2_DEFENSE_DQ.getValue(), PartyType.DEFENDANT2))
             .thenReturn(singletonList(bundlingRequestDocument));
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(bundleDocumentsRetrieval.getDqByCategoryId(caseData, DocCategory.DQ_DEF1.getValue(), PartyType.DEFENDANT1))
             .thenReturn(singletonList(bundlingRequestDocument));
 
