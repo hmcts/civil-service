@@ -24,7 +24,7 @@ public class CaseProceedsInCasemanStrategy implements EventHistoryStrategy {
 
     @Override
     public boolean supports(CaseData caseData) {
-        if (caseData == null || caseData.getTakenOfflineDate() == null) {
+        if (caseData == null) {
             return false;
         }
 
@@ -39,10 +39,7 @@ public class CaseProceedsInCasemanStrategy implements EventHistoryStrategy {
             || (caseData.getOrderSDODocumentDJCollection() != null
             && !caseData.getOrderSDODocumentDJCollection().isEmpty());
 
-        boolean takenOfflineAfterSdo = YesOrNo.NO.equals(caseData.getDrawDirectionsOrderRequired())
-            && caseData.getReasonNotSuitableSDO() == null;
-
-        return sdoDrawnAndFiled || takenOfflineAfterSdo;
+        return takenOfflineAfterSdoState || (sdoDrawnAndFiled && caseData.getTakenOfflineDate() != null);
     }
 
     @Override

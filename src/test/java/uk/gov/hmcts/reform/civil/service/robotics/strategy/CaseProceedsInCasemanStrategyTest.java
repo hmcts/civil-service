@@ -64,12 +64,21 @@ class CaseProceedsInCasemanStrategyTest {
     }
 
     @Test
+    void supportsReturnsFalseWhenOrderPresentButNoTakenOfflineDate() {
+        CaseData caseData = CaseData.builder()
+            .orderSDODocumentDJ(Document.builder().documentFileName("sdo.pdf").build())
+            .build();
+
+        assertThat(strategy.supports(caseData)).isFalse();
+    }
+
+    @Test
     void supportsReturnsTrueWhenDirectionsOrderDisabled() {
         CaseData caseData = CaseData.builder()
             .takenOfflineDate(LocalDateTime.now())
             .drawDirectionsOrderRequired(YesOrNo.NO)
             .build();
-        assertThat(strategy.supports(caseData)).isTrue();
+        assertThat(strategy.supports(caseData)).isFalse();
     }
 
     @Test
@@ -79,7 +88,7 @@ class CaseProceedsInCasemanStrategyTest {
             .takenOfflineByStaffDate(LocalDateTime.now())
             .drawDirectionsOrderRequired(YesOrNo.NO)
             .build();
-        assertThat(strategy.supports(caseData)).isTrue();
+        assertThat(strategy.supports(caseData)).isFalse();
     }
 
     @Test
@@ -111,9 +120,7 @@ class CaseProceedsInCasemanStrategyTest {
     @Test
     void supportsReturnsTrueWhenStateHistoryIndicatesTakenOfflineAfterSdo() {
         when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.TAKEN_OFFLINE_AFTER_SDO.fullName())));
-        CaseData caseData = CaseData.builder()
-            .takenOfflineDate(LocalDateTime.now())
-            .build();
+        CaseData caseData = CaseData.builder().build();
 
         assertThat(strategy.supports(caseData)).isTrue();
     }

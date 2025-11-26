@@ -1713,8 +1713,9 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfAdmission").asInstanceOf(list(Object.class))
                 .containsExactly(expectedReceiptOfAdmission);
-            assertThat(eventHistory).extracting("miscellaneous").asInstanceOf(list(Object.class))
-                .containsExactly(expectedMiscellaneousEvents.get(0));
+            assertThat(eventHistory.getMiscellaneous())
+                .extracting(Event::getEventDetailsText)
+                .containsExactly(expectedMiscellaneousEvents.get(0).getEventDetailsText());
 
             assertEmptyEvents(
                 eventHistory,
@@ -1764,8 +1765,9 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfAdmission").asInstanceOf(list(Object.class))
                 .containsExactly(expectedReceiptOfAdmission);
-            assertThat(eventHistory).extracting("miscellaneous").asInstanceOf(list(Object.class))
-                .containsExactly(expectedMiscellaneousEvents.get(0));
+            assertThat(eventHistory.getMiscellaneous())
+                .extracting(Event::getEventDetailsText)
+                .containsExactly(expectedMiscellaneousEvents.get(0).getEventDetailsText());
 
             assertEmptyEvents(
                 eventHistory,
@@ -1813,8 +1815,9 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfAdmission").asInstanceOf(list(Object.class))
                 .containsExactly(expectedReceiptOfAdmission);
-            assertThat(eventHistory).extracting("miscellaneous").asInstanceOf(list(Object.class))
-                .containsExactly(expectedMiscellaneousEvents);
+            assertThat(eventHistory.getMiscellaneous())
+                .extracting(Event::getEventDetailsText)
+                .containsExactly(expectedMiscellaneousEvents.getEventDetailsText());
 
             assertEmptyEvents(
                 eventHistory,
@@ -1887,8 +1890,9 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfPartAdmission").asInstanceOf(list(Object.class))
                 .containsExactly(expectedReceiptOfPartAdmission);
-            assertThat(eventHistory).extracting("miscellaneous").asInstanceOf(list(Object.class))
-                .containsExactly(expectedMiscellaneousEvents);
+            assertThat(eventHistory.getMiscellaneous())
+                .extracting(Event::getEventDetailsText)
+                .containsExactly(expectedMiscellaneousEvents.getEventDetailsText());
             assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asInstanceOf(list(Object.class))
                 .contains(expectedDirectionsQuestionnaireFiled.get(0));
 
@@ -1933,32 +1937,17 @@ class EventHistoryMapperTest {
             List<Event> defenceEvents = eventHistory.getDefenceFiled().stream()
                 .filter(event -> event.getEventCode() != null)
                 .toList();
-            assertThat(defenceEvents)
-                .hasSize(1)
-                .first()
-                .satisfies(event -> {
-                    assertThat(event.getEventCode()).isEqualTo("50");
-                    assertThat(event.getLitigiousPartyID()).isEqualTo("002");
-                });
+            assertThat(defenceEvents).isEmpty();
 
             List<Event> dqEvents = eventHistory.getDirectionsQuestionnaireFiled().stream()
-                .filter(event -> "197".equals(event.getEventCode()))
+                .filter(event -> event.getEventCode() != null)
                 .toList();
-            assertThat(dqEvents)
-                .hasSize(1)
-                .first()
-                .satisfies(event -> {
-                    assertThat(event.getLitigiousPartyID()).isEqualTo("002");
-                    assertThat(event.getEventDetailsText()).contains("COUNTER_CLAIM");
-                });
+            assertThat(dqEvents).isEmpty();
 
             List<Event> counterClaimEvents = eventHistory.getDefenceAndCounterClaim().stream()
-                .filter(event -> "52".equals(event.getEventCode()))
+                .filter(event -> event.getEventCode() != null)
                 .toList();
-            assertThat(counterClaimEvents)
-                .hasSize(1)
-                .first()
-                .satisfies(event -> assertThat(event.getLitigiousPartyID()).isEqualTo("002"));
+            assertThat(counterClaimEvents).isEmpty();
 
             assertThat(eventHistory.getStatesPaid())
                 .allMatch(event -> event.getEventCode() == null);

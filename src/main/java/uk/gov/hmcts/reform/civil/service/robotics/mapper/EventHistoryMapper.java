@@ -165,15 +165,6 @@ public class EventHistoryMapper {
             strategy.contribute(builder, caseData, authToken);
             invoked.add(strategyClass);
         }
-
-        // Fallback: run any remaining non-state strategies once
-        eventHistoryStrategies.stream()
-            .filter(strategy -> !invoked.contains(AopUtils.getTargetClass(strategy)))
-            .filter(strategy -> strategy.supports(caseData))
-            .forEach(strategy -> {
-                strategy.contribute(builder, caseData, authToken);
-                invoked.add(targetClass(strategy));
-            });
     }
 
     private static final Map<FlowState.Main, List<Class<? extends EventHistoryStrategy>>> STATE_STRATEGY_MAP =
@@ -232,9 +223,12 @@ public class EventHistoryMapper {
         BreathingSpaceEventStrategy.class,
         InterlocutoryJudgmentStrategy.class,
         DefaultJudgmentEventStrategy.class,
+        ConsentExtensionEventStrategy.class,
         JudgmentByAdmissionStrategy.class,
         SetAsideJudgmentStrategy.class,
         CertificateOfSatisfactionOrCancellationStrategy.class,
+        CaseProceedsInCasemanStrategy.class,
+        DefendantNoCDeadlineStrategy.class,
         CaseQueriesStrategy.class
     );
 

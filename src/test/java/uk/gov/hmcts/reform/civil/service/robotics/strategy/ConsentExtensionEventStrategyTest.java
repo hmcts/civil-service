@@ -5,14 +5,19 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -24,6 +29,10 @@ class ConsentExtensionEventStrategyTest {
 
     @Mock
     private RoboticsSequenceGenerator sequenceGenerator;
+    @Mock
+    private IStateFlowEngine stateFlowEngine;
+    @Mock
+    private StateFlow stateFlow;
 
     @InjectMocks
     private ConsentExtensionEventStrategy strategy;
@@ -32,6 +41,10 @@ class ConsentExtensionEventStrategyTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(5, 6, 7, 8);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
+        when(stateFlow.getStateHistory()).thenReturn(
+            List.of(State.from(FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName()))
+        );
     }
 
     @Test

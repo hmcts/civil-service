@@ -47,8 +47,8 @@ class TakenOfflinePastApplicantResponseStrategyTest {
     }
 
     @Test
-    void supportsReturnsFalseWhenTakenOfflineDateMissing() {
-        assertThat(strategy.supports(CaseData.builder().build())).isFalse();
+    void supportsReturnsTrueWhenTakenOfflineDateMissingButStatePresent() {
+        assertThat(strategy.supports(CaseData.builder().build())).isTrue();
     }
 
     @Test

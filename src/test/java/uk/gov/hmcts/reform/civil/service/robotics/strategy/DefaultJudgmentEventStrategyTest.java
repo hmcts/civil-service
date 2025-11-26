@@ -97,6 +97,7 @@ class DefaultJudgmentEventStrategyTest {
         assertThat(history.getMiscellaneous().get(0).getEventCode()).isEqualTo(MISCELLANEOUS.getCode());
         assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
             .isEqualTo("RPA Reason: Default Judgment granted and claim moved offline.");
+        assertThat(history.getDefaultJudgment().get(0).getEventDetails().getInstallmentAmount()).isEqualByComparingTo("0.00");
     }
 
     @Test
@@ -193,6 +194,7 @@ class DefaultJudgmentEventStrategyTest {
             .repaymentFrequency(RepaymentFrequencyDJ.ONCE_TWO_WEEKS)
             .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal("5500")).build())
             .totalInterest(BigDecimal.valueOf(150))
+            .repaymentSuggestion("1234")
             .build();
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
@@ -279,6 +281,7 @@ class DefaultJudgmentEventStrategyTest {
                 .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
                 .firstRepaymentDate(LocalDate.of(2024, 8, 15))
                 .build())
+            .repaymentSuggestion("4321")
             .repaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_WEEK)
             .build();
 
@@ -288,6 +291,48 @@ class DefaultJudgmentEventStrategyTest {
         EventDetails details = builder.build().getDefaultJudgment().get(0).getEventDetails();
         assertThat(details.getInstallmentAmount()).isEqualByComparingTo("43.21");
         assertThat(details.getInstallmentPeriod()).isEqualTo("WK");
+    }
+
+    @Test
+    void fallsBackToRepaymentSuggestionWhenNoPlanProvided() {
+        LocalDateTime now = LocalDate.of(2024, 10, 1).atTime(9, 0);
+        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+        lenient().when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(1, 2);
+        when(timelineHelper.now()).thenReturn(now);
+        when(partyLookup.respondentId(0)).thenReturn("002");
+
+        CaseData caseData = StrategyTestDataFactory.defaultJudgment1v1Builder()
+            .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+            .repaymentSuggestion("1234")
+            .repaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH)
+            .build();
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventDetails details = builder.build().getDefaultJudgment().get(0).getEventDetails();
+        assertThat(details.getInstallmentAmount()).isEqualByComparingTo("12.34");
+        assertThat(details.getInstallmentPeriod()).isEqualTo("MTH");
+    }
+
+    @Test
+    void usesZeroInstallmentAmountWhenNotRepaymentPlan() {
+        LocalDateTime now = LocalDate.of(2024, 11, 1).atTime(9, 0);
+        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+        lenient().when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(1, 2);
+        when(timelineHelper.now()).thenReturn(now);
+        when(partyLookup.respondentId(0)).thenReturn("002");
+
+        CaseData caseData = StrategyTestDataFactory.defaultJudgment1v1Builder()
+            .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
+            .build();
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventDetails details = builder.build().getDefaultJudgment().get(0).getEventDetails();
+        assertThat(details.getInstallmentAmount()).isEqualByComparingTo("0.00");
     }
 
     @Test

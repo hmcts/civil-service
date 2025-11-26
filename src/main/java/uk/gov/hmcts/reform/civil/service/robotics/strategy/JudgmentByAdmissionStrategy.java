@@ -96,7 +96,7 @@ public class JudgmentByAdmissionStrategy implements EventHistoryStrategy {
             .amountOfCosts(amountOfCosts)
             .amountPaidBeforeJudgment(ccjPaymentDetails
                 .map(CCJPaymentDetails::getCcjPaymentPaidSomeAmountInPounds)
-                .map(amountPaid -> amountPaid.setScale(2, RoundingMode.HALF_UP)).orElse(ZERO))
+                .map(amountPaid -> amountPaid.setScale(2)).orElse(ZERO))
             .isJudgmentForthwith(hasCourtDecisionInFavourOfClaimant(caseData)
                 ? caseData.applicant1SuggestedPayImmediately()
                 : caseData.isPayImmediately())
@@ -117,7 +117,7 @@ public class JudgmentByAdmissionStrategy implements EventHistoryStrategy {
             .orElse(ZERO);
         BigDecimal claimFee = ccjPaymentDetails
             .map(CCJPaymentDetails::getCcjJudgmentAmountClaimFee)
-            .map(amount -> amount.setScale(2, RoundingMode.HALF_UP))
+            .map(amount -> amount.setScale(2))
             .orElse(ZERO);
 
         if (caseData.isApplicantLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
@@ -134,8 +134,14 @@ public class JudgmentByAdmissionStrategy implements EventHistoryStrategy {
             .orElse(ZERO);
         BigDecimal interest = caseData.isLipvLipOneVOne() && !caseData.isPartAdmitClaimSpec()
             ? ccjPaymentDetails.map(CCJPaymentDetails::getCcjJudgmentLipInterest).orElse(ZERO)
+            : totalInterestForLrClaim(caseData);
+        return base.add(interest).setScale(2);
+    }
+
+    private BigDecimal totalInterestForLrClaim(CaseData caseData) {
+        return featureToggleService.isLrAdmissionBulkEnabled()
+            ? ZERO
             : ofNullable(caseData.getTotalInterest()).orElse(ZERO);
-        return base.add(interest).setScale(2, RoundingMode.HALF_UP);
     }
 
     private LocalDateTime resolveJudgmentDate(CaseData caseData) {

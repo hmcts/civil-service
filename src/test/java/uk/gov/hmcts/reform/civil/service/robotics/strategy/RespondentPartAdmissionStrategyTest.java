@@ -205,6 +205,29 @@ class RespondentPartAdmissionStrategyTest {
     }
 
     @Test
+    void contributeUsesRespondent1DateWhenSameSolicitorNoRespondent2Date() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .multiPartyClaimOneDefendantSolicitor()
+            .atStateBothRespondentsSameResponse1v2SameSolicitor(RespondentResponseType.PART_ADMISSION)
+            .respondentResponseIsSame(YES)
+            .respondent2ResponseDate(null)
+            .build();
+
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11, 12);
+
+        EventHistory.EventHistoryBuilder historyBuilder = EventHistory.builder();
+        strategy.contribute(historyBuilder, caseData, null);
+
+        EventHistory history = historyBuilder.build();
+        assertThat(history.getReceiptOfPartAdmission()).hasSize(2);
+        assertThat(history.getReceiptOfPartAdmission())
+            .extracting(Event::getDateReceived)
+            .containsOnly(caseData.getRespondent1ResponseDate());
+        assertThat(history.getMiscellaneous()).hasSize(2);
+        assertThat(history.getDirectionsQuestionnaireFiled()).hasSize(2);
+    }
+
+    @Test
     void contributeAddsStatesPaidWhenSpecRequiresAdmission() {
         CaseDataBuilder builder = CaseDataBuilder.builder().setClaimTypeToSpecClaim();
         builder.respondent1DQ();

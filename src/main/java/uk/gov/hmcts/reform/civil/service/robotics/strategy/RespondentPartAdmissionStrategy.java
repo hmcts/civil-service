@@ -175,9 +175,6 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
                                    Party respondent,
                                    boolean isRespondent1,
                                    LocalDateTime responseDate) {
-        if (useStatesPaid(caseData)) {
-            return;
-        }
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             return;
         }

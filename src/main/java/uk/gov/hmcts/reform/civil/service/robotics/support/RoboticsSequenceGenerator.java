@@ -31,10 +31,6 @@ public class RoboticsSequenceGenerator {
         currentSequence = maxSequence(history.getJudgmentByAdmission(), currentSequence);
         currentSequence = maxSequence(history.getGeneralFormOfApplication(), currentSequence);
         currentSequence = maxSequence(history.getDefenceStruckOut(), currentSequence);
-        currentSequence = maxSequence(history.getDefaultJudgment(), currentSequence);
-        currentSequence = maxSequence(history.getInterlocutoryJudgment(), currentSequence);
-        currentSequence = maxSequence(history.getSetAsideJudgment(), currentSequence);
-        currentSequence = maxSequence(history.getCertificateOfSatisfactionOrCancellation(), currentSequence);
         return currentSequence + 1;
     }
 

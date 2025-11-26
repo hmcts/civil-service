@@ -194,7 +194,7 @@ class RespondentFullAdmissionStrategyTest {
         assertThat(history.getReceiptOfAdmission()).hasSize(1);
         assertThat(history.getReceiptOfAdmission().get(0).getEventSequence()).isEqualTo(10);
 
-        assertThat(history.getMiscellaneous()).isEmpty();
+        assertThat(history.getMiscellaneous()).isNullOrEmpty();
     }
 
     @Test

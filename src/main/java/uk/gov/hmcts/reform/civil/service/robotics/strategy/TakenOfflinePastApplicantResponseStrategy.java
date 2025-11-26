@@ -24,7 +24,6 @@ public class TakenOfflinePastApplicantResponseStrategy implements EventHistorySt
     @Override
     public boolean supports(CaseData caseData) {
         return caseData != null
-            && caseData.getTakenOfflineDate() != null
             && hasPastApplicantResponseState(caseData);
     }
 

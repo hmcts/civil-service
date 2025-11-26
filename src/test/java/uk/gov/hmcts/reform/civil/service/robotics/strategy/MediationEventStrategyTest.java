@@ -16,12 +16,17 @@ import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,6 +42,10 @@ class MediationEventStrategyTest {
     private RoboticsSequenceGenerator sequenceGenerator;
     @Mock
     private RoboticsEventTextFormatter textFormatter;
+    @Mock
+    private IStateFlowEngine stateFlowEngine;
+    @Mock
+    private StateFlow stateFlow;
 
     @InjectMocks
     private MediationEventStrategy strategy;
@@ -45,6 +54,8 @@ class MediationEventStrategyTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         when(textFormatter.inMediation()).thenReturn("IN MEDIATION");
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
+        when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.IN_MEDIATION.fullName())));
     }
 
     @Test

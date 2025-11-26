@@ -11,6 +11,10 @@ import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.time.format.DateTimeFormatter;
@@ -19,6 +23,7 @@ import java.util.List;
 
 import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
@@ -34,13 +39,23 @@ public class ConsentExtensionEventStrategy implements EventHistoryStrategy {
     private static final DateTimeFormatter DISPLAY_DATE = DateTimeFormatter.ofPattern("dd MM yyyy");
 
     private final RoboticsSequenceGenerator sequenceGenerator;
+    private final IStateFlowEngine stateFlowEngine;
 
     @Override
     public boolean supports(CaseData caseData) {
         if (caseData == null) {
             return false;
         }
-        return defendant1ExtensionExists.test(caseData) || defendant2ExtensionExists.test(caseData);
+        boolean hasExtensionData = defendant1ExtensionExists.test(caseData) || defendant2ExtensionExists.test(caseData);
+        if (!hasExtensionData) {
+            return false;
+        }
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return true;
+        }
+
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+        return hasTimeExtensionState(stateFlow);
     }
 
     @Override
@@ -98,5 +113,16 @@ public class ConsentExtensionEventStrategy implements EventHistoryStrategy {
                 format("Defendant: %s has agreed extension: %s", party.getDetails().getPartyName(), extensionDate);
             default -> format("agreed extension date: %s", extensionDate);
         };
+    }
+
+    private boolean hasTimeExtensionState(StateFlow stateFlow) {
+        if (stateFlow == null) {
+            return false;
+        }
+        return stateFlow.getStateHistory().stream()
+            .map(State::getName)
+            .anyMatch(name ->
+                FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName().equals(name)
+                    || FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName().equals(name));
     }
 }

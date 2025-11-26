@@ -89,7 +89,7 @@ public class DefaultJudgmentEventStrategy implements EventHistoryStrategy {
             .filter(value -> !value.isBlank())
             .map(BigDecimal::new)
             .map(MonetaryConversions::penniesToPounds)
-            .orElse(ZERO);
+            .orElse(null);
 
         DJPaymentTypeSelection paymentType = caseData.getPaymentTypeSelection();
         boolean immediate = DJPaymentTypeSelection.IMMEDIATELY.equals(paymentType);
@@ -101,7 +101,9 @@ public class DefaultJudgmentEventStrategy implements EventHistoryStrategy {
             : JudgmentsOnlineHelper.getFixedCostsOfJudgmentForDJ(caseData)
             .add(JudgmentsOnlineHelper.getClaimFeeOfJudgmentForDJ(caseData));
 
-        BigDecimal installmentAmount = getInstallmentAmount(caseData);
+        BigDecimal installmentAmount = DJPaymentTypeSelection.REPAYMENT_PLAN.equals(paymentType)
+            ? getInstallmentAmountFromRepaymentSuggestion(caseData)
+            : ZERO;
 
         boolean jointJudgment = caseData.getRespondent2() != null;
 
@@ -113,7 +115,7 @@ public class DefaultJudgmentEventStrategy implements EventHistoryStrategy {
             .eventDetailsText("")
             .eventDetails(EventDetails.builder()
                 .miscText("")
-                .amountOfJudgment(amountClaimedWithInterest.setScale(2, RoundingMode.HALF_UP))
+                .amountOfJudgment(amountClaimedWithInterest.setScale(2))
                 .amountOfCosts(amountOfCosts)
                 .amountPaidBeforeJudgment(caseData.getPartialPayment() == YES ? partialPaymentPounds : ZERO)
                 .isJudgmentForthwith(immediate)
@@ -165,19 +167,26 @@ public class DefaultJudgmentEventStrategy implements EventHistoryStrategy {
             : caseData.isPayByInstallment();
 
         if (!payByInstallment) {
-            return ZERO;
+            return null;
         }
 
         Optional<RepaymentPlanLRspec> plan = ofNullable(caseData.getRespondent1RepaymentPlan());
         BigDecimal amount = hasCourtDecisionInFavourOfClaimant(caseData)
             ? caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec()
-            : plan.map(RepaymentPlanLRspec::getPaymentAmount).orElse(ZERO);
+            : plan.map(RepaymentPlanLRspec::getPaymentAmount).orElse(null);
 
         return MonetaryConversions.penniesToPounds(
             Optional.ofNullable(amount)
-                .map(value -> value.setScale(2, RoundingMode.HALF_UP))
-                .orElse(ZERO)
-        );
+                .map(value -> value.setScale(2))
+                .orElse(ZERO));
+    }
+
+    private BigDecimal getInstallmentAmountFromRepaymentSuggestion(CaseData caseData) {
+        String suggestion = caseData.getRepaymentSuggestion();
+        if (suggestion == null || suggestion.isBlank()) {
+            return null;
+        }
+        return MonetaryConversions.penniesToPounds(new BigDecimal(suggestion)).setScale(2);
     }
 
     private String getInstallmentPeriod(CaseData data) {

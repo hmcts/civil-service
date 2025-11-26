@@ -5,25 +5,19 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsRespondentResponseSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
 import uk.gov.hmcts.reform.civil.service.robotics.support.StrategyTestDataFactory;
-import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
-import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -45,12 +39,6 @@ class RespondentFullDefenceStrategyTest {
     @Mock
     private RoboticsSequenceGenerator sequenceGenerator;
 
-    @Mock
-    private IStateFlowEngine stateFlowEngine;
-
-    @Mock
-    private StateFlow stateFlow;
-
     private RoboticsRespondentResponseSupport respondentResponseSupport;
     private RespondentFullDefenceStrategy strategy;
 
@@ -60,23 +48,7 @@ class RespondentFullDefenceStrategyTest {
         RoboticsEventTextFormatter formatter = new RoboticsEventTextFormatter();
         RoboticsTimelineHelper timelineHelper = new RoboticsTimelineHelper(() -> NOW);
         respondentResponseSupport = new RoboticsRespondentResponseSupport(formatter, timelineHelper);
-        strategy = new RespondentFullDefenceStrategy(sequenceGenerator, respondentResponseSupport, stateFlowEngine);
-
-        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
-        when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.FULL_DEFENCE.fullName())));
-    }
-
-    @Test
-    void supportsReturnsTrueWhenStateMissing() {
-        when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.CLAIM_ISSUED.fullName())));
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateRespondentFullDefence()
-            .build()
-            .toBuilder()
-            .ccdState(CaseState.CASE_ISSUED)
-            .build();
-
-        assertThat(strategy.supports(caseData)).isTrue();
+        strategy = new RespondentFullDefenceStrategy(sequenceGenerator, respondentResponseSupport);
     }
 
     @Test
@@ -146,22 +118,10 @@ class RespondentFullDefenceStrategyTest {
         strategy.contribute(builder, caseData, null);
 
         EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous())
-            .extracting(Event::getEventDetailsText)
-            .contains(respondentResponseSupport.prepareRespondentResponseText(
-                caseData,
-                caseData.getRespondent1(),
-                true
-            ));
-        assertThat(history.getDefenceFiled())
-            .extracting(Event::getEventCode)
-            .containsExactly(DEFENCE_FILED.getCode());
-        assertThat(history.getDirectionsQuestionnaireFiled())
-            .extracting(Event::getEventCode)
-            .containsExactly(DIRECTIONS_QUESTIONNAIRE_FILED.getCode());
-        assertThat(history.getDefenceAndCounterClaim())
-            .extracting(Event::getEventCode)
-            .containsExactly(DEFENCE_AND_COUNTER_CLAIM.getCode());
+        assertThat(history.getMiscellaneous()).isNullOrEmpty();
+        assertThat(history.getDefenceFiled()).isNullOrEmpty();
+        assertThat(history.getDirectionsQuestionnaireFiled()).isNullOrEmpty();
+        assertThat(history.getDefenceAndCounterClaim()).isNullOrEmpty();
     }
 
     @Test
@@ -371,11 +331,7 @@ class RespondentFullDefenceStrategyTest {
     }
 
     @Test
-    void contributeSkipsSameSolicitorDivergentResponsesForSpec() {
-        when(stateFlow.getStateHistory()).thenReturn(List.of(
-            State.from(FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName())
-        ));
-
+    void contributeHandlesSameSolicitorDivergentResponsesForSpec() {
         CaseData caseData = CaseDataBuilder.builder()
             .setClaimTypeToSpecClaim()
             .multiPartyClaimOneDefendantSolicitor()
@@ -384,7 +340,7 @@ class RespondentFullDefenceStrategyTest {
             .respondent2DQ()
             .build();
 
-        assertThat(strategy.supports(caseData)).isFalse();
+        assertThat(strategy.supports(caseData)).isTrue();
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11, 12, 13);
 
@@ -392,10 +348,29 @@ class RespondentFullDefenceStrategyTest {
         strategy.contribute(builder, caseData, null);
 
         EventHistory history = builder.build();
-        assertThat(history.getDefenceFiled()).isNullOrEmpty();
+        assertThat(history.getDefenceFiled()).hasSize(1);
+        assertThat(history.getDirectionsQuestionnaireFiled()).hasSize(1);
+    }
 
-        when(stateFlow.getStateHistory()).thenReturn(List.of(
-            State.from(FlowState.Main.FULL_DEFENCE.fullName())
-        ));
+    @Test
+    void contributeDoesNotAddRespondent2EventsWhenNoResponseDateWithSameSolicitorDifferentResponse() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .setClaimTypeToSpecClaim()
+            .multiPartyClaimOneDefendantSolicitor()
+            .atState1v2SameSolicitorDivergentResponse(FULL_DEFENCE, FULL_ADMISSION)
+            .respondentResponseIsSame(NO)
+            .respondent2ResponseDate(null)
+            .build();
+
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11, 12, 13);
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventHistory history = builder.build();
+        assertThat(history.getDefenceFiled()).hasSize(1);
+        assertThat(history.getDirectionsQuestionnaireFiled()).hasSize(1);
+        assertThat(history.getDefenceFiled().get(0).getLitigiousPartyID())
+            .isEqualTo("002");
     }
 }
