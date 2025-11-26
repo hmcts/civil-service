@@ -110,15 +110,13 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_WhenAboutToStartIsInvoked() {
-            BreathingSpaceLiftInfo breathingSpaceLiftInfo = BreathingSpaceLiftInfo.builder()
-                .expectedEnd(LocalDate.now().minusDays(5))
-                .build();
-            BreathingSpaceInfo breathingSpaceInfo = BreathingSpaceInfo.builder()
-                .lift(breathingSpaceLiftInfo)
-                .build();
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .breathing(breathingSpaceInfo)
-                .build();
+            BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
+            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now().minusDays(5));
+            BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
+            breathingSpaceInfo.setLift(breathingSpaceLiftInfo);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setBreathing(breathingSpaceInfo);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -127,15 +125,13 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotReturnError_WhenAboutToStartIsInvokedOneDefendant() {
-            BreathingSpaceLiftInfo breathingSpaceLiftInfo = BreathingSpaceLiftInfo.builder()
-                .expectedEnd(LocalDate.now().minusDays(5))
-                .build();
-            BreathingSpaceInfo breathingSpaceInfo = BreathingSpaceInfo.builder()
-                .lift(breathingSpaceLiftInfo)
-                .build();
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .breathing(breathingSpaceInfo)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15)).build();
+            BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
+            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now().minusDays(5));
+            BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
+            breathingSpaceInfo.setLift(breathingSpaceLiftInfo);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setBreathing(breathingSpaceInfo);
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -144,53 +140,48 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnDefendantDetails_WhenAboutToStartIsInvokedOneDefendant() {
-            BreathingSpaceLiftInfo breathingSpaceLiftInfo = BreathingSpaceLiftInfo.builder()
-                .expectedEnd(LocalDate.now().minusDays(5))
-                .build();
-            BreathingSpaceInfo breathingSpaceInfo = BreathingSpaceInfo.builder()
-                .lift(breathingSpaceLiftInfo)
-                .build();
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .breathing(breathingSpaceInfo)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15)).build();
+            BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
+            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now().minusDays(5));
+            BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
+            breathingSpaceInfo.setLift(breathingSpaceLiftInfo);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setBreathing(breathingSpaceInfo);
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
-            assertThat(response.getData().get("defendantDetailsSpec")).isNotNull();
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getDefendantDetailsSpec()).isNotNull();
         }
 
         @Test
         void shouldReturnDefendantDetails_WhenAboutToStartIsInvokedTwoDefendant() {
-            BreathingSpaceLiftInfo breathingSpaceLiftInfo = BreathingSpaceLiftInfo.builder()
-                .expectedEnd(LocalDate.now().minusDays(5))
-                .build();
-            BreathingSpaceInfo breathingSpaceInfo = BreathingSpaceInfo.builder()
-                .lift(breathingSpaceLiftInfo)
-                .build();
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .breathing(breathingSpaceInfo)
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15)).build();
+            BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
+            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now().minusDays(5));
+            BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
+            breathingSpaceInfo.setLift(breathingSpaceLiftInfo);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setBreathing(breathingSpaceInfo);
+            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setAddRespondent2(YES);
+            caseData.setRespondent2SameLegalRepresentative(YES);
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
-            assertThat(response.getData().get("defendantDetailsSpec")).isNotNull();
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getDefendantDetailsSpec()).isNotNull();
         }
 
         @Test
         void shouldReturnError_WhenAboutToStartAndInBreathingSpace() {
-            BreathingSpaceEnterInfo breathingSpaceEnterInfo = BreathingSpaceEnterInfo.builder()
-                .start(LocalDate.now().minusDays(10))
-                .build();
-            BreathingSpaceInfo breathingSpaceInfo = BreathingSpaceInfo.builder()
-                .enter(breathingSpaceEnterInfo)
-                .build();
+            BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
+            breathingSpaceEnterInfo.setStart(LocalDate.now().minusDays(10));
+            BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
+            breathingSpaceInfo.setEnter(breathingSpaceEnterInfo);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .breathing(breathingSpaceInfo)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setBreathing(breathingSpaceInfo);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             var response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -201,11 +192,13 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_WhenAboutToStartInvokeWhenRespondentResponseLanguageIsBilingual() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .breathing(BreathingSpaceInfo.builder().lift(null).build())
-                .caseDataLiP(
-                    CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
-                .build();
+            RespondentLiPResponse respondentLiPResponse  = new RespondentLiPResponse();
+            respondentLiPResponse.setRespondent1ResponseLanguage("BOTH");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setBreathing(BreathingSpaceInfo.builder().lift(null).build());
+            caseData.setCaseDataLiP(caseDataLiP);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -237,138 +230,124 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnBoth_whenHaveTwoDefendants() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Both")
-                        .build())
-                    .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setAddRespondent2(YES);
+            caseData.setRespondent2SameLegalRepresentative(YES);
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            DynamicList dynamicList = new DynamicList();
+            dynamicList.setValue(new DynamicListElement(null, "Both"));
+            caseData.setDefendantDetailsSpec(dynamicList);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData().get("bothDefendantsSpec")).isEqualTo("Both");
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getBothDefendantsSpec()).isEqualTo("Both");
         }
 
         @Test
         void shouldReturnOne_whenHaveOneDefendants() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Test User")
-                        .build())
-                    .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setAddRespondent2(YES);
+            caseData.setRespondent2SameLegalRepresentative(YES);
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            DynamicListElement dynamicListElement = new DynamicListElement(null, "Test User");
+            DynamicList dynamicList = new DynamicList();
+            dynamicList.setValue(dynamicListElement);
+            caseData.setDefendantDetailsSpec(dynamicList);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData().get("bothDefendantsSpec")).isEqualTo("One");
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getBothDefendantsSpec()).isEqualTo("One");
         }
 
         @Test
         void shouldReturnOneDefendantText_whenOneDefendant() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Test User")
-                        .build())
-                    .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            DynamicListElement dynamicListElement = new DynamicListElement(null, "Test User");
+            DynamicList dynamicList = new DynamicList();
+            dynamicList.setValue(dynamicListElement);
+            caseData.setDefendantDetailsSpec(dynamicList);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData().get("currentDefendant"))
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getCurrentDefendant())
                 .isEqualTo("Has Test User paid some of the amount owed?");
         }
 
         @Test
         void shouldReturnBothDefendantText_whenTwoDefendant() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Test User")
-                        .label("Test User2")
-                        .label("Both Defendants")
-                        .build())
-                    .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setAddRespondent2(YES);
+            caseData.setRespondent2SameLegalRepresentative(YES);
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            DynamicListElement dynamicListElement = new DynamicListElement(null, "Both Defendants");
+            DynamicList dynamicList = new DynamicList();
+            dynamicList.setValue(dynamicListElement);
+            caseData.setDefendantDetailsSpec(dynamicList);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData().get("currentDefendant"))
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getCurrentDefendant())
                 .isEqualTo("Have the defendants paid some of the amount owed?");
         }
 
         @Test
         void shouldReturnBothDefendant_whenTwoDefendantSelected() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Test User")
-                        .label("Test User2")
-                        .label("Both Defendants")
-                        .build())
-                    .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setAddRespondent2(YES);
+            caseData.setRespondent2SameLegalRepresentative(YES);
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            DynamicListElement element = new DynamicListElement(null, "Both Defendants");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData().get("currentDefendantName"))
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getCurrentDefendantName())
                 .isEqualTo("both defendants");
         }
 
         @Test
         void shouldReturnDefendantName_whenOneDefendantSelected() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Steve Rodgers")
-                        .build())
-                    .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setAddRespondent2(YES);
+            caseData.setRespondent2SameLegalRepresentative(YES);
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            DynamicListElement element = new DynamicListElement(null, "Steve Rodgers");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData().get("currentDefendantName"))
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getCurrentDefendantName())
                 .isEqualTo("Steve Rodgers");
-            //
-            assertThat(response.getData().get("registrationTypeRespondentOne")).isNull();
-            assertThat(response.getData().get("registrationTypeRespondentTwo")).isNull();
+            assertThat(updatedData.getRegistrationTypeRespondentOne()).isNull();
+            assertThat(updatedData.getRegistrationTypeRespondentTwo()).isNull();
         }
 
         @Test
         void shouldReturnRegistrationInfo_whenOneVOne() {
             when(time.now()).thenReturn(LocalDateTime.of(2023, 2, 20, 11, 11, 11));
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .addRespondent2(NO)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Steve Rodgers")
-                        .build())
-                    .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setAddRespondent2(NO);
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            DynamicListElement element = new DynamicListElement(null, "Steve Rodgers");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -384,17 +363,15 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnRegistrationInfo_whenTwoVOne() {
             when(time.now()).thenReturn(LocalDateTime.of(2023, 2, 20, 11, 11, 11));
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .addRespondent2(NO)
-                .addApplicant2(YesOrNo.YES)
-                .applicant2(PartyBuilder.builder().individual().build())
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Steve Rodgers")
-                        .build())
-                    .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setAddRespondent2(NO);
+            caseData.setAddApplicant2(YesOrNo.YES);
+            caseData.setApplicant2(PartyBuilder.builder().individual().build());
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            DynamicListElement element = new DynamicListElement(null, "Steve Rodgers");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -410,17 +387,15 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotReturnRegistrationInfo_whenOneVTwoAndOneDefendantSelected() {
             when(time.now()).thenReturn(LocalDateTime.of(2023, 2, 20, 11, 11, 11));
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Steve Rodgers")
-                        .build())
-                    .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setAddRespondent2(YES);
+            caseData.setRespondent2SameLegalRepresentative(YES);
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            DynamicListElement element = new DynamicListElement(null, "Steve Rodgers");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -431,19 +406,15 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnRegistrationInfo_whenOneVTwoAndBothDefendantSelected() {
             when(time.now()).thenReturn(LocalDateTime.of(2023, 2, 20, 11, 11, 11));
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Test User")
-                        .label("Test User2")
-                        .label("Both Defendants")
-                        .build())
-                    .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setAddRespondent2(YES);
+            caseData.setRespondent2SameLegalRepresentative(YES);
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            DynamicListElement element = new DynamicListElement(null, "Both Defendants");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -469,11 +440,9 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnError_whenPartiallyPaid() {
             BigDecimal interestAmount = new BigDecimal(100);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-                .build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YesOrNo.YES)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPayment(YesOrNo.YES);
 
             when(interestCalculator.calculateInterest(caseData)).thenReturn(interestAmount);
 
@@ -484,18 +453,17 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldShowOldFixedCostsPage_whenNoErrorsAndPreClaimIssueFixedCosts() {
-            BigDecimal claimAmount = new BigDecimal(2000);
-            BigDecimal interestAmount = new BigDecimal(100);
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(100));
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(NO)
-                .totalClaimAmount(claimAmount)
-                .totalInterest(interestAmount)
-                .partialPaymentAmount("3000")
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPayment(NO);
+            BigDecimal claimAmount = new BigDecimal(2000);
+            BigDecimal interestAmount = new BigDecimal(100);
+            caseData.setTotalClaimAmount(claimAmount);
+            caseData.setTotalInterest(interestAmount);
+            caseData.setPartialPaymentAmount("3000");
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -505,24 +473,23 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldShowNewFixedCostsPage_whenNoErrorsAndJudgmentAmountMoreThan25AndYesClaimIssueFixedCosts() {
-            BigDecimal claimAmount = new BigDecimal(2000);
-            BigDecimal interestAmount = new BigDecimal(100);
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(1));
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(NO)
-                .totalClaimAmount(claimAmount)
-                .totalInterest(interestAmount)
-                .claimFee(Fee.builder()
-                    .calculatedAmountInPence(BigDecimal.valueOf(1))
-                    .build())
-                .fixedCosts(FixedCosts.builder()
-                    .claimFixedCosts(YES)
-                    .fixedCostAmount("10000")
-                    .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPayment(NO);
+            BigDecimal claimAmount = new BigDecimal(2000);
+            BigDecimal interestAmount = new BigDecimal(100);
+            caseData.setTotalClaimAmount(claimAmount);
+            caseData.setTotalInterest(interestAmount);
+            Fee fee = new Fee();
+            fee.setCalculatedAmountInPence(BigDecimal.valueOf(1));
+            caseData.setClaimFee(fee);
+            FixedCosts fixedCosts  = new FixedCosts();
+            fixedCosts.setClaimFixedCosts(YES);
+            fixedCosts.setFixedCostAmount("10000");
+            caseData.setFixedCosts(fixedCosts);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -534,29 +501,27 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotShowNewFixedCostsPage_whenJudgmentAmountLessThan25AndYesClaimIssueFixedCostsAndShouldNotCalculateRepaymentBreakdown() {
-            BigDecimal claimAmount = new BigDecimal(20);
-            BigDecimal interestAmount = new BigDecimal(1);
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(1));
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(NO)
-                .totalClaimAmount(claimAmount)
-                .totalInterest(interestAmount)
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Test User")
-                        .build())
-                    .build())
-                .claimFee(Fee.builder()
-                    .calculatedAmountInPence(BigDecimal.valueOf(1))
-                    .build())
-                .fixedCosts(FixedCosts.builder()
-                    .claimFixedCosts(YES)
-                    .fixedCostAmount("10")
-                    .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPayment(NO);
+            BigDecimal claimAmount = new BigDecimal(20);
+            BigDecimal interestAmount = new BigDecimal(1);
+            caseData.setTotalClaimAmount(claimAmount);
+            caseData.setTotalInterest(interestAmount);
+            DynamicListElement element = new DynamicListElement(null, "Test User");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
+            Fee fee = new Fee();
+            fee.setCalculatedAmountInPence(BigDecimal.valueOf(1));
+            caseData.setClaimFee(fee);
+            FixedCosts fixedCosts  = new FixedCosts();
+            fixedCosts.setClaimFixedCosts(YES);
+            fixedCosts.setFixedCostAmount("10");
+            caseData.setFixedCosts(fixedCosts);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -568,29 +533,27 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldShowNewFixedCostsPage_whenJudgmentAmountWithInterestMoreThan25() {
-            BigDecimal claimAmount = new BigDecimal(2000);
-            BigDecimal interestAmount = new BigDecimal(100);
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(1));
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(NO)
-                .totalClaimAmount(claimAmount)
-                .totalInterest(interestAmount)
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Test User")
-                        .build())
-                    .build())
-                .claimFee(Fee.builder()
-                    .calculatedAmountInPence(BigDecimal.valueOf(10000))
-                    .build())
-                .fixedCosts(FixedCosts.builder()
-                    .claimFixedCosts(YES)
-                    .fixedCostAmount("100")
-                    .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPayment(NO);
+            BigDecimal claimAmount = new BigDecimal(2000);
+            BigDecimal interestAmount = new BigDecimal(100);
+            caseData.setTotalClaimAmount(claimAmount);
+            caseData.setTotalInterest(interestAmount);
+            DynamicListElement element = new DynamicListElement(null, "Test User");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
+            Fee fee = new Fee();
+            fee.setCalculatedAmountInPence(BigDecimal.valueOf(10000));
+            caseData.setClaimFee(fee);
+            FixedCosts fixedCosts  = new FixedCosts();
+            fixedCosts.setClaimFixedCosts(YES);
+            fixedCosts.setFixedCostAmount("100");
+            caseData.setFixedCosts(fixedCosts);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -602,28 +565,26 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotShowNewFixedCostsPage_whenNoErrorsAndNoClaimIssueFixedCosts() {
-            BigDecimal claimAmount = new BigDecimal(2000);
-            BigDecimal interestAmount = new BigDecimal(100);
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(1));
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(NO)
-                .totalClaimAmount(claimAmount)
-                .totalInterest(interestAmount)
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Test User")
-                        .build())
-                    .build())
-                .claimFee(Fee.builder()
-                    .calculatedAmountInPence(BigDecimal.valueOf(1))
-                    .build())
-                .fixedCosts(FixedCosts.builder()
-                    .claimFixedCosts(NO)
-                    .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPayment(NO);
+            BigDecimal claimAmount = new BigDecimal(2000);
+            BigDecimal interestAmount = new BigDecimal(100);
+            caseData.setTotalClaimAmount(claimAmount);
+            caseData.setTotalInterest(interestAmount);
+            DynamicListElement element = new DynamicListElement(null, "Test User");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
+            Fee fee = new Fee();
+            fee.setCalculatedAmountInPence(BigDecimal.valueOf(1));
+            caseData.setClaimFee(fee);
+            FixedCosts fixedCosts  = new FixedCosts();
+            fixedCosts.setClaimFixedCosts(NO);
+            caseData.setFixedCosts(fixedCosts);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -645,11 +606,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             String due = "1000"; //in pounds
             String suggest = "99999"; // 999 pound in pennies
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .repaymentDue(due)
-                .repaymentSuggestion(suggest)
-                .repaymentDate(testDate)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRepaymentDue(due);
+            caseData.setRepaymentSuggestion(suggest);
+            caseData.setRepaymentDate(testDate);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isEmpty();
@@ -661,11 +621,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             String due = "1000"; //in pounds
             String suggest = "110000"; // 1100 pound in pennies
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .repaymentDue(due)
-                .repaymentSuggestion(suggest)
-                .repaymentDate(testDate)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRepaymentDue(due);
+            caseData.setRepaymentSuggestion(suggest);
+            caseData.setRepaymentDate(testDate);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -679,11 +638,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             String due = "1000"; //in pounds
             String suggest = "10000"; // 100 pound in pennies
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .repaymentDue(due)
-                .repaymentSuggestion(suggest)
-                .repaymentDate(testDate)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRepaymentDue(due);
+            caseData.setRepaymentSuggestion(suggest);
+            caseData.setRepaymentDate(testDate);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isEmpty();
@@ -691,20 +649,19 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenDateInPastAndNotEligible() {
-            //eligible date is 31 days in the future, but as text says "after", we set text to one day previous i.e.
-            //If 7th is the eligible date, text will say "after the 6th".
-            LocalDate eligibleDate = LocalDate.now().plusDays(30);
-            var testDate = LocalDate.now().plusDays(25);
             String due = "1000"; //in pounds
             String suggest = "10000"; // 100 pound in pennies
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .repaymentDue(due)
-                .repaymentSuggestion(suggest)
-                .repaymentDate(testDate)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRepaymentDue(due);
+            caseData.setRepaymentSuggestion(suggest);
+            var testDate = LocalDate.now().plusDays(25);
+            caseData.setRepaymentDate(testDate);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //eligible date is 31 days in the future, but as text says "after", we set text to one day previous i.e.
+            //If 7th is the eligible date, text will say "after the 6th".
+            LocalDate eligibleDate = LocalDate.now().plusDays(30);
             assertThat(response.getErrors().get(0))
                 .isEqualTo("Selected date must be after " + formatLocalDate(
                     eligibleDate,
@@ -722,11 +679,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_whenPastPaymentDate() {
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YesOrNo.YES)
-                .paymentSetDate(LocalDate.now().minusDays(15))
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPayment(YesOrNo.YES);
+            caseData.setPaymentSetDate(LocalDate.now().minusDays(15));
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors().get(0)).isEqualTo("Payment Date cannot be past date");
@@ -735,11 +691,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotReturnError_whenPastPaymentDate() {
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YesOrNo.YES)
-                .paymentSetDate(LocalDate.now().plusDays(15))
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPayment(YesOrNo.YES);
+            caseData.setPaymentSetDate(LocalDate.now().plusDays(15));
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isEmpty();
@@ -757,23 +712,21 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .thenReturn(BigDecimal.valueOf(0)
                 );
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YES)
-                .paymentSetDate(LocalDate.now().minusDays(15))
-                .partialPaymentAmount("100")
-                .totalClaimAmount(BigDecimal.valueOf(5002))
-                .fixedCosts(FixedCosts.builder()
-                    .claimFixedCosts(YES)
-                    .fixedCostAmount("10000")
-                    .build())
-                .claimFixedCostsOnEntryDJ(YES)
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Test User")
-                        .build())
-                    .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPayment(YES);
+            caseData.setPaymentSetDate(LocalDate.now().minusDays(15));
+            caseData.setPartialPaymentAmount("100");
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(5002));
+            FixedCosts fixedCosts = new FixedCosts();
+            fixedCosts.setClaimFixedCosts(YES);
+            fixedCosts.setFixedCostAmount("10000");
+            caseData.setFixedCosts(fixedCosts);
+            caseData.setClaimFixedCostsOnEntryDJ(YES);
+            DynamicListElement element = new DynamicListElement(null, "Test User");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             String test = "The judgment will order " + caseData.getDefendantDetailsSpec().getValue().getLabel()
@@ -801,23 +754,21 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .thenReturn(BigDecimal.valueOf(0)
                 );
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YES)
-                .paymentSetDate(LocalDate.now().minusDays(15))
-                .partialPaymentAmount("100")
-                .totalClaimAmount(BigDecimal.valueOf(5001))
-                .fixedCosts(FixedCosts.builder()
-                    .claimFixedCosts(YES)
-                    .fixedCostAmount("10000")
-                    .build())
-                .claimFixedCostsOnEntryDJ(NO)
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Test User")
-                        .build())
-                    .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPayment(YES);
+            caseData.setPaymentSetDate(LocalDate.now().minusDays(15));
+            caseData.setPartialPaymentAmount("100");
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(5001));
+            FixedCosts fixedCosts = new FixedCosts();
+            fixedCosts.setClaimFixedCosts(YES);
+            fixedCosts.setFixedCostAmount("10000");
+            caseData.setFixedCosts(fixedCosts);
+            caseData.setClaimFixedCostsOnEntryDJ(NO);
+            DynamicListElement element = new DynamicListElement(null, "Test User");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             String test = "The judgment will order " + caseData.getDefendantDetailsSpec().getValue().getLabel()
@@ -845,23 +796,21 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .thenReturn(BigDecimal.valueOf(0)
                 );
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YES)
-                .paymentSetDate(LocalDate.now().minusDays(15))
-                .partialPaymentAmount("100")
-                .totalClaimAmount(BigDecimal.valueOf(3001))
-                .fixedCosts(FixedCosts.builder()
-                    .claimFixedCosts(YES)
-                    .fixedCostAmount("10000")
-                    .build())
-                .claimFixedCostsOnEntryDJ(YES)
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Test User")
-                        .build())
-                    .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPayment(YES);
+            caseData.setPaymentSetDate(LocalDate.now().minusDays(15));
+            caseData.setPartialPaymentAmount("100");
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(3001));
+            FixedCosts fixedCosts = new FixedCosts();
+            fixedCosts.setClaimFixedCosts(YES);
+            fixedCosts.setFixedCostAmount("10000");
+            caseData.setFixedCosts(fixedCosts);
+            caseData.setClaimFixedCostsOnEntryDJ(YES);
+            DynamicListElement element = new DynamicListElement(null, "Test User");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             String test = "The judgment will order " + caseData.getDefendantDetailsSpec().getValue().getLabel()
@@ -889,23 +838,21 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .thenReturn(BigDecimal.valueOf(0)
                 );
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YES)
-                .paymentSetDate(LocalDate.now().minusDays(15))
-                .partialPaymentAmount("100")
-                .totalClaimAmount(BigDecimal.valueOf(3001))
-                .fixedCosts(FixedCosts.builder()
-                    .claimFixedCosts(YES)
-                    .fixedCostAmount("10000")
-                    .build())
-                .claimFixedCostsOnEntryDJ(NO)
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Test User")
-                        .build())
-                    .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPayment(YES);
+            caseData.setPaymentSetDate(LocalDate.now().minusDays(15));
+            caseData.setPartialPaymentAmount("100");
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(3001));
+            FixedCosts fixedCosts = new FixedCosts();
+            fixedCosts.setClaimFixedCosts(YES);
+            fixedCosts.setFixedCostAmount("10000");
+            caseData.setFixedCosts(fixedCosts);
+            caseData.setClaimFixedCostsOnEntryDJ(NO);
+            DynamicListElement element = new DynamicListElement(null, "Test User");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             String test = "The judgment will order " + caseData.getDefendantDetailsSpec().getValue().getLabel()
@@ -933,22 +880,20 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .thenReturn(BigDecimal.valueOf(0)
                 );
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YES)
-                .paymentSetDate(LocalDate.now().minusDays(15))
-                .partialPaymentAmount("299500")
-                .totalClaimAmount(BigDecimal.valueOf(3000))
-                .fixedCosts(FixedCosts.builder()
-                    .claimFixedCosts(YES)
-                    .fixedCostAmount("10000")
-                    .build())
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Test User")
-                        .build())
-                    .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPayment(YES);
+            caseData.setPaymentSetDate(LocalDate.now().minusDays(15));
+            caseData.setPartialPaymentAmount("299500");
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(3000));
+            FixedCosts fixedCosts = new FixedCosts();
+            fixedCosts.setClaimFixedCosts(YES);
+            fixedCosts.setFixedCostAmount("10000");
+            caseData.setFixedCosts(fixedCosts);
+            DynamicListElement element = new DynamicListElement(null, "Test User");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             String test = "The judgment will order " + caseData.getDefendantDetailsSpec().getValue().getLabel()
@@ -976,21 +921,19 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .thenReturn(BigDecimal.valueOf(0)
                 );
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YES)
-                .paymentSetDate(LocalDate.now().minusDays(15))
-                .partialPaymentAmount("299500")
-                .totalClaimAmount(BigDecimal.valueOf(3000))
-                .fixedCosts(FixedCosts.builder()
-                    .claimFixedCosts(NO)
-                    .build())
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Test User")
-                        .build())
-                    .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPayment(YES);
+            caseData.setPaymentSetDate(LocalDate.now().minusDays(15));
+            caseData.setPartialPaymentAmount("299500");
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(3000));
+            FixedCosts fixedCosts = new FixedCosts();
+            fixedCosts.setClaimFixedCosts(NO);
+            caseData.setFixedCosts(fixedCosts);
+            DynamicListElement element = new DynamicListElement(null, "Test User");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             String test = "The judgment will order " + caseData.getDefendantDetailsSpec().getValue().getLabel()
@@ -1015,26 +958,23 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(100)
                 );
-            Fee fee = Fee.builder()
-                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                .version("1")
-                .code("CODE")
-                .build();
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YesOrNo.YES)
-                .claimFee(fee)
-                .paymentSetDate(LocalDate.now().minusDays(15))
-                .partialPaymentAmount("100")
-                .totalClaimAmount(BigDecimal.valueOf(1010))
-                .paymentConfirmationDecisionSpec(YesOrNo.YES)
-                .partialPayment(YesOrNo.YES)
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Test User")
-                        .build())
-                    .build())
-                .build();
+            Fee fee = new Fee();
+            fee.setCalculatedAmountInPence(BigDecimal.valueOf(100));
+            fee.setVersion("1");
+            fee.setCode("CODE");
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPayment(YesOrNo.YES);
+            caseData.setClaimFee(fee);
+            caseData.setPaymentSetDate(LocalDate.now().minusDays(15));
+            caseData.setPartialPaymentAmount("100");
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(1010));
+            caseData.setPaymentConfirmationDecisionSpec(YesOrNo.YES);
+            caseData.setPartialPayment(YesOrNo.YES);
+            DynamicListElement element = new DynamicListElement(null, "Test User");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             String test = "The judgment will order " + caseData.getDefendantDetailsSpec().getValue().getLabel()
@@ -1065,26 +1005,23 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(100)
                 );
-            Fee fee = Fee.builder()
-                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                .version("1")
-                .code("CODE")
-                .build();
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YesOrNo.YES)
-                .claimFee(fee)
-                .paymentSetDate(LocalDate.now().minusDays(15))
-                .partialPaymentAmount("100")
-                .totalClaimAmount(BigDecimal.valueOf(499))
-                .paymentConfirmationDecisionSpec(YesOrNo.YES)
-                .partialPayment(YesOrNo.YES)
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Test User")
-                        .build())
-                    .build())
-                .build();
+            Fee fee = new Fee();
+            fee.setCalculatedAmountInPence(BigDecimal.valueOf(100));
+            fee.setVersion("1");
+            fee.setCode("CODE");
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPayment(YesOrNo.YES);
+            caseData.setClaimFee(fee);
+            caseData.setPaymentSetDate(LocalDate.now().minusDays(15));
+            caseData.setPartialPaymentAmount("100");
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(499));
+            caseData.setPaymentConfirmationDecisionSpec(YesOrNo.YES);
+            caseData.setPartialPayment(YesOrNo.YES);
+            DynamicListElement element = new DynamicListElement(null, "Test User");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             String test = "The judgment will order " + caseData.getDefendantDetailsSpec().getValue().getLabel()
@@ -1113,26 +1050,23 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(100)
                 );
-            Fee fee = Fee.builder()
-                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                .version("1")
-                .code("CODE")
-                .build();
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YesOrNo.YES)
-                .claimFee(fee)
-                .paymentSetDate(LocalDate.now().minusDays(15))
-                .partialPaymentAmount("100")
-                .totalClaimAmount(BigDecimal.valueOf(999))
-                .paymentConfirmationDecisionSpec(YesOrNo.YES)
-                .partialPayment(YesOrNo.YES)
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Test User")
-                        .build())
-                    .build())
-                .build();
+            Fee fee = new Fee();
+            fee.setCalculatedAmountInPence(BigDecimal.valueOf(100));
+            fee.setVersion("1");
+            fee.setCode("CODE");
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPayment(YesOrNo.YES);
+            caseData.setClaimFee(fee);
+            caseData.setPaymentSetDate(LocalDate.now().minusDays(15));
+            caseData.setPartialPaymentAmount("100");
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(999));
+            caseData.setPaymentConfirmationDecisionSpec(YesOrNo.YES);
+            caseData.setPartialPayment(YesOrNo.YES);
+            DynamicListElement element = new DynamicListElement(null, "Test User");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             String test = "The judgment will order " + caseData.getDefendantDetailsSpec().getValue().getLabel()
                 + " to pay £1191.00, including the claim fee and"
@@ -1161,24 +1095,21 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(0)
                 );
-            Fee fee = Fee.builder()
-                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                .version("1")
-                .code("CODE")
-                .build();
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YesOrNo.YES)
-                .claimFee(fee)
-                .paymentSetDate(LocalDate.now().minusDays(15))
-                .partialPaymentAmount("100")
-                .totalClaimAmount(BigDecimal.valueOf(5001))
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Test User")
-                        .build())
-                    .build())
-                .build();
+            Fee fee = new Fee();
+            fee.setCalculatedAmountInPence(BigDecimal.valueOf(100));
+            fee.setVersion("1");
+            fee.setCode("CODE");
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPayment(YesOrNo.YES);
+            caseData.setClaimFee(fee);
+            caseData.setPaymentSetDate(LocalDate.now().minusDays(15));
+            caseData.setPartialPaymentAmount("100");
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(5001));
+            DynamicListElement element = new DynamicListElement(null, "Test User");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             String test = "The judgment will order " + caseData.getDefendantDetailsSpec().getValue().getLabel()
@@ -1203,29 +1134,24 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(0)
                 );
-            Fee fee = Fee.builder()
-                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                .version("1")
-                .code("CODE")
-                .build();
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YesOrNo.YES)
-                .claimFee(fee)
-                .paymentSetDate(LocalDate.now().minusDays(15))
-                .partialPaymentAmount("100")
-                .totalClaimAmount(BigDecimal.valueOf(5001))
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Test User")
-                        .label("Test User2")
-                        .label("Both Defendants")
-                        .build())
-                    .build())
-                .build();
+            Fee fee = new Fee();
+            fee.setCalculatedAmountInPence(BigDecimal.valueOf(100));
+            fee.setVersion("1");
+            fee.setCode("CODE");
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setAddRespondent2(YES);
+            caseData.setRespondent2SameLegalRepresentative(YES);
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPayment(YesOrNo.YES);
+            caseData.setClaimFee(fee);
+            caseData.setPaymentSetDate(LocalDate.now().minusDays(15));
+            caseData.setPartialPaymentAmount("100");
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(5001));
+            DynamicListElement element = new DynamicListElement(null, "Both Defendants");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             String test = "The judgment will order the defendants to pay £5001.00, including the claim fee and"
@@ -1249,29 +1175,25 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(100)
                 );
-            Fee fee = Fee.builder()
-                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                .version("1")
-                .code("CODE")
-                .build();
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YesOrNo.YES)
-                .paymentSetDate(LocalDate.now().minusDays(15))
-                .partialPaymentAmount("100")
-                .claimFee(fee)
-                .totalClaimAmount(BigDecimal.valueOf(1010))
-                .paymentConfirmationDecisionSpec(YesOrNo.YES)
-                .partialPayment(YesOrNo.YES)
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Test User")
-                        .build())
-                    .build())
-                .specRespondent1Represented(NO)
-                .respondent1Represented(null)
-
-                .build();
+            Fee fee = new Fee();
+            fee.setCalculatedAmountInPence(BigDecimal.valueOf(100));
+            fee.setVersion("1");
+            fee.setCode("CODE");
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPayment(YesOrNo.YES);
+            caseData.setPaymentSetDate(LocalDate.now().minusDays(15));
+            caseData.setPartialPaymentAmount("100");
+            caseData.setClaimFee(fee);
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(1010));
+            caseData.setPaymentConfirmationDecisionSpec(YesOrNo.YES);
+            caseData.setPartialPayment(YesOrNo.YES);
+            DynamicListElement element = new DynamicListElement(null, "Test User");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
+            caseData.setSpecRespondent1Represented(NO);
+            caseData.setRespondent1Represented(null);
             CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             String test =
@@ -1301,32 +1223,29 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(100)
                 );
-            Fee fee = Fee.builder()
-                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                .version("1")
-                .code("CODE")
-                .build();
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YesOrNo.YES)
-                .claimFee(fee)
-                .paymentSetDate(LocalDate.now().minusDays(15))
-                .partialPaymentAmount("100")
-                .totalClaimAmount(BigDecimal.valueOf(1010))
-                .paymentConfirmationDecisionSpec(YesOrNo.YES)
-                .partialPayment(YesOrNo.YES)
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Test User")
-                        .build())
-                    .build())
-                .specRespondent1Represented(NO)
-                .respondent1Represented(null)
-                .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
-                    .outstandingFeeInPounds(BigDecimal.ZERO)
-                    .build())
-                .hwfFeeType(FeeType.CLAIMISSUED)
-                .build();
+            Fee fee = new Fee();
+            fee.setCalculatedAmountInPence(BigDecimal.valueOf(100));
+            fee.setVersion("1");
+            fee.setCode("CODE");
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPayment(YesOrNo.YES);
+            caseData.setClaimFee(fee);
+            caseData.setPaymentSetDate(LocalDate.now().minusDays(15));
+            caseData.setPartialPaymentAmount("100");
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(1010));
+            caseData.setPaymentConfirmationDecisionSpec(YesOrNo.YES);
+            caseData.setPartialPayment(YesOrNo.YES);
+            DynamicListElement element = new DynamicListElement(null, "Test User");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
+            caseData.setSpecRespondent1Represented(NO);
+            caseData.setRespondent1Represented(null);
+            HelpWithFeesDetails helpWithFeesDetails = new HelpWithFeesDetails();
+            helpWithFeesDetails.setOutstandingFeeInPounds(BigDecimal.ZERO);
+            caseData.setClaimIssuedHwfDetails(helpWithFeesDetails);
+            caseData.setHwfFeeType(FeeType.CLAIMISSUED);
             CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             String test =
@@ -1362,9 +1281,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGetException_whenIsCalledAndTheOverallIsNull() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             assertThrows(NullPointerException.class, () -> {
                 handler.handle(params);
@@ -1377,85 +1295,89 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotGenerateDocumentAndContinueOffline_whenIsCalled1v1AndIsJudgmentOnlineLiveDisabled() {
-            Flags respondent1Flags = Flags.builder().partyName("respondent1name").roleOnCase("respondent1").build();
-            Party respondent = Party.builder()
-                .individualFirstName("Dis")
-                .individualLastName("Guy")
-                .type(INDIVIDUAL).flags(respondent1Flags).build();
+            Flags respondent1Flags = new Flags();
+            respondent1Flags.setPartyName("respondent1name");
+            respondent1Flags.setRoleOnCase("respondent1");
+            Party respondent = new Party();
+            respondent.setIndividualFirstName("Dis");
+            respondent.setIndividualLastName("Guy");
+            respondent.setType(INDIVIDUAL);
+            respondent.setFlags(respondent1Flags);
 
             CaseData caseDataBefore = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
-                .respondent1(respondent).build()
-                .toBuilder()
-                .respondent1DetailsForClaimDetailsTab(respondent.toBuilder().flags(respondent1Flags).build())
-                .caseNameHmctsInternal("Mr. John Rambo v Dis Guy")
-                .caseNamePublic("'John Rambo' v 'Dis Guy'")
-                .build();
+                .respondent1(respondent).build();
+            caseDataBefore.setRespondent1DetailsForClaimDetailsTab(respondent);
+            caseDataBefore.setCaseNameHmctsInternal("Mr. John Rambo v Dis Guy");
+            caseDataBefore.setCaseNamePublic("'John Rambo' v 'Dis Guy'");
 
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(0)
                 );
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("John Smith")
-                        .build())
-                    .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            DynamicListElement element = new DynamicListElement(null, "John Smith");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, caseDataBefore.toMap(mapper));
 
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).extracting("businessProcess").isNotNull();
-            assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_SPEC.name());
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getBusinessProcess()).isNotNull();
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(DEFAULT_JUDGEMENT_SPEC.name());
             assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
             assertInterestIsPopulated(response, 0);
         }
 
         @Test
         void shouldGenerateDocumentAndContinueOnline_whenIsCalled1v1() {
-            Flags respondent1Flags = Flags.builder().partyName("respondent1name").roleOnCase("respondent1").build();
-            Party respondent = Party.builder()
-                .individualFirstName("Dis")
-                .individualLastName("Guy")
-                .type(INDIVIDUAL).flags(respondent1Flags).build();
+            Flags respondent1Flags = new Flags();
+            respondent1Flags.setPartyName("respondent1name");
+            respondent1Flags.setRoleOnCase("respondent1");
+            Party respondent = new Party();
+            respondent.setIndividualFirstName("Dis");
+            respondent.setIndividualLastName("Guy");
+            respondent.setType(INDIVIDUAL);
+            respondent.setFlags(respondent1Flags);
 
             CaseData caseDataBefore = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
-                .respondent1(respondent).build()
-                .toBuilder()
-                .respondent1DetailsForClaimDetailsTab(respondent.toBuilder().flags(respondent1Flags).build())
-                .caseNameHmctsInternal("Mr. John Rambo v Dis Guy")
-                .caseNamePublic("'John Rambo' v 'Dis Guy'")
-                .build();
+                .respondent1(respondent).build();
+            caseDataBefore.setRespondent1DetailsForClaimDetailsTab(respondent);
+            caseDataBefore.setCaseNameHmctsInternal("Mr. John Rambo v Dis Guy");
+            caseDataBefore.setCaseNamePublic("'John Rambo' v 'Dis Guy'");
 
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(0)
                 );
-            when(addressMapper.toRoboticsAddress(any())).thenReturn(RoboticsAddress.builder().build());
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPaymentAmount("10")
-                .totalClaimAmount(BigDecimal.valueOf(1010))
-                .partialPayment(YES)
-                .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("John Smith")
-                        .build())
-                    .build())
-                .build();
+            when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPaymentAmount("10");
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(1010));
+            caseData.setPartialPayment(YES);
+            caseData.setPaymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY);
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("0123");
+            caseLocationCivil.setRegion("0321");;
+            caseData.setCaseManagementLocation(caseLocationCivil);
+            DynamicListElement element = new DynamicListElement(null, "John Smith");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, caseDataBefore.toMap(mapper));
 
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).extracting("businessProcess").isNotNull();
-            assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getBusinessProcess()).isNotNull();
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
             assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+            // Use Map-based verification for activeJudgment due to complex nested objects
             assertThat(response.getData()).extracting("activeJudgment").isNotNull();
             assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("ISSUED");
             assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo("DEFAULT_JUDGMENT");
@@ -1469,50 +1391,53 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGenerateDocumentAndContinueOnline_whenIsCalled1v2NonDivergent() {
-            Flags respondent1Flags = Flags.builder().partyName("respondent1name").roleOnCase("respondent1").build();
-            Party respondent = Party.builder()
-                .individualFirstName("Dis")
-                .individualLastName("Guy")
-                .type(INDIVIDUAL).flags(respondent1Flags).build();
+            Flags respondent1Flags = new Flags();
+            respondent1Flags.setPartyName("respondent1name");
+            respondent1Flags.setRoleOnCase("respondent1");
+            Party respondent = new Party();
+            respondent.setIndividualFirstName("Dis");
+            respondent.setIndividualLastName("Guy");
+            respondent.setType(INDIVIDUAL);
+            respondent.setFlags(respondent1Flags);
 
             CaseData caseDataBefore = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
-                .respondent1(respondent).build()
-                .toBuilder()
-                .respondent1DetailsForClaimDetailsTab(respondent.toBuilder().flags(respondent1Flags).build())
-                .caseNameHmctsInternal("Mr. John Rambo v Dis Guy")
-                .caseNamePublic("'John Rambo' v 'Dis Guy'")
-                .build();
+                .respondent1(respondent).build();
+            caseDataBefore.setRespondent1DetailsForClaimDetailsTab(respondent);
+            caseDataBefore.setCaseNameHmctsInternal("Mr. John Rambo v Dis Guy");
+            caseDataBefore.setCaseNamePublic("'John Rambo' v 'Dis Guy'");
 
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(0)
                 );
-            when(addressMapper.toRoboticsAddress(any())).thenReturn(RoboticsAddress.builder().build());
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .applicant1(PartyBuilder.builder().individual().build())
-                .respondent1(PartyBuilder.builder().individual().build())
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YesOrNo.YES)
-                .respondent2SameLegalRepresentative(YesOrNo.YES)
-                .partialPaymentAmount("10")
-                .totalClaimAmount(BigDecimal.valueOf(1010))
-                .partialPayment(YES)
-                .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Both Defendants")
-                        .build())
-                    .build())
-                .build();
+            when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setApplicant1(PartyBuilder.builder().individual().build());
+            caseData.setRespondent1(PartyBuilder.builder().individual().build());
+            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setAddRespondent2(YesOrNo.YES);
+            caseData.setRespondent2SameLegalRepresentative(YesOrNo.YES);
+            caseData.setPartialPaymentAmount("10");
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(1010));
+            caseData.setPartialPayment(YES);
+            caseData.setPaymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY);
+            CaseLocationCivil caseLocationCivil =  new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("0123");
+            caseLocationCivil.setRegion("0321");
+            caseData.setCaseManagementLocation(caseLocationCivil);
+            DynamicListElement element = new DynamicListElement(null, "Both Defendants");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, caseDataBefore.toMap(mapper));
 
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).extracting("businessProcess").isNotNull();
-            assertThat(response.getData().get("businessProcess")).extracting("camundaEvent").isEqualTo(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getBusinessProcess()).isNotNull();
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
             assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
             assertThat(response.getData()).extracting("activeJudgment").isNotNull();
             assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("ISSUED");
@@ -1530,43 +1455,45 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotGenerateDocumentAndContinueOffline_whenIsCalled1v2Divergent() {
-            Flags respondent1Flags = Flags.builder().partyName("respondent1name").roleOnCase("respondent1").build();
-            Party respondent = Party.builder()
-                .individualFirstName("Dis")
-                .individualLastName("Guy")
-                .type(INDIVIDUAL).flags(respondent1Flags).build();
+            Flags respondent1Flags = new Flags();
+            respondent1Flags.setPartyName("respondent1name");
+            respondent1Flags.setRoleOnCase("respondent1");
+            Party respondent = new Party();
+            respondent.setIndividualFirstName("Dis");
+            respondent.setIndividualLastName("Guy");
+            respondent.setType(INDIVIDUAL);
+            respondent.setFlags(respondent1Flags);
 
             CaseData caseDataBefore = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
-                .respondent1(respondent).build()
-                .toBuilder()
-                .respondent1DetailsForClaimDetailsTab(respondent.toBuilder().flags(respondent1Flags).build())
-                .caseNameHmctsInternal("Mr. John Rambo v Dis Guy")
-                .caseNamePublic("'John Rambo' v 'Dis Guy'")
-                .build();
+                .respondent1(respondent).build();
+            caseDataBefore.setRespondent1DetailsForClaimDetailsTab(respondent);
+            caseDataBefore.setCaseNameHmctsInternal("Mr. John Rambo v Dis Guy");
+            caseDataBefore.setCaseNamePublic("'John Rambo' v 'Dis Guy'");
 
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(0)
                 );
-            when(addressMapper.toRoboticsAddress(any())).thenReturn(RoboticsAddress.builder().build());
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .applicant1(PartyBuilder.builder().individual().build())
-                .respondent1(PartyBuilder.builder().individual().build())
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YesOrNo.YES)
-                .respondent2SameLegalRepresentative(YesOrNo.YES)
-                .partialPaymentAmount("10")
-                .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
-                .totalClaimAmount(BigDecimal.valueOf(1010))
-                .partialPayment(YES)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("John Smith")
-                        .build())
-                    .build())
-                .build();
+            when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setApplicant1(PartyBuilder.builder().individual().build());
+            caseData.setRespondent1(PartyBuilder.builder().individual().build());
+            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setAddRespondent2(YesOrNo.YES);
+            caseData.setRespondent2SameLegalRepresentative(YesOrNo.YES);
+            caseData.setPartialPaymentAmount("10");
+            caseData.setPaymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY);
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(1010));
+            caseData.setPartialPayment(YES);
+            CaseLocationCivil caseLocationCivil  = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("0123");
+            caseLocationCivil.setRegion("0321");
+            caseData.setCaseManagementLocation(caseLocationCivil);
+            DynamicListElement element = new DynamicListElement(null, "John Smith");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, caseDataBefore.toMap(mapper));
 
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
@@ -1591,32 +1518,31 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotGenerateDocumentAndContinueOffline_whenIsCalled2v1JOIsNotLive() {
-            Flags respondent1Flags = Flags.builder().partyName("respondent1name").roleOnCase("respondent1").build();
-            Party respondent = Party.builder()
-                .individualFirstName("Dis")
-                .individualLastName("Guy")
-                .type(INDIVIDUAL).flags(respondent1Flags).build();
+            Flags respondent1Flags = new Flags();
+            respondent1Flags.setPartyName("respondent1name");
+            respondent1Flags.setRoleOnCase("respondent1");
+            Party respondent = new Party();
+            respondent.setIndividualFirstName("Dis");
+            respondent.setIndividualLastName("Guy");
+            respondent.setType(INDIVIDUAL);
+            respondent.setFlags(respondent1Flags);
 
             CaseData caseDataBefore = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
-                .respondent1(respondent).build()
-                .toBuilder()
-                .respondent1DetailsForClaimDetailsTab(respondent.toBuilder().flags(respondent1Flags).build())
-                .caseNameHmctsInternal("Mr. John Rambo v Dis Guy")
-                .caseNamePublic("'John Rambo' v 'Dis Guy'")
-                .build();
+                .respondent1(respondent).build();
+            caseDataBefore.setRespondent1DetailsForClaimDetailsTab(respondent);
+            caseDataBefore.setCaseNameHmctsInternal("Mr. John Rambo v Dis Guy");
+            caseDataBefore.setCaseNamePublic("'John Rambo' v 'Dis Guy'");
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .applicant1(PartyBuilder.builder().individual().build())
-                .applicant2(PartyBuilder.builder().individual().build())
-                .addApplicant2(YesOrNo.YES)
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("John Smith")
-                        .build())
-                    .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setApplicant1(PartyBuilder.builder().individual().build());
+            caseData.setApplicant2(PartyBuilder.builder().individual().build());
+            caseData.setAddApplicant2(YesOrNo.YES);
+            DynamicListElement element = new DynamicListElement(null, "John Smith");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, caseDataBefore.toMap(mapper));
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
@@ -1630,41 +1556,43 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldMoveToFinalOrderIssued_whenIsJOOnlineAnd2v1() {
-            Flags respondent1Flags = Flags.builder().partyName("respondent1name").roleOnCase("respondent1").build();
-            Party respondent = Party.builder()
-                .individualFirstName("Dis")
-                .individualLastName("Guy")
-                .type(INDIVIDUAL).flags(respondent1Flags).build();
+            Flags respondent1Flags = new Flags();
+            respondent1Flags.setPartyName("respondent1name");
+            respondent1Flags.setRoleOnCase("respondent1");
+            Party respondent = new Party();
+            respondent.setIndividualFirstName("Dis");
+            respondent.setIndividualLastName("Guy");
+            respondent.setType(INDIVIDUAL);
+            respondent.setFlags(respondent1Flags);
 
             CaseData caseDataBefore = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
-                .respondent1(respondent).build()
-                .toBuilder()
-                .respondent1DetailsForClaimDetailsTab(respondent.toBuilder().flags(respondent1Flags).build())
-                .caseNameHmctsInternal("Mr. John Rambo v Dis Guy")
-                .caseNamePublic("'John Rambo' v 'Dis Guy'")
-                .build();
+                .respondent1(respondent).build();
+            caseDataBefore.setRespondent1DetailsForClaimDetailsTab(respondent);
+            caseDataBefore.setCaseNameHmctsInternal("Mr. John Rambo v Dis Guy");
+            caseDataBefore.setCaseNamePublic("'John Rambo' v 'Dis Guy'");
 
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(0)
                 );
-            when(addressMapper.toRoboticsAddress(any())).thenReturn(RoboticsAddress.builder().build());
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .applicant1(PartyBuilder.builder().individual().build())
-                .applicant2(PartyBuilder.builder().individual().build())
-                .addApplicant2(YesOrNo.YES)
-                .partialPaymentAmount("10")
-                .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
-                .totalClaimAmount(BigDecimal.valueOf(1010))
-                .partialPayment(YES)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("John Smith")
-                        .build())
-                    .build())
-                .build();
+            when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setApplicant1(PartyBuilder.builder().individual().build());
+            caseData.setApplicant2(PartyBuilder.builder().individual().build());
+            caseData.setAddApplicant2(YesOrNo.YES);
+            caseData.setPartialPaymentAmount("10");
+            caseData.setPaymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY);
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(1010));
+            caseData.setPartialPayment(YES);
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("0123");
+            caseLocationCivil.setRegion("0321");
+            caseData.setCaseManagementLocation(caseLocationCivil);
+            DynamicListElement element = new DynamicListElement(null, "John Smith");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, caseDataBefore.toMap(mapper));
 
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
@@ -1687,9 +1615,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             String body = "<br /><a href=\"/cases/case-details/1594901956117591#Claim documents\" "
                 + "target=\"_blank\">Download  default judgment</a> "
                 + "%n%n The defendant will be served with the Default Judgment.";
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
             assertThat(response).usingRecursiveComparison().isEqualTo(
@@ -1701,24 +1628,22 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnJudgementRequestedResponse_whenInvokedOneDefendantWhen1v2() {
-            String header = "# Default judgment requested";
-            String body = "A default judgment has been sent to John Smith. "
-                + "The claim will now progress offline (on paper)";
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .applicant1(PartyBuilder.builder().build())
-                .respondent1(PartyBuilder.builder().build())
-                .respondent2(PartyBuilder.builder().build())
-                .addRespondent2(YesOrNo.YES)
-                .respondent2SameLegalRepresentative(YesOrNo.YES)
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("John Smith")
-                        .build())
-                    .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setApplicant1(PartyBuilder.builder().build());
+            caseData.setRespondent1(PartyBuilder.builder().build());
+            caseData.setRespondent2(PartyBuilder.builder().build());
+            caseData.setAddRespondent2(YesOrNo.YES);
+            caseData.setRespondent2SameLegalRepresentative(YesOrNo.YES);
+            DynamicListElement element = new DynamicListElement(null, "John Smith");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+            String header = "# Default judgment requested";
+            String body = "A default judgment has been sent to John Smith. "
+                + "The claim will now progress offline (on paper)";
             assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
                 .confirmationHeader(header)
                 .confirmationBody(String.format(body))
@@ -1727,24 +1652,22 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnJudgementRequestedResponse_whenInvokedBothDefendantWhen1v2() {
-            String body = "<br /><a href=\"/cases/case-details/1594901956117591#Claim documents\" "
-                + "target=\"_blank\">Download  default judgment</a> "
-                + "%n%n The defendant will be served the Default Judgment.";
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .applicant1(PartyBuilder.builder().build())
-                .respondent1(PartyBuilder.builder().build())
-                .respondent2(PartyBuilder.builder().build())
-                .addRespondent2(YesOrNo.YES)
-                .respondent2SameLegalRepresentative(YesOrNo.YES)
-                .defendantDetailsSpec(DynamicList.builder()
-                    .value(DynamicListElement.builder()
-                        .label("Both")
-                        .build())
-                    .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setApplicant1(PartyBuilder.builder().build());
+            caseData.setRespondent1(PartyBuilder.builder().build());
+            caseData.setRespondent2(PartyBuilder.builder().build());
+            caseData.setAddRespondent2(YesOrNo.YES);
+            caseData.setRespondent2SameLegalRepresentative(YesOrNo.YES);
+            DynamicListElement element = new DynamicListElement(null, "Both");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+            String body = "<br /><a href=\"/cases/case-details/1594901956117591#Claim documents\" "
+                + "target=\"_blank\">Download  default judgment</a> "
+                + "%n%n The defendant will be served the Default Judgment.";
             assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
                 .confirmationHeader(
                     "# Default Judgment Granted ")
@@ -1754,11 +1677,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnJudgementRequestedResponse_whenLrVLip() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .applicant1(PartyBuilder.builder().build())
-                .respondent1(PartyBuilder.builder().build())
-                .respondent1Represented(NO)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setApplicant1(PartyBuilder.builder().build());
+            caseData.setRespondent1(PartyBuilder.builder().build());
+            caseData.setRespondent1Represented(NO);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
             assertThat(caseData.isLRvLipOneVOne()).isTrue();
@@ -1772,17 +1694,16 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnJudgementGrantedResponse_whenisJudgmentLiveTrueAndLrVLip() {
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setApplicant1(PartyBuilder.builder().build());
+            caseData.setRespondent1(PartyBuilder.builder().build());
+            caseData.setRespondent1Represented(NO);
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
             String body = "<br /><a href=\"/cases/case-details/1594901956117591#Claim documents\" "
                 + "target=\"_blank\">Download  default judgment</a> "
                 + "%n%n The defendant will be served with the Default Judgment.";
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .applicant1(PartyBuilder.builder().build())
-                .respondent1(PartyBuilder.builder().build())
-                .respondent1Represented(NO)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
             assertThat(caseData.isLRvLipOneVOne()).isTrue();
             assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
                 .confirmationHeader(
@@ -1797,32 +1718,31 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         when(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(36, LocalDate.now()))
             .thenReturn(LocalDateTime.now().plusMonths(36));
 
-        Flags respondent1Flags = Flags.builder().partyName("respondent1name").roleOnCase("respondent1").build();
-        Party respondent = Party.builder()
-            .individualFirstName("Dis")
-            .individualLastName("Guy")
-            .type(INDIVIDUAL).flags(respondent1Flags).build();
+        Flags respondent1Flags = new Flags();
+        respondent1Flags.setPartyName("respondent1name");
+        respondent1Flags.setRoleOnCase("respondent1");
+        Party respondent = new Party();
+        respondent.setIndividualFirstName("Dis");
+        respondent.setIndividualLastName("Guy");
+        respondent.setType(INDIVIDUAL);
+        respondent.setFlags(respondent1Flags);
 
         CaseData caseDataBefore = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
-            .respondent1(respondent).build()
-            .toBuilder()
-            .respondent1DetailsForClaimDetailsTab(respondent.toBuilder().flags(respondent1Flags).build())
-            .caseNameHmctsInternal("Mr. John Rambo v Dis Guy")
-            .caseNamePublic("'John Rambo' v 'Dis Guy'")
-            .build();
+            .respondent1(respondent).build();
+        caseDataBefore.setRespondent1DetailsForClaimDetailsTab(respondent);
+        caseDataBefore.setCaseNameHmctsInternal("Mr. John Rambo v Dis Guy");
+        caseDataBefore.setCaseNamePublic("'John Rambo' v 'Dis Guy'");
 
         when(interestCalculator.calculateInterest(any()))
             .thenReturn(BigDecimal.valueOf(0)
             );
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-            .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("John Smith")
-                                                 .build())
-                                      .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+        DynamicListElement element = new DynamicListElement(null, "John Smith");
+        DynamicList list = new DynamicList();
+        list.setValue(element);
+        caseData.setDefendantDetailsSpec(list);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, caseDataBefore.toMap(mapper));
 
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
