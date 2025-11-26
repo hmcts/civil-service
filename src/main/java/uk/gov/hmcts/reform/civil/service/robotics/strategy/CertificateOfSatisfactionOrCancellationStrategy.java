@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class CertificateOfSatisfactionOrCancellationStrategy implements EventHistoryStrategy {
@@ -40,6 +42,7 @@ public class CertificateOfSatisfactionOrCancellationStrategy implements EventHis
         if (!supports(caseData)) {
             return;
         }
+        log.info("Building COSC robotics events for caseId {}", caseData.getCcdCaseReference());
 
         boolean markPaidInFullExists = caseData.getJoMarkedPaidInFullIssueDate() != null;
         LocalDateTime dateReceived = markPaidInFullExists

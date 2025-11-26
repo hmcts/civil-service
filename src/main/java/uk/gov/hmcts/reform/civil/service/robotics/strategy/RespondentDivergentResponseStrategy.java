@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -43,6 +44,7 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2DivergentResponseExists;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class RespondentDivergentResponseStrategy implements EventHistoryStrategy {
@@ -87,6 +89,7 @@ public class RespondentDivergentResponseStrategy implements EventHistoryStrategy
         if (!supports(caseData)) {
             return;
         }
+        log.info("Building respondent divergent response robotics events for caseId {}", caseData.getCcdCaseReference());
 
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
         boolean goingOffline = OFFLINE_STATES.contains(stateFlow.getState().getName());

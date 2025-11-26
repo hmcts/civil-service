@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
@@ -37,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirecti
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildDirectionsQuestionnaireEvent;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ClaimantResponseStrategy implements EventHistoryStrategy {
@@ -69,6 +71,7 @@ public class ClaimantResponseStrategy implements EventHistoryStrategy {
         if (!supports(caseData)) {
             return;
         }
+        log.info("Building claimant response robotics events for caseId {}", caseData.getCcdCaseReference());
 
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
         boolean hasProceedState = hasState(stateFlow, FlowState.Main.FULL_DEFENCE_PROCEED);

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -19,6 +20,7 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MENTAL_HEALTH_BREATHING_SPACE_ENTERED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MENTAL_HEALTH_BREATHING_SPACE_LIFTED;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class BreathingSpaceEventStrategy implements EventHistoryStrategy {
@@ -41,6 +43,8 @@ public class BreathingSpaceEventStrategy implements EventHistoryStrategy {
         if (!supports(caseData)) {
             return;
         }
+        log.info("Building breathing space robotics events for caseId {}", caseData.getCcdCaseReference());
+
         if (caseData.getBreathing().getEnter() != null && caseData.getBreathing().getLift() == null) {
             if (BreathingSpaceType.STANDARD.equals(caseData.getBreathing().getEnter().getType())) {
                 buildEvent(builder, caseData, BREATHING_SPACE_ENTERED, BreathingStatus.ENTER);

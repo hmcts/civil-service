@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class InterlocutoryJudgmentStrategy implements EventHistoryStrategy {
@@ -52,6 +54,7 @@ public class InterlocutoryJudgmentStrategy implements EventHistoryStrategy {
         if (!supports(caseData)) {
             return;
         }
+        log.info("Building InterlocutoryJudgmentStrategy events for caseId {}", caseData.getCcdCaseReference());
 
         boolean grantedForSingleRespondent = isGrantedForSingleRespondent(caseData);
 

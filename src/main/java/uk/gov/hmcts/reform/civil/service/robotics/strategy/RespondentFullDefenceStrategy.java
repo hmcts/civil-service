@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
@@ -41,6 +42,7 @@ import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1v2SameSol
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2DivergentResponseExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseExists;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
@@ -70,6 +72,7 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
         if (!supports(caseData)) {
             return;
         }
+        log.info("Building respondent full defence robotics events for caseId {}", caseData.getCcdCaseReference());
 
         EventBuckets buckets = initialiseBuckets(builder.build());
 

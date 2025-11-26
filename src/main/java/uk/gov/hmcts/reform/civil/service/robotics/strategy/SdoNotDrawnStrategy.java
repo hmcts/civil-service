@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import static org.apache.commons.lang3.StringUtils.left;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class SdoNotDrawnStrategy implements EventHistoryStrategy {
@@ -38,6 +40,7 @@ public class SdoNotDrawnStrategy implements EventHistoryStrategy {
         if (!supports(caseData)) {
             return;
         }
+        log.info("Building SDO not drawn robotics event for caseId {}", caseData.getCcdCaseReference());
 
         String reason = caseData.getReasonNotSuitableSDO().getInput();
         String message = left(

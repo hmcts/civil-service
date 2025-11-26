@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
@@ -15,6 +16,7 @@ import static org.apache.commons.lang3.StringUtils.left;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class CaseNotesStrategy implements EventHistoryStrategy {
@@ -35,6 +37,7 @@ public class CaseNotesStrategy implements EventHistoryStrategy {
         if (!supports(caseData)) {
             return;
         }
+        log.info("Building case note robotics events for caseId {}", caseData.getCcdCaseReference());
 
         List<CaseNote> notes = unwrapElements(caseData.getCaseNotes());
         notes.stream()

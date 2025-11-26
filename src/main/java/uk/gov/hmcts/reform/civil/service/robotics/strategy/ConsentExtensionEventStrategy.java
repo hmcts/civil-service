@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PartyRole;
@@ -32,6 +33,7 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ExtensionExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ExtensionExists;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ConsentExtensionEventStrategy implements EventHistoryStrategy {
@@ -63,6 +65,7 @@ public class ConsentExtensionEventStrategy implements EventHistoryStrategy {
         if (!supports(caseData)) {
             return;
         }
+        log.info("Building consent extension robotics events for caseId {}", caseData.getCcdCaseReference());
 
         MultiPartyScenario scenario = getMultiPartyScenario(caseData);
         List<Event> events = new ArrayList<>();

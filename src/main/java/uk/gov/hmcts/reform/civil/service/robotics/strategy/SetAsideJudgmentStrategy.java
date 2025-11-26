@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
@@ -21,6 +22,7 @@ import java.util.List;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class SetAsideJudgmentStrategy implements EventHistoryStrategy {
@@ -40,6 +42,7 @@ public class SetAsideJudgmentStrategy implements EventHistoryStrategy {
         if (!supports(caseData)) {
             return;
         }
+        log.info("Building set aside judgment robotics events for caseId {}", caseData.getCcdCaseReference());
 
         List<Event> events = new ArrayList<>();
         events.add(buildEvent(builder, caseData, RESPONDENT_ID));

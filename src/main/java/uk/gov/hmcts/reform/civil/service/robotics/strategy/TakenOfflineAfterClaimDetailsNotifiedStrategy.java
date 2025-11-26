@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenera
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class TakenOfflineAfterClaimDetailsNotifiedStrategy implements EventHistoryStrategy {
@@ -34,6 +36,7 @@ public class TakenOfflineAfterClaimDetailsNotifiedStrategy implements EventHisto
         if (!supports(caseData)) {
             return;
         }
+        log.info("Building taken offline after claim details notified robotics event for caseId {}", caseData.getCcdCaseReference());
 
         String message = textFormatter.onlyOneRespondentNotified();
         builder.miscellaneous(

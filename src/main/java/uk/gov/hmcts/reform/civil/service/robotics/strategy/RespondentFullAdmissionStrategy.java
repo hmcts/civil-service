@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -26,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class RespondentFullAdmissionStrategy implements EventHistoryStrategy {
@@ -49,6 +51,7 @@ public class RespondentFullAdmissionStrategy implements EventHistoryStrategy {
         if (!supports(caseData)) {
             return;
         }
+        log.info("Building respondent full admission robotics events for caseId {}", caseData.getCcdCaseReference());
 
         if (defendant1ResponseExists.test(caseData)) {
             LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();

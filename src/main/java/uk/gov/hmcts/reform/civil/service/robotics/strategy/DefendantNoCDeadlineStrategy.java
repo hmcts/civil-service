@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class DefendantNoCDeadlineStrategy implements EventHistoryStrategy {
@@ -32,6 +34,7 @@ public class DefendantNoCDeadlineStrategy implements EventHistoryStrategy {
         if (!supports(caseData)) {
             return;
         }
+        log.info("Building defendant notice-of-change deadline robotics event for caseId {}", caseData.getCcdCaseReference());
         LocalDateTime takenOfflineDate = requireNonNull(caseData.getTakenOfflineDate());
         String details = textFormatter.claimMovedOfflineAfterNocDeadline();
         builder.miscellaneous(buildMiscEvent(builder, sequenceGenerator, details, takenOfflineDate));

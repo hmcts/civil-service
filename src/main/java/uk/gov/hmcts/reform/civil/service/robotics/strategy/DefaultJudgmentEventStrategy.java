@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
@@ -34,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFAULT_JUDGMEN
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RECORD_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class DefaultJudgmentEventStrategy implements EventHistoryStrategy {
@@ -54,6 +56,7 @@ public class DefaultJudgmentEventStrategy implements EventHistoryStrategy {
         if (!supports(caseData)) {
             return;
         }
+        log.info("Building default judgment robotics events for caseId {}", caseData.getCcdCaseReference());
 
         boolean grantedFlag = hasMultipleDefendants(caseData);
         addDefaultJudgmentEvents(builder, caseData, grantedFlag);

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -25,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.PROCEED
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_STRUCK_OUT;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.GENERAL_FORM_OF_APPLICATION;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class GeneralApplicationStrikeOutStrategy implements EventHistoryStrategy {
@@ -48,6 +50,7 @@ public class GeneralApplicationStrikeOutStrategy implements EventHistoryStrategy
         if (applications.isEmpty()) {
             return;
         }
+        log.info("Building general application strike out robotics events for caseId {}", caseData.getCcdCaseReference());
 
         builder.generalFormOfApplication(applications.stream()
             .map(app -> Event.builder()

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -33,6 +34,7 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JudgmentByAdmissionStrategy implements EventHistoryStrategy {
@@ -52,6 +54,7 @@ public class JudgmentByAdmissionStrategy implements EventHistoryStrategy {
         if (!supports(caseData)) {
             return;
         }
+        log.info("Building JudgmentByAdmissionStrategy events for caseId {}", caseData.getCcdCaseReference());
 
         builder.miscellaneous(buildMiscellaneousEvent(builder, caseData));
         builder.judgmentByAdmission(buildJudgmentByAdmissionEvent(builder, caseData));

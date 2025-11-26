@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
@@ -16,6 +17,7 @@ import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseE
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1v2SameSolicitorSameResponse;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseExists;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class RespondentCounterClaimStrategy implements EventHistoryStrategy {
@@ -34,6 +36,7 @@ public class RespondentCounterClaimStrategy implements EventHistoryStrategy {
         if (!supports(caseData)) {
             return;
         }
+        log.info("Building respondent counter claim robotics events for caseId {}", caseData.getCcdCaseReference());
 
         if (defendant1ResponseExists.test(caseData)) {
             respondentResponseSupport.addRespondentMiscEvent(

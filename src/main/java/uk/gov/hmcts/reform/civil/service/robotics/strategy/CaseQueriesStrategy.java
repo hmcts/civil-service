@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -17,6 +18,7 @@ import java.util.Set;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.QUERIES_ON_CASE;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class CaseQueriesStrategy implements EventHistoryStrategy {
@@ -43,6 +45,7 @@ public class CaseQueriesStrategy implements EventHistoryStrategy {
         if (!supports(caseData)) {
             return;
         }
+        log.info("Building case queries robotics event for caseId {}", caseData.getCcdCaseReference());
 
         LocalDateTime dateReceived = caseData.getTakenOfflineDate() != null
             ? caseData.getTakenOfflineDate()

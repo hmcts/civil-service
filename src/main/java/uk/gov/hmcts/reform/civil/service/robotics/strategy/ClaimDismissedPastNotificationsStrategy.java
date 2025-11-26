@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -18,6 +19,7 @@ import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ClaimDismissedPastNotificationsStrategy implements EventHistoryStrategy {
@@ -51,6 +53,7 @@ public class ClaimDismissedPastNotificationsStrategy implements EventHistoryStra
         if (!supports(caseData)) {
             return;
         }
+        log.info("Building claim dismissed past notifications robotics event for caseId {}", caseData.getCcdCaseReference());
 
         Set<FlowState.Main> matchedStates = orderedMatchedStates(caseData);
         matchedStates.forEach(state -> emitDismissedEvent(builder, caseData, state));

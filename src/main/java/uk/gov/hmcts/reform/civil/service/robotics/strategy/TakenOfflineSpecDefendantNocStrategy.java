@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -13,6 +14,7 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class TakenOfflineSpecDefendantNocStrategy implements EventHistoryStrategy {
@@ -34,6 +36,7 @@ public class TakenOfflineSpecDefendantNocStrategy implements EventHistoryStrateg
             return;
         }
 
+        log.info("Building taken offline spec defendant NOC robotics event for caseId {}", caseData.getCcdCaseReference());
         String message = textFormatter.noticeOfChangeFiled();
         builder.miscellaneous(buildMiscEvent(
             builder,

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -21,6 +22,7 @@ import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenari
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildEnumeratedMiscEvent;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class UnrepresentedDefendantStrategy implements EventHistoryStrategy {
@@ -44,6 +46,7 @@ public class UnrepresentedDefendantStrategy implements EventHistoryStrategy {
             return;
         }
 
+        log.info("Building unrepresented defendant robotics events for caseId {}", caseData.getCcdCaseReference());
         List<String> defendantNames = getDefendantNames(UNREPRESENTED, caseData);
         LocalDateTime submittedDate = caseData.getSubmittedDate();
 

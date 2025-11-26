@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -36,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseE
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1v2SameSolicitorSameResponse;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseExists;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
@@ -70,6 +72,7 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
         if (!supports(caseData)) {
             return;
         }
+        log.info("Building respondent part admission robotics events for caseId {}", caseData.getCcdCaseReference());
 
         List<Event> existingDirections = Optional.ofNullable(builder.build().getDirectionsQuestionnaireFiled())
             .orElse(List.of());

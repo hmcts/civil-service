@@ -78,6 +78,8 @@ public class EventHistoryMapper {
     }
 
     public EventHistory buildEvents(CaseData caseData, String authToken) {
+        log.info("Building robotics event history for caseId {}", caseData.getCcdCaseReference());
+
         EventHistory.EventHistoryBuilder builder = EventHistory.builder()
             .directionsQuestionnaireFiled(List.of(Event.builder().build()));
 
@@ -90,6 +92,7 @@ public class EventHistoryMapper {
         runGlobalStrategies(builder, caseData, authToken, registry, invoked);
 
         EventHistory eventHistory = eventHistorySequencer.sortEvents(builder.build());
+        log.info("Completed robotics event history for caseId {}", caseData.getCcdCaseReference());
         log.info("Event history: {}", eventHistory);
         return eventHistory;
     }
