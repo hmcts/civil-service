@@ -150,7 +150,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             .atStateClaimIssued()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
             .caseManagementLocation(createCaseLocationCivil())
-        .build();
+            .build();
         caseData.setCcdState(CaseState.CASE_DISCONTINUED);
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
