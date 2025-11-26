@@ -92,8 +92,8 @@ if [ "$RUN_ALL_FUNCTIONAL_TESTS" = "true" ]; then
   run_functional_tests
 
 #Check if FT_TYPE has changed since the previous run
-elif [ -f "$FT_TYPE_STATE_FILE" ] && [ "$(cat \"$FT_TYPE_STATE_FILE\")" != "$FT_TYPE" ]; then
-  echo "FT_TYPE changed from '$(cat \"$FT_TYPE_STATE_FILE\")' to '$FT_TYPE'."
+elif [ -f "$FT_TYPE_STATE_FILE" ] && [ "$(cat "$FT_TYPE_STATE_FILE")" != "$FT_TYPE" ]; then
+  echo "FT_TYPE changed from '$(cat "$FT_TYPE_STATE_FILE")' to '$FT_TYPE'."
   echo "Ignoring $TEST_FILES_REPORT and running all functional tests."
   export FORCE_ALL_FUNCTIONAL_TESTS=true
   run_functional_tests
