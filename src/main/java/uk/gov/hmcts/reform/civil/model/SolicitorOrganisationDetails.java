@@ -1,16 +1,20 @@
 package uk.gov.hmcts.reform.civil.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class SolicitorOrganisationDetails {
 
-    private final String email;
-    private final String organisationName;
-    private final String fax;
-    private final String dx;
-    private final String phoneNumber;
-    private final Address address;
+    private String email;
+    private String organisationName;
+    private String fax;
+    private String dx;
+    private String phoneNumber;
+    private Address address;
 }
