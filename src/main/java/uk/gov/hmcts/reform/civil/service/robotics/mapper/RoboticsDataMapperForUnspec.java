@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.robotics.ClaimDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.LitigiousParty;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Solicitor;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsCaseDataSupport;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
@@ -171,6 +172,15 @@ public class RoboticsDataMapperForUnspec extends BaseRoboticsDataMapper {
             return null;
         }
 
+        uk.gov.hmcts.reform.civil.prd.model.Organisation organisation = null;
+        if (organisationId != null) {
+            try {
+                organisation = organisationService.findOrganisationById(organisationId).orElse(null);
+            } catch (FeignException e) {
+                log.error("Error recovering org id {} for case id {}", organisationId, caseData.getLegacyCaseReference(), e);
+            }
+        }
+
         return caseDataSupport.buildSolicitor(
             RoboticsCaseDataSupport.SolicitorData.builder()
                 .id(RoboticsDataUtil.RESPONDENT_SOLICITOR_ID)
@@ -182,7 +192,7 @@ public class RoboticsDataMapperForUnspec extends BaseRoboticsDataMapper {
                     .map(s -> s.substring(0, Math.min(s.length(), 24)))
                     .orElse(null))
                 .serviceAddress(caseData.getRespondentSolicitor1ServiceAddress())
-                .organisation(fetchOrganisation(organisationId, caseData))
+                .organisation(organisation)
                 .organisationDetails(organisationDetails.orElse(null))
                 .build()
         );
@@ -190,6 +200,15 @@ public class RoboticsDataMapperForUnspec extends BaseRoboticsDataMapper {
 
     private Solicitor buildApplicantSolicitor(CaseData caseData) {
         Optional<String> organisationId = getOrganisationId(caseData.getApplicant1OrganisationPolicy());
+
+        Organisation organisation = null;
+        if (organisationId.isPresent()) {
+            try {
+                organisation = organisationService.findOrganisationById(organisationId.get()).orElse(null);
+            } catch (FeignException e) {
+                log.error("Error recovering org id {} for case id {}", organisationId.orElse(null), caseData.getLegacyCaseReference(), e);
+            }
+        }
 
         return caseDataSupport.buildSolicitor(
             RoboticsCaseDataSupport.SolicitorData.builder()
@@ -202,7 +221,7 @@ public class RoboticsDataMapperForUnspec extends BaseRoboticsDataMapper {
                     .map(s -> s.substring(0, Math.min(s.length(), 24)))
                     .orElse(null))
                 .serviceAddress(caseData.getApplicantSolicitor1ServiceAddress())
-                .organisation(fetchOrganisation(organisationId.orElse(null), caseData))
+                .organisation(organisation)
                 .organisationDetails(null)
                 .build()
         );
@@ -278,6 +297,12 @@ public class RoboticsDataMapperForUnspec extends BaseRoboticsDataMapper {
         if (organisationId == null && organisationDetails.isEmpty()) {
             return null;
         }
+
+        Organisation organisation = null;
+        if (organisationId != null) {
+            organisation = organisationService.findOrganisationById(organisationId).orElse(null);
+        }
+
         return caseDataSupport.buildSolicitor(
             RoboticsCaseDataSupport.SolicitorData.builder()
                 .id(RoboticsDataUtil.RESPONDENT2_SOLICITOR_ID)
@@ -289,21 +314,9 @@ public class RoboticsDataMapperForUnspec extends BaseRoboticsDataMapper {
                     .map(s -> s.substring(0, Math.min(s.length(), 24)))
                     .orElse(null))
                 .serviceAddress(caseData.getRespondentSolicitor2ServiceAddress())
-                .organisation(fetchOrganisation(organisationId, caseData))
+                .organisation(organisation)
                 .organisationDetails(organisationDetails.orElse(null))
                 .build()
         );
-    }
-
-    private uk.gov.hmcts.reform.civil.prd.model.Organisation fetchOrganisation(String organisationId, CaseData caseData) {
-        if (organisationId == null) {
-            return null;
-        }
-        try {
-            return organisationService.findOrganisationById(organisationId).orElse(null);
-        } catch (FeignException e) {
-            log.error("Error recovering org id {} for case id {}", organisationId, caseData.getLegacyCaseReference(), e);
-            return null;
-        }
     }
 }

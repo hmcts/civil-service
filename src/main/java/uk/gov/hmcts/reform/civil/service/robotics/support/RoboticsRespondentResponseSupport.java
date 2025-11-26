@@ -217,13 +217,6 @@ public class RoboticsRespondentResponseSupport {
                                                     Party respondent,
                                                     boolean isRespondent1,
                                                     LocalDateTime dateReceived) {
-        if (caseData == null || respondent == null) {
-            return;
-        }
-        String message = prepareRespondentResponseText(caseData, respondent, isRespondent1);
-        if (!StringUtils.hasText(message)) {
-            return;
-        }
-        RoboticsEventSupport.addRespondentMiscEvent(builder, sequenceGenerator, message, dateReceived);
+        addRespondentMiscEvent(builder, sequenceGenerator, caseData, respondent, isRespondent1, dateReceived);
     }
 }

@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
@@ -41,7 +40,7 @@ public class CaseProceedsInCasemanStrategy implements EventHistoryStrategy {
             || (caseData.getOrderSDODocumentDJCollection() != null
             && !caseData.getOrderSDODocumentDJCollection().isEmpty());
 
-        return takenOfflineAfterSdoState || (sdoDrawnAndFiled && caseData.getTakenOfflineDate() != null);
+        return sdoDrawnAndFiled && caseData.getTakenOfflineDate() != null;
     }
 
     @Override
@@ -51,7 +50,14 @@ public class CaseProceedsInCasemanStrategy implements EventHistoryStrategy {
         }
         log.info("Building case proceeds in Caseman robotics event for caseId {}", caseData.getCcdCaseReference());
         String message = textFormatter.caseProceedsInCaseman();
+        boolean hasState = hasState(stateFlowEngine.evaluate(caseData));
+        boolean hasSdoDocument = caseData.getTakenOfflineDate() != null
+            && caseData.getOrderSDODocumentDJ() != null;
+
         builder.miscellaneous(buildMiscEvent(builder, sequenceGenerator, message, caseData.getTakenOfflineDate()));
+        if (hasState && hasSdoDocument) {
+            builder.miscellaneous(buildMiscEvent(builder, sequenceGenerator, message, caseData.getTakenOfflineDate()));
+        }
     }
 
     private boolean hasState(StateFlow stateFlow) {

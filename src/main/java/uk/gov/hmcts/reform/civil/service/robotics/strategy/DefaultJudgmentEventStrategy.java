@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
+import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentBySetDate;
-import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
@@ -22,14 +22,12 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
 import static java.math.BigDecimal.ZERO;
-import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFAULT_JUDGMENT_GRANTED;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RECORD_JUDGMENT;
@@ -164,42 +162,21 @@ public class DefaultJudgmentEventStrategy implements EventHistoryStrategy {
         return null;
     }
 
-    private BigDecimal getInstallmentAmount(CaseData caseData) {
-        boolean payByInstallment = hasCourtDecisionInFavourOfClaimant(caseData)
-            ? caseData.applicant1SuggestedPayByInstalments()
-            : caseData.isPayByInstallment();
-
-        if (!payByInstallment) {
-            return null;
-        }
-
-        Optional<RepaymentPlanLRspec> plan = ofNullable(caseData.getRespondent1RepaymentPlan());
-        BigDecimal amount = hasCourtDecisionInFavourOfClaimant(caseData)
-            ? caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec()
-            : plan.map(RepaymentPlanLRspec::getPaymentAmount).orElse(null);
-
-        return MonetaryConversions.penniesToPounds(
-            Optional.ofNullable(amount)
-                .map(value -> value.setScale(2))
-                .orElse(ZERO));
-    }
-
     private BigDecimal getInstallmentAmountFromRepaymentSuggestion(CaseData caseData) {
         String suggestion = caseData.getRepaymentSuggestion();
-        if (suggestion == null || suggestion.isBlank()) {
-            return null;
-        }
-        return MonetaryConversions.penniesToPounds(new BigDecimal(suggestion)).setScale(2);
+        return MonetaryConversions.penniesToPounds(new BigDecimal(suggestion));
     }
 
     private String getInstallmentPeriod(CaseData data) {
-        if (data.getPaymentTypeSelection() == DJPaymentTypeSelection.REPAYMENT_PLAN
-            && data.getRepaymentFrequency() != null) {
-            return switch (data.getRepaymentFrequency()) {
-                case ONCE_ONE_WEEK -> "WK";
-                case ONCE_TWO_WEEKS -> "FOR";
-                case ONCE_ONE_MONTH -> "MTH";
-            };
+        if (data.getPaymentTypeSelection() == DJPaymentTypeSelection.REPAYMENT_PLAN) {
+            if (data.getRepaymentFrequency().equals(RepaymentFrequencyDJ.ONCE_ONE_WEEK)) {
+                return "WK";
+            } else if (data.getRepaymentFrequency().equals(RepaymentFrequencyDJ.ONCE_TWO_WEEKS)) {
+                return "FOR";
+            } else if (data.getRepaymentFrequency().equals(RepaymentFrequencyDJ.ONCE_ONE_MONTH)) {
+                return "MTH";
+            }
+
         } else if (data.getPaymentTypeSelection() == DJPaymentTypeSelection.IMMEDIATELY) {
             return "FW";
         }

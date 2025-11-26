@@ -121,9 +121,7 @@ public class EventHistoryMapper {
         if (caseData.getRespondent2ClaimResponseIntentionType() != null) {
             return caseData.getRespondent2ClaimResponseIntentionType().getLabel();
         }
-        return caseData.getRespondent1ClaimResponseIntentionType() != null
-            ? caseData.getRespondent1ClaimResponseIntentionType().getLabel()
-            : null;
+        return caseData.getRespondent1ClaimResponseIntentionType().getLabel();
     }
 
     private void dispatchState(EventHistory.EventHistoryBuilder builder,
@@ -234,9 +232,4 @@ public class EventHistoryMapper {
         DefendantNoCDeadlineStrategy.class,
         CaseQueriesStrategy.class
     );
-
-    @SuppressWarnings("unchecked")
-    private Class<? extends EventHistoryStrategy> targetClass(EventHistoryStrategy strategy) {
-        return (Class<? extends EventHistoryStrategy>) AopUtils.getTargetClass(strategy);
-    }
 }

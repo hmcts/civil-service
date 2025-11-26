@@ -49,6 +49,7 @@ public class ClaimantResponseStrategy implements EventHistoryStrategy {
     );
     private static final String PROCEED_INTENTION = "proceed";
     private static final String NOT_PROCEED_INTENTION = "not proceed";
+    private static final String CLAIMANT_PROCEEDS_TEXT = "Claimant proceeds.";
     private static final String CLAIMANTS_PROCEED_TEXT = "Claimants proceed.";
 
     private final IStateFlowEngine stateFlowEngine;
@@ -105,7 +106,7 @@ public class ClaimantResponseStrategy implements EventHistoryStrategy {
             case ONE_V_ONE:
                 boolean useMultipartyTexts = isSmallClaimMediation(claimType, track, respondent1Mediation, applicant1Mediation);
                 handleProceedScenario(builder, caseData, useMultipartyTexts, multipartyTexts,
-                                      List.of(textFormatter.claimantProceeds()));
+                                      List.of(CLAIMANT_PROCEEDS_TEXT));
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
                 YesOrNo proceedResp1 = caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2();
@@ -113,7 +114,7 @@ public class ClaimantResponseStrategy implements EventHistoryStrategy {
                 boolean useMultiSameSolicitor = isAnyNo(proceedResp1, proceedResp2)
                     || isSmallClaimMediation(claimType, track, respondent1Mediation, applicant1Mediation);
                 handleProceedScenario(builder, caseData, useMultiSameSolicitor, multipartyTexts,
-                                      List.of(textFormatter.claimantProceeds()));
+                                      List.of(CLAIMANT_PROCEEDS_TEXT));
                 break;
             case ONE_V_TWO_TWO_LEGAL_REP:
                 YesOrNo proceedRespOne = caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2();
@@ -121,7 +122,7 @@ public class ClaimantResponseStrategy implements EventHistoryStrategy {
                 boolean useMultiTwoSolicitors = isAnyNo(proceedRespOne, proceedRespTwo)
                     || isSmallClaimMediation(claimType, track, respondent1Mediation, applicant1Mediation, respondent2Mediation);
                 handleProceedScenario(builder, caseData, useMultiTwoSolicitors, multipartyTexts,
-                                      List.of(textFormatter.claimantProceeds()));
+                                      List.of(CLAIMANT_PROCEEDS_TEXT));
                 break;
             case TWO_V_ONE:
                 YesOrNo applicant1Proceeds = caseData.getApplicant1ProceedWithClaimMultiParty2v1();
@@ -133,7 +134,7 @@ public class ClaimantResponseStrategy implements EventHistoryStrategy {
                 break;
             default:
                 handleProceedScenario(builder, caseData, false, multipartyTexts,
-                                      List.of(textFormatter.claimantProceeds()));
+                                      List.of(CLAIMANT_PROCEEDS_TEXT));
         }
     }
 

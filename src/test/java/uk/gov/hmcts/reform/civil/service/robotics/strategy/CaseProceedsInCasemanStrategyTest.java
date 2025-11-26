@@ -118,6 +118,28 @@ class CaseProceedsInCasemanStrategyTest {
     }
 
     @Test
+    void contributeAddsDuplicateWhenStateAndSdoDocumentPresent() {
+        LocalDateTime offline = LocalDateTime.of(2024, 7, 1, 12, 0);
+        CaseData caseData = CaseData.builder()
+            .takenOfflineDate(offline)
+            .orderSDODocumentDJ(Document.builder().documentFileName("sdo.pdf").build())
+            .build();
+
+        when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.TAKEN_OFFLINE_AFTER_SDO.fullName())));
+        when(sequenceGenerator.nextSequence(any())).thenReturn(1, 2);
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventHistory history = builder.build();
+        assertThat(history.getMiscellaneous()).hasSize(2);
+        assertThat(history.getMiscellaneous()).allMatch(event ->
+            event.getDateReceived().equals(offline)
+                && "RPA Reason: Case Proceeds in Caseman.".equals(event.getEventDetailsText())
+        );
+    }
+
+    @Test
     void supportsReturnsTrueWhenStateHistoryIndicatesTakenOfflineAfterSdo() {
         when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.TAKEN_OFFLINE_AFTER_SDO.fullName())));
         CaseData caseData = CaseData.builder().build();

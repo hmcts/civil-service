@@ -353,6 +353,7 @@ class DefaultJudgmentEventStrategyTest {
             .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(new BigDecimal("2000"))
             .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(LocalDate.of(2024, 9, 15))
             .repaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH)
+            .repaymentSuggestion("2000")
             .build();
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
