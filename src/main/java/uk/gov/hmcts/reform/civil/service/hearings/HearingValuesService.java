@@ -213,7 +213,7 @@ public class HearingValuesService {
             || shouldUpdateApplicant2UnavailableDates(caseData)
             || shouldUpdateRespondent1UnavailableDates(caseData)
             || shouldUpdateRespondent2UnavailableDates(caseData)) {
-            updateMissingUnavailableDatesForApplicants(caseData, builder);
+            updateMissingUnavailableDatesForApplicants(caseData);
             rollUpUnavailabilityDatesForRespondent(caseData);
             copyDatesIntoListingTabFields(builder.build(), builder);
             return true;
