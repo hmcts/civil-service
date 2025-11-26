@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -99,8 +100,9 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
         if (Optional.ofNullable(callbackParams.getRequest()).map(CallbackRequest::getEventId).isPresent()) {
             caseData.setLegacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
             caseData.setBusinessProcess(BusinessProcess.ready(CREATE_LIP_CLAIM));
-            caseData.setRespondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(
-                null).build());
+            Party party = caseData.getRespondent1();
+            party.setFlags(null);
+            caseData.setRespondent1DetailsForClaimDetailsTab(party);
 
             caseFlagsInitialiser.initialiseCaseFlags(CREATE_LIP_CLAIM, caseData);
             populateWithPartyIds(caseData);
@@ -124,10 +126,10 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
 
         if (!locations.isEmpty()) {
             LocationRefData locationRefData = locations.get(0);
-            caseData.setCaseManagementLocation(CaseLocationCivil.builder()
-                                                       .region(locationRefData.getRegionId())
-                                                       .baseLocation(locationRefData.getEpimmsId())
-                                                       .build());
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setRegion(locationRefData.getRegionId());
+            caseLocationCivil.setBaseLocation(locationRefData.getEpimmsId());
+            caseData.setCaseManagementLocation(caseLocationCivil);
             caseData.setLocationName(locationRefData.getSiteName());
         }
         if (featureToggleService.isWelshEnabledForMainCase()) {
