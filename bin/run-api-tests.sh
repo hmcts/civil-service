@@ -54,7 +54,7 @@ run_functional_tests() {
     else
       yarn test:api
     fi
-  elif [ -z "$PR_FT_GROUPS" ] || [ "$FORCE_ALL_FUNCTIONAL_TESTS" = "true" ]; then
+  elif [ -z "$PR_FT_GROUPS" ]; then
     yarn test:api-nonprod
   else
     run_functional_test_groups
@@ -83,7 +83,13 @@ run_failed_not_executed_functional_tests() {
 #MAIN SCRIPT
 TEST_FILES_REPORT="test-results/functional/testFilesReport.json"
 PREV_TEST_FILES_REPORT="test-results/functional/prevTestFilesReport.json"
-FT_TYPE_STATE_FILE="test-results/functional/prevFtType"
+FT_TYPE_STATE_FILE="./test-results/functional/prevFtType.txt"
+
+echo "Running functional tests for '$FT_TYPE'"
+
+if [ -f "$FT_TYPE_STATE_FILE" ]; then
+  echo "FT_TYPE previous state '$(cat "$FT_TYPE_STATE_FILE")' new state '$FT_TYPE'."
+fi
 
 #Check if RUN_ALL_FUNCTIONAL_TESTS is set to true
 if [ "$RUN_ALL_FUNCTIONAL_TESTS" = "true" ]; then
@@ -95,7 +101,6 @@ if [ "$RUN_ALL_FUNCTIONAL_TESTS" = "true" ]; then
 elif [ -f "$FT_TYPE_STATE_FILE" ] && [ "$(cat "$FT_TYPE_STATE_FILE")" != "$FT_TYPE" ]; then
   echo "FT_TYPE changed from '$(cat "$FT_TYPE_STATE_FILE")' to '$FT_TYPE'."
   echo "Ignoring $TEST_FILES_REPORT and running all functional tests."
-  export FORCE_ALL_FUNCTIONAL_TESTS=true
   run_functional_tests
 
 #Check if testFilesReport.json exists and is non-empty
