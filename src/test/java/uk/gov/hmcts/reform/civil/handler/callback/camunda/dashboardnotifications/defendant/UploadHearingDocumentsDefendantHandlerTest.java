@@ -67,10 +67,8 @@ class UploadHearingDocumentsDefendantHandlerTest extends BaseCallbackHandlerTest
 
     @Test
     void createDashboardNotifications() {
-
         params.put("ccdCaseReference", "1239988");
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
@@ -103,7 +101,6 @@ class UploadHearingDocumentsDefendantHandlerTest extends BaseCallbackHandlerTest
 
         params.put("ccdCaseReference", "1239988");
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
@@ -137,7 +134,6 @@ class UploadHearingDocumentsDefendantHandlerTest extends BaseCallbackHandlerTest
 
         params.put("ccdCaseReference", "1239988");
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);

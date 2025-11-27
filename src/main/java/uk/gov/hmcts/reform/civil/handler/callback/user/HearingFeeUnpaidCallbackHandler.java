@@ -47,10 +47,9 @@ public class HearingFeeUnpaidCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse setCaseDismissedHearingFeeDueDate(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData().toBuilder()
-            .businessProcess(BusinessProcess.ready(HEARING_FEE_UNPAID))
-            .caseDismissedHearingFeeDueDate(time.now())
-            .build();
+        CaseData caseData = callbackParams.getCaseData();
+        caseData.setBusinessProcess(BusinessProcess.ready(HEARING_FEE_UNPAID));
+        caseData.setCaseDismissedHearingFeeDueDate(time.now());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(mapper))

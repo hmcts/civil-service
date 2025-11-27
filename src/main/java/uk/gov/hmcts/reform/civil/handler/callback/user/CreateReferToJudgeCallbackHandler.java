@@ -63,9 +63,7 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
 
     private CallbackResponse submitReferToJudge(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        boolean leadDefendantIs1 = locationHelper.leadDefendantIs1(caseData);
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.isReferToJudgeClaim(YesOrNo.YES);
+        caseData.setIsReferToJudgeClaim(YesOrNo.YES);
 
         if (CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             locationHelper.getClaimantRequestedCourt(caseData)
@@ -76,13 +74,13 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
                                            callbackParams.getParams().get(BEARER_TOKEN).toString()),
                                        requestedCourt)
                                    .ifPresent(matchingLocation ->
-                                                  LocationHelper.updateWithLocation(caseDataBuilder, matchingLocation)
+                                                  LocationHelper.updateWithLocation(caseData, matchingLocation)
                                    )
                 );
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

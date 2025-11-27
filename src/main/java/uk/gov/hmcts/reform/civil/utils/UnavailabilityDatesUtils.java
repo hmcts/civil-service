@@ -104,8 +104,7 @@ public class UnavailabilityDatesUtils {
         }
     }
 
-    public static void rollUpUnavailabilityDatesForApplicantDJ(CaseData.CaseDataBuilder<?, ?> builder) {
-        CaseData caseData = builder.build();
+    public static void rollUpUnavailabilityDatesForApplicantDJ(CaseData caseData) {
         if (caseData.getHearingSupportRequirementsDJ() != null
             && YES.equals(caseData.getHearingSupportRequirementsDJ().getHearingUnavailableDates())) {
             List<UnavailableDate> unavailableDates = new ArrayList<>();
@@ -118,34 +117,34 @@ public class UnavailabilityDatesUtils {
                 UnavailableDateType type = fromDate.isEqual(toDate) ? SINGLE_DATE : DATE_RANGE;
 
                 if (SINGLE_DATE.equals(type)) {
-                    unavailableDates.add(UnavailableDate.builder()
-                                             .eventAdded(DJ_EVENT)
-                                             .dateAdded(dateAdded)
-                                             .date(fromDate)
-                                             .unavailableDateType(type)
-                                             .build());
+                    UnavailableDate unavailableDate1 =  new UnavailableDate();
+                    unavailableDate1.setEventAdded(DJ_EVENT);
+                    unavailableDate1.setDateAdded(dateAdded);
+                    unavailableDate1.setDate(fromDate);
+                    unavailableDate1.setUnavailableDateType(type);
+                    unavailableDates.add(unavailableDate1);
                 } else {
-                    unavailableDates.add(UnavailableDate.builder()
-                                             .eventAdded(DJ_EVENT)
-                                             .dateAdded(dateAdded)
-                                             .fromDate(fromDate)
-                                             .toDate(toDate)
-                                             .unavailableDateType(type)
-                                             .build());
+                    UnavailableDate unavailableDate1 =  new UnavailableDate();
+                    unavailableDate1.setEventAdded(DJ_EVENT);
+                    unavailableDate1.setDateAdded(dateAdded);
+                    unavailableDate1.setFromDate(fromDate);
+                    unavailableDate1.setToDate(toDate);
+                    unavailableDate1.setUnavailableDateType(type);
+                    unavailableDates.add(unavailableDate1);
                 }
             }
 
-            builder.applicant1(caseData.getApplicant1().toBuilder()
-                                   .unavailableDates(wrapElements(unavailableDates))
-                                   .build());
+            Party applicant1 = caseData.getApplicant1();
+            applicant1.setUnavailableDates(wrapElements(unavailableDates));
+            caseData.setApplicant1(applicant1);
 
-            builder.applicant1UnavailableDatesForTab(wrapElements(unavailableDates));
+            caseData.setApplicant1UnavailableDatesForTab(wrapElements(unavailableDates));
 
             if (caseData.getApplicant2() != null) {
-                builder.applicant2(caseData.getApplicant2().toBuilder()
-                                       .unavailableDates(wrapElements(unavailableDates))
-                                       .build());
-                builder.applicant2UnavailableDatesForTab(wrapElements(unavailableDates));
+                Party applicant2 = caseData.getApplicant1();
+                applicant2.setUnavailableDates(wrapElements(unavailableDates));
+                caseData.setApplicant2(applicant2);
+                caseData.setApplicant2UnavailableDatesForTab(wrapElements(unavailableDates));
             }
         }
     }
@@ -391,11 +390,11 @@ public class UnavailabilityDatesUtils {
         caseData.setRespondent2UnavailableDatesForTab(dates);
     }
 
-    public static void updateMissingUnavailableDatesForApplicants(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+    public static void updateMissingUnavailableDatesForApplicants(CaseData caseData) {
         if (isClaimantIntentionEvent(caseData)) {
             rollUpUnavailabilityDatesForApplicant(caseData);
         } else {
-            rollUpUnavailabilityDatesForApplicantDJ(builder);
+            rollUpUnavailabilityDatesForApplicantDJ(caseData);
         }
     }
 
