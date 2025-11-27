@@ -9,9 +9,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgementDeductionValue;
 
 import java.util.Optional;
 
-/**
- * Central place for the deduction-value cloning logic shared across all tracks.
- */
 @Service
 public class SdoJudgementDeductionService {
 

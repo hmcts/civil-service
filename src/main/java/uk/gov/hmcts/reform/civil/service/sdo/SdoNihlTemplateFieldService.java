@@ -14,10 +14,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Consolidates NIHL-specific toggle and narrative helpers so Docmosis builders
- * can remain orchestration-focused and avoid poking at {@link CaseData}.
- */
 @Service
 public class SdoNihlTemplateFieldService {
 

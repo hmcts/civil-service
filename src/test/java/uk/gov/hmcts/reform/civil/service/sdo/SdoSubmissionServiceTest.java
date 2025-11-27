@@ -26,7 +26,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -195,14 +194,14 @@ class SdoSubmissionServiceTest {
 
         service.prepareSubmission(caseData, AUTH_TOKEN);
 
-        verify(caseProgressionService).applyCaseProgressionRouting(eq(caseData), eq(AUTH_TOKEN), eq(false), eq(true));
+        verify(caseProgressionService).applyCaseProgressionRouting(caseData, AUTH_TOKEN, false, true);
     }
 
     private void mockEaCourtMutation(CaseData caseData, YesOrNo value) {
         doAnswer(invocation -> {
             caseData.setEaCourtLocation(value);
             return null;
-        }).when(caseProgressionService).applyCaseProgressionRouting(eq(caseData), eq(AUTH_TOKEN), eq(false), eq(true));
+        }).when(caseProgressionService).applyCaseProgressionRouting(caseData, AUTH_TOKEN, false, true);
     }
 
 }

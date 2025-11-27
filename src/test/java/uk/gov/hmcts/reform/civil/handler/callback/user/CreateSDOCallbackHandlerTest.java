@@ -18,7 +18,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
-import uk.gov.hmcts.reform.civil.bankholidays.NonWorkingDaysCollection;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
@@ -148,7 +147,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -296,8 +294,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         return createDynamicList(List.of(element1, element2, element3), element2);
     }
 
-    private static CaseDocument createCaseDocument(String documentUrl) {
-        Document document = new Document(documentUrl, null, null, null, null, null);
+    private static CaseDocument createCaseDocument() {
+        Document document = new Document("url", null, null, null, null, null);
         CaseDocument caseDocument = new CaseDocument();
         caseDocument.setDocumentLink(document);
         return caseDocument;
@@ -310,8 +308,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         return location;
     }
 
-    private static CaseData withCaseManagementLocation(CaseData caseData, String baseLocation, String region) {
-        caseData.setCaseManagementLocation(createCaseLocation(baseLocation, region));
+    private static CaseData withCaseManagementLocation(CaseData caseData) {
+        caseData.setCaseManagementLocation(createCaseLocation("00000", null));
         return caseData;
     }
 
@@ -320,6 +318,33 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         clone.setListItems(source.getListItems());
         clone.setValue(value);
         return clone;
+    }
+
+    private SdoR2WitnessOfFact createWitnessesOfFact(LocalDate testDate, boolean valid) {
+        Integer testWitnesses = valid ? 0 : -1;
+        SdoR2RestrictNoOfWitnessDetails witnessDetails = new SdoR2RestrictNoOfWitnessDetails();
+        witnessDetails.setNoOfWitnessClaimant(testWitnesses);
+        witnessDetails.setNoOfWitnessDefendant(testWitnesses);
+
+        SdoR2RestrictWitness restrictWitness = new SdoR2RestrictWitness();
+        restrictWitness.setRestrictNoOfWitnessDetails(witnessDetails);
+
+        SdoR2WitnessOfFact witnessesOfFact = new SdoR2WitnessOfFact();
+        witnessesOfFact.setSdoWitnessDeadlineDate(testDate);
+        witnessesOfFact.setSdoR2RestrictWitness(restrictWitness);
+        return witnessesOfFact;
+    }
+
+    private SdoR2SmallClaimsWitnessStatements createWitnessStatements(boolean valid) {
+        int countWitness = valid ? 0 : -1;
+        SdoR2SmallClaimsRestrictWitness restrictWitness = new SdoR2SmallClaimsRestrictWitness();
+        restrictWitness.setNoOfWitnessClaimant(countWitness);
+        restrictWitness.setNoOfWitnessDefendant(countWitness);
+
+        SdoR2SmallClaimsWitnessStatements witnessStatements = new SdoR2SmallClaimsWitnessStatements();
+        witnessStatements.setIsRestrictWitness(YES);
+        witnessStatements.setSdoR2SmallClaimsRestrictWitness(restrictWitness);
+        return witnessStatements;
     }
 
     @MockBean
@@ -332,16 +357,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     private CreateSDOCallbackHandler handler;
 
     @Autowired
-    private AssignCategoryId assignCategoryId;
-
-    @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private DirectionsOrderCallbackPipeline directionsOrderCallbackPipeline;
-
-    @Autowired
-    private DirectionsOrderStageExecutor directionsOrderStageExecutor;
 
     @Autowired
     private SdoNarrativeService sdoNarrativeService;
@@ -359,13 +375,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     private SdoGeneratorService sdoGeneratorService;
 
     @MockBean
-    private NonWorkingDaysCollection nonWorkingDaysCollection;
-
-    @MockBean
     private CategoryService categoryService;
-
-    @Autowired
-    private LocationHelper locationHelper;
 
     @Value("${court-location.unspecified-claim.epimms-id}")
     private String ccmccEpimsId;
@@ -410,7 +420,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
-            CaseDocument order = createCaseDocument("url");
+            CaseDocument order = createCaseDocument();
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -448,7 +458,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
-            CaseDocument order = createCaseDocument("url");
+            CaseDocument order = createCaseDocument();
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -495,7 +505,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setCaseDataLiP(caseDataLiP);
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
-            CaseDocument order = createCaseDocument("url");
+            CaseDocument order = createCaseDocument();
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -542,7 +552,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setCaseDataLiP(caseDataLiP);
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
-            CaseDocument order = createCaseDocument("url");
+            CaseDocument order = createCaseDocument();
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -589,7 +599,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setCaseDataLiP(respondentLipData);
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
-            CaseDocument order = createCaseDocument("url");
+            CaseDocument order = createCaseDocument();
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -615,7 +625,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
-            CaseDocument order = createCaseDocument("url");
+            CaseDocument order = createCaseDocument();
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -746,7 +756,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateDefaultFieldsForNihl() {
-            List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+            List<FastTrack> fastTrackList = new ArrayList<>();
             fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
 
             String preSelectedCourt = "214320";
@@ -1096,6 +1106,30 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsExactly("def court request region", "def court requested epimm");
         }
 
+        private Applicant1DQ buildApplicantRequestedCourt() {
+            CaseLocationCivil applicantRequestedLocation = new CaseLocationCivil();
+            applicantRequestedLocation.setBaseLocation("app court requested epimm");
+            applicantRequestedLocation.setRegion("app court request region");
+            RequestedCourt applicantRequestedCourt = new RequestedCourt();
+            applicantRequestedCourt.setCaseLocation(applicantRequestedLocation);
+            applicantRequestedCourt.setResponseCourtCode("123");
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQRequestedCourt(applicantRequestedCourt);
+            return applicant1DQ;
+        }
+
+        private Respondent1DQ buildRespondentRequestedCourt() {
+            CaseLocationCivil respondentRequestedLocation = new CaseLocationCivil();
+            respondentRequestedLocation.setBaseLocation("def court requested epimm");
+            respondentRequestedLocation.setRegion("def court request region");
+            RequestedCourt respondentRequestedCourt = new RequestedCourt();
+            respondentRequestedCourt.setCaseLocation(respondentRequestedLocation);
+            respondentRequestedCourt.setResponseCourtCode("321");
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQRequestedCourt(respondentRequestedCourt);
+            return respondent1DQ;
+        }
+
         @Test
         void shouldNotUpdateCaseManagementLocation_whenNotUnder1000SpecCcmcc() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
@@ -1110,29 +1144,17 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             applicant1.setType(Party.Type.INDIVIDUAL);
             caseData.setApplicant1(applicant1);
 
-            CaseLocationCivil applicantRequestedLocation = new CaseLocationCivil();
-            applicantRequestedLocation.setBaseLocation("app court requested epimm");
-            applicantRequestedLocation.setRegion("app court request region");
-            RequestedCourt applicantRequestedCourt = new RequestedCourt();
-            applicantRequestedCourt.setCaseLocation(applicantRequestedLocation);
-            applicantRequestedCourt.setResponseCourtCode("123");
-            Applicant1DQ applicant1DQ = new Applicant1DQ();
-            applicant1DQ.setApplicant1DQRequestedCourt(applicantRequestedCourt);
-            caseData.setApplicant1DQ(applicant1DQ);
+            caseData.setApplicant1DQ(
+                buildApplicantRequestedCourt()
+            );
 
             Party respondent1 = new Party();
             respondent1.setType(Party.Type.INDIVIDUAL);
             caseData.setRespondent1(respondent1);
 
-            CaseLocationCivil respondentRequestedLocation = new CaseLocationCivil();
-            respondentRequestedLocation.setBaseLocation("def court requested epimm");
-            respondentRequestedLocation.setRegion("def court request region");
-            RequestedCourt respondentRequestedCourt = new RequestedCourt();
-            respondentRequestedCourt.setCaseLocation(respondentRequestedLocation);
-            respondentRequestedCourt.setResponseCourtCode("321");
-            Respondent1DQ respondent1DQ = new Respondent1DQ();
-            respondent1DQ.setRespondent1DQRequestedCourt(respondentRequestedCourt);
-            caseData.setRespondent1DQ(respondent1DQ);
+            caseData.setRespondent1DQ(
+                buildRespondentRequestedCourt()
+            );
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1148,24 +1170,20 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
 
         private CallbackParams params;
-        private CaseData caseData;
-        private String userId;
 
-        private static final String EMAIL = "example@email.com";
         private final LocalDateTime submittedDate = LocalDateTime.now();
 
         @BeforeEach
         void setup() {
             List<String> items = List.of("label 1", "label 2", "label 3");
             DynamicList localOptions = DynamicList.fromList(items, Object::toString, items.get(0), false);
-            caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             caseData.setCaseManagementLocation(createCaseLocation("00000", null));
             caseData.setDisposalHearingMethodInPerson(localOptions);
             caseData.setFastTrackMethodInPerson(localOptions);
             caseData.setSmallClaimsMethodInPerson(localOptions);
             caseData.setSetFastTrackFlag(YES);
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            userId = UUID.randomUUID().toString();
 
             given(time.now()).willReturn(submittedDate);
 
@@ -1190,16 +1208,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class AboutToSubmitCallbackVariableCase {
-
-        private String userId;
-
-        private static final String EMAIL = "example@email.com";
         private final LocalDateTime submittedDate = LocalDateTime.now();
 
         @BeforeEach
         void setup() {
-            userId = UUID.randomUUID().toString();
-
             given(time.now()).willReturn(submittedDate);
         }
 
@@ -1228,16 +1240,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class AboutToSubmitCallbackWelshParty {
-
-        private String userId;
-
-        private static final String EMAIL = "example@email.com";
         private final LocalDateTime submittedDate = LocalDateTime.now();
 
         @BeforeEach
         void setup() {
-            userId = UUID.randomUUID().toString();
-
             given(time.now()).willReturn(submittedDate);
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         }
@@ -1245,7 +1251,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSaveDocumentToTempList_whenClaimantIsWelsh() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            caseData.setSdoOrderDocument(createCaseDocument("url"));
+            caseData.setSdoOrderDocument(createCaseDocument());
             caseData.setClaimantBilingualLanguagePreference("WELSH");
             caseData.setCaseManagementLocation(createCaseLocation("00000", null));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1260,7 +1266,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSaveDocumentToTempList_whenDefendantIsWelsh() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            caseData.setSdoOrderDocument(createCaseDocument("url"));
+            caseData.setSdoOrderDocument(createCaseDocument());
             RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
             respondentLiPResponse.setRespondent1ResponseLanguage("BOTH");
             CaseDataLiP caseDataLiP = new CaseDataLiP();
@@ -1285,23 +1291,21 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         DynamicListElement optionThree = createDynamicListElement("00003", "court 3 - 3 address - Y03 7RB");
         DynamicList localOptions = createDynamicList(List.of(optionOne, optionTwo, optionThree), null);
 
-        DynamicListElement selectedCourt = optionTwo;
-
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
         caseData.setDisposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson);
-        caseData.setDisposalHearingMethodInPerson(cloneDynamicListWithValue(localOptions, selectedCourt));
+        caseData.setDisposalHearingMethodInPerson(cloneDynamicListWithValue(localOptions, optionTwo));
         caseData.setFastTrackMethodInPerson(localOptions);
         caseData.setSmallClaimsMethodInPerson(localOptions);
-        caseData.setDisposalHearingMethodInPerson(cloneDynamicListWithValue(localOptions, selectedCourt));
+        caseData.setDisposalHearingMethodInPerson(cloneDynamicListWithValue(localOptions, optionTwo));
         caseData.setDisposalHearingMethodToggle(Collections.singletonList(OrderDetailsPagesSectionsToggle.SHOW));
         caseData.setOrderType(OrderType.DISPOSAL);
         caseData.setRespondent1Represented(NO);
-        caseData.setCaseManagementLocation(createCaseLocation(selectedCourt.getCode(), null));
+        caseData.setCaseManagementLocation(createCaseLocation(optionTwo.getCode(), null));
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isLocationWhiteListedForCaseProgression(selectedCourt.getCode()))
+        when(featureToggleService.isLocationWhiteListedForCaseProgression(optionTwo.getCode()))
             .thenReturn(isLocationWhiteListed);
-        when(locationRefDataService.getLocationMatchingLabel(selectedCourt.getCode(), params.getParams().get(
+        when(locationRefDataService.getLocationMatchingLabel(optionTwo.getCode(), params.getParams().get(
             CallbackParams.Params.BEARER_TOKEN).toString()))
             .thenReturn(Optional.of(LocationRefData.builder()
                                         .regionId("region id")
@@ -1517,9 +1521,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     static Stream<Arguments> testDataUnspec() {
         CaseData scenario1 = withCaseManagementLocation(
-            CaseDataBuilder.builder().atStateClaimDraft().build(),
-            "00000",
-            null
+            CaseDataBuilder.builder().atStateClaimDraft().build()
         );
         DynamicListElement selectedCourt = createDynamicListElement("00002", "court 2 - 2 address - Y02 7RB");
         DynamicList fastTrackSelection = cloneDynamicListWithValue(options, selectedCourt);
@@ -1530,9 +1532,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         scenario1.setClaimsTrack(ClaimsTrack.fastTrack);
 
         CaseData scenario2 = withCaseManagementLocation(
-            CaseDataBuilder.builder().atStateClaimDraft().build(),
-            "00000",
-            null
+            CaseDataBuilder.builder().atStateClaimDraft().build()
         );
         scenario2.setCaseAccessCategory(UNSPEC_CLAIM);
         scenario2.setAllocatedTrack(AllocatedTrack.SMALL_CLAIM);
@@ -1542,9 +1542,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         scenario2.setOrderType(OrderType.DECIDE_DAMAGES);
 
         CaseData scenario3 = withCaseManagementLocation(
-            CaseDataBuilder.builder().atStateClaimDraft().build(),
-            "00000",
-            null
+            CaseDataBuilder.builder().atStateClaimDraft().build()
         );
         DynamicList disposalSelection = cloneDynamicListWithValue(options, selectedCourt);
         scenario3.setCaseAccessCategory(UNSPEC_CLAIM);
@@ -1555,9 +1553,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         scenario3.setOrderType(OrderType.DISPOSAL);
 
         CaseData scenario4 = withCaseManagementLocation(
-            CaseDataBuilder.builder().atStateClaimDraft().build(),
-            "00000",
-            null
+            CaseDataBuilder.builder().atStateClaimDraft().build()
         );
         DynamicList smallClaimsSelection = cloneDynamicListWithValue(options, selectedCourt);
         scenario4.setCaseAccessCategory(UNSPEC_CLAIM);
@@ -1567,9 +1563,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         scenario4.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
 
         CaseData scenario5 = withCaseManagementLocation(
-            CaseDataBuilder.builder().atStateClaimDraft().build(),
-            "00000",
-            null
+            CaseDataBuilder.builder().atStateClaimDraft().build()
         );
         scenario5.setCaseAccessCategory(UNSPEC_CLAIM);
         scenario5.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
@@ -1579,9 +1573,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         scenario5.setOrderType(OrderType.DECIDE_DAMAGES);
 
         CaseData scenario6 = withCaseManagementLocation(
-            CaseDataBuilder.builder().atStateClaimDraft().build(),
-            "00000",
-            null
+            CaseDataBuilder.builder().atStateClaimDraft().build()
         );
         scenario6.setCaseAccessCategory(UNSPEC_CLAIM);
         scenario6.setAllocatedTrack(AllocatedTrack.SMALL_CLAIM);
@@ -1615,9 +1607,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         DynamicListElement selectedCourt = createDynamicListElement("00002", "court 2 - 2 address - Y02 7RB");
 
         CaseData scenario1 = withCaseManagementLocation(
-            CaseDataBuilder.builder().atStateClaimDraft().build(),
-            "00000",
-            null
+            CaseDataBuilder.builder().atStateClaimDraft().build()
         );
         scenario1.setCaseAccessCategory(SPEC_CLAIM);
         scenario1.setResponseClaimTrack("SMALL_CLAIM");
@@ -1626,9 +1616,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         scenario1.setClaimsTrack(ClaimsTrack.fastTrack);
 
         CaseData scenario2 = withCaseManagementLocation(
-            CaseDataBuilder.builder().atStateClaimDraft().build(),
-            "00000",
-            null
+            CaseDataBuilder.builder().atStateClaimDraft().build()
         );
         scenario2.setCaseAccessCategory(SPEC_CLAIM);
         scenario2.setResponseClaimTrack("SMALL_CLAIM");
@@ -1638,9 +1626,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         scenario2.setOrderType(OrderType.DECIDE_DAMAGES);
 
         CaseData scenario3 = withCaseManagementLocation(
-            CaseDataBuilder.builder().atStateClaimDraft().build(),
-            "00000",
-            null
+            CaseDataBuilder.builder().atStateClaimDraft().build()
         );
         scenario3.setCaseAccessCategory(SPEC_CLAIM);
         scenario3.setResponseClaimTrack("SMALL_CLAIM");
@@ -1649,9 +1635,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         scenario3.setOrderType(OrderType.DECIDE_DAMAGES);
 
         CaseData scenario4 = withCaseManagementLocation(
-            CaseDataBuilder.builder().atStateClaimDraft().build(),
-            "00000",
-            null
+            CaseDataBuilder.builder().atStateClaimDraft().build()
         );
         scenario4.setCaseAccessCategory(SPEC_CLAIM);
         scenario4.setResponseClaimTrack("FAST_CLAIM");
@@ -1661,9 +1645,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         scenario4.setOrderType(OrderType.DISPOSAL);
 
         CaseData scenario5 = withCaseManagementLocation(
-            CaseDataBuilder.builder().atStateClaimDraft().build(),
-            "00000",
-            null
+            CaseDataBuilder.builder().atStateClaimDraft().build()
         );
         scenario5.setCaseAccessCategory(SPEC_CLAIM);
         scenario5.setResponseClaimTrack("FAST_CLAIM");
@@ -1672,9 +1654,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         scenario5.setOrderType(OrderType.DISPOSAL);
 
         CaseData scenario6 = withCaseManagementLocation(
-            CaseDataBuilder.builder().atStateClaimDraft().build(),
-            "00000",
-            null
+            CaseDataBuilder.builder().atStateClaimDraft().build()
         );
         scenario6.setCaseAccessCategory(SPEC_CLAIM);
         scenario6.setResponseClaimTrack("FAST_CLAIM");
@@ -1683,9 +1663,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         scenario6.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
 
         CaseData scenario7 = withCaseManagementLocation(
-            CaseDataBuilder.builder().atStateClaimDraft().build(),
-            "00000",
-            null
+            CaseDataBuilder.builder().atStateClaimDraft().build()
         );
         scenario7.setCaseAccessCategory(SPEC_CLAIM);
         scenario7.setResponseClaimTrack("FAST_CLAIM");
@@ -1695,9 +1673,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         scenario7.setOrderType(OrderType.DECIDE_DAMAGES);
 
         CaseData scenario8 = withCaseManagementLocation(
-            CaseDataBuilder.builder().atStateClaimDraft().build(),
-            "00000",
-            null
+            CaseDataBuilder.builder().atStateClaimDraft().build()
         );
         scenario8.setCaseAccessCategory(SPEC_CLAIM);
         scenario8.setResponseClaimTrack("FAST_CLAIM");
@@ -1706,9 +1682,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         scenario8.setOrderType(OrderType.DECIDE_DAMAGES);
 
         CaseData scenario9 = withCaseManagementLocation(
-            CaseDataBuilder.builder().atStateClaimDraft().build(),
-            "00000",
-            null
+            CaseDataBuilder.builder().atStateClaimDraft().build()
         );
         scenario9.setCaseAccessCategory(SPEC_CLAIM);
         scenario9.setResponseClaimTrack("SMALL_CLAIM");
@@ -1734,13 +1708,12 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     class MidEventPrePopulateOrderDetailsPagesCallback extends LocationRefSampleDataBuilder {
         private LocalDate newDate;
         private LocalDate nextWorkingDayDate;
-        private LocalDateTime localDateTime;
 
         @BeforeEach
         void setup() {
             newDate = LocalDate.of(2020, 1, 15);
             nextWorkingDayDate = LocalDate.of(2023, 12, 15);
-            localDateTime = LocalDateTime.of(2020, 1, 1, 12, 0, 0);
+            LocalDateTime localDateTime = LocalDateTime.of(2020, 1, 1, 12, 0, 0);
             when(time.now()).thenReturn(localDateTime);
             when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(nextWorkingDayDate);
             when(deadlinesCalculator.calculateFirstWorkingDay(any(LocalDate.class))).thenReturn(nextWorkingDayDate);
@@ -1957,13 +1930,14 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("The claimant must prepare a Scott Schedule of the defects, items of damage, "
                                + "or any other relevant matters");
             assertThat(response.getData()).extracting("fastTrackBuildingDispute").extracting("input2")
-                .isEqualTo("The columns should be headed:\n"
-                               + "  •  Item\n"
-                               + "  •  Alleged defect\n"
-                               + "  •  Claimant’s costing\n"
-                               + "  •  Defendant’s response\n"
-                               + "  •  Defendant’s costing\n"
-                               + "  •  Reserved for Judge’s use");
+                .isEqualTo("""
+                        The columns should be headed:
+                          •  Item
+                          •  Alleged defect
+                          •  Claimant’s costing
+                          •  Defendant’s response
+                          •  Defendant’s costing
+                          •  Reserved for Judge’s use""");
             assertThat(response.getData()).extracting("fastTrackBuildingDispute").extracting("input3")
                 .isEqualTo("The claimant must upload to the Digital Portal the Scott Schedule with the relevant columns"
                                + " completed by 4pm on");
@@ -1992,23 +1966,26 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "to the pages in that bundle.");
 
             assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting("input1")
-                .isEqualTo("If impecuniosity is alleged by the claimant and not admitted by the defendant, the "
-                               + "claimant's disclosure as ordered earlier in this Order must include:\n"
-                               + "a) Evidence of all income from all sources for a period of 3 months prior to the "
-                               + "commencement of hire until the earlier of:\n "
-                               + "     i) 3 months after cessation of hire\n"
-                               + "     ii) the repair or replacement of the claimant's vehicle\n"
-                               + "b) Copies of all bank, credit card, and saving account statements for a period of 3"
-                               + " months prior to the commencement of hire until the earlier of:\n"
-                               + "     i) 3 months after cessation of hire\n"
-                               + "     ii) the repair or replacement of the claimant's vehicle\n"
-                               + "c) Evidence of any loan, overdraft or other credit facilities available to the "
-                               + "claimant.");
+                .isEqualTo("""
+                        If impecuniosity is alleged by the claimant and not admitted by the defendant, the \
+                        claimant's disclosure as ordered earlier in this Order must include:
+                        a) Evidence of all income from all sources for a period of 3 months prior to the \
+                        commencement of hire until the earlier of:
+                         \
+                             i) 3 months after cessation of hire
+                             ii) the repair or replacement of the claimant's vehicle
+                        b) Copies of all bank, credit card, and saving account statements for a period of 3\
+                         months prior to the commencement of hire until the earlier of:
+                             i) 3 months after cessation of hire
+                             ii) the repair or replacement of the claimant's vehicle
+                        c) Evidence of any loan, overdraft or other credit facilities available to the \
+                        claimant.""");
             assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting(
                     "sdoR2FastTrackCreditHireDetails").extracting("input2")
-                .isEqualTo("The claimant must upload to the Digital Portal a witness statement addressing\n"
-                               + "a) the need to hire a replacement vehicle; and\n"
-                               + "b) impecuniosity");
+                .isEqualTo("""
+                        The claimant must upload to the Digital Portal a witness statement addressing
+                        a) the need to hire a replacement vehicle; and
+                        b) impecuniosity""");
             assertThat(response.getData()).extracting("sdoR2FastTrackCreditHire").extracting(
                     "sdoR2FastTrackCreditHireDetails").extracting("date1")
                 .isEqualTo(nextWorkingDayDate.toString());
@@ -2046,11 +2023,12 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackHousingDisrepair").extracting("input1")
                 .isEqualTo("The claimant must prepare a Scott Schedule of the items in disrepair.");
             assertThat(response.getData()).extracting("fastTrackHousingDisrepair").extracting("input2")
-                .isEqualTo("The columns should be headed:\n"
-                               + "  •  Item\n"
-                               + "  •  Alleged disrepair\n"
-                               + "  •  Defendant’s response\n"
-                               + "  •  Reserved for Judge’s use");
+                .isEqualTo("""
+                        The columns should be headed:
+                          •  Item
+                          •  Alleged disrepair
+                          •  Defendant’s response
+                          •  Reserved for Judge’s use""");
             assertThat(response.getData()).extracting("fastTrackHousingDisrepair").extracting("input3")
                 .isEqualTo("The claimant must upload to the Digital Portal the Scott Schedule with the relevant "
                                + "columns completed by 4pm on");
@@ -2127,22 +2105,25 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).doesNotHaveToString("smallClaimsFlightDelay");
 
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input1")
-                .isEqualTo("If impecuniosity is alleged by the claimant and not admitted by the defendant, the "
-                               + "claimant's disclosure as ordered earlier in this Order must include:\n"
-                               + "a) Evidence of all income from all sources for a period of 3 months prior to the "
-                               + "commencement of hire until the earlier of:\n "
-                               + "     i) 3 months after cessation of hire\n"
-                               + "     ii) the repair or replacement of the claimant's vehicle\n"
-                               + "b) Copies of all bank, credit card, and saving account statements for a period of 3"
-                               + " months prior to the commencement of hire until the earlier of:\n"
-                               + "     i) 3 months after cessation of hire\n"
-                               + "     ii) the repair or replacement of the claimant's vehicle\n"
-                               + "c) Evidence of any loan, overdraft or other credit facilities available to the "
-                               + "claimant.");
+                .isEqualTo("""
+                        If impecuniosity is alleged by the claimant and not admitted by the defendant, the \
+                        claimant's disclosure as ordered earlier in this Order must include:
+                        a) Evidence of all income from all sources for a period of 3 months prior to the \
+                        commencement of hire until the earlier of:
+                         \
+                             i) 3 months after cessation of hire
+                             ii) the repair or replacement of the claimant's vehicle
+                        b) Copies of all bank, credit card, and saving account statements for a period of 3\
+                         months prior to the commencement of hire until the earlier of:
+                             i) 3 months after cessation of hire
+                             ii) the repair or replacement of the claimant's vehicle
+                        c) Evidence of any loan, overdraft or other credit facilities available to the \
+                        claimant.""");
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input2")
-                .isEqualTo("The claimant must upload to the Digital Portal a witness statement addressing\n"
-                               + "a) the need to hire a replacement vehicle; and\n"
-                               + "b) impecuniosity");
+                .isEqualTo("""
+                        The claimant must upload to the Digital Portal a witness statement addressing
+                        a) the need to hire a replacement vehicle; and
+                        b) impecuniosity""");
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("date1")
                 .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input3")
@@ -2254,18 +2235,20 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("smallClaimsFlightDelay").extracting("relatedClaimsInput")
-                .isEqualTo("In the event that the Claimant(s) or Defendant(s) are aware if other \n"
-                               + "claims relating to the same flight they must notify the court \n"
-                               + "where the claim is being managed within 14 days of receipt of \n"
-                               + "this Order providing all relevant details of those claims including \n"
-                               + "case number(s), hearing date(s) and copy final substantive order(s) \n"
-                               + "if any, to assist the Court with ongoing case management which may \n"
-                               + "include the cases being heard together.");
+                .isEqualTo("""
+                        In the event that the Claimant(s) or Defendant(s) are aware if other\s
+                        claims relating to the same flight they must notify the court\s
+                        where the claim is being managed within 14 days of receipt of\s
+                        this Order providing all relevant details of those claims including\s
+                        case number(s), hearing date(s) and copy final substantive order(s)\s
+                        if any, to assist the Court with ongoing case management which may\s
+                        include the cases being heard together.""");
             assertThat(response.getData()).extracting("smallClaimsFlightDelay").extracting("legalDocumentsInput")
-                .isEqualTo("Any arguments as to the law to be applied to this claim, together with \n"
-                               + "copies of legal authorities or precedents relied on, shall be uploaded \n"
-                               + "to the Digital Portal not later than 3 full working days before the \n"
-                               + "final hearing date.");
+                .isEqualTo("""
+                        Any arguments as to the law to be applied to this claim, together with\s
+                        copies of legal authorities or precedents relied on, shall be uploaded\s
+                        to the Digital Portal not later than 3 full working days before the\s
+                        final hearing date.""");
 
         }
 
@@ -2739,7 +2722,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void fastTRackSdoR2NihlPathTwo() {
 
-            List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+            List<FastTrack> fastTrackList = new ArrayList<>();
             fastTrackList.add(FastTrack.fastClaimBuildingDispute);
             fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
 
@@ -2762,7 +2745,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void fastTrackFlagSetToYesNihlPathOne() {
-            List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+            List<FastTrack> fastTrackList = new ArrayList<>();
             fastTrackList.add(FastTrack.fastClaimBuildingDispute);
             fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
 
@@ -2826,7 +2809,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = createCaseDocument("url");
+            CaseDocument order = createCaseDocument();
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
@@ -2838,7 +2821,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedDisposalHearingSDOTelephoneHearing().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = createCaseDocument("url");
+            CaseDocument order = createCaseDocument();
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
@@ -2850,7 +2833,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedDisposalHearingSDOVideoHearing().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = createCaseDocument("url");
+            CaseDocument order = createCaseDocument();
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
@@ -2862,7 +2845,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedFastTrackSDOInPersonHearing().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = createCaseDocument("url");
+            CaseDocument order = createCaseDocument();
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
@@ -2874,7 +2857,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedFastTrackSDOTelephoneHearing().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = createCaseDocument("url");
+            CaseDocument order = createCaseDocument();
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
@@ -2886,7 +2869,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedFastTrackSDOVideoHearing().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = createCaseDocument("url");
+            CaseDocument order = createCaseDocument();
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
@@ -2898,7 +2881,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedSmallClaimsSDOInPersonHearing().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = createCaseDocument("url");
+            CaseDocument order = createCaseDocument();
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
@@ -2910,7 +2893,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedSmallClaimsSDOTelephoneHearing().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = createCaseDocument("url");
+            CaseDocument order = createCaseDocument();
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
@@ -2922,7 +2905,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedSmallClaimsSDOVideoHearing().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = createCaseDocument("url");
+            CaseDocument order = createCaseDocument();
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
@@ -2933,7 +2916,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            CaseDocument order = createCaseDocument("url");
+            CaseDocument order = createCaseDocument();
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
@@ -2943,7 +2926,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGenerateAndSaveSdoOrder_whenNihl() {
-            List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+            List<FastTrack> fastTrackList = new ArrayList<>();
             fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
@@ -2954,7 +2937,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setFastClaims(fastTrackList);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            CaseDocument order = createCaseDocument("url");
+            CaseDocument order = createCaseDocument();
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
@@ -2965,7 +2948,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @ParameterizedTest
         @ValueSource(booleans = {true, false})
         void shouldValidateFieldsForNihl(boolean valid) {
-            List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+            List<FastTrack> fastTrackList = new ArrayList<>();
             fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
 
             LocalDate testDate = valid ? LocalDate.now().plusDays(1) : LocalDate.now();
@@ -3021,18 +3004,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             sdoR2Trial.setSdoR2TrialFirstOpenDateAfter(trialFirstOpenDateAfter);
             sdoR2Trial.setSdoR2TrialWindow(trialWindow);
 
-            Integer testWitnesses = valid ? 0 : -1;
-            SdoR2RestrictNoOfWitnessDetails witnessDetails = new SdoR2RestrictNoOfWitnessDetails();
-            witnessDetails.setNoOfWitnessClaimant(testWitnesses);
-            witnessDetails.setNoOfWitnessDefendant(testWitnesses);
-
-            SdoR2RestrictWitness restrictWitness = new SdoR2RestrictWitness();
-            restrictWitness.setRestrictNoOfWitnessDetails(witnessDetails);
-
-            SdoR2WitnessOfFact witnessesOfFact =  new SdoR2WitnessOfFact();
-            witnessesOfFact.setSdoWitnessDeadlineDate(testDate);
-            witnessesOfFact.setSdoR2RestrictWitness(restrictWitness);
-
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .build();
@@ -3049,7 +3020,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setSdoR2ScheduleOfLoss(scheduleOfLoss);
             caseData.setSdoR2Trial(sdoR2Trial);
             caseData.setSdoR2ImportantNotesDate(testDate);
-            caseData.setSdoR2WitnessesOfFact(witnessesOfFact);
+            caseData.setSdoR2WitnessesOfFact(createWitnessesOfFact(testDate, valid));
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -3074,7 +3045,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setSmallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing));
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = createCaseDocument("url");
+            CaseDocument order = createCaseDocument();
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
@@ -3223,15 +3194,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             SdoR2SmallClaimsImpNotes impNotes = new SdoR2SmallClaimsImpNotes();
             impNotes.setDate(testDate);
 
-            int countWitness = valid ? 0 : -1;
-            SdoR2SmallClaimsRestrictWitness restrictWitness = new SdoR2SmallClaimsRestrictWitness();
-            restrictWitness.setNoOfWitnessClaimant(countWitness);
-            restrictWitness.setNoOfWitnessDefendant(countWitness);
-
-            SdoR2SmallClaimsWitnessStatements witnessStatements = new SdoR2SmallClaimsWitnessStatements();
-            witnessStatements.setIsRestrictWitness(YES);
-            witnessStatements.setSdoR2SmallClaimsRestrictWitness(restrictWitness);
-
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .build();
@@ -3241,7 +3203,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setSdoR2SmallClaimsPPI(smallClaimsPPI);
             caseData.setSdoR2SmallClaimsHearing(smallClaimsHearing);
             caseData.setSdoR2SmallClaimsImpNotes(impNotes);
-            caseData.setSdoR2SmallClaimsWitnessStatements(witnessStatements);
+            caseData.setSdoR2SmallClaimsWitnessStatements(createWitnessStatements(valid));
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
 

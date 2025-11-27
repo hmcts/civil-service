@@ -40,10 +40,6 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_UPLOAD;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ROAD_TRAFFIC_ACCIDENT_UPLOAD_SDO;
 
-/**
- * Builds the specialist fast-track sections (credit hire, building/clinical disputes, PI, housing, RTA) so the
- * parent defaults service remains a thin orchestrator.
- */
 @Service
 @RequiredArgsConstructor
 public class SdoFastTrackSpecialistDirectionsService {

@@ -13,10 +13,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsMediation;
 import java.util.Locale;
 import java.util.Optional;
 
-/**
- * Shared helper for small-claims docmosis templates; consolidates hearing labels, mediation text,
- * and other narrative fields so builders remain orchestration-only.
- */
 @Service
 @RequiredArgsConstructor
 public class SdoSmallClaimsTemplateFieldService {

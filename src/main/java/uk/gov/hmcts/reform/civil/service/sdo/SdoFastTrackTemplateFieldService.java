@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.sdo;
 
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodVideoConferenceHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
@@ -15,10 +16,6 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
-/**
- * Encapsulates fast-track specific narrative and label building so callers (Docmosis templates,
- * confirmation tasks) do not need to duplicate string handling or poke at CaseData manually.
- */
 @Service
 public class SdoFastTrackTemplateFieldService {
 
@@ -62,7 +59,7 @@ public class SdoFastTrackTemplateFieldService {
 
         if (Optional.ofNullable(hearingTime)
             .map(FastTrackHearingTime::getHearingDuration)
-            .map(value -> value.getLabel()).isPresent()) {
+            .map(FastTrackHearingTimeEstimate::getLabel).isPresent()) {
             if (OTHER.equals(hearingTime.getHearingDuration().getLabel())) {
                 StringBuilder otherLength = new StringBuilder();
                 if (hearingTime.getOtherHours() != null) {

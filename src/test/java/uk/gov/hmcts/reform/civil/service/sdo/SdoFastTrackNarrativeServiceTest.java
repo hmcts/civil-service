@@ -81,7 +81,8 @@ class SdoFastTrackNarrativeServiceTest {
         service.populateFastTrackNarrative(caseData);
 
         String input = caseData.getFastTrackOrderWithoutJudgement().getInput();
-        assertThat(input).startsWith(ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_NO_ARTICLE);
-        assertThat(input).contains("15 June 2025");
+        assertThat(input)
+            .startsWith(ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_NO_ARTICLE)
+            .contains("15 June 2025");
     }
 }

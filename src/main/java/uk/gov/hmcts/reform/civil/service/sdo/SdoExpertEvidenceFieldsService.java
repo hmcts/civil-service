@@ -5,11 +5,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPersonalInjury;
 
-/**
- * Builds the default expert-evidence paragraph used when pre-populating the fast-track
- * section of the SDO.  Keeping the strings and deadline wiring here prevents
- * {@link SdoTrackDefaultsService} from rebuilding the same structure inline.
- */
 @Service
 @RequiredArgsConstructor
 public class SdoExpertEvidenceFieldsService {

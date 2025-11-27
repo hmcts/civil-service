@@ -21,13 +21,15 @@ public class DirectionsOrderCallbackPipeline {
     public DirectionsOrderTaskResult run(DirectionsOrderTaskContext context, DirectionsOrderLifecycleStage stage) {
         return tasks.stream()
             .filter(task -> supports(task, context, stage))
-            .peek(task -> log.debug(
-                "Executing task {} for stage {} and caseId {}",
-                task.getClass().getSimpleName(),
-                stage,
-                context.caseData().getCcdCaseReference()
-            ))
-            .map(task -> task.execute(context))
+            .map(task -> {
+                log.debug(
+                    "Executing task {} for stage {} and caseId {}",
+                    task.getClass().getSimpleName(),
+                    stage,
+                    context.caseData().getCcdCaseReference()
+                );
+                return task.execute(context);
+            })
             .reduce(DirectionsOrderTaskResult.empty(context.caseData()), this::mergeResults);
     }
 

@@ -48,10 +48,6 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_BRIEF;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_NO_ARTICLE;
 
-/**
- * Encapsulates the fast-track narrative blocks so {@link SdoFastTrackOrderDefaultsService}
- * becomes a thin orchestrator that delegates to this service plus the specialist directions helper.
- */
 @Service
 @RequiredArgsConstructor
 public class SdoFastTrackNarrativeService {

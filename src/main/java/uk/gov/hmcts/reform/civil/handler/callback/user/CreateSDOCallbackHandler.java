@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.Dir
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Collections;
 import java.util.List;
@@ -44,7 +43,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         + "This can be requested by using the Make an Order event.";
 
     private final ObjectMapper objectMapper;
-    private final FeatureToggleService featureToggleService;
     private final DirectionsOrderCallbackPipeline directionsOrderCallbackPipeline;
     private final DirectionsOrderStageExecutor directionsOrderStageExecutor;
 

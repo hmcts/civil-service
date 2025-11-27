@@ -15,10 +15,6 @@ import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.CARM_MEDIATION_TEXT;
 
-/**
- * Concentrates the various CARM / bilingual toggle mutations so the pre-population services
- * can focus on core business logic.
- */
 @Service
 @RequiredArgsConstructor
 @Slf4j
