@@ -135,13 +135,12 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                    List<EvidenceUploadTrial> trialDocumentarySmallTrack
     ) {
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         //For case which are 1v1, 2v1  we show respondent fields for documents to be uploaded,
         //if a case is 1v2 and different solicitors we want to show separate fields for each respondent solicitor i.e.
         //RESPONDENTSOLICITORTWO and RESPONDENTSOLICITORONE
         //if a case is 1v2 with same solicitor they will see respondent 2 fields as they have RESPONDENTSOLICITORTWO role
         //default flag for respondent 1 solicitor
-        caseDataBuilder.caseTypeFlag(CASE_TYPE_FLAG_NO);
+        caseData.setCaseTypeFlag(CASE_TYPE_FLAG_NO);
 
         boolean multiParts = Objects.nonNull(caseData.getEvidenceUploadOptions())
             && !caseData.getEvidenceUploadOptions().getListItems().isEmpty();
@@ -150,65 +149,65 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             if (multiParts
                 && caseData.getEvidenceUploadOptions()
                 .getValue().getLabel().startsWith(OPTION_APP2)) {
-                caseDataBuilder.caseTypeFlag("ApplicantTwoFields");
+                caseData.setCaseTypeFlag("ApplicantTwoFields");
             }
         } else if (events.get(0).equals(EVIDENCE_UPLOAD_RESPONDENT)
             && ((multiParts && caseData.getEvidenceUploadOptions().getValue().getLabel().startsWith(OPTION_DEF2))
             || (!multiParts && Objects.nonNull(caseData.getCcdCaseReference())
             && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)))) {
             // 1v2 same sol, def2 selected OR 1v2 dif sol, log in as def2
-            caseDataBuilder.caseTypeFlag("RespondentTwoFields");
+            caseData.setCaseTypeFlag("RespondentTwoFields");
         }
 
         // clears the flag, as otherwise if the user returns to previous screen and unselects an option,
         // which was previously selected, the option will still be shown
-        caseDataBuilder.witnessStatementFlag(CASE_TYPE_FLAG_NO);
-        caseDataBuilder.witnessSummaryFlag(CASE_TYPE_FLAG_NO);
-        caseDataBuilder.witnessReferredStatementFlag(CASE_TYPE_FLAG_NO);
-        caseDataBuilder.expertReportFlag(CASE_TYPE_FLAG_NO);
-        caseDataBuilder.expertJointFlag(CASE_TYPE_FLAG_NO);
-        caseDataBuilder.trialAuthorityFlag(CASE_TYPE_FLAG_NO);
-        caseDataBuilder.trialCostsFlag(CASE_TYPE_FLAG_NO);
-        caseDataBuilder.trialDocumentaryFlag(CASE_TYPE_FLAG_NO);
+        caseData.setWitnessStatementFlag(CASE_TYPE_FLAG_NO);
+        caseData.setWitnessSummaryFlag(CASE_TYPE_FLAG_NO);
+        caseData.setWitnessReferredStatementFlag(CASE_TYPE_FLAG_NO);
+        caseData.setExpertReportFlag(CASE_TYPE_FLAG_NO);
+        caseData.setExpertJointFlag(CASE_TYPE_FLAG_NO);
+        caseData.setTrialAuthorityFlag(CASE_TYPE_FLAG_NO);
+        caseData.setTrialCostsFlag(CASE_TYPE_FLAG_NO);
+        caseData.setTrialDocumentaryFlag(CASE_TYPE_FLAG_NO);
 
         // Based on claim type being fast track or small claims, there will be two different lists to select from
         // for either list we then want to display a (same) document upload field corresponding,
         // below combines what would have been two separate show conditions in CCD, into a single flag
         if (nonNull(witnessStatementFastTrack) && witnessStatementFastTrack.contains(EvidenceUploadWitness.WITNESS_STATEMENT)
             || nonNull(witnessStatementSmallTrack) && witnessStatementSmallTrack.contains(EvidenceUploadWitness.WITNESS_STATEMENT)) {
-            caseDataBuilder.witnessStatementFlag("show_witness_statement");
+            caseData.setWitnessStatementFlag("show_witness_statement");
         }
         if (nonNull(witnessSummaryFastTrack) && witnessSummaryFastTrack.contains(EvidenceUploadWitness.WITNESS_SUMMARY)
             || nonNull(witnessSummarySmallTrack) && witnessSummarySmallTrack.contains(EvidenceUploadWitness.WITNESS_SUMMARY)) {
-            caseDataBuilder.witnessSummaryFlag("show_witness_summary");
+            caseData.setWitnessSummaryFlag("show_witness_summary");
         }
         if (nonNull(witnessReferredFastTrack) && witnessReferredFastTrack.contains(EvidenceUploadWitness.DOCUMENTS_REFERRED)
             || nonNull(witnessReferredSmallTrack) && witnessReferredSmallTrack.contains(EvidenceUploadWitness.DOCUMENTS_REFERRED)) {
-            caseDataBuilder.witnessReferredStatementFlag("show_witness_referred");
+            caseData.setWitnessReferredStatementFlag("show_witness_referred");
         }
         if (nonNull(expertReportFastTrack) && expertReportFastTrack.contains(EvidenceUploadExpert.EXPERT_REPORT)
             || nonNull(expertReportSmallTrack) && expertReportSmallTrack.contains(EvidenceUploadExpert.EXPERT_REPORT)) {
-            caseDataBuilder.expertReportFlag("show_expert_report");
+            caseData.setExpertReportFlag("show_expert_report");
         }
         if (nonNull(expertJointFastTrack) && expertJointFastTrack.contains(EvidenceUploadExpert.JOINT_STATEMENT)
             || nonNull(expertJointSmallTrack) && expertJointSmallTrack.contains(EvidenceUploadExpert.JOINT_STATEMENT)) {
-            caseDataBuilder.expertJointFlag("show_joint_expert");
+            caseData.setExpertJointFlag("show_joint_expert");
         }
         if (nonNull(trialAuthorityFastTrack) && trialAuthorityFastTrack.contains(EvidenceUploadTrial.AUTHORITIES)
             || nonNull(trialAuthoritySmallTrack) && trialAuthoritySmallTrack.contains(EvidenceUploadTrial.AUTHORITIES)) {
-            caseDataBuilder.trialAuthorityFlag("show_trial_authority");
+            caseData.setTrialAuthorityFlag("show_trial_authority");
         }
         if (nonNull(trialCostsFastTrack) && trialCostsFastTrack.contains(EvidenceUploadTrial.COSTS)
             || nonNull(trialCostsSmallTrack) && trialCostsSmallTrack.contains(EvidenceUploadTrial.COSTS)) {
-            caseDataBuilder.trialCostsFlag("show_trial_costs");
+            caseData.setTrialCostsFlag("show_trial_costs");
         }
         if (nonNull(trialDocumentaryFastTrack) && trialDocumentaryFastTrack.contains(EvidenceUploadTrial.DOCUMENTARY)
             || nonNull(trialDocumentarySmallTrack) && trialDocumentarySmallTrack.contains(EvidenceUploadTrial.DOCUMENTARY)) {
-            caseDataBuilder.trialDocumentaryFlag("show_trial_documentary");
+            caseData.setTrialDocumentaryFlag("show_trial_documentary");
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

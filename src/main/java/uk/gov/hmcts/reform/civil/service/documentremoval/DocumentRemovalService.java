@@ -130,13 +130,13 @@ public class DocumentRemovalService {
                     .value(DocumentToKeep.builder()
                         .documentId(docId)
                         .caseDocumentToKeep(CaseDocumentToKeep.builder()
-                            .documentFilename(documentNode.getKey().get(DOCUMENT_FILENAME).asText())
+                            .documentFilename(documentNode.getKey().get(DOCUMENT_FILENAME).asText().trim())
                             .documentUrl(documentNode.getKey().get(DOCUMENT_URL).asText())
                             .documentBinaryUrl(documentNode.getKey().get(DOCUMENT_BINARY_URL).asText())
                             .uploadTimestamp(getUploadTimestampFromDocumentNode(documentNode.getKey()))
                             .build())
                         .uploadedDate(getUploadTimestampFromDocumentNode(documentNode.getKey()))
-                        .systemGenerated(getSystemGeneratedFlag(documentNode.getValue(), documentNode.getKey().get(DOCUMENT_FILENAME).asText()))
+                        .systemGenerated(getSystemGeneratedFlag(documentNode.getValue(), documentNode.getKey().get(DOCUMENT_FILENAME).asText().trim()))
                         .build())
                     .build());
         }

@@ -24,8 +24,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_FINAL_ORDER_TO_LIP_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_FINAL_ORDER_TO_LIP_DEFENDANT;
@@ -53,18 +51,6 @@ class SendFinalOrderToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
     public static final String TASK_ID_CLAIMANT = "SendFinalOrderToClaimantLIP";
 
     @Test
-    void shouldNotCallRecordScenario_whenCaseProgressionIsDisabled() {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
-
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, CaseData.builder().build())
-            .build();
-
-        handler.handle(callbackParams);
-        verifyNoInteractions(dashboardScenariosService);
-    }
-
-    @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(SEND_FINAL_ORDER_TO_LIP_DEFENDANT);
         assertThat(handler.handledEvents()).contains(SEND_FINAL_ORDER_TO_LIP_CLAIMANT);
@@ -90,7 +76,6 @@ class SendFinalOrderToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_FINAL_ORDER_TO_LIP_DEFENDANT.name());
         // when
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         // then
@@ -106,7 +91,6 @@ class SendFinalOrderToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_FINAL_ORDER_TO_LIP_CLAIMANT.name());
         // when
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         // then
@@ -123,7 +107,6 @@ class SendFinalOrderToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_TRANSLATED_ORDER_TO_LIP_CLAIMANT.name());
         // when
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         // then
@@ -140,7 +123,6 @@ class SendFinalOrderToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_TRANSLATED_ORDER_TO_LIP_DEFENDANT.name());
         // when
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         // then

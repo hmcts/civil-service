@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.model.finalorders;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
+import lombok.experimental.Accessors;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@Accessors(chain = true)
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor

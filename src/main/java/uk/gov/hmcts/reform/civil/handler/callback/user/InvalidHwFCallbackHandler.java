@@ -55,19 +55,20 @@ public class InvalidHwFCallbackHandler extends CallbackHandler {
     }
 
     private CaseData setUpBusinessProcess(CaseData caseData) {
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
-                .businessProcess(BusinessProcess.ready(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME));
+        caseData.setBusinessProcess(BusinessProcess.ready(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME));
 
         if (caseData.isHWFTypeHearing()) {
             HelpWithFeesDetails hearingFeeDetails =
                 Optional.ofNullable(caseData.getHearingHwfDetails()).orElse(new HelpWithFeesDetails());
-            updatedData.hearingHwfDetails(hearingFeeDetails.toBuilder().hwfCaseEvent(INVALID_HWF_REFERENCE).build());
+            hearingFeeDetails.setHwfCaseEvent(INVALID_HWF_REFERENCE);
+            caseData.setHearingHwfDetails(hearingFeeDetails);
         }
         if (caseData.isHWFTypeClaimIssued()) {
             HelpWithFeesDetails claimIssuedHwfDetails =
                 Optional.ofNullable(caseData.getClaimIssuedHwfDetails()).orElse(new HelpWithFeesDetails());
-            updatedData.claimIssuedHwfDetails(claimIssuedHwfDetails.toBuilder().hwfCaseEvent(INVALID_HWF_REFERENCE).build());
+            claimIssuedHwfDetails.setHwfCaseEvent(INVALID_HWF_REFERENCE);
+            caseData.setClaimIssuedHwfDetails(claimIssuedHwfDetails);
         }
-        return updatedData.build();
+        return caseData;
     }
 }
