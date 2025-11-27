@@ -67,7 +67,6 @@ class HelpWithFeeDashboardNoticeHandlerTest extends BaseCallbackHandlerTest {
 
         params.put("ccdCaseReference", "1239988");
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseData.builder()
