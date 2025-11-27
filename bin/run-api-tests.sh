@@ -93,8 +93,6 @@ else
   echo "FT_TYPE previous state '$(cat "$FT_TYPE_STATE_FILE")' new state '$FT_TYPE'."
 fi
 
-echo "FT_TYPE previous state '$(cat "$FT_TYPE_STATE_FILE")' new state '$FT_TYPE'."
-
 #Check if RUN_ALL_FUNCTIONAL_TESTS is set to true
 if [ "$RUN_ALL_FUNCTIONAL_TESTS" = "true" ]; then
   echo "The label 'runAllFunctionalTests' exists on the PR."
