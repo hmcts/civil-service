@@ -51,7 +51,7 @@ class TriggerApplicationClosureCallbackHandlerTest extends BaseCallbackHandlerTe
     @Test
     void shouldTriggerGeneralApplicationEvent_whenCaseHasGeneralApplication() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDetails(CaseData.builder().build(),
+            .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),
                                         true,
                                         true,
                                         true, true,

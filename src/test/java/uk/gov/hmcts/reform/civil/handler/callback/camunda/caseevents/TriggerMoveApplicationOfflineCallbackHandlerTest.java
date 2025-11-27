@@ -45,7 +45,7 @@ class TriggerMoveApplicationOfflineCallbackHandlerTest extends BaseCallbackHandl
     @Test
     void shouldTriggerGeneralApplicationEvent_whenCaseHasGeneralApplication() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDetails(CaseData.builder().build(),
+            .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),
                                         true,
                                         true,
                                         true, true,
@@ -74,7 +74,7 @@ class TriggerMoveApplicationOfflineCallbackHandlerTest extends BaseCallbackHandl
 
     @Test
     void triggerGeneralApplicationEventThrowsException_HandleFailure() {
-        CaseData baseCaseData = CaseData.builder().build();
+        CaseData baseCaseData = CaseDataBuilder.builder().build();
         baseCaseData.setCcdCaseReference(1234L);
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataWithDetails(baseCaseData,
