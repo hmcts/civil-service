@@ -47,6 +47,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -120,11 +121,11 @@ public class SubmitClaimTask {
         caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
 
         List<LocationRefData> locations = (locationRefDataService
-            .getCourtLocationsByEpimmsIdAndCourtType(authorisationToken, epimmsId));
-        if (!locations.isEmpty()) {
-            LocationRefData locationRefData = locations.get(0);
-            caseData.setLocationName(locationRefData.getSiteName());
-        }
+            .getCourtLocationsByEpimmsId(authorisationToken, epimmsId));
+
+        Optional.ofNullable(locations)
+            .orElseGet(Collections::emptyList).stream().findFirst()
+            .ifPresent(locationRefData -> caseData.setLocationName(locationRefData.getSiteName()));
 
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             caseData.setRespondent2DetailsForClaimDetailsTab(caseData.getRespondent2().toBuilder().flags(null).build());

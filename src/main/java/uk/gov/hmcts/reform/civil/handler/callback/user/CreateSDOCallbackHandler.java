@@ -49,6 +49,7 @@ import uk.gov.hmcts.reform.civil.model.SmallClaimsMediation;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
@@ -283,7 +284,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
          * Update case management location to preferred logic and return preferred location when legal advisor SDO,
          * otherwise return preferred location only.
          */
-        Optional<RequestedCourt> preferredCourt = updateCaseManagementLocationIfLegalAdvisorSdo(caseData);
+        Optional<RequestedCourt> preferredCourt = updateCaseManagementLocationIfLegalAdvisorSdo(callbackParams, caseData);
 
         DynamicList hearingMethodList = getDynamicHearingMethodList(callbackParams, caseData);
 
@@ -1766,12 +1767,25 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
     }
 
-    private Optional<RequestedCourt> updateCaseManagementLocationIfLegalAdvisorSdo(CaseData caseData) {
+    private Optional<RequestedCourt> updateCaseManagementLocationIfLegalAdvisorSdo(CallbackParams callbackParams,
+                                                                                   CaseData caseData) {
         Optional<RequestedCourt> preferredCourt;
         if (isSpecClaim1000OrLessAndCcmcc(ccmccAmount).test(caseData)) {
             preferredCourt = locationHelper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData);
-            preferredCourt.map(RequestedCourt::getCaseLocation)
-                .ifPresent(caseData::setCaseManagementLocation);
+
+            preferredCourt.ifPresent(requestedCourt -> {
+                caseData.setCaseManagementLocation(requestedCourt.getCaseLocation());
+
+                String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+                String epimmsId = requestedCourt.getCaseLocation().getBaseLocation();
+
+                List<LocationRefData> locations = locationRefDataService.getCourtLocationsByEpimmsId(authToken, epimmsId);
+                Optional.ofNullable(locations)
+                    .orElseGet(Collections::emptyList)
+                    .stream().findFirst()
+                    .ifPresent(locationRefData -> caseData.setLocationName(locationRefData.getSiteName()));
+            });
+
             return preferredCourt;
         } else {
             return locationHelper.getCaseManagementLocation(caseData);
