@@ -52,6 +52,7 @@ spring:
     placeholder-replacement: false
     table: schema_version
     baseline-on-migrate: true
+    lock-retry-count: ${FLYWAY_LOCK_RETRY_COUNT:3600}
 
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
