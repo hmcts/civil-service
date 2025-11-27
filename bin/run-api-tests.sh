@@ -83,13 +83,17 @@ run_failed_not_executed_functional_tests() {
 #MAIN SCRIPT
 TEST_FILES_REPORT="test-results/functional/testFilesReport.json"
 PREV_TEST_FILES_REPORT="test-results/functional/prevTestFilesReport.json"
-FT_TYPE_STATE_FILE="./test-results/functional/prevFtType.txt"
+FT_TYPE_STATE_FILE="test-results/functional/prevFtType.txt"
 
 echo "Running functional tests for '$FT_TYPE'"
 
-if [ -f "$FT_TYPE_STATE_FILE" ]; then
+if [ ! -f "$FT_TYPE_STATE_FILE" ]; then
+  echo "No previous functional type file '$FT_TYPE_STATE_FILE' new state '$FT_TYPE'."
+else
   echo "FT_TYPE previous state '$(cat "$FT_TYPE_STATE_FILE")' new state '$FT_TYPE'."
 fi
+
+echo "FT_TYPE previous state '$(cat "$FT_TYPE_STATE_FILE")' new state '$FT_TYPE'."
 
 #Check if RUN_ALL_FUNCTIONAL_TESTS is set to true
 if [ "$RUN_ALL_FUNCTIONAL_TESTS" = "true" ]; then
