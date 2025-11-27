@@ -40,94 +40,86 @@ class DirectionsOrderCaseProgressionServiceTest {
     @Test
     void shouldApplyEaCourtLocationWhenResolverReturnsValue() {
         CaseData caseData = CaseData.builder().build();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         when(journeyToggleService.resolveEaCourtLocation(caseData, true)).thenReturn(YesOrNo.YES);
 
-        service.applyEaCourtLocation(caseData, builder, true);
+        service.applyEaCourtLocation(caseData, true);
 
-        assertThat(builder.build().getEaCourtLocation()).isEqualTo(YesOrNo.YES);
+        assertThat(caseData.getEaCourtLocation()).isEqualTo(YesOrNo.YES);
     }
 
     @Test
     void shouldSkipEaCourtLocationWhenResolverReturnsNull() {
         CaseData caseData = CaseData.builder().build();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         when(journeyToggleService.resolveEaCourtLocation(caseData, true)).thenReturn(null);
 
-        service.applyEaCourtLocation(caseData, builder, true);
+        service.applyEaCourtLocation(caseData, true);
 
-        assertThat(builder.build().getEaCourtLocation()).isNull();
+        assertThat(caseData.getEaCourtLocation()).isNull();
     }
 
     @Test
     void shouldDelegateWaUpdateWhenFeatureEnabled() {
         CaseData caseData = CaseData.builder().build();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
 
-        service.updateWaLocationsIfEnabled(caseData, builder, AUTH);
+        service.updateWaLocationsIfEnabled(caseData, AUTH);
 
-        verify(locationService).updateWaLocationsIfRequired(caseData, builder, AUTH);
+        verify(locationService).updateWaLocationsIfRequired(caseData, AUTH);
     }
 
     @Test
     void shouldSkipWaUpdateWhenFeatureDisabledAndClearDefaultFalse() {
         CaseData caseData = CaseData.builder().build();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
 
-        service.updateWaLocationsIfEnabled(caseData, builder, AUTH);
+        service.updateWaLocationsIfEnabled(caseData, AUTH);
 
-        verify(locationService, never()).updateWaLocationsIfRequired(any(), any(), anyString());
-        verify(locationService, never()).clearWaLocationMetadata(builder);
+        verify(locationService, never()).updateWaLocationsIfRequired(any(), anyString());
+        verify(locationService, never()).clearWaLocationMetadata(caseData);
     }
 
     @Test
     void shouldClearWaMetadataWhenFeatureDisabledAndClearFlagTrue() {
         CaseData caseData = CaseData.builder().build();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
 
-        service.updateWaLocationsIfEnabled(caseData, builder, AUTH, true);
+        service.updateWaLocationsIfEnabled(caseData, AUTH, true);
 
-        verify(locationService).clearWaLocationMetadata(builder);
-        verify(locationService, never()).updateWaLocationsIfRequired(any(), any(), anyString());
+        verify(locationService).clearWaLocationMetadata(caseData);
+        verify(locationService, never()).updateWaLocationsIfRequired(any(), anyString());
     }
 
     @Test
     void shouldApplyRoutingAndUpdateWaMetadata() {
         CaseData caseData = CaseData.builder().build();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         when(journeyToggleService.resolveEaCourtLocation(caseData, true)).thenReturn(YesOrNo.YES);
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
 
-        service.applyCaseProgressionRouting(caseData, builder, AUTH, true);
+        service.applyCaseProgressionRouting(caseData, AUTH, true);
 
-        verify(locationService).updateWaLocationsIfRequired(caseData, builder, AUTH);
-        assertThat(builder.build().getEaCourtLocation()).isEqualTo(YesOrNo.YES);
+        verify(locationService).updateWaLocationsIfRequired(caseData, AUTH);
+        assertThat(caseData.getEaCourtLocation()).isEqualTo(YesOrNo.YES);
     }
 
     @Test
     void shouldClearWaMetadataWhenRoutingDisabled() {
         CaseData caseData = CaseData.builder().build();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
 
-        service.applyCaseProgressionRouting(caseData, builder, AUTH, true);
+        service.applyCaseProgressionRouting(caseData, AUTH, true);
 
-        verify(locationService, never()).clearWaLocationMetadata(builder);
-        verify(locationService, never()).updateWaLocationsIfRequired(any(), any(), anyString());
+        verify(locationService, never()).clearWaLocationMetadata(caseData);
+        verify(locationService, never()).updateWaLocationsIfRequired(any(), anyString());
     }
 
     @Test
     void shouldClearWaMetadataWhenRoutingDisabledAndClearFlagTrueExplicit() {
         CaseData caseData = CaseData.builder().build();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
 
-        service.applyCaseProgressionRouting(caseData, builder, AUTH, true, true);
+        service.applyCaseProgressionRouting(caseData, AUTH, true, true);
 
-        verify(locationService).clearWaLocationMetadata(builder);
-        verify(locationService, never()).updateWaLocationsIfRequired(any(), any(), anyString());
+        verify(locationService).clearWaLocationMetadata(caseData);
+        verify(locationService, never()).updateWaLocationsIfRequired(any(), anyString());
     }
 }

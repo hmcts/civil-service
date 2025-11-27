@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.CaseData.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
@@ -34,21 +33,20 @@ public class SdoSubmissionService {
 
     public CaseData prepareSubmission(CaseData caseData, String authToken) {
         log.info("Preparing SDO submission payload for caseId {}", caseData.getCcdCaseReference());
-        CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-            .businessProcess(BusinessProcess.ready(CaseEvent.CREATE_SDO))
-            .hearingNotes(getHearingNotes(caseData));
+        caseData.setBusinessProcess(BusinessProcess.ready(CaseEvent.CREATE_SDO));
+        caseData.setHearingNotes(getHearingNotes(caseData));
 
-        moveGeneratedDocument(caseData, builder);
-        directionsOrderCaseProgressionService.applyCaseProgressionRouting(caseData, builder, authToken, false, true);
-        trimMethodLocations(caseData, builder);
-        updateSmallClaimsHearing(caseData, builder);
-        updateClaimsTrack(caseData, builder);
-        updateTrialLocations(caseData, builder);
+        moveGeneratedDocument(caseData);
+        updateClaimsTrack(caseData);
+        directionsOrderCaseProgressionService.applyCaseProgressionRouting(caseData, authToken, false, true);
+        trimMethodLocations(caseData);
+        updateSmallClaimsHearing(caseData);
+        updateTrialLocations(caseData);
 
-        return builder.build();
+        return caseData;
     }
 
-    private void moveGeneratedDocument(CaseData caseData, CaseDataBuilder<?, ?> builder) {
+    private void moveGeneratedDocument(CaseData caseData) {
         CaseDocument document = caseData.getSdoOrderDocument();
         if (document == null) {
             return;
@@ -59,32 +57,32 @@ public class SdoSubmissionService {
             List<uk.gov.hmcts.reform.civil.model.common.Element<CaseDocument>> preTranslation =
                 new ArrayList<>(Optional.ofNullable(caseData.getPreTranslationDocuments()).orElseGet(ArrayList::new));
             preTranslation.add(ElementUtils.element(document));
-            builder.preTranslationDocuments(preTranslation);
+            caseData.setPreTranslationDocuments(preTranslation);
         } else {
             log.info("Moving SDO document to system generated collection for caseId {}", caseData.getCcdCaseReference());
             List<uk.gov.hmcts.reform.civil.model.common.Element<CaseDocument>> generatedDocuments =
                 new ArrayList<>(Optional.ofNullable(caseData.getSystemGeneratedCaseDocuments()).orElseGet(ArrayList::new));
             generatedDocuments.add(ElementUtils.element(document));
-            builder.systemGeneratedCaseDocuments(generatedDocuments);
+            caseData.setSystemGeneratedCaseDocuments(generatedDocuments);
         }
 
-        builder.sdoOrderDocument(null);
+        caseData.setSdoOrderDocument(null);
     }
 
-    private void trimMethodLocations(CaseData caseData, CaseDataBuilder<?, ?> builder) {
+    private void trimMethodLocations(CaseData caseData) {
         Optional.ofNullable(caseData.getDisposalHearingMethodInPerson())
             .map(sdoLocationService::trimListItems)
-            .ifPresent(builder::disposalHearingMethodInPerson);
+            .ifPresent(caseData::setDisposalHearingMethodInPerson);
         Optional.ofNullable(caseData.getFastTrackMethodInPerson())
             .map(sdoLocationService::trimListItems)
-            .ifPresent(builder::fastTrackMethodInPerson);
+            .ifPresent(caseData::setFastTrackMethodInPerson);
         Optional.ofNullable(caseData.getSmallClaimsMethodInPerson())
             .map(sdoLocationService::trimListItems)
-            .ifPresent(builder::smallClaimsMethodInPerson);
+            .ifPresent(caseData::setSmallClaimsMethodInPerson);
         log.info("Trimmed hearing method locations for caseId {}", caseData.getCcdCaseReference());
     }
 
-    private void updateSmallClaimsHearing(CaseData caseData, CaseDataBuilder<?, ?> builder) {
+    private void updateSmallClaimsHearing(CaseData caseData) {
         if (!caseClassificationService.isDrhSmallClaim(caseData) || caseData.getSdoR2SmallClaimsHearing() == null) {
             return;
         }
@@ -99,24 +97,24 @@ public class SdoSubmissionService {
             .map(sdoLocationService::trimListItems)
             .ifPresent(hearingBuilder::altHearingCourtLocationList);
 
-        builder.sdoR2SmallClaimsHearing(hearingBuilder.build());
+        caseData.setSdoR2SmallClaimsHearing(hearingBuilder.build());
     }
 
-    private void updateClaimsTrack(CaseData caseData, CaseDataBuilder<?, ?> builder) {
+    private void updateClaimsTrack(CaseData caseData) {
         CaseCategory caseCategory = caseData.getCaseAccessCategory();
         switch (caseCategory) {
             case UNSPEC_CLAIM:
                 if (caseClassificationService.isSmallClaimsTrack(caseData)) {
-                    builder.allocatedTrack(SMALL_CLAIM);
+                    caseData.setAllocatedTrack(SMALL_CLAIM);
                 } else if (caseClassificationService.isFastTrack(caseData)) {
-                    builder.allocatedTrack(FAST_CLAIM);
+                    caseData.setAllocatedTrack(FAST_CLAIM);
                 }
                 break;
             case SPEC_CLAIM:
                 if (caseClassificationService.isSmallClaimsTrack(caseData)) {
-                    builder.responseClaimTrack(SMALL_CLAIM.name());
+                    caseData.setResponseClaimTrack(SMALL_CLAIM.name());
                 } else if (caseClassificationService.isFastTrack(caseData)) {
-                    builder.responseClaimTrack(FAST_CLAIM.name());
+                    caseData.setResponseClaimTrack(FAST_CLAIM.name());
                 }
                 break;
             default:
@@ -124,7 +122,7 @@ public class SdoSubmissionService {
         }
     }
 
-    private void updateTrialLocations(CaseData caseData, CaseDataBuilder<?, ?> builder) {
+    private void updateTrialLocations(CaseData caseData) {
         if (caseData.getSdoR2Trial() == null) {
             return;
         }
@@ -139,7 +137,7 @@ public class SdoSubmissionService {
             .map(sdoLocationService::trimListItems)
             .ifPresent(trialBuilder::altHearingCourtLocationList);
 
-        builder.sdoR2Trial(trialBuilder.build());
+        caseData.setSdoR2Trial(trialBuilder.build());
     }
 
 }

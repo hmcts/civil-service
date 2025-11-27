@@ -10,17 +10,17 @@ public class SdoDisposalOrderDefaultsService {
 
     private final SdoDisposalNarrativeService sdoDisposalNarrativeService;
 
-    public void populateDisposalOrderDetails(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        sdoDisposalNarrativeService.applyJudgesRecital(updatedData);
-        sdoDisposalNarrativeService.applyDisclosureOfDocuments(updatedData);
-        sdoDisposalNarrativeService.applyWitnessOfFact(updatedData);
-        sdoDisposalNarrativeService.applyMedicalEvidence(updatedData);
-        sdoDisposalNarrativeService.applyQuestionsToExperts(updatedData);
-        sdoDisposalNarrativeService.applySchedulesOfLoss(updatedData);
-        sdoDisposalNarrativeService.applyFinalDisposalHearing(updatedData);
-        sdoDisposalNarrativeService.applyHearingTime(updatedData);
-        sdoDisposalNarrativeService.applyOrderWithoutHearing(updatedData);
-        sdoDisposalNarrativeService.applyBundle(updatedData);
-        sdoDisposalNarrativeService.applyNotes(updatedData);
+    public void populateDisposalOrderDetails(CaseData caseData) {
+        sdoDisposalNarrativeService.applyJudgesRecital(caseData);
+        sdoDisposalNarrativeService.applyDisclosureOfDocuments(caseData);
+        sdoDisposalNarrativeService.applyWitnessOfFact(caseData);
+        sdoDisposalNarrativeService.applyMedicalEvidence(caseData);
+        sdoDisposalNarrativeService.applyQuestionsToExperts(caseData);
+        sdoDisposalNarrativeService.applySchedulesOfLoss(caseData);
+        sdoDisposalNarrativeService.applyFinalDisposalHearing(caseData);
+        sdoDisposalNarrativeService.applyHearingTime(caseData);
+        sdoDisposalNarrativeService.applyOrderWithoutHearing(caseData);
+        sdoDisposalNarrativeService.applyBundle(caseData);
+        sdoDisposalNarrativeService.applyNotes(caseData);
     }
 }

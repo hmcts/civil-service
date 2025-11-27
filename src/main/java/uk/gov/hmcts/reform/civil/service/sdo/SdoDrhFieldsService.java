@@ -51,7 +51,6 @@ public class SdoDrhFieldsService {
     private final SdoDeadlineService sdoDeadlineService;
 
     public void populateDrhFields(CaseData caseData,
-                                  CaseData.CaseDataBuilder<?, ?> updatedData,
                                   Optional<RequestedCourt> preferredCourt,
                                   DynamicList hearingMethodList,
                                   List<LocationRefData> locationRefDataList) {
@@ -65,29 +64,29 @@ public class SdoDrhFieldsService {
             .orElse(null);
         hearingMethodList.setValue(telephoneOption);
 
-        updatedData.sdoR2SmallClaimsJudgesRecital(SdoR2SmallClaimsJudgesRecital.builder().input(JUDGE_RECITAL).build());
-        updatedData.sdoR2SmallClaimsPPI(SdoR2SmallClaimsPPI.builder()
+        caseData.setSdoR2SmallClaimsJudgesRecital(SdoR2SmallClaimsJudgesRecital.builder().input(JUDGE_RECITAL).build());
+        caseData.setSdoR2SmallClaimsPPI(SdoR2SmallClaimsPPI.builder()
                                             .ppiDate(sdoDeadlineService.calendarDaysFromNow(21))
                                             .text(PPI_DESCRIPTION)
                                             .build());
-        updatedData.sdoR2SmallClaimsUploadDoc(SdoR2SmallClaimsUploadDoc.builder()
-                                                  .sdoUploadOfDocumentsTxt(UPLOAD_DOC_DESCRIPTION)
-                                                  .build());
-        updatedData.sdoR2SmallClaimsWitnessStatements(SdoR2SmallClaimsWitnessStatements.builder()
-                                                          .sdoStatementOfWitness(WITNESS_STATEMENT_TEXT)
-                                                          .isRestrictWitness(YesOrNo.NO)
-                                                          .isRestrictPages(YesOrNo.NO)
-                                                          .sdoR2SmallClaimsRestrictWitness(SdoR2SmallClaimsRestrictWitness.builder()
-                                                                                             .partyIsCountedAsWitnessTxt(RESTRICT_WITNESS_TEXT)
-                                                                                             .build())
-                                                          .sdoR2SmallClaimsRestrictPages(SdoR2SmallClaimsRestrictPages.builder()
-                                                                                            .fontDetails(RESTRICT_NUMBER_PAGES_TEXT2)
-                                                                                            .noOfPages(12)
-                                                                                            .witnessShouldNotMoreThanTxt(RESTRICT_NUMBER_PAGES_TEXT1)
-                                                                                            .build())
-                                                          .text(WITNESS_DESCRIPTION_TEXT)
-                                                          .build());
-        updatedData.sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder()
+        caseData.setSdoR2SmallClaimsUploadDoc(SdoR2SmallClaimsUploadDoc.builder()
+                                                 .sdoUploadOfDocumentsTxt(UPLOAD_DOC_DESCRIPTION)
+                                                 .build());
+        caseData.setSdoR2SmallClaimsWitnessStatements(SdoR2SmallClaimsWitnessStatements.builder()
+                                                           .sdoStatementOfWitness(WITNESS_STATEMENT_TEXT)
+                                                           .isRestrictWitness(YesOrNo.NO)
+                                                           .isRestrictPages(YesOrNo.NO)
+                                                           .sdoR2SmallClaimsRestrictWitness(SdoR2SmallClaimsRestrictWitness.builder()
+                                                                                              .partyIsCountedAsWitnessTxt(RESTRICT_WITNESS_TEXT)
+                                                                                              .build())
+                                                           .sdoR2SmallClaimsRestrictPages(SdoR2SmallClaimsRestrictPages.builder()
+                                                                                         .fontDetails(RESTRICT_NUMBER_PAGES_TEXT2)
+                                                                                         .noOfPages(12)
+                                                                                         .witnessShouldNotMoreThanTxt(RESTRICT_NUMBER_PAGES_TEXT1)
+                                                                                         .build())
+                                                           .text(WITNESS_DESCRIPTION_TEXT)
+                                                           .build());
+        caseData.setSdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder()
                                                 .trialOnOptions(HearingOnRadioOptions.OPEN_DATE)
                                                 .methodOfHearing(hearingMethodList)
                                                 .lengthList(SmallClaimsSdoR2TimeEstimate.THIRTY_MINUTES)
@@ -107,15 +106,15 @@ public class SdoDrhFieldsService {
                                                                                   .physicalBundlePartyTxt(BUNDLE_TEXT)
                                                                                   .build())
                                                 .build());
-        updatedData.sdoR2SmallClaimsImpNotes(SdoR2SmallClaimsImpNotes.builder()
-                                                 .text(IMP_NOTES_TEXT)
-                                                 .date(sdoDeadlineService.calendarDaysFromNow(7))
-                                                 .build());
-        updatedData.sdoR2SmallClaimsUploadDocToggle(includeInOrderToggle);
-        updatedData.sdoR2SmallClaimsHearingToggle(includeInOrderToggle);
-        updatedData.sdoR2SmallClaimsWitnessStatementsToggle(includeInOrderToggle);
-        updatedData.sdoR2DrhUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(WELSH_LANG_DESCRIPTION).build());
+        caseData.setSdoR2SmallClaimsImpNotes(SdoR2SmallClaimsImpNotes.builder()
+                                                .text(IMP_NOTES_TEXT)
+                                                .date(sdoDeadlineService.calendarDaysFromNow(7))
+                                                .build());
+        caseData.setSdoR2SmallClaimsUploadDocToggle(includeInOrderToggle);
+        caseData.setSdoR2SmallClaimsHearingToggle(includeInOrderToggle);
+        caseData.setSdoR2SmallClaimsWitnessStatementsToggle(includeInOrderToggle);
+        caseData.setSdoR2DrhUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(WELSH_LANG_DESCRIPTION).build());
 
-        sdoJourneyToggleService.applyR2SmallClaimsMediation(caseData, updatedData, includeInOrderToggle);
+        sdoJourneyToggleService.applyR2SmallClaimsMediation(caseData, includeInOrderToggle);
     }
 }

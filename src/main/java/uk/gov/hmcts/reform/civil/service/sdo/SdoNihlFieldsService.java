@@ -19,7 +19,7 @@ public class SdoNihlFieldsService {
     private final SdoLocationService sdoLocationService;
     private final SdoNihlOrderService sdoNihlOrderService;
 
-    public void populateNihlFields(CaseData.CaseDataBuilder<?, ?> updatedData,
+    public void populateNihlFields(CaseData caseData,
                                    DynamicList hearingMethodList,
                                    Optional<RequestedCourt> preferredCourt,
                                    List<LocationRefData> locationRefDataList) {
@@ -33,7 +33,7 @@ public class SdoNihlFieldsService {
         DynamicList alternativeCourtLocations = sdoLocationService.buildAlternativeCourtLocations(locationRefDataList);
 
         sdoNihlOrderService.populateStandardDirections(
-            updatedData,
+            caseData,
             hearingMethodList,
             trialCourtList,
             alternativeCourtLocations

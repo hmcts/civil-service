@@ -154,18 +154,13 @@ class SdoLocationServiceTest {
     @Test
     void shouldUpdateWaLocationsWhenServicePresent() {
         CaseData caseData = CaseData.builder().build();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
         doAnswer(invocation -> null).when(updateWaCourtLocationsService)
             .updateCourtListingWALocations(AUTH_TOKEN, caseData);
 
-        service.updateWaLocationsIfRequired(caseData, builder, AUTH_TOKEN);
+        service.updateWaLocationsIfRequired(caseData, AUTH_TOKEN);
 
         verify(updateWaCourtLocationsService).updateCourtListingWALocations(AUTH_TOKEN, caseData);
-        CaseData updatedCaseData = builder.build();
-        assertThat(updatedCaseData.getTaskManagementLocations()).isNull();
-        assertThat(updatedCaseData.getTaskManagementLocationsTab()).isNull();
-        assertThat(updatedCaseData.getCaseManagementLocationTab()).isNull();
     }
 
     @Test
@@ -177,9 +172,8 @@ class SdoLocationServiceTest {
         );
 
         CaseData caseData = CaseData.builder().build();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
-        service.updateWaLocationsIfRequired(caseData, builder, AUTH_TOKEN);
+        service.updateWaLocationsIfRequired(caseData, AUTH_TOKEN);
 
         verify(updateWaCourtLocationsService, never()).updateCourtListingWALocations(anyString(), any());
     }
@@ -212,12 +206,10 @@ class SdoLocationServiceTest {
             .caseManagementLocationTab(TaskManagementLocationTab.builder().build())
             .build();
 
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-        service.clearWaLocationMetadata(builder);
+        service.clearWaLocationMetadata(caseData);
 
-        CaseData cleared = builder.build();
-        assertThat(cleared.getTaskManagementLocations()).isNull();
-        assertThat(cleared.getTaskManagementLocationsTab()).isNull();
-        assertThat(cleared.getCaseManagementLocationTab()).isNull();
+        assertThat(caseData.getTaskManagementLocations()).isNull();
+        assertThat(caseData.getTaskManagementLocationsTab()).isNull();
+        assertThat(caseData.getCaseManagementLocationTab()).isNull();
     }
 }

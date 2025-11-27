@@ -15,26 +15,22 @@ class SdoJudgementDeductionServiceTest {
         CaseData caseData = CaseData.builder()
             .drawDirectionsOrder(JudgementSum.builder().judgementSum(15d).build())
             .build();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
-        service.populateJudgementDeductionValues(caseData, builder);
+        service.populateJudgementDeductionValues(caseData);
 
-        CaseData result = builder.build();
-        assertThat(result.getDisposalHearingJudgementDeductionValue().getValue()).isEqualTo("15.0%");
-        assertThat(result.getFastTrackJudgementDeductionValue().getValue()).isEqualTo("15.0%");
-        assertThat(result.getSmallClaimsJudgementDeductionValue().getValue()).isEqualTo("15.0%");
+        assertThat(caseData.getDisposalHearingJudgementDeductionValue().getValue()).isEqualTo("15.0%");
+        assertThat(caseData.getFastTrackJudgementDeductionValue().getValue()).isEqualTo("15.0%");
+        assertThat(caseData.getSmallClaimsJudgementDeductionValue().getValue()).isEqualTo("15.0%");
     }
 
     @Test
     void shouldSkipPopulationWhenJudgementSumMissing() {
         CaseData caseData = CaseData.builder().build();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
-        service.populateJudgementDeductionValues(caseData, builder);
+        service.populateJudgementDeductionValues(caseData);
 
-        CaseData result = builder.build();
-        assertThat(result.getDisposalHearingJudgementDeductionValue()).isNull();
-        assertThat(result.getFastTrackJudgementDeductionValue()).isNull();
-        assertThat(result.getSmallClaimsJudgementDeductionValue()).isNull();
+        assertThat(caseData.getDisposalHearingJudgementDeductionValue()).isNull();
+        assertThat(caseData.getFastTrackJudgementDeductionValue()).isNull();
+        assertThat(caseData.getSmallClaimsJudgementDeductionValue()).isNull();
     }
 }

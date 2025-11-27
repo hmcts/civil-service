@@ -30,23 +30,22 @@ public class SdoPrePopulateService {
         CallbackParams callbackParams = context.callbackParams();
         log.info("Pre-populating SDO defaults for caseId {}", caseData.getCcdCaseReference());
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
-        sdoTrackDefaultsService.applyBaseTrackDefaults(caseData, updatedData);
+        sdoTrackDefaultsService.applyBaseTrackDefaults(caseData);
 
         Optional<RequestedCourt> preferredCourt = sdoHearingPreparationService
-            .updateCaseManagementLocationIfLegalAdvisorSdo(updatedData, caseData);
+            .updateCaseManagementLocationIfLegalAdvisorSdo(caseData);
 
         DynamicList hearingMethodList = sdoHearingPreparationService.getDynamicHearingMethodList(callbackParams, caseData);
-        sdoHearingPreparationService.applyVersionSpecificHearingDefaults(callbackParams, updatedData, hearingMethodList);
+        sdoHearingPreparationService.applyVersionSpecificHearingDefaults(callbackParams, hearingMethodList);
 
         List<LocationRefData> locationRefDataList = sdoHearingPreparationService.populateHearingLocations(
-            preferredCourt, authToken, updatedData);
+            preferredCourt, authToken, caseData);
 
-        sdoDrhFieldsService.populateDrhFields(caseData, updatedData, preferredCourt, hearingMethodList, locationRefDataList);
-        sdoNihlFieldsService.populateNihlFields(updatedData, hearingMethodList, preferredCourt, locationRefDataList);
+        sdoDrhFieldsService.populateDrhFields(caseData, preferredCourt, hearingMethodList, locationRefDataList);
+        sdoNihlFieldsService.populateNihlFields(caseData, hearingMethodList, preferredCourt, locationRefDataList);
 
-        sdoTrackDefaultsService.applyR2Defaults(caseData, updatedData);
-        return updatedData.build();
+        sdoTrackDefaultsService.applyR2Defaults(caseData);
+        return caseData;
     }
 }

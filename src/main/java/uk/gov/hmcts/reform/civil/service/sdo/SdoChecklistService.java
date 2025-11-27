@@ -23,71 +23,69 @@ public class SdoChecklistService {
 
     public void applyOrderChecklists(
         CaseData caseData,
-        CaseData.CaseDataBuilder<?, ?> updatedData,
         List<OrderDetailsPagesSectionsToggle> checkList
     ) {
-        updatedData.fastTrackAltDisputeResolutionToggle(checkList);
-        updatedData.fastTrackVariationOfDirectionsToggle(checkList);
-        updatedData.fastTrackSettlementToggle(checkList);
-        updatedData.fastTrackDisclosureOfDocumentsToggle(checkList);
-        updatedData.fastTrackWitnessOfFactToggle(checkList);
-        updatedData.fastTrackSchedulesOfLossToggle(checkList);
-        updatedData.fastTrackCostsToggle(checkList);
-        updatedData.fastTrackTrialToggle(checkList);
-        updatedData.fastTrackTrialBundleToggle(checkList);
-        updatedData.fastTrackMethodToggle(checkList);
-        updatedData.disposalHearingDisclosureOfDocumentsToggle(checkList);
-        updatedData.disposalHearingWitnessOfFactToggle(checkList);
-        updatedData.disposalHearingMedicalEvidenceToggle(checkList);
-        updatedData.disposalHearingQuestionsToExpertsToggle(checkList);
-        updatedData.disposalHearingSchedulesOfLossToggle(checkList);
-        updatedData.disposalHearingFinalDisposalHearingToggle(checkList);
-        updatedData.disposalHearingMethodToggle(checkList);
-        updatedData.disposalHearingBundleToggle(checkList);
-        updatedData.disposalHearingClaimSettlingToggle(checkList);
-        updatedData.disposalHearingCostsToggle(checkList);
-        updatedData.smallClaimsHearingToggle(checkList);
-        updatedData.smallClaimsMethodToggle(checkList);
-        updatedData.smallClaimsDocumentsToggle(checkList);
-        updatedData.smallClaimsWitnessStatementToggle(checkList);
-        updatedData.smallClaimsFlightDelayToggle(checkList);
+        caseData.setFastTrackAltDisputeResolutionToggle(checkList);
+        caseData.setFastTrackVariationOfDirectionsToggle(checkList);
+        caseData.setFastTrackSettlementToggle(checkList);
+        caseData.setFastTrackDisclosureOfDocumentsToggle(checkList);
+        caseData.setFastTrackWitnessOfFactToggle(checkList);
+        caseData.setFastTrackSchedulesOfLossToggle(checkList);
+        caseData.setFastTrackCostsToggle(checkList);
+        caseData.setFastTrackTrialToggle(checkList);
+        caseData.setFastTrackTrialBundleToggle(checkList);
+        caseData.setFastTrackMethodToggle(checkList);
+        caseData.setDisposalHearingDisclosureOfDocumentsToggle(checkList);
+        caseData.setDisposalHearingWitnessOfFactToggle(checkList);
+        caseData.setDisposalHearingMedicalEvidenceToggle(checkList);
+        caseData.setDisposalHearingQuestionsToExpertsToggle(checkList);
+        caseData.setDisposalHearingSchedulesOfLossToggle(checkList);
+        caseData.setDisposalHearingFinalDisposalHearingToggle(checkList);
+        caseData.setDisposalHearingMethodToggle(checkList);
+        caseData.setDisposalHearingBundleToggle(checkList);
+        caseData.setDisposalHearingClaimSettlingToggle(checkList);
+        caseData.setDisposalHearingCostsToggle(checkList);
+        caseData.setSmallClaimsHearingToggle(checkList);
+        caseData.setSmallClaimsMethodToggle(checkList);
+        caseData.setSmallClaimsDocumentsToggle(checkList);
+        caseData.setSmallClaimsWitnessStatementToggle(checkList);
+        caseData.setSmallClaimsFlightDelayToggle(checkList);
 
-        sdoJourneyToggleService.applySmallClaimsChecklistToggle(caseData, updatedData, checkList);
+        sdoJourneyToggleService.applySmallClaimsChecklistToggle(caseData, checkList);
     }
 
     public void applyR2Checklists(
         CaseData caseData,
-        CaseData.CaseDataBuilder<?, ?> updatedData,
         List<IncludeInOrderToggle> includeInOrderToggle
     ) {
-        updatedData.sdoAltDisputeResolution(
+        caseData.setSdoAltDisputeResolution(
             SdoR2FastTrackAltDisputeResolution.builder()
                 .includeInOrderToggle(includeInOrderToggle)
                 .build()
         );
-        updatedData.sdoVariationOfDirections(
+        caseData.setSdoVariationOfDirections(
             SdoR2VariationOfDirections.builder()
                 .includeInOrderToggle(includeInOrderToggle)
                 .build()
         );
-        updatedData.sdoR2Settlement(
+        caseData.setSdoR2Settlement(
             SdoR2Settlement.builder()
                 .includeInOrderToggle(includeInOrderToggle)
                 .build()
         );
-        updatedData.sdoR2DisclosureOfDocumentsToggle(includeInOrderToggle).build();
-        updatedData.sdoR2SeparatorWitnessesOfFactToggle(includeInOrderToggle).build();
-        updatedData.sdoR2SeparatorExpertEvidenceToggle(includeInOrderToggle).build();
-        updatedData.sdoR2SeparatorAddendumReportToggle(includeInOrderToggle).build();
-        updatedData.sdoR2SeparatorFurtherAudiogramToggle(includeInOrderToggle).build();
-        updatedData.sdoR2SeparatorQuestionsClaimantExpertToggle(includeInOrderToggle).build();
-        updatedData.sdoR2SeparatorPermissionToRelyOnExpertToggle(includeInOrderToggle);
-        updatedData.sdoR2SeparatorEvidenceAcousticEngineerToggle(includeInOrderToggle);
-        updatedData.sdoR2SeparatorQuestionsToEntExpertToggle(includeInOrderToggle);
-        updatedData.sdoR2ScheduleOfLossToggle(includeInOrderToggle);
-        updatedData.sdoR2SeparatorUploadOfDocumentsToggle(includeInOrderToggle);
-        updatedData.sdoR2TrialToggle(includeInOrderToggle);
+        caseData.setSdoR2DisclosureOfDocumentsToggle(includeInOrderToggle);
+        caseData.setSdoR2SeparatorWitnessesOfFactToggle(includeInOrderToggle);
+        caseData.setSdoR2SeparatorExpertEvidenceToggle(includeInOrderToggle);
+        caseData.setSdoR2SeparatorAddendumReportToggle(includeInOrderToggle);
+        caseData.setSdoR2SeparatorFurtherAudiogramToggle(includeInOrderToggle);
+        caseData.setSdoR2SeparatorQuestionsClaimantExpertToggle(includeInOrderToggle);
+        caseData.setSdoR2SeparatorPermissionToRelyOnExpertToggle(includeInOrderToggle);
+        caseData.setSdoR2SeparatorEvidenceAcousticEngineerToggle(includeInOrderToggle);
+        caseData.setSdoR2SeparatorQuestionsToEntExpertToggle(includeInOrderToggle);
+        caseData.setSdoR2ScheduleOfLossToggle(includeInOrderToggle);
+        caseData.setSdoR2SeparatorUploadOfDocumentsToggle(includeInOrderToggle);
+        caseData.setSdoR2TrialToggle(includeInOrderToggle);
 
-        sdoJourneyToggleService.applyR2SmallClaimsMediation(caseData, updatedData, includeInOrderToggle);
+        sdoJourneyToggleService.applyR2SmallClaimsMediation(caseData, includeInOrderToggle);
     }
 }

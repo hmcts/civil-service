@@ -35,11 +35,9 @@ public class SdoDocumentTask implements DirectionsOrderCallbackTask {
         if (document.isPresent()) {
             CaseDocument generatedDocument = document.get();
             sdoDocumentService.assignCategory(generatedDocument, "caseManagementOrders");
-            CaseData updatedCaseData = caseData.toBuilder()
-                .sdoOrderDocument(generatedDocument)
-                .build();
+            caseData.setSdoOrderDocument(generatedDocument);
             log.info("Generated SDO document for caseId {}", caseData.getCcdCaseReference());
-            return new DirectionsOrderTaskResult(updatedCaseData, Collections.emptyList(), null);
+            return new DirectionsOrderTaskResult(caseData, Collections.emptyList(), null);
         }
 
         log.info("No SDO document generated for caseId {}", caseData.getCcdCaseReference());

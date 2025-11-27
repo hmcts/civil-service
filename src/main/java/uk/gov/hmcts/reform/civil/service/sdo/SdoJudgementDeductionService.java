@@ -15,24 +15,24 @@ import java.util.Optional;
 @Service
 public class SdoJudgementDeductionService {
 
-    public void populateJudgementDeductionValues(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+    public void populateJudgementDeductionValues(CaseData caseData) {
         Optional.ofNullable(caseData.getDrawDirectionsOrder())
             .map(JudgementSum::getJudgementSum)
             .map(deduction -> deduction + "%")
             .ifPresent(deductionPercentage -> {
-                updatedData.disposalHearingJudgementDeductionValue(
+                caseData.setDisposalHearingJudgementDeductionValue(
                     DisposalHearingJudgementDeductionValue.builder()
                         .value(deductionPercentage)
                         .build()
                 );
 
-                updatedData.fastTrackJudgementDeductionValue(
+                caseData.setFastTrackJudgementDeductionValue(
                     FastTrackJudgementDeductionValue.builder()
                         .value(deductionPercentage)
                         .build()
                 );
 
-                updatedData.smallClaimsJudgementDeductionValue(
+                caseData.setSmallClaimsJudgementDeductionValue(
                     SmallClaimsJudgementDeductionValue.builder()
                         .value(deductionPercentage)
                         .build()

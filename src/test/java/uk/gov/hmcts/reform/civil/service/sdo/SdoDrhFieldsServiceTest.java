@@ -53,30 +53,27 @@ class SdoDrhFieldsServiceTest {
 
     @Test
     void shouldPopulateDrhFields() {
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder().build().toBuilder();
+        CaseData caseData = CaseData.builder().build();
         DynamicList hearingMethodList = dynamicList("initial", HearingMethod.TELEPHONE.getLabel());
 
-        service.populateDrhFields(CaseData.builder().build(), builder, Optional.of(RequestedCourt.builder().build()),
+        service.populateDrhFields(caseData, Optional.of(RequestedCourt.builder().build()),
             hearingMethodList, Collections.emptyList());
 
-        CaseData result = builder.build();
-
-        assertThat(result.getSdoR2SmallClaimsJudgesRecital()).isNotNull();
-        assertThat(result.getSdoR2SmallClaimsHearing()).isNotNull();
-        assertThat(result.getSdoR2SmallClaimsHearing().getMethodOfHearing().getValue().getLabel())
+        assertThat(caseData.getSdoR2SmallClaimsJudgesRecital()).isNotNull();
+        assertThat(caseData.getSdoR2SmallClaimsHearing()).isNotNull();
+        assertThat(caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing().getValue().getLabel())
             .isEqualTo(HearingMethod.TELEPHONE.getLabel());
-        assertThat(result.getSdoR2SmallClaimsUploadDocToggle()).containsExactly(IncludeInOrderToggle.INCLUDE);
+        assertThat(caseData.getSdoR2SmallClaimsUploadDocToggle()).containsExactly(IncludeInOrderToggle.INCLUDE);
     }
 
     @Test
     void shouldDelegateCarmFieldsToJourneyService() {
         CaseData caseData = CaseData.builder().build();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
-        service.populateDrhFields(caseData, builder, Optional.empty(),
+        service.populateDrhFields(caseData, Optional.empty(),
             dynamicList("initial", HearingMethod.TELEPHONE.getLabel()), Collections.emptyList());
 
-        verify(journeyToggleService).applyR2SmallClaimsMediation(caseData, builder,
+        verify(journeyToggleService).applyR2SmallClaimsMediation(caseData,
             List.of(IncludeInOrderToggle.INCLUDE));
     }
 

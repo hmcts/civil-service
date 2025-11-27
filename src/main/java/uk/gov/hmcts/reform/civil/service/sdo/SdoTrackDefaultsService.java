@@ -27,29 +27,29 @@ public class SdoTrackDefaultsService {
 
     private static final List<IncludeInOrderToggle> INCLUDE_IN_ORDER_TOGGLE = List.of(IncludeInOrderToggle.INCLUDE);
 
-    public void applyBaseTrackDefaults(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
-        initialiseTrackDefaults(updatedData);
-        sdoJourneyToggleService.applyJourneyFlags(caseData, updatedData);
+    public void applyBaseTrackDefaults(CaseData caseData) {
+        initialiseTrackDefaults(caseData);
+        sdoJourneyToggleService.applyJourneyFlags(caseData);
 
         List<OrderDetailsPagesSectionsToggle> checkList = List.of(OrderDetailsPagesSectionsToggle.SHOW);
-        sdoChecklistService.applyOrderChecklists(caseData, updatedData, checkList);
-        sdoJudgementDeductionService.populateJudgementDeductionValues(caseData, updatedData);
+        sdoChecklistService.applyOrderChecklists(caseData, checkList);
+        sdoJudgementDeductionService.populateJudgementDeductionValues(caseData);
 
-        sdoDisposalOrderDefaultsService.populateDisposalOrderDetails(updatedData);
-        sdoFastTrackOrderDefaultsService.populateFastTrackOrderDetails(updatedData);
-        sdoSmallClaimsOrderDefaultsService.populateSmallClaimsOrderDetails(caseData, updatedData, checkList);
+        sdoDisposalOrderDefaultsService.populateDisposalOrderDetails(caseData);
+        sdoFastTrackOrderDefaultsService.populateFastTrackOrderDetails(caseData);
+        sdoSmallClaimsOrderDefaultsService.populateSmallClaimsOrderDetails(caseData, checkList);
 
-        sdoExpertEvidenceFieldsService.populateFastTrackExpertEvidence(updatedData);
-        sdoDisclosureOfDocumentsFieldsService.populateFastTrackDisclosureOfDocuments(updatedData);
+        sdoExpertEvidenceFieldsService.populateFastTrackExpertEvidence(caseData);
+        sdoDisclosureOfDocumentsFieldsService.populateFastTrackDisclosureOfDocuments(caseData);
     }
 
-    public void applyR2Defaults(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
-        sdoChecklistService.applyR2Checklists(caseData, updatedData, INCLUDE_IN_ORDER_TOGGLE);
-        updatedData.sdoR2FastTrackUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(
+    public void applyR2Defaults(CaseData caseData) {
+        sdoChecklistService.applyR2Checklists(caseData, INCLUDE_IN_ORDER_TOGGLE);
+        caseData.setSdoR2FastTrackUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(
             SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
-        updatedData.sdoR2SmallClaimsUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(
+        caseData.setSdoR2SmallClaimsUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(
             SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
-        updatedData.sdoR2DisposalHearingUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(
+        caseData.setSdoR2DisposalHearingUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(
             SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
     }
 
@@ -57,10 +57,9 @@ public class SdoTrackDefaultsService {
         return INCLUDE_IN_ORDER_TOGGLE;
     }
 
-    private void initialiseTrackDefaults(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        updatedData
-            .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
-            .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
+    private void initialiseTrackDefaults(CaseData caseData) {
+        caseData.setSmallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson);
+        caseData.setFastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
     }
 
 }

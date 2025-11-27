@@ -41,11 +41,11 @@ class SdoNihlFieldsServiceTest {
 
     @Test
     void shouldSetHearingMethodAndDelegateToOrderService() {
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder().build().toBuilder();
+        CaseData caseData = CaseData.builder().build();
         DynamicList hearingList = hearingMethodList();
 
         service.populateNihlFields(
-            builder,
+            caseData,
             hearingList,
             Optional.of(RequestedCourt.builder().build()),
             Collections.emptyList()
@@ -53,7 +53,7 @@ class SdoNihlFieldsServiceTest {
 
         ArgumentCaptor<DynamicList> hearingCaptor = ArgumentCaptor.forClass(DynamicList.class);
         verify(orderService).populateStandardDirections(
-            org.mockito.Mockito.eq(builder),
+            org.mockito.Mockito.eq(caseData),
             hearingCaptor.capture(),
             Mockito.any(DynamicList.class),
             Mockito.any(DynamicList.class)

@@ -40,11 +40,11 @@ class SdoDisclosureOfDocumentsFieldsServiceTest {
         when(deadlineService.nextWorkingDayFromNowWeeks(5)).thenReturn(date5Weeks);
         when(deadlineService.nextWorkingDayFromNowWeeks(8)).thenReturn(date8Weeks);
 
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder().build().toBuilder();
+        CaseData caseData = CaseData.builder().build();
 
-        service.populateFastTrackDisclosureOfDocuments(builder);
+        service.populateFastTrackDisclosureOfDocuments(caseData);
 
-        FastTrackDisclosureOfDocuments disclosure = builder.build().getFastTrackDisclosureOfDocuments();
+        FastTrackDisclosureOfDocuments disclosure = caseData.getFastTrackDisclosureOfDocuments();
         assertThat(disclosure).isNotNull();
         assertThat(disclosure.getDate1()).isEqualTo(date4Weeks);
         assertThat(disclosure.getDate2()).isEqualTo(date5Weeks);

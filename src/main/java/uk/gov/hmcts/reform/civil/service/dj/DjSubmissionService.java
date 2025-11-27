@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.CaseData.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderCaseProgressionService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
@@ -24,27 +23,25 @@ public class DjSubmissionService {
 
     public CaseData prepareSubmission(CaseData caseData, String authToken) {
         log.info("Preparing DJ submission payload for caseId {}", caseData.getCcdCaseReference());
-        CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-            .businessProcess(BusinessProcess.ready(STANDARD_DIRECTION_ORDER_DJ))
-            .hearingNotes(getHearingNotes(caseData));
+        caseData.setBusinessProcess(BusinessProcess.ready(STANDARD_DIRECTION_ORDER_DJ));
+        caseData.setHearingNotes(getHearingNotes(caseData));
 
-        removePreviewDocument(caseData, builder);
+        removePreviewDocument(caseData);
         assignDocumentCategories(caseData);
         directionsOrderCaseProgressionService.applyCaseProgressionRouting(
             caseData,
-            builder,
             authToken,
             false,
             false
         );
 
-        return builder.build();
+        return caseData;
     }
 
-    private void removePreviewDocument(CaseData caseData, CaseDataBuilder<?, ?> builder) {
+    private void removePreviewDocument(CaseData caseData) {
         if (caseData.getOrderSDODocumentDJ() != null) {
             log.info("Removing DJ preview document before submission for caseId {}", caseData.getCcdCaseReference());
-            builder.orderSDODocumentDJ(null);
+            caseData.setOrderSDODocumentDJ(null);
         }
     }
 

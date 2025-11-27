@@ -52,41 +52,40 @@ class SdoFastTrackSpecialistDirectionsServiceTest {
 
     @Test
     void shouldPopulateAllSpecialistSections() {
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+        CaseData caseData = CaseData.builder().build();
 
-        service.populateSpecialistDirections(builder);
-        CaseData result = builder.build();
+        service.populateSpecialistDirections(caseData);
 
-        FastTrackBuildingDispute buildingDispute = result.getFastTrackBuildingDispute();
+        FastTrackBuildingDispute buildingDispute = caseData.getFastTrackBuildingDispute();
         assertThat(buildingDispute).isNotNull();
         assertThat(buildingDispute.getInput1()).isEqualTo(BUILDING_SCHEDULE_INTRO_SDO);
         assertThat(buildingDispute.getInput2()).isEqualTo(BUILDING_SCHEDULE_COLUMNS_SDO);
         assertThat(buildingDispute.getInput3()).isEqualTo(BUILDING_SCHEDULE_CLAIMANT_INSTRUCTION);
         assertThat(buildingDispute.getInput4()).isEqualTo(BUILDING_SCHEDULE_DEFENDANT_INSTRUCTION);
 
-        FastTrackHousingDisrepair housing = result.getFastTrackHousingDisrepair();
+        FastTrackHousingDisrepair housing = caseData.getFastTrackHousingDisrepair();
         assertThat(housing).isNotNull();
         assertThat(housing.getInput1()).isEqualTo(HOUSING_SCHEDULE_INTRO_SDO);
         assertThat(housing.getInput2()).isEqualTo(HOUSING_SCHEDULE_COLUMNS_SDO);
         assertThat(housing.getInput3()).isEqualTo(HOUSING_SCHEDULE_CLAIMANT_INSTRUCTION);
         assertThat(housing.getInput4()).isEqualTo(HOUSING_SCHEDULE_DEFENDANT_INSTRUCTION);
 
-        FastTrackClinicalNegligence clinicalNegligence = result.getFastTrackClinicalNegligence();
+        FastTrackClinicalNegligence clinicalNegligence = caseData.getFastTrackClinicalNegligence();
         assertThat(clinicalNegligence).isNotNull();
         assertThat(clinicalNegligence.getInput1()).isEqualTo(CLINICAL_DOCUMENTS_HEADING);
         assertThat(clinicalNegligence.getInput2()).isEqualTo(CLINICAL_PARTIES_SDO);
         assertThat(clinicalNegligence.getInput3()).isEqualTo(CLINICAL_NOTES_SDO);
         assertThat(clinicalNegligence.getInput4()).isEqualTo(CLINICAL_BUNDLE_SDO);
 
-        assertThat(result.getSdoR2FastTrackCreditHire()).isNotNull();
-        FastTrackPersonalInjury personalInjury = result.getFastTrackPersonalInjury();
+        assertThat(caseData.getSdoR2FastTrackCreditHire()).isNotNull();
+        FastTrackPersonalInjury personalInjury = caseData.getFastTrackPersonalInjury();
         assertThat(personalInjury).isNotNull();
         assertThat(personalInjury.getInput1()).isEqualTo(PERSONAL_INJURY_PERMISSION_SDO);
         assertThat(personalInjury.getInput2()).isEqualTo(PERSONAL_INJURY_QUESTIONS);
         assertThat(personalInjury.getInput3()).isEqualTo(PERSONAL_INJURY_ANSWERS);
         assertThat(personalInjury.getInput4()).isEqualTo(PERSONAL_INJURY_UPLOAD);
 
-        FastTrackRoadTrafficAccident roadTrafficAccident = result.getFastTrackRoadTrafficAccident();
+        FastTrackRoadTrafficAccident roadTrafficAccident = caseData.getFastTrackRoadTrafficAccident();
         assertThat(roadTrafficAccident).isNotNull();
         assertThat(roadTrafficAccident.getInput()).isEqualTo(ROAD_TRAFFIC_ACCIDENT_UPLOAD_SDO);
     }

@@ -49,92 +49,84 @@ public class SdoSmallClaimsNarrativeService {
 
     private final SdoDeadlineService sdoDeadlineService;
 
-    public void applyJudgesRecital(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        updatedData.smallClaimsJudgesRecital(SmallClaimsJudgesRecital.builder()
-                .input(JUDGES_RECITAL_STATEMENTS_OF_CASE_WITH_COMMA)
-                .build())
-            .build();
+    public void applyJudgesRecital(CaseData caseData) {
+        caseData.setSmallClaimsJudgesRecital(SmallClaimsJudgesRecital.builder()
+                                                  .input(JUDGES_RECITAL_STATEMENTS_OF_CASE_WITH_COMMA)
+                                                  .build());
     }
 
-    public void applyDocumentDirections(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        updatedData.smallClaimsDocuments(SmallClaimsDocuments.builder()
-                .input1(SMALL_CLAIMS_DOCUMENTS_UPLOAD)
-                .input2(SMALL_CLAIMS_DOCUMENTS_WARNING)
-                .build())
-            .build();
+    public void applyDocumentDirections(CaseData caseData) {
+        caseData.setSmallClaimsDocuments(SmallClaimsDocuments.builder()
+                                             .input1(SMALL_CLAIMS_DOCUMENTS_UPLOAD)
+                                             .input2(SMALL_CLAIMS_DOCUMENTS_WARNING)
+                                             .build());
     }
 
-    public void applyWitnessStatements(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        updatedData.sdoR2SmallClaimsWitnessStatementOther(SdoR2SmallClaimsWitnessStatements.builder()
-                .sdoStatementOfWitness(WITNESS_STATEMENT_TEXT)
-                .isRestrictWitness(NO)
-                .sdoR2SmallClaimsRestrictWitness(SdoR2SmallClaimsRestrictWitness.builder()
-                                                     .noOfWitnessClaimant(2)
-                                                     .noOfWitnessDefendant(2)
-                                                     .partyIsCountedAsWitnessTxt(RESTRICT_WITNESS_TEXT)
-                                                     .build())
-                .isRestrictPages(NO)
-                .sdoR2SmallClaimsRestrictPages(SdoR2SmallClaimsRestrictPages.builder()
-                                                   .witnessShouldNotMoreThanTxt(RESTRICT_NUMBER_PAGES_TEXT1)
-                                                   .noOfPages(12)
-                                                   .fontDetails(RESTRICT_NUMBER_PAGES_TEXT2)
-                                                   .build())
-                .text(WITNESS_DESCRIPTION_TEXT)
-                .build())
-            .build();
+    public void applyWitnessStatements(CaseData caseData) {
+        caseData.setSdoR2SmallClaimsWitnessStatementOther(SdoR2SmallClaimsWitnessStatements.builder()
+                                                             .sdoStatementOfWitness(WITNESS_STATEMENT_TEXT)
+                                                             .isRestrictWitness(NO)
+                                                             .sdoR2SmallClaimsRestrictWitness(SdoR2SmallClaimsRestrictWitness.builder()
+                                                                                              .noOfWitnessClaimant(2)
+                                                                                              .noOfWitnessDefendant(2)
+                                                                                              .partyIsCountedAsWitnessTxt(RESTRICT_WITNESS_TEXT)
+                                                                                              .build())
+                                                             .isRestrictPages(NO)
+                                                             .sdoR2SmallClaimsRestrictPages(SdoR2SmallClaimsRestrictPages.builder()
+                                                                                         .witnessShouldNotMoreThanTxt(RESTRICT_NUMBER_PAGES_TEXT1)
+                                                                                         .noOfPages(12)
+                                                                                         .fontDetails(RESTRICT_NUMBER_PAGES_TEXT2)
+                                                                                         .build())
+                                                             .text(WITNESS_DESCRIPTION_TEXT)
+                                                             .build());
     }
 
-    public void applyCreditHire(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        updatedData.smallClaimsCreditHire(SmallClaimsCreditHire.builder()
-                .input1(CREDIT_HIRE_DISCLOSURE_SDO)
-                .input2(CREDIT_HIRE_STATEMENT_PROMPT_SDO)
-                .date1(sdoDeadlineService.nextWorkingDayFromNowWeeks(4))
-                .input3(CREDIT_HIRE_NON_COMPLIANCE_SDO)
-                .input4(CREDIT_HIRE_PARTIES_LIAISE)
-                .date2(sdoDeadlineService.nextWorkingDayFromNowWeeks(6))
-                .input5(CREDIT_HIRE_BASIC_RATE_EVIDENCE_WITH_LIABILITY)
-                .input6(CREDIT_HIRE_DEFENDANT_UPLOAD_SDO)
-                .date3(sdoDeadlineService.nextWorkingDayFromNowWeeks(8))
-                .input7(CREDIT_HIRE_CLAIMANT_EVIDENCE_SDO)
-                .date4(sdoDeadlineService.nextWorkingDayFromNowWeeks(10))
-                .input11(CREDIT_HIRE_WITNESS_LIMIT_SDO)
-                .build())
-            .build();
+    public void applyCreditHire(CaseData caseData) {
+        caseData.setSmallClaimsCreditHire(SmallClaimsCreditHire.builder()
+                                              .input1(CREDIT_HIRE_DISCLOSURE_SDO)
+                                              .input2(CREDIT_HIRE_STATEMENT_PROMPT_SDO)
+                                              .date1(sdoDeadlineService.nextWorkingDayFromNowWeeks(4))
+                                              .input3(CREDIT_HIRE_NON_COMPLIANCE_SDO)
+                                              .input4(CREDIT_HIRE_PARTIES_LIAISE)
+                                              .date2(sdoDeadlineService.nextWorkingDayFromNowWeeks(6))
+                                              .input5(CREDIT_HIRE_BASIC_RATE_EVIDENCE_WITH_LIABILITY)
+                                              .input6(CREDIT_HIRE_DEFENDANT_UPLOAD_SDO)
+                                              .date3(sdoDeadlineService.nextWorkingDayFromNowWeeks(8))
+                                              .input7(CREDIT_HIRE_CLAIMANT_EVIDENCE_SDO)
+                                              .date4(sdoDeadlineService.nextWorkingDayFromNowWeeks(10))
+                                              .input11(CREDIT_HIRE_WITNESS_LIMIT_SDO)
+                                              .build());
     }
 
-    public void applyRoadTrafficAccident(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        updatedData.smallClaimsRoadTrafficAccident(SmallClaimsRoadTrafficAccident.builder()
-                .input(ROAD_TRAFFIC_ACCIDENT_SMALL_CLAIMS)
-                .build())
-            .build();
+    public void applyRoadTrafficAccident(CaseData caseData) {
+        caseData.setSmallClaimsRoadTrafficAccident(SmallClaimsRoadTrafficAccident.builder()
+                                                       .input(ROAD_TRAFFIC_ACCIDENT_SMALL_CLAIMS)
+                                                       .build());
     }
 
-    public void applyFlightDelaySection(CaseData.CaseDataBuilder<?, ?> updatedData,
+    public void applyFlightDelaySection(CaseData caseData,
                                         List<OrderDetailsPagesSectionsToggle> checkList) {
-        updatedData.smallClaimsFlightDelay(SmallClaimsFlightDelay.builder()
-                .smallClaimsFlightDelayToggle(checkList)
-                .relatedClaimsInput(FLIGHT_DELAY_RELATED_CLAIMS_NOTICE)
-                .legalDocumentsInput(FLIGHT_DELAY_LEGAL_ARGUMENTS_NOTICE)
-                .build())
-            .build();
+        caseData.setSmallClaimsFlightDelay(SmallClaimsFlightDelay.builder()
+                                                   .smallClaimsFlightDelayToggle(checkList)
+                                                   .relatedClaimsInput(FLIGHT_DELAY_RELATED_CLAIMS_NOTICE)
+                                                   .legalDocumentsInput(FLIGHT_DELAY_LEGAL_ARGUMENTS_NOTICE)
+                                                   .build());
     }
 
-    public void applyHearingSection(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        updatedData.smallClaimsHearing(SmallClaimsHearing.builder()
-                .input1(SMALL_CLAIMS_HEARING_LISTING_NOTICE)
-                .input2(SMALL_CLAIMS_HEARING_FEE_WARNING)
-                .build())
-            .build();
+    public void applyHearingSection(CaseData caseData) {
+        caseData.setSmallClaimsHearing(SmallClaimsHearing.builder()
+                                               .input1(SMALL_CLAIMS_HEARING_LISTING_NOTICE)
+                                               .input2(SMALL_CLAIMS_HEARING_FEE_WARNING)
+                                               .build());
     }
 
-    public void applyNotesSection(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        updatedData.smallClaimsNotes(SmallClaimsNotes.builder()
-                .input(String.format(
-                    "%s %s.",
-                    ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_NO_ARTICLE,
-                    DateFormatHelper.formatLocalDate(sdoDeadlineService.workingDaysFromNow(5), DATE)
-                ))
-                .build())
-            .build();
+    public void applyNotesSection(CaseData caseData) {
+        caseData.setSmallClaimsNotes(SmallClaimsNotes.builder()
+                                              .input(String.format(
+                                                  "%s %s.",
+                                                  ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_NO_ARTICLE,
+                                                  DateFormatHelper.formatLocalDate(sdoDeadlineService.workingDaysFromNow(5), DATE)
+                                              ))
+                                              .build());
     }
 }

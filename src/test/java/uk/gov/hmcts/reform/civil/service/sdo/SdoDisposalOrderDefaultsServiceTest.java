@@ -20,11 +20,10 @@ class SdoDisposalOrderDefaultsServiceTest {
     private SdoDeadlineService deadlineService;
 
     private SdoDisposalOrderDefaultsService service;
-    private SdoDisposalNarrativeService sdoDisposalNarrativeService;
 
     @BeforeEach
     void setUp() {
-        sdoDisposalNarrativeService = new SdoDisposalNarrativeService(deadlineService);
+        SdoDisposalNarrativeService sdoDisposalNarrativeService = new SdoDisposalNarrativeService(deadlineService);
         service = new SdoDisposalOrderDefaultsService(sdoDisposalNarrativeService);
         lenient().when(deadlineService.nextWorkingDayFromNowWeeks(anyInt()))
             .thenAnswer(invocation -> LocalDate.of(2025, 1, 1).plusWeeks(invocation.getArgument(0, Integer.class)));
@@ -34,13 +33,12 @@ class SdoDisposalOrderDefaultsServiceTest {
 
     @Test
     void shouldPopulateCoreDisposalFields() {
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+        CaseData caseData = CaseData.builder().build();
 
-        service.populateDisposalOrderDetails(builder);
-        CaseData result = builder.build();
+        service.populateDisposalOrderDetails(caseData);
 
-        assertThat(result.getDisposalHearingJudgesRecital()).isNotNull();
-        assertThat(result.getDisposalOrderWithoutHearing()).isNotNull();
-        assertThat(result.getDisposalHearingNotes().getDate()).isNotNull();
+        assertThat(caseData.getDisposalHearingJudgesRecital()).isNotNull();
+        assertThat(caseData.getDisposalOrderWithoutHearing()).isNotNull();
+        assertThat(caseData.getDisposalHearingNotes().getDate()).isNotNull();
     }
 }

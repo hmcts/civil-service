@@ -47,84 +47,80 @@ class SdoDisposalNarrativeServiceTest {
 
     @Test
     void shouldPopulateDisclosureAndWitnessSections() {
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+        CaseData caseData = CaseData.builder().build();
 
-        service.applyDisclosureOfDocuments(builder);
-        service.applyWitnessOfFact(builder);
+        service.applyDisclosureOfDocuments(caseData);
+        service.applyWitnessOfFact(caseData);
 
-        CaseData result = builder.build();
-        assertThat(result.getDisposalHearingDisclosureOfDocuments().getDate1())
+        assertThat(caseData.getDisposalHearingDisclosureOfDocuments().getDate1())
             .isEqualTo(LocalDate.of(2025, 4, 1).plusWeeks(10));
-        assertThat(result.getDisposalHearingDisclosureOfDocuments().getInput1())
+        assertThat(caseData.getDisposalHearingDisclosureOfDocuments().getInput1())
             .isEqualTo(DISPOSAL_DOCUMENTS_EXCHANGE);
-        assertThat(result.getDisposalHearingDisclosureOfDocuments().getInput2())
+        assertThat(caseData.getDisposalHearingDisclosureOfDocuments().getInput2())
             .isEqualTo(DISPOSAL_DOCUMENTS_UPLOAD);
-        assertThat(result.getDisposalHearingWitnessOfFact().getDate2())
+        assertThat(caseData.getDisposalHearingWitnessOfFact().getDate2())
             .isEqualTo(LocalDate.of(2025, 4, 1).plusWeeks(4));
-        assertThat(result.getDisposalHearingWitnessOfFact().getInput3())
+        assertThat(caseData.getDisposalHearingWitnessOfFact().getInput3())
             .isEqualTo(DISPOSAL_WITNESS_UPLOAD);
-        assertThat(result.getDisposalHearingWitnessOfFact().getInput4())
+        assertThat(caseData.getDisposalHearingWitnessOfFact().getInput4())
             .isEqualTo(DISPOSAL_WITNESS_CPR32_6);
-        assertThat(result.getDisposalHearingWitnessOfFact().getInput5())
+        assertThat(caseData.getDisposalHearingWitnessOfFact().getInput5())
             .isEqualTo(DISPOSAL_WITNESS_CPR32_7_DEADLINE);
-        assertThat(result.getDisposalHearingWitnessOfFact().getInput6())
+        assertThat(caseData.getDisposalHearingWitnessOfFact().getInput6())
             .isEqualTo(DISPOSAL_WITNESS_TRIAL_NOTE_SDO);
     }
 
     @Test
     void shouldPopulateJudgesRecitalUsingSharedConstant() {
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+        CaseData caseData = CaseData.builder().build();
 
-        service.applyJudgesRecital(builder);
+        service.applyJudgesRecital(caseData);
 
-        assertThat(builder.build().getDisposalHearingJudgesRecital().getInput())
+        assertThat(caseData.getDisposalHearingJudgesRecital().getInput())
             .isEqualTo(DISPOSAL_JUDGES_RECITAL_CLAIM_FORM);
     }
 
     @Test
     void shouldPopulateOrderWithoutHearingAndNotes() {
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+        CaseData caseData = CaseData.builder().build();
 
-        service.applyOrderWithoutHearing(builder);
-        service.applyNotes(builder);
+        service.applyOrderWithoutHearing(caseData);
+        service.applyNotes(caseData);
 
-        CaseData result = builder.build();
-        assertThat(result.getDisposalOrderWithoutHearing().getInput())
+        assertThat(caseData.getDisposalOrderWithoutHearing().getInput())
             .startsWith(ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_NO_ARTICLE);
-        assertThat(result.getDisposalHearingNotes().getInput())
+        assertThat(caseData.getDisposalHearingNotes().getInput())
             .isEqualTo(ORDER_WITHOUT_HEARING_UPLOAD_TO_PORTAL_SDO);
-        assertThat(result.getDisposalHearingNotes().getDate())
+        assertThat(caseData.getDisposalHearingNotes().getDate())
             .isEqualTo(LocalDate.of(2025, 4, 1).plusWeeks(1));
     }
 
     @Test
     void shouldPopulateSchedulesAndBundleUsingLibraryText() {
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+        CaseData caseData = CaseData.builder().build();
 
-        service.applySchedulesOfLoss(builder);
-        service.applyBundle(builder);
+        service.applySchedulesOfLoss(caseData);
+        service.applyBundle(caseData);
 
-        CaseData result = builder.build();
-        assertThat(result.getDisposalHearingSchedulesOfLoss().getInput2())
+        assertThat(caseData.getDisposalHearingSchedulesOfLoss().getInput2())
             .isEqualTo(DISPOSAL_SCHEDULE_CLAIMANT_UPLOAD_SDO);
-        assertThat(result.getDisposalHearingSchedulesOfLoss().getInput3())
+        assertThat(caseData.getDisposalHearingSchedulesOfLoss().getInput3())
             .isEqualTo(DISPOSAL_SCHEDULE_COUNTER_SEND);
-        assertThat(result.getDisposalHearingSchedulesOfLoss().getInput4())
+        assertThat(caseData.getDisposalHearingSchedulesOfLoss().getInput4())
             .isEqualTo(DISPOSAL_SCHEDULE_COUNTER_UPLOAD_SDO);
-        assertThat(result.getDisposalHearingBundle().getInput())
+        assertThat(caseData.getDisposalHearingBundle().getInput())
             .isEqualTo(DISPOSAL_BUNDLE_REQUIREMENT);
     }
 
     @Test
     void shouldPopulateHearingDatesUsingCurrentClock() {
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+        CaseData caseData = CaseData.builder().build();
 
-        service.applyFinalDisposalHearing(builder);
-        service.applyHearingTime(builder);
+        service.applyFinalDisposalHearing(caseData);
+        service.applyHearingTime(caseData);
 
         LocalDate expected = LocalDate.now().plusWeeks(16);
-        CaseData result = builder.build();
-        assertThat(result.getDisposalHearingFinalDisposalHearing().getDate()).isEqualTo(expected);
-        assertThat(result.getDisposalHearingHearingTime().getDateTo()).isEqualTo(expected);
+        assertThat(caseData.getDisposalHearingFinalDisposalHearing().getDate()).isEqualTo(expected);
+        assertThat(caseData.getDisposalHearingHearingTime().getDateTo()).isEqualTo(expected);
     }
 }

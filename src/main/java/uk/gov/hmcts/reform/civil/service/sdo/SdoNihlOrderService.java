@@ -43,54 +43,54 @@ public class SdoNihlOrderService {
 
     private final SdoDeadlineService sdoDeadlineService;
 
-    public void populateStandardDirections(CaseData.CaseDataBuilder<?, ?> updatedData,
+    public void populateStandardDirections(CaseData caseData,
                                            DynamicList hearingMethodList,
                                            DynamicList trialCourtList,
                                            DynamicList alternativeCourtLocations) {
 
-        updatedData.sdoFastTrackJudgesRecital(FastTrackJudgesRecital.builder()
+        caseData.setSdoFastTrackJudgesRecital(FastTrackJudgesRecital.builder()
                                                   .input(SdoR2UiConstantFastTrack.JUDGE_RECITAL).build());
 
-        updatedData.sdoR2DisclosureOfDocuments(SdoR2DisclosureOfDocuments.builder()
-                                                   .standardDisclosureTxt(SdoR2UiConstantFastTrack.STANDARD_DISCLOSURE)
-                                                   .standardDisclosureDate(sdoDeadlineService.calendarDaysFromNow(28))
-                                                   .inspectionTxt(SdoR2UiConstantFastTrack.INSPECTION)
-                                                   .inspectionDate(sdoDeadlineService.calendarDaysFromNow(42))
-                                                   .requestsWillBeCompiledLabel(SdoR2UiConstantFastTrack.REQUEST_COMPILED_WITH)
-                                                   .build());
+        caseData.setSdoR2DisclosureOfDocuments(SdoR2DisclosureOfDocuments.builder()
+                                                  .standardDisclosureTxt(SdoR2UiConstantFastTrack.STANDARD_DISCLOSURE)
+                                                  .standardDisclosureDate(sdoDeadlineService.calendarDaysFromNow(28))
+                                                  .inspectionTxt(SdoR2UiConstantFastTrack.INSPECTION)
+                                                  .inspectionDate(sdoDeadlineService.calendarDaysFromNow(42))
+                                                  .requestsWillBeCompiledLabel(SdoR2UiConstantFastTrack.REQUEST_COMPILED_WITH)
+                                                  .build());
 
-        updatedData.sdoR2WitnessesOfFact(buildWitnessesOfFact()).build();
+        caseData.setSdoR2WitnessesOfFact(buildWitnessesOfFact());
 
-        updatedData.sdoR2ScheduleOfLoss(SdoR2ScheduleOfLoss.builder()
-                                            .sdoR2ScheduleOfLossClaimantText(SdoR2UiConstantFastTrack.SCHEDULE_OF_LOSS_CLAIMANT)
-                                            .isClaimForPecuniaryLoss(NO)
-                                            .sdoR2ScheduleOfLossClaimantDate(sdoDeadlineService.calendarDaysFromNow(364))
-                                            .sdoR2ScheduleOfLossDefendantText(SdoR2UiConstantFastTrack.SCHEDULE_OF_LOSS_DEFENDANT)
-                                            .sdoR2ScheduleOfLossDefendantDate(sdoDeadlineService.calendarDaysFromNow(378))
-                                            .sdoR2ScheduleOfLossPecuniaryLossTxt(SdoR2UiConstantFastTrack.PECUNIARY_LOSS)
-                                            .build());
+        caseData.setSdoR2ScheduleOfLoss(SdoR2ScheduleOfLoss.builder()
+                                             .sdoR2ScheduleOfLossClaimantText(SdoR2UiConstantFastTrack.SCHEDULE_OF_LOSS_CLAIMANT)
+                                             .isClaimForPecuniaryLoss(NO)
+                                             .sdoR2ScheduleOfLossClaimantDate(sdoDeadlineService.calendarDaysFromNow(364))
+                                             .sdoR2ScheduleOfLossDefendantText(SdoR2UiConstantFastTrack.SCHEDULE_OF_LOSS_DEFENDANT)
+                                             .sdoR2ScheduleOfLossDefendantDate(sdoDeadlineService.calendarDaysFromNow(378))
+                                             .sdoR2ScheduleOfLossPecuniaryLossTxt(SdoR2UiConstantFastTrack.PECUNIARY_LOSS)
+                                             .build());
 
-        updatedData.sdoR2Trial(buildTrial(hearingMethodList, trialCourtList, alternativeCourtLocations)).build();
+        caseData.setSdoR2Trial(buildTrial(hearingMethodList, trialCourtList, alternativeCourtLocations));
 
-        updatedData.sdoR2ImportantNotesTxt(SdoR2UiConstantFastTrack.IMPORTANT_NOTES);
-        updatedData.sdoR2ImportantNotesDate(sdoDeadlineService.calendarDaysFromNow(7));
+        caseData.setSdoR2ImportantNotesTxt(SdoR2UiConstantFastTrack.IMPORTANT_NOTES);
+        caseData.setSdoR2ImportantNotesDate(sdoDeadlineService.calendarDaysFromNow(7));
 
-        updatedData.sdoR2ExpertEvidence(SdoR2ExpertEvidence.builder()
-                                            .sdoClaimantPermissionToRelyTxt(SdoR2UiConstantFastTrack.CLAIMANT_PERMISSION_TO_RELY).build());
+        caseData.setSdoR2ExpertEvidence(SdoR2ExpertEvidence.builder()
+                                               .sdoClaimantPermissionToRelyTxt(SdoR2UiConstantFastTrack.CLAIMANT_PERMISSION_TO_RELY).build());
 
-        updatedData.sdoR2AddendumReport(SdoR2AddendumReport.builder()
-                                            .sdoAddendumReportTxt(SdoR2UiConstantFastTrack.ADDENDUM_REPORT)
-                                            .sdoAddendumReportDate(sdoDeadlineService.calendarDaysFromNow(56)).build());
+        caseData.setSdoR2AddendumReport(SdoR2AddendumReport.builder()
+                                               .sdoAddendumReportTxt(SdoR2UiConstantFastTrack.ADDENDUM_REPORT)
+                                               .sdoAddendumReportDate(sdoDeadlineService.calendarDaysFromNow(56)).build());
 
-        updatedData.sdoR2FurtherAudiogram(buildFurtherAudiogram()).build();
-        updatedData.sdoR2QuestionsClaimantExpert(buildQuestionsForClaimantExpert()).build();
-        updatedData.sdoR2PermissionToRelyOnExpert(buildPermissionToRelyOnExpert()).build();
-        updatedData.sdoR2EvidenceAcousticEngineer(buildEvidenceFromAcousticEngineer()).build();
-        updatedData.sdoR2QuestionsToEntExpert(buildQuestionsToEntExpert()).build();
-        updatedData.sdoR2UploadOfDocuments(SdoR2UploadOfDocuments.builder()
-                                               .sdoUploadOfDocumentsTxt(SdoR2UiConstantFastTrack.UPLOAD_OF_DOCUMENTS)
-                                               .build());
-        updatedData.sdoR2NihlUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder()
+        caseData.setSdoR2FurtherAudiogram(buildFurtherAudiogram());
+        caseData.setSdoR2QuestionsClaimantExpert(buildQuestionsForClaimantExpert());
+        caseData.setSdoR2PermissionToRelyOnExpert(buildPermissionToRelyOnExpert());
+        caseData.setSdoR2EvidenceAcousticEngineer(buildEvidenceFromAcousticEngineer());
+        caseData.setSdoR2QuestionsToEntExpert(buildQuestionsToEntExpert());
+        caseData.setSdoR2UploadOfDocuments(SdoR2UploadOfDocuments.builder()
+                                                  .sdoUploadOfDocumentsTxt(SdoR2UiConstantFastTrack.UPLOAD_OF_DOCUMENTS)
+                                                  .build());
+        caseData.setSdoR2NihlUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder()
                                                   .description(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
     }
 

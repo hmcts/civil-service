@@ -45,43 +45,42 @@ class SdoFastTrackNarrativeServiceTest {
 
     @Test
     void shouldPopulateCoreFastTrackNarrative() {
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+        CaseData caseData = CaseData.builder().build();
 
-        service.populateFastTrackNarrative(builder);
+        service.populateFastTrackNarrative(caseData);
 
         LocalDate calendarBase = LocalDate.of(2025, 1, 1);
         LocalDate workingDayBase = LocalDate.of(2025, 2, 1);
-        CaseData result = builder.build();
-        assertThat(result.getFastTrackJudgesRecital().getInput())
+        assertThat(caseData.getFastTrackJudgesRecital().getInput())
             .isEqualTo(JUDGES_RECITAL_STATEMENTS_OF_CASE_WITH_COMMA);
-        assertThat(result.getFastTrackDisclosureOfDocuments())
+        assertThat(caseData.getFastTrackDisclosureOfDocuments())
             .extracting(FastTrackDisclosureOfDocuments::getInput1, FastTrackDisclosureOfDocuments::getDate1)
             .containsExactly(FAST_TRACK_DISCLOSURE_STANDARD_SDO, workingDayBase.plusWeeks(4));
-        assertThat(result.getSdoR2FastTrackWitnessOfFact().getSdoWitnessDeadlineDate())
+        assertThat(caseData.getSdoR2FastTrackWitnessOfFact().getSdoWitnessDeadlineDate())
             .isEqualTo(calendarBase.plusDays(70));
-        assertThat(result.getFastTrackSchedulesOfLoss())
+        assertThat(caseData.getFastTrackSchedulesOfLoss())
             .extracting(
                 FastTrackSchedulesOfLoss::getDate1,
                 FastTrackSchedulesOfLoss::getDate2
             )
             .containsExactly(workingDayBase.plusWeeks(10), workingDayBase.plusWeeks(12));
-        assertThat(result.getFastTrackTrial())
+        assertThat(caseData.getFastTrackTrial())
             .extracting(FastTrackTrial::getDate1, FastTrackTrial::getDate2)
             .containsExactly(calendarBase.plusDays(22 * 7), calendarBase.plusDays(30 * 7));
-        assertThat(result.getFastTrackHearingTime())
+        assertThat(caseData.getFastTrackHearingTime())
             .extracting(FastTrackHearingTime::getDateFrom, FastTrackHearingTime::getDateTo)
             .containsExactly(calendarBase.plusDays(22 * 7), calendarBase.plusDays(30 * 7));
-        assertThat(result.getFastTrackNotes().getDate())
+        assertThat(caseData.getFastTrackNotes().getDate())
             .isEqualTo(workingDayBase.plusWeeks(1));
     }
 
     @Test
     void shouldPopulateOrderWithoutHearingUsingDeadlineService() {
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+        CaseData caseData = CaseData.builder().build();
 
-        service.populateFastTrackNarrative(builder);
+        service.populateFastTrackNarrative(caseData);
 
-        String input = builder.build().getFastTrackOrderWithoutJudgement().getInput();
+        String input = caseData.getFastTrackOrderWithoutJudgement().getInput();
         assertThat(input).startsWith(ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_NO_ARTICLE);
         assertThat(input).contains("15 June 2025");
     }

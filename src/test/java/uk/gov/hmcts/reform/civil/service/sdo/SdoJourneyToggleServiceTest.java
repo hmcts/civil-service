@@ -39,13 +39,11 @@ class SdoJourneyToggleServiceTest {
         when(featureToggleService.isWelshJourneyEnabled(any(CaseData.class))).thenReturn(true);
 
         CaseData caseData = CaseData.builder().build();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
-        service.applyJourneyFlags(caseData, builder);
+        service.applyJourneyFlags(caseData);
 
-        CaseData result = builder.build();
-        assertThat(result.getShowCarmFields()).isEqualTo(YesOrNo.YES);
-        assertThat(result.getBilingualHint()).isEqualTo(YesOrNo.YES);
+        assertThat(caseData.getShowCarmFields()).isEqualTo(YesOrNo.YES);
+        assertThat(caseData.getBilingualHint()).isEqualTo(YesOrNo.YES);
     }
 
     @Test
@@ -53,12 +51,11 @@ class SdoJourneyToggleServiceTest {
         when(featureToggleService.isCarmEnabled(any(CaseData.class))).thenReturn(false);
 
         CaseData caseData = CaseData.builder().build();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         List<OrderDetailsPagesSectionsToggle> checklist = List.of(OrderDetailsPagesSectionsToggle.SHOW);
 
-        service.applySmallClaimsChecklistToggle(caseData, builder, checklist);
+        service.applySmallClaimsChecklistToggle(caseData, checklist);
 
-        assertThat(builder.build().getSmallClaimsMediationSectionToggle()).isNull();
+        assertThat(caseData.getSmallClaimsMediationSectionToggle()).isNull();
     }
 
     @Test
@@ -66,13 +63,11 @@ class SdoJourneyToggleServiceTest {
         when(featureToggleService.isCarmEnabled(any(CaseData.class))).thenReturn(true);
 
         CaseData caseData = CaseData.builder().build();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
-        service.applyR2SmallClaimsMediation(caseData, builder, List.of(IncludeInOrderToggle.INCLUDE));
+        service.applyR2SmallClaimsMediation(caseData, List.of(IncludeInOrderToggle.INCLUDE));
 
-        CaseData result = builder.build();
-        assertThat(result.getSdoR2SmallClaimsMediationSectionToggle()).containsExactly(IncludeInOrderToggle.INCLUDE);
-        assertThat(result.getSdoR2SmallClaimsMediationSectionStatement()).isNotNull();
+        assertThat(caseData.getSdoR2SmallClaimsMediationSectionToggle()).containsExactly(IncludeInOrderToggle.INCLUDE);
+        assertThat(caseData.getSdoR2SmallClaimsMediationSectionStatement()).isNotNull();
     }
 
     @Test
@@ -80,11 +75,10 @@ class SdoJourneyToggleServiceTest {
         when(featureToggleService.isCarmEnabled(any(CaseData.class))).thenReturn(true);
 
         CaseData caseData = CaseData.builder().build();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
-        service.applySmallClaimsMediationStatement(caseData, builder);
+        service.applySmallClaimsMediationStatement(caseData);
 
-        assertThat(builder.build().getSmallClaimsMediationSectionStatement()).isNotNull();
+        assertThat(caseData.getSmallClaimsMediationSectionStatement()).isNotNull();
     }
 
     @Test

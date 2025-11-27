@@ -22,48 +22,44 @@ public class DirectionsOrderCaseProgressionService {
     private final SdoFeatureToggleService featureToggleService;
     private final SdoLocationService sdoLocationService;
 
-    public void applyEaCourtLocation(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder, boolean allowLipvLrWithNoC) {
+    public void applyEaCourtLocation(CaseData caseData, boolean allowLipvLrWithNoC) {
         YesOrNo resolvedEaCourt = sdoJourneyToggleService.resolveEaCourtLocation(caseData, allowLipvLrWithNoC);
         if (resolvedEaCourt != null) {
             log.info("Setting EA court location={} for caseId {}", resolvedEaCourt, caseData.getCcdCaseReference());
-            builder.eaCourtLocation(resolvedEaCourt);
+            caseData.setEaCourtLocation(resolvedEaCourt);
         }
     }
 
     public void applyCaseProgressionRouting(CaseData caseData,
-                                            CaseData.CaseDataBuilder<?, ?> builder,
                                             String authToken,
                                             boolean allowLipvLrWithNoC) {
-        applyCaseProgressionRouting(caseData, builder, authToken, false, allowLipvLrWithNoC);
+        applyCaseProgressionRouting(caseData, authToken, false, allowLipvLrWithNoC);
     }
 
     public void applyCaseProgressionRouting(CaseData caseData,
-                                            CaseData.CaseDataBuilder<?, ?> builder,
                                             String authToken,
                                             boolean clearWaMetadataWhenDisabled,
                                             boolean allowLipvLrWithNoC) {
-        applyEaCourtLocation(caseData, builder, allowLipvLrWithNoC);
-        updateWaLocationsIfEnabled(caseData, builder, authToken, clearWaMetadataWhenDisabled);
+        applyEaCourtLocation(caseData, allowLipvLrWithNoC);
+        updateWaLocationsIfEnabled(caseData, authToken, clearWaMetadataWhenDisabled);
     }
 
     public void updateWaLocationsIfEnabled(CaseData caseData,
-                                           CaseData.CaseDataBuilder<?, ?> builder,
                                            String authToken) {
-        updateWaLocationsIfEnabled(caseData, builder, authToken, false);
+        updateWaLocationsIfEnabled(caseData, authToken, false);
     }
 
     public void updateWaLocationsIfEnabled(CaseData caseData,
-                                           CaseData.CaseDataBuilder<?, ?> builder,
                                            String authToken,
                                            boolean clearWaMetadataWhenDisabled) {
         if (!featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
             if (clearWaMetadataWhenDisabled) {
                 log.info("Clearing WA location metadata for caseId {}", caseData.getCcdCaseReference());
-                sdoLocationService.clearWaLocationMetadata(builder);
+                sdoLocationService.clearWaLocationMetadata(caseData);
             }
             return;
         }
         log.info("Updating WA locations for caseId {}", caseData.getCcdCaseReference());
-        sdoLocationService.updateWaLocationsIfRequired(caseData, builder, authToken);
+        sdoLocationService.updateWaLocationsIfRequired(caseData, authToken);
     }
 }

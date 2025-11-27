@@ -22,7 +22,7 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CLINICAL_DOCUMENTS_HEADING;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CLINICAL_NOTES_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CLINICAL_PARTIES_SDO;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_BASIC_RATE_EVIDENCE_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_BASIC_RATE_EVIDENCE_WITH_LIABILITY;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_CLAIMANT_EVIDENCE_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_DEFENDANT_UPLOAD_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_DISCLOSURE_SDO;
@@ -50,13 +50,13 @@ public class SdoFastTrackSpecialistDirectionsService {
 
     private final SdoDeadlineService deadlineService;
 
-    public void populateSpecialistDirections(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        updatedData.fastTrackBuildingDispute(buildBuildingDispute()).build();
-        updatedData.fastTrackClinicalNegligence(buildClinicalNegligence()).build();
-        updatedData.sdoR2FastTrackCreditHire(buildCreditHire()).build();
-        updatedData.fastTrackHousingDisrepair(buildHousingDisrepair()).build();
-        updatedData.fastTrackPersonalInjury(buildPersonalInjury()).build();
-        updatedData.fastTrackRoadTrafficAccident(buildRoadTrafficAccident()).build();
+    public void populateSpecialistDirections(CaseData caseData) {
+        caseData.setFastTrackBuildingDispute(buildBuildingDispute());
+        caseData.setFastTrackClinicalNegligence(buildClinicalNegligence());
+        caseData.setSdoR2FastTrackCreditHire(buildCreditHire());
+        caseData.setFastTrackHousingDisrepair(buildHousingDisrepair());
+        caseData.setFastTrackPersonalInjury(buildPersonalInjury());
+        caseData.setFastTrackRoadTrafficAccident(buildRoadTrafficAccident());
     }
 
     private FastTrackBuildingDispute buildBuildingDispute() {
@@ -84,7 +84,7 @@ public class SdoFastTrackSpecialistDirectionsService {
 
         return SdoR2FastTrackCreditHire.builder()
             .input1(CREDIT_HIRE_DISCLOSURE_SDO)
-            .input5(CREDIT_HIRE_BASIC_RATE_EVIDENCE_SDO)
+            .input5(CREDIT_HIRE_BASIC_RATE_EVIDENCE_WITH_LIABILITY)
             .input6(CREDIT_HIRE_DEFENDANT_UPLOAD_SDO)
             .date3(deadlineService.nextWorkingDayFromNowWeeks(8))
             .input7(CREDIT_HIRE_CLAIMANT_EVIDENCE_SDO)

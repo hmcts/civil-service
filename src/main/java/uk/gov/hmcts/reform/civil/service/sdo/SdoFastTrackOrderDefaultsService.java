@@ -11,8 +11,8 @@ public class SdoFastTrackOrderDefaultsService {
     private final SdoFastTrackNarrativeService sdoFastTrackNarrativeService;
     private final SdoFastTrackSpecialistDirectionsService specialistDirectionsService;
 
-    public void populateFastTrackOrderDetails(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        sdoFastTrackNarrativeService.populateFastTrackNarrative(updatedData);
-        specialistDirectionsService.populateSpecialistDirections(updatedData);
+    public void populateFastTrackOrderDetails(CaseData caseData) {
+        sdoFastTrackNarrativeService.populateFastTrackNarrative(caseData);
+        specialistDirectionsService.populateSpecialistDirections(caseData);
     }
 }

@@ -16,7 +16,7 @@ public class SdoExpertEvidenceFieldsService {
 
     private final SdoDeadlineService sdoDeadlineService;
 
-    public void populateFastTrackExpertEvidence(CaseData.CaseDataBuilder<?, ?> updatedData) {
+    public void populateFastTrackExpertEvidence(CaseData caseData) {
         FastTrackPersonalInjury expertEvidence = FastTrackPersonalInjury.builder()
             .input1("The Claimant has permission to rely upon the written expert evidence already uploaded to the"
                 + " Digital Portal with the particulars of claim")
@@ -29,6 +29,6 @@ public class SdoExpertEvidenceFieldsService {
             .date4(sdoDeadlineService.nextWorkingDayFromNowDays(49))
             .build();
 
-        updatedData.fastTrackPersonalInjury(expertEvidence).build();
+        caseData.setFastTrackPersonalInjury(expertEvidence);
     }
 }

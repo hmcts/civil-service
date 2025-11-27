@@ -48,7 +48,7 @@ class SdoDocumentTaskTest {
 
         DirectionsOrderTaskResult result = task.execute(context);
 
-        assertThat(result.updatedCaseData()).isNotSameAs(caseData);
+        assertThat(result.updatedCaseData()).isEqualTo(caseData);
         assertThat(result.errors()).isEmpty();
         assertThat(result.updatedCaseData().getSdoOrderDocument()).isEqualTo(document);
         verify(sdoDocumentService).generateSdoDocument(caseData, AUTH_TOKEN);

@@ -30,30 +30,26 @@ class SdoChecklistServiceTest {
     @Test
     void shouldPopulateOrderChecklistsAndDelegateSmallClaimsToggle() {
         CaseData caseData = CaseData.builder().build();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         List<OrderDetailsPagesSectionsToggle> showList = List.of(OrderDetailsPagesSectionsToggle.SHOW);
 
-        service.applyOrderChecklists(caseData, builder, showList);
+        service.applyOrderChecklists(caseData, showList);
 
-        CaseData result = builder.build();
-        assertThat(result.getFastTrackAltDisputeResolutionToggle()).isEqualTo(showList);
-        assertThat(result.getDisposalHearingDisclosureOfDocumentsToggle()).isEqualTo(showList);
-        assertThat(result.getSmallClaimsHearingToggle()).isEqualTo(showList);
-        verify(journeyToggleService).applySmallClaimsChecklistToggle(caseData, builder, showList);
+        assertThat(caseData.getFastTrackAltDisputeResolutionToggle()).isEqualTo(showList);
+        assertThat(caseData.getDisposalHearingDisclosureOfDocumentsToggle()).isEqualTo(showList);
+        assertThat(caseData.getSmallClaimsHearingToggle()).isEqualTo(showList);
+        verify(journeyToggleService).applySmallClaimsChecklistToggle(caseData, showList);
     }
 
     @Test
     void shouldPopulateR2ChecklistsAndMediationToggle() {
         CaseData caseData = CaseData.builder().build();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         List<IncludeInOrderToggle> includeList = List.of(IncludeInOrderToggle.INCLUDE);
 
-        service.applyR2Checklists(caseData, builder, includeList);
+        service.applyR2Checklists(caseData, includeList);
 
-        CaseData result = builder.build();
-        assertThat(result.getSdoAltDisputeResolution().getIncludeInOrderToggle()).containsExactly(
+        assertThat(caseData.getSdoAltDisputeResolution().getIncludeInOrderToggle()).containsExactly(
             IncludeInOrderToggle.INCLUDE);
-        assertThat(result.getSdoR2TrialToggle()).isEqualTo(includeList);
-        verify(journeyToggleService).applyR2SmallClaimsMediation(caseData, builder, includeList);
+        assertThat(caseData.getSdoR2TrialToggle()).isEqualTo(includeList);
+        verify(journeyToggleService).applyR2SmallClaimsMediation(caseData, includeList);
     }
 }

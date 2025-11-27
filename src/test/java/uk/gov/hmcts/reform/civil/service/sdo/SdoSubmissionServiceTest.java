@@ -151,8 +151,6 @@ class SdoSubmissionServiceTest {
             .sdoR2Trial(trial)
             .build();
 
-        when(locationService.trimListItems(originalList)).thenReturn(trimmedList);
-
         CaseData result = service.prepareSubmission(caseData, AUTH_TOKEN);
 
         assertThat(result.getDisposalHearingMethodInPerson()).isEqualTo(trimmedList);
@@ -197,15 +195,14 @@ class SdoSubmissionServiceTest {
 
         service.prepareSubmission(caseData, AUTH_TOKEN);
 
-        verify(caseProgressionService).applyCaseProgressionRouting(eq(caseData), any(), eq(AUTH_TOKEN), eq(false), eq(true));
+        verify(caseProgressionService).applyCaseProgressionRouting(eq(caseData), eq(AUTH_TOKEN), eq(false), eq(true));
     }
 
     private void mockEaCourtMutation(CaseData caseData, YesOrNo value) {
         doAnswer(invocation -> {
-            CaseData.CaseDataBuilder<?, ?> builder = invocation.getArgument(1);
-            builder.eaCourtLocation(value);
+            caseData.setEaCourtLocation(value);
             return null;
-        }).when(caseProgressionService).applyCaseProgressionRouting(eq(caseData), any(), eq(AUTH_TOKEN), eq(false), eq(true));
+        }).when(caseProgressionService).applyCaseProgressionRouting(eq(caseData), eq(AUTH_TOKEN), eq(false), eq(true));
     }
 
 }

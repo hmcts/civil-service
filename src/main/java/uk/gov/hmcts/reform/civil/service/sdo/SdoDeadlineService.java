@@ -42,7 +42,7 @@ public class SdoDeadlineService {
     }
 
     /**
-     * Returns the first working day after {@code LocalDate.now().plusDays(days)}.
+     * Returns the first working day on/after {@code LocalDate.now().plusDays(days)}.
      */
     public LocalDate nextWorkingDayFromNowDays(int days) {
         return nextWorkingDay(LocalDate.now().plusDays(days));

@@ -42,14 +42,13 @@ public class SdoHearingPreparationService {
     String ccmccEpimsId;
 
     public Optional<RequestedCourt> updateCaseManagementLocationIfLegalAdvisorSdo(
-        CaseData.CaseDataBuilder<?, ?> updatedData,
         CaseData caseData
     ) {
         Optional<RequestedCourt> preferredCourt;
         if (isSpecClaim1000OrLessAndCcmcc(ccmccAmount).test(caseData)) {
             preferredCourt = locationHelper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData);
             preferredCourt.map(RequestedCourt::getCaseLocation)
-                .ifPresent(updatedData::caseManagementLocation);
+                .ifPresent(caseData::setCaseManagementLocation);
             return preferredCourt;
         } else {
             return locationHelper.getCaseManagementLocation(caseData);
@@ -72,7 +71,6 @@ public class SdoHearingPreparationService {
 
     public void applyVersionSpecificHearingDefaults(
         CallbackParams callbackParams,
-        CaseData.CaseDataBuilder<?, ?> updatedData,
         DynamicList hearingMethodList
     ) {
         CallbackVersion version = callbackParams.getVersion();
@@ -82,16 +80,17 @@ public class SdoHearingPreparationService {
                 .findFirst()
                 .orElse(null);
             hearingMethodList.setValue(inPerson);
-            updatedData.hearingMethodValuesFastTrack(hearingMethodList);
-            updatedData.hearingMethodValuesDisposalHearing(hearingMethodList);
-            updatedData.hearingMethodValuesSmallClaims(hearingMethodList);
+            CaseData caseData = callbackParams.getCaseData();
+            caseData.setHearingMethodValuesFastTrack(hearingMethodList);
+            caseData.setHearingMethodValuesDisposalHearing(hearingMethodList);
+            caseData.setHearingMethodValuesSmallClaims(hearingMethodList);
         }
     }
 
     public List<LocationRefData> populateHearingLocations(
         Optional<RequestedCourt> preferredCourt,
         String authToken,
-        CaseData.CaseDataBuilder<?, ?> updatedData
+        CaseData caseData
     ) {
         List<LocationRefData> locationRefDataList = sdoLocationService.fetchHearingLocations(authToken);
         DynamicList locationsList = sdoLocationService.buildLocationList(
@@ -99,9 +98,9 @@ public class SdoHearingPreparationService {
             false,
             locationRefDataList
         );
-        updatedData.disposalHearingMethodInPerson(locationsList);
-        updatedData.fastTrackMethodInPerson(locationsList);
-        updatedData.smallClaimsMethodInPerson(locationsList);
+        caseData.setDisposalHearingMethodInPerson(locationsList);
+        caseData.setFastTrackMethodInPerson(locationsList);
+        caseData.setSmallClaimsMethodInPerson(locationsList);
         return locationRefDataList;
     }
 

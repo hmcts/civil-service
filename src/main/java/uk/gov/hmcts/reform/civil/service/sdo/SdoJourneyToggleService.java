@@ -33,43 +33,41 @@ public class SdoJourneyToggleService {
 
     private final SdoFeatureToggleService sdoFeatureToggleService;
 
-    public void applyJourneyFlags(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
-        updatedData.showCarmFields(sdoFeatureToggleService.isCarmEnabled(caseData) ? YesOrNo.YES : YesOrNo.NO);
+    public void applyJourneyFlags(CaseData caseData) {
+        caseData.setShowCarmFields(sdoFeatureToggleService.isCarmEnabled(caseData) ? YesOrNo.YES : YesOrNo.NO);
 
         if (sdoFeatureToggleService.isWelshJourneyEnabled(caseData)) {
-            updatedData.bilingualHint(YesOrNo.YES);
+            caseData.setBilingualHint(YesOrNo.YES);
         }
         log.debug("Applied journey flags for caseId {} (CARM={}, bilingualHint={})",
                   caseData.getCcdCaseReference(),
-                  updatedData.build().getShowCarmFields(),
-                  updatedData.build().getBilingualHint());
+                  caseData.getShowCarmFields(),
+                  caseData.getBilingualHint());
     }
 
     public void applySmallClaimsChecklistToggle(CaseData caseData,
-                                                CaseData.CaseDataBuilder<?, ?> updatedData,
                                                 List<OrderDetailsPagesSectionsToggle> checkList) {
         if (sdoFeatureToggleService.isCarmEnabled(caseData)) {
-            updatedData.smallClaimsMediationSectionToggle(checkList);
+            caseData.setSmallClaimsMediationSectionToggle(checkList);
         }
     }
 
     public void applyR2SmallClaimsMediation(CaseData caseData,
-                                            CaseData.CaseDataBuilder<?, ?> updatedData,
                                             List<IncludeInOrderToggle> includeInOrderToggle) {
         if (sdoFeatureToggleService.isCarmEnabled(caseData)) {
-            updatedData.sdoR2SmallClaimsMediationSectionToggle(includeInOrderToggle);
-            updatedData.sdoR2SmallClaimsMediationSectionStatement(SdoR2SmallClaimsMediation.builder()
+            caseData.setSdoR2SmallClaimsMediationSectionToggle(includeInOrderToggle);
+            caseData.setSdoR2SmallClaimsMediationSectionStatement(SdoR2SmallClaimsMediation.builder()
                                                                       .input(CARM_MEDIATION_TEXT)
                                                                       .build());
             log.debug("Applied R2 small claims mediation defaults for caseId {}", caseData.getCcdCaseReference());
         }
     }
 
-    public void applySmallClaimsMediationStatement(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+    public void applySmallClaimsMediationStatement(CaseData caseData) {
         if (sdoFeatureToggleService.isCarmEnabled(caseData)) {
-            updatedData.smallClaimsMediationSectionStatement(SmallClaimsMediation.builder()
-                                                              .input(SMALL_CLAIMS_MEDIATION_TEXT)
-                                                              .build());
+            caseData.setSmallClaimsMediationSectionStatement(SmallClaimsMediation.builder()
+                                                           .input(SMALL_CLAIMS_MEDIATION_TEXT)
+                                                           .build());
             log.debug("Applied small claims mediation statement for caseId {}", caseData.getCcdCaseReference());
         }
     }

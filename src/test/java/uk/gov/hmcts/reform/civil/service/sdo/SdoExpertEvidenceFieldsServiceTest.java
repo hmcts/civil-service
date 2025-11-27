@@ -35,11 +35,11 @@ class SdoExpertEvidenceFieldsServiceTest {
         when(deadlineService.nextWorkingDayFromNowDays(42)).thenReturn(date42);
         when(deadlineService.nextWorkingDayFromNowDays(49)).thenReturn(date49);
 
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder().build().toBuilder();
+        CaseData caseData = CaseData.builder().build();
 
-        service.populateFastTrackExpertEvidence(builder);
+        service.populateFastTrackExpertEvidence(caseData);
 
-        FastTrackPersonalInjury personalInjury = builder.build().getFastTrackPersonalInjury();
+        FastTrackPersonalInjury personalInjury = caseData.getFastTrackPersonalInjury();
         assertThat(personalInjury).isNotNull();
         assertThat(personalInjury.getDate1()).isNull();
         assertThat(personalInjury.getDate2()).isEqualTo(date14);

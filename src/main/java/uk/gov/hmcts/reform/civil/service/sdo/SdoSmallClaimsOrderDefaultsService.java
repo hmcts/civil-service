@@ -18,45 +18,46 @@ public class SdoSmallClaimsOrderDefaultsService {
     private final SdoJourneyToggleService sdoJourneyToggleService;
 
     public void populateSmallClaimsOrderDetails(CaseData caseData,
-                                                CaseData.CaseDataBuilder<?, ?> updatedData,
                                                 List<OrderDetailsPagesSectionsToggle> checkList) {
-        smallClaimsNarrativeService.applyJudgesRecital(updatedData);
-        smallClaimsNarrativeService.applyDocumentDirections(updatedData);
-        smallClaimsNarrativeService.applyWitnessStatements(updatedData);
-        sdoJourneyToggleService.applySmallClaimsMediationStatement(caseData, updatedData);
-        smallClaimsNarrativeService.applyFlightDelaySection(updatedData, checkList);
-        smallClaimsNarrativeService.applyHearingSection(updatedData);
-        smallClaimsNarrativeService.applyNotesSection(updatedData);
-        smallClaimsNarrativeService.applyCreditHire(updatedData);
-        smallClaimsNarrativeService.applyRoadTrafficAccident(updatedData);
+        smallClaimsNarrativeService.applyJudgesRecital(caseData);
+        smallClaimsNarrativeService.applyDocumentDirections(caseData);
+        smallClaimsNarrativeService.applyWitnessStatements(caseData);
+        sdoJourneyToggleService.applySmallClaimsMediationStatement(caseData);
+        smallClaimsNarrativeService.applyFlightDelaySection(caseData, checkList);
+        smallClaimsNarrativeService.applyHearingSection(caseData);
+        smallClaimsNarrativeService.applyNotesSection(caseData);
+        smallClaimsNarrativeService.applyCreditHire(caseData);
+        smallClaimsNarrativeService.applyRoadTrafficAccident(caseData);
 
         if (CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(caseData.getDecisionOnRequestReconsiderationOptions())) {
-            updatedData.drawDirectionsOrderRequired(null);
-            updatedData.drawDirectionsOrderSmallClaims(null);
-            updatedData.fastClaims(null);
-            updatedData.smallClaims(null);
-            updatedData.claimsTrack(null);
-            updatedData.orderType(null);
-            updatedData.trialAdditionalDirectionsForFastTrack(null);
-            updatedData.drawDirectionsOrderSmallClaimsAdditionalDirections(null);
-            updatedData.fastTrackAllocation(FastTrackAllocation.builder().assignComplexityBand(null).build());
-            updatedData.disposalHearingAddNewDirections(null);
-            updatedData.smallClaimsAddNewDirections(null);
-            updatedData.fastTrackAddNewDirections(null);
-            updatedData.sdoHearingNotes(null);
-            updatedData.fastTrackHearingNotes(null);
-            updatedData.disposalHearingHearingNotes(null);
-            updatedData.sdoR2SmallClaimsHearing(null);
-            updatedData.sdoR2SmallClaimsUploadDoc(null);
-            updatedData.sdoR2SmallClaimsPPI(null);
-            updatedData.sdoR2SmallClaimsImpNotes(null);
-            updatedData.sdoR2SmallClaimsWitnessStatements(null);
-            updatedData.sdoR2SmallClaimsHearingToggle(null);
-            updatedData.sdoR2SmallClaimsJudgesRecital(null);
-            updatedData.sdoR2SmallClaimsWitnessStatementsToggle(null);
-            updatedData.sdoR2SmallClaimsPPIToggle(null);
-            updatedData.sdoR2SmallClaimsUploadDocToggle(null);
+            caseData.setDrawDirectionsOrderRequired(null);
+            caseData.setDrawDirectionsOrderSmallClaims(null);
+            caseData.setFastClaims(null);
+            caseData.setSmallClaims(null);
+            caseData.setClaimsTrack(null);
+            caseData.setOrderType(null);
+            caseData.setTrialAdditionalDirectionsForFastTrack(null);
+            caseData.setDrawDirectionsOrderSmallClaimsAdditionalDirections(null);
+            FastTrackAllocation allocation = new FastTrackAllocation();
+            allocation.setAssignComplexityBand(null);
+            caseData.setFastTrackAllocation(allocation);
+            caseData.setDisposalHearingAddNewDirections(null);
+            caseData.setSmallClaimsAddNewDirections(null);
+            caseData.setFastTrackAddNewDirections(null);
+            caseData.setSdoHearingNotes(null);
+            caseData.setFastTrackHearingNotes(null);
+            caseData.setDisposalHearingHearingNotes(null);
+            caseData.setSdoR2SmallClaimsHearing(null);
+            caseData.setSdoR2SmallClaimsUploadDoc(null);
+            caseData.setSdoR2SmallClaimsPPI(null);
+            caseData.setSdoR2SmallClaimsImpNotes(null);
+            caseData.setSdoR2SmallClaimsWitnessStatements(null);
+            caseData.setSdoR2SmallClaimsHearingToggle(null);
+            caseData.setSdoR2SmallClaimsJudgesRecital(null);
+            caseData.setSdoR2SmallClaimsWitnessStatementsToggle(null);
+            caseData.setSdoR2SmallClaimsPPIToggle(null);
+            caseData.setSdoR2SmallClaimsUploadDocToggle(null);
         }
     }
 }

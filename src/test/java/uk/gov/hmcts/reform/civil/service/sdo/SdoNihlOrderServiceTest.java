@@ -38,26 +38,25 @@ class SdoNihlOrderServiceTest {
 
     @Test
     void shouldPopulateSharedSectionsUsingLibraryText() {
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+        CaseData caseData = CaseData.builder().build();
         DynamicList hearingList = singleOptionList("IN_PERSON");
         DynamicList trialCourt = singleOptionList("Trial Court");
         DynamicList altCourt = singleOptionList("Alt Court");
 
-        service.populateStandardDirections(builder, hearingList, trialCourt, altCourt);
+        service.populateStandardDirections(caseData, hearingList, trialCourt, altCourt);
 
-        CaseData result = builder.build();
-        assertThat(result.getSdoR2DisclosureOfDocuments().getStandardDisclosureTxt())
+        assertThat(caseData.getSdoR2DisclosureOfDocuments().getStandardDisclosureTxt())
             .isEqualTo(FAST_TRACK_DISCLOSURE_STANDARD_SDO);
-        assertThat(result.getSdoR2ScheduleOfLoss().getSdoR2ScheduleOfLossClaimantText())
+        assertThat(caseData.getSdoR2ScheduleOfLoss().getSdoR2ScheduleOfLossClaimantText())
             .isEqualTo(SCHEDULE_OF_LOSS_CLAIMANT);
-        assertThat(result.getSdoR2ScheduleOfLoss().getSdoR2ScheduleOfLossDefendantText())
+        assertThat(caseData.getSdoR2ScheduleOfLoss().getSdoR2ScheduleOfLossDefendantText())
             .isEqualTo(SCHEDULE_OF_LOSS_DEFENDANT);
-        assertThat(result.getSdoR2PermissionToRelyOnExpert().getSdoPermissionToRelyOnExpertTxt())
+        assertThat(caseData.getSdoR2PermissionToRelyOnExpert().getSdoPermissionToRelyOnExpertTxt())
             .isEqualTo(PERMISSION_TO_RELY_ON_EXPERT);
-        assertThat(result.getSdoR2Trial().getMethodOfHearing()).isEqualTo(hearingList);
-        assertThat(result.getSdoR2Trial().getHearingCourtLocationList()).isEqualTo(trialCourt);
-        assertThat(result.getSdoR2Trial().getAltHearingCourtLocationList()).isEqualTo(altCourt);
-        assertThat(result.getSdoR2NihlUseOfWelshLanguage()).isNotNull();
+        assertThat(caseData.getSdoR2Trial().getMethodOfHearing()).isEqualTo(hearingList);
+        assertThat(caseData.getSdoR2Trial().getHearingCourtLocationList()).isEqualTo(trialCourt);
+        assertThat(caseData.getSdoR2Trial().getAltHearingCourtLocationList()).isEqualTo(altCourt);
+        assertThat(caseData.getSdoR2NihlUseOfWelshLanguage()).isNotNull();
     }
 
     private DynamicList singleOptionList(String label) {

@@ -25,10 +25,6 @@ public class SdoFeatureToggleService {
         return featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
     }
 
-    public boolean isCaseProgressionEnabled() {
-        return featureToggleService.isCaseProgressionEnabled();
-    }
-
     public boolean isDefendantNoCOnlineForCase(CaseData caseData) {
         return featureToggleService.isDefendantNoCOnlineForCase(caseData);
     }

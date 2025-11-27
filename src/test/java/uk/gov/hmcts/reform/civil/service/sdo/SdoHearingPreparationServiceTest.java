@@ -68,12 +68,10 @@ class SdoHearingPreparationServiceTest {
         when(locationHelper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData))
             .thenReturn(Optional.of(requestedCourt));
 
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-
-        Optional<RequestedCourt> result = service.updateCaseManagementLocationIfLegalAdvisorSdo(builder, caseData);
+        Optional<RequestedCourt> result = service.updateCaseManagementLocationIfLegalAdvisorSdo(caseData);
 
         assertThat(result).contains(requestedCourt);
-        assertThat(builder.build().getCaseManagementLocation()).isEqualTo(requestedCourt.getCaseLocation());
+        assertThat(caseData.getCaseManagementLocation()).isEqualTo(requestedCourt.getCaseLocation());
     }
 
     @Test
@@ -85,7 +83,7 @@ class SdoHearingPreparationServiceTest {
             .build();
         when(locationHelper.getCaseManagementLocation(caseData)).thenReturn(Optional.empty());
 
-        Optional<RequestedCourt> result = service.updateCaseManagementLocationIfLegalAdvisorSdo(caseData.toBuilder(), caseData);
+        Optional<RequestedCourt> result = service.updateCaseManagementLocationIfLegalAdvisorSdo(caseData);
 
         assertThat(result).isEmpty();
         verify(locationHelper).getCaseManagementLocation(caseData);
@@ -114,7 +112,7 @@ class SdoHearingPreparationServiceTest {
         when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), anyString(), anyString()))
             .thenReturn(Optional.of(CategorySearchResult.builder().categories(List.of(inPerson, telephone, notInAttendance)).build()));
 
-        DynamicList list = service.getDynamicHearingMethodList(callbackParams(CaseCategory.SPEC_CLAIM), CaseData.builder()
+        DynamicList list = service.getDynamicHearingMethodList(callbackParams(), CaseData.builder()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .build());
 
@@ -134,15 +132,13 @@ class SdoHearingPreparationServiceTest {
             .value(DynamicListElement.builder().label("OTHER").code("OTHER").build())
             .build();
 
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+        CaseData caseData = CaseData.builder().build();
         service.applyVersionSpecificHearingDefaults(
-            CallbackParams.builder().version(V_1).build(),
-            builder,
+            CallbackParams.builder().version(V_1).caseData(caseData).build(),
             hearingList
         );
 
-        CaseData built = builder.build();
-        assertThat(built.getHearingMethodValuesFastTrack()).isEqualTo(hearingList);
+        assertThat(caseData.getHearingMethodValuesFastTrack()).isEqualTo(hearingList);
         assertThat(hearingList.getValue()).isEqualTo(inPerson);
     }
 
@@ -155,18 +151,17 @@ class SdoHearingPreparationServiceTest {
         when(sdoLocationService.fetchHearingLocations(AUTH)).thenReturn(List.of(locationRefData));
         when(sdoLocationService.buildLocationList(any(), anyBoolean(), anyList())).thenReturn(locationList);
 
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
-        List<LocationRefData> refs = service.populateHearingLocations(Optional.empty(), AUTH, builder);
+        CaseData caseData = CaseData.builder().build();
+        List<LocationRefData> refs = service.populateHearingLocations(Optional.empty(), AUTH, caseData);
 
         assertThat(refs).hasSize(1);
-        CaseData built = builder.build();
-        assertThat(built.getDisposalHearingMethodInPerson()).isEqualTo(locationList);
+        assertThat(caseData.getDisposalHearingMethodInPerson()).isEqualTo(locationList);
         verify(sdoLocationService).fetchHearingLocations(AUTH);
     }
 
-    private CallbackParams callbackParams(CaseCategory category) {
+    private CallbackParams callbackParams() {
         CaseData caseData = CaseData.builder()
-            .caseAccessCategory(category)
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("EPIMS123").build())
             .build();
         return CallbackParams.builder()

@@ -77,29 +77,26 @@ class SdoTrackDefaultsServiceTest {
         when(featureToggleService.isWelshJourneyEnabled(any(CaseData.class))).thenReturn(true);
 
         CaseData caseData = CaseData.builder().build();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
-        service.applyBaseTrackDefaults(caseData, builder);
+        service.applyBaseTrackDefaults(caseData);
 
-        CaseData result = builder.build();
-        assertThat(result.getShowCarmFields()).isEqualTo(YesOrNo.YES);
-        assertThat(result.getBilingualHint()).isEqualTo(YesOrNo.YES);
-        assertThat(result.getDisposalHearingJudgesRecital()).isNotNull();
-        assertThat(result.getSmallClaimsMediationSectionStatement()).isNotNull();
+        assertThat(caseData.getShowCarmFields()).isEqualTo(YesOrNo.YES);
+        assertThat(caseData.getBilingualHint()).isEqualTo(YesOrNo.YES);
+        assertThat(caseData.getDisposalHearingJudgesRecital()).isNotNull();
+        assertThat(caseData.getSmallClaimsMediationSectionStatement()).isNotNull();
     }
 
     @Test
     void shouldApplyR2Defaults() {
         when(featureToggleService.isCarmEnabled(any(CaseData.class))).thenReturn(true);
 
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder().build().toBuilder();
-        service.applyR2Defaults(CaseData.builder().build(), builder);
+        CaseData caseData = CaseData.builder().build();
+        service.applyR2Defaults(caseData);
 
-        CaseData result = builder.build();
-        SdoR2FastTrackAltDisputeResolution disputeResolution = result.getSdoAltDisputeResolution();
+        SdoR2FastTrackAltDisputeResolution disputeResolution = caseData.getSdoAltDisputeResolution();
         assertThat(disputeResolution).isNotNull();
         assertThat(disputeResolution.getIncludeInOrderToggle()).containsExactly(IncludeInOrderToggle.INCLUDE);
-        assertThat(result.getSdoR2FastTrackUseOfWelshLanguage()).isNotNull();
-        assertThat(result.getSdoR2DisposalHearingUseOfWelshLanguage()).isNotNull();
+        assertThat(caseData.getSdoR2FastTrackUseOfWelshLanguage()).isNotNull();
+        assertThat(caseData.getSdoR2DisposalHearingUseOfWelshLanguage()).isNotNull();
     }
 }

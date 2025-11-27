@@ -439,13 +439,14 @@ public class SdoGeneratorServiceTest {
         SdoFastTrackSpecialistDirectionsService specialistService =
             new SdoFastTrackSpecialistDirectionsService(deadlineService);
 
-        CaseData.CaseDataBuilder<?, ?> builder = baseCase.toBuilder()
+        CaseData caseData = baseCase.toBuilder()
             .drawDirectionsOrderRequired(YesOrNo.NO)
             .claimsTrack(ClaimsTrack.fastTrack)
-            .fastTrackTrialBundleToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW));
+            .fastTrackTrialBundleToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
+            .build();
 
-        specialistService.populateSpecialistDirections(builder);
-        return builder.build();
+        specialistService.populateSpecialistDirections(caseData);
+        return caseData;
     }
 
     @Test

@@ -45,64 +45,61 @@ class SdoSmallClaimsNarrativeServiceTest {
 
     @Test
     void shouldPopulateJudgesRecitalAndDocuments() {
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+        CaseData caseData = CaseData.builder().build();
 
-        service.applyJudgesRecital(builder);
-        service.applyDocumentDirections(builder);
+        service.applyJudgesRecital(caseData);
+        service.applyDocumentDirections(caseData);
 
-        CaseData result = builder.build();
-        assertThat(result.getSmallClaimsJudgesRecital().getInput())
+        assertThat(caseData.getSmallClaimsJudgesRecital().getInput())
             .isEqualTo(JUDGES_RECITAL_STATEMENTS_OF_CASE_WITH_COMMA);
-        assertThat(result.getSmallClaimsDocuments().getInput1())
+        assertThat(caseData.getSmallClaimsDocuments().getInput1())
             .isEqualTo(SMALL_CLAIMS_DOCUMENTS_UPLOAD);
-        assertThat(result.getSmallClaimsDocuments().getInput2())
+        assertThat(caseData.getSmallClaimsDocuments().getInput2())
             .isEqualTo(SMALL_CLAIMS_DOCUMENTS_WARNING);
     }
 
     @Test
     void shouldPopulateWitnessStatementsAndCreditHire() {
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+        CaseData caseData = CaseData.builder().build();
 
-        service.applyWitnessStatements(builder);
-        service.applyCreditHire(builder);
+        service.applyWitnessStatements(caseData);
+        service.applyCreditHire(caseData);
 
-        CaseData result = builder.build();
-        assertThat(result.getSdoR2SmallClaimsWitnessStatementOther().getSdoR2SmallClaimsRestrictWitness()
+        assertThat(caseData.getSdoR2SmallClaimsWitnessStatementOther().getSdoR2SmallClaimsRestrictWitness()
                        .getNoOfWitnessClaimant()).isEqualTo(2);
-        assertThat(result.getSdoR2SmallClaimsWitnessStatementOther().getSdoStatementOfWitness())
+        assertThat(caseData.getSdoR2SmallClaimsWitnessStatementOther().getSdoStatementOfWitness())
             .isEqualTo(WITNESS_STATEMENT_TEXT);
-        assertThat(result.getSmallClaimsCreditHire().getDate4())
+        assertThat(caseData.getSmallClaimsCreditHire().getDate4())
             .isEqualTo(LocalDate.of(2025, 3, 1).plusWeeks(10));
     }
 
     @Test
     void shouldPopulateRoadTrafficAccident() {
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+        CaseData caseData = CaseData.builder().build();
 
-        service.applyRoadTrafficAccident(builder);
+        service.applyRoadTrafficAccident(caseData);
 
-        assertThat(builder.build().getSmallClaimsRoadTrafficAccident().getInput())
+        assertThat(caseData.getSmallClaimsRoadTrafficAccident().getInput())
             .isEqualTo(ROAD_TRAFFIC_ACCIDENT_SMALL_CLAIMS);
     }
 
     @Test
     void shouldPopulateFlightDelayHearingAndNotes() {
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+        CaseData caseData = CaseData.builder().build();
 
-        service.applyFlightDelaySection(builder, List.of(OrderDetailsPagesSectionsToggle.SHOW));
-        service.applyHearingSection(builder);
-        service.applyNotesSection(builder);
+        service.applyFlightDelaySection(caseData, List.of(OrderDetailsPagesSectionsToggle.SHOW));
+        service.applyHearingSection(caseData);
+        service.applyNotesSection(caseData);
 
-        CaseData result = builder.build();
-        assertThat(result.getSmallClaimsFlightDelay().getSmallClaimsFlightDelayToggle())
+        assertThat(caseData.getSmallClaimsFlightDelay().getSmallClaimsFlightDelayToggle())
             .containsExactly(OrderDetailsPagesSectionsToggle.SHOW);
-        assertThat(result.getSmallClaimsFlightDelay().getRelatedClaimsInput())
+        assertThat(caseData.getSmallClaimsFlightDelay().getRelatedClaimsInput())
             .isEqualTo(FLIGHT_DELAY_RELATED_CLAIMS_NOTICE);
-        assertThat(result.getSmallClaimsFlightDelay().getLegalDocumentsInput())
+        assertThat(caseData.getSmallClaimsFlightDelay().getLegalDocumentsInput())
             .isEqualTo(FLIGHT_DELAY_LEGAL_ARGUMENTS_NOTICE);
-        assertThat(result.getSmallClaimsHearing().getInput2()).isNotBlank();
-        assertThat(result.getSmallClaimsHearing().getInput1()).isEqualTo(SMALL_CLAIMS_HEARING_LISTING_NOTICE);
-        assertThat(result.getSmallClaimsNotes().getInput())
+        assertThat(caseData.getSmallClaimsHearing().getInput2()).isNotBlank();
+        assertThat(caseData.getSmallClaimsHearing().getInput1()).isEqualTo(SMALL_CLAIMS_HEARING_LISTING_NOTICE);
+        assertThat(caseData.getSmallClaimsNotes().getInput())
             .startsWith(ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_NO_ARTICLE);
     }
 }

@@ -26,12 +26,11 @@ class SdoSmallClaimsOrderDefaultsServiceTest {
     private SdoFeatureToggleService featureToggleService;
 
     private SdoSmallClaimsOrderDefaultsService service;
-    private SdoSmallClaimsNarrativeService narrativeService;
 
     @BeforeEach
     void setUp() {
         SdoJourneyToggleService journeyToggleService = new SdoJourneyToggleService(featureToggleService);
-        narrativeService = new SdoSmallClaimsNarrativeService(deadlineService);
+        SdoSmallClaimsNarrativeService narrativeService = new SdoSmallClaimsNarrativeService(deadlineService);
         service = new SdoSmallClaimsOrderDefaultsService(narrativeService, journeyToggleService);
 
         lenient().when(deadlineService.nextWorkingDayFromNowWeeks(anyInt()))
@@ -44,19 +43,16 @@ class SdoSmallClaimsOrderDefaultsServiceTest {
     @Test
     void shouldPopulateSmallClaimsFieldsAndMediationStatement() {
         CaseData caseData = CaseData.builder().build();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
         service.populateSmallClaimsOrderDetails(
             caseData,
-            builder,
             List.of(OrderDetailsPagesSectionsToggle.SHOW)
         );
 
-        CaseData result = builder.build();
-        assertThat(result.getSmallClaimsDocuments()).isNotNull();
-        assertThat(result.getSmallClaimsMediationSectionStatement()).isNotNull();
-        assertThat(result.getSmallClaimsCreditHire()).isNotNull();
-        assertThat(result.getSmallClaimsFlightDelay()).isNotNull();
-        assertThat(result.getSmallClaimsNotes()).isNotNull();
+        assertThat(caseData.getSmallClaimsDocuments()).isNotNull();
+        assertThat(caseData.getSmallClaimsMediationSectionStatement()).isNotNull();
+        assertThat(caseData.getSmallClaimsCreditHire()).isNotNull();
+        assertThat(caseData.getSmallClaimsFlightDelay()).isNotNull();
+        assertThat(caseData.getSmallClaimsNotes()).isNotNull();
     }
 }

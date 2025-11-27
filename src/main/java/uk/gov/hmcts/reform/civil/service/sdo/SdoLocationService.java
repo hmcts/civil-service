@@ -92,17 +92,16 @@ public class SdoLocationService {
     }
 
     public void updateWaLocationsIfRequired(CaseData caseData,
-                                            CaseData.CaseDataBuilder<?, ?> builder,
                                             String authToken) {
         log.info("Updating WA court locations if required for caseId {}", caseData.getCcdCaseReference());
         updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(authToken, caseData));
     }
 
-    public void clearWaLocationMetadata(CaseData.CaseDataBuilder<?, ?> builder) {
+    public void clearWaLocationMetadata(CaseData caseData) {
         log.info("Clearing WA location metadata");
-        builder.taskManagementLocations(null)
-            .taskManagementLocationsTab(null)
-            .caseManagementLocationTab(null);
+        caseData.setTaskManagementLocations(null);
+        caseData.setTaskManagementLocationsTab(null);
+        caseData.setCaseManagementLocationTab(null);
     }
 
     public DynamicList buildAlternativeCourtLocations(List<LocationRefData> locations) {

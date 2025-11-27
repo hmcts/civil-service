@@ -26,11 +26,11 @@ class SdoFastTrackOrderDefaultsServiceTest {
 
     @Test
     void shouldPopulateFastTrackDefaults() {
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+        CaseData caseData = CaseData.builder().build();
 
-        service.populateFastTrackOrderDetails(builder);
+        service.populateFastTrackOrderDetails(caseData);
 
-        verify(fastTrackNarrativeService).populateFastTrackNarrative(builder);
-        verify(specialistDirectionsService).populateSpecialistDirections(builder);
+        verify(fastTrackNarrativeService).populateFastTrackNarrative(caseData);
+        verify(specialistDirectionsService).populateSpecialistDirections(caseData);
     }
 }

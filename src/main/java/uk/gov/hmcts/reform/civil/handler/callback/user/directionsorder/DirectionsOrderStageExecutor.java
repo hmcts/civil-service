@@ -18,7 +18,7 @@ import java.util.List;
 @Slf4j
 public class DirectionsOrderStageExecutor {
 
-    private static final List<DirectionsOrderLifecycleStage> ORDER_GENERATION_SEQUENCE = List.of(
+    private static final List<DirectionsOrderLifecycleStage> ORDER_GENERATION_WITH_DETAILS = List.of(
         DirectionsOrderLifecycleStage.ORDER_DETAILS,
         DirectionsOrderLifecycleStage.MID_EVENT,
         DirectionsOrderLifecycleStage.DOCUMENT_GENERATION
@@ -30,7 +30,7 @@ public class DirectionsOrderStageExecutor {
         CaseData caseData,
         CallbackParams callbackParams
     ) {
-        return runStages(caseData, callbackParams, ORDER_GENERATION_SEQUENCE);
+        return runStages(caseData, callbackParams, ORDER_GENERATION_WITH_DETAILS);
     }
 
     public DirectionsOrderStageExecutionResult runStages(

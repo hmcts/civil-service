@@ -21,7 +21,7 @@ public class SdoDisclosureOfDocumentsFieldsService {
 
     private final SdoDeadlineService sdoDeadlineService;
 
-    public void populateFastTrackDisclosureOfDocuments(CaseData.CaseDataBuilder<?, ?> updatedData) {
+    public void populateFastTrackDisclosureOfDocuments(CaseData caseData) {
         FastTrackDisclosureOfDocuments disclosure = FastTrackDisclosureOfDocuments.builder()
             .input1(FAST_TRACK_DISCLOSURE_STANDARD_SDO)
             .date1(sdoDeadlineService.nextWorkingDayFromNowWeeks(4))
@@ -32,6 +32,6 @@ public class SdoDisclosureOfDocumentsFieldsService {
             .date3(sdoDeadlineService.nextWorkingDayFromNowWeeks(8))
             .build();
 
-        updatedData.fastTrackDisclosureOfDocuments(disclosure).build();
+        caseData.setFastTrackDisclosureOfDocuments(disclosure);
     }
 }

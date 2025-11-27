@@ -64,89 +64,89 @@ public class SdoFastTrackNarrativeService {
 
     private final SdoDeadlineService sdoDeadlineService;
 
-    public void populateFastTrackNarrative(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        applyJudgesRecital(updatedData);
-        applyDisclosureOfDocuments(updatedData);
-        applyWitnessesOfFact(updatedData);
-        applySchedulesOfLoss(updatedData);
-        applyTrial(updatedData);
-        applyHearingTime(updatedData);
-        applyNotes(updatedData);
-        applyOrderWithoutHearing(updatedData);
+    public void populateFastTrackNarrative(CaseData caseData) {
+        applyJudgesRecital(caseData);
+        applyDisclosureOfDocuments(caseData);
+        applyWitnessesOfFact(caseData);
+        applySchedulesOfLoss(caseData);
+        applyTrial(caseData);
+        applyHearingTime(caseData);
+        applyNotes(caseData);
+        applyOrderWithoutHearing(caseData);
     }
 
-    private void applyJudgesRecital(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        updatedData.fastTrackJudgesRecital(FastTrackJudgesRecital.builder()
-                                              .input(JUDGES_RECITAL_STATEMENTS_OF_CASE_WITH_COMMA)
-                                              .build()).build();
+    private void applyJudgesRecital(CaseData caseData) {
+        caseData.setFastTrackJudgesRecital(FastTrackJudgesRecital.builder()
+                                                       .input(JUDGES_RECITAL_STATEMENTS_OF_CASE_WITH_COMMA)
+                                                       .build());
     }
 
-    private void applyDisclosureOfDocuments(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        updatedData.fastTrackDisclosureOfDocuments(FastTrackDisclosureOfDocuments.builder()
-                                              .input1(FAST_TRACK_DISCLOSURE_STANDARD_SDO)
-                                              .date1(sdoDeadlineService.nextWorkingDayFromNowWeeks(4))
-                                              .input2(FAST_TRACK_DISCLOSURE_INSPECTION)
-                                              .date2(sdoDeadlineService.nextWorkingDayFromNowWeeks(6))
-                                              .input3(FAST_TRACK_DISCLOSURE_REQUESTS_WITHIN_SEVEN_DAYS_SDO)
-                                              .input4(FAST_TRACK_DISCLOSURE_UPLOAD_PREFIX + " " + FAST_TRACK_DISCLOSURE_UPLOAD_DEADLINE)
-                                              .date3(sdoDeadlineService.nextWorkingDayFromNowWeeks(8))
-                                              .build()).build();
+    private void applyDisclosureOfDocuments(CaseData caseData) {
+        caseData.setFastTrackDisclosureOfDocuments(FastTrackDisclosureOfDocuments.builder()
+                                                       .input1(FAST_TRACK_DISCLOSURE_STANDARD_SDO)
+                                                       .date1(sdoDeadlineService.nextWorkingDayFromNowWeeks(4))
+                                                       .input2(FAST_TRACK_DISCLOSURE_INSPECTION)
+                                                       .date2(sdoDeadlineService.nextWorkingDayFromNowWeeks(6))
+                                                       .input3(FAST_TRACK_DISCLOSURE_REQUESTS_WITHIN_SEVEN_DAYS_SDO)
+                                                       .input4(FAST_TRACK_DISCLOSURE_UPLOAD_PREFIX + " " + FAST_TRACK_DISCLOSURE_UPLOAD_DEADLINE)
+                                                       .date3(sdoDeadlineService.nextWorkingDayFromNowWeeks(8))
+                                                       .build());
     }
 
-    private void applyWitnessesOfFact(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        updatedData.sdoR2FastTrackWitnessOfFact(buildWitnessesOfFact()).build();
+    private void applyWitnessesOfFact(CaseData caseData) {
+        caseData.setSdoR2FastTrackWitnessOfFact(buildWitnessesOfFact());
     }
 
-    private void applySchedulesOfLoss(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        updatedData.fastTrackSchedulesOfLoss(FastTrackSchedulesOfLoss.builder()
-                                               .input1(FAST_TRACK_SCHEDULE_CLAIMANT_UPLOAD)
-                                               .date1(sdoDeadlineService.nextWorkingDayFromNowWeeks(10))
-                                               .input2(FAST_TRACK_SCHEDULE_DEFENDANT_UPLOAD)
-                                               .date2(sdoDeadlineService.nextWorkingDayFromNowWeeks(12))
-                                               .input3(FAST_TRACK_SCHEDULE_FUTURE_LOSS_SDO)
-                                               .build()).build();
+    private void applySchedulesOfLoss(CaseData caseData) {
+        caseData.setFastTrackSchedulesOfLoss(FastTrackSchedulesOfLoss.builder()
+                                                         .input1(FAST_TRACK_SCHEDULE_CLAIMANT_UPLOAD)
+                                                         .date1(sdoDeadlineService.nextWorkingDayFromNowWeeks(10))
+                                                         .input2(FAST_TRACK_SCHEDULE_DEFENDANT_UPLOAD)
+                                                         .date2(sdoDeadlineService.nextWorkingDayFromNowWeeks(12))
+                                                         .input3(FAST_TRACK_SCHEDULE_FUTURE_LOSS_SDO)
+                                                         .build());
     }
 
-    private void applyTrial(CaseData.CaseDataBuilder<?, ?> updatedData) {
+    private void applyTrial(CaseData caseData) {
         LocalDate trialStart = calendarWeeksFromNow(TRIAL_WINDOW_START_WEEKS);
         LocalDate trialEnd = calendarWeeksFromNow(TRIAL_WINDOW_END_WEEKS);
-        updatedData.fastTrackTrial(FastTrackTrial.builder()
-                                     .input1(FAST_TRACK_TRIAL_TIME_ALLOWED_SDO)
-                                     .date1(trialStart)
-                                     .date2(trialEnd)
-                                     .input2(FAST_TRACK_TRIAL_TIME_WARNING_SDO)
-                                     .input3(FAST_TRACK_TRIAL_BUNDLE_NOTICE)
-                                     .type(Collections.singletonList(DOCUMENTS))
-                                     .build()).build();
+        caseData.setFastTrackTrial(FastTrackTrial.builder()
+                                            .input1(FAST_TRACK_TRIAL_TIME_ALLOWED_SDO)
+                                            .date1(trialStart)
+                                            .date2(trialEnd)
+                                            .input2(FAST_TRACK_TRIAL_TIME_WARNING_SDO)
+                                            .input3(FAST_TRACK_TRIAL_BUNDLE_NOTICE)
+                                            .type(Collections.singletonList(DOCUMENTS))
+                                            .build());
     }
 
-    private void applyHearingTime(CaseData.CaseDataBuilder<?, ?> updatedData) {
+    private void applyHearingTime(CaseData caseData) {
         LocalDate trialStart = calendarWeeksFromNow(TRIAL_WINDOW_START_WEEKS);
         LocalDate trialEnd = calendarWeeksFromNow(TRIAL_WINDOW_END_WEEKS);
-        updatedData.fastTrackHearingTime(FastTrackHearingTime.builder()
-                                         .dateFrom(trialStart)
-                                         .dateTo(trialEnd)
-                                         .dateToToggle(DATE_TO_SHOW_TRUE)
-                                         .helpText1(FAST_TRACK_TRIAL_HEARING_HELP_TEXT)
-                                         .build());
+        caseData.setFastTrackHearingTime(FastTrackHearingTime.builder()
+                                                 .dateFrom(trialStart)
+                                                 .dateTo(trialEnd)
+                                                 .dateToToggle(DATE_TO_SHOW_TRUE)
+                                                 .helpText1(FAST_TRACK_TRIAL_HEARING_HELP_TEXT)
+                                                 .build());
     }
 
-    private void applyNotes(CaseData.CaseDataBuilder<?, ?> updatedData) {
-        updatedData.fastTrackNotes(FastTrackNotes.builder()
-                                     .input(ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_BRIEF)
-                                     .date(sdoDeadlineService.nextWorkingDayFromNowWeeks(1))
-                                     .build()).build();
+    private void applyNotes(CaseData caseData) {
+        caseData.setFastTrackNotes(FastTrackNotes.builder()
+                                           .input(ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_BRIEF)
+                                           .date(sdoDeadlineService.nextWorkingDayFromNowWeeks(1))
+                                           .build());
     }
 
-    private void applyOrderWithoutHearing(CaseData.CaseDataBuilder<?, ?> updatedData) {
+    private void applyOrderWithoutHearing(CaseData caseData) {
         LocalDate deadline = sdoDeadlineService.orderSetAsideOrVariedApplicationDeadline(LocalDateTime.now());
-        updatedData.fastTrackOrderWithoutJudgement(FastTrackOrderWithoutJudgement.builder()
-                                                .input(String.format(
-                                                    "%s %s.",
-                                                    ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_NO_ARTICLE,
-                                                    deadline.format(ORDER_DATE_FORMAT)
-                                                ))
-                                                .build());
+        caseData.setFastTrackOrderWithoutJudgement(FastTrackOrderWithoutJudgement.builder()
+                                                             .input(String.format(
+                                                                 "%s %s.",
+                                                                 ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_NO_ARTICLE,
+                                                                 deadline.format(ORDER_DATE_FORMAT)
+                                                             ))
+                                                             .build());
     }
 
     private SdoR2WitnessOfFact buildWitnessesOfFact() {

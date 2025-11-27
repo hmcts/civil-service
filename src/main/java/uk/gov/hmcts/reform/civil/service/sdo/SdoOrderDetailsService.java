@@ -33,34 +33,33 @@ public class SdoOrderDetailsService {
 
     public CaseData updateOrderDetails(DirectionsOrderTaskContext context) {
         CaseData caseData = context.caseData();
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
-        updateDeductionValue(caseData, updatedData);
-        applyTrackFlags(caseData, updatedData);
-        mapHearingMethodFields(caseData, updatedData, context.callbackParams().getVersion());
+        updateDeductionValue(caseData);
+        applyTrackFlags(caseData);
+        mapHearingMethodFields(caseData, context.callbackParams().getVersion());
 
-        return updatedData.build();
+        return caseData;
     }
 
-    private void applyTrackFlags(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
-        updatedData.setSmallClaimsFlag(NO);
-        updatedData.setFastTrackFlag(NO);
-        updatedData.isSdoR2NewScreen(NO);
+    private void applyTrackFlags(CaseData caseData) {
+        caseData.setSetSmallClaimsFlag(NO);
+        caseData.setSetFastTrackFlag(NO);
+        caseData.setIsSdoR2NewScreen(NO);
 
         if (caseClassificationService.isSmallClaimsTrack(caseData)) {
-            updatedData.setSmallClaimsFlag(YES);
+            caseData.setSetSmallClaimsFlag(YES);
             if (caseClassificationService.isDrhSmallClaim(caseData)) {
-                updatedData.isSdoR2NewScreen(YES);
+                caseData.setIsSdoR2NewScreen(YES);
             }
         } else if (caseClassificationService.isFastTrack(caseData)) {
-            updatedData.setFastTrackFlag(YES);
+            caseData.setSetFastTrackFlag(YES);
             if (caseClassificationService.isNihlFastTrack(caseData)) {
-                updatedData.isSdoR2NewScreen(YES);
+                caseData.setIsSdoR2NewScreen(YES);
             }
         }
     }
 
-    private void updateDeductionValue(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+    private void updateDeductionValue(CaseData caseData) {
         Optional.ofNullable(caseData.getDrawDirectionsOrder())
             .map(JudgementSum::getJudgementSum)
             .map(d -> d + "%")
@@ -69,25 +68,24 @@ public class SdoOrderDetailsService {
                     DisposalHearingJudgementDeductionValue.builder()
                         .value(deductionPercentage)
                         .build();
-                updatedData.disposalHearingJudgementDeductionValue(disposalValue);
+                caseData.setDisposalHearingJudgementDeductionValue(disposalValue);
 
                 FastTrackJudgementDeductionValue fastTrackValue =
                     FastTrackJudgementDeductionValue.builder()
                         .value(deductionPercentage)
                         .build();
-                updatedData.fastTrackJudgementDeductionValue(fastTrackValue);
+                caseData.setFastTrackJudgementDeductionValue(fastTrackValue);
 
                 SmallClaimsJudgementDeductionValue smallClaimsValue =
                     SmallClaimsJudgementDeductionValue.builder()
                         .value(deductionPercentage)
                         .build();
-                updatedData.smallClaimsJudgementDeductionValue(smallClaimsValue);
+                caseData.setSmallClaimsJudgementDeductionValue(smallClaimsValue);
             });
     }
 
     private void mapHearingMethodFields(
         CaseData caseData,
-        CaseData.CaseDataBuilder<?, ?> updatedData,
         CallbackVersion version
     ) {
         if (!V_1.equals(version)) {
@@ -96,9 +94,9 @@ public class SdoOrderDetailsService {
 
         applyHearingMethod(caseData.getHearingMethodValuesDisposalHearing(), method -> {
             switch (method) {
-                case IN_PERSON -> updatedData.disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson);
-                case VIDEO -> updatedData.disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodVideoConferenceHearing);
-                case TELEPHONE -> updatedData.disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodTelephoneHearing);
+                case IN_PERSON -> caseData.setDisposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson);
+                case VIDEO -> caseData.setDisposalHearingMethod(DisposalHearingMethod.disposalHearingMethodVideoConferenceHearing);
+                case TELEPHONE -> caseData.setDisposalHearingMethod(DisposalHearingMethod.disposalHearingMethodTelephoneHearing);
                 default -> {
                     // No other values are expected;
                 }
@@ -107,9 +105,9 @@ public class SdoOrderDetailsService {
 
         applyHearingMethod(caseData.getHearingMethodValuesFastTrack(), method -> {
             switch (method) {
-                case IN_PERSON -> updatedData.fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
-                case VIDEO -> updatedData.fastTrackMethod(FastTrackMethod.fastTrackMethodVideoConferenceHearing);
-                case TELEPHONE -> updatedData.fastTrackMethod(FastTrackMethod.fastTrackMethodTelephoneHearing);
+                case IN_PERSON -> caseData.setFastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
+                case VIDEO -> caseData.setFastTrackMethod(FastTrackMethod.fastTrackMethodVideoConferenceHearing);
+                case TELEPHONE -> caseData.setFastTrackMethod(FastTrackMethod.fastTrackMethodTelephoneHearing);
                 default -> {
                     // No other values are expected;
                 }
@@ -118,9 +116,9 @@ public class SdoOrderDetailsService {
 
         applyHearingMethod(caseData.getHearingMethodValuesSmallClaims(), method -> {
             switch (method) {
-                case IN_PERSON -> updatedData.smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson);
-                case VIDEO -> updatedData.smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodVideoConferenceHearing);
-                case TELEPHONE -> updatedData.smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodTelephoneHearing);
+                case IN_PERSON -> caseData.setSmallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson);
+                case VIDEO -> caseData.setSmallClaimsMethod(SmallClaimsMethod.smallClaimsMethodVideoConferenceHearing);
+                case TELEPHONE -> caseData.setSmallClaimsMethod(SmallClaimsMethod.smallClaimsMethodTelephoneHearing);
                 default -> {
                     // No other values are expected;
                 }
