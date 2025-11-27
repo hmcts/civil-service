@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.documentmanagement.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
+import lombok.experimental.Accessors;
 import lombok.NoArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,6 +10,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 
 import java.time.LocalDateTime;
 
+@Accessors(chain = true)
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
