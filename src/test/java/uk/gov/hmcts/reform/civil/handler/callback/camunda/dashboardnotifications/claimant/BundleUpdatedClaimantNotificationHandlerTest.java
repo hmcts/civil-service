@@ -45,7 +45,6 @@ class BundleUpdatedClaimantNotificationHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldRecordScenario_whenApplicantNotRepresented() {
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             caseData.setApplicant1Represented(YesOrNo.NO);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -68,7 +67,6 @@ class BundleUpdatedClaimantNotificationHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldRecordFastTrackScenario_whenApplicantNotRepresented() {
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             caseData.setApplicant1Represented(YesOrNo.NO);
             caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
@@ -94,8 +92,6 @@ class BundleUpdatedClaimantNotificationHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldNotRecordScenario_whenApplicantRepresented() {
-
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             caseData.setApplicant1Represented(YesOrNo.YES);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(

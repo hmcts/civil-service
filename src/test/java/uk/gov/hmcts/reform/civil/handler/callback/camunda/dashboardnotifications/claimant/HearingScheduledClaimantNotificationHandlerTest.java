@@ -93,18 +93,6 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
     }
 
     @Test
-    void shouldNotCallRecordScenario_whenCaseProgressionIsDisabled() {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
-
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, CaseDataBuilder.builder().build())
-            .build();
-
-        handler.handle(callbackParams);
-        verifyNoInteractions(dashboardScenariosService);
-    }
-
-    @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
         assertThat(handler.camundaActivityId(
             CallbackParamsBuilder.builder()
@@ -185,7 +173,6 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
     @Test
     void shouldCreateDashboardNotificationsForHearingFeeIfFeePaymentFailure_HMC() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         HearingNoticeVariables hearingNoticeVariables = new HearingNoticeVariables();
         hearingNoticeVariables.setHearingId("HER1234");
         hearingNoticeVariables.setHearingType("AAA7-TRI");
@@ -234,7 +221,6 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
     @Test
     void shouldCreateDashboardNotificationsForHearingFeeIfFeeNeverPaid_HMC() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         HearingNoticeVariables hearingNoticeVariables = new HearingNoticeVariables();
         hearingNoticeVariables.setHearingId("HER1234");
         hearingNoticeVariables.setHearingType("AAA7-TRI");
@@ -296,7 +282,6 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
     @Test
     void shouldNotCreateDashboardNotificationsForHearingFeeIfFeePaymentSuccess_HMC() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         HearingNoticeVariables hearingNoticeVariables = new HearingNoticeVariables();
         hearingNoticeVariables.setHearingId("HER1234");
         hearingNoticeVariables.setHearingType("AAA7-TRI");
@@ -335,7 +320,6 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
     @Test
     void shouldNotCreateDashboardNotificationsForHearingFeeIfHearingTypeDisposal_HMC() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         HearingNoticeVariables hearingNoticeVariables = new HearingNoticeVariables();
         hearingNoticeVariables.setHearingId("HER1234");
         hearingNoticeVariables.setHearingType("AAA7-DIS");
@@ -371,7 +355,6 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
     @Test
     void shouldNotCreateDashboardNotificationsForHearingFeeIfPaidWithHwF_HMC() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         HearingNoticeVariables hearingNoticeVariables = new HearingNoticeVariables();
         hearingNoticeVariables.setHearingId("HER1234");
         hearingNoticeVariables.setHearingType("AAA7-TRI");
@@ -412,7 +395,6 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
     @Test
     void shouldCreateDashboardNotificationsForHearingFeeIfNotPaidWithHwF_HMC() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         HearingNoticeVariables hearingNoticeVariables = new HearingNoticeVariables();
         hearingNoticeVariables.setHearingId("HER1234");
         hearingNoticeVariables.setHearingType("AAA7-TRI");
@@ -454,8 +436,6 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
 
     @Test
     void shouldNotCreateDashboardNotificationsForHearingFeeIfCaseInHRAndListing_butApplicantLR() {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");
         caseData.setCcdCaseReference(1234L);
