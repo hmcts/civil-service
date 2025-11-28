@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.time.LocalDate;
@@ -99,6 +100,8 @@ class CaseEventTaskHandlerTest {
     private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
     @Spy
     private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
+    @Spy
+    private RoboticsEventTextFormatter textFormatter = new RoboticsEventTextFormatter();
     @Captor
     ArgumentCaptor<CaseDataContent> caseDataContentArgumentCaptor;
     @InjectMocks

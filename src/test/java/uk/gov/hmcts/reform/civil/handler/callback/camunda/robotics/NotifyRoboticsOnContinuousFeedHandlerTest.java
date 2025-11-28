@@ -32,6 +32,12 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsCaseDataSupport;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsRespondentResponseSupport;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -57,6 +63,12 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
     AddressLinesMapper.class,
     EventHistorySequencer.class,
     EventHistoryMapper.class,
+    RoboticsEventTextFormatter.class,
+    RoboticsTimelineHelper.class,
+    RoboticsRespondentResponseSupport.class,
+    RoboticsCaseDataSupport.class,
+    RoboticsPartyLookup.class,
+    RoboticsSequenceGenerator.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
     SimpleStateFlowEngine.class,
