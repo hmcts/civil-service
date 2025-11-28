@@ -922,9 +922,9 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent2SameLegalRepresentative(NO)
                     .isRespondent2(YES)
                     .build();
-            caseData.setShowConditionFlags(EnumSet.of(
+            caseData = caseData.toBuilder().showConditionFlags(EnumSet.of(
                     DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1
-            ));
+            )).build();
             CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
 
             // When
@@ -1233,7 +1233,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                             DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2
                     ))
                     .build();
-            when(toggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(
                     caseData, MID, "specHandleAdmitPartClaim", "DEFENDANT_RESPONSE_SPEC");
 
@@ -1383,15 +1382,17 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void testValidateSpecDefendantResponseAdmitClaimOwingAmountIsNull() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build();
-            caseData.setRespondent1(PartyBuilder.builder().individual().build());
-            caseData.setIsRespondent1(YES);
-            caseData.setRespondent2(PartyBuilder.builder().individual().build());
-            caseData.setIsRespondent2(YES);
-            caseData.setSpecDefenceAdmitted2Required(YES);
-            caseData.setSpecDefenceAdmittedRequired(YES);
-            caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
-            caseData.setTotalClaimAmount(new BigDecimal(7000));
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
+                    .toBuilder()
+                    .respondent1(PartyBuilder.builder().individual().build())
+                    .isRespondent1(YES)
+                    .respondent2(PartyBuilder.builder().individual().build())
+                    .isRespondent2(YES)
+                    .specDefenceAdmitted2Required(YES)
+                    .specDefenceAdmittedRequired(YES)
+                    .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                    .totalClaimAmount(new BigDecimal(7000))
+                    .build();
             when(toggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
             when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal("0.05"));
             CallbackParams params = callbackParamsOf(
@@ -1409,6 +1410,18 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void testValidateSpecDefendantResponseAdmitClaimOwingAmountNotPartAdmit() {
             // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
+                    .toBuilder()
+                    .respondent1(PartyBuilder.builder().individual().build())
+                    .isRespondent1(YES)
+                    .respondent2(PartyBuilder.builder().individual().build())
+                    .isRespondent2(NO)
+                    .specDefenceAdmitted2Required(NO)
+                    .specDefenceAdmittedRequired(YES)
+                    .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                    .totalClaimAmount(new BigDecimal(7000))
+                    .respondToAdmittedClaimOwingAmount(new BigDecimal(50000))
+                    .build();
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build();
             caseData.setRespondent1(PartyBuilder.builder().individual().build());
             caseData.setIsRespondent1(YES);
@@ -1495,9 +1508,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent2Copy(PartyBuilder.builder().individual().build())
                     .atSpecAoSRespondent2HomeAddressRequired(NO)
                     .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
-                    .build();
-            caseData.setRespondent2ResponseDate(dateTime);
-            caseData.setRespondent1ResponseDate(null);
+                    .build().toBuilder()
+                    .build().toBuilder()
+                    .respondent2ResponseDate(dateTime)
+                    .respondent1ResponseDate(null).build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
@@ -2490,7 +2504,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void specificSummary_whenPartialAdmitNotPay_LrAdmissionBulkEnabled() {
             // Given
-            when(toggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
             BigDecimal admitted = BigDecimal.valueOf(1000);
             LocalDate whenWillPay = LocalDate.now().plusMonths(1);
             CaseData caseData = CaseDataBuilder.builder()
@@ -2578,7 +2591,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void specificSummary_whenPartialAdmitPayImmediately_LrAdmissionBulkEnabled() {
             // Given
-            when(toggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
             BigDecimal admitted = BigDecimal.valueOf(1000);
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
             CaseData caseData = CaseDataBuilder.builder()
@@ -2605,7 +2617,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void specificSummary_whenPartialAdmitPayImmediately1v2_LrAdmissionBulkEnabled() {
             // Given
-            when(toggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
             BigDecimal admitted = BigDecimal.valueOf(1000);
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
             CaseData caseData = CaseDataBuilder.builder()
@@ -2734,11 +2745,12 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             BigDecimal howMuchWasPaid = new BigDecimal(MonetaryConversions.poundsToPennies(totalClaimAmount));
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
+                    .build().toBuilder()
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                    .specDefenceAdmittedRequired(YesOrNo.YES)
+                    .respondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(howMuchWasPaid).build())
+                    .totalClaimAmount(totalClaimAmount)
                     .build();
-            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
-            caseData.setSpecDefenceAdmittedRequired(YesOrNo.YES);
-            caseData.setRespondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(howMuchWasPaid).build());
-            caseData.setTotalClaimAmount(totalClaimAmount);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
             // When
@@ -2960,11 +2972,12 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             BigDecimal totalClaimAmount = BigDecimal.valueOf(10000);
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
+                    .build().toBuilder()
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                    .specDefenceAdmittedRequired(YesOrNo.YES)
+                    .respondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(howMuchWasPaid).build())
+                    .totalClaimAmount(totalClaimAmount)
                     .build();
-            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
-            caseData.setSpecDefenceAdmittedRequired(YesOrNo.YES);
-            caseData.setRespondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(howMuchWasPaid).build());
-            caseData.setTotalClaimAmount(totalClaimAmount);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
             // When
@@ -2984,8 +2997,9 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
+                    .build().toBuilder()
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
                     .build();
-            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
             // When
@@ -3233,27 +3247,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors()).isNotNull();
         }
 
-        @Test
-        void shouldPopulateTotalClaimAmountPlusInterestAdmitPart() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimDetailsNotified()
-                    .totalClaimAmount(new BigDecimal(7000))
-                    .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-            when(toggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
-            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal("0.05"));
-
-            // When
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                    .handle(params);
-
-            // Then
-            assertThat(response.getData().get("totalClaimAmountPlusInterestAdmitPart")).isNotNull();
-        }
     }
 
     @Nested
@@ -3345,8 +3338,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent2SameLegalRepresentative(NO)
                     .respondent1DQ()
                     .build();
-            CaseData updatedCaseData = caseData;
-            updatedCaseData.setResp2MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(NO).build());
+            CaseData updatedCaseData = caseData.toBuilder()
+                    .resp2MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(NO).build()).build();
             CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
             // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler

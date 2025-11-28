@@ -189,7 +189,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
         @Test
         void shouldNotSetCcjJudgmentAmountShowInterestToNoWhenPayImmediatelyAndLrAdmissionBulkEnabled_1v2() {
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
             LocalDate whenWillPay = LocalDate.of(2024, 11, 11);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
