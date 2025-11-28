@@ -65,10 +65,9 @@ class ClaimantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldRecordScenario_whenInvokedWhenCaseProgressionSmallClaims() {
-            CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build().toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .responseClaimTrack("SMALL_CLAIM")
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setResponseClaimTrack("SMALL_CLAIM");
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(UPDATE_DASHBOARD_TASK_LIST_CLAIMANT_DECISION_OUTCOME.name()).build()
             ).build();
@@ -90,10 +89,9 @@ class ClaimantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldRecordScenario_whenInvokedWhenCaseProgressionFastTrack() {
-            CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build().toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .responseClaimTrack("FAST_CLAIM")
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setResponseClaimTrack("FAST_CLAIM");
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(UPDATE_DASHBOARD_TASK_LIST_CLAIMANT_DECISION_OUTCOME.name()).build()
             ).build();
@@ -114,11 +112,10 @@ class ClaimantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldRecordScenario_whenInvokedWhenCaseProgressionFastTrack_WhenTrialReadinessDone() {
-            CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build().toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .responseClaimTrack("FAST_CLAIM")
-                .trialReadyApplicant(YesOrNo.YES)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setResponseClaimTrack("FAST_CLAIM");
+            caseData.setTrialReadyApplicant(YesOrNo.YES);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(UPDATE_DASHBOARD_TASK_LIST_CLAIMANT_DECISION_OUTCOME.name()).build()
             ).build();

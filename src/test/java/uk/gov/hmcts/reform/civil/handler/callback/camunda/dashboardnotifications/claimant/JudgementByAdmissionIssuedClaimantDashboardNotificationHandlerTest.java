@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -78,24 +79,24 @@ class JudgementByAdmissionIssuedClaimantDashboardNotificationHandlerTest extends
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .respondent1Represented(YesOrNo.NO)
-            .applicant1Represented(YesOrNo.NO)
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-            .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.YES)
-            .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("John Doe")
-                                                 .build())
-                                      .build())
-            .respondent1(PartyBuilder.builder().individual().build())
-            .activeJudgment(JudgmentDetails.builder().issueDate(LocalDate.now())
-                                        .state(JudgmentState.ISSUED)
-                                .type(JudgmentType.JUDGMENT_BY_ADMISSION)
-                                       .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+        caseData.setApplicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.YES);
+        DynamicListElement dynamicListElement = new DynamicListElement();
+        dynamicListElement.setLabel("John Doe");
+        DynamicList dynamicList = new DynamicList();
+        dynamicList.setValue(dynamicListElement);
+        caseData.setDefendantDetailsSpec(dynamicList);
+        caseData.setRespondent1(PartyBuilder.builder().individual().build());
+        JudgmentDetails judgmentDetails = new JudgmentDetails();
+        judgmentDetails.setIssueDate(LocalDate.now());
+        judgmentDetails.setState(JudgmentState.ISSUED);
+        judgmentDetails.setType(JudgmentType.JUDGMENT_BY_ADMISSION);
+        caseData.setActiveJudgment(judgmentDetails);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -117,24 +118,24 @@ class JudgementByAdmissionIssuedClaimantDashboardNotificationHandlerTest extends
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .respondent1Represented(YesOrNo.NO)
-            .applicant1Represented(YesOrNo.NO)
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-            .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.YES)
-            .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("John Doe")
-                                                 .build())
-                                      .build())
-            .respondent1(PartyBuilder.builder().organisation().build())
-            .activeJudgment(JudgmentDetails.builder().issueDate(LocalDate.now())
-                                .state(JudgmentState.ISSUED)
-                                .type(JudgmentType.JUDGMENT_BY_ADMISSION)
-                                .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+        caseData.setApplicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.YES);
+        DynamicListElement dynamicListElement = new DynamicListElement();
+        dynamicListElement.setLabel("John Doe");
+        DynamicList dynamicList = new DynamicList();
+        dynamicList.setValue(dynamicListElement);
+        caseData.setDefendantDetailsSpec(dynamicList);
+        caseData.setRespondent1(PartyBuilder.builder().organisation().build());
+        JudgmentDetails judgmentDetails = new JudgmentDetails();
+        judgmentDetails.setIssueDate(LocalDate.now());
+        judgmentDetails.setState(JudgmentState.ISSUED);
+        judgmentDetails.setType(JudgmentType.JUDGMENT_BY_ADMISSION);
+        caseData.setActiveJudgment(judgmentDetails);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -156,18 +157,17 @@ class JudgementByAdmissionIssuedClaimantDashboardNotificationHandlerTest extends
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .respondent1Represented(YesOrNo.NO)
-            .applicant1Represented(YesOrNo.YES)
-            .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("John Doe")
-                                                 .build())
-                                      .build())
-            .respondent1(PartyBuilder.builder().individual().build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.YES);
+        DynamicListElement dynamicListElement = new DynamicListElement();
+        dynamicListElement.setLabel("John Doe");
+        DynamicList dynamicList = new DynamicList();
+        dynamicList.setValue(dynamicListElement);
+        caseData.setDefendantDetailsSpec(dynamicList);
+        caseData.setRespondent1(PartyBuilder.builder().individual().build());
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)

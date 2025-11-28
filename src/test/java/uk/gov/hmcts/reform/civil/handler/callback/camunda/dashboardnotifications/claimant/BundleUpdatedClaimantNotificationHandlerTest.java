@@ -49,9 +49,8 @@ class BundleUpdatedClaimantNotificationHandlerTest extends BaseCallbackHandlerTe
         @Test
         void shouldRecordScenario_whenApplicantNotRepresented() {
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_AMEND_RESTITCH_BUNDLE_CLAIMANT.name()).build()
             ).build();
@@ -73,13 +72,12 @@ class BundleUpdatedClaimantNotificationHandlerTest extends BaseCallbackHandlerTe
         @Test
         void shouldRecordFastTrackScenario_whenApplicantNotRepresented() {
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .drawDirectionsOrderRequired(YesOrNo.YES)
-                .drawDirectionsOrderSmallClaims(NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .orderType(OrderType.DECIDE_DAMAGES)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
+            caseData.setDrawDirectionsOrderSmallClaims(NO);
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setOrderType(OrderType.DECIDE_DAMAGES);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_AMEND_RESTITCH_BUNDLE_CLAIMANT.name()).build()
             ).build();
@@ -101,9 +99,8 @@ class BundleUpdatedClaimantNotificationHandlerTest extends BaseCallbackHandlerTe
         void shouldNotRecordScenario_whenApplicantRepresented() {
 
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .applicant1Represented(YesOrNo.YES)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setApplicant1Represented(YesOrNo.YES);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_AMEND_RESTITCH_BUNDLE_CLAIMANT.name()).build()
             ).build();

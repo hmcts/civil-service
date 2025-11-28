@@ -224,7 +224,7 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private  String freeFormHearingNotes;
     private CaseDocument finalOrderDocument;
     @Builder.Default
-    private final List<Element<CaseDocument>> finalOrderDocumentCollection = new ArrayList<>();
+    private List<Element<CaseDocument>> finalOrderDocumentCollection = new ArrayList<>();
 
     // Court officer order
     private FinalOrderFurtherHearing courtOfficerFurtherHearingComplex;

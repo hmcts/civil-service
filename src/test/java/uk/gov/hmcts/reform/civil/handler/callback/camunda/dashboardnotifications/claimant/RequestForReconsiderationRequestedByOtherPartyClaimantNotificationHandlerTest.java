@@ -68,9 +68,8 @@ class RequestForReconsiderationRequestedByOtherPartyClaimantNotificationHandlerT
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
-            .toBuilder().applicant1Represented(YesOrNo.NO)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseData.setApplicant1Represented(YesOrNo.NO);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -94,9 +93,8 @@ class RequestForReconsiderationRequestedByOtherPartyClaimantNotificationHandlerT
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
-            .toBuilder().applicant1Represented(YesOrNo.YES)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseData.setApplicant1Represented(YesOrNo.YES);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -120,11 +118,10 @@ class RequestForReconsiderationRequestedByOtherPartyClaimantNotificationHandlerT
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
-            .toBuilder().applicant1Represented(YesOrNo.YES)
-            .orderRequestedForReviewDefendant(YesOrNo.YES)
-            .orderRequestedForReviewClaimant(YesOrNo.YES)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseData.setApplicant1Represented(YesOrNo.YES);
+        caseData.setOrderRequestedForReviewDefendant(YesOrNo.YES);
+        caseData.setOrderRequestedForReviewClaimant(YesOrNo.YES);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -148,11 +145,10 @@ class RequestForReconsiderationRequestedByOtherPartyClaimantNotificationHandlerT
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
-            .toBuilder().applicant1Represented(YesOrNo.NO)
-            .orderRequestedForReviewDefendant(YesOrNo.YES)
-            .orderRequestedForReviewClaimant(YesOrNo.YES)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setOrderRequestedForReviewDefendant(YesOrNo.YES);
+        caseData.setOrderRequestedForReviewClaimant(YesOrNo.YES);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)

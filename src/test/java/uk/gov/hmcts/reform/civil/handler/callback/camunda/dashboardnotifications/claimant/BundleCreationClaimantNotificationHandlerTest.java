@@ -53,13 +53,12 @@ class BundleCreationClaimantNotificationHandlerTest extends BaseCallbackHandlerT
 
         @Test
         void shouldRecordScenario_whenInvokedWhenNotTrialReady() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .drawDirectionsOrderRequired(YesOrNo.YES)
-                .drawDirectionsOrderSmallClaims(NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .orderType(OrderType.DECIDE_DAMAGES)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
+            caseData.setDrawDirectionsOrderSmallClaims(NO);
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setOrderType(OrderType.DECIDE_DAMAGES);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_BUNDLE_CREATED_FOR_CLAIMANT1.name()).build()
             ).build();
@@ -100,13 +99,12 @@ class BundleCreationClaimantNotificationHandlerTest extends BaseCallbackHandlerT
 
         @Test
         void shouldRecordScenario_whenInvokedWhenTrialReady() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyApplicant().build().toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .drawDirectionsOrderRequired(YesOrNo.YES)
-                .drawDirectionsOrderSmallClaims(NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .orderType(OrderType.DECIDE_DAMAGES)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyApplicant().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
+            caseData.setDrawDirectionsOrderSmallClaims(NO);
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setOrderType(OrderType.DECIDE_DAMAGES);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_BUNDLE_CREATED_FOR_CLAIMANT1.name()).build()
             ).build();

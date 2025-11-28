@@ -68,9 +68,10 @@ class HearingFeePaidClaimantNotificationHandlerTest extends BaseCallbackHandlerT
 
         @Test
         void shouldRecordScenario_whenInvokedWhenHwFRemissionNotGranted() {
+            FeePaymentOutcomeDetails feePaymentOutcomeDetails = new FeePaymentOutcomeDetails();
+            feePaymentOutcomeDetails.setHwfFullRemissionGrantedForHearingFee(YesOrNo.NO);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim().hwfFeeType(FeeType.HEARING)
-                .feePaymentOutcomeDetails(
-                    FeePaymentOutcomeDetails.builder().hwfFullRemissionGrantedForHearingFee(YesOrNo.NO).build())
+                .feePaymentOutcomeDetails(feePaymentOutcomeDetails)
                 .applicant1Represented(YesOrNo.NO).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -95,7 +96,10 @@ class HearingFeePaidClaimantNotificationHandlerTest extends BaseCallbackHandlerT
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
                 .applicant1Represented(YesOrNo.NO)
                 .build();
-            caseData = caseData.toBuilder().hearingFeePaymentDetails(PaymentDetails.builder().status(SUCCESS).reference("REFERENCE").build()).build();
+            PaymentDetails paymentDetails = new PaymentDetails();
+            paymentDetails.setStatus(SUCCESS);
+            paymentDetails.setReference("REFERENCE");
+            caseData.setHearingFeePaymentDetails(paymentDetails);
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);

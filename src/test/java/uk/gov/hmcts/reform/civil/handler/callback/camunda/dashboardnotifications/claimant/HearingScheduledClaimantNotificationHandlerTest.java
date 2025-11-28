@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
@@ -96,7 +97,7 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, CaseData.builder().build())
+            .of(ABOUT_TO_SUBMIT, CaseDataBuilder.builder().build())
             .build();
 
         handler.handle(callbackParams);
@@ -122,14 +123,17 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
 
-        DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();
-        DynamicList list = DynamicList.builder().value(location).listItems(List.of(location)).build();
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .applicant1Represented(YesOrNo.NO)
-            .responseClaimTrack("FAST_CLAIM")
-            .build().toBuilder().hearingLocation(list).build();
+        DynamicListElement location = new DynamicListElement();
+        location.setLabel("Name - Loc - 1");
+        DynamicList list = new DynamicList();
+        list.setValue(location);
+        list.setListItems(List.of(location));
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setResponseClaimTrack("FAST_CLAIM");
+        caseData.setHearingLocation(list);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -152,13 +156,12 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .ccdState(HEARING_READINESS)
-            .listingOrRelisting(LISTING)
-            .applicant1Represented(YesOrNo.NO)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setCcdState(HEARING_READINESS);
+        caseData.setListingOrRelisting(LISTING);
+        caseData.setApplicant1Represented(YesOrNo.NO);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -185,23 +188,27 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
     void shouldCreateDashboardNotificationsForHearingFeeIfFeePaymentFailure_HMC() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        HearingNoticeVariables hearingNoticeVariables = new HearingNoticeVariables();
+        hearingNoticeVariables.setHearingId("HER1234");
+        hearingNoticeVariables.setHearingType("AAA7-TRI");
         when(hearingNoticeCamundaService.getProcessVariables(any()))
-            .thenReturn(HearingNoticeVariables.builder()
-                            .hearingId("HER1234")
-                            .hearingType("AAA7-TRI")
-                            .build());
-        when(hearingFeesService.getFeeForHearingSmallClaims(any()))
-            .thenReturn(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build());
+            .thenReturn(hearingNoticeVariables);
+        Fee fee = new Fee();
+        fee.setCalculatedAmountInPence(new BigDecimal(10));
+        when(hearingFeesService.getFeeForHearingSmallClaims(any())).thenReturn(fee);
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .totalClaimAmount(new BigDecimal(100))
-            .responseClaimTrack("SMALL_CLAIM")
-            .applicant1Represented(YesOrNo.NO)
-            .hearingFeePaymentDetails(PaymentDetails.builder().status(PaymentStatus.FAILED).build())
-            .businessProcess(BusinessProcess.builder().processInstanceId("").build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setTotalClaimAmount(new BigDecimal(100));
+        caseData.setResponseClaimTrack("SMALL_CLAIM");
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        PaymentDetails paymentDetails = new PaymentDetails();
+        paymentDetails.setStatus(PaymentStatus.FAILED);
+        caseData.setHearingFeePaymentDetails(paymentDetails);
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setProcessInstanceId("");
+        caseData.setBusinessProcess(businessProcess);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -230,22 +237,24 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
     void shouldCreateDashboardNotificationsForHearingFeeIfFeeNeverPaid_HMC() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        HearingNoticeVariables hearingNoticeVariables = new HearingNoticeVariables();
+        hearingNoticeVariables.setHearingId("HER1234");
+        hearingNoticeVariables.setHearingType("AAA7-TRI");
         when(hearingNoticeCamundaService.getProcessVariables(any()))
-            .thenReturn(HearingNoticeVariables.builder()
-                            .hearingId("HER1234")
-                            .hearingType("AAA7-TRI")
-                            .build());
-        when(hearingFeesService.getFeeForHearingSmallClaims(any()))
-            .thenReturn(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build());
+            .thenReturn(hearingNoticeVariables);
+        Fee fee = new Fee();
+        fee.setCalculatedAmountInPence(new BigDecimal(10));
+        when(hearingFeesService.getFeeForHearingSmallClaims(any())).thenReturn(fee);
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .totalClaimAmount(new BigDecimal(100))
-            .responseClaimTrack("SMALL_CLAIM")
-            .applicant1Represented(YesOrNo.NO)
-            .businessProcess(BusinessProcess.builder().processInstanceId("").build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setTotalClaimAmount(new BigDecimal(100));
+        caseData.setResponseClaimTrack("SMALL_CLAIM");
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setProcessInstanceId("");
+        caseData.setBusinessProcess(businessProcess);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -290,20 +299,23 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
     void shouldNotCreateDashboardNotificationsForHearingFeeIfFeePaymentSuccess_HMC() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        HearingNoticeVariables hearingNoticeVariables = new HearingNoticeVariables();
+        hearingNoticeVariables.setHearingId("HER1234");
+        hearingNoticeVariables.setHearingType("AAA7-TRI");
         when(hearingNoticeCamundaService.getProcessVariables(any()))
-            .thenReturn(HearingNoticeVariables.builder()
-                            .hearingId("HER1234")
-                            .hearingType("AAA7-TRI")
-                            .build());
+            .thenReturn(hearingNoticeVariables);
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .applicant1Represented(YesOrNo.NO)
-            .responseClaimTrack("FAST_CLAIM")
-            .hearingFeePaymentDetails(PaymentDetails.builder().status(PaymentStatus.SUCCESS).build())
-            .businessProcess(BusinessProcess.builder().processInstanceId("").build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setResponseClaimTrack("FAST_CLAIM");
+        PaymentDetails paymentDetails = new PaymentDetails();
+        paymentDetails.setStatus(PaymentStatus.SUCCESS);
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setProcessInstanceId("");
+        caseData.setHearingFeePaymentDetails(paymentDetails);
+        caseData.setBusinessProcess(businessProcess);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -326,19 +338,20 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
     void shouldNotCreateDashboardNotificationsForHearingFeeIfHearingTypeDisposal_HMC() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        HearingNoticeVariables hearingNoticeVariables = new HearingNoticeVariables();
+        hearingNoticeVariables.setHearingId("HER1234");
+        hearingNoticeVariables.setHearingType("AAA7-DIS");
         when(hearingNoticeCamundaService.getProcessVariables(any()))
-            .thenReturn(HearingNoticeVariables.builder()
-                            .hearingId("HER1234")
-                            .hearingType("AAA7-DIS")
-                            .build());
+            .thenReturn(hearingNoticeVariables);
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .applicant1Represented(YesOrNo.NO)
-            .responseClaimTrack("FAST_CLAIM")
-            .businessProcess(BusinessProcess.builder().processInstanceId("").build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setResponseClaimTrack("FAST_CLAIM");
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setProcessInstanceId("");
+        caseData.setBusinessProcess(businessProcess);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -361,22 +374,25 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
     void shouldNotCreateDashboardNotificationsForHearingFeeIfPaidWithHwF_HMC() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        HearingNoticeVariables hearingNoticeVariables = new HearingNoticeVariables();
+        hearingNoticeVariables.setHearingId("HER1234");
+        hearingNoticeVariables.setHearingType("AAA7-TRI");
         when(hearingNoticeCamundaService.getProcessVariables(any()))
-            .thenReturn(HearingNoticeVariables.builder()
-                            .hearingId("HER1234")
-                            .hearingType("AAA7-TRI")
-                            .build());
+            .thenReturn(hearingNoticeVariables);
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .respondent1Represented(YesOrNo.NO)
-            .applicant1Represented(YesOrNo.NO)
-            .responseClaimTrack("FAST_CLAIM")
-            .hearingHelpFeesReferenceNumber("123")
-            .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder().hwfFullRemissionGrantedForHearingFee(YesOrNo.YES).build())
-            .businessProcess(BusinessProcess.builder().processInstanceId("").build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setResponseClaimTrack("FAST_CLAIM");
+        caseData.setHearingHelpFeesReferenceNumber("123");
+        FeePaymentOutcomeDetails feePaymentOutcomeDetails  = new FeePaymentOutcomeDetails();
+        feePaymentOutcomeDetails.setHwfFullRemissionGrantedForHearingFee(YesOrNo.YES);
+        caseData.setFeePaymentOutcomeDetails(feePaymentOutcomeDetails);
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setProcessInstanceId("");
+        caseData.setBusinessProcess(businessProcess);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -399,22 +415,23 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
     void shouldCreateDashboardNotificationsForHearingFeeIfNotPaidWithHwF_HMC() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        HearingNoticeVariables hearingNoticeVariables = new HearingNoticeVariables();
+        hearingNoticeVariables.setHearingId("HER1234");
+        hearingNoticeVariables.setHearingType("AAA7-TRI");
         when(hearingNoticeCamundaService.getProcessVariables(any()))
-            .thenReturn(HearingNoticeVariables.builder()
-                            .hearingId("HER1234")
-                            .hearingType("AAA7-TRI")
-                            .build());
+            .thenReturn(hearingNoticeVariables);
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .respondent1Represented(YesOrNo.NO)
-            .applicant1Represented(YesOrNo.NO)
-            .totalClaimAmount(new BigDecimal(100))
-            .responseClaimTrack("SMALL_CLAIM")
-            .hearingHelpFeesReferenceNumber("123")
-            .businessProcess(BusinessProcess.builder().processInstanceId("").build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setTotalClaimAmount(new BigDecimal(100));
+        caseData.setResponseClaimTrack("SMALL_CLAIM");
+        caseData.setHearingHelpFeesReferenceNumber("123");
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setProcessInstanceId("");
+        caseData.setBusinessProcess(businessProcess);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -441,13 +458,12 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
     void shouldNotCreateDashboardNotificationsForHearingFeeIfCaseInHRAndListing_butApplicantLR() {
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .ccdState(HEARING_READINESS)
-            .listingOrRelisting(LISTING)
-            .applicant1Represented(YesOrNo.YES)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setCcdState(HEARING_READINESS);
+        caseData.setListingOrRelisting(LISTING);
+        caseData.setApplicant1Represented(YesOrNo.YES);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -466,18 +482,17 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .ccdState(ccdState)
-            .listingOrRelisting(listingOrRelisting)
-            .applicant1Represented(applicant1Represented)
-            .respondent1Represented(respondent1Represented)
-            .hearingFeePaymentDetails(hearingFeePaymentDetails)
-            .hearingHelpFeesReferenceNumber("123")
-            .responseClaimTrack("FAST_CLAIM")
-            .feePaymentOutcomeDetails(feePaymentOutcomeDetails)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setCcdState(ccdState);
+        caseData.setListingOrRelisting(listingOrRelisting);
+        caseData.setApplicant1Represented(applicant1Represented);
+        caseData.setRespondent1Represented(respondent1Represented);
+        caseData.setHearingFeePaymentDetails(hearingFeePaymentDetails);
+        caseData.setHearingHelpFeesReferenceNumber("123");
+        caseData.setResponseClaimTrack("FAST_CLAIM");
+        caseData.setFeePaymentOutcomeDetails(feePaymentOutcomeDetails);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -501,11 +516,15 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
     }
 
     private static Stream<Arguments> provideTestCases() {
+        PaymentDetails paymentDetails = new PaymentDetails();
+        paymentDetails.setStatus(PaymentStatus.SUCCESS);
+        FeePaymentOutcomeDetails feePaymentOutcomeDetails  = new FeePaymentOutcomeDetails();
+        feePaymentOutcomeDetails.setHwfFullRemissionGrantedForHearingFee(YesOrNo.YES);
         return Stream.of(
             Arguments.of(CaseState.HEARING_READINESS, ListingOrRelisting.LISTING, YesOrNo.NO, YesOrNo.NO,
-                         PaymentDetails.builder().status(PaymentStatus.SUCCESS).build(), null),
+                         paymentDetails, null),
             Arguments.of(CaseState.HEARING_READINESS, ListingOrRelisting.LISTING, YesOrNo.NO, YesOrNo.NO,
-                         null, FeePaymentOutcomeDetails.builder().hwfFullRemissionGrantedForHearingFee(YesOrNo.YES).build())
+                         null, feePaymentOutcomeDetails)
         );
     }
 }
