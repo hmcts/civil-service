@@ -120,7 +120,6 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(LocationRefData.builder().siteName("Name").courtAddress("Loc").postcode("1").build());
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
 
         DynamicListElement location = new DynamicListElement();
@@ -154,7 +153,6 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
     @Test
     void shouldCreateDashboardNotificationsForHearingFeeIfCaseInHRAndListing() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");
@@ -480,7 +478,6 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
                                                             YesOrNo applicant1Represented, YesOrNo respondent1Represented,
                                                             PaymentDetails hearingFeePaymentDetails, FeePaymentOutcomeDetails feePaymentOutcomeDetails) {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");

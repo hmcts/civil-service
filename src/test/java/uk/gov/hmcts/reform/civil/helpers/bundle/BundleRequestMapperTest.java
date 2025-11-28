@@ -5,6 +5,7 @@ import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleTestUtil.assertBundleCreateRequestIsValid;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleTestUtil.assertCostsBudgets;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleTestUtil.assertDirectionsQuestionnaires;
+import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleTestUtil.assertDirectionsQuestionnairesWithCategoryIds;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleTestUtil.assertDisclosedDocuments;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleTestUtil.assertExpertEvidences;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleTestUtil.assertJointStatementOfExperts;
@@ -40,8 +41,6 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -73,18 +72,17 @@ class BundleRequestMapperTest {
             new DisclosedDocumentsMapper(documentsRetrieval, conversionDocs),
             new CostsBudgetsMapper(conversionDocs),
             new JointExpertsMapper(documentsRetrieval),
-            new DQMapper(documentsRetrieval, featureToggleService, sysGenDocMapper),
+            new DQMapper(documentsRetrieval, sysGenDocMapper),
             new OrdersMapper(sysGenDocMapper),
             filenameGenerator
         );
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldMapCaseDataToBundleCreateRequest(boolean caseProgressionEnabled) {
+    @Test
+    void shouldMapCaseDataToBundleCreateRequest() {
         // Given
         CaseData caseData = getCaseData();
-        mockFeatureToggles(caseProgressionEnabled, false);
+        mockFeatureToggles(false);
 
         // When
         BundleCreateRequest result = mapCaseData(caseData);
@@ -93,7 +91,7 @@ class BundleRequestMapperTest {
         assertBundleCreateRequestIsValid(result);
         assertTrialDocumentFileNames(result);
         assertStatementsOfCaseDocuments(result);
-        assertDirectionsQuestionnaires(caseProgressionEnabled, result);
+        assertDirectionsQuestionnairesWithCategoryIds(result);
         assertOrdersDocuments(result);
         assertWitnessStatements(result);
         assertExpertEvidences(result);
@@ -102,12 +100,11 @@ class BundleRequestMapperTest {
         assertCostsBudgets(result);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldMapCaseDataWithAmendBundleEnabled(boolean caseProgressionEnabled) {
+    @Test
+    void shouldMapCaseDataWithAmendBundleEnabled() {
         // Given
         CaseData caseData = getCaseDataNoCategoryId();
-        mockFeatureToggles(caseProgressionEnabled, true);
+        mockFeatureToggles(true);
 
         // When
         BundleCreateRequest result = mapCaseData(caseData);
@@ -116,7 +113,7 @@ class BundleRequestMapperTest {
         assertBundleCreateRequestIsValid(result);
         assertTrialDocumentFileNames(result);
         assertStatementsOfCaseDocuments(result);
-        assertDirectionsQuestionnaires(featureToggleService.isCaseProgressionEnabled(), result);
+        assertDirectionsQuestionnairesWithCategoryIds(result);
         assertOrdersDocuments(result);
         assertWitnessStatements(result);
         assertExpertEvidences(result);
@@ -184,8 +181,7 @@ class BundleRequestMapperTest {
         assertFalse(result.getCaseDetails().getCaseData().isHasRespondant2());
     }
 
-    private void mockFeatureToggles(boolean caseProgressionEnabled, boolean amendBundleEnabled) {
-        given(featureToggleService.isCaseProgressionEnabled()).willReturn(caseProgressionEnabled);
+    private void mockFeatureToggles(boolean amendBundleEnabled) {
         given(featureToggleService.isAmendBundleEnabled()).willReturn(amendBundleEnabled);
     }
 

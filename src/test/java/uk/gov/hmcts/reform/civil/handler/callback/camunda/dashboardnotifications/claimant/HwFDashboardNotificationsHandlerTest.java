@@ -120,8 +120,6 @@ class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTest {
             caseData.setHearingHwfDetails(helpWithFeesDetails);
             caseData.setApplicant1Represented(YesOrNo.NO);
 
-            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("hearingFeeRemissionAmount", "£1000");
             scenarioParams.put("hearingFeeOutStandingAmount", "£25");
