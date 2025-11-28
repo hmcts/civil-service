@@ -28,18 +28,21 @@ public final class DivergencePredicates {
         return switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_ONE_LEGAL_REP ->
                 //scenario: either of them have submitted full defence response
-                !caseData.getRespondent1ClaimResponseType().equals(caseData.getRespondent2ClaimResponseType())
-                    && (caseData.getRespondent1ClaimResponseType().equals(FULL_DEFENCE)
-                    || caseData.getRespondent2ClaimResponseType().equals(FULL_DEFENCE));
+                !Objects.equals(
+                    caseData.getRespondent1ClaimResponseType(),
+                    caseData.getRespondent2ClaimResponseType()
+                )
+                    && (FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
+                    || FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType()));
             case ONE_V_TWO_TWO_LEGAL_REP ->
                 //scenario: latest response is full defence
                 !Objects.equals(
                     caseData.getRespondent1ClaimResponseType(),
                     caseData.getRespondent2ClaimResponseType()
                 )
-                    && ((caseData.getRespondent2ClaimResponseType().equals(FULL_DEFENCE)
+                    && ((FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType())
                     && caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate()))
-                    || (caseData.getRespondent1ClaimResponseType().equals(FULL_DEFENCE)
+                    || (FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
                     && caseData.getRespondent1ResponseDate().isAfter(caseData.getRespondent2ResponseDate())));
             case TWO_V_ONE -> (FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
                 || FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeToApplicant2()))
@@ -57,18 +60,19 @@ public final class DivergencePredicates {
                 caseData.getRespondent1ClaimResponseType(),
                 caseData.getRespondent2ClaimResponseType()
             )
-                //scenario: latest response is not full defence
-                && ((!caseData.getRespondent2ClaimResponseType().equals(FULL_DEFENCE)
+                && ((!FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType())
                 && caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate())
-                || !caseData.getRespondent1ClaimResponseType().equals(FULL_DEFENCE)
+                || !FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
                 && caseData.getRespondent1ResponseDate().isAfter(caseData.getRespondent2ResponseDate()))
-                //scenario: neither responses are full defence
-                || (!caseData.getRespondent1ClaimResponseType().equals(FULL_DEFENCE)
-                && !caseData.getRespondent2ClaimResponseType().equals(FULL_DEFENCE)));
+                || (!FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
+                && !FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType())));
             case ONE_V_TWO_ONE_LEGAL_REP ->
-                !caseData.getRespondent1ClaimResponseType().equals(caseData.getRespondent2ClaimResponseType())
-                    && (!caseData.getRespondent1ClaimResponseType().equals(FULL_DEFENCE)
-                    && !caseData.getRespondent2ClaimResponseType().equals(FULL_DEFENCE));
+                !Objects.equals(
+                    caseData.getRespondent1ClaimResponseType(),
+                    caseData.getRespondent2ClaimResponseType()
+                )
+                    && (!FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
+                    && !FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType()));
             case TWO_V_ONE -> !(FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType()) || FULL_DEFENCE
                 .equals(caseData.getRespondent1ClaimResponseTypeToApplicant2()));
             default -> false;
