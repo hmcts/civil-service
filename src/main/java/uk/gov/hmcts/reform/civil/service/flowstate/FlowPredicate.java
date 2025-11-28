@@ -23,69 +23,58 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_AD
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 
-@SuppressWarnings("Deprecated")
-public class FlowPredicate {
+@SuppressWarnings("java:S1214")
+public interface FlowPredicate {
 
-    private FlowPredicate() {
-        //Utility classes require a private constructor for checkstyle
-    }
-
-    public static final Predicate<CaseData> claimIssued = ClaimPredicate.issued;
-    public static final Predicate<CaseData> specClaim = ClaimPredicate.isSpec;
-
-    public static final Predicate<CaseData> caseContainsLiP = LipPredicate.caseContainsLiP;
-
-    public static final Predicate<CaseData> hasNotifiedClaimDetailsToBoth = ClaimPredicate.isSpec.negate().and(NotificationPredicate.hasClaimDetailsNotifiedToBoth);
-    public static final Predicate<CaseData> claimDetailsNotifiedTimeExtension = NotificationPredicate.notifiedTimeExtension;
-    public static final Predicate<CaseData> takenOfflineAfterClaimDetailsNotified = TakenOfflinePredicate.afterClaimDetailsNotified;
-
-    public static final Predicate<CaseData> takenOfflineSDONotDrawn = TakenOfflinePredicate.byStaff.negate().and(TakenOfflinePredicate.sdoNotDrawn);
-    public static final Predicate<CaseData> takenOfflineBySystem = TakenOfflinePredicate.bySystem.and(ClaimPredicate.changeOfRepresentation.negate());
-    public static final Predicate<CaseData> takenOfflineByStaff = TakenOfflinePredicate.byStaff;
-    public static final Predicate<CaseData> takenOfflineAfterSDO = TakenOfflinePredicate.byStaff.negate().and(TakenOfflinePredicate.afterSdo.and(TakenOfflinePredicate.bySystem));
-    public static final Predicate<CaseData> takenOfflineByStaffAfterClaimNotified = TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.afterClaimNotifiedFutureDeadline);
-    public static final Predicate<CaseData> takenOfflineByStaffAfterClaimDetailsNotified = TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.afterClaimNotifiedNoAckNoResponseNoExtension);
-    public static final Predicate<CaseData> isDefendantNoCOnlineForCaseAfterJBA = TakenOfflinePredicate.isDefendantNoCOnlineForCaseAfterJBA;
-
-    public static final Predicate<CaseData> applicantOutOfTimeNotBeingTakenOffline = OutOfTimePredicate.notBeingTakenOffline;
-    public static final Predicate<CaseData> applicantOutOfTimeProcessedByCamunda = OutOfTimePredicate.processedByCamunda;
-
-    public static final Predicate<CaseData> paymentSuccessful = PaymentPredicate.successful;
-
-    public static final Predicate<CaseData> acceptRepaymentPlan = RepaymentPredicate.acceptRepaymentPlan;
-    public static final Predicate<CaseData> rejectRepaymentPlan = RepaymentPredicate.rejectRepaymentPlan;
-
-    public static final Predicate<CaseData> isRespondentResponseLangIsBilingual = LanguagePredicate.respondentIsBilingual;
-    public static final Predicate<CaseData> onlyInitialRespondentResponseLangIsBilingual = LanguagePredicate.onlyInitialResponseIsBilingual;
-
-    public static final Predicate<CaseData> isInHearingReadiness = HearingPredicate.isInReadiness;
-
-    public static final Predicate<CaseData> fullAdmissionSpec =  ResponsePredicate.isType(FULL_ADMISSION);
-    public static final Predicate<CaseData> partAdmissionSpec = ResponsePredicate.isType(PART_ADMISSION);
-    public static final Predicate<CaseData> counterClaimSpec = ResponsePredicate.isType(COUNTER_CLAIM);
-    public static final Predicate<CaseData> fullDefenceSpec = ResponsePredicate.isType(FULL_DEFENCE);
-    public static final Predicate<CaseData> counterClaim = ResponsePredicate.isType(RespondentResponseType.COUNTER_CLAIM);
-
-    public static final Predicate<CaseData> isOneVOneResponseFlagSpec = ResponsePredicate.isOneVOneResponseFlagSpec;
-    public static final Predicate<CaseData> notificationAcknowledged = ResponsePredicate.notificationAcknowledged;
-    public static final Predicate<CaseData> respondentTimeExtension = ResponsePredicate.respondentTimeExtension;
-    public static final Predicate<CaseData> allResponsesReceived = ResponsePredicate.allResponsesReceived;
-    public static final Predicate<CaseData> awaitingResponsesFullDefenceReceived = ResponsePredicate.awaitingResponsesFullDefenceReceived;
-    public static final Predicate<CaseData> awaitingResponsesFullAdmitReceived = ResponsePredicate.awaitingResponsesFullAdmitReceived;
-    public static final Predicate<CaseData> awaitingResponsesNonFullDefenceOrFullAdmitReceived
+    Predicate<CaseData> claimIssued = ClaimPredicate.issued;
+    Predicate<CaseData> specClaim = ClaimPredicate.isSpec;
+    Predicate<CaseData> hasNotifiedClaimDetailsToBoth = ClaimPredicate.isSpec.negate()
+        .and(NotificationPredicate.hasClaimDetailsNotifiedToBoth);
+    Predicate<CaseData> claimDetailsNotifiedTimeExtension = NotificationPredicate.notifiedTimeExtension;
+    Predicate<CaseData> takenOfflineAfterClaimDetailsNotified = TakenOfflinePredicate.afterClaimDetailsNotified;
+    Predicate<CaseData> takenOfflineSDONotDrawn = TakenOfflinePredicate.byStaff.negate()
+        .and(TakenOfflinePredicate.sdoNotDrawn);
+    Predicate<CaseData> takenOfflineBySystem = TakenOfflinePredicate.bySystem
+        .and(ClaimPredicate.changeOfRepresentation.negate());
+    Predicate<CaseData> takenOfflineByStaff = TakenOfflinePredicate.byStaff;
+    Predicate<CaseData> takenOfflineAfterSDO = TakenOfflinePredicate.byStaff.negate()
+        .and(TakenOfflinePredicate.afterSdo.and(TakenOfflinePredicate.bySystem));
+    Predicate<CaseData> takenOfflineByStaffAfterClaimNotified = TakenOfflinePredicate.byStaff
+        .and(TakenOfflinePredicate.afterClaimNotifiedFutureDeadline);
+    Predicate<CaseData> takenOfflineByStaffAfterClaimDetailsNotified = TakenOfflinePredicate.byStaff.and(
+        TakenOfflinePredicate.afterClaimNotifiedNoAckNoResponseNoExtension);
+    Predicate<CaseData> isDefendantNoCOnlineForCaseAfterJBA = TakenOfflinePredicate.isDefendantNoCOnlineForCaseAfterJBA;
+    Predicate<CaseData> applicantOutOfTimeNotBeingTakenOffline = OutOfTimePredicate.notBeingTakenOffline;
+    Predicate<CaseData> applicantOutOfTimeProcessedByCamunda = OutOfTimePredicate.processedByCamunda;
+    Predicate<CaseData> paymentSuccessful = PaymentPredicate.successful;
+    Predicate<CaseData> acceptRepaymentPlan = RepaymentPredicate.acceptRepaymentPlan;
+    Predicate<CaseData> rejectRepaymentPlan = RepaymentPredicate.rejectRepaymentPlan;
+    Predicate<CaseData> isRespondentResponseLangIsBilingual = LanguagePredicate.respondentIsBilingual;
+    Predicate<CaseData> onlyInitialRespondentResponseLangIsBilingual = LanguagePredicate.onlyInitialResponseIsBilingual;
+    Predicate<CaseData> isInHearingReadiness = HearingPredicate.isInReadiness;
+    Predicate<CaseData> fullAdmissionSpec = ResponsePredicate.isType(FULL_ADMISSION);
+    Predicate<CaseData> partAdmissionSpec = ResponsePredicate.isType(PART_ADMISSION);
+    Predicate<CaseData> counterClaimSpec = ResponsePredicate.isType(COUNTER_CLAIM);
+    Predicate<CaseData> fullDefenceSpec = ResponsePredicate.isType(FULL_DEFENCE);
+    Predicate<CaseData> counterClaim = ResponsePredicate.isType(RespondentResponseType.COUNTER_CLAIM);
+    Predicate<CaseData> isOneVOneResponseFlagSpec = ResponsePredicate.isOneVOneResponseFlagSpec;
+    Predicate<CaseData> notificationAcknowledged = ResponsePredicate.notificationAcknowledged;
+    Predicate<CaseData> respondentTimeExtension = ResponsePredicate.respondentTimeExtension;
+    Predicate<CaseData> allResponsesReceived = ResponsePredicate.allResponsesReceived;
+    Predicate<CaseData> awaitingResponsesFullDefenceReceived = ResponsePredicate.awaitingResponsesFullDefenceReceived;
+    Predicate<CaseData> awaitingResponsesFullAdmitReceived = ResponsePredicate.awaitingResponsesFullAdmitReceived;
+    Predicate<CaseData> awaitingResponsesNonFullDefenceOrFullAdmitReceived
         = ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceived;
+    Predicate<CaseData> caseDismissedAfterDetailNotified = DismissedPredicate.afterClaimDetailNotified;
+    Predicate<CaseData> pastClaimDetailsNotificationDeadline = DismissedPredicate.pastClaimDetailsNotificationDeadline;
+    Predicate<CaseData> claimDismissedByCamunda = DismissedPredicate.byCamunda;
+    Predicate<CaseData> caseDismissedPastHearingFeeDue = DismissedPredicate.pastHearingFeeDue;
+    Predicate<CaseData> fullDefenceProceed = ClaimantPredicate.fullDefenceProceed;
+    Predicate<CaseData> fullDefenceNotProceed = ClaimantPredicate.fullDefenceNotProceed;
+    Predicate<CaseData> divergentRespondWithDQAndGoOffline = DivergencePredicate.divergentRespondWithDQAndGoOffline;
+    Predicate<CaseData> divergentRespondGoOffline = DivergencePredicate.divergentRespondGoOffline;
+    Predicate<CaseData> divergentRespondWithDQAndGoOfflineSpec = DivergencePredicate.divergentRespondWithDQAndGoOfflineSpec;
+    Predicate<CaseData> divergentRespondGoOfflineSpec = DivergencePredicate.divergentRespondGoOfflineSpec;
 
-    public static final Predicate<CaseData> caseDismissedAfterDetailNotified = DismissedPredicate.afterClaimDetailNotified;
-    public static final Predicate<CaseData> pastClaimDetailsNotificationDeadline = DismissedPredicate.pastClaimDetailsNotificationDeadline;
-    public static final Predicate<CaseData> claimDismissedByCamunda = DismissedPredicate.byCamunda;
-    public static final Predicate<CaseData> caseDismissedPastHearingFeeDue = DismissedPredicate.pastHearingFeeDue;
-
-    public static final Predicate<CaseData> fullDefenceProceed = ClaimantPredicate.fullDefenceProceed;
-    public static final Predicate<CaseData> fullDefenceNotProceed = ClaimantPredicate.fullDefenceNotProceed;
-
-    public static final Predicate<CaseData> divergentRespondWithDQAndGoOffline = DivergencePredicate.divergentRespondWithDQAndGoOffline;
-    public static final Predicate<CaseData> divergentRespondGoOffline = DivergencePredicate.divergentRespondGoOffline;
-    public static final Predicate<CaseData> divergentRespondWithDQAndGoOfflineSpec = DivergencePredicate.divergentRespondWithDQAndGoOfflineSpec;
-    public static final Predicate<CaseData> divergentRespondGoOfflineSpec = DivergencePredicate.divergentRespondGoOfflineSpec;
-
+    Predicate<CaseData> caseContainsLiP = LipPredicate.caseContainsLiP;
 }
