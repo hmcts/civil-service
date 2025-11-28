@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -364,9 +363,9 @@ public class InitiateGeneralApplicationServiceHelper {
         String applicant1OrgCaseRole = caseData.getApplicant1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
         String respondent1OrgCaseRole = caseData.getRespondent1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
         String applicant2OrgCaseRole = caseData.getApplicant2OrganisationPolicy() != null
-            ? caseData.getApplicant2OrganisationPolicy().getOrgPolicyCaseAssignedRole() : EMPTY;
+            ? caseData.getApplicant2OrganisationPolicy().getOrgPolicyCaseAssignedRole() : StringUtils.EMPTY;
         String respondent2OrgCaseRole = caseData.getRespondent2OrganisationPolicy() != null
-            ? caseData.getRespondent2OrganisationPolicy().getOrgPolicyCaseAssignedRole() : EMPTY;
+            ? caseData.getRespondent2OrganisationPolicy().getOrgPolicyCaseAssignedRole() : StringUtils.EMPTY;
 
         Optional<CaseAssignmentUserRole> applicantSol = userRoles.getCaseAssignmentUserRoles().stream()
             .filter(caseAssigned -> caseAssigned.getUserId().equals(userDetails.getId())).findFirst();

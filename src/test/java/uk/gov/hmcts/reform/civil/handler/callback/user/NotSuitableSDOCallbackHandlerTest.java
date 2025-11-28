@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -43,7 +43,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
     ValidationAutoConfiguration.class})
 class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @MockitoBean
     private Time time;
 
     @Autowired
@@ -78,6 +78,9 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         private CallbackParams params;
         private CaseData caseData;
+
+        @MockitoBean
+        private CallbackParams callbackParams;
 
         @Test
         void shouldValidateReasonLessThan150_whenInvoked() {

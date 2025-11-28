@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -49,7 +49,7 @@ class GenerateAcknowledgementOfClaimForSpecHandlerTest extends BaseCallbackHandl
     @Autowired
     private GenerateAcknowledgementOfClaimForSpecCallbackHandler handler;
 
-    @MockBean
+    @MockitoBean
     private AcknowledgementOfClaimGeneratorForSpec acknowledgementOfClaimGenerator;
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();

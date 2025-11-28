@@ -25,8 +25,11 @@ import uk.gov.hmcts.reform.civil.service.http.HttpResponseHeadersService;
 
 import java.util.Objects;
 import java.util.Optional;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotNull;
+
+import static uk.gov.hmcts.reform.civil.helpers.CaseTypeIdentifier.isCivil;
+import static uk.gov.hmcts.reform.civil.helpers.CaseTypeIdentifier.isGeneralApplication;
 
 @Tag(name = "Callback Controller")
 @Slf4j
@@ -75,6 +78,10 @@ public class CallbackController {
             .pageId(pageId.orElse(null))
             .caseData(caseDetailsConverter.toCaseData(caseDetails))
             .caseDataBefore(caseDetailsBefore != null ? caseDetailsConverter.toCaseData(caseDetailsBefore) : null)
+            .baseCaseData(caseDetailsConverter.toBaseCaseData(caseDetails))
+            .baseCaseDataBefore(caseDetailsBefore != null ? caseDetailsConverter.toBaseCaseData(caseDetailsBefore) : null)
+            .isGeneralApplicationCase(isGeneralApplication(caseDetails))
+            .isCivilCase(isCivil(caseDetails))
             .build();
 
         CallbackResponse callbackResponse = callbackHandlerFactory.dispatch(callbackParams);

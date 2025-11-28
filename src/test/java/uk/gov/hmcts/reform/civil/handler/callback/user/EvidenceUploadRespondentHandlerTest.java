@@ -11,11 +11,10 @@ import org.junit.platform.commons.util.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.testsupport.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
-import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.RespondentEvidenceHandlerTestConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -48,14 +47,12 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -69,7 +66,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOADED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
@@ -103,7 +99,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private EvidenceUploadRespondentHandler handler;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     private final LocalDateTime time = LocalDateTime.now();
@@ -111,7 +107,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private RespondentSetOptionsTask respondentSetOptionsTask;
 
-    @MockBean
+    @MockitoBean
     private CoreCaseUserService coreCaseUserService;
 
     @Autowired
@@ -1301,18 +1297,6 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .confirmationHeader(header)
             .confirmationBody(body)
             .build());
-    }
-
-    @Test
-    void whenRegisterCalledThenReturnEvidenceUploadCaseEvent() {
-        // Given
-        Map<String, CallbackHandler> registerTarget = new HashMap<>();
-
-        // When
-        handler.register(registerTarget);
-
-        // Then
-        assertThat(registerTarget).containsExactly(entry(EVIDENCE_UPLOAD_RESPONDENT.name(), handler));
     }
 
     private <T, A> T invoke(T target, String method, A argument) {

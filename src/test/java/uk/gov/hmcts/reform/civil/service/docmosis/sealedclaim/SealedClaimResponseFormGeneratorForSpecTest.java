@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.PaymentMethod;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
@@ -50,17 +49,15 @@ class SealedClaimResponseFormGeneratorForSpecTest {
     private static final String AUTH = "Bearer xyz";
 
     @Mock
-    private RepresentativeService representativeService;
-    @Mock
     private DocumentGeneratorService documentGeneratorService;
     @Mock
     private DocumentManagementService documentManagementService;
     @Mock
-    private FeatureToggleService featureToggleService;
-    @Mock
     private ReferenceNumberAndCourtDetailsPopulator referenceNumberPopulator;
     @Mock
     private StatementOfTruthPopulator statementOfTruthPopulator;
+    @Mock
+    private RepresentativeService representativeService;
 
     @Captor
     private ArgumentCaptor<SealedClaimResponseFormForSpec> templateDataCaptor;
