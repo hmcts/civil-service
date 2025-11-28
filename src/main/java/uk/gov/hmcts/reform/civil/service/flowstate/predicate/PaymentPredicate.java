@@ -1,26 +1,25 @@
-package uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed;
+package uk.gov.hmcts.reform.civil.service.flowstate.predicate;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.CaseDataPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.annotations.BusinessRule;
 
 import java.util.function.Predicate;
 
 @SuppressWarnings("java:S1214")
-public interface PaymentPredicate {
+public non-sealed interface PaymentPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Payment",
         summary = "Pay Immediately (Part admission)",
-        description = "Part admission payment time (IMMEDIATELY)"
+        description = "Part admission where the payment time selected is 'IMMEDIATELY'"
     )
     Predicate<CaseData> payImmediatelyPartAdmission =
         CaseDataPredicate.Payment.isPayImmediately;
 
     @BusinessRule(
         group = "Payment",
-        summary = "Payment Pay Immediately (Full admission)",
-        description = "Full admission 1v1 with when to be paid and applicant not proceed"
+        summary = "Pay immediately (Full admission)",
+        description = "SPEC 1v1 full admission where 'when to be paid' is set and the applicant chose not to proceed"
     )
     Predicate<CaseData> payImmediatelyFullAdmission =
         CaseDataPredicate.Claim.isSpecClaim
@@ -31,7 +30,7 @@ public interface PaymentPredicate {
     @BusinessRule(
         group = "Payment",
         summary = "Payment successful",
-        description = "Applicant represented and a payment success timestamp or claim-issued success was recorded"
+        description = "Card payment for the issue fee succeeded (or claim issue recorded as successful) and the applicant is represented"
     )
     Predicate<CaseData> successful =
         CaseDataPredicate.Applicant.isRepresented
@@ -41,7 +40,7 @@ public interface PaymentPredicate {
     @BusinessRule(
         group = "Payment",
         summary = "Payment failed",
-        description = "Applicant represented and a payment success timestamp or claim-issued failed was recorded"
+        description = "Card payment for the issue fee failed (or claim issue recorded as failed) and the applicant is represented"
     )
     Predicate<CaseData> failed =
         CaseDataPredicate.Applicant.isRepresented

@@ -1,44 +1,48 @@
-package uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed;
+package uk.gov.hmcts.reform.civil.service.flowstate.predicate;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.CaseDataPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.annotations.BusinessRule;
 
 import java.util.function.Predicate;
 
 @SuppressWarnings("java:S1214")
-public interface DismissedPredicate {
+public non-sealed interface DismissedPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Dismissed",
-        summary = "Claim dismissed by Camunda",
-        description = "A claim dismissal date has been recorded (automated Camunda handling)")
+        summary = "Claim dismissed (Camunda)",
+        description = "Claim has a recorded dismissed date indicating automated processing (Camunda)"
+    )
     Predicate<CaseData> byCamunda = CaseDataPredicate.Claim.hasDismissedDate;
 
     @BusinessRule(
         group = "Dismissed",
-        summary = "Case dismissed past hearing fee due",
-        description = "Case dismissed due to past hearing fee due date")
+        summary = "Hearing fee due date missed - case dismissed",
+        description = "Case dismissed because the hearing fee due date has passed"
+    )
     Predicate<CaseData> pastHearingFeeDue = CaseDataPredicate.Hearing.hasDismissedFeeDueDate;
 
     @BusinessRule(
         group = "Dismissed",
-        summary = "Case dismissed past claim deadline",
-        description = "Case dismissed due to past claim deadline")
+        summary = "Claim dismissal deadline has expired",
+        description = "Case dismissed because the claim dismissal deadline has passed"
+    )
     Predicate<CaseData> pastClaimDeadline = CaseDataPredicate.Claim.hasPassedDismissalDeadline;
 
     @BusinessRule(
         group = "Dismissed",
-        summary = "Past claim notification deadline",
-        description = "Claim notification deadline has passed without a claim notification date being set")
+        summary = "Claim notification deadline expired (no notification recorded)",
+        description = "Claim notification deadline has passed and no claim notification date is set"
+    )
     Predicate<CaseData> pastClaimNotificationDeadline =
         CaseDataPredicate.Claim.hasPassedNotificationDeadline
             .and(CaseDataPredicate.Claim.hasNotificationDate.negate());
 
     @BusinessRule(
         group = "Dismissed",
-        summary = "Past claim details notification deadline",
-        description = "Claim details notification deadline has passed without a claim details notification date being set")
+        summary = "Claim details notification deadline expired (no details recorded)",
+        description = "Claim details notification deadline has passed with no claim details notification date set (claim notification exists)"
+    )
     Predicate<CaseData> pastClaimDetailsNotificationDeadline =
         CaseDataPredicate.ClaimDetails.passedNotificationDeadline
             .and(CaseDataPredicate.ClaimDetails.hasNotificationDate.negate())
@@ -46,8 +50,8 @@ public interface DismissedPredicate {
 
     @BusinessRule(
         group = "Dismissed",
-        summary = "Dismissed after claim notified extension",
-        description = "Dismissal deadline has passed with no intention to proceed from respondents, and at least one respondent with a time extension has not acknowledged the claim."
+        summary = "Dismissed - extension active and no acknowledgement",
+        description = "Dismissal deadline has passed; no respondent intends to proceed; at least one respondent with a time extension has not acknowledged service"
     )
     Predicate<CaseData> afterClaimNotifiedExtension =
         CaseDataPredicate.Claim.hasPassedDismissalDeadline
@@ -62,8 +66,8 @@ public interface DismissedPredicate {
 
     @BusinessRule(
         group = "Dismissed",
-        summary = "Case dismissed after claim acknowledged and deadline passed",
-        description = "Checks if a case is dismissed after claim acknowledgment and deadline passed"
+        summary = "Dismissed - acknowledged, no extension, no response",
+        description = "Dismissal deadline has passed; at least respondent 1 acknowledged service and has no time extension; not taken offline by staff; in 1v2 two‑solicitor cases both acknowledged with at least one still without a response"
     )
     Predicate<CaseData> afterClaimAcknowledged =
         CaseDataPredicate.Claim.hasPassedDismissalDeadline
@@ -84,8 +88,8 @@ public interface DismissedPredicate {
 
     @BusinessRule(
         group = "Dismissed",
-        summary = "Case dismissed after claim acknowledged and time extension deadline passed",
-        description = "Checks if a case is dismissed after claim acknowledgment and time extension"
+        summary = "Dismissed - acknowledged with extension(s)",
+        description = "Dismissal deadline has passed; respondent(s) acknowledged service and at least one time extension applies; not marked 'not suitable for SDO' and not taken offline by staff"
     )
     Predicate<CaseData> afterClaimAcknowledgedExtension =
         CaseDataPredicate.Claim.hasPassedDismissalDeadline
@@ -106,8 +110,9 @@ public interface DismissedPredicate {
 
     @BusinessRule(
         group = "Dismissed",
-        summary = "Case dismissed after claim-notified deadline passed",
-        description = "Claim dismissal deadline passed and respondents have not acknowledged/responded, and case not taken offline by staff")
+        summary = "Dismissed - claim details deadline expired (no AoS/response/extension)",
+        description = "Dismissal deadline has passed; no acknowledgement, no response, no time extension or intention to proceed recorded; not taken offline by staff (supports 1v1 and 1v2 scenarios)"
+    )
     Predicate<CaseData> afterClaimDetailNotified =
         CaseDataPredicate.Claim.hasPassedDismissalDeadline
             .and(CaseDataPredicate.Respondent.hasAcknowledgedNotificationRespondent1.negate())

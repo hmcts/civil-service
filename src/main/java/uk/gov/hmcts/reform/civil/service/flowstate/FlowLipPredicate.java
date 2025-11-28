@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.LipPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LipPredicate;
 
 import java.util.function.Predicate;
 

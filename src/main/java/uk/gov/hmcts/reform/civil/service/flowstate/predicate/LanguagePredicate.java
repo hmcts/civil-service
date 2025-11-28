@@ -1,13 +1,12 @@
-package uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed;
+package uk.gov.hmcts.reform.civil.service.flowstate.predicate;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.CaseDataPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.annotations.BusinessRule;
 
 import java.util.function.Predicate;
 
 @SuppressWarnings("java:S1214")
-public interface LanguagePredicate {
+public non-sealed interface LanguagePredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Language",
@@ -18,13 +17,13 @@ public interface LanguagePredicate {
     @BusinessRule(
         group = "Language",
         summary = "Respondent response marked bilingual",
-        description = "Respondent indicated their response is bilingual (translated documents may be present)")
+        description = "Respondent indicated their response is bilingual")
     Predicate<CaseData> respondentIsBilingual = CaseDataPredicate.Language.isRespondentBilingual;
 
     @BusinessRule(
         group = "Language",
-        summary = "Only initial respondent response bilingual",
-        description = "Response marked bilingual and language-preference change has not been made")
+        summary = "Respondent response language is bilingual (initial only)",
+        description = "Respondent marked their response as bilingual but has not requested ongoing bilingual processing")
     Predicate<CaseData> onlyInitialResponseIsBilingual = CaseDataPredicate.Language.isRespondentBilingual
         .and(CaseDataPredicate.Language.hasChangePreference.negate());
 

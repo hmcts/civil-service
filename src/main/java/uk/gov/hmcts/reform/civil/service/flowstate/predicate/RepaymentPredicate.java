@@ -1,18 +1,17 @@
-package uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed;
+package uk.gov.hmcts.reform.civil.service.flowstate.predicate;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.CaseDataPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.annotations.BusinessRule;
 
 import java.util.function.Predicate;
 
 @SuppressWarnings("java:S1214")
-public interface RepaymentPredicate {
+public non-sealed interface RepaymentPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Repayment",
         summary = "Repayment plan accepted",
-        description = "Applicant has accepted the proposed repayment plan and case is not taken offline in LiP condition"
+        description = "Applicant accepted the proposed repayment plan; if LiP v LiP, the case has not been taken offline by staff"
     )
     Predicate<CaseData> acceptRepaymentPlan =
         CaseDataPredicate.RepaymentPlan.accepted.and(
@@ -23,7 +22,7 @@ public interface RepaymentPredicate {
     @BusinessRule(
         group = "Repayment",
         summary = "Repayment plan rejected",
-        description = "Applicant has rejected the proposed repayment plan and case is not taken offline in LiP condition"
+        description = "Applicant rejected the proposed repayment plan; if LiP v LiP, the case has not been taken offline by staff"
     )
     Predicate<CaseData> rejectRepaymentPlan =
         CaseDataPredicate.RepaymentPlan.rejected.and(

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed;
+package uk.gov.hmcts.reform.civil.service.flowstate.predicate;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +16,18 @@ class LanguagePredicateTest {
 
     @Mock
     private CaseData caseData;
+
+    @Test
+    void should_return_true_for_claimantIsBilingual_when_claimant_is_bilingual() {
+        when(caseData.isClaimantBilingual()).thenReturn(true);
+        assertTrue(LanguagePredicate.claimantIsBilingual.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_claimantIsBilingual_when_claimant_is_not_bilingual() {
+        when(caseData.isClaimantBilingual()).thenReturn(false);
+        assertFalse(LanguagePredicate.claimantIsBilingual.test(caseData));
+    }
 
     @Test
     void should_return_true_for_responseIsBilingual_when_case_data_is_bilingual() {
