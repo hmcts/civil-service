@@ -60,7 +60,7 @@ public class SendSDOToLiPDefendantCallbackHandlerTest extends BaseCallbackHandle
     void shouldDownloadDocumentAndPrintLetterSuccessfullyForDefendantLiP() {
         // given
         CaseData caseData = CaseDataBuilder.builder()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SDO_ORDER).build())).build();
+            .systemGeneratedCaseDocuments(wrapElements(new CaseDocument().setDocumentType(SDO_ORDER))).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_SDO_ORDER_TO_LIP_DEFENDANT.name());
 
@@ -76,7 +76,7 @@ public class SendSDOToLiPDefendantCallbackHandlerTest extends BaseCallbackHandle
     void shouldDownloadDocumentAndPrintLetterSuccessfullyForClaimantLiP() {
         // given
         CaseData caseData = CaseDataBuilder.builder()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SDO_ORDER).build())).build();
+            .systemGeneratedCaseDocuments(wrapElements(new CaseDocument().setDocumentType(SDO_ORDER))).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_SDO_ORDER_TO_LIP_CLAIMANT.name());
 

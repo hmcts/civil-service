@@ -78,7 +78,7 @@ class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
     void shouldDownloadDocumentAndPrintLetterSuccessfully() {
         // given
         CaseData caseData = CaseDataBuilder.builder()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(HEARING_FORM).build()))
+            .systemGeneratedCaseDocuments(wrapElements(new CaseDocument().setDocumentType(HEARING_FORM)))
             .respondent1Represented(YesOrNo.NO).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_HEARING_TO_LIP_DEFENDANT.name());
@@ -94,7 +94,7 @@ class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
     void shouldDownloadDocumentAndPrintLetterSuccessfullyWhenIsClaimant() {
         // given
         CaseData caseData = CaseDataBuilder.builder()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(HEARING_FORM).build()))
+            .systemGeneratedCaseDocuments(wrapElements(new CaseDocument().setDocumentType(HEARING_FORM)))
             .applicant1Represented(YesOrNo.NO).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_HEARING_TO_LIP_CLAIMANT.name());
@@ -109,13 +109,12 @@ class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldDownloadDocumentAndPrintWelshLetterSuccessfully() {
         // given
-        CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-            .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build();
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
-            .caseDataLiP(caseDataLiP)
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(HEARING_FORM).build()))
-            .respondent1Represented(YesOrNo.NO).build();
-;
+        CaseDataLiP caseDataLiP = new CaseDataLiP()
+            .setRespondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage("BOTH"));
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setSystemGeneratedCaseDocuments(wrapElements(new CaseDocument().setDocumentType(HEARING_FORM)));
+        caseData.setRespondent1Represented(YesOrNo.NO);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_HEARING_TO_LIP_DEFENDANT_HMC.name());
         // when
@@ -129,12 +128,12 @@ class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldDownloadDocumentAndPrintLetterWelshSuccessfullyWhenIsClaimant() {
         // given
-        CaseDocument caseDocument = CaseDocument.builder().documentType(HEARING_FORM_WELSH).documentLink(DOCUMENT_LINK).build();
+        CaseDocument caseDocument = new CaseDocument().setDocumentType(HEARING_FORM_WELSH).setDocumentLink(DOCUMENT_LINK);
         CaseData caseData = CaseDataBuilder.builder()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(HEARING_FORM).build()))
+            .systemGeneratedCaseDocuments(wrapElements(new CaseDocument().setDocumentType(HEARING_FORM)))
             .applicant1Represented(YesOrNo.NO)
-            .claimantBilingualLanguagePreference(Language.BOTH.toString()).build().toBuilder()
-            .hearingDocumentsWelsh(wrapElements(caseDocument)).build();
+            .claimantBilingualLanguagePreference(Language.BOTH.toString()).build();
+        caseData.setHearingDocumentsWelsh(wrapElements(caseDocument));
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_HEARING_TO_LIP_CLAIMANT_HMC.name());
         // when
