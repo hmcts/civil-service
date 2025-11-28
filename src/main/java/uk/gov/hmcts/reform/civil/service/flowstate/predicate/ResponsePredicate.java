@@ -1,9 +1,8 @@
-package uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed;
+package uk.gov.hmcts.reform.civil.service.flowstate.predicate;
 
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.CaseDataPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.annotations.BusinessRule;
 
 import java.util.function.Predicate;
@@ -11,12 +10,12 @@ import java.util.function.Predicate;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 
 @SuppressWarnings("java:S1214")
-public interface ResponsePredicate {
+public non-sealed interface ResponsePredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Response",
         summary = "Notification acknowledged",
-        description = "At least one required defendant has acknowledged notification (matches State Flow 'NOTIFICATION_ACKNOWLEDGED')"
+        description = "At least one required defendant has acknowledged service (matches State Flow 'NOTIFICATION_ACKNOWLEDGED')"
     )
     Predicate<CaseData> notificationAcknowledged =
         CaseDataPredicate.Respondent.hasAcknowledgedNotificationRespondent1.or(
@@ -27,7 +26,7 @@ public interface ResponsePredicate {
     @BusinessRule(
         group = "Response",
         summary = "Respondent time extension granted",
-        description = "A respondent has been granted a time extension to respond (aligns with State Flow time-extension conditions)"
+        description = "A defendant has obtained a time extension to respond"
     )
     Predicate<CaseData> respondentTimeExtension =
         CaseDataPredicate.Respondent.hasTimeExtensionRespondent1.or(
@@ -36,8 +35,8 @@ public interface ResponsePredicate {
 
     @BusinessRule(
         group = "Response",
-        summary = "All required responses received",
-        description = "All required defendant responses for the multi-party scenario have been received (State Flow 'ALL_RESPONSES_RECEIVED')"
+        summary = "Every required defendant response has been received",
+        description = "All required defendant responses for the current multi-party scenario have been received (State Flow 'ALL_RESPONSES_RECEIVED')"
     )
     Predicate<CaseData> allResponsesReceived =
         CaseDataPredicate.Respondent.hasResponseDateRespondent1
@@ -48,8 +47,8 @@ public interface ResponsePredicate {
 
     @BusinessRule(
         group = "Response",
-        summary = "Awaiting other responses — full defence received",
-        description = "In 1v2(two legal reps) one defendant returned a full defence and the other has not yet provided a response type"
+        summary = "Awaiting other responses - full defence received",
+        description = "In a 1v2 two‑solicitor case one defendant has provided a full defence and the co‑defendant is yet to respond"
     )
     Predicate<CaseData> awaitingResponsesFullDefenceReceived =
         CaseDataPredicate.MultiParty.isOneVTwoTwoLegalRep
@@ -60,8 +59,8 @@ public interface ResponsePredicate {
 
     @BusinessRule(
         group = "Response",
-        summary = "Awaiting other responses — full defence received (SPEC)",
-        description = "In 1v2(two legal reps) one defendant returned a full defence and the other has not yet provided a response type"
+        summary = "Awaiting other responses - full defence received (SPEC)",
+        description = "In a 1v2 two‑solicitor SPEC case one defendant has provided a full defence and the co‑defendant is yet to respond"
     )
     Predicate<CaseData> awaitingResponsesFullDefenceReceivedSpec =
         CaseDataPredicate.MultiParty.isOneVTwoTwoLegalRep
@@ -72,8 +71,8 @@ public interface ResponsePredicate {
 
     @BusinessRule(
         group = "Response",
-        summary = "Awaiting other responses — full admission received",
-        description = "In 1v2(two legal reps) one defendant returned a full admission and the other has not yet provided a response type"
+        summary = "Awaiting other responses - full admission received",
+        description = "In a 1v2 two‑solicitor case one defendant has provided a full admission and the co‑defendant is yet to respond"
     )
     Predicate<CaseData> awaitingResponsesFullAdmitReceived =
         CaseDataPredicate.MultiParty.isOneVTwoTwoLegalRep
@@ -84,8 +83,8 @@ public interface ResponsePredicate {
 
     @BusinessRule(
         group = "Response",
-        summary = "Awaiting other responses — full admission received (SPEC)",
-        description = "In 1v2(two legal reps) one defendant returned a full admission and the other has not yet provided a response type"
+        summary = "Awaiting other responses - full admission received (SPEC)",
+        description = "In a 1v2 two‑solicitor SPEC case one defendant has provided a full admission and the co‑defendant is yet to respond"
     )
     Predicate<CaseData> awaitingResponsesFullAdmitReceivedSpec =
         CaseDataPredicate.MultiParty.isOneVTwoTwoLegalRep
@@ -96,8 +95,8 @@ public interface ResponsePredicate {
 
     @BusinessRule(
         group = "Response",
-        summary = "Awaiting other responses — non-full response received",
-        description = "In 1v2(two legal reps) one defendant returned a non-full-defence/admission response and the other has not yet provided a response type"
+        summary = "Awaiting other responses - non-full response received",
+        description = "In a 1v2 two‑solicitor case one defendant has provided a response other than full defence/admission and the co‑defendant is yet to respond"
     )
     Predicate<CaseData> awaitingResponsesNonFullDefenceOrFullAdmitReceived =
         CaseDataPredicate.MultiParty.isOneVTwoTwoLegalRep
@@ -114,8 +113,8 @@ public interface ResponsePredicate {
 
     @BusinessRule(
         group = "Response",
-        summary = "Awaiting other responses — non-full response received (SPEC)",
-        description = "In 1v2(two legal reps) one defendant returned a non-full-defence/admission response and the other has not yet provided a response type"
+        summary = "Awaiting other responses - non-full response received (SPEC)",
+        description = "In a 1v2 two‑solicitor SPEC case one defendant has provided a response other than full defence/admission and the co‑defendant is yet to respond"
     )
     Predicate<CaseData> awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec =
         CaseDataPredicate.MultiParty.isOneVTwoTwoLegalRep
@@ -133,7 +132,7 @@ public interface ResponsePredicate {
     @BusinessRule(
         group = "Response",
         summary = "One-v-one response flag (spec)",
-        description = "Flag indicating a one-v-one response was provided (used in SPEC response routing)"
+        description = "Flag indicating a one‑v‑one response was provided (used in SPEC response routing)"
     )
     Predicate<CaseData> isOneVOneResponseFlagSpec = CaseDataPredicate.Claim.hasOneVOneResponseFlag;
 
@@ -141,7 +140,7 @@ public interface ResponsePredicate {
     @BusinessRule(
         group = "Response",
         summary = "Matches the specified non-SPEC response type",
-        description = "Checks if respondent(s) non-SPEC response(s) match the provided RespondentResponseType according to multi-party scenario rules"
+        description = "Checks if respondent response type(s) for UNSPEC match the given RespondentResponseType for multi‑party scenario"
     )
     public static Predicate<CaseData> isType(RespondentResponseType responseType) {
         return CaseDataPredicate.Respondent.hasResponseDateRespondent1
@@ -163,7 +162,7 @@ public interface ResponsePredicate {
     @BusinessRule(
         group = "Response",
         summary = "Matches the specified type for a SPEC",
-        description = "Checks if the respondent's response type matches the specified type for a SPEC claim"
+        description = "Checks if the respondent response type(s) for SPEC match the given RespondentResponseTypeSpec for multi‑party scenario"
     )
     public static Predicate<CaseData> isType(RespondentResponseTypeSpec responseType) {
         return CaseDataPredicate.Claim.isSpecClaim.and(CaseDataPredicate.Respondent.hasResponseDateRespondent1)

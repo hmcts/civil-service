@@ -2,19 +2,19 @@ package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.ClaimPredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.ClaimantPredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.DismissedPredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.DivergencePredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.HearingPredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.LanguagePredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.LipPredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.NotificationPredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.OutOfTimePredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.PaymentPredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.RepaymentPredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.ResponsePredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed.TakenOfflinePredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimantPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.DismissedPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.DivergencePredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.HearingPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LanguagePredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LipPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.NotificationPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.OutOfTimePredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.PaymentPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.RepaymentPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ResponsePredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 
 import java.util.function.Predicate;
 

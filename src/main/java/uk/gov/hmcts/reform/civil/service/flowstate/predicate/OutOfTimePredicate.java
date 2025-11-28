@@ -1,13 +1,12 @@
-package uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed;
+package uk.gov.hmcts.reform.civil.service.flowstate.predicate;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.CaseDataPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.annotations.BusinessRule;
 
 import java.util.function.Predicate;
 
 @SuppressWarnings("java:S1214")
-public interface OutOfTimePredicate {
+public non-sealed interface OutOfTimePredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "OutOfTime",

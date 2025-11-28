@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed;
+package uk.gov.hmcts.reform.civil.service.flowstate.predicate;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -399,6 +399,125 @@ class ResponsePredicateTest {
         when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
         when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.PART_ADMISSION);
         assertFalse(ResponsePredicate.isType(RespondentResponseTypeSpec.FULL_DEFENCE).test(caseData));
+    }
+
+    @Test
+    void should_return_true_for_awaitingResponsesFullDefenceReceivedSpec_when_r1_full_defence_and_r2_no_response() {
+        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
+        when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(null);
+        assertTrue(ResponsePredicate.awaitingResponsesFullDefenceReceivedSpec.test(caseData));
+    }
+
+    @Test
+    void should_return_true_for_awaitingResponsesFullDefenceReceivedSpec_when_r2_full_defence_and_r1_no_response() {
+        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(null);
+        when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
+        assertTrue(ResponsePredicate.awaitingResponsesFullDefenceReceivedSpec.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_awaitingResponsesFullDefenceReceivedSpec_when_not_two_legal_reps() {
+        assertFalse(ResponsePredicate.awaitingResponsesFullDefenceReceivedSpec.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_awaitingResponsesFullDefenceReceivedSpec_when_both_have_responses() {
+        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
+        when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_ADMISSION);
+        assertFalse(ResponsePredicate.awaitingResponsesFullDefenceReceivedSpec.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_awaitingResponsesFullDefenceReceivedSpec_when_neither_is_full_defence() {
+        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.PART_ADMISSION);
+        when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(null);
+        assertFalse(ResponsePredicate.awaitingResponsesFullDefenceReceivedSpec.test(caseData));
+    }
+
+    @Test
+    void should_return_true_for_awaitingResponsesFullAdmitReceivedSpec_when_r1_full_admission_and_r2_no_response() {
+        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_ADMISSION);
+        when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(null);
+        assertTrue(ResponsePredicate.awaitingResponsesFullAdmitReceivedSpec.test(caseData));
+    }
+
+    @Test
+    void should_return_true_for_awaitingResponsesFullAdmitReceivedSpec_when_r2_full_admission_and_r1_no_response() {
+        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(null);
+        when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_ADMISSION);
+        assertTrue(ResponsePredicate.awaitingResponsesFullAdmitReceivedSpec.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_awaitingResponsesFullAdmitReceivedSpec_when_not_two_legal_reps() {
+        assertFalse(ResponsePredicate.awaitingResponsesFullAdmitReceivedSpec.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_awaitingResponsesFullAdmitReceivedSpec_when_both_have_responses() {
+        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_ADMISSION);
+        when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
+        assertFalse(ResponsePredicate.awaitingResponsesFullAdmitReceivedSpec.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_awaitingResponsesFullAdmitReceivedSpec_when_neither_is_full_admission() {
+        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.PART_ADMISSION);
+        when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(null);
+        assertFalse(ResponsePredicate.awaitingResponsesFullAdmitReceivedSpec.test(caseData));
+    }
+
+    @Test
+    void should_return_true_for_awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec_when_r1_non_full_and_r2_no_response() {
+        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.PART_ADMISSION);
+        when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(null);
+        assertTrue(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.test(caseData));
+    }
+
+    @Test
+    void should_return_true_for_awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec_when_r2_non_full_and_r1_no_response() {
+        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(null);
+        when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.PART_ADMISSION);
+        assertTrue(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec_when_not_two_legal_reps() {
+        assertFalse(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec_when_both_have_responses() {
+        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.PART_ADMISSION);
+        when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
+        assertFalse(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec_when_r1_full_defence_and_r2_no_response() {
+        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
+        when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(null);
+        assertFalse(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec_when_neither_has_response() {
+        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(null);
+        when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(null);
+        assertFalse(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.test(caseData));
     }
 
     @Test
