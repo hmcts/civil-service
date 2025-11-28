@@ -22,13 +22,12 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SET_LIP_RESPONDENT_RE
 
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings("unchecked")
 public class RespondentResponseDeadlineCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(SET_LIP_RESPONDENT_RESPONSE_DEADLINE);
 
     public static final String TASK_ID = "SetRespondent1Deadline";
-    private Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::updateRespondentDeadlineDate);
+    private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::updateRespondentDeadlineDate);
     private final ObjectMapper objectMapper;
     private final DeadlinesCalculator deadlinesCalculator;
 
@@ -50,12 +49,11 @@ public class RespondentResponseDeadlineCallbackHandler extends CallbackHandler {
     private CallbackResponse updateRespondentDeadlineDate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime respondentDeadline = deadlinesCalculator.plus28DaysAt4pmDeadline(LocalDateTime.now());
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder()
-            .respondent1ResponseDeadline(respondentDeadline)
-            .nextDeadline(respondentDeadline.toLocalDate());
+        caseData.setRespondent1ResponseDeadline(respondentDeadline);
+        caseData.setNextDeadline(respondentDeadline.toLocalDate());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

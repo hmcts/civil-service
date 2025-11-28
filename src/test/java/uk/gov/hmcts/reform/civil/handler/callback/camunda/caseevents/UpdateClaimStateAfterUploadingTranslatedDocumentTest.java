@@ -73,10 +73,8 @@ public class UpdateClaimStateAfterUploadingTranslatedDocumentTest extends BaseCa
     @Test
     void shouldUpdateClaimState_WhenClaimStateIsClaimIssued() {
         // given
-        CaseData caseData = CaseDataBuilder.builder()
-                .build().toBuilder()
-                .ccdState(CaseState.CASE_ISSUED)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdState(CaseState.CASE_ISSUED);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         // when
         var response = (AboutToStartOrSubmitCallbackResponse)handler.handle(params);
@@ -89,10 +87,8 @@ public class UpdateClaimStateAfterUploadingTranslatedDocumentTest extends BaseCa
     @Test
     void shouldUpdateClaimState_WhenAwaitingApplicantIntentionClaimState() {
         // given
-        CaseData caseData = CaseDataBuilder.builder()
-            .build().toBuilder()
-            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdState(CaseState.AWAITING_APPLICANT_INTENTION);
         when(updateClaimStateService.setUpCaseState(caseData)).thenReturn(JUDICIAL_REFERRAL.name());
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         // when
@@ -107,17 +103,13 @@ public class UpdateClaimStateAfterUploadingTranslatedDocumentTest extends BaseCa
     @Test
     void shouldNotUpdateClaimState_WhenClaimantSignedSettlementAgreement() {
         // given
-        CaseData caseData = CaseDataBuilder.builder()
-            .build().toBuilder()
-            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
-            .build();
-        caseData = caseData.toBuilder()
-            .caseDataLiP(CaseDataLiP.builder()
-                .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                    .applicant1SignedSettlementAgreement(YesOrNo.YES)
-                    .build())
-                .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdState(CaseState.AWAITING_APPLICANT_INTENTION);
+        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+        claimantLiPResponse.setApplicant1SignedSettlementAgreement(YesOrNo.YES);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+        caseData.setCaseDataLiP(caseDataLiP);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         // when
         var response = (AboutToStartOrSubmitCallbackResponse)handler.handle(params);

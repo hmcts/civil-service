@@ -182,10 +182,10 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .atSpecAoSRespondentCorrespondenceAddressRequired(YesOrNo.NO)
-                .atSpecAoSRespondentCorrespondenceAddressDetails(Address.builder()
-                                                                   .postCode(postCode)
-                                                                   .build())
                 .build();
+            Address respondentAddress = new Address();
+            respondentAddress.setPostCode(postCode);
+            caseData.setSpecAoSRespondentCorrespondenceAddressdetails(respondentAddress);
 
             CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "confirm-details");
             CallbackRequest request = CallbackRequest.builder()

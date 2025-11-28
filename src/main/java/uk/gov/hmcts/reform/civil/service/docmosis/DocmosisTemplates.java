@@ -13,7 +13,7 @@ public enum DocmosisTemplates {
     N2_2V1("CV-SPC-CLM-ENG-01352.docx", "sealed_claim_form_spec%s.pdf"),
     N10("CV-SPEC-ACK-ENG-00001-v01.docx", "acknowledgement_of_service_form_spec_%s.pdf"),
     N9_MULTIPARTY_SAME_SOL("CV-UNS-ACK-ENG-01142.docx", "acknowledgement_of_claim_form_%s.pdf"),
-    N11("CV-UNS-ACK-ENG-01146.docx", " acknowledgement_of_claim_form_%s.pdf"),
+    N11("CV-UNS-ACK-ENG-01146.docx", "acknowledgement_of_claim_form_%s.pdf"),
     N121_SPEC("CV-SPC-DEC-ENG-00910.docx", "default_judgment_spec_form_%s.pdf"),
     N121_SPEC_NON_IMMEDIATE("CV-SPC-DEC-ENG-00913.docx", "default_judgment_spec_form_%s.pdf"),
     N121_SPEC_DEFENDANT("CV-SPC-DEC-ENG-00911.docx", "default_judgment_spec_form_%s.pdf"),

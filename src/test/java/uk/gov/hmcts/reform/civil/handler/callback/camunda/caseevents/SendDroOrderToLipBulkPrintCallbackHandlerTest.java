@@ -49,7 +49,7 @@ public class SendDroOrderToLipBulkPrintCallbackHandlerTest extends BaseCallbackH
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, CaseData.builder().build())
+            .of(ABOUT_TO_SUBMIT, CaseDataBuilder.builder().build())
             .build();
 
         handler.handle(callbackParams);

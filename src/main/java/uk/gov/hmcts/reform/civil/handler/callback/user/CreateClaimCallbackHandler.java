@@ -177,13 +177,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         CaseData caseData = callbackParams.getCaseData();
         List<LocationRefData> locations = fetchLocationData(callbackParams);
 
+        CourtLocation courtLocation = new CourtLocation();
+        courtLocation.setApplicantPreferredCourtLocationList(courtLocationUtils.getLocationsFromList(locations));
         caseData.setClaimStarted(YES);
         caseData.setFeatureToggleWA(toggleConfiguration.getFeatureToggle());
-        caseData.setCourtLocation(
-            CourtLocation.builder()
-                .applicantPreferredCourtLocationList(courtLocationUtils.getLocationsFromList(locations))
-                .build()
-        );
+        caseData.setCourtLocation(courtLocation);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper)).build();
@@ -302,7 +300,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         Optional<PaymentDetails> paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails());
         String customerReference = paymentDetails.map(PaymentDetails::getCustomerReference).orElse(reference);
-        PaymentDetails updatedDetails = PaymentDetails.builder().customerReference(customerReference).build();
+        PaymentDetails updatedDetails = new PaymentDetails();
+        updatedDetails.setCustomerReference(customerReference);
         caseData.setClaimIssuedPaymentDetails(updatedDetails);
         caseData.setClaimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()));
         caseData.setPaymentTypePBA("PBAv3");
@@ -318,11 +317,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private CallbackResponse getIdamEmail(CallbackParams callbackParams) {
         UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
         CaseData caseData = callbackParams.getCaseData();
-
-        caseData.setApplicantSolicitor1CheckEmail(
-            CorrectEmail.builder().email(userDetails.getEmail()).build()
-        );
-        caseData.setApplicantSolicitor1UserDetails(IdamUserDetails.builder().build());
+        CorrectEmail correctEmail = new CorrectEmail();
+        correctEmail.setEmail(userDetails.getEmail());
+        caseData.setApplicantSolicitor1CheckEmail(correctEmail);
+        caseData.setApplicantSolicitor1UserDetails(new IdamUserDetails());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
@@ -457,11 +455,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
             Optional<SolicitorReferences> references = ofNullable(caseData.getSolicitorReferences());
             references.ifPresent(ref -> {
-                SolicitorReferences updatedSolicitorReferences = SolicitorReferences.builder()
-                    .applicantSolicitor1Reference(ref.getApplicantSolicitor1Reference())
-                    .respondentSolicitor1Reference(ref.getRespondentSolicitor1Reference())
-                    .respondentSolicitor2Reference(ref.getRespondentSolicitor1Reference())
-                    .build();
+                SolicitorReferences updatedSolicitorReferences = new SolicitorReferences();
+                updatedSolicitorReferences.setApplicantSolicitor1Reference(ref.getApplicantSolicitor1Reference());
+                updatedSolicitorReferences.setRespondentSolicitor1Reference(ref.getRespondentSolicitor1Reference());
+                updatedSolicitorReferences.setRespondentSolicitor2Reference(ref.getRespondentSolicitor1Reference());
                 caseData.setSolicitorReferences(updatedSolicitorReferences);
             });
             caseData.setRespondentSolicitor2ServiceAddressRequired(caseData.getRespondentSolicitor1ServiceAddressRequired());
@@ -471,32 +468,31 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         // moving statement of truth value to correct field, this was not possible in mid event.
         // resetting statement of truth to make sure it's empty the next time it appears in the UI.
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-        caseData.setUiStatementOfTruth(StatementOfTruth.builder().build());
+        caseData.setUiStatementOfTruth(new StatementOfTruth());
         caseData.setApplicantSolicitor1ClaimStatementOfTruth(statementOfTruth);
-        Party respondent1DetailsForTab = Party.builder()
-            .partyID(caseData.getRespondent1().getPartyID())
-            .type(caseData.getRespondent1().getType())
-            .individualTitle(caseData.getRespondent1().getIndividualTitle())
-            .individualFirstName(caseData.getRespondent1().getIndividualFirstName())
-            .individualLastName(caseData.getRespondent1().getIndividualLastName())
-            .individualDateOfBirth(caseData.getRespondent1().getIndividualDateOfBirth())
-            .companyName(caseData.getRespondent1().getCompanyName())
-            .organisationName(caseData.getRespondent1().getOrganisationName())
-            .soleTraderTitle(caseData.getRespondent1().getSoleTraderTitle())
-            .soleTraderFirstName(caseData.getRespondent1().getSoleTraderFirstName())
-            .soleTraderLastName(caseData.getRespondent1().getSoleTraderLastName())
-            .soleTraderTradingAs(caseData.getRespondent1().getSoleTraderTradingAs())
-            .soleTraderDateOfBirth(caseData.getRespondent1().getSoleTraderDateOfBirth())
-            .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
-            .partyName(caseData.getRespondent1().getPartyName())
-            .bulkClaimPartyName(caseData.getRespondent1().getBulkClaimPartyName())
-            .partyTypeDisplayValue(caseData.getRespondent1().getPartyTypeDisplayValue())
-            .partyEmail(caseData.getRespondent1().getPartyEmail())
-            .partyPhone(caseData.getRespondent1().getPartyPhone())
-            .legalRepHeading(caseData.getRespondent1().getLegalRepHeading())
-            .unavailableDates(caseData.getRespondent1().getUnavailableDates())
-            .flags(null)
-            .build();
+        Party respondent1DetailsForTab = new Party();
+        respondent1DetailsForTab.setPartyID(caseData.getRespondent1().getPartyID());
+        respondent1DetailsForTab.setType(caseData.getRespondent1().getType());
+        respondent1DetailsForTab.setIndividualTitle(caseData.getRespondent1().getIndividualTitle());
+        respondent1DetailsForTab.setIndividualFirstName(caseData.getRespondent1().getIndividualFirstName());
+        respondent1DetailsForTab.setIndividualLastName(caseData.getRespondent1().getIndividualLastName());
+        respondent1DetailsForTab.setIndividualDateOfBirth(caseData.getRespondent1().getIndividualDateOfBirth());
+        respondent1DetailsForTab.setCompanyName(caseData.getRespondent1().getCompanyName());
+        respondent1DetailsForTab.setOrganisationName(caseData.getRespondent1().getOrganisationName());
+        respondent1DetailsForTab.setSoleTraderTitle(caseData.getRespondent1().getSoleTraderTitle());
+        respondent1DetailsForTab.setSoleTraderFirstName(caseData.getRespondent1().getSoleTraderFirstName());
+        respondent1DetailsForTab.setSoleTraderLastName(caseData.getRespondent1().getSoleTraderLastName());
+        respondent1DetailsForTab.setSoleTraderTradingAs(caseData.getRespondent1().getSoleTraderTradingAs());
+        respondent1DetailsForTab.setSoleTraderDateOfBirth(caseData.getRespondent1().getSoleTraderDateOfBirth());
+        respondent1DetailsForTab.setPrimaryAddress(caseData.getRespondent1().getPrimaryAddress());
+        respondent1DetailsForTab.setPartyName(caseData.getRespondent1().getPartyName());
+        respondent1DetailsForTab.setBulkClaimPartyName(caseData.getRespondent1().getBulkClaimPartyName());
+        respondent1DetailsForTab.setPartyTypeDisplayValue(caseData.getRespondent1().getPartyTypeDisplayValue());
+        respondent1DetailsForTab.setPartyEmail(caseData.getRespondent1().getPartyEmail());
+        respondent1DetailsForTab.setPartyPhone(caseData.getRespondent1().getPartyPhone());
+        respondent1DetailsForTab.setLegalRepHeading(caseData.getRespondent1().getLegalRepHeading());
+        respondent1DetailsForTab.setUnavailableDates(caseData.getRespondent1().getUnavailableDates());
+        respondent1DetailsForTab.setFlags(null);
         caseData.setRespondent1DetailsForClaimDetailsTab(respondent1DetailsForTab);
 
         // data for case list and unassigned list
@@ -505,30 +501,29 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         caseData.setCaseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(caseData));
 
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            Party respondent2DetailsForTab = Party.builder()
-                .partyID(caseData.getRespondent2().getPartyID())
-                .type(caseData.getRespondent2().getType())
-                .individualTitle(caseData.getRespondent2().getIndividualTitle())
-                .individualFirstName(caseData.getRespondent2().getIndividualFirstName())
-                .individualLastName(caseData.getRespondent2().getIndividualLastName())
-                .individualDateOfBirth(caseData.getRespondent2().getIndividualDateOfBirth())
-                .companyName(caseData.getRespondent2().getCompanyName())
-                .organisationName(caseData.getRespondent2().getOrganisationName())
-                .soleTraderTitle(caseData.getRespondent2().getSoleTraderTitle())
-                .soleTraderFirstName(caseData.getRespondent2().getSoleTraderFirstName())
-                .soleTraderLastName(caseData.getRespondent2().getSoleTraderLastName())
-                .soleTraderTradingAs(caseData.getRespondent2().getSoleTraderTradingAs())
-                .soleTraderDateOfBirth(caseData.getRespondent2().getSoleTraderDateOfBirth())
-                .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
-                .partyName(caseData.getRespondent2().getPartyName())
-                .bulkClaimPartyName(caseData.getRespondent2().getBulkClaimPartyName())
-                .partyTypeDisplayValue(caseData.getRespondent2().getPartyTypeDisplayValue())
-                .partyEmail(caseData.getRespondent2().getPartyEmail())
-                .partyPhone(caseData.getRespondent2().getPartyPhone())
-                .legalRepHeading(caseData.getRespondent2().getLegalRepHeading())
-                .unavailableDates(caseData.getRespondent2().getUnavailableDates())
-                .flags(null)
-                .build();
+            Party respondent2DetailsForTab = new Party();
+            respondent2DetailsForTab.setPartyID(caseData.getRespondent2().getPartyID());
+            respondent2DetailsForTab.setType(caseData.getRespondent2().getType());
+            respondent2DetailsForTab.setIndividualTitle(caseData.getRespondent2().getIndividualTitle());
+            respondent2DetailsForTab.setIndividualFirstName(caseData.getRespondent2().getIndividualFirstName());
+            respondent2DetailsForTab.setIndividualLastName(caseData.getRespondent2().getIndividualLastName());
+            respondent2DetailsForTab.setIndividualDateOfBirth(caseData.getRespondent2().getIndividualDateOfBirth());
+            respondent2DetailsForTab.setCompanyName(caseData.getRespondent2().getCompanyName());
+            respondent2DetailsForTab.setOrganisationName(caseData.getRespondent2().getOrganisationName());
+            respondent2DetailsForTab.setSoleTraderTitle(caseData.getRespondent2().getSoleTraderTitle());
+            respondent2DetailsForTab.setSoleTraderFirstName(caseData.getRespondent2().getSoleTraderFirstName());
+            respondent2DetailsForTab.setSoleTraderLastName(caseData.getRespondent2().getSoleTraderLastName());
+            respondent2DetailsForTab.setSoleTraderTradingAs(caseData.getRespondent2().getSoleTraderTradingAs());
+            respondent2DetailsForTab.setSoleTraderDateOfBirth(caseData.getRespondent2().getSoleTraderDateOfBirth());
+            respondent2DetailsForTab.setPrimaryAddress(caseData.getRespondent2().getPrimaryAddress());
+            respondent2DetailsForTab.setPartyName(caseData.getRespondent2().getPartyName());
+            respondent2DetailsForTab.setBulkClaimPartyName(caseData.getRespondent2().getBulkClaimPartyName());
+            respondent2DetailsForTab.setPartyTypeDisplayValue(caseData.getRespondent2().getPartyTypeDisplayValue());
+            respondent2DetailsForTab.setPartyEmail(caseData.getRespondent2().getPartyEmail());
+            respondent2DetailsForTab.setPartyPhone(caseData.getRespondent2().getPartyPhone());
+            respondent2DetailsForTab.setLegalRepHeading(caseData.getRespondent2().getLegalRepHeading());
+            respondent2DetailsForTab.setUnavailableDates(caseData.getRespondent2().getUnavailableDates());
+            respondent2DetailsForTab.setFlags(null);
             caseData.setRespondent2DetailsForClaimDetailsTab(respondent2DetailsForTab);
         }
 
@@ -554,12 +549,15 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         caseData.setCaseNameHmctsInternal(buildCaseName(caseData));
 
         //case management category
-        CaseManagementCategoryElement civil =
-            CaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
+        CaseManagementCategoryElement civil = new CaseManagementCategoryElement();
+        civil.setCode("Civil");
+        civil.setLabel("Civil");
         List<Element<CaseManagementCategoryElement>> itemList = new ArrayList<>();
         itemList.add(element(civil));
-        caseData.setCaseManagementCategory(
-            CaseManagementCategory.builder().value(civil).list_items(itemList).build());
+        CaseManagementCategory cmCategory = new CaseManagementCategory();
+        cmCategory.setList_items(itemList);
+        cmCategory.setValue(civil);
+        caseData.setCaseManagementCategory(cmCategory);
         log.info("Case management equals: " + caseData.getCaseManagementCategory());
         log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
 
@@ -603,20 +601,16 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         CorrectEmail applicantSolicitor1CheckEmail = caseData.getApplicantSolicitor1CheckEmail();
 
         if (applicantSolicitor1CheckEmail.isCorrect()) {
-            caseData.setApplicantSolicitor1UserDetails(
-                IdamUserDetails.builder()
-                    .id(userDetails.getId())
-                    .email(applicantSolicitor1CheckEmail.getEmail())
-                    .build()
-            );
+            IdamUserDetails idamUserDetails = new IdamUserDetails();
+            idamUserDetails.setId(userDetails.getId());
+            idamUserDetails.setEmail(applicantSolicitor1CheckEmail.getEmail());
+            caseData.setApplicantSolicitor1UserDetails(idamUserDetails);
         } else {
             IdamUserDetails applicantSolicitor1UserDetails = caseData.getApplicantSolicitor1UserDetails();
-            caseData.setApplicantSolicitor1UserDetails(
-                IdamUserDetails.builder()
-                    .id(userDetails.getId())
-                    .email(applicantSolicitor1UserDetails.getEmail())
-                    .build()
-            );
+            IdamUserDetails  idamUserDetails = new IdamUserDetails();
+            idamUserDetails.setId(userDetails.getId());
+            idamUserDetails.setEmail(applicantSolicitor1UserDetails.getEmail());
+            caseData.setApplicantSolicitor1UserDetails(idamUserDetails);
         }
 
         caseData.setBusinessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST_CLAIM));
@@ -635,7 +629,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         caseData.setSubmittedDate(time.now());
 
         //set check email field to null for GDPR
-        caseData.setApplicantSolicitor1CheckEmail(CorrectEmail.builder().build());
+        caseData.setApplicantSolicitor1CheckEmail(new CorrectEmail());
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
@@ -700,18 +694,17 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
             fetchLocationData(callbackParams), courtLocations);
         if (nonNull(courtLocation)) {
-            caseData.setCaseManagementLocation(
-                CaseLocationCivil.builder().region(regionId).baseLocation(epimmsId).build()
-            );
-            caseData.setCourtLocation(
-                CourtLocation.builder()
-                    .applicantPreferredCourt(courtLocation.getCourtLocationCode())
-                    .caseLocation(LocationHelper.buildCaseLocation(courtLocation))
-                    .reasonForHearingAtSpecificCourt(caseData.getCourtLocation().getReasonForHearingAtSpecificCourt())
-                    //to clear list of court locations from caseData
-                    .applicantPreferredCourtLocationList(null)
-                    .build()
-            );
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation(epimmsId);
+            caseLocationCivil.setRegion(regionId);
+            caseData.setCaseManagementLocation(caseLocationCivil);
+            CourtLocation courtLocation1 = new CourtLocation();
+            courtLocation1.setApplicantPreferredCourt(courtLocation.getCourtLocationCode());
+            courtLocation1.setCaseLocation(LocationHelper.buildCaseLocation(courtLocation));
+            courtLocation1.setReasonForHearingAtSpecificCourt(caseData.getCourtLocation().getReasonForHearingAtSpecificCourt());
+            //to clear list of court locations from caseData
+            courtLocation1.setApplicantPreferredCourtLocationList(null);
+            caseData.setCourtLocation(courtLocation1);
         }
     }
 

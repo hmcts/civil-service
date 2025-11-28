@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RequiredArgsConstructor
 @Service
@@ -15,6 +17,8 @@ import java.util.Map;
 public class CaseTaskTrackingService {
 
     private final ObjectProvider<TelemetryClient> telemetryClientProvider;
+
+    private final Map<String, String> recentErrors = new ConcurrentHashMap<>();
 
     public void trackCaseTask(String caseId,
                               String eventType,
@@ -38,5 +42,21 @@ public class CaseTaskTrackingService {
         }
 
         telemetryClient.trackEvent(eventName, properties, null);
+    }
+
+    private String key(String caseId, String taskId) {
+        return caseId + "::" + (taskId == null ? "" : taskId);
+    }
+
+    public void rememberErrors(String caseId, String taskId, List<String> errors) {
+        if (errors == null || errors.isEmpty()) {
+            return;
+        }
+        String joined = String.join(" | ", errors);
+        recentErrors.put(key(caseId, taskId), joined);
+    }
+
+    public String consumeErrors(String caseId, String taskId) {
+        return recentErrors.remove(key(caseId, taskId));
     }
 }

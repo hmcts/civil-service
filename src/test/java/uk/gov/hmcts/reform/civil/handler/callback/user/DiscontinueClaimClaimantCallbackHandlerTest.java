@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import java.time.LocalDate;
 
@@ -36,7 +37,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 
 @SpringBootTest(classes = {
     DiscontinueClaimClaimantCallbackHandler.class,
@@ -110,9 +110,15 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldPopulateDefendantListFor1v2LrVLr_WhenAboutToStartIsInvoked() {
+            Party party = new Party();
+            party.setType(Party.Type.INDIVIDUAL);
+            party.setPartyName("Resp1");
+            Party party2 = new Party();
+            party2.setType(Party.Type.INDIVIDUAL);
+            party2.setPartyName("Resp2");
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("Resp1").build())
-                .respondent2(Party.builder().type(Party.Type.INDIVIDUAL).partyName("Resp2").build()).build();
+                .respondent1(party)
+                .respondent2(party2).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -140,11 +146,9 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldSetSelectedClaimant_when2v1() {
-            DynamicList claimantWhoIsDiscontinuingList = DynamicList.builder()
-                .value(DynamicListElement.builder()
-                           .label("Both")
-                           .build())
-                .build();
+            DynamicListElement dynamicListElement = new DynamicListElement(null, "Both");
+            DynamicList claimantWhoIsDiscontinuingList = new DynamicList();
+            claimantWhoIsDiscontinuingList.setValue(dynamicListElement);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered().build();
             caseData.setClaimantWhoIsDiscontinuing(claimantWhoIsDiscontinuingList);
@@ -178,11 +182,9 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldHaveNoErrors_when2v1AndPermissionGrantedDataValid() {
-            DynamicList claimantWhoIsDiscontinuingList = DynamicList.builder()
-                .value(DynamicListElement.builder()
-                           .label("Both")
-                           .build())
-                .build();
+            DynamicListElement dynamicListElement = new DynamicListElement(null, "Both");
+            DynamicList claimantWhoIsDiscontinuingList = new DynamicList();
+            claimantWhoIsDiscontinuingList.setValue(dynamicListElement);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered().build();
             caseData.setClaimantWhoIsDiscontinuing(claimantWhoIsDiscontinuingList);
@@ -195,19 +197,17 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldHaveErrors_when2v1AndPermissionDateInFuture() {
-            DynamicList claimantWhoIsDiscontinuingList = DynamicList.builder()
-                .value(DynamicListElement.builder()
-                           .label("Both")
-                           .build())
-                .build();
+            DynamicListElement dynamicListElement = new DynamicListElement(null, "Both");
+            DynamicList claimantWhoIsDiscontinuingList = new DynamicList();
+            claimantWhoIsDiscontinuingList.setValue(dynamicListElement);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered().build();
             caseData.setClaimantWhoIsDiscontinuing(claimantWhoIsDiscontinuingList);
             caseData.setIsPermissionGranted(SettleDiscontinueYesOrNoList.YES);
-            caseData.setPermissionGrantedComplex(PermissionGranted.builder()
-                                                     .permissionGrantedJudge("Test")
-                                                     .permissionGrantedDate(LocalDate.now().plusDays(1))
-                                                     .build());
+            PermissionGranted permissionGranted  = new PermissionGranted();
+            permissionGranted.setPermissionGrantedJudge("Test");
+            permissionGranted.setPermissionGrantedDate(LocalDate.now().plusDays(1));
+            caseData.setPermissionGrantedComplex(permissionGranted);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -218,11 +218,9 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldHaveErrors_when2v1AndPermissionNotGranted() {
-            DynamicList claimantWhoIsDiscontinuingList = DynamicList.builder()
-                .value(DynamicListElement.builder()
-                           .label("Both")
-                           .build())
-                .build();
+            DynamicListElement dynamicListElement = new DynamicListElement(null, "Both");
+            DynamicList claimantWhoIsDiscontinuingList = new DynamicList();
+            claimantWhoIsDiscontinuingList.setValue(dynamicListElement);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered().build();
             caseData.setClaimantWhoIsDiscontinuing(claimantWhoIsDiscontinuingList);
@@ -242,10 +240,10 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
         @BeforeEach
         void setup() {
             CaseData caseDataBefore = CaseDataBuilder.builder()
-                .applicant1(Party.builder().type(INDIVIDUAL).build())
-                .applicant2(Party.builder().type(INDIVIDUAL).build())
-                .respondent1(Party.builder().type(INDIVIDUAL).build())
-                .respondent2(Party.builder().type(INDIVIDUAL).build())
+                .applicant1(PartyBuilder.builder().individual().build())
+                .applicant2(PartyBuilder.builder().individual().build())
+                .respondent1(PartyBuilder.builder().individual().build())
+                .respondent2(PartyBuilder.builder().individual().build())
                 .buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
         }
@@ -253,13 +251,13 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldUpdateCaseState_WhenNoCourtPermissionAndFullDiscontinue_2v1() {
             CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimSubmitted2v1RespondentUnrepresented().build().toBuilder()
-                    .typeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE)
-                    .claimantWhoIsDiscontinuing(DynamicList.builder()
-                            .value(DynamicListElement.builder()
-                                    .label("Both")
-                                    .build()).build())
-                    .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO).build();
+                    .atStateClaimSubmitted2v1RespondentUnrepresented().build();
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE);
+            DynamicListElement dynamicListElement = new DynamicListElement(null, "Both");
+            DynamicList dynamicList = new DynamicList();
+            dynamicList.setValue(dynamicListElement);
+            caseData.setClaimantWhoIsDiscontinuing(dynamicList);
+            caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.NO);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -270,10 +268,10 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldUpdateCaseState_WhenNoCourtPermissionAndFullDiscontinue_1v2() {
             CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimSubmitted1v2AndOnlyFirstRespondentIsRepresented().build().toBuilder()
-                    .typeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE)
-                    .isDiscontinuingAgainstBothDefendants(SettleDiscontinueYesOrNoList.YES)
-                    .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO).build();
+                    .atStateClaimSubmitted1v2AndOnlyFirstRespondentIsRepresented().build();
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE);
+            caseData.setIsDiscontinuingAgainstBothDefendants(SettleDiscontinueYesOrNoList.YES);
+            caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.NO);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -283,10 +281,10 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldUpdateCaseState_WhenNoCourtPermissionAndFullDiscontinue_1v1() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
-                    .typeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE)
-                    .isDiscontinuingAgainstBothDefendants(SettleDiscontinueYesOrNoList.YES)
-                    .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE);
+            caseData.setIsDiscontinuingAgainstBothDefendants(SettleDiscontinueYesOrNoList.YES);
+            caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.NO);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -296,9 +294,9 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldNotUpdateCaseState_WhenNotFullDiscontinue() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
-                    .typeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE)
-                    .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE);
+            caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.NO);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -311,9 +309,9 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
     class SubmittedCallback {
         @Test
         void shouldShowPermissionGrantedByCourtHeader_WhenCourtPermissionGranted() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
-                    .isPermissionGranted(SettleDiscontinueYesOrNoList.YES)
-                    .courtPermissionNeeded(SettleDiscontinueYesOrNoList.YES).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setIsPermissionGranted(SettleDiscontinueYesOrNoList.YES);
+            caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.YES);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
             SubmittedCallbackResponse response =
@@ -325,14 +323,14 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldShowCaseDiscontinuedFDHeader_WhenNoCourtPermissionAndClaimantsBothSelected2v1() {
+            DynamicListElement dynamicListElement = new DynamicListElement(null, "Both");
+            DynamicList dynamicList = new DynamicList();
+            dynamicList.setValue(dynamicListElement);
             CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimSubmitted2v1RespondentUnrepresented().build().toBuilder()
-                    .typeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE)
-                    .claimantWhoIsDiscontinuing(DynamicList.builder()
-                            .value(DynamicListElement.builder()
-                                    .label("Both")
-                                    .build()).build())
-                    .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO).build();
+                    .atStateClaimSubmitted2v1RespondentUnrepresented().build();
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE);
+            caseData.setClaimantWhoIsDiscontinuing(dynamicList);
+            caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.NO);
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
@@ -346,10 +344,10 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldShowCaseDiscontinuedFDHeader_WhenNoCourtPermissionAndAgainstBothDefendants1v2() {
             CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimSubmitted1v2AndOnlyFirstRespondentIsRepresented().build().toBuilder()
-                    .typeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE)
-                    .isDiscontinuingAgainstBothDefendants(SettleDiscontinueYesOrNoList.YES)
-                    .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO).build();
+                    .atStateClaimSubmitted1v2AndOnlyFirstRespondentIsRepresented().build();
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE);
+            caseData.setIsDiscontinuingAgainstBothDefendants(SettleDiscontinueYesOrNoList.YES);
+            caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.NO);
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
@@ -362,10 +360,10 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldShowCaseDiscontinuedFDHeader_WhenNoCourtPermission1v1() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
-                    .typeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE)
-                    .isDiscontinuingAgainstBothDefendants(SettleDiscontinueYesOrNoList.YES)
-                    .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE);
+            caseData.setIsDiscontinuingAgainstBothDefendants(SettleDiscontinueYesOrNoList.YES);
+            caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.NO);
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
@@ -379,10 +377,10 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldShowNoCourtPermissionFDAnyoneHeader_WhenNoCourtPermissionAndNotAgainstBothDefendants1v2() {
             CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimSubmitted1v2AndOnlyFirstRespondentIsRepresented().build().toBuilder()
-                    .typeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE)
-                    .isDiscontinuingAgainstBothDefendants(SettleDiscontinueYesOrNoList.NO)
-                    .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO).build();
+                    .atStateClaimSubmitted1v2AndOnlyFirstRespondentIsRepresented().build();
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE);
+            caseData.setIsDiscontinuingAgainstBothDefendants(SettleDiscontinueYesOrNoList.NO);
+            caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.NO);
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
@@ -395,13 +393,13 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldShowNoCourtPermissionFDAnyoneHeader_WhenNoCourtPermissionAndNotBothClaimantsSelected2v1() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentUnrepresented().build().toBuilder()
-                    .typeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE)
-                    .claimantWhoIsDiscontinuing(DynamicList.builder()
-                            .value(DynamicListElement.builder()
-                                    .label("claimant 1")
-                                    .build()).build())
-                    .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO).build();
+            DynamicListElement dynamicListElement = new DynamicListElement(null, "claimant 1");
+            DynamicList dynamicList = new DynamicList();
+            dynamicList.setValue(dynamicListElement);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentUnrepresented().build();
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE);
+            caseData.setClaimantWhoIsDiscontinuing(dynamicList);
+            caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.NO);
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
@@ -414,14 +412,14 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldShowNoCourtPermissionPDHeader_WhenNoCourtPermissionAndPartDiscountinue2v1() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentUnrepresented().build().toBuilder()
-                    .typeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE)
-                    .claimantWhoIsDiscontinuing(DynamicList.builder()
-                            .value(DynamicListElement.builder()
-                                    .label("claimant 1")
-                                    .build()).build())
-                    .isDiscontinuingAgainstBothDefendants(SettleDiscontinueYesOrNoList.NO)
-                    .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO).build();
+            DynamicListElement dynamicListElement = new DynamicListElement(null, "claimant 1");
+            DynamicList dynamicList = new DynamicList();
+            dynamicList.setValue(dynamicListElement);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentUnrepresented().build();
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE);
+            caseData.setClaimantWhoIsDiscontinuing(dynamicList);
+            caseData.setIsDiscontinuingAgainstBothDefendants(SettleDiscontinueYesOrNoList.NO);
+            caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.NO);
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
@@ -435,10 +433,10 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldShowNoCourtPermissionPDHeader_When1v2NoCourtPermissionAndPartDiscountinue() {
             CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimSubmitted1v2AndOnlyFirstRespondentIsRepresented().build().toBuilder()
-                    .typeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE)
-                    .isDiscontinuingAgainstBothDefendants(SettleDiscontinueYesOrNoList.YES)
-                    .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO).build();
+                    .atStateClaimSubmitted1v2AndOnlyFirstRespondentIsRepresented().build();
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE);
+            caseData.setIsDiscontinuingAgainstBothDefendants(SettleDiscontinueYesOrNoList.YES);
+            caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.NO);
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
@@ -452,9 +450,9 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldShowNoCourtPermissionPDHeader_WhenNoCourtPermissionAnd1v1PartDiscountinue() {
             CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimIssued().build().toBuilder()
-                    .typeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE)
-                    .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO).build();
+                    .atStateClaimIssued().build();
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE);
+            caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.NO);
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 

@@ -111,9 +111,8 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
         @Test
         void shouldSetRespondent1FlagToYes_whenOneRespondentRepresentative() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .addRespondent2(NO)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setAddRespondent2(NO);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -129,9 +128,8 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
         @Test
         void shouldSetRespondent1FlagToYes_whenRespondentTwoRepresentative() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .addRespondent2(YES)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setAddRespondent2(YES);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -150,10 +148,9 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
         @Test
         void shouldReturnError_whenRespDeadlineIsBeforeOf28Days() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .addRespondent2(NO)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(35))
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setAddRespondent2(NO);
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(35));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -172,10 +169,9 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
         @Test
         void shouldNotReturnError_whenDeadlineIsBeforeOf28DaysForCaseworker() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .addRespondent2(NO)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(35))
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setAddRespondent2(NO);
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(35));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -193,11 +189,10 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
         @Test
         void shouldReturnError_whenIsMultiPartyScenarioTwoVsOne() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .addRespondent2(NO)
-                .addApplicant2(YES)
-                .respondent1TimeExtensionDate(LocalDateTime.now())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setAddRespondent2(NO);
+            caseData.setAddApplicant2(YES);
+            caseData.setRespondent1TimeExtensionDate(LocalDateTime.now());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -213,10 +208,9 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
         @Test
         void shouldReturnError_whenIsMultiPartyScenarioOneVsOne() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .addRespondent2(NO)
-                .respondent1TimeExtensionDate(LocalDateTime.now())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setAddRespondent2(NO);
+            caseData.setRespondent1TimeExtensionDate(LocalDateTime.now());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -232,11 +226,10 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
         @Test
         void shouldReturnError_whenIsMultiPartyScenarioOneVsTwoOneLegalReps() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .addRespondent2(NO)
-                .respondent2(Party.builder().build())
-                .respondent1TimeExtensionDate(LocalDateTime.now())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setAddRespondent2(NO);
+            caseData.setRespondent2(Party.builder().build());
+            caseData.setRespondent1TimeExtensionDate(LocalDateTime.now());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -252,12 +245,11 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
         @Test
         void shouldReturnError_whenIsMultiPartyScenarioOneVsTwoTwoLegalReps() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .addRespondent2(NO)
-                .respondent2(Party.builder().build())
-                .respondent2SameLegalRepresentative(NO)
-                .respondent1TimeExtensionDate(LocalDateTime.now())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setAddRespondent2(NO);
+            caseData.setRespondent2(Party.builder().build());
+            caseData.setRespondent2SameLegalRepresentative(NO);
+            caseData.setRespondent1TimeExtensionDate(LocalDateTime.now());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -286,15 +278,14 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
         @Test
         void shouldValidateExtensionDate_whenAllDataIsProvided() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .addRespondent2(NO)
-                .respondentSolicitor1AgreedDeadlineExtension(now())
-                .respondent2(Party.builder().build())
-                .respondent2SameLegalRepresentative(NO)
-                .respondent2ResponseDeadline(LocalDateTime.now())
-                .respondentSolicitor2AgreedDeadlineExtension(LocalDate.now())
-                .businessProcess(BusinessProcess.builder().camundaEvent(SPEC_ACKNOWLEDGEMENT_OF_SERVICE).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setAddRespondent2(NO);
+            caseData.setRespondentSolicitor1AgreedDeadlineExtension(now());
+            caseData.setRespondent2(Party.builder().build());
+            caseData.setRespondent2SameLegalRepresentative(NO);
+            caseData.setRespondent2ResponseDeadline(LocalDateTime.now());
+            caseData.setRespondentSolicitor2AgreedDeadlineExtension(LocalDate.now());
+            caseData.setBusinessProcess(BusinessProcess.builder().camundaEvent(SPEC_ACKNOWLEDGEMENT_OF_SERVICE).build());
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -310,15 +301,14 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
         @Test
         void shouldReturnError_whenAllDataIsProvided() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .addRespondent2(NO)
-                .respondentSolicitor1AgreedDeadlineExtension(now())
-                .respondent2(Party.builder().build())
-                .respondent2SameLegalRepresentative(NO)
-                .respondent2ResponseDeadline(LocalDateTime.now().plusDays(99))
-                .respondentSolicitor2AgreedDeadlineExtension(LocalDate.now())
-                .businessProcess(BusinessProcess.builder().camundaEvent(SPEC_ACKNOWLEDGEMENT_OF_SERVICE).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setAddRespondent2(NO);
+            caseData.setRespondentSolicitor1AgreedDeadlineExtension(now());
+            caseData.setRespondent2(Party.builder().build());
+            caseData.setRespondent2SameLegalRepresentative(NO);
+            caseData.setRespondent2ResponseDeadline(LocalDateTime.now().plusDays(99));
+            caseData.setRespondentSolicitor2AgreedDeadlineExtension(LocalDate.now());
+            caseData.setBusinessProcess(BusinessProcess.builder().camundaEvent(SPEC_ACKNOWLEDGEMENT_OF_SERVICE).build());
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -339,15 +329,14 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
         @Test
         void shouldResponseDeadline_whenAllDataIsProvided() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .addRespondent2(NO)
-                .respondentSolicitor1AgreedDeadlineExtension(now())
-                .respondent2(Party.builder().build())
-                .respondent2SameLegalRepresentative(NO)
-                .respondent2ResponseDeadline(LocalDateTime.now())
-                .respondentSolicitor2AgreedDeadlineExtension(LocalDate.now())
-                .businessProcess(BusinessProcess.builder().camundaEvent(SPEC_ACKNOWLEDGEMENT_OF_SERVICE).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setAddRespondent2(NO);
+            caseData.setRespondentSolicitor1AgreedDeadlineExtension(now());
+            caseData.setRespondent2(Party.builder().build());
+            caseData.setRespondent2SameLegalRepresentative(NO);
+            caseData.setRespondent2ResponseDeadline(LocalDateTime.now());
+            caseData.setRespondentSolicitor2AgreedDeadlineExtension(LocalDate.now());
+            caseData.setBusinessProcess(BusinessProcess.builder().camundaEvent(SPEC_ACKNOWLEDGEMENT_OF_SERVICE).build());
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -471,9 +460,8 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
         void shouldReturnHeaderAndBody_whenAboutToSubmitIsCalled() {
             when(exitSurveyContentService.respondentSurvey()).thenReturn("---");
             String header = "# Extension deadline submitted";
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now());
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
