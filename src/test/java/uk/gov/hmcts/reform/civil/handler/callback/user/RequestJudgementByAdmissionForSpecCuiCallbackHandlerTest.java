@@ -171,7 +171,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
         @Test
         void shouldSetCcjJudgmentAmountShowInterestToNoWhenPayImmediatelyAndLrAdmissionBulkEnabled() {
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
             LocalDate whenWillPay = LocalDate.of(2024, 11, 11);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
@@ -212,7 +211,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
         @Test
         void shouldNotSetCcjJudgmentAmountShowInterestToNoWhenPayBySetDateAndLrAdmissionBulkEnabled() {
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
             when(interestCalculator.calculateInterest(any())).thenReturn(BigDecimal.valueOf(0));
             LocalDate whenWillPay = LocalDate.of(2024, 11, 11);
 
@@ -503,7 +501,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .fixedCosts(FixedCosts.builder().claimFixedCosts(NO).build())
                 .totalInterest(BigDecimal.valueOf(100))
                 .build();
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -536,7 +533,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .totalClaimAmount(new BigDecimal(1000))
                 .fixedCosts(FixedCosts.builder().claimFixedCosts(YES).build())
                 .build();
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -854,7 +850,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
 
             AboutToStartOrSubmitCallbackResponse response;
             try (MockedStatic<LocalDateTime> mock = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {

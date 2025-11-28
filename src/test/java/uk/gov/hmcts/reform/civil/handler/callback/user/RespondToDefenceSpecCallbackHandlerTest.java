@@ -3064,9 +3064,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnCorrectSummaryForAllFinalsOrderIssued() {
-            String expected =
-                "The judgment will order the defendant to pay £1041.00, including the claim fee, any fixed costs if claimed and interest if applicable, as shown:";
-
             final String expected = "The judgment request will be processed and a County"
                 + " Court Judgment (CCJ) will be issued, you will receive any further updates by email.";
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
@@ -3172,15 +3169,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getState()).isEqualTo(CaseState.CASE_SETTLED.name());
         }
-    }
-
-    private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
-        return objectMapper.convertValue(response.getData(), CaseData.class);
-    }
-
-    @Test
-    void handleEventsReturnsTheExpectedCallbackEvents() {
-        assertThat(handler.handledEvents()).containsOnly(CLAIMANT_RESPONSE_SPEC);
     }
 
     @Nested
@@ -3327,10 +3315,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .addApplicant2(YES)
                 .applicant2(PartyBuilder.builder().individual().build())
                 .build();
-            CaseData updatedCaseData = caseData.toBuilder()
-                .app1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
-                                               .unavailableDatesForMediation(unAvailableDates)
-                                               .build()).build();
             CaseData updatedCaseData = caseData;
             updatedCaseData.setApp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
                                                 .unavailableDatesForMediation(unAvailableDates)
@@ -3362,10 +3346,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .addApplicant2(YES)
                 .applicant2(PartyBuilder.builder().individual().build())
                 .build();
-            CaseData updatedCaseData = caseData.toBuilder()
-                .app1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
-                                               .unavailableDatesForMediation(unAvailableDates)
-                                               .build()).build();
             CaseData updatedCaseData = caseData;
             updatedCaseData.setApp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
                                                 .unavailableDatesForMediation(unAvailableDates)
@@ -3398,10 +3378,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .addApplicant2(YES)
                 .applicant2(PartyBuilder.builder().individual().build())
                 .build();
-            CaseData updatedCaseData = caseData.toBuilder()
-                .app1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
-                                               .unavailableDatesForMediation(unAvailableDates)
-                                               .build()).build();
             CaseData updatedCaseData = caseData;
             updatedCaseData.setApp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
                                                 .unavailableDatesForMediation(unAvailableDates)
@@ -3434,10 +3410,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .addApplicant2(YES)
                 .applicant2(PartyBuilder.builder().individual().build())
                 .build();
-            CaseData updatedCaseData = caseData.toBuilder()
-                .app1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
-                                               .unavailableDatesForMediation(unAvailableDates)
-                                               .build()).build();
             CaseData updatedCaseData = caseData;
             updatedCaseData.setApp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
                                                 .unavailableDatesForMediation(unAvailableDates)
@@ -3469,10 +3441,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .addApplicant2(YES)
                 .applicant2(PartyBuilder.builder().individual().build())
                 .build();
-            CaseData updatedCaseData = caseData.toBuilder()
-                .app1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
-                                               .unavailableDatesForMediation(unAvailableDates)
-                                               .build()).build();
             CaseData updatedCaseData = caseData;
             updatedCaseData.setApp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
                                                 .unavailableDatesForMediation(unAvailableDates)
@@ -3505,10 +3473,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .addApplicant2(YES)
                 .applicant2(PartyBuilder.builder().individual().build())
                 .build();
-            CaseData updatedCaseData = caseData.toBuilder()
-                .app1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
-                                               .unavailableDatesForMediation(unAvailableDates)
-                                               .build()).build();
             CaseData updatedCaseData = caseData;
             updatedCaseData.setApp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
                                                 .unavailableDatesForMediation(unAvailableDates)

@@ -5,10 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Data
 @Builder
 @AllArgsConstructor
-@Data
-@NoArgsConstructor(force = true)
+@NoArgsConstructor
 public class AirlineEpimsId {
 
     String airline;
