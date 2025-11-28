@@ -3,8 +3,11 @@ package uk.gov.hmcts.reform.civil.stateflow.transitions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
@@ -40,6 +43,7 @@ import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTrans
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTransitionBuilder.isClaimantNotSettlePartAdmitClaim;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTransitionBuilder.isSpecSmallClaim;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTransitionBuilder.partAdmitPayImmediately;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTransitionBuilder.protectAgainstExuiBug;
 
 @ExtendWith(MockitoExtension.class)
 class PartAdmissionTransitionBuilderTest {
@@ -573,6 +577,22 @@ class PartAdmissionTransitionBuilderTest {
             .build();
 
         assertTrue(getCarmEnabledForCase(caseData));
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ResponseOneVOneShowTag.class, names = {
+        "ONE_V_ONE_PART_ADMIT_PAY_INSTALMENT",
+        "ONE_V_ONE_PART_ADMIT_PAY_BY_SET_DATE",
+        "ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY",
+        "ONE_V_ONE_PART_ADMIT_HAS_PAID"
+    })
+    void shouldReturnFalseForOneVOnePartAdmit(ResponseOneVOneShowTag tag) {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued().build().toBuilder()
+            .showResponseOneVOneFlag(tag)
+            .build();
+
+        assertFalse(protectAgainstExuiBug.test(caseData));
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {
