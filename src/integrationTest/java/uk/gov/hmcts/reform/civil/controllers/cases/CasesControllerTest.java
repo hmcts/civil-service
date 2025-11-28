@@ -45,6 +45,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.singletonList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -85,7 +86,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
     private static final String GA_CASE_APP_URL = "/cases/{caseId}/ga/applications";
 
     private static final List<DashboardClaimInfo> claimResults =
-        Collections.singletonList(DashboardClaimInfo.builder()
+        singletonList(DashboardClaimInfo.builder()
                                       .claimAmount(new BigDecimal(
                                           "1000"))
                                       .claimNumber("4786")
@@ -455,17 +456,16 @@ public class CasesControllerTest extends BaseIntegrationTest {
         public void shouldReturnHttpStatusOK() {
             SearchResult expectedCaseDetails = SearchResult.builder()
                 .total(1)
-                .cases(Arrays
-                           .asList(CaseDetails
-                                       .builder()
-                                       .id(1L)
-                                       .id(1L)
-                                       .build()))
+                .cases(singletonList(CaseDetails
+                                         .builder()
+                                         .id(1L)
+                                         .id(1L)
+                                         .build()))
                 .build();
 
             SearchResult expectedCaseData = SearchResult.builder()
                 .total(1)
-                .cases(Arrays.asList(CaseDetails.builder().id(1L).build()))
+                .cases(singletonList(CaseDetails.builder().id(1L).build()))
                 .build();
 
             when(gaCoreCaseDataService.searchGeneralApplication(any(), anyString()))

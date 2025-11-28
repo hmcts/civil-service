@@ -51,7 +51,6 @@ public class GaCaseEventServiceTest {
     private static final String AUTHORISATION = "authorisation";
     private static final String USER_ID = "123";
     private static final String CASE_ID = "123";
-    private static final String DRAFT = "draft";
     private static final String EVENT_ID = "1";
     private static final StartEventResponse RESPONSE = StartEventResponse
         .builder()
