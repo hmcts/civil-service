@@ -1,18 +1,17 @@
-package uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed;
+package uk.gov.hmcts.reform.civil.service.flowstate.predicate;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.CaseDataPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.annotations.BusinessRule;
 
 import java.util.function.Predicate;
 
 @SuppressWarnings("java:S1214")
-public interface HearingPredicate {
+public non-sealed interface HearingPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Hearing",
-        summary = "Case in hearing readiness",
-        description = "Hearing reference present, hearing listed and case not dismissed or taken offline"
+        summary = "Hearing listed and case in readiness",
+        description = "Hearing has been listed and the case is in hearing readiness (no dismissals/taken offline)"
     )
     Predicate<CaseData> isInReadiness =
         CaseDataPredicate.Hearing.hasReference

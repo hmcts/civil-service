@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed;
+package uk.gov.hmcts.reform.civil.service.flowstate.predicate;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -23,6 +24,64 @@ class ClaimantPredicateTest {
 
     @Mock
     private CaseData caseData;
+
+    @Nested
+    class BeforeResponse {
+
+        @Test
+        void should_return_true_when_unspec_2v1_and_no_response_dates_for_both_applicants() {
+            when(caseData.getCaseAccessCategory()).thenReturn(UNSPEC_CLAIM);
+            when(caseData.getAddApplicant2()).thenReturn(YES);
+            when(caseData.getApplicant1ResponseDate()).thenReturn(null);
+            when(caseData.getApplicant2ResponseDate()).thenReturn(null);
+
+            assertTrue(ClaimantPredicate.beforeResponse.test(caseData));
+        }
+
+        @Test
+        void should_return_false_when_unspec_2v1_and_applicant1_has_response_date() {
+            when(caseData.getCaseAccessCategory()).thenReturn(UNSPEC_CLAIM);
+            when(caseData.getAddApplicant2()).thenReturn(YES);
+            when(caseData.getApplicant1ResponseDate()).thenReturn(java.time.LocalDateTime.now());
+
+            assertFalse(ClaimantPredicate.beforeResponse.test(caseData));
+        }
+
+        @Test
+        void should_return_false_when_unspec_2v1_and_applicant2_has_response_date() {
+            when(caseData.getCaseAccessCategory()).thenReturn(UNSPEC_CLAIM);
+            when(caseData.getAddApplicant2()).thenReturn(YES);
+            when(caseData.getApplicant1ResponseDate()).thenReturn(null);
+            when(caseData.getApplicant2ResponseDate()).thenReturn(java.time.LocalDateTime.now());
+
+            assertFalse(ClaimantPredicate.beforeResponse.test(caseData));
+        }
+
+        @Test
+        void should_return_true_when_not_unspec_2v1_and_applicant1_has_no_response_date() {
+            when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
+            when(caseData.getApplicant1ResponseDate()).thenReturn(null);
+
+            assertTrue(ClaimantPredicate.beforeResponse.test(caseData));
+        }
+
+        @Test
+        void should_return_false_when_not_unspec_2v1_and_applicant1_has_response_date() {
+            when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
+            when(caseData.getApplicant1ResponseDate()).thenReturn(java.time.LocalDateTime.now());
+
+            assertFalse(ClaimantPredicate.beforeResponse.test(caseData));
+        }
+
+        @Test
+        void should_return_false_when_unspec_but_no_applicant2_added_and_applicant1_has_response_date() {
+            when(caseData.getCaseAccessCategory()).thenReturn(UNSPEC_CLAIM);
+            when(caseData.getAddApplicant2()).thenReturn(NO);
+            when(caseData.getApplicant1ResponseDate()).thenReturn(java.time.LocalDateTime.now());
+
+            assertFalse(ClaimantPredicate.beforeResponse.test(caseData));
+        }
+    }
 
     @Nested
     class FullDefenceProceed {
@@ -144,4 +203,5 @@ class ClaimantPredicateTest {
             assertTrue(ClaimantPredicate.fullDefenceNotProceed.test(caseData));
         }
     }
+
 }

@@ -1,18 +1,17 @@
-package uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed;
+package uk.gov.hmcts.reform.civil.service.flowstate.predicate;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.CaseDataPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.annotations.BusinessRule;
 
 import java.util.function.Predicate;
 
 @SuppressWarnings("java:S1214")
-public interface ClaimPredicate {
+public non-sealed interface ClaimPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Claim",
-        summary = "Spec claim",
-        description = "Case is a SPEC (damages) claim as per case access category"
+        summary = "SPEC claim",
+        description = "Case is in the SPEC (damages) service based on case access category"
     )
     Predicate<CaseData> isSpec = CaseDataPredicate.Claim.isSpecClaim;
 
@@ -25,15 +24,15 @@ public interface ClaimPredicate {
 
     @BusinessRule(
         group = "Claim",
-        summary = "Case change-of-representation",
-        description = "Change-of-representation recorded"
+        summary = "Case change of representation",
+        description = "A change of legal representation has been recorded on the case"
     )
     Predicate<CaseData> changeOfRepresentation = CaseDataPredicate.Claim.hasChangeOfRepresentation;
 
     @BusinessRule(
         group = "Claim",
-        summary = "Claim submitted one legal representative",
-        description = "Claim has a submitted date and one legal representative"
+        summary = "Submitted - one respondent representative",
+        description = "Submitted claim where respondent 1 is represented and either there is a single defendant, or there are two defendants sharing the same legal representative"
     )
     Predicate<CaseData> submittedOneRespondentRepresentative =
         CaseDataPredicate.Claim.hasSubmittedDate
@@ -47,8 +46,8 @@ public interface ClaimPredicate {
 
     @BusinessRule(
         group = "Claim",
-        summary = "Claim submitted two registered representatives",
-        description = "Claim has a submitted date and two registered representatives"
+        summary = "Submitted - two respondent representatives (both orgs registered)",
+        description = "Submitted claim with two defendants, each represented by different solicitors and both defendant organisations are registered"
     )
     Predicate<CaseData> submittedTwoRegisteredRespondentRepresentatives =
         CaseDataPredicate.Claim.hasSubmittedDate
@@ -61,8 +60,8 @@ public interface ClaimPredicate {
 
     @BusinessRule(
         group = "Claim",
-        summary = "Claim submitted two representatives one unregistered",
-        description = "Claim has a submitted date and two representatives one unregistered"
+        summary = "Submitted - two respondent representatives (one org unregistered)",
+        description = "Submitted claim with two defendants, each represented by different solicitors where exactly one defendant organisation is not registered"
     )
     Predicate<CaseData> submittedTwoRespondentRepresentativesOneUnregistered =
         CaseDataPredicate.Claim.hasSubmittedDate
@@ -80,8 +79,8 @@ public interface ClaimPredicate {
 
     @BusinessRule(
         group = "Claim",
-        summary = "Claim submitted two representatives both unregistered",
-        description = "Claim has a submitted date and two representatives both unregistered"
+        summary = "Submitted - two respondent representatives (both orgs unregistered)",
+        description = "Submitted claim with two defendants, each represented by different solicitors and both defendant organisations are not registered"
     )
     Predicate<CaseData> submittedBothUnregisteredSolicitors =
         CaseDataPredicate.Claim.hasSubmittedDate
@@ -94,8 +93,8 @@ public interface ClaimPredicate {
 
     @BusinessRule(
         group = "Claim",
-        summary = "Claim submitted one representative unregistered",
-        description = "Claim has a submitted date and one representative unregistered"
+        summary = "Submitted - 1v1 represented defendant with unregistered org",
+        description = "Submitted 1v1 claim where defendant is represented but their organisation is not registered"
     )
     Predicate<CaseData> submitted1v1RespondentOneUnregistered =
         CaseDataPredicate.Claim.hasSubmittedDate
@@ -105,8 +104,8 @@ public interface ClaimPredicate {
 
     @BusinessRule(
         group = "Claim",
-        summary = "Claim submitted one unrepresented defendant only",
-        description = "Claim has a submitted date and unrepresented defendant only"
+        summary = "Submitted - unrepresented defendant only",
+        description = "Submitted claim with a single unrepresented defendant (no second defendant)"
     )
     Predicate<CaseData> submittedOneUnrepresentedDefendantOnly =
         CaseDataPredicate.Claim.hasSubmittedDate
@@ -115,8 +114,8 @@ public interface ClaimPredicate {
 
     @BusinessRule(
         group = "Claim",
-        summary = "Claim submitted respondent1 unrepresented",
-        description = "Claim has a submitted date and respondent unrepresented"
+        summary = "Submitted - respondent 1 unrepresented",
+        description = "Submitted claim where respondent 1 is unrepresented"
     )
     Predicate<CaseData> submittedRespondent1Unrepresented =
         CaseDataPredicate.Claim.hasSubmittedDate
@@ -124,8 +123,8 @@ public interface ClaimPredicate {
 
     @BusinessRule(
         group = "Claim",
-        summary = "Claim submitted respondent2 unrepresented",
-        description = "Claim has a submitted date and respondent unrepresented"
+        summary = "Submitted - respondent 2 unrepresented",
+        description = "Submitted claim where respondent 2 is unrepresented"
     )
     Predicate<CaseData> submittedRespondent2Unrepresented =
         CaseDataPredicate.Claim.hasSubmittedDate
@@ -134,15 +133,15 @@ public interface ClaimPredicate {
 
     @BusinessRule(
         group = "Claim",
-        summary = "Claim issued",
-        description = "Claim has a claim notification deadline (claim has been issued/notified)"
+        summary = "Claim notified",
+        description = "Acknowledgement deadline exists - claim notification has been sent (State Flow: claim notified)"
     )
     Predicate<CaseData> issued = CaseDataPredicate.Claim.hasNotificationDeadline;
 
     @BusinessRule(
         group = "Claim",
-        summary = "Claim pending issued",
-        description = ""
+        summary = "Pending claim issue (registered defendants)",
+        description = "Issue date is set and all represented defendants have registered organisations (second defendant absent or registered/same solicitor). Used for moving to pending issue"
     )
     Predicate<CaseData> pendingIssued =
         CaseDataPredicate.Claim.hasIssueDate
@@ -161,8 +160,8 @@ public interface ClaimPredicate {
 
     @BusinessRule(
         group = "Claim",
-        summary = "Claim pending issued unrepresented defendant",
-        description = "The claim has been issued and is pending service to an unrepresented defendant. This applies to all non-SPEC claims with an unrepresented defendant, and to multi-party SPEC claims that also have an unrepresented defendant."
+        summary = "Pending claim issue - unrepresented defendant(s)",
+        description = "Issue date is set and at least one defendant is unrepresented. Applies to all UNSPEC, and to SPEC only for multi‑party scenarios"
     )
    Predicate<CaseData> pendingIssuedUnrepresented =
         CaseDataPredicate.Claim.hasIssueDate
@@ -187,8 +186,8 @@ public interface ClaimPredicate {
 
     @BusinessRule(
         group = "Claim",
-        summary = "Claim after issued",
-        description = "The claim has been issued and is pending acknowledgement or response from the defendant. This state is active before the notification deadline. For a specified claim, a notification date must have been set, whereas for an unspecified claim, it should not."
+        summary = "After issue - no AoS/response, before claim details",
+        description = "No claim‑details notification yet; respondent has not acknowledged service or responded; claim notification deadline is in the future. For SPEC, a notification date exists; for UNSPEC, it does not"
     )
     Predicate<CaseData> afterIssued =
         CaseDataPredicate.ClaimDetails.hasNotificationDate.negate()

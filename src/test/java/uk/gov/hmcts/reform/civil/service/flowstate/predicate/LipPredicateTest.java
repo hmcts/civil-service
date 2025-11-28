@@ -1,10 +1,14 @@
-package uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed;
+package uk.gov.hmcts.reform.civil.service.flowstate.predicate;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -15,6 +19,9 @@ class LipPredicateTest {
 
     @Mock
     private CaseData caseData;
+
+    @Mock
+    private CaseDataLiP caseDataLiP;
 
     @Test
     void should_return_true_for_isLipCase_when_case_data_is_lip_v_lip_one_v_one() {
@@ -124,5 +131,75 @@ class LipPredicateTest {
         when(caseData.isRespondent2LiP()).thenReturn(false);
         when(caseData.isApplicantNotRepresented()).thenReturn(false);
         assertFalse(LipPredicate.caseContainsLiP.test(caseData));
+    }
+
+    @Test
+    void should_return_true_for_isLiPvLRCase_when_case_is_lip_v_lr_one_v_one() {
+        when(caseData.isLipvLROneVOne()).thenReturn(true);
+        assertTrue(LipPredicate.isLiPvLRCase.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_isLiPvLRCase_when_case_is_not_lip_v_lr_one_v_one() {
+        when(caseData.isLipvLROneVOne()).thenReturn(false);
+        assertFalse(LipPredicate.isLiPvLRCase.test(caseData));
+    }
+
+    @Test
+    void should_return_true_for_isHelpWithFees_when_case_has_help_with_fees() {
+        when(caseData.isHelpWithFees()).thenReturn(true);
+        assertTrue(LipPredicate.isHelpWithFees.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_isHelpWithFees_when_case_has_no_help_with_fees() {
+        when(caseData.isHelpWithFees()).thenReturn(false);
+        assertFalse(LipPredicate.isHelpWithFees.test(caseData));
+    }
+
+    @Test
+    void should_return_true_for_nocApplyForLiPClaimant_when_noc_is_submitted_for_claimant() {
+        when(caseData.nocApplyForLiPClaimant()).thenReturn(true);
+        assertTrue(LipPredicate.nocApplyForLiPClaimant.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_nocApplyForLiPClaimant_when_noc_is_not_submitted_for_claimant() {
+        when(caseData.nocApplyForLiPClaimant()).thenReturn(false);
+        assertFalse(LipPredicate.nocApplyForLiPClaimant.test(caseData));
+    }
+
+    @Test
+    void should_return_true_for_pinInPostEnabled_when_respondent1_pin_in_post_exists() {
+        when(caseData.getRespondent1PinToPostLRspec()).thenReturn(new DefendantPinToPostLRspec());
+        assertTrue(LipPredicate.pinInPostEnabled.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_pinInPostEnabled_when_respondent1_pin_in_post_absent() {
+        when(caseData.getRespondent1PinToPostLRspec()).thenReturn(null);
+        assertFalse(LipPredicate.pinInPostEnabled.test(caseData));
+    }
+
+    @Test
+    void should_return_true_for_fullDefenceProceed_when_spec_and_applicant1_has_not_settled() {
+        when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.SPEC_CLAIM);
+        when(caseData.getCaseDataLiP()).thenReturn(caseDataLiP);
+        when(caseDataLiP.getApplicant1SettleClaim()).thenReturn(YesOrNo.NO);
+        assertTrue(LipPredicate.fullDefenceProceed.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_fullDefenceProceed_when_not_spec_claim() {
+        when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.UNSPEC_CLAIM);
+        assertFalse(LipPredicate.fullDefenceProceed.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_fullDefenceProceed_when_spec_but_applicant1_has_settled() {
+        when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.SPEC_CLAIM);
+        when(caseData.getCaseDataLiP()).thenReturn(caseDataLiP);
+        when(caseDataLiP.getApplicant1SettleClaim()).thenReturn(YesOrNo.YES);
+        assertFalse(LipPredicate.fullDefenceProceed.test(caseData));
     }
 }

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed;
+package uk.gov.hmcts.reform.civil.service.flowstate.predicate;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -26,14 +26,12 @@ class HearingPredicateTest {
         @Test
         void should_return_false_for_isInReadiness_when_no_hearing_reference() {
             when(caseData.getHearingReferenceNumber()).thenReturn(null);
-
             assertFalse(HearingPredicate.isInReadiness.test(caseData));
         }
 
         @Test
         void should_return_false_for_isInReadiness_when_hearing_not_listed() {
             when(caseData.getHearingReferenceNumber()).thenReturn("000HN001");
-
             assertFalse(HearingPredicate.isInReadiness.test(caseData));
         }
 
@@ -41,7 +39,6 @@ class HearingPredicateTest {
         void should_return_true_for_isInReadiness_when_hearing_listed() {
             when(caseData.getHearingReferenceNumber()).thenReturn("000HN001");
             when(caseData.getListingOrRelisting()).thenReturn(LISTING);
-
             assertTrue(HearingPredicate.isInReadiness.test(caseData));
         }
 
@@ -50,7 +47,6 @@ class HearingPredicateTest {
             when(caseData.getHearingReferenceNumber()).thenReturn("000HN001");
             when(caseData.getListingOrRelisting()).thenReturn(LISTING);
             when(caseData.getCaseDismissedHearingFeeDueDate()).thenReturn(LocalDateTime.now().plusDays(5));
-
             assertFalse(HearingPredicate.isInReadiness.test(caseData));
         }
 
@@ -59,7 +55,6 @@ class HearingPredicateTest {
             when(caseData.getHearingReferenceNumber()).thenReturn("000HN001");
             when(caseData.getListingOrRelisting()).thenReturn(LISTING);
             when(caseData.getTakenOfflineDate()).thenReturn(LocalDateTime.now());
-
             assertFalse(HearingPredicate.isInReadiness.test(caseData));
         }
 
@@ -68,7 +63,6 @@ class HearingPredicateTest {
             when(caseData.getHearingReferenceNumber()).thenReturn("000HN001");
             when(caseData.getListingOrRelisting()).thenReturn(LISTING);
             when(caseData.getTakenOfflineByStaffDate()).thenReturn(LocalDateTime.now());
-
             assertFalse(HearingPredicate.isInReadiness.test(caseData));
         }
     }

@@ -45,7 +45,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.predicate.util.Predica
  * phrasing where authoritative (State Flow Transition Catalogue).
  */
 @SuppressWarnings("java:S1214")
-public interface CaseDataPredicate {
+sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, DismissedPredicate, DivergencePredicate,
+HearingPredicate, LanguagePredicate, LipPredicate, NotificationPredicate, OutOfTimePredicate, PaymentPredicate,
+RepaymentPredicate, ResponsePredicate, TakenOfflinePredicate{
 
     interface Applicant {
 
@@ -269,15 +271,15 @@ public interface CaseDataPredicate {
         @BusinessRule(
             group = "Claim",
             summary = "Claim notification options present",
-            description = "Notification options for claim were sent to defendant solicitor"
+            description = "Defendant claim-notification options exist"
         )
         Predicate<CaseData> hasNotifyOptions =
             nullSafe(c -> c.getDefendantSolicitorNotifyClaimOptions() != null);
 
         @BusinessRule(
             group = "Claim",
-            summary = "Claim notify option Cc is 'Both'",
-            description = "The claim notify options was set to 'Both'"
+            summary = "Claim notify option is 'Both'",
+            description = "Defendant claim-notification option value is 'Both'"
         )
         Predicate<CaseData> isNotifyOptionsBoth =
             nullSafe(c -> "Both".equals(c.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel()));
@@ -308,9 +310,9 @@ public interface CaseDataPredicate {
             nullSafe(c -> c.getShowResponseOneVOneFlag() != null);
 
         @BusinessRule(
-            group = "Respondent",
-            summary = "Show Response OneVOne Flag is of type",
-            description = "Factory: checks show response OneVOne enum equals the provided ResponseOneVOneShowTag"
+            group = "Claim",
+            summary = "One‑v‑one response flag equals specified type",
+            description = "Checks the one‑v‑one response flag equals the provided ResponseOneVOneShowTag"
         )
         static Predicate<CaseData> isType(ResponseOneVOneShowTag responseType) {
             return nullSafe(c -> c.getShowResponseOneVOneFlag() != null

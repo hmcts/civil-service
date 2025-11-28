@@ -1,8 +1,7 @@
-package uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed;
+package uk.gov.hmcts.reform.civil.service.flowstate.predicate;
 
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.CaseDataPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.annotations.BusinessRule;
 
 import java.util.function.Predicate;
@@ -11,12 +10,12 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 
 @SuppressWarnings("java:S1214")
-public interface DivergencePredicate {
+public non-sealed interface DivergencePredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Divergence",
-        summary = "Divergent non-SPEC responses with DQ - go offline",
-        description = "Detects differing non-SPEC responses across defendants where one returned FULL_DEFENCE causing divergence handling"
+        summary = "Responses diverge - generate DQs then go offline",
+        description = "Responses diverge and discrete directions questionnaires must be produced before going offline."
     )
     Predicate<CaseData> divergentRespondWithDQAndGoOffline =
         c -> switch (getMultiPartyScenario(c)) {
@@ -38,8 +37,8 @@ public interface DivergencePredicate {
 
     @BusinessRule(
         group = "Divergence",
-        summary = "Divergent non-SPEC responses - go offline",
-        description = "Detects differing responses where no defendant returned full defence and offline handling applies"
+        summary = "Responses diverge - go offline",
+        description = "Defendant responses diverge so the case must go offline."
     )
     Predicate<CaseData> divergentRespondGoOffline =
         c ->
@@ -61,8 +60,8 @@ public interface DivergencePredicate {
 
     @BusinessRule(
         group = "Divergence",
-        summary = "Spec divergence: DQ and offline",
-        description = "SPEC cases where defendants' SPEC responses differ and divergence handling applies"
+        summary = "SPEC divergence - generate DQs then go offline",
+        description = "SPEC divergent responses requiring DQs before going offline."
     )
     Predicate<CaseData> divergentRespondWithDQAndGoOfflineSpec =
         CaseDataPredicate.Claim.isSpecClaim.and(c ->
@@ -101,8 +100,8 @@ public interface DivergencePredicate {
 
     @BusinessRule(
         group = "Divergence",
-        summary = "Spec divergence: offline",
-        description = "SPEC cases where divergence does not involve full defence and offline handling applies"
+        summary = "SPEC divergence - go offline",
+        description = "SPEC defendant/claimant responses diverge so the case must go offline."
     )
     Predicate<CaseData> divergentRespondGoOfflineSpec =
         CaseDataPredicate.Claim.isSpecClaim.and(c ->

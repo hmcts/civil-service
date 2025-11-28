@@ -1,39 +1,38 @@
-package uk.gov.hmcts.reform.civil.service.flowstate.predicate.composed;
+package uk.gov.hmcts.reform.civil.service.flowstate.predicate;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.CaseDataPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.annotations.BusinessRule;
 
 import java.util.function.Predicate;
 
 @SuppressWarnings("java:S1214")
-public interface TakenOfflinePredicate {
+public non-sealed interface TakenOfflinePredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "TakenOffline",
         summary = "Case taken offline by system",
-        description = "Taken offline date exists"
+        description = "System-driven taken-offline marker present (takenOffline date exists)"
     )
     Predicate<CaseData> bySystem = CaseDataPredicate.TakenOffline.dateExists;
 
     @BusinessRule(
         group = "TakenOffline",
         summary = "Case taken offline by staff",
-        description = "Taken offline by staff date exists"
+        description = "Manual taken-offline marker present (takenOfflineByStaff date exists)"
     )
     Predicate<CaseData> byStaff = CaseDataPredicate.TakenOffline.byStaffDateExists;
 
     @BusinessRule(
         group = "TakenOffline",
         summary = "SDO not Suitable",
-        description = "Case has 'not suitable for SDO' reason"
+        description = "Case flagged 'not suitable for SDO'"
     )
     Predicate<CaseData> sdoNotSuitable = CaseDataPredicate.TakenOffline.hasSdoReasonNotSuitable;
 
     @BusinessRule(
         group = "TakenOffline",
         summary = "SDO not drawn",
-        description = "Case has 'not suitable for SDO' reason and taken offline date exists"
+        description = "Case flagged 'not suitable for SDO' and a taken-offline date exists"
     )
     Predicate<CaseData> sdoNotDrawn =
         CaseDataPredicate.TakenOffline.hasSdoReasonNotSuitable
@@ -42,7 +41,7 @@ public interface TakenOfflinePredicate {
     @BusinessRule(
         group = "TakenOffline",
         summary = "Before SDO (draw directions order) handling",
-        description = "Case not marked for draw directions order and not marked as 'not suitable for SDO', response date exists"
+        description = "Applicant response date present; draw-directions-order NOT required; NOT marked 'not suitable for SDO'"
     )
     Predicate<CaseData> beforeSdo =
         CaseDataPredicate.Applicant.hasResponseDateApplicant1
@@ -52,7 +51,7 @@ public interface TakenOfflinePredicate {
     @BusinessRule(
         group = "TakenOffline",
         summary = "After SDO (draw directions order) handling",
-        description = "Case marked for draw directions order and not marked as 'not suitable for SDO',"
+        description = "Draw-directions-order required; NOT marked 'not suitable for SDO'"
     )
     Predicate<CaseData> afterSdo =
         CaseDataPredicate.TakenOffline.hasDrawDirectionsOrderRequired
@@ -60,8 +59,8 @@ public interface TakenOfflinePredicate {
 
     @BusinessRule(
         group = "TakenOffline",
-        summary = "After SDO (draw directions order) not suitable for SDO",
-        description = "Case marked for draw directions order and marked as 'not suitable for SDO',"
+        summary = "Not suitable for SDO (no draw directions order)",
+        description = "Draw-directions-order NOT required; marked 'not suitable for SDO'"
     )
     Predicate<CaseData> afterSdoNotSuitable =
         CaseDataPredicate.TakenOffline.hasDrawDirectionsOrderRequired.negate()
@@ -69,8 +68,8 @@ public interface TakenOfflinePredicate {
 
     @BusinessRule(
         group = "TakenOffline",
-        summary = "Claim notification completed",
-        description = "Claim notification date exists and notify options were set (not 'Both')"
+        summary = "Before claim notification (submitted, not notified)",
+        description = "Case submitted; claim notification NOT set (no notification deadline/date)"
     )
     Predicate<CaseData> beforeClaimIssue =
         // In case of SPEC and UNSPEC claim ClaimNotificationDeadline will be set when the case is issued
@@ -100,8 +99,8 @@ public interface TakenOfflinePredicate {
 
     @BusinessRule(
         group = "TakenOffline",
-        summary = "SDO not drawn after claim notified extension",
-        description = "Case has 'not suitable for SDO' reason, has been taken offline, respondent 1 has a time extension for response, but has not yet acknowledged service or provided a response."
+        summary = "After claim notified - respondent extension, no AoS/response",
+        description = "Respondent 1 has a time extension but has not acknowledged service or responded"
     )
     Predicate<CaseData> afterClaimNotifiedExtension =
             CaseDataPredicate.Respondent.hasAcknowledgedNotificationRespondent1.negate()
@@ -111,7 +110,7 @@ public interface TakenOfflinePredicate {
     @BusinessRule(
         group = "TakenOffline",
         summary = "Taken offline after claim notified",
-        description = "Case taken offline after claim notification but before claim details notification and respondent acknowledgement"
+        description = "After claim notified but before claim details notification and any respondent acknowledgement"
     )
     Predicate<CaseData> afterClaimNotifiedFutureDeadline =
             CaseDataPredicate.Respondent.hasAcknowledgedNotificationRespondent1.negate()
@@ -122,7 +121,7 @@ public interface TakenOfflinePredicate {
     @BusinessRule(
         group = "TakenOffline",
         summary = "Taken offline after claim details notified (acknowledged, N/A response, extension)",
-        description = "Taken offline by staff with respondent acknowledgment and time extension"
+        description = "Respondent(s) acknowledged service; time extension(s) granted"
     )
     Predicate<CaseData> afterClaimNotifiedAckExtension =
         CaseDataPredicate.Respondent.hasAcknowledgedNotificationRespondent1
@@ -139,7 +138,7 @@ public interface TakenOfflinePredicate {
     @BusinessRule(
         group = "TakenOffline",
         summary = "Taken offline after claim details notified (acknowledged, no response, extension)",
-        description = "Taken offline by staff with respondent acknowledgment and time extension"
+        description = "Respondent(s) acknowledged service; no response yet; time extension(s) granted"
     )
     Predicate<CaseData> afterClaimNotifiedAckNoResponseExtension =
         CaseDataPredicate.Respondent.hasAcknowledgedNotificationRespondent1
@@ -178,7 +177,7 @@ public interface TakenOfflinePredicate {
     @BusinessRule(
         group = "TakenOffline",
         summary = "Taken offline after claim details notified (acknowledged, no response, no Extension)",
-        description = "Taken offline by staff with no respondent acknowledgment and no time extension"
+        description = "Respondent(s) acknowledged service; no response yet; no time extension"
     )
     Predicate<CaseData> afterClaimNotifiedAckNoResponseNoExtension =
         CaseDataPredicate.Respondent.hasAcknowledgedNotificationRespondent1
@@ -197,7 +196,7 @@ public interface TakenOfflinePredicate {
     @BusinessRule(
         group = "TakenOffline",
         summary = "Offline caused by Camunda processing",
-        description = "Indicates the case was taken offline via Camunda/automated processing (takenOffline date present)"
+        description = "Case taken offline via Camunda/automation (takenOffline date present) where LiP NoC/JO by admission and representation change apply"
     )
     Predicate<CaseData> isDefendantNoCOnlineForCaseAfterJBA =
         CaseDataPredicate.Lip.isPartyUnrepresented
