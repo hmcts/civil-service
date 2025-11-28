@@ -1,9 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
-import org.apache.commons.lang3.StringUtils;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.flowstate.legacy.LegacyFlowDelegate;
 

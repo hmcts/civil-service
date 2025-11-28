@@ -89,6 +89,8 @@ class CaseTaskTrackingServiceTest {
     @SuppressWarnings("unchecked")
     void trackCaseTask_additionalPropertiesOverrideBaseKeys_whenDuplicateKeysProvided() {
 
+        when(telemetryClientProvider.getIfAvailable()).thenReturn(telemetryClient);
+
         Map<String, String> additionalProperties = new HashMap<>();
         additionalProperties.put("caseId", "OVERRIDDEN");
         additionalProperties.put("eventType", "OVERRIDE_TYPE");
