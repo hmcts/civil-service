@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -22,7 +21,7 @@ import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,18 +38,23 @@ class NonImmediatePaymentTypeDefaultJudgmentFormBuilderTest {
     @Mock
     private OrganisationService organisationService;
 
-    @InjectMocks
     private NonImmediatePaymentTypeDefaultJudgmentFormBuilder nonImmediatePaymentTypeDefaultJudgmentFormBuilder;
 
     @BeforeEach
     void setUp() {
+        nonImmediatePaymentTypeDefaultJudgmentFormBuilder = new NonImmediatePaymentTypeDefaultJudgmentFormBuilder(
+            interestCalculator,
+            judgmentAmountsCalculator,
+            organisationService,
+            new DjWelshTextService()
+        );
         when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder().name("org name")
-            .contactInformation(Arrays.asList(ContactInformation.builder()
-                .addressLine1("addressLine1")
-                .addressLine2("addressLine2")
-                .addressLine3("addressLine3")
-                .postCode("postCode")
-                .build())).build()));
+            .contactInformation(Collections.singletonList(ContactInformation.builder()
+                    .addressLine1("addressLine1")
+                    .addressLine2("addressLine2")
+                    .addressLine3("addressLine3")
+                    .postCode("postCode")
+                    .build())).build()));
     }
 
     @Test
