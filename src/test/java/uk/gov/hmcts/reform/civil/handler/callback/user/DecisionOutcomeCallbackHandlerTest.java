@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
-import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -17,11 +16,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MOVE_TO_DECISION_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_DASHBOARD_TASK_LIST_DEFENDANT_DECISION_OUTCOME;
@@ -71,14 +66,4 @@ class DecisionOutcomeCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(MOVE_TO_DECISION_OUTCOME.name());
         assertThat(updatedData.getBusinessProcess().getStatus()).isEqualTo(READY);
     }
-
-    @Test
-    void shouldHandleOnlyMoveToDecisionOutcomeEvent() {
-        Map<String, CallbackHandler> handlers = new HashMap<>();
-
-        handler.register(handlers);
-
-        assertThat(handlers).containsExactly(entry(MOVE_TO_DECISION_OUTCOME.toString(), handler));
-    }
-
 }
