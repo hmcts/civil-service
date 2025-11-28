@@ -115,22 +115,21 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
 
         boolean isRespondent1PartAdmission = RespondentResponseTypeSpec.PART_ADMISSION.equals(
-            caseData.getRespondentClaimResponseTypeForSpecGeneric()
-        );
+                caseData.getRespondentClaimResponseTypeForSpecGeneric());
 
-        boolean isRespondent2PartAdmission = RespondentResponseTypeSpec.PART_ADMISSION.equals(
-            caseData.getRespondent2ClaimResponseTypeForSpec()
-        );
+        boolean isRespondent2PartAdmission =
+                RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec());
 
         boolean isPartAdmission = isRespondent1PartAdmission;
 
         if ((ONE_V_TWO_TWO_LEGAL_REP.equals(multiPartyScenario) && YesOrNo.YES.equals(caseData.getIsRespondent2()))) {
             isPartAdmission = isRespondent2PartAdmission;
-        } else if ((ONE_V_TWO_ONE_LEGAL_REP.equals(multiPartyScenario) && caseData.getRespondentResponseIsSame().equals(NO))) {
+        } else if ((ONE_V_TWO_ONE_LEGAL_REP.equals(multiPartyScenario)
+                && caseData.getRespondentResponseIsSame().equals(NO))) {
             isPartAdmission = false;
         }
 
-        return featureToggleService.isLrAdmissionBulkEnabled() && isPartAdmission;
+        return isPartAdmission;
     }
 
     private BigDecimal getClaimOwingAmount(CaseData caseData, boolean isPartLRAdmission) {
