@@ -9,6 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
+import uk.gov.hmcts.reform.civil.ga.service.GaFeesPaymentService;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
@@ -49,6 +50,8 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
     private CoreCaseDataService coreCaseDataService;
     @MockBean
     private PaymentRequestUpdateCallbackService paymentRequestUpdateCallbackService;
+    @MockBean
+    private GaFeesPaymentService feesPaymentService;
 
     @BeforeEach
     void before() {

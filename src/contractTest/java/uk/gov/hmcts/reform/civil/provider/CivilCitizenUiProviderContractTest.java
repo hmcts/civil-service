@@ -26,6 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.hmcts.reform.civil.controllers.fees.FeesPaymentController;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.ga.service.GaFeesPaymentService;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.service.FeesPaymentService;
 
@@ -52,6 +53,8 @@ class CivilCitizenUiProviderContractTest {
 
     @Mock
     private FeesPaymentService feesPaymentService;
+    @Mock
+    private GaFeesPaymentService gaFeesPaymentService;
     private AutoCloseable mocks;
 
     @PactBrokerConsumerVersionSelectors
@@ -69,7 +72,7 @@ class CivilCitizenUiProviderContractTest {
             System.setProperty("pactbroker.url", brokerUrl);
         }
         mocks = MockitoAnnotations.openMocks(this);
-        FeesPaymentController controller = new FeesPaymentController(feesPaymentService);
+        FeesPaymentController controller = new FeesPaymentController(feesPaymentService, gaFeesPaymentService);
         MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter(buildObjectMapper());
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
             .setMessageConverters(messageConverter)

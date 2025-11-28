@@ -142,6 +142,9 @@ pin-in-post:
   cui-front-end:
     url: ${CUI_URL:http://localhost:3001}
 
+cui-front-end:
+  url: ${CUI_URL:http://localhost:3001}
+
 ocmc:
   client:
     id: ${OCMC_CLIENT_ID:cmc_citizen}
