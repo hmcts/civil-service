@@ -193,7 +193,7 @@ public class TestingSupportController {
     @GetMapping("/testing-support/{caseId}/trigger-trial-bundle")
     public ResponseEntity<String> getTrialBundleEvent(@PathVariable("caseId") Long caseId) {
         String responseMsg = SUCCESS;
-        var event = new BundleCreationTriggerEvent(caseId, getAccessToken());
+        var event = new BundleCreationTriggerEvent(caseId, getSystemUserToken());
         try {
             bundleCreationTriggerEventHandler.sendBundleCreationTrigger(event);
         } catch (Exception e) {
@@ -274,12 +274,5 @@ public class TestingSupportController {
 
     private String getSystemUserToken() {
         return userService.getAccessToken(systemUserConfig.getUserName(), systemUserConfig.getPassword());
-    }
-
-    private String getAccessToken() {
-        return userService.getAccessToken(
-            systemUserConfig.getUserName(),
-            systemUserConfig.getPassword()
-        );
     }
 }
