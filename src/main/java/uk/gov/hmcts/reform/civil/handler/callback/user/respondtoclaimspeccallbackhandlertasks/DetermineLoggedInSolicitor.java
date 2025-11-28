@@ -48,17 +48,17 @@ public class DetermineLoggedInSolicitor implements CaseTask {
         log.info("Updating solicitor roles for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
 
         if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORONE)) {
-            log.debug("Solicitor has RESPONDENTSOLICITORONE role for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
+            log.info("Solicitor has RESPONDENTSOLICITORONE role for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
             updatedCaseData.isRespondent1(YES);
             updatedCaseData.isRespondent2(NO);
             updatedCaseData.isApplicant1(NO);
         } else if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORTWO)) {
-            log.debug("Solicitor has RESPONDENTSOLICITORTWO role for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
+            log.info("Solicitor has RESPONDENTSOLICITORTWO role for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
             updatedCaseData.isRespondent1(NO);
             updatedCaseData.isRespondent2(YES);
             updatedCaseData.isApplicant1(NO);
         } else if (solicitorHasCaseRole(callbackParams, APPLICANTSOLICITORONE)) {
-            log.debug("Solicitor has APPLICANTSOLICITORONE role for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
+            log.info("Solicitor has APPLICANTSOLICITORONE role for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
             updatedCaseData.isRespondent1(NO);
             updatedCaseData.isRespondent2(NO);
             updatedCaseData.isApplicant1(YES);
@@ -69,10 +69,10 @@ public class DetermineLoggedInSolicitor implements CaseTask {
         log.info("Updating company or organisation status for caseId: {}", caseData.getCcdCaseReference());
 
         if (YES.equals(caseData.getIsRespondent2())) {
-            log.debug("Updating company or organisation status for Respondent2 for caseId: {}", caseData.getCcdCaseReference());
+            log.info("Updating company or organisation status for Respondent2 for caseId: {}", caseData.getCcdCaseReference());
             updateCompanyOrOrganisationStatusForRespondent2(caseData, updatedCaseData);
         } else {
-            log.debug("Updating company or organisation status for Respondent1 for caseId: {}", caseData.getCcdCaseReference());
+            log.info("Updating company or organisation status for Respondent1 for caseId: {}", caseData.getCcdCaseReference());
             updateCompanyOrOrganisationStatusForRespondent1(caseData, updatedCaseData);
         }
     }
@@ -83,10 +83,10 @@ public class DetermineLoggedInSolicitor implements CaseTask {
         if (caseData.getRespondent2DetailsForClaimDetailsTab() != null
                 && ("Company".equals(caseData.getRespondent2DetailsForClaimDetailsTab().getPartyTypeDisplayValue())
                 || "Organisation".equals(caseData.getRespondent2DetailsForClaimDetailsTab().getPartyTypeDisplayValue()))) {
-            log.debug("Respondent2 is a Company or Organisation for caseId: {}", caseData.getCcdCaseReference());
+            log.info("Respondent2 is a Company or Organisation for caseId: {}", caseData.getCcdCaseReference());
             updatedCaseData.neitherCompanyNorOrganisation(NO);
         } else {
-            log.debug("Respondent2 is neither a Company nor Organisation for caseId: {}", caseData.getCcdCaseReference());
+            log.info("Respondent2 is neither a Company nor Organisation for caseId: {}", caseData.getCcdCaseReference());
             updatedCaseData.neitherCompanyNorOrganisation(YES);
         }
     }
@@ -97,10 +97,10 @@ public class DetermineLoggedInSolicitor implements CaseTask {
         if (caseData.getRespondent1DetailsForClaimDetailsTab() != null
                 && ("Company".equals(caseData.getRespondent1DetailsForClaimDetailsTab().getPartyTypeDisplayValue())
                 || "Organisation".equals(caseData.getRespondent1DetailsForClaimDetailsTab().getPartyTypeDisplayValue()))) {
-            log.debug("Respondent1 is a Company or Organisation for caseId: {}", caseData.getCcdCaseReference());
+            log.info("Respondent1 is a Company or Organisation for caseId: {}", caseData.getCcdCaseReference());
             updatedCaseData.neitherCompanyNorOrganisation(NO);
         } else {
-            log.debug("Respondent1 is neither a Company nor Organisation for caseId: {}", caseData.getCcdCaseReference());
+            log.info("Respondent1 is neither a Company nor Organisation for caseId: {}", caseData.getCcdCaseReference());
             updatedCaseData.neitherCompanyNorOrganisation(YES);
         }
     }
@@ -116,7 +116,7 @@ public class DetermineLoggedInSolicitor implements CaseTask {
                 caseRole
         );
 
-        log.debug("Solicitor has case role '{}' for caseId {}: {}", caseRole, caseData.getCcdCaseReference(), hasRole);
+        log.info("Solicitor has case role '{}' for caseId {}: {}", caseRole, caseData.getCcdCaseReference(), hasRole);
         return hasRole;
     }
 }

@@ -88,30 +88,32 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         }
 
         CaseData caseData = getUpdatedCaseData(callbackParams);
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
-        populateDQPartyIds(builder);
-        addEventAndDateAddedToRespondentExperts(builder);
-        addEventAndDateAddedToRespondentWitnesses(builder);
+        populateDQPartyIds(caseData);
+        addEventAndDateAddedToRespondentExperts(caseData);
+        addEventAndDateAddedToRespondentWitnesses(caseData);
 
-        caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_CUI, builder);
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(builder);
+        caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_CUI, caseData);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(caseData);
 
         updateCaseManagementLocationDetailsService.updateRespondent1RequestedCourtDetails(
-            caseData, builder, updateCaseManagementLocationDetailsService.fetchLocationData(callbackParams));
+            callbackParams.getCaseData(), updateCaseManagementLocationDetailsService.fetchLocationData(callbackParams));
 
-        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent1(callbackParams, builder);
-        CaseData updatedData = builder.claimDismissedDeadline(
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent1(callbackParams, caseData);
+
+        caseData.setClaimDismissedDeadline(
             deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
                 DEFENDANT_RESPONSE_CUI_DEADLINE_EXTENSION_MONTHS,
                 LocalDate.now()
-            )).build();
+            ));
+
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
-            AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));
+            AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseData.toMap(objectMapper));
 
         boolean needsTranslating = featureToggleService.isWelshEnabledForMainCase()
-            ? (caseData.isRespondentResponseBilingual() || caseData.isClaimantBilingual())
-            : caseData.isRespondentResponseBilingual();
+            ? (callbackParams.getCaseData().isRespondentResponseBilingual() || callbackParams.getCaseData().isClaimantBilingual())
+            : callbackParams.getCaseData().isRespondentResponseBilingual();
 
         if (!needsTranslating) {
             responseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.name());
@@ -146,20 +148,19 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             responseDate
         ) : null;
 
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-            .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_CUI))
-            .respondent1ResponseDate(responseDate)
-            .respondent1GeneratedResponseDocument(dummyDocument)
-            .respondent1ClaimResponseDocumentSpec(dummyDocument)
-            .responseClaimTrack(AllocatedTrack.getAllocatedTrack(
+        caseData.setBusinessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_CUI));
+        caseData.setRespondent1ResponseDate(responseDate);
+        caseData.setRespondent1GeneratedResponseDocument(dummyDocument);
+        caseData.setRespondent1ClaimResponseDocumentSpec(dummyDocument);
+        caseData.setResponseClaimTrack(AllocatedTrack.getAllocatedTrack(
                 caseData.getTotalClaimAmount(),
                 null,
                 null,
                 featureToggleService,
                 caseData
-            ).name())
-            .applicant1ResponseDeadline(applicantDeadline)
-            .nextDeadline(applicantDeadline != null ? applicantDeadline.toLocalDate() : null);
+            ).name());
+        caseData.setApplicant1ResponseDeadline(applicantDeadline);
+        caseData.setNextDeadline(applicantDeadline != null ? applicantDeadline.toLocalDate() : null);
 
         if (featureToggleService.isWelshEnabledForMainCase()) {
             Optional<Language> optionalLanguage = Optional.ofNullable(caseData.getRespondent1DQ())
@@ -167,10 +168,15 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             String respondentLanguageString = optionalLanguage.map(Language::name).orElse(null);
             optionalLanguage.ifPresent(docLanguage -> {
                 CaseDataLiP caseDataLiP = caseData.getCaseDataLiP();
-                builder.caseDataLiP(caseDataLiP.toBuilder()
-                                        .respondent1LiPResponse(caseDataLiP.getRespondent1LiPResponse().toBuilder()
-                                                                    .respondent1ResponseLanguage(docLanguage.name()).build())
-                                        .build());
+                RespondentLiPResponse respondent1LiPResponse = caseDataLiP != null && caseDataLiP.getRespondent1LiPResponse() != null
+                    ? caseDataLiP.getRespondent1LiPResponse()
+                    : new RespondentLiPResponse();
+
+                respondent1LiPResponse.setRespondent1ResponseLanguage(docLanguage.name());
+
+                CaseDataLiP updatedCaseDataLiP = caseDataLiP != null ? caseDataLiP : new CaseDataLiP();
+                updatedCaseDataLiP.setRespondent1LiPResponse(respondent1LiPResponse);
+                caseData.setCaseDataLiP(updatedCaseDataLiP);
             });
             if (respondentLanguageString == null) {
                 respondentLanguageString = Optional.ofNullable(caseData.getCaseDataLiP())
@@ -178,8 +184,8 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
                     .map(RespondentLiPResponse::getRespondent1ResponseLanguage)
                     .orElse(null);
             }
-            builder.defendantLanguagePreferenceDisplay(PreferredLanguage.fromString(respondentLanguageString));
+            caseData.setDefendantLanguagePreferenceDisplay(PreferredLanguage.fromString(respondentLanguageString));
         }
-        return builder.build();
+        return caseData;
     }
 }

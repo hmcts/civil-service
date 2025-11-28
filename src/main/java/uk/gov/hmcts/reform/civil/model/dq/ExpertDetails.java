@@ -10,14 +10,14 @@ import java.math.BigDecimal;
 @Builder(toBuilder = true)
 public class ExpertDetails {
 
-    private final String partyID;
-    private final String expertName;
-    private final String firstName;
-    private final String lastName;
-    private final String phoneNumber;
-    private final String emailAddress;
-    private final String whyRequired;
-    private final String fieldofExpertise;
+    private String partyID;
+    private String expertName;
+    private String firstName;
+    private String lastName;
+    private String phoneNumber;
+    private String emailAddress;
+    private String whyRequired;
+    private String fieldofExpertise;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal estimatedCost;
+    private BigDecimal estimatedCost;
 }

@@ -190,8 +190,8 @@ public class HearingValuesService {
             // in an inconsistent state where app/res fields have no party ids
             // and litfriends, witnesses and experts do it's still safe to call populateWithPartyFlags
             // as it was created to not overwrite partyId fields if they exist.
-            populateWithPartyIds(builder);
-            populateDQPartyIds(builder);
+            populateWithPartyIds(caseData);
+            populateDQPartyIds(caseData);
             populateWitnessAndExpertsPartyIds(builder);
             return true;
         }
@@ -213,8 +213,8 @@ public class HearingValuesService {
             || shouldUpdateApplicant2UnavailableDates(caseData)
             || shouldUpdateRespondent1UnavailableDates(caseData)
             || shouldUpdateRespondent2UnavailableDates(caseData)) {
-            updateMissingUnavailableDatesForApplicants(caseData, builder);
-            rollUpUnavailabilityDatesForRespondent(builder);
+            updateMissingUnavailableDatesForApplicants(caseData);
+            rollUpUnavailabilityDatesForRespondent(caseData);
             copyDatesIntoListingTabFields(builder.build(), builder);
             return true;
         }
@@ -233,7 +233,7 @@ public class HearingValuesService {
     private boolean initialiseMissingCaseFlags(CaseData.CaseDataBuilder<?, ?> builder) {
         CaseData caseData = builder.build();
         if (caseData.getApplicant1().getFlags() == null) {
-            caseFlagInitialiser.initialiseMissingCaseFlags(builder);
+            caseFlagInitialiser.initialiseMissingCaseFlags(caseData);
             return true;
         }
         return false;

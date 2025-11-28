@@ -5,17 +5,19 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Data
 @Builder
+@NoArgsConstructor
 public class TimelineOfEventDetails {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final LocalDate timelineDate;
+    private LocalDate timelineDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final String timelineDescription;
+    private String timelineDescription;
 
     @JsonCreator
     public TimelineOfEventDetails(@JsonProperty("timelineDate") LocalDate timelineDate,

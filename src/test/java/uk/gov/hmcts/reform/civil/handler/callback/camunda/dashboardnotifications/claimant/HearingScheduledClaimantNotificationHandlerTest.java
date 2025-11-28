@@ -92,18 +92,6 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
     }
 
     @Test
-    void shouldNotCallRecordScenario_whenCaseProgressionIsDisabled() {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(false);
-
-        CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_SUBMIT, CaseData.builder().build())
-            .build();
-
-        handler.handle(callbackParams);
-        verifyNoInteractions(dashboardScenariosService);
-    }
-
-    @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
         assertThat(handler.camundaActivityId(
             CallbackParamsBuilder.builder()
@@ -119,7 +107,6 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(LocationRefData.builder().siteName("Name").courtAddress("Loc").postcode("1").build());
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
 
         DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();
@@ -150,7 +137,6 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
     @Test
     void shouldCreateDashboardNotificationsForHearingFeeIfCaseInHRAndListing() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
@@ -184,7 +170,6 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
     @Test
     void shouldCreateDashboardNotificationsForHearingFeeIfFeePaymentFailure_HMC() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(hearingNoticeCamundaService.getProcessVariables(any()))
             .thenReturn(HearingNoticeVariables.builder()
                             .hearingId("HER1234")
@@ -229,7 +214,6 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
     @Test
     void shouldCreateDashboardNotificationsForHearingFeeIfFeeNeverPaid_HMC() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(hearingNoticeCamundaService.getProcessVariables(any()))
             .thenReturn(HearingNoticeVariables.builder()
                             .hearingId("HER1234")
@@ -289,7 +273,6 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
     @Test
     void shouldNotCreateDashboardNotificationsForHearingFeeIfFeePaymentSuccess_HMC() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(hearingNoticeCamundaService.getProcessVariables(any()))
             .thenReturn(HearingNoticeVariables.builder()
                             .hearingId("HER1234")
@@ -325,7 +308,6 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
     @Test
     void shouldNotCreateDashboardNotificationsForHearingFeeIfHearingTypeDisposal_HMC() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(hearingNoticeCamundaService.getProcessVariables(any()))
             .thenReturn(HearingNoticeVariables.builder()
                             .hearingId("HER1234")
@@ -360,7 +342,6 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
     @Test
     void shouldNotCreateDashboardNotificationsForHearingFeeIfPaidWithHwF_HMC() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(hearingNoticeCamundaService.getProcessVariables(any()))
             .thenReturn(HearingNoticeVariables.builder()
                             .hearingId("HER1234")
@@ -398,7 +379,6 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
     @Test
     void shouldCreateDashboardNotificationsForHearingFeeIfNotPaidWithHwF_HMC() {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(hearingNoticeCamundaService.getProcessVariables(any()))
             .thenReturn(HearingNoticeVariables.builder()
                             .hearingId("HER1234")
@@ -439,8 +419,6 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
 
     @Test
     void shouldNotCreateDashboardNotificationsForHearingFeeIfCaseInHRAndListing_butApplicantLR() {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
@@ -464,7 +442,6 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
                                                             YesOrNo applicant1Represented, YesOrNo respondent1Represented,
                                                             PaymentDetails hearingFeePaymentDetails, FeePaymentOutcomeDetails feePaymentOutcomeDetails) {
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")

@@ -14,8 +14,8 @@ import java.util.Map;
 @Builder
 public class AdditionalData {
 
-    private final Map<String, Object> data;
-    private final Map<String, JsonNode> definition;
+    private Map<String, Object> data;
+    private Map<String, JsonNode> definition;
 
     @JsonCreator
     public AdditionalData(@JsonProperty("Data") Map<String, Object> data,

@@ -15,9 +15,9 @@ import java.util.Optional;
 @Data
 public class HearingLipSupportRequirements {
 
-    private final String name;
-    private final List<DisabilityRequirement> requirements;
-    private final String otherSupport;
+    private String name;
+    private List<DisabilityRequirement> requirements;
+    private String otherSupport;
 
     @JsonIgnore
     public static HearingLipSupportRequirements toHearingSupportRequirements(RequirementsLip hearingSupportLip) {

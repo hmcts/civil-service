@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
@@ -120,6 +121,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
+@Accessors(chain = true)
 @SuperBuilder(toBuilder = true)
 @Jacksonized
 @EqualsAndHashCode(callSuper = true)
@@ -404,13 +406,15 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private  MediationAvailability resp1MediationAvailability;
     private  MediationAvailability resp2MediationAvailability;
 
-    private  String additionalInformationForJudge;
-    private  String applicantAdditionalInformationForJudge;
+    private final String additionalInformationForJudge;
+    private final String applicantAdditionalInformationForJudge;
     @JsonUnwrapped
     private  ExpertRequirements respondToClaimExperts;
 
     private  String caseNote;
     private  List<Element<CaseNote>> caseNotes;
+
+    private final String notificationSummary;
 
     @Valid
     private  CloseClaim withdrawClaim;

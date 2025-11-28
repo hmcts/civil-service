@@ -51,47 +51,46 @@ public class FullRemissionHWFCallbackHandler extends CallbackHandler {
 
     private CallbackResponse fullRemissionHWF(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
-            .businessProcess(BusinessProcess.ready(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME));
+        caseData.setBusinessProcess(BusinessProcess.ready(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME));
         BigDecimal claimFeeAmount = caseData.getCalculatedClaimFeeInPence();
         BigDecimal hearingFeeAmount = caseData.getCalculatedHearingFeeInPence();
 
         if (caseData.isHWFTypeClaimIssued() && claimFeeAmount.compareTo(BigDecimal.ZERO) != 0) {
             Optional.ofNullable(caseData.getClaimIssuedHwfDetails())
                 .ifPresentOrElse(
-                    claimIssuedHwfDetails -> updatedData.claimIssuedHwfDetails(
-                        claimIssuedHwfDetails.toBuilder().remissionAmount(claimFeeAmount)
-                            .outstandingFeeInPounds(BigDecimal.ZERO)
-                            .hwfCaseEvent(FULL_REMISSION_HWF)
-                            .build()
-                    ),
-                    () -> updatedData.claimIssuedHwfDetails(
-                        HelpWithFeesDetails.builder().remissionAmount(claimFeeAmount)
-                            .outstandingFeeInPounds(BigDecimal.ZERO)
-                            .hwfCaseEvent(FULL_REMISSION_HWF)
-                            .build()
-                    )
+                    claimIssuedHwfDetails -> {
+                        claimIssuedHwfDetails.setRemissionAmount(claimFeeAmount);
+                        claimIssuedHwfDetails.setOutstandingFeeInPounds(BigDecimal.ZERO);
+                        claimIssuedHwfDetails.setHwfCaseEvent(FULL_REMISSION_HWF);
+                    },
+                    () -> {
+                        HelpWithFeesDetails newDetails = new HelpWithFeesDetails();
+                        newDetails.setRemissionAmount(claimFeeAmount);
+                        newDetails.setOutstandingFeeInPounds(BigDecimal.ZERO);
+                        newDetails.setHwfCaseEvent(FULL_REMISSION_HWF);
+                        caseData.setClaimIssuedHwfDetails(newDetails);
+                    }
                 );
         } else if (caseData.isHWFTypeHearing() && hearingFeeAmount.compareTo(BigDecimal.ZERO) != 0) {
             Optional.ofNullable(caseData.getHearingHwfDetails())
                 .ifPresentOrElse(
-                    hearingHwfDetails -> updatedData.hearingHwfDetails(
-                        HelpWithFeesDetails.builder().remissionAmount(hearingFeeAmount)
-                            .outstandingFeeInPounds(BigDecimal.ZERO)
-                            .hwfCaseEvent(FULL_REMISSION_HWF)
-                            .build()
-                    ),
-                    () -> updatedData.hearingHwfDetails(
-                        HelpWithFeesDetails.builder().remissionAmount(hearingFeeAmount)
-                            .hwfCaseEvent(FULL_REMISSION_HWF)
-                            .build()
-                    )
+                    hearingHwfDetails -> {
+                        hearingHwfDetails.setRemissionAmount(hearingFeeAmount);
+                        hearingHwfDetails.setOutstandingFeeInPounds(BigDecimal.ZERO);
+                        hearingHwfDetails.setHwfCaseEvent(FULL_REMISSION_HWF);
+                    },
+                    () -> {
+                        HelpWithFeesDetails newDetails = new HelpWithFeesDetails();
+                        newDetails.setRemissionAmount(hearingFeeAmount);
+                        newDetails.setHwfCaseEvent(FULL_REMISSION_HWF);
+                        caseData.setHearingHwfDetails(newDetails);
+                    }
                 );
         }
-        helpWithFeesForTabService.setUpHelpWithFeeTab(updatedData);
+        helpWithFeesForTabService.setUpHelpWithFeeTab(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 }

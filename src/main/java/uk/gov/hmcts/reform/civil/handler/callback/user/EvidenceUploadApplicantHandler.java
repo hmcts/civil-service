@@ -32,23 +32,22 @@ public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
 
     @Override
     CallbackResponse createShowCondition(CaseData caseData, UserInfo userInfo) {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         //For case which are 1v1, 2v1  we show respondent fields for documents to be uploaded,
         //if a case is 1v2 and different solicitors we want to show separate fields for each respondent solicitor i.e.
         //RESPONDENTSOLICITORTWO and RESPONDENTSOLICITORONE
         //if a case is 1v2 with same solicitor they will see respondent 2 fields as they have RESPONDENTSOLICITORTWO role
         //default flag for respondent 1 solicitor
-        caseDataBuilder.caseTypeFlag("do_not_show");
+        caseData.setCaseTypeFlag("do_not_show");
 
         boolean multiParts = Objects.nonNull(caseData.getEvidenceUploadOptions())
             && !caseData.getEvidenceUploadOptions().getListItems().isEmpty();
         if (multiParts
             && caseData.getEvidenceUploadOptions()
             .getValue().getLabel().startsWith("Claimant 2 - ")) {
-            caseDataBuilder.caseTypeFlag("ApplicantTwoFields");
+            caseData.setCaseTypeFlag("ApplicantTwoFields");
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(this.objectMapper))
+            .data(caseData.toMap(this.objectMapper))
             .build();
     }
 

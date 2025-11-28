@@ -72,16 +72,14 @@ public class FeePaymentOutcomeHWFCallBackHandler extends CallbackHandler {
 
     private CallbackResponse submitFeePaymentOutcome(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (caseData.isHWFTypeClaimIssued()) {
             LocalDate issueDate = LocalDate.now();
-            caseDataBuilder.issueDate(issueDate).build();
-            caseDataBuilder.businessProcess(BusinessProcess.ready(CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT));
+            caseData.setIssueDate(issueDate);
+            caseData.setBusinessProcess(BusinessProcess.ready(CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT));
         } else if (caseData.isHWFTypeHearing()) {
-            caseDataBuilder.businessProcess(BusinessProcess.ready(CITIZEN_HEARING_FEE_PAYMENT));
+            caseData.setBusinessProcess(BusinessProcess.ready(CITIZEN_HEARING_FEE_PAYMENT));
         }
-        caseData = caseDataBuilder.build();
         caseData = hwfFeePaymentOutcomeService.updateHwfReferenceNumber(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
