@@ -4,16 +4,28 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.BundleFileNameList;
 import uk.gov.hmcts.reform.civil.helpers.bundle.BundleDocumentsRetrieval;
 import uk.gov.hmcts.reform.civil.helpers.bundle.PartyType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.bundle.BundlingRequestDocument;
+import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.DQ_APP1;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.DQ_APP2;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.DQ_DEF1;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.DQ_DEF2;
+import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleUtils.buildBundlingRequestDoc;
+import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleUtils.generateDocName;
+import static uk.gov.hmcts.reform.civil.helpers.bundle.PartyType.CLAIMANT1;
+import static uk.gov.hmcts.reform.civil.helpers.bundle.PartyType.CLAIMANT2;
+import static uk.gov.hmcts.reform.civil.helpers.bundle.PartyType.DEFENDANT1;
+import static uk.gov.hmcts.reform.civil.helpers.bundle.PartyType.DEFENDANT2;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @Service
@@ -27,14 +39,14 @@ public class DQMapper {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
 
         bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getDqByCategoryId(
-            caseData, DocCategory.APP1_DQ.getValue(), PartyType.CLAIMANT1));
+            caseData, DocCategory.APP1_DQ.getValue(), CLAIMANT1));
         bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getDqByCategoryId(
-            caseData, DocCategory.DEF1_DEFENSE_DQ.getValue(), PartyType.DEFENDANT1));
+            caseData, DocCategory.DEF1_DEFENSE_DQ.getValue(), DEFENDANT1));
         bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getDqByCategoryId(
-            caseData, DocCategory.DQ_DEF1.getValue(), PartyType.DEFENDANT1));
+            caseData, DQ_DEF1.getValue(), DEFENDANT1));
 
         bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getDqByCategoryId(
-            caseData, DocCategory.DEF2_DEFENSE_DQ.getValue(), PartyType.DEFENDANT2));
+            caseData, DocCategory.DEF2_DEFENSE_DQ.getValue(), DEFENDANT2));
 
         // No-category DQ
         List<uk.gov.hmcts.reform.civil.model.common.Element<uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument>> dqNoCategory =
@@ -48,7 +60,34 @@ public class DQMapper {
             uk.gov.hmcts.reform.civil.enums.caseprogression.BundleFileNameList
                 .DIRECTIONS_QUESTIONNAIRE_NO_CATEGORY_ID.getDisplayName()
         ));
-
+        //ManageDocuments
+        List<Element<ManageDocument>> manageDocuments = caseData.getManageDocumentsList();
+        if (!manageDocuments.isEmpty()) {
+            manageDocuments.forEach(manageDocument -> {
+                extractedDocumentByCategoryAndPartyType(DQ_APP1, manageDocument, bundlingRequestDocuments, CLAIMANT1);
+                extractedDocumentByCategoryAndPartyType(DQ_APP2, manageDocument, bundlingRequestDocuments, CLAIMANT2);
+                extractedDocumentByCategoryAndPartyType(DQ_DEF1, manageDocument, bundlingRequestDocuments, DEFENDANT1);
+                extractedDocumentByCategoryAndPartyType(DQ_DEF2, manageDocument, bundlingRequestDocuments, DEFENDANT2);
+            });
+        }
         return wrapElements(bundlingRequestDocuments);
+    }
+
+    private void extractedDocumentByCategoryAndPartyType(DocCategory docCategory,
+                                                                Element<ManageDocument> md,
+                                                                List<BundlingRequestDocument> bundlingRequestDocuments,
+                                                                PartyType partyType) {
+        if (docCategory.getValue().equals(md.getValue().getDocumentLink().getCategoryID())) {
+            bundlingRequestDocuments.add(
+                buildBundlingRequestDoc(
+                    generateDocName(BundleFileNameList.DIRECTIONS_QUESTIONNAIRE.getDisplayName(),
+                                    partyType.getDisplayName(), null,
+                                    md.getValue().getCreatedDatetime().toLocalDate()
+                    ),
+                    md.getValue().getDocumentLink(),
+                    md.getValue().getDocumentType().name()
+                )
+            );
+        }
     }
 }

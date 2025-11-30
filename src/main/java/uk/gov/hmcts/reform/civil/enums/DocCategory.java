@@ -11,6 +11,7 @@ public enum DocCategory {
     DEF2_DEFENSE_DQ("defendant2DefenseDirectionsQuestionnaire"),
     APP1_DQ("directionsQuestionnaire"),
     DQ_APP1("DQApplicant"),
+    DQ_APP2("DQApplicantTwo"),
     DQ_DEF1("DQRespondent"),
     DQ_DEF2("DQRespondentTwo"),
     HEARING_NOTICES("hearingNotices"),

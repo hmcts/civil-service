@@ -1,12 +1,11 @@
 package uk.gov.hmcts.reform.civil.helpers.bundle.mappers;
 
-import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getEvidenceUploadDocsByPartyAndDocType;
-import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleUtils.buildBundlingRequestDoc;
-import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleUtils.generateDocName;
-
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.BundleFileNameList;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.TypeOfDocDocumentaryEvidenceOfTrial;
@@ -16,6 +15,7 @@ import uk.gov.hmcts.reform.civil.helpers.bundle.PartyType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DocumentWithRegex;
 import uk.gov.hmcts.reform.civil.model.bundle.BundlingRequestDocument;
+import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
@@ -25,8 +25,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getEvidenceUploadDocsByPartyAndDocType;
+import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleUtils.buildBundlingRequestDoc;
+import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleUtils.generateDocName;
 
 @Service
 @RequiredArgsConstructor
@@ -163,6 +164,25 @@ public class StatementsOfCaseMapper {
                         bundleDocumentsRetrieval.getParticularsOfClaimName(caseData, BundleFileNameList.OTHER),
                         poc.getValue().getDocument(), ""
                     )));
+            }
+
+            List<Element<ManageDocument>> manageDocuments = caseData.getManageDocumentsList();
+            if (!manageDocuments.isEmpty()) {
+                manageDocuments.forEach(md -> {
+                    if (DocCategory.PARTICULARS_OF_CLAIM.getValue()
+                        .equals(md.getValue().getDocumentLink().getCategoryID())) {
+                        bundlingRequestDocuments.add(
+                            buildBundlingRequestDoc(
+                                bundleDocumentsRetrieval.getParticularsOfClaimName(
+                                    caseData,
+                                    BundleFileNameList.PARTICULARS_OF_CLAIM
+                                ),
+                                md.getValue().getDocumentLink(),
+                                md.getValue().getDocumentType().name()
+                            )
+                        );
+                    }
+                });
             }
         }
         return bundlingRequestDocuments;
