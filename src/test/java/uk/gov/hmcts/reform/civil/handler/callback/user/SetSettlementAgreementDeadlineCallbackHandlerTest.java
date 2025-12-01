@@ -57,14 +57,13 @@ public class SetSettlementAgreementDeadlineCallbackHandlerTest extends BaseCallb
             // Given
             LocalDateTime expectedDateTime = LocalDateTime.parse("2024-01-22T13:12:34");
             CaseData caseData = CaseDataBuilder.builder()
-                .build().toBuilder()
-                .caseDataLiP(CaseDataLiP.builder()
+                .build();
+            caseData.setCaseDataLiP(CaseDataLiP.builder()
                     .applicant1LiPResponse(ClaimantLiPResponse.builder()
                         .applicant1SignedSettlementAgreement(YesOrNo.YES).build()
                     )
-                    .build())
-                .claimantBilingualLanguagePreference(Language.BOTH.toString())
-                .build();
+                    .build());
+            caseData.setClaimantBilingualLanguagePreference(Language.BOTH.toString());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(deadlinesCalculator.getRespondToSettlementAgreementDeadline(any())).thenReturn(expectedDateTime);
 
@@ -80,14 +79,13 @@ public class SetSettlementAgreementDeadlineCallbackHandlerTest extends BaseCallb
         void shouldNotSetSettlementAgreementDeadlineIfNotBilingual() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
-                .build().toBuilder()
-                .caseDataLiP(CaseDataLiP.builder()
+                .build();
+            caseData.setCaseDataLiP(CaseDataLiP.builder()
                     .applicant1LiPResponse(ClaimantLiPResponse.builder()
                         .applicant1SignedSettlementAgreement(YesOrNo.YES).build()
                     )
-                    .build())
-                .claimantBilingualLanguagePreference(Language.ENGLISH.toString())
-                .build();
+                    .build());
+            caseData.setClaimantBilingualLanguagePreference(Language.ENGLISH.toString());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             // When
@@ -102,9 +100,8 @@ public class SetSettlementAgreementDeadlineCallbackHandlerTest extends BaseCallb
         void shouldNotSetSettlementAgreementDeadlineIfClaimantNotSigned() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
-                .build().toBuilder()
-                .claimantBilingualLanguagePreference(Language.BOTH.toString())
                 .build();
+            caseData.setClaimantBilingualLanguagePreference(Language.BOTH.toString());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             // When
@@ -118,19 +115,18 @@ public class SetSettlementAgreementDeadlineCallbackHandlerTest extends BaseCallb
         @Test
         void shouldSetSettlementAgreementDeadline_WhenCourtDecisionInFavourClaimantImmediateRepayment() {
             // Given
-            LocalDateTime expectedDateTime = LocalDateTime.parse("2024-05-20T13:12:34");
+            final LocalDateTime expectedDateTime = LocalDateTime.parse("2024-05-20T13:12:34");
             CaseData caseData = CaseDataBuilder.builder()
-                    .build().toBuilder()
-                    .caseDataLiP(CaseDataLiP.builder()
+                    .build();
+            caseData.setCaseDataLiP(CaseDataLiP.builder()
                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
                                     .applicant1SignedSettlementAgreement(YesOrNo.YES)
                                     .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
                                     .build()
                             )
-                            .build())
-                    .claimantBilingualLanguagePreference(Language.BOTH.toString())
-                    .applicant1RepaymentOptionForDefendantSpec(PaymentType.IMMEDIATELY)
-                    .build();
+                            .build());
+            caseData.setClaimantBilingualLanguagePreference(Language.BOTH.toString());
+            caseData.setApplicant1RepaymentOptionForDefendantSpec(PaymentType.IMMEDIATELY);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(deadlinesCalculator.getRespondentToImmediateSettlementAgreement(any())).thenReturn(expectedDateTime);
 

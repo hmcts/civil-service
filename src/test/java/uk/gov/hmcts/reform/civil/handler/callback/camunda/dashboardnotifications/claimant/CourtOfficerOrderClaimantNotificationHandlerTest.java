@@ -74,13 +74,14 @@ class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallbackHandl
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .hearingFeePaymentDetails(PaymentDetails.builder().status(PaymentStatus.SUCCESS).build())
-                .responseClaimTrack("SMALL_CLAIM")
-                .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
-                .ccdCaseReference(1234L)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            PaymentDetails paymentDetails = new PaymentDetails();
+            paymentDetails.setStatus(PaymentStatus.SUCCESS);
+            caseData.setHearingFeePaymentDetails(paymentDetails);
+            caseData.setResponseClaimTrack("SMALL_CLAIM");
+            caseData.setAllocatedTrack(AllocatedTrack.SMALL_CLAIM);
+            caseData.setCcdCaseReference(1234L);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_CLAIMANT.name()).build()
             ).build();
@@ -108,12 +109,11 @@ class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallbackHandl
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .trialReadyApplicant(YesOrNo.YES)
-                .responseClaimTrack("FAST_CLAIM")
-                .ccdCaseReference(1234L)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setTrialReadyApplicant(YesOrNo.YES);
+            caseData.setResponseClaimTrack("FAST_CLAIM");
+            caseData.setCcdCaseReference(1234L);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_CLAIMANT.name()).build()
@@ -141,11 +141,10 @@ class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallbackHandl
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .responseClaimTrack("FAST_CLAIM")
-                .ccdCaseReference(1234L)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setResponseClaimTrack("FAST_CLAIM");
+            caseData.setCcdCaseReference(1234L);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_CLAIMANT.name()).build()
@@ -164,10 +163,9 @@ class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallbackHandl
         @Test
         void shouldNotRecordScenario_whenClaimantRepresented() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                    .applicant1Represented(YesOrNo.YES)
-                    .ccdCaseReference(1234L)
-                    .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
+            caseData.setApplicant1Represented(YesOrNo.YES);
+            caseData.setCcdCaseReference(1234L);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_CLAIMANT.name()).build()
@@ -182,10 +180,9 @@ class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallbackHandl
         @Test
         void shouldNotRecordScenario_whenCaseEventsIsNotEnabled() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .ccdCaseReference(1234L)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setCcdCaseReference(1234L);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_CLAIMANT.name()).build()

@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -88,18 +89,19 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setApplicant1Represented(YesOrNo.NO);
         LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
-
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1ResponseDeadline(dateTime)
-            .defaultJudgmentDocuments(List.of(
-                Element.<CaseDocument>builder()
-                    .value(CaseDocument.builder().documentType(DocumentType.DEFAULT_JUDGMENT)
-                               .createdDatetime(LocalDateTime.now()).build()).build()))
-            .build();
+        caseData.setRespondent1ResponseDeadline(dateTime);
+        CaseDocument caseDocument = new CaseDocument();
+        caseDocument.setDocumentType(DocumentType.DEFAULT_JUDGMENT);
+        caseDocument.setCreatedDatetime(LocalDateTime.now());
+        Element<CaseDocument> element = new Element<>();
+        element.setValue(caseDocument);
+        List<Element<CaseDocument>> elements = List.of(element);
+        caseData.setDefaultJudgmentDocuments(elements);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -124,15 +126,13 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setApplicant1Represented(YesOrNo.NO);
         LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
-
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1ResponseDeadline(dateTime)
-            .repaymentSummaryObject("Test String")
-            .build();
+        caseData.setRespondent1ResponseDeadline(dateTime);
+        caseData.setRepaymentSummaryObject("Test String");
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -156,17 +156,17 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1ResponseDeadline(LocalDateTime.now())
-            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                          .whenWillThisAmountBePaid(LocalDate.now().minusDays(1)).build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setRespondent1ResponseDeadline(LocalDateTime.now());
+        caseData.setCcdState(CaseState.AWAITING_APPLICANT_INTENTION);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+        RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = new RespondToClaimAdmitPartLRspec();
+        respondToClaimAdmitPartLRspec.setWhenWillThisAmountBePaid(LocalDate.now().minusDays(1));
+        caseData.setRespondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -207,37 +207,35 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
 
     static Stream<Arguments> provideDefendantSignSettlementData() {
 
-        CaseData defendantRejectedSSA = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1ResponseDeadline(LocalDateTime.now())
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondentSignSettlementAgreement(YesOrNo.NO)
-                             .build())
-            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
-            .build();
+        CaseData defendantRejectedSSA = CaseDataBuilder.builder().build();
+        defendantRejectedSSA.setLegacyCaseReference("reference");
+        defendantRejectedSSA.setCcdCaseReference(1234L);
+        defendantRejectedSSA.setApplicant1Represented(YesOrNo.NO);
+        defendantRejectedSSA.setRespondent1ResponseDeadline(LocalDateTime.now());
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setRespondentSignSettlementAgreement(YesOrNo.NO);
+        defendantRejectedSSA.setCaseDataLiP(caseDataLiP);
+        defendantRejectedSSA.setCcdState(CaseState.AWAITING_APPLICANT_INTENTION);
 
-        CaseData defendantNotRespondedToSSA = CaseData.builder()
-            .legacyCaseReference("reference")
-            .applicant1Represented(YesOrNo.NO)
-            .ccdCaseReference(1234L)
-            .respondent1ResponseDeadline(LocalDateTime.now())
-            .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.of(2024, 3, 1, 12, 0, 0))
-            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
-            .build();
+        CaseData defendantNotRespondedToSSA = CaseDataBuilder.builder().build();
+        defendantNotRespondedToSSA.setLegacyCaseReference("reference");
+        defendantNotRespondedToSSA.setApplicant1Represented(YesOrNo.NO);
+        defendantNotRespondedToSSA.setCcdCaseReference(1234L);
+        defendantNotRespondedToSSA.setRespondent1ResponseDeadline(LocalDateTime.now());
+        defendantNotRespondedToSSA.setRespondent1RespondToSettlementAgreementDeadline(LocalDateTime.of(2024, 3, 1, 12, 0, 0));
+        defendantNotRespondedToSSA.setCcdState(CaseState.AWAITING_APPLICANT_INTENTION);
 
-        CaseData defendantBreakSSA = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1ResponseDeadline(LocalDateTime.now())
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                               .whenWillThisAmountBePaid(LocalDate.now().minusDays(1)).build())
-            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
-            .build();
+        CaseData defendantBreakSSA = CaseDataBuilder.builder().build();
+        defendantBreakSSA.setLegacyCaseReference("reference");
+        defendantBreakSSA.setCcdCaseReference(1234L);
+        defendantBreakSSA.setApplicant1Represented(YesOrNo.NO);
+        defendantBreakSSA.setRespondent1ResponseDeadline(LocalDateTime.now());
+        defendantBreakSSA.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+        defendantBreakSSA.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+        RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = new RespondToClaimAdmitPartLRspec();
+        respondToClaimAdmitPartLRspec.setWhenWillThisAmountBePaid(LocalDate.now().minusDays(1));
+        defendantBreakSSA.setRespondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec);
+        defendantBreakSSA.setCcdState(CaseState.AWAITING_APPLICANT_INTENTION);
 
         return Stream.of(
             Arguments.of(defendantRejectedSSA),
