@@ -678,12 +678,10 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             }
         }
 
-        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-            updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
-                callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                caseData
-            ));
-        }
+        updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
+            callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
+            caseData
+        ));
 
         // Save finalOrderSelection and toggle before they're cleared by nullPreviousSelections
         // These are only used for state determination, not for early return logic

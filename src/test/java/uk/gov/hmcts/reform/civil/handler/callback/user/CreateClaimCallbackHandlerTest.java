@@ -1511,15 +1511,13 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .containsEntry("legacyCaseReference", REFERENCE_NUMBER)
-                .containsEntry("submittedDate", submittedDate.format(DateTimeFormatter.ISO_DATE_TIME))
-                .containsEntry("allocatedTrack", MULTI_CLAIM.name());
+                .containsEntry("submittedDate", submittedDate.format(DateTimeFormatter.ISO_DATE_TIME));
         }
 
         @Test
         void shouldSetIntermediateAllocatedTrack_whenInvoked() {
             // New multi and intermediate track change track logic
             // claim amount is 100000.00, so track is intermediate, as this is the upper limit
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).containsEntry("allocatedTrack", INTERMEDIATE_CLAIM.name());
         }
@@ -1528,7 +1526,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetMultiAllocatedTrack_whenInvoked() {
             // New multi and intermediate track change track logic
             // claim amount is 100000.01, so track is multi
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             ClaimValue claimValue = new ClaimValue();
             claimValue.setStatementOfValueInPennies(BigDecimal.valueOf(10000001));
             CaseData caseDataUpdated = CaseDataBuilder.builder().atStateClaimDraft()
