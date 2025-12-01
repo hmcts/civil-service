@@ -4,13 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Value;
 
-@Value
+@Data
 @Builder
 @AllArgsConstructor
-@Data
-@NoArgsConstructor(force = true)
+@NoArgsConstructor
 public class AirlineEpimsId {
 
     String airline;
