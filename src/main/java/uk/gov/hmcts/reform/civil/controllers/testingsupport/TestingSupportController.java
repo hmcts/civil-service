@@ -46,6 +46,8 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BaseCaseData;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -61,7 +63,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUn
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
 import java.util.List;
-import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.STARTED;
 
@@ -97,33 +98,22 @@ public class TestingSupportController {
     private final CoreCaseUserService coreCaseUserService;
     private final GAJudgeRevisitTaskHandler gaJudgeRevisitTaskHandler;
 
-    private static final String BEARER_TOKEN = "Bearer Token";
     private static final String SUCCESS = "success";
     private static final String FAILED = "failed";
 
+    @SuppressWarnings("ClassEscapesDefinedScope")
     @GetMapping("/testing-support/case/{caseId}/business-process")
     public ResponseEntity<BusinessProcessInfo> getBusinessProcess(@PathVariable("caseId") Long caseId) {
         log.info("Get business process for caseId: {}", caseId);
-        CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseId));
-        var businessProcess = caseData.getBusinessProcess();
-        var businessProcessInfo = new BusinessProcessInfo(businessProcess);
-        businessProcessInfo.setCcdState(caseData.getCcdState().toString());
+        final CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseId));
 
-        if (businessProcess.getStatus() == STARTED) {
-            try {
-                camundaRestEngineClient.findIncidentByProcessInstanceId(businessProcess.getProcessInstanceId())
-                    .map(camundaRestEngineClient::getIncidentMessage)
-                    .ifPresent(businessProcessInfo::setIncidentMessage);
-            } catch (FeignException e) {
-                if (e.status() != 404) {
-                    businessProcessInfo.setIncidentMessage(e.contentUTF8());
-                }
-            }
-        }
+        final var businessProcessInfo = businessProcessInfoFrom(caseData.getBusinessProcess());
+        businessProcessInfo.setCcdState(caseData.getCcdState().toString());
 
         return new ResponseEntity<>(businessProcessInfo, HttpStatus.OK);
     }
 
+    @SuppressWarnings("ClassEscapesDefinedScope")
     @GetMapping("/testing-support/feature-toggle/{toggle}")
     @Operation(summary = "Check if a feature toggle is enabled")
     public ResponseEntity<FeatureToggleInfo> checkFeatureToggle(
@@ -133,6 +123,7 @@ public class TestingSupportController {
         return new ResponseEntity<>(featureToggleInfo, HttpStatus.OK);
     }
 
+    @SuppressWarnings("ClassEscapesDefinedScope")
     @PostMapping(
         value = "/testing-support/is-dashboard-toggle-enabled",
         produces = "application/json")
@@ -306,25 +297,87 @@ public class TestingSupportController {
         return new ResponseEntity<>(response.getBody(), response.getStatusCode());
     }
 
+    @SuppressWarnings("ClassEscapesDefinedScope")
     @GetMapping("/testing-support/case/{caseId}/business-process/ga")
     public ResponseEntity<BusinessProcessInfo> getGACaseReference(@PathVariable("caseId") Long caseId) {
-        log.info("Get GA case reference for parent caseId: {}", caseId);
-        CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseId));
+        log.info("Get the last business process info for parent caseId: {}", caseId);
+        final CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseId));
+        final List<Element<GeneralApplication>> generalApplications = caseData.getGeneralApplications();
 
-        if (caseData.getGeneralApplications() == null) {
+        if (generalApplications == null || generalApplications.isEmpty()) {
             log.info("No General Applications found for caseId: {}", caseId);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        int size = caseData.getGeneralApplications().size();
-        var generalApplication = caseData.getGeneralApplications().get(size - 1);
-        var businessProcess = Objects.requireNonNull(generalApplication).getValue().getBusinessProcess();
-        var businessProcessInfo = new BusinessProcessInfo(businessProcess);
+        final var generalApplication = generalApplications.get(generalApplications.size() - 1);
+        final var businessProcess = generalApplication.getValue().getBusinessProcess();
 
         log.info(
-            "GA Business process status: {} Camunda Event: {}", businessProcess.getStatus(), businessProcess
-                .getCamundaEvent()
+            "Last GA Business process status: {}, Camunda Event: {}, parentCaseID: {}",
+            businessProcess.getStatus(),
+            businessProcess.getCamundaEvent(),
+            caseId
         );
+
+        return new ResponseEntity<>(businessProcessInfoFrom(businessProcess), HttpStatus.OK);
+    }
+
+    @GetMapping("/testing-support/trigger-judge-revisit-process-event/{state}/{genAppType}")
+    public ResponseEntity<String> getJudgeRevisitProcessEvent(@PathVariable("state") String ccdState,
+                                                              @PathVariable("genAppType") String genAppType) {
+
+        final ExternalTaskImpl externalTask = new ExternalTaskImpl();
+        String responseMsg;
+
+        try {
+            if (ccdState.equals("ORDER_MADE")) {
+                if (genAppType.equals("STAY_THE_CLAIM")) {
+                    checkStayOrderDeadlineEndTaskHandler.handleTask(externalTask);
+                } else {
+                    checkUnlessOrderDeadlineEndTaskHandler.handleTask(externalTask);
+                }
+            } else {
+                gaJudgeRevisitTaskHandler.handleTask(externalTask);
+            }
+            responseMsg = SUCCESS;
+        } catch (Exception e) {
+            responseMsg = FAILED;
+        }
+
+        return new ResponseEntity<>(responseMsg, HttpStatus.OK);
+    }
+
+    @PostMapping(value = {"/user-roles/{caseId}"})
+    @Operation(summary = "User roles for case")
+    public CaseAssignmentUserRolesResource getUserRoles(
+        @PathVariable("caseId") String caseId) {
+        return coreCaseUserService.getUserRoles(caseId);
+    }
+
+    @PostMapping(value = {"/assignCase/{caseId}", "/assignCase/{caseId}/{caseRole}"})
+    @Operation(summary = "Assign case to user")
+    public void assignCase(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
+                           @PathVariable("caseId") String caseId,
+                           @PathVariable("caseRole") CaseRole caseRole) {
+        final String userId = userService.getUserInfo(authorisation).getUid();
+        final String organisationId = organisationService.findOrganisation(authorisation)
+            .map(Organisation::getOrganisationIdentifier)
+            .orElse(null);
+        coreCaseUserService.assignCase(caseId, userId, organisationId, caseRole);
+        log.info("Assign caseId: {}", caseId);
+    }
+
+    @GetMapping(value = {"/getOrgDetails"})
+    @Operation(summary = "Get organisation details")
+    public String getOrgDetailsByUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation) {
+        final String userId = userService.getUserInfo(authorisation).getUid();
+        return organisationService.findOrganisationByUserId(userId)
+            .map(Organisation::getOrganisationIdentifier)
+            .orElse(null);
+    }
+
+    private BusinessProcessInfo businessProcessInfoFrom(final BusinessProcess businessProcess) {
+        var businessProcessInfo = new BusinessProcessInfo(businessProcess);
 
         if (businessProcess.getStatus() == STARTED) {
             try {
@@ -338,58 +391,7 @@ public class TestingSupportController {
             }
         }
 
-        return new ResponseEntity<>(businessProcessInfo, HttpStatus.OK);
-    }
-
-    @GetMapping("/testing-support/trigger-judge-revisit-process-event/{state}/{genAppType}")
-    public ResponseEntity<String> getJudgeRevisitProcessEvent(@PathVariable("state") String ccdState,
-                                                              @PathVariable("genAppType") String genAppType) {
-
-        String responseMsg = "success";
-        ExternalTaskImpl externalTask = new ExternalTaskImpl();
-        try {
-            if (ccdState.equals("ORDER_MADE")) {
-                if (genAppType.equals("STAY_THE_CLAIM")) {
-                    checkStayOrderDeadlineEndTaskHandler.handleTask(externalTask);
-                } else {
-                    checkUnlessOrderDeadlineEndTaskHandler.handleTask(externalTask);
-                }
-            } else {
-                gaJudgeRevisitTaskHandler.handleTask(externalTask);
-            }
-        } catch (Exception e) {
-            responseMsg = "failed";
-        }
-
-        return new ResponseEntity<>(responseMsg, HttpStatus.OK);
-    }
-
-    @PostMapping(value = {"/user-roles/{caseId}"})
-    @Operation(summary = "user roles for the cases")
-    public CaseAssignmentUserRolesResource getUserRoles(
-        @PathVariable("caseId") String caseId) {
-        return coreCaseUserService.getUserRoles(caseId);
-    }
-
-    @PostMapping(value = {"/assignCase/{caseId}", "/assignCase/{caseId}/{caseRole}"})
-    @Operation(summary = "Assign case to user")
-    public void assignCase(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
-                           @PathVariable("caseId") String caseId,
-                           @PathVariable("caseRole") CaseRole caseRole) {
-        String userId = userService.getUserInfo(authorisation).getUid();
-        String organisationId = organisationService.findOrganisation(authorisation)
-            .map(Organisation::getOrganisationIdentifier).orElse(null);
-        coreCaseUserService.assignCase(caseId, userId, organisationId, caseRole);
-        log.info("Assign caseId: {}", caseId);
-    }
-
-    @GetMapping(value = {"/getOrgDetails"})
-    @Operation(summary = "Assign case to user")
-    public String getOrgDetailsByUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation) {
-        String userId = userService.getUserInfo(authorisation).getUid();
-        return organisationService.findOrganisationByUserId(userId)
-            .map(Organisation::getOrganisationIdentifier).orElse(null);
-
+        return businessProcessInfo;
     }
 
     private String getSystemUserToken() {

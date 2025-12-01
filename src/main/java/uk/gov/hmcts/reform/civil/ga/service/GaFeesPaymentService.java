@@ -33,7 +33,7 @@ public class GaFeesPaymentService {
 
     public CardPaymentStatusResponse createGovPaymentRequest(String caseReference, String authorization) {
 
-        log.info("Creating gov Payment request url for caseId {}", caseReference);
+        log.info("Creating general application Gov Payment request url for caseId {}", caseReference);
         CaseDetails caseDetails = gaCoreCaseDataService.getCase(Long.valueOf(caseReference));
         GeneralApplicationCaseData caseData = caseDetailsConverter.toGeneralApplicationCaseData(caseDetails);
         String parentCaseRef = caseData.getParentCaseReference();
@@ -49,7 +49,7 @@ public class GaFeesPaymentService {
                         .divide(BigDecimal.valueOf(100), RoundingMode.CEILING)
                         .setScale(2, RoundingMode.CEILING))
             .currency("GBP")
-            .language(caseData.isApplicantBilingual() ? "cy" : "En")
+            .language(caseData.isApplicantBilingual() ? "cy" : "en")
             .returnUrl(cuiFrontEndUrl + returnUrlSubPath + caseReference)
             .build();
         CardPaymentServiceRequestResponse govPayCardPaymentRequest = paymentStatusService
@@ -64,7 +64,7 @@ public class GaFeesPaymentService {
     }
 
     public CardPaymentStatusResponse getGovPaymentRequestStatus(String caseReference, String paymentReference, String authorization) {
-        log.info("Checking payment status for {}", paymentReference);
+        log.info("Checking general application payment status for {}", paymentReference);
         PaymentDto cardPaymentDetails = paymentStatusService.getCardPaymentDetails(paymentReference, authorization);
         String paymentStatus = cardPaymentDetails.getStatus();
         CardPaymentStatusResponse.CardPaymentStatusResponseBuilder response = CardPaymentStatusResponse.builder()
@@ -74,7 +74,7 @@ public class GaFeesPaymentService {
             .paymentAmount(cardPaymentDetails.getAmount());
 
         if (paymentStatus.equals("Failed")) {
-            Arrays.asList(cardPaymentDetails.getStatusHistories()).stream()
+            Arrays.stream(cardPaymentDetails.getStatusHistories())
                 .filter(h -> h.getStatus().equals(paymentStatus))
                 .findFirst()
                 .ifPresent(h -> response.errorCode(h.getErrorCode()).errorDescription(h.getErrorMessage()));
@@ -82,10 +82,13 @@ public class GaFeesPaymentService {
 
         try {
             updatePaymentStatusService.updatePaymentStatus(caseReference, response.build());
-
         } catch (Exception e) {
-
-            log.error("Update payment status failed for application [{}]", caseReference);
+            log.error(
+                "Update general application payment status failed for claim [{}]. Error: {}",
+                caseReference,
+                e.getMessage(),
+                e
+            );
         }
 
         return response.build();

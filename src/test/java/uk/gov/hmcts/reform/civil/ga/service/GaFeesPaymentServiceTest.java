@@ -63,7 +63,7 @@ class GaFeesPaymentServiceTest {
     private static final CardPaymentServiceRequestDTO CARD_PAYMENT_SERVICE_REQUEST
         = CardPaymentServiceRequestDTO.builder()
         .returnUrl("${cui-front-end.url}/general-application/payment-confirmation/1701090368574910/gaid/2801090368574910")
-        .language("En")
+        .language("en")
         .amount(new BigDecimal("232.00")).currency("GBP").build();
 
     @Autowired
