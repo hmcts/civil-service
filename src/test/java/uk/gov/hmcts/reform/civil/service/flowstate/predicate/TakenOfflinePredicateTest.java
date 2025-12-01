@@ -34,6 +34,62 @@ class TakenOfflinePredicateTest {
     }
 
     @Test
+    void should_return_false_for_bySystem_when_taken_offline_date_does_not_exist() {
+        when(caseData.getTakenOfflineDate()).thenReturn(null);
+        assertFalse(TakenOfflinePredicate.bySystem.test(caseData));
+    }
+
+    @Test
+    void should_return_true_for_byStaff_when_taken_offline_by_staff_date_exists() {
+        when(caseData.getTakenOfflineByStaffDate()).thenReturn(LocalDateTime.now());
+        assertTrue(TakenOfflinePredicate.byStaff.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_byStaff_when_taken_offline_by_staff_date_does_not_exist() {
+        when(caseData.getTakenOfflineByStaffDate()).thenReturn(null);
+        assertFalse(TakenOfflinePredicate.byStaff.test(caseData));
+    }
+
+    @Test
+    void should_return_true_for_sdoNotSuitable_when_suitable_sdo_reason_exists() {
+        when(caseData.getReasonNotSuitableSDO()).thenReturn(ReasonNotSuitableSDO.builder().input("reason").build());
+        assertTrue(TakenOfflinePredicate.sdoNotSuitable.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_sdoNotSuitable_when_no_suitable_sdo_reason() {
+        when(caseData.getReasonNotSuitableSDO()).thenReturn(null);
+        assertFalse(TakenOfflinePredicate.sdoNotSuitable.test(caseData));
+    }
+
+    @Test
+    void should_return_true_for_sdoNotDrawn_when_suitable_sdo_reason_exists_and_taken_offline_date_exists_and_by_staff_date_negated() {
+        when(caseData.getReasonNotSuitableSDO()).thenReturn(ReasonNotSuitableSDO.builder().input("reason").build());
+        when(caseData.getTakenOfflineDate()).thenReturn(LocalDateTime.now());
+        assertTrue(TakenOfflinePredicate.sdoNotDrawn.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_sdoNotDrawn_when_no_suitable_sdo_reason() {
+        when(caseData.getReasonNotSuitableSDO()).thenReturn(null);
+        assertFalse(TakenOfflinePredicate.sdoNotDrawn.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_sdoNotDrawn_when_taken_offline_date_does_not_exist() {
+        when(caseData.getReasonNotSuitableSDO()).thenReturn(ReasonNotSuitableSDO.builder().input("reason").build());
+        assertFalse(TakenOfflinePredicate.sdoNotDrawn.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_sdoNotDrawn_when_taken_offline_by_staff_date_exists() {
+        when(caseData.getTakenOfflineByStaffDate()).thenReturn(LocalDateTime.now());
+        assertFalse(TakenOfflinePredicate.byStaff.negate()
+                        .and(TakenOfflinePredicate.sdoNotDrawn).test(caseData));
+    }
+
+    @Test
     void should_return_true_for_beforeSdo_when_applicant1_has_response_and_no_draw_order_and_no_sdo_reason() {
         when(caseData.getApplicant1ResponseDate()).thenReturn(LocalDateTime.now());
         when(caseData.getDrawDirectionsOrderRequired()).thenReturn(null);
@@ -59,6 +115,26 @@ class TakenOfflinePredicateTest {
         when(caseData.getApplicant1ResponseDate()).thenReturn(LocalDateTime.now());
         when(caseData.getReasonNotSuitableSDO()).thenReturn(ReasonNotSuitableSDO.builder().input("reason").build());
         assertFalse(TakenOfflinePredicate.beforeSdo.test(caseData));
+    }
+
+    @Test
+    void should_return_true_for_afterSdo_when_draw_directions_order_required_and_not_suitable_sdo_negated() {
+        when(caseData.getDrawDirectionsOrderRequired()).thenReturn(YesOrNo.YES);
+        when(caseData.getReasonNotSuitableSDO()).thenReturn(null);
+        assertTrue(TakenOfflinePredicate.afterSdo.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_afterSdo_when_draw_directions_order_required() {
+        when(caseData.getDrawDirectionsOrderRequired()).thenReturn(null);
+        assertFalse(TakenOfflinePredicate.afterSdo.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_afterSdo_when_suitable_sdo_reason_exists() {
+        when(caseData.getDrawDirectionsOrderRequired()).thenReturn(YesOrNo.YES);
+        when(caseData.getReasonNotSuitableSDO()).thenReturn(ReasonNotSuitableSDO.builder().input("reason").build());
+        assertFalse(TakenOfflinePredicate.afterSdo.test(caseData));
     }
 
     @Test
@@ -270,70 +346,6 @@ class TakenOfflinePredicateTest {
         when(caseData.getRespondent1TimeExtensionDate()).thenReturn(LocalDateTime.now());
         assertFalse(TakenOfflinePredicate.afterClaimNotifiedAckNoResponseNoExtension.test(caseData));
     }
-
-    @Test
-    void should_return_false_for_bySystem_when_taken_offline_date_does_not_exist() {
-        when(caseData.getTakenOfflineDate()).thenReturn(null);
-        assertFalse(TakenOfflinePredicate.bySystem.test(caseData));
-    }
-
-    @Test
-    void should_return_true_for_byStaff_when_taken_offline_by_staff_date_exists() {
-        when(caseData.getTakenOfflineByStaffDate()).thenReturn(LocalDateTime.now());
-        assertTrue(TakenOfflinePredicate.byStaff.test(caseData));
-    }
-
-    @Test
-    void should_return_false_for_byStaff_when_taken_offline_by_staff_date_does_not_exist() {
-        when(caseData.getTakenOfflineByStaffDate()).thenReturn(null);
-        assertFalse(TakenOfflinePredicate.byStaff.test(caseData));
-    }
-
-    @Test
-    void should_return_true_for_afterSdo_when_draw_directions_order_required_and_not_suitable_sdo_negated() {
-        when(caseData.getDrawDirectionsOrderRequired()).thenReturn(YesOrNo.YES);
-        when(caseData.getReasonNotSuitableSDO()).thenReturn(null);
-        assertTrue(TakenOfflinePredicate.afterSdo.test(caseData));
-    }
-
-    @Test
-    void should_return_false_for_afterSdo_when_draw_directions_order_required() {
-        when(caseData.getDrawDirectionsOrderRequired()).thenReturn(null);
-        assertFalse(TakenOfflinePredicate.afterSdo.test(caseData));
-    }
-
-    @Test
-    void should_return_false_for_afterSdo_when_suitable_sdo_reason_exists() {
-        when(caseData.getDrawDirectionsOrderRequired()).thenReturn(YesOrNo.YES);
-        when(caseData.getReasonNotSuitableSDO()).thenReturn(ReasonNotSuitableSDO.builder().input("reason").build());
-        assertFalse(TakenOfflinePredicate.afterSdo.test(caseData));
-    }
-
-    @Test
-    void should_return_true_for_sdoNotDrawn_when_suitable_sdo_reason_exists_and_taken_offline_date_exists_and_by_staff_date_negated() {
-        when(caseData.getReasonNotSuitableSDO()).thenReturn(ReasonNotSuitableSDO.builder().input("reason").build());
-        when(caseData.getTakenOfflineDate()).thenReturn(LocalDateTime.now());
-        assertTrue(TakenOfflinePredicate.sdoNotDrawn.test(caseData));
-    }
-
-    @Test
-    void should_return_false_for_sdoNotDrawn_when_no_suitable_sdo_reason() {
-        when(caseData.getReasonNotSuitableSDO()).thenReturn(null);
-        assertFalse(TakenOfflinePredicate.sdoNotDrawn.test(caseData));
-    }
-
-    @Test
-    void should_return_false_for_sdoNotDrawn_when_taken_offline_date_does_not_exist() {
-        when(caseData.getReasonNotSuitableSDO()).thenReturn(ReasonNotSuitableSDO.builder().input("reason").build());
-        assertFalse(TakenOfflinePredicate.sdoNotDrawn.test(caseData));
-    }
-
-    @Test
-    void should_return_false_for_sdoNotDrawn_when_taken_offline_by_staff_date_exists() {
-        when(caseData.getTakenOfflineByStaffDate()).thenReturn(LocalDateTime.now());
-        assertFalse(TakenOfflinePredicate.byStaff.negate().and(TakenOfflinePredicate.sdoNotDrawn).test(caseData));
-    }
-
 
     @Test
     void should_return_true_for_afterNotifiedOptions_when_notified_and_options_not_both() {

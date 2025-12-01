@@ -34,7 +34,6 @@ class ClaimantPredicateTest {
             when(caseData.getAddApplicant2()).thenReturn(YES);
             when(caseData.getApplicant1ResponseDate()).thenReturn(null);
             when(caseData.getApplicant2ResponseDate()).thenReturn(null);
-
             assertTrue(ClaimantPredicate.beforeResponse.test(caseData));
         }
 
@@ -43,7 +42,6 @@ class ClaimantPredicateTest {
             when(caseData.getCaseAccessCategory()).thenReturn(UNSPEC_CLAIM);
             when(caseData.getAddApplicant2()).thenReturn(YES);
             when(caseData.getApplicant1ResponseDate()).thenReturn(java.time.LocalDateTime.now());
-
             assertFalse(ClaimantPredicate.beforeResponse.test(caseData));
         }
 
@@ -53,7 +51,6 @@ class ClaimantPredicateTest {
             when(caseData.getAddApplicant2()).thenReturn(YES);
             when(caseData.getApplicant1ResponseDate()).thenReturn(null);
             when(caseData.getApplicant2ResponseDate()).thenReturn(java.time.LocalDateTime.now());
-
             assertFalse(ClaimantPredicate.beforeResponse.test(caseData));
         }
 
@@ -61,7 +58,6 @@ class ClaimantPredicateTest {
         void should_return_true_when_not_unspec_2v1_and_applicant1_has_no_response_date() {
             when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
             when(caseData.getApplicant1ResponseDate()).thenReturn(null);
-
             assertTrue(ClaimantPredicate.beforeResponse.test(caseData));
         }
 
@@ -69,7 +65,6 @@ class ClaimantPredicateTest {
         void should_return_false_when_not_unspec_2v1_and_applicant1_has_response_date() {
             when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
             when(caseData.getApplicant1ResponseDate()).thenReturn(java.time.LocalDateTime.now());
-
             assertFalse(ClaimantPredicate.beforeResponse.test(caseData));
         }
 
@@ -78,7 +73,6 @@ class ClaimantPredicateTest {
             when(caseData.getCaseAccessCategory()).thenReturn(UNSPEC_CLAIM);
             when(caseData.getAddApplicant2()).thenReturn(NO);
             when(caseData.getApplicant1ResponseDate()).thenReturn(java.time.LocalDateTime.now());
-
             assertFalse(ClaimantPredicate.beforeResponse.test(caseData));
         }
     }
@@ -90,7 +84,6 @@ class ClaimantPredicateTest {
         void should_return_true_for_fullDefenceProceed_when_1v1_spec_claim_and_applicant_will_proceed() {
             when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
             when(caseData.getApplicant1ProceedWithClaim()).thenReturn(YES);
-
             assertTrue(ClaimantPredicate.fullDefenceProceed.test(caseData));
         }
 
@@ -98,7 +91,6 @@ class ClaimantPredicateTest {
         void should_return_false_for_fullDefenceProceed_when_1v1_spec_claim_and_applicant_will_not_proceed() {
             when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
             when(caseData.getApplicant1ProceedWithClaim()).thenReturn(NO);
-
             assertFalse(ClaimantPredicate.fullDefenceProceed.test(caseData));
         }
 
@@ -107,7 +99,6 @@ class ClaimantPredicateTest {
             when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
             when(caseData.getAddApplicant2()).thenReturn(YES);
             when(caseData.getApplicant1ProceedWithClaimSpec2v1()).thenReturn(YES);
-
             assertTrue(ClaimantPredicate.fullDefenceProceed.test(caseData));
         }
 
@@ -116,14 +107,12 @@ class ClaimantPredicateTest {
             when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
             when(caseData.getAddApplicant2()).thenReturn(YES);
             when(caseData.getApplicant1ProceedWithClaimSpec2v1()).thenReturn(NO);
-
             assertFalse(ClaimantPredicate.fullDefenceProceed.test(caseData));
         }
 
         @Test
         void should_return_true_for_fullDefenceProceed_when_1v1_unspec_claim_and_applicant_will_proceed() {
             when(caseData.getApplicant1ProceedWithClaim()).thenReturn(YES);
-
             assertTrue(ClaimantPredicate.fullDefenceProceed.test(caseData));
         }
 
@@ -145,7 +134,6 @@ class ClaimantPredicateTest {
         void should_return_true_for_fullDefenceProceed_when_2v1_unspec_claim_and_applicant_one_will_proceed() {
             when(caseData.getAddApplicant2()).thenReturn(YES);
             when(caseData.getApplicant1ProceedWithClaimMultiParty2v1()).thenReturn(YES);
-
             assertTrue(ClaimantPredicate.fullDefenceProceed.test(caseData));
         }
 
@@ -153,7 +141,6 @@ class ClaimantPredicateTest {
         void should_return_true_for_fullDefenceProceed_when_2v1_unspec_claim_and_applicant_two_will_proceed() {
             when(caseData.getAddApplicant2()).thenReturn(YES);
             when(caseData.getApplicant2ProceedWithClaimMultiParty2v1()).thenReturn(YES);
-
             assertTrue(ClaimantPredicate.fullDefenceProceed.test(caseData));
         }
     }
@@ -165,7 +152,6 @@ class ClaimantPredicateTest {
         void should_return_true_for_fullDefenceNotProceed_when_1v1_spec_claim_and_applicant_will_not_proceed() {
             when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
             when(caseData.getApplicant1ProceedWithClaim()).thenReturn(NO);
-
             assertTrue(ClaimantPredicate.fullDefenceNotProceed.test(caseData));
         }
 
@@ -174,14 +160,12 @@ class ClaimantPredicateTest {
             when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
             when(caseData.getAddApplicant2()).thenReturn(YES);
             when(caseData.getApplicant1ProceedWithClaimSpec2v1()).thenReturn(NO);
-
             assertTrue(ClaimantPredicate.fullDefenceNotProceed.test(caseData));
         }
 
         @Test
         void should_return_true_for_fullDefenceNotProceed_when_1v1_unspec_claim_and_applicant_will_not_proceed() {
             when(caseData.getApplicant1ProceedWithClaim()).thenReturn(NO);
-
             assertTrue(ClaimantPredicate.fullDefenceNotProceed.test(caseData));
         }
 
@@ -190,7 +174,6 @@ class ClaimantPredicateTest {
             when(caseData.getRespondent2()).thenReturn(Party.builder().build());
             when(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2()).thenReturn(NO);
             when(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2()).thenReturn(NO);
-
             assertTrue(ClaimantPredicate.fullDefenceNotProceed.test(caseData));
         }
 
@@ -199,7 +182,6 @@ class ClaimantPredicateTest {
             when(caseData.getAddApplicant2()).thenReturn(YES);
             when(caseData.getApplicant1ProceedWithClaimMultiParty2v1()).thenReturn(NO);
             when(caseData.getApplicant2ProceedWithClaimMultiParty2v1()).thenReturn(NO);
-
             assertTrue(ClaimantPredicate.fullDefenceNotProceed.test(caseData));
         }
     }

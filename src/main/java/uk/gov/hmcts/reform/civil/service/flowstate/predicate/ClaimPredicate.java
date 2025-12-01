@@ -17,6 +17,13 @@ public non-sealed interface ClaimPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Claim",
+        summary = "Claim notified",
+        description = "Acknowledgement deadline exists - claim notification has been sent (State Flow: claim notified)"
+    )
+    Predicate<CaseData> issued = CaseDataPredicate.Claim.hasNotificationDeadline;
+
+    @BusinessRule(
+        group = "Claim",
         summary = "Claim submitted",
         description = "Claim has a submitted date (claim has been submitted)"
     )
@@ -133,15 +140,9 @@ public non-sealed interface ClaimPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Claim",
-        summary = "Claim notified",
-        description = "Acknowledgement deadline exists - claim notification has been sent (State Flow: claim notified)"
-    )
-    Predicate<CaseData> issued = CaseDataPredicate.Claim.hasNotificationDeadline;
-
-    @BusinessRule(
-        group = "Claim",
         summary = "Pending claim issue (registered defendants)",
-        description = "Issue date is set and all represented defendants have registered organisations (second defendant absent or registered/same solicitor). Used for moving to pending issue"
+        description = "Issue date is set and all represented defendants have registered organisations " +
+            "(second defendant absent or registered/same solicitor). Used for moving to pending issue"
     )
     Predicate<CaseData> pendingIssued =
         CaseDataPredicate.Claim.hasIssueDate
@@ -187,7 +188,8 @@ public non-sealed interface ClaimPredicate extends CaseDataPredicate {
     @BusinessRule(
         group = "Claim",
         summary = "After issue - no AoS/response, before claim details",
-        description = "No claim‑details notification yet; respondent has not acknowledged service or responded; claim notification deadline is in the future. For SPEC, a notification date exists; for UNSPEC, it does not"
+        description = "No claim‑details notification yet; respondent has not acknowledged service or responded; " +
+            "claim notification deadline is in the future. For SPEC, a notification date exists; for UNSPEC, it does not"
     )
     Predicate<CaseData> afterIssued =
         CaseDataPredicate.ClaimDetails.hasNotificationDate.negate()
