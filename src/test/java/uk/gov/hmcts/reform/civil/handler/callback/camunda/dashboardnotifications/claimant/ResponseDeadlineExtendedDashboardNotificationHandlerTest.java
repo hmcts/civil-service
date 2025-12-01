@@ -65,9 +65,9 @@ class ResponseDeadlineExtendedDashboardNotificationHandlerTest extends BaseCallb
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
-            .toBuilder().respondent1Represented(YesOrNo.NO).applicant1Represented(YesOrNo.NO)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.NO);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
