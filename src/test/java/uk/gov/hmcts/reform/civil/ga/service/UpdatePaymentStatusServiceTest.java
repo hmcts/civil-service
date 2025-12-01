@@ -71,7 +71,7 @@ class UpdatePaymentStatusServiceTest {
 
         updatePaymentStatusService.updatePaymentStatus(String.valueOf(CASE_ID), getCardPaymentStatusResponse());
 
-        verify(gaCoreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
+        verify(gaCoreCaseDataService, times(1)).getCase(CASE_ID);
         verify(gaCoreCaseDataService).startUpdate(String.valueOf(CASE_ID), INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT);
         verify(gaCoreCaseDataService).submitUpdate(any(), any());
 
@@ -104,7 +104,7 @@ class UpdatePaymentStatusServiceTest {
 
         updatePaymentStatusService.updatePaymentStatus(String.valueOf(CASE_ID), getCardPaymentStatusResponse());
 
-        verify(gaCoreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
+        verify(gaCoreCaseDataService, times(1)).getCase(CASE_ID);
         verify(gaCoreCaseDataService).startUpdate(String.valueOf(CASE_ID), MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID);
         verify(gaCoreCaseDataService).submitUpdate(any(), any());
 
@@ -117,7 +117,7 @@ class UpdatePaymentStatusServiceTest {
                 new TypeReference<Map<String, Object>>() {
                 }
             ))
-            .id(Long.valueOf(CASE_ID)).build();
+            .id(CASE_ID).build();
     }
 
     private StartEventResponse startEventResponse(CaseDetails caseDetails, CaseEvent event) {
