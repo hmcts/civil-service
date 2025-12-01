@@ -5,6 +5,7 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.variable.value.FileValue;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseAssignmentMigrationCaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReferenceCsvLoader;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.DashboardScenarioCaseReference;
@@ -19,6 +20,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.springframework.util.StringUtils.hasText;
 
 @Component
 @Slf4j
@@ -60,6 +63,8 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
         List<T> caseReferences = new ArrayList<>();
         String caseIds = externalTask.getVariable("caseIds");
         String scenario = externalTask.getVariable("scenario");
+        String userEmailAddress = externalTask.getVariable("userEmailAddress");
+        String organisationId = externalTask.getVariable("organisationId");
 
         FileValue excelFileValue = externalTask.getVariableTyped("excelFile", false);
 
@@ -89,20 +94,13 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
                 .toList();
 
             caseReferences = caseIdList.stream()
-                .map(id -> {
-                    Object instance;
-                    if (scenario != null) {
-                        DashboardScenarioCaseReference scenarioInstance = new DashboardScenarioCaseReference();
-                        scenarioInstance.setCaseReference(id);
-                        scenarioInstance.setDashboardScenario(scenario);
-                        instance = scenarioInstance;
-                    } else {
-                        CaseReference caseRef = new CaseReference();
-                        caseRef.setCaseReference(id);
-                        instance = caseRef;
-                    }
-                    return task.getType().cast(instance);
-                })
+                .map(id -> buildCaseReference(
+                    task.getType(),
+                    id,
+                    scenario,
+                    userEmailAddress,
+                    organisationId
+                ))
                 .toList();
             log.info("Created {} case references from Camunda variables", caseReferences.size());
         } else {
@@ -134,6 +132,37 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
             return caseReferenceCsvLoader.loadCaseReferenceList(type, csvFileName, encryptionSecret);
         } else {
             return caseReferenceCsvLoader.loadCaseReferenceList(type, csvFileName);
+        }
+    }
+
+    private <T extends CaseReference> T buildCaseReference(
+        Class<T> type,
+        String caseId,
+        String scenario,
+        String userEmailAddress,
+        String organisationId
+    ) {
+        if (DashboardScenarioCaseReference.class.isAssignableFrom(type)) {
+            if (scenario == null) {
+                throw new IllegalArgumentException("Scenario must be provided for dashboard scenario migration tasks");
+            }
+            DashboardScenarioCaseReference scenarioInstance = new DashboardScenarioCaseReference();
+            scenarioInstance.setCaseReference(caseId);
+            scenarioInstance.setDashboardScenario(scenario);
+            return type.cast(scenarioInstance);
+        } else if (CaseAssignmentMigrationCaseReference.class.isAssignableFrom(type)) {
+            if (!hasText(userEmailAddress) || !hasText(organisationId)) {
+                throw new IllegalArgumentException("userEmailAddress and organisationId must be provided for case assignment migrations");
+            }
+            CaseAssignmentMigrationCaseReference assignmentReference = new CaseAssignmentMigrationCaseReference();
+            assignmentReference.setCaseReference(caseId);
+            assignmentReference.setUserEmailAddress(userEmailAddress);
+            assignmentReference.setOrganisationId(organisationId);
+            return type.cast(assignmentReference);
+        } else {
+            CaseReference caseReference = new CaseReference();
+            caseReference.setCaseReference(caseId);
+            return type.cast(caseReference);
         }
     }
 }
