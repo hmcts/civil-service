@@ -69,7 +69,8 @@ class ResubmitClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldUpdateBusinessProcess_whenInvoked_spec() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim()
-                .build().toBuilder().caseAccessCategory(SPEC_CLAIM).build();
+                .build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             // When
@@ -91,7 +92,8 @@ class ResubmitClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldUpdateBusinessProcess_whenInvoked_spec_blocked() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim()
-                .build().toBuilder().caseAccessCategory(SPEC_CLAIM).build();
+                .build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             // When
