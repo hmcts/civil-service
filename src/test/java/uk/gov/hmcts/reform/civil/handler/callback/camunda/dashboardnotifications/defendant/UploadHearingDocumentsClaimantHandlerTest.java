@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.UploadHearingDocumentsClaimantHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -74,6 +75,10 @@ class UploadHearingDocumentsClaimantHandlerTest extends BaseCallbackHandlerTest 
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
+        DynamicListElement selectedCourt = new DynamicListElement();
+        selectedCourt.setCode("00002");
+        selectedCourt.setLabel("court 2 - 2 address - Y02 7RB");
+
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");
         caseData.setApplicant1Represented(YesOrNo.NO);
@@ -81,7 +86,9 @@ class UploadHearingDocumentsClaimantHandlerTest extends BaseCallbackHandlerTest 
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
         caseData.setClaimsTrack(ClaimsTrack.fastTrack);
         caseData.setCcdState(CaseState.CASE_PROGRESSION);
-        caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("00002"));
+        CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+        caseLocationCivil.setBaseLocation(selectedCourt.getCode());
+        caseData.setCaseManagementLocation(caseLocationCivil);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -104,6 +111,10 @@ class UploadHearingDocumentsClaimantHandlerTest extends BaseCallbackHandlerTest 
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
+        DynamicListElement selectedCourt = new DynamicListElement();
+        selectedCourt.setCode("00002");
+        selectedCourt.setLabel("court 2 - 2 address - Y02 7RB");
+
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");
         caseData.setApplicant1Represented(YesOrNo.NO);
@@ -111,7 +122,9 @@ class UploadHearingDocumentsClaimantHandlerTest extends BaseCallbackHandlerTest 
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
         caseData.setClaimsTrack(ClaimsTrack.fastTrack);
         caseData.setCcdState(CaseState.CASE_PROGRESSION);
-        caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("00002"));
+        CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+        caseLocationCivil.setBaseLocation(selectedCourt.getCode());
+        caseData.setCaseManagementLocation(caseLocationCivil);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -134,6 +147,10 @@ class UploadHearingDocumentsClaimantHandlerTest extends BaseCallbackHandlerTest 
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
+        DynamicListElement selectedCourt = new DynamicListElement();
+        selectedCourt.setCode("00002");
+        selectedCourt.setLabel("court 2 - 2 address - Y02 7RB");
+
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");
         caseData.setApplicant1Represented(YesOrNo.NO);
@@ -141,7 +158,9 @@ class UploadHearingDocumentsClaimantHandlerTest extends BaseCallbackHandlerTest 
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
         caseData.setClaimsTrack(ClaimsTrack.fastTrack);
         caseData.setCcdState(CaseState.CASE_PROGRESSION);
-        caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("00002"));
+        CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+        caseLocationCivil.setBaseLocation(selectedCourt.getCode());
+        caseData.setCaseManagementLocation(caseLocationCivil);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)

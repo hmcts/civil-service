@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.service.hearingnotice;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.HearingDay;
 
@@ -12,6 +14,7 @@ import java.util.List;
 @Data
 @Builder(toBuilder = true)
 @AllArgsConstructor
+@NoArgsConstructor
 public class HearingNoticeVariables implements MappableObject {
 
     public String hearingId;

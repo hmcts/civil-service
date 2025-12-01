@@ -50,10 +50,8 @@ class ClaimIssueCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldAddClaimNotificationDeadline_whenClaimIsIssued() {
-        CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued()
-            .build().toBuilder()
-            .respondent1OrganisationIDCopy("")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
+        caseData.setRespondent1OrganisationIDCopy("");
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         when(deadlinesCalculator.addMonthsToDateAtMidnight(eq(4), any(LocalDate.class)))
@@ -82,15 +80,9 @@ class ClaimIssueCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldNotThrowException_whenIdCopyIsNotDefined() {
-        CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued()
-            .build().toBuilder()
-            .respondent1OrganisationIDCopy("")
-            .build();
-        caseData = caseData.toBuilder()
-            .respondent1OrganisationPolicy(
-                OrganisationPolicy.builder().build()
-            )
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
+        caseData.setRespondent1OrganisationIDCopy("");
+        caseData.setRespondent1OrganisationPolicy(new OrganisationPolicy());
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         when(deadlinesCalculator.addMonthsToDateAtMidnight(eq(4), any(LocalDate.class)))
@@ -104,8 +96,11 @@ class ClaimIssueCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldRemoveSubmitterIdOnly() {
-        CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().applicantSolicitor1UserDetails(
-            IdamUserDetails.builder().id("submitter-id").email("applicantsolicitor@example.com").build()).build();
+        CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
+        IdamUserDetails solicitorDetails = new IdamUserDetails();
+        solicitorDetails.setId("submitter-id");
+        solicitorDetails.setEmail("applicantsolicitor@example.com");
+        caseData.setApplicantSolicitor1UserDetails(solicitorDetails);
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 

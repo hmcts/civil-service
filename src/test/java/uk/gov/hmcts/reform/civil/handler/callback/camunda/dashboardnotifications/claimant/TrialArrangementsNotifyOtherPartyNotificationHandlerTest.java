@@ -87,18 +87,19 @@ class TrialArrangementsNotifyOtherPartyNotificationHandlerTest extends BaseCallb
         }
 
         static Stream<Object[]> provideCaseData() {
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setApplicant1SettleClaim(YesOrNo.YES);
+            caseDataLiP.setApplicant1ClaimSettledDate(LocalDate.now());
             return Stream.of(
                 new Object[]{
                     CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
-                        .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
-                                         .applicant1ClaimSettledDate(LocalDate.now()).build())
+                        .caseDataLip(caseDataLiP)
                         .applicant1Represented(YesOrNo.NO).build(),
                     SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_CLAIMANT.getScenario()
                 },
                 new Object[]{
                     CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
-                        .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
-                                         .applicant1ClaimSettledDate(LocalDate.now()).build())
+                        .caseDataLip(caseDataLiP)
                         .applicant1Represented(YesOrNo.YES).build(),
                     SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_LR_CLAIMANT.getScenario()
                 }

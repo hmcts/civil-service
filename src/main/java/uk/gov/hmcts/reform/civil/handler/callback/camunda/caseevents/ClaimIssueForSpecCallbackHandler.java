@@ -43,12 +43,10 @@ public class ClaimIssueForSpecCallbackHandler extends CallbackHandler {
     private CallbackResponse addClaimNotificationDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime deadline = deadlinesCalculator.addMonthsToDateAtMidnight(4, caseData.getIssueDate());
-        CaseData caseDataUpdated = caseData.toBuilder()
-            .claimNotificationDeadline(deadline)
-            .build();
+        caseData.setClaimNotificationDeadline(deadline);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataUpdated.toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
