@@ -7,6 +7,7 @@ import java.util.function.Predicate;
 
 @SuppressWarnings("java:S1214")
 public interface FlowLipPredicate {
+
     Predicate<CaseData> isLipCase = LipPredicate.isLiPvLiPCase;
     Predicate<CaseData> agreedToMediation = LipPredicate.agreedToMediation;
     Predicate<CaseData> isTranslatedDocumentUploaded = LipPredicate.isTranslatedDocumentUploaded;
@@ -14,4 +15,5 @@ public interface FlowLipPredicate {
     Predicate<CaseData> isRespondentSignSettlementAgreement = LipPredicate.isRespondentSignSettlementAgreement;
     Predicate<CaseData> nocSubmittedForLiPDefendantBeforeOffline = LipPredicate.nocSubmittedForLiPDefendantBeforeOffline;
     Predicate<CaseData> nocSubmittedForLiPDefendant = LipPredicate.nocSubmittedForLiPDefendant;
+
 }

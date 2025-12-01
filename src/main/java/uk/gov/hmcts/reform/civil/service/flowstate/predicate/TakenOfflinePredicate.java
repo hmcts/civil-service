@@ -72,7 +72,7 @@ public non-sealed interface TakenOfflinePredicate extends CaseDataPredicate {
         description = "Case submitted; claim notification NOT set (no notification deadline/date)"
     )
     Predicate<CaseData> beforeClaimIssue =
-        // In case of SPEC and UNSPEC claim ClaimNotificationDeadline will be set when the case is issued
+        // If SPEC and UNSPEC claim ClaimNotificationDeadline will be set when the case is issued
         CaseDataPredicate.Claim.hasNotificationDeadline.negate()
             .and(CaseDataPredicate.Claim.hasNotificationDate.negate())
             .and(CaseDataPredicate.Claim.hasSubmittedDate);

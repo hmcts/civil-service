@@ -27,8 +27,7 @@ public non-sealed interface DivergencePredicate extends CaseDataPredicate {
                 .and(CaseDataPredicate.Respondent.respondent2ResponseAfterRespondent1)).test(c)
                 || (CaseDataPredicate.Respondent.isTypeRespondent1(FULL_DEFENCE)
                 .and(CaseDataPredicate.Respondent.respondent1ResponseAfterRespondent2)).test(c));
-            case TWO_V_ONE ->
-                (CaseDataPredicate.Respondent.isTypeRespondent1(FULL_DEFENCE).test(c)
+            case TWO_V_ONE -> (CaseDataPredicate.Respondent.isTypeRespondent1(FULL_DEFENCE).test(c)
                 || CaseDataPredicate.Respondent.isTypeRespondent1ToApplicant2(FULL_DEFENCE).test(c))
                 && !(CaseDataPredicate.Respondent.isTypeRespondent1(FULL_DEFENCE).test(c)
                 && CaseDataPredicate.Respondent.isTypeRespondent1ToApplicant2(FULL_DEFENCE).test(c));
@@ -65,38 +64,40 @@ public non-sealed interface DivergencePredicate extends CaseDataPredicate {
     )
     Predicate<CaseData> divergentRespondWithDQAndGoOfflineSpec =
         CaseDataPredicate.Claim.isSpecClaim.and(c ->
-          switch (getMultiPartyScenario(c)) {
-              case ONE_V_TWO_ONE_LEGAL_REP ->
-                  CaseDataPredicate.Respondent.isTypeSpecRespondent1(null).negate()
-                      .and(CaseDataPredicate.Respondent.isTypeSpecRespondent2(null).negate())
-                      .and(CaseDataPredicate.Respondent.isSameResponseFlag.negate())
-                      .and(CaseDataPredicate.Respondent.responsesDifferSpec)
-                      .and(CaseDataPredicate.Respondent.isTypeSpecRespondent1(
-                              RespondentResponseTypeSpec.FULL_DEFENCE)
-                               .or(CaseDataPredicate.Respondent.isTypeSpecRespondent2(
-                                   RespondentResponseTypeSpec.FULL_DEFENCE)))
-                      .test(c);
-              case ONE_V_TWO_TWO_LEGAL_REP ->
-                  CaseDataPredicate.Respondent.isTypeSpecRespondent1(null).negate()
-                      .and(CaseDataPredicate.Respondent.isTypeSpecRespondent2(null).negate())
-                      .and(CaseDataPredicate.Respondent.hasResponseDateRespondent1)
-                      .and(CaseDataPredicate.Respondent.hasResponseDateRespondent2)
-                      .and(CaseDataPredicate.Respondent.isTypeSpecRespondent1(
-                              RespondentResponseTypeSpec.FULL_DEFENCE).negate()
-                               .or(CaseDataPredicate.Respondent.responsesDifferSpec))
-                      .test(c);
-              case TWO_V_ONE ->
-                  (CaseDataPredicate.Claimant.responseTypeSpecClaimant2(
-                          RespondentResponseTypeSpec.FULL_DEFENCE)
-                      .or(CaseDataPredicate.Claimant.responseTypeSpecClaimant1(
-                          RespondentResponseTypeSpec.FULL_DEFENCE)))
-                      .and((CaseDataPredicate.Claimant.responseTypeSpecClaimant2(
-                              RespondentResponseTypeSpec.FULL_DEFENCE)
-                          .and(CaseDataPredicate.Claimant.responseTypeSpecClaimant1(
-                              RespondentResponseTypeSpec.FULL_DEFENCE))).negate())
-                      .test(c);
-              default -> false;
-          });
+            switch (getMultiPartyScenario(c)) {
+                case ONE_V_TWO_ONE_LEGAL_REP ->
+                    CaseDataPredicate.Respondent.isTypeSpecRespondent1(null).negate()
+                        .and(CaseDataPredicate.Respondent.isTypeSpecRespondent2(
+                            null).negate())
+                        .and(CaseDataPredicate.Respondent.isSameResponseFlag.negate())
+                        .and(CaseDataPredicate.Respondent.responsesDifferSpec)
+                        .and(CaseDataPredicate.Respondent.isTypeSpecRespondent1(
+                                RespondentResponseTypeSpec.FULL_DEFENCE)
+                                 .or(CaseDataPredicate.Respondent.isTypeSpecRespondent2(
+                                     RespondentResponseTypeSpec.FULL_DEFENCE)))
+                        .test(c);
+                case ONE_V_TWO_TWO_LEGAL_REP ->
+                    CaseDataPredicate.Respondent.isTypeSpecRespondent1(null).negate()
+                        .and(CaseDataPredicate.Respondent.isTypeSpecRespondent2(
+                            null).negate())
+                        .and(CaseDataPredicate.Respondent.hasResponseDateRespondent1)
+                        .and(CaseDataPredicate.Respondent.hasResponseDateRespondent2)
+                        .and(CaseDataPredicate.Respondent.isTypeSpecRespondent1(
+                                RespondentResponseTypeSpec.FULL_DEFENCE).negate()
+                                 .or(CaseDataPredicate.Respondent.responsesDifferSpec))
+                        .test(c);
+                case TWO_V_ONE ->
+                    (CaseDataPredicate.Claimant.responseTypeSpecClaimant2(
+                            RespondentResponseTypeSpec.FULL_DEFENCE)
+                        .or(CaseDataPredicate.Claimant.responseTypeSpecClaimant1(
+                            RespondentResponseTypeSpec.FULL_DEFENCE)))
+                        .and((CaseDataPredicate.Claimant.responseTypeSpecClaimant2(
+                                RespondentResponseTypeSpec.FULL_DEFENCE)
+                            .and(CaseDataPredicate.Claimant.responseTypeSpecClaimant1(
+                                RespondentResponseTypeSpec.FULL_DEFENCE))).negate())
+                        .test(c);
+                default -> false;
+            });
 
     @BusinessRule(
         group = "Divergence",
@@ -105,24 +106,25 @@ public non-sealed interface DivergencePredicate extends CaseDataPredicate {
     )
     Predicate<CaseData> divergentRespondGoOfflineSpec =
         CaseDataPredicate.Claim.isSpecClaim.and(c ->
-          switch (getMultiPartyScenario(c)) {
-              case ONE_V_TWO_ONE_LEGAL_REP ->
-                  CaseDataPredicate.Respondent.isTypeSpecRespondent1(null).negate()
-                      .and(CaseDataPredicate.Respondent.isTypeSpecRespondent2(null).negate())
-                      .and(CaseDataPredicate.Respondent.isSameResponseFlag.negate())
-                      .and(CaseDataPredicate.Respondent.responsesDifferSpec)
-                      .and(CaseDataPredicate.Respondent.isTypeSpecRespondent1(
-                          RespondentResponseTypeSpec.FULL_DEFENCE).negate())
-                      .and(CaseDataPredicate.Respondent.isTypeSpecRespondent2(
-                          RespondentResponseTypeSpec.FULL_DEFENCE).negate())
-                      .test(c);
-              case TWO_V_ONE ->
-                  CaseDataPredicate.Claimant.responseTypeSpecClaimant1(RespondentResponseTypeSpec.FULL_DEFENCE).negate()
-                      .and(CaseDataPredicate.Claimant.responseTypeSpecClaimant2(
-                          RespondentResponseTypeSpec.FULL_DEFENCE).negate())
-                      .and(CaseDataPredicate.Claimant.responsesDifferSpec)
-                      .test(c);
-              default -> false;
-          });
+            switch (getMultiPartyScenario(c)) {
+                case ONE_V_TWO_ONE_LEGAL_REP ->
+                    CaseDataPredicate.Respondent.isTypeSpecRespondent1(null).negate()
+                        .and(CaseDataPredicate.Respondent.isTypeSpecRespondent2(null).negate())
+                        .and(CaseDataPredicate.Respondent.isSameResponseFlag.negate())
+                        .and(CaseDataPredicate.Respondent.responsesDifferSpec)
+                        .and(CaseDataPredicate.Respondent.isTypeSpecRespondent1(
+                            RespondentResponseTypeSpec.FULL_DEFENCE).negate())
+                        .and(CaseDataPredicate.Respondent.isTypeSpecRespondent2(
+                            RespondentResponseTypeSpec.FULL_DEFENCE).negate())
+                        .test(c);
+                case TWO_V_ONE ->
+                    CaseDataPredicate.Claimant.responseTypeSpecClaimant1(
+                            RespondentResponseTypeSpec.FULL_DEFENCE).negate()
+                        .and(CaseDataPredicate.Claimant.responseTypeSpecClaimant2(
+                            RespondentResponseTypeSpec.FULL_DEFENCE).negate())
+                        .and(CaseDataPredicate.Claimant.responsesDifferSpec)
+                        .test(c);
+                default -> false;
+            });
 
 }

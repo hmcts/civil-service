@@ -36,7 +36,6 @@ class DivergencePredicateTest {
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YES);
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(FULL_DEFENCE);
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(PART_ADMISSION);
-
             assertTrue(DivergencePredicate.divergentRespondWithDQAndGoOffline.test(caseData));
         }
 
@@ -46,7 +45,6 @@ class DivergencePredicateTest {
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YES);
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(PART_ADMISSION);
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(FULL_DEFENCE);
-
             assertTrue(DivergencePredicate.divergentRespondWithDQAndGoOffline.test(caseData));
         }
 
@@ -56,7 +54,6 @@ class DivergencePredicateTest {
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YES);
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(FULL_DEFENCE);
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(FULL_DEFENCE);
-
             assertFalse(DivergencePredicate.divergentRespondWithDQAndGoOffline.test(caseData));
         }
 
@@ -67,7 +64,6 @@ class DivergencePredicateTest {
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(PART_ADMISSION);
             when(caseData.getRespondent1ResponseDate()).thenReturn(LocalDateTime.now());
             when(caseData.getRespondent2ResponseDate()).thenReturn(LocalDateTime.now().minusDays(1));
-
             assertTrue(DivergencePredicate.divergentRespondWithDQAndGoOffline.test(caseData));
         }
 
@@ -78,7 +74,6 @@ class DivergencePredicateTest {
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(FULL_DEFENCE);
             when(caseData.getRespondent1ResponseDate()).thenReturn(LocalDateTime.now().minusDays(1));
             when(caseData.getRespondent2ResponseDate()).thenReturn(LocalDateTime.now());
-
             assertTrue(DivergencePredicate.divergentRespondWithDQAndGoOffline.test(caseData));
         }
 
@@ -90,7 +85,6 @@ class DivergencePredicateTest {
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(PART_ADMISSION);
             when(caseData.getRespondent1ResponseDate()).thenReturn(LocalDateTime.now().minusDays(1));
             when(caseData.getRespondent2ResponseDate()).thenReturn(LocalDateTime.now());
-
             assertFalse(DivergencePredicate.divergentRespondWithDQAndGoOffline.test(caseData));
         }
 
@@ -99,7 +93,6 @@ class DivergencePredicateTest {
             when(caseData.getRespondent2()).thenReturn(Party.builder().build());
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(FULL_DEFENCE);
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(FULL_DEFENCE);
-
             assertFalse(DivergencePredicate.divergentRespondWithDQAndGoOffline.test(caseData));
         }
 
@@ -108,7 +101,6 @@ class DivergencePredicateTest {
             when(caseData.getAddApplicant2()).thenReturn(YES);
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(FULL_DEFENCE);
             when(caseData.getRespondent1ClaimResponseTypeToApplicant2()).thenReturn(PART_ADMISSION);
-
             assertTrue(DivergencePredicate.divergentRespondWithDQAndGoOffline.test(caseData));
         }
 
@@ -117,7 +109,6 @@ class DivergencePredicateTest {
             when(caseData.getAddApplicant2()).thenReturn(YES);
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(PART_ADMISSION);
             when(caseData.getRespondent1ClaimResponseTypeToApplicant2()).thenReturn(FULL_DEFENCE);
-
             assertTrue(DivergencePredicate.divergentRespondWithDQAndGoOffline.test(caseData));
         }
 
@@ -126,7 +117,6 @@ class DivergencePredicateTest {
             when(caseData.getAddApplicant2()).thenReturn(YES);
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(PART_ADMISSION);
             when(caseData.getRespondent1ClaimResponseTypeToApplicant2()).thenReturn(PART_ADMISSION);
-
             assertFalse(DivergencePredicate.divergentRespondWithDQAndGoOffline.test(caseData));
         }
 
@@ -135,7 +125,6 @@ class DivergencePredicateTest {
             when(caseData.getAddApplicant2()).thenReturn(YES);
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(PART_ADMISSION);
             when(caseData.getRespondent1ClaimResponseTypeToApplicant2()).thenReturn(COUNTER_CLAIM);
-
             assertFalse(DivergencePredicate.divergentRespondWithDQAndGoOffline.test(caseData));
         }
 
@@ -155,7 +144,6 @@ class DivergencePredicateTest {
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(PART_ADMISSION);
             when(caseData.getRespondent1ResponseDate()).thenReturn(LocalDateTime.now());
             when(caseData.getRespondent2ResponseDate()).thenReturn(LocalDateTime.now().minusDays(1));
-
             assertTrue(DivergencePredicate.divergentRespondWithDQAndGoOffline.test(caseData));
         }
 
@@ -174,7 +162,6 @@ class DivergencePredicateTest {
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(NO);
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(PART_ADMISSION);
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(COUNTER_CLAIM);
-
             assertTrue(DivergencePredicate.divergentRespondGoOffline.test(caseData));
         }
 
@@ -184,7 +171,6 @@ class DivergencePredicateTest {
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YES);
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(PART_ADMISSION);
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(COUNTER_CLAIM);
-
             assertTrue(DivergencePredicate.divergentRespondGoOffline.test(caseData));
         }
 
@@ -194,7 +180,6 @@ class DivergencePredicateTest {
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YES);
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(PART_ADMISSION);
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(PART_ADMISSION);
-
             assertFalse(DivergencePredicate.divergentRespondGoOffline.test(caseData));
         }
 
@@ -204,7 +189,6 @@ class DivergencePredicateTest {
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YES);
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(FULL_DEFENCE);
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(COUNTER_CLAIM);
-
             assertFalse(DivergencePredicate.divergentRespondGoOffline.test(caseData));
         }
 
@@ -214,7 +198,6 @@ class DivergencePredicateTest {
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YES);
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(PART_ADMISSION);
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(FULL_DEFENCE);
-
             assertFalse(DivergencePredicate.divergentRespondGoOffline.test(caseData));
         }
 
@@ -223,7 +206,6 @@ class DivergencePredicateTest {
             when(caseData.getAddApplicant2()).thenReturn(YES);
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(PART_ADMISSION);
             when(caseData.getRespondent1ClaimResponseTypeToApplicant2()).thenReturn(COUNTER_CLAIM);
-
             assertTrue(DivergencePredicate.divergentRespondGoOffline.test(caseData));
         }
 
@@ -240,7 +222,6 @@ class DivergencePredicateTest {
             when(caseData.getAddApplicant2()).thenReturn(YES);
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(PART_ADMISSION);
             when(caseData.getRespondent1ClaimResponseTypeToApplicant2()).thenReturn(FULL_DEFENCE);
-
             assertFalse(DivergencePredicate.divergentRespondGoOffline.test(caseData));
         }
 
@@ -252,7 +233,6 @@ class DivergencePredicateTest {
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(COUNTER_CLAIM);
             when(caseData.getRespondent1ResponseDate()).thenReturn(LocalDateTime.now());
             when(caseData.getRespondent2ResponseDate()).thenReturn(LocalDateTime.now().minusDays(1));
-
             assertTrue(DivergencePredicate.divergentRespondGoOffline.test(caseData));
         }
 
@@ -264,7 +244,6 @@ class DivergencePredicateTest {
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(COUNTER_CLAIM);
             when(caseData.getRespondent1ResponseDate()).thenReturn(LocalDateTime.now().minusDays(1));
             when(caseData.getRespondent2ResponseDate()).thenReturn(LocalDateTime.now());
-
             assertTrue(DivergencePredicate.divergentRespondGoOffline.test(caseData));
         }
 
@@ -287,7 +266,6 @@ class DivergencePredicateTest {
             when(caseData.getRespondentResponseIsSame()).thenReturn(NO);
             when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
             when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.PART_ADMISSION);
-
             assertTrue(DivergencePredicate.divergentRespondWithDQAndGoOfflineSpec.test(caseData));
         }
 
@@ -300,7 +278,6 @@ class DivergencePredicateTest {
             when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.PART_ADMISSION);
             when(caseData.getRespondent1ResponseDate()).thenReturn(LocalDateTime.now().minusDays(1));
             when(caseData.getRespondent2ResponseDate()).thenReturn(LocalDateTime.now());
-
             assertTrue(DivergencePredicate.divergentRespondWithDQAndGoOfflineSpec.test(caseData));
         }
 
@@ -310,7 +287,6 @@ class DivergencePredicateTest {
             when(caseData.getAddApplicant2()).thenReturn(YES);
             when(caseData.getClaimant1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
             when(caseData.getClaimant2ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.PART_ADMISSION);
-
             assertTrue(DivergencePredicate.divergentRespondWithDQAndGoOfflineSpec.test(caseData));
         }
 
@@ -332,7 +308,6 @@ class DivergencePredicateTest {
             when(caseData.getRespondentResponseIsSame()).thenReturn(NO);
             when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.PART_ADMISSION);
             when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.COUNTER_CLAIM);
-
             assertTrue(DivergencePredicate.divergentRespondGoOfflineSpec.test(caseData));
         }
 
@@ -342,7 +317,6 @@ class DivergencePredicateTest {
             when(caseData.getAddApplicant2()).thenReturn(YES);
             when(caseData.getClaimant1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.PART_ADMISSION);
             when(caseData.getClaimant2ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.COUNTER_CLAIM);
-
             assertTrue(DivergencePredicate.divergentRespondGoOfflineSpec.test(caseData));
         }
 
