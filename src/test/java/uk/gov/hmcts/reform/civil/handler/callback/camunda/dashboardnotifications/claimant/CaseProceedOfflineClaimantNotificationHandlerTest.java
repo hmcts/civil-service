@@ -29,14 +29,12 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_WITHOUT_TASK_CHANGES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT;
@@ -80,15 +78,14 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
         @Test
         void shouldRecordScenario_whenInvokedWithoutCPEnabled() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                    .respondent1Represented(YesOrNo.NO)
-                    .applicant1Represented(YesOrNo.NO)
-                    .ccdCaseReference(1234L)
-                .generalApplications(List.of(Element.<GeneralApplication>builder().build()))
-                    .previousCCDState(AWAITING_APPLICANT_INTENTION).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setCcdCaseReference(1234L);
+            caseData.setGeneralApplications(List.of(new Element<>(null, new GeneralApplication())));
+            caseData.setPreviousCCDState(AWAITING_APPLICANT_INTENTION);
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            when(toggleService.isGaForLipsEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -104,7 +101,7 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
 
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
-                    SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT.getScenario(),
+                    SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_WITHOUT_TASK_CHANGES.getScenario(),
                     caseData.getCcdCaseReference().toString(),
                     ScenarioRequestParams.builder().params(scenarioParams).build()
             );
@@ -125,15 +122,14 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
         @Test
         void shouldRecordScenarioForLipVsLr_whenInvokedWithoutCPEnabled() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                .respondent1Represented(YesOrNo.YES)
-                .applicant1Represented(YesOrNo.NO)
-                .ccdCaseReference(1234L)
-                .generalApplications(List.of(Element.<GeneralApplication>builder().build()))
-                .previousCCDState(AWAITING_APPLICANT_INTENTION).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
+            caseData.setRespondent1Represented(YesOrNo.YES);
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setCcdCaseReference(1234L);
+            caseData.setGeneralApplications(List.of(new Element<>(null, new GeneralApplication())));
+            caseData.setPreviousCCDState(AWAITING_APPLICANT_INTENTION);
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            when(toggleService.isGaForLipsEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -149,7 +145,7 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
 
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
-                SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT.getScenario(),
+                SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_WITHOUT_TASK_CHANGES.getScenario(),
                 caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
@@ -170,14 +166,13 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
         @Test
         void shouldRecordScenario_whenInvokedForCaseProgressionFeatureToggle() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .applicant1Represented(YesOrNo.NO)
-                .ccdCaseReference(1234L)
-                .previousCCDState(All_FINAL_ORDERS_ISSUED).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setCcdCaseReference(1234L);
+            caseData.setPreviousCCDState(All_FINAL_ORDERS_ISSUED);
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -202,15 +197,13 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
         void shouldRecordQMScenario_whenInvokedForCaseWithOpenApplicantCitizenQuery() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec()
-                .includesApplicantCitizenQueryFollowUp(OffsetDateTime.now())
-                .build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .applicant1Represented(YesOrNo.NO)
-                .ccdCaseReference(1234L)
-                .previousCCDState(All_FINAL_ORDERS_ISSUED).build();
+                .includesApplicantCitizenQueryFollowUp(OffsetDateTime.now()).build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setCcdCaseReference(1234L);
+            caseData.setPreviousCCDState(All_FINAL_ORDERS_ISSUED);
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -236,54 +229,6 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
                 caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
-        }
-
-        @Test
-        void shouldNotRecordScenario_whenNotInvoked() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                    .respondent1Represented(YesOrNo.NO)
-                    .applicant1Represented(YesOrNo.NO)
-                    .ccdCaseReference(1234L)
-                    .build();
-
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
-            ).build();
-            // When
-            handler.handle(params);
-
-            // Then
-            verifyNoInteractions(dashboardScenariosService);
-        }
-
-        @Test
-        void shouldNotRecordScenario_whenCaseProgressionIsNotEnabledAndIsOnCaseProgressionState() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .applicant1Represented(YesOrNo.NO)
-                .ccdCaseReference(1234L)
-                .previousCCDState(All_FINAL_ORDERS_ISSUED).build();
-
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(false);
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
-            ).build();
-
-            // When
-            handler.handle(params);
-
-            // Then
-            verifyNoInteractions(dashboardScenariosService);
         }
     }
 

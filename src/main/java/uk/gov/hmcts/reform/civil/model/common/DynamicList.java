@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.civil.model.common;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.jackson.Jacksonized;
 
 import java.util.Comparator;
@@ -17,6 +19,8 @@ import static java.util.stream.Collectors.toList;
 @Data
 @Jacksonized
 @Builder(toBuilder = true)
+@AllArgsConstructor
+@NoArgsConstructor(force = true)
 public class DynamicList {
 
     /**

@@ -28,10 +28,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("bulk_claim_enabled");
     }
 
-    public boolean isPinInPostEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("pin-in-post");
-    }
-
     public boolean isRPAEmailEnabled() {
         return this.featureToggleApi.isFeatureEnabled("enable-rpa-emails");
     }
@@ -52,14 +48,6 @@ public class FeatureToggleService {
                 );
     }
 
-    public boolean isTransferOnlineCaseEnabled() {
-        return featureToggleApi.isFeatureEnabled("isTransferOnlineCaseEnabled");
-    }
-
-    public boolean isCaseProgressionEnabled() {
-        return featureToggleApi.isFeatureEnabled("cui-case-progression");
-    }
-
     public boolean isJudgmentOnlineLive() {
         return featureToggleApi.isFeatureEnabled("isJudgmentOnlineLive");
     }
@@ -75,10 +63,6 @@ public class FeatureToggleService {
         return isSpecClaim
             && featureToggleApi.isFeatureEnabledForDate("cam-enabled-for-case",
                                                         epoch, false);
-    }
-
-    public boolean isGaForLipsEnabled() {
-        return featureToggleApi.isFeatureEnabled("GaForLips");
     }
 
     public boolean isMultiOrIntermediateTrackEnabled(CaseData caseData) {
@@ -116,14 +100,12 @@ public class FeatureToggleService {
 
     public boolean isCaseProgressionEnabledAndLocationWhiteListed(String location) {
         return location != null
-            && featureToggleApi.isFeatureEnabledForLocation("case-progression-location-whitelist", location, true)
-            && isCaseProgressionEnabled();
+            && featureToggleApi.isFeatureEnabledForLocation("case-progression-location-whitelist", location, true);
     }
 
-    public boolean isGaForLipsEnabledAndLocationWhiteListed(String location) {
+    public boolean isLocationWhiteListed(String location) {
         return location != null
-            && featureToggleApi.isFeatureEnabledForLocation("ea-courts-whitelisted-for-ga-lips", location, false)
-            && isGaForLipsEnabled();
+            && featureToggleApi.isFeatureEnabledForLocation("ea-courts-whitelisted-for-ga-lips", location, false);
     }
 
     public boolean isJOLiveFeedActive() {
@@ -166,10 +148,6 @@ public class FeatureToggleService {
         ZoneId zoneId = ZoneId.systemDefault();
         long epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         return featureToggleApi.isFeatureEnabledForDate("cui-query-management", epoch, false);
-    }
-
-    public boolean isLrAdmissionBulkEnabled() {
-        return featureToggleApi.isFeatureEnabled("lr-admission-bulk");
     }
 
     public boolean isCuiGaNroEnabled() {

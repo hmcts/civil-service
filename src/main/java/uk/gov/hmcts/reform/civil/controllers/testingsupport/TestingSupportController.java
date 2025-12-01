@@ -21,14 +21,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.controllers.testingsupport.model.TestCamundaProcess;
+import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.event.HearingFeePaidEvent;
 import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
 import uk.gov.hmcts.reform.civil.event.TrialReadyNotificationEvent;
+import uk.gov.hmcts.reform.civil.handler.event.BundleCreationTriggerEventHandler;
 import uk.gov.hmcts.reform.civil.handler.event.HearingFeePaidEventHandler;
 import uk.gov.hmcts.reform.civil.handler.event.HearingFeeUnpaidEventHandler;
-import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
-import uk.gov.hmcts.reform.civil.handler.event.BundleCreationTriggerEventHandler;
 import uk.gov.hmcts.reform.civil.handler.event.TrialReadyNotificationEventHandler;
 import uk.gov.hmcts.reform.civil.handler.tasks.ClaimDismissedHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -37,11 +38,12 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.judgments.CjesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
-import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
 import java.util.List;
@@ -61,9 +63,11 @@ public class TestingSupportController {
     private final FeatureToggleService featureToggleService;
     private final IStateFlowEngine stateFlowEngine;
     private final EventHistoryMapper eventHistoryMapper;
-    private final RoboticsDataMapper roboticsDataMapper;
+    private final RoboticsDataMapperForUnspec roboticsDataMapper;
     private final RoboticsDataMapperForSpec roboticsSpecDataMapper;
     private final CjesMapper cjesMapper;
+    private final SystemUpdateUserConfiguration systemUserConfig;
+    private final UserService userService;
 
     private final ClaimDismissedHandler claimDismissedHandler;
     private final HearingFeePaidEventHandler hearingFeePaidHandler;
@@ -71,7 +75,6 @@ public class TestingSupportController {
     private final TrialReadyNotificationEventHandler trialReadyNotificationHandler;
     private final BundleCreationTriggerEventHandler bundleCreationTriggerEventHandler;
 
-    private static final String BEARER_TOKEN = "Bearer Token";
     private static final String SUCCESS = "success";
     private static final String FAILED = "failed";
 
@@ -155,7 +158,7 @@ public class TestingSupportController {
         produces = "application/json")
     public String getRPAJsonInformationForCaseData(
         @RequestBody CaseData caseData) throws JsonProcessingException {
-        return roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
+        return roboticsDataMapper.toRoboticsCaseData(caseData, getSystemUserToken()).toJsonString();
     }
 
     @PostMapping(
@@ -163,7 +166,7 @@ public class TestingSupportController {
         produces = "application/json")
     public String getRPAJsonInformationForSpecCaseData(
         @RequestBody CaseData caseData) throws JsonProcessingException {
-        return roboticsSpecDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
+        return roboticsSpecDataMapper.toRoboticsCaseData(caseData, getSystemUserToken()).toJsonString();
     }
 
     @PostMapping(
@@ -190,7 +193,7 @@ public class TestingSupportController {
     @GetMapping("/testing-support/{caseId}/trigger-trial-bundle")
     public ResponseEntity<String> getTrialBundleEvent(@PathVariable("caseId") Long caseId) {
         String responseMsg = SUCCESS;
-        var event = new BundleCreationTriggerEvent(caseId);
+        var event = new BundleCreationTriggerEvent(caseId, getSystemUserToken());
         try {
             bundleCreationTriggerEventHandler.sendBundleCreationTrigger(event);
         } catch (Exception e) {
@@ -267,5 +270,9 @@ public class TestingSupportController {
         ResponseEntity<List<HistoricProcessInstanceDto>> response =
                 camundaRestEngineClient.getProcessInstances(processInstanceId, definitionKey, variables);
         return new ResponseEntity<>(response.getBody(), response.getStatusCode());
+    }
+
+    private String getSystemUserToken() {
+        return userService.getAccessToken(systemUserConfig.getUserName(), systemUserConfig.getPassword());
     }
 }

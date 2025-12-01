@@ -49,13 +49,9 @@ public class BundleCreatedNotificationCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
 
         if (featureToggleService.isAmendBundleEnabled()) {
-            caseData = caseData.toBuilder()
-                .bundleEvent(BUNDLE_CREATED_NOTIFICATION_EVENT)
-                .build();
+            caseData.setBundleEvent(BUNDLE_CREATED_NOTIFICATION_EVENT);
         } else {
-            caseData = caseData.toBuilder()
-                .businessProcess(BusinessProcess.ready(BUNDLE_CREATION_NOTIFICATION))
-                .build();
+            caseData.setBusinessProcess(BusinessProcess.ready(BUNDLE_CREATION_NOTIFICATION));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

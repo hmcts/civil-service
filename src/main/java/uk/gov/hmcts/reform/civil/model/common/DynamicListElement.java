@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.civil.model.common;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.jackson.Jacksonized;
 
 import java.util.UUID;
@@ -14,19 +16,21 @@ import java.util.UUID;
 @Data
 @Jacksonized
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor(force = true)
 public class DynamicListElement {
 
-    public static final DynamicListElement EMPTY = DynamicListElement.builder().build();
+    public static final DynamicListElement EMPTY = new DynamicListElement();
 
     /**
      * Property that maps to the value attribute of the option tag.
      */
-    private final String code;
+    private String code;
 
     /**
      * Property that maps to the label attribute of the option tag.
      */
-    private final String label;
+    private String label;
 
     public static DynamicListElement dynamicElement(String label) {
         return DynamicListElement.builder()

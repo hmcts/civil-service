@@ -11,8 +11,8 @@ import lombok.Setter;
 @Builder(toBuilder = true)
 public class GAStatementOfTruth {
 
-    private final String name;
-    private final String role;
+    private String name;
+    private String role;
 
     @JsonCreator
     GAStatementOfTruth(@JsonProperty("name") String name,

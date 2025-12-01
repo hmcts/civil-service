@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -58,6 +59,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestType;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
@@ -305,8 +307,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(PartyBuilder.builder().individual()
-                    .individualDateOfBirth(now().plusDays(1))
-                    .build())
+                                .individualDateOfBirth(now().plusDays(1))
+                                .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -324,8 +326,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(PartyBuilder.builder().individual()
-                    .soleTraderDateOfBirth(now().plusDays(1))
-                    .build())
+                                .soleTraderDateOfBirth(now().plusDays(1))
+                                .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -343,8 +345,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(PartyBuilder.builder().individual()
-                    .individualDateOfBirth(now().minusDays(1))
-                    .build())
+                                .individualDateOfBirth(now().minusDays(1))
+                                .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -362,8 +364,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(PartyBuilder.builder().individual()
-                    .soleTraderDateOfBirth(now().minusDays(1))
-                    .build())
+                                .soleTraderDateOfBirth(now().minusDays(1))
+                                .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -379,16 +381,18 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
+            Address address = new Address();
+            address.setAddressLine1("Line 1 test again for more than 35 characters");
+            address.setAddressLine2("Line 1 test again for more than 35 characters");
+            address.setAddressLine3("Line 1 test again for more than 35 characters");
+            address.setCounty("Line 1 test again for more than 35 characters");
+            address.setPostCode("Line 1 test again for more than 35 characters");
+            address.setPostTown("Line 1 test again for more than 35 characters");
+            Party party = new Party();
+            party.setType(Party.Type.ORGANISATION);
+            party.setPrimaryAddress(address);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant1(Party.builder().type(Party.Type.ORGANISATION)
-                    .primaryAddress(Address.builder()
-                        .addressLine1("Line 1 test again for more than 35 characters")
-                        .addressLine2("Line 1 test again for more than 35 characters")
-                        .addressLine3("Line 1 test again for more than 35 characters")
-                        .county("Line 1 test again for more than 35 characters")
-                        .postCode("Line 1 test again for more than 35 characters")
-                        .postTown("Line 1 test again for more than 35 characters").build())
-                    .build())
+                .applicant1(party)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -406,12 +410,15 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
+            Address address = new Address();
+            address.setAddressLine1("TEST");
+            Party party = new Party();
+            party.setType(Party.Type.COMPANY);
+            party.setPrimaryAddress(address);
+            party.setCompanyName("MR This is very long nam exceeds 70 characters to throw"
+                                 + " error for max length allowed");
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant1(Party.builder()
-                    .type(Party.Type.COMPANY)
-                    .primaryAddress(Address.builder().addressLine1("TEST").build())
-                    .companyName("MR This is very long nam exceeds 70 characters to throw"
-                        + " error for max length allowed").build())
+                .applicant1(party)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -427,14 +434,16 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
+            Address address = new Address();
+            address.setAddressLine1("Address line 1");
+            Party party = new Party();
+            party.setType(Party.Type.INDIVIDUAL);
+            party.setIndividualFirstName("This is very long name");
+            party.setIndividualTitle("MR");
+            party.setIndividualLastName("exceeds 70 characters to throw error for max length allowed");
+            party.setPrimaryAddress(address);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant1(Party.builder()
-                    .type(Party.Type.INDIVIDUAL)
-                    .individualFirstName("This is very long name")
-                    .individualTitle("MR")
-                    .individualLastName("exceeds 70 characters to throw error for max length allowed")
-                    .primaryAddress(Address.builder().addressLine1("Address line 1").build())
-                    .build())
+                .applicant1(party)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -450,14 +459,16 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
+            Address address = new Address();
+            address.setAddressLine1("Address line 1");
+            Party party = new Party();
+            party.setType(Party.Type.SOLE_TRADER);
+            party.setSoleTraderFirstName("This is very long name");
+            party.setSoleTraderTitle("MR");
+            party.setSoleTraderLastName("exceeds 70 characters to throw error for max length allowed");
+            party.setPrimaryAddress(address);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant1(Party.builder()
-                    .type(Party.Type.SOLE_TRADER)
-                    .soleTraderFirstName("This is very long name")
-                    .soleTraderTitle("MR")
-                    .soleTraderLastName("exceeds 70 characters to throw error for max length allowed")
-                    .primaryAddress(Address.builder().addressLine1("Address line 1").build())
-                    .build())
+                .applicant1(party)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -473,13 +484,15 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
+            Address address = new Address();
+            address.setAddressLine1("Address line 1");
+            Party party = new Party();
+            party.setType(Party.Type.ORGANISATION);
+            party.setOrganisationName("This is very long name exceeds 70 characters "
+                                                      + " to throw error for max length allowed");
+            party.setPrimaryAddress(address);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant1(Party.builder()
-                    .type(Party.Type.ORGANISATION)
-                    .organisationName("This is very long name exceeds 70 characters "
-                        + " to throw error for max length allowed")
-                    .primaryAddress(Address.builder().addressLine1("Address line 1").build())
-                    .build())
+                .applicant1(party)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -495,12 +508,12 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             when(toggleService.isJudgmentOnlineLive()).thenReturn(false);
 
+            Party party = new Party();
+            party.setType(Party.Type.ORGANISATION);
+            party.setOrganisationName("This is very long name exceeds 70 characters "
+                                          + " to throw error for max length allowed");
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant1(Party.builder()
-                    .type(Party.Type.ORGANISATION)
-                    .organisationName("This is very long name exceeds 70 characters "
-                        + " to throw error for max length allowed")
-                    .build())
+                .applicant1(party)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -522,8 +535,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant2(PartyBuilder.builder().individual()
-                    .individualDateOfBirth(now().plusDays(1))
-                    .build())
+                                .individualDateOfBirth(now().plusDays(1))
+                                .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -539,8 +552,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant2(PartyBuilder.builder().individual()
-                    .soleTraderDateOfBirth(now().plusDays(1))
-                    .build())
+                                .soleTraderDateOfBirth(now().plusDays(1))
+                                .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -556,8 +569,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant2(PartyBuilder.builder().individual()
-                    .individualDateOfBirth(now().minusDays(1))
-                    .build())
+                                .individualDateOfBirth(now().minusDays(1))
+                                .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -573,8 +586,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant2(PartyBuilder.builder().individual()
-                    .soleTraderDateOfBirth(now().minusDays(1))
-                    .build())
+                                .soleTraderDateOfBirth(now().minusDays(1))
+                                .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -590,16 +603,18 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
+            Address address = new Address();
+            address.setAddressLine1("Line 1 test again for more than 35 characters");
+            address.setAddressLine2("Line 1 test again for more than 35 characters");
+            address.setAddressLine3("Line 1 test again for more than 35 characters");
+            address.setCounty("Line 1 test again for more than 35 characters");
+            address.setPostCode("Line 1 test again for more than 35 characters");
+            address.setPostTown("Line 1 test again for more than 35 characters");
+            Party party = new Party();
+            party.setType(Party.Type.INDIVIDUAL);
+            party.setPrimaryAddress(address);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant2(Party.builder().type(Party.Type.INDIVIDUAL)
-                    .primaryAddress(Address.builder()
-                        .addressLine1("Line 1 test again for more than 35 characters")
-                        .addressLine2("Line 1 test again for more than 35 characters")
-                        .addressLine3("Line 1 test again for more than 35 characters")
-                        .county("Line 1 test again for more than 35 characters")
-                        .postCode("Line 1 test again for more than 35 characters")
-                        .postTown("Line 1 test again for more than 35 characters").build())
-                    .build())
+                .applicant2(party)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -617,12 +632,15 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
+            Address address = new Address();
+            address.setAddressLine1("TEST");
+            Party party = new Party();
+            party.setType(Party.Type.COMPANY);
+            party.setPrimaryAddress(address);
+            party.setCompanyName("MR This is very long nam exceeds 70 characters to throw"
+                                 + " error for max length allowed");
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant2(Party.builder()
-                    .type(Party.Type.COMPANY)
-                    .primaryAddress(Address.builder().addressLine1("TEST").build())
-                    .companyName("MR This is very long nam exceeds 70 characters to throw"
-                        + " error for max length allowed").build())
+                .applicant2(party)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -638,14 +656,16 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
+            Address address = new Address();
+            address.setAddressLine1("Address line 1");
+            Party party = new Party();
+            party.setType(Party.Type.INDIVIDUAL);
+            party.setIndividualFirstName("This is very long name");
+            party.setIndividualTitle("MR");
+            party.setIndividualLastName("exceeds 70 characters to throw error for max length allowed");
+            party.setPrimaryAddress(address);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant2(Party.builder()
-                    .type(Party.Type.INDIVIDUAL)
-                    .individualFirstName("This is very long name")
-                    .individualTitle("MR")
-                    .individualLastName("exceeds 70 characters to throw error for max length allowed")
-                    .primaryAddress(Address.builder().addressLine1("Address line 1").build())
-                    .build())
+                .applicant2(party)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -661,14 +681,16 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
+            Address address = new Address();
+            address.setAddressLine1("Address line 1");
+            Party party = new Party();
+            party.setType(Type.SOLE_TRADER);
+            party.setSoleTraderFirstName("This is very long name");
+            party.setSoleTraderTitle("MR");
+            party.setSoleTraderLastName("exceeds 70 characters to throw error for max length allowed");
+            party.setPrimaryAddress(address);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant2(Party.builder()
-                    .type(Type.SOLE_TRADER)
-                    .soleTraderFirstName("This is very long name")
-                    .soleTraderTitle("MR")
-                    .soleTraderLastName("exceeds 70 characters to throw error for max length allowed")
-                    .primaryAddress(Address.builder().addressLine1("Address line 1").build())
-                    .build())
+                .applicant2(party)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -684,13 +706,15 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
+            Address address = new Address();
+            address.setAddressLine1("Address line 1");
+            Party party = new Party();
+            party.setType(Party.Type.ORGANISATION);
+            party.setOrganisationName("This is very long name exceeds 70 characters "
+                                      + " to throw error for max length allowed");
+            party.setPrimaryAddress(address);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant2(Party.builder()
-                    .type(Party.Type.ORGANISATION)
-                    .organisationName("This is very long name exceeds 70 characters "
-                        + " to throw error for max length allowed")
-                    .primaryAddress(Address.builder().addressLine1("Address line 1").build())
-                    .build())
+                .applicant2(party)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -706,13 +730,19 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     class MidEventParticularsOfClaimCallback {
 
         private final String pageId = "particulars-of-claim";
-        private final CaseData.CaseDataBuilder caseDataBuilder =
-            CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder();
+        private final CaseData baseCaseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+
+        private CaseData freshCaseData() {
+            return objMapper.convertValue(
+                objMapper.convertValue(baseCaseData, java.util.Map.class),
+                CaseData.class
+            );
+        }
 
         @Test
         void shouldReturnErrors_whenNoDocuments() {
             // Given
-            CaseData caseData = caseDataBuilder.build();
+            CaseData caseData = freshCaseData();
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
             // When
@@ -725,7 +755,9 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnErrors_whenParticularsOfClaimFieldsAreInErrorState() {
             // Given
-            CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder().build()).build();
+            CaseData caseData = freshCaseData();
+            ServedDocumentFiles servedDocumentFiles = new ServedDocumentFiles();
+            caseData.setServedDocumentFiles(servedDocumentFiles);
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
             // When
@@ -738,9 +770,10 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoErrors_whenParticularOfClaimsFieldsAreValid() {
             // Given
-            CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder()
-                .particularsOfClaimText("Some string")
-                .build()).build();
+            CaseData caseData = freshCaseData();
+            ServedDocumentFiles servedDocumentFiles = new ServedDocumentFiles();
+            servedDocumentFiles.setParticularsOfClaimText("Some string");
+            caseData.setServedDocumentFiles(servedDocumentFiles);
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
             // When
@@ -756,10 +789,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     class MidEventFeeCallback {
 
         private final String pageId = "fee";
-        private final Fee feeData = Fee.builder()
-            .code("CODE")
-            .calculatedAmountInPence(BigDecimal.valueOf(100))
-            .build();
+        private Fee feeData;
         private final Organisation organisation = Organisation.builder()
             .paymentAccount(List.of("12345", "98765"))
             .build();
@@ -767,6 +797,9 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
+            feeData = new Fee();
+            feeData.setCode("CODE");
+            feeData.setCalculatedAmountInPence(BigDecimal.valueOf(100));
             given(feesService.getFeeDataByClaimValue(any())).willReturn(feeData);
         }
 
@@ -830,8 +863,10 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("customerReference")
                 .isEqualTo("12345");
 
+            DynamicList expectedList = new DynamicList();
+            expectedList.setValue(DynamicListElement.EMPTY);
             assertThat(getDynamicList(response))
-                .isEqualTo(DynamicList.builder().value(DynamicListElement.EMPTY).build());
+                .isEqualTo(expectedList);
         }
 
         @Test
@@ -874,12 +909,11 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = objMapper.convertValue(response.getData(), CaseData.class);
 
             // Then
-            assertThat(response.getData())
-                .extracting("applicantSolicitor1CheckEmail")
-                .extracting("email")
-                .isEqualTo(email);
+            assertThat(updatedData.getApplicantSolicitor1CheckEmail()).isNotNull();
+            assertThat(updatedData.getApplicantSolicitor1CheckEmail().getEmail()).isEqualTo(email);
         }
 
         @Test
@@ -891,11 +925,10 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(userService.getUserDetails(any()))
                 .willReturn(UserDetails.builder().email(email).id(userId).build());
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                    .email("email@example.com")
-                    .build())
-                .build();
+            IdamUserDetails idamUserDetails = new IdamUserDetails(userId, email);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData.setApplicantSolicitor1UserDetails(idamUserDetails);
+
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             // When
@@ -1158,8 +1191,11 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             String name = "John Smith";
             String role = "Solicitor";
 
+            StatementOfTruth statementOfTruth = new StatementOfTruth();
+            statementOfTruth.setName(name);
+            statementOfTruth.setRole(role);
             CaseData caseData = CaseDataBuilder.builder()
-                .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
+                .uiStatementOfTruth(statementOfTruth)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, "statement-of-truth");
@@ -1178,16 +1214,36 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldCalculateAmountBreakup_whenCalled() {
             // Given
+            ClaimAmountBreakupDetails breakupDetails1 = new ClaimAmountBreakupDetails();
+            breakupDetails1.setClaimAmount(new BigDecimal(1000));
+            breakupDetails1.setClaimReason("Test reason1");
+            ClaimAmountBreakup breakup1 = new ClaimAmountBreakup();
+            breakup1.setValue(breakupDetails1);
             List<ClaimAmountBreakup> claimAmountBreakup = new ArrayList<>();
-            claimAmountBreakup.add(ClaimAmountBreakup.builder()
-                .value(ClaimAmountBreakupDetails.builder()
-                    .claimAmount(new BigDecimal(1000)).claimReason("Test reason1").build()).build());
+            claimAmountBreakup.add(breakup1);
 
-            claimAmountBreakup.add(ClaimAmountBreakup.builder()
-                .value(ClaimAmountBreakupDetails.builder()
-                    .claimAmount(new BigDecimal(2000)).claimReason("Test reason2").build()).build());
+            ClaimAmountBreakupDetails breakupDetails2 = new ClaimAmountBreakupDetails();
+            breakupDetails2.setClaimAmount(new BigDecimal(2000));
+            breakupDetails2.setClaimReason("Test reason2");
+            ClaimAmountBreakup breakup2 = new ClaimAmountBreakup();
+            breakup2.setValue(breakupDetails2);
+            claimAmountBreakup.add(breakup2);
+            ClaimAmountBreakupDetails claimAmountBreakupDetails = new ClaimAmountBreakupDetails();
+            claimAmountBreakupDetails.setClaimAmount(new BigDecimal(1000));
+            claimAmountBreakupDetails.setClaimReason("Test reason1");
+            ClaimAmountBreakup breakup = new ClaimAmountBreakup();
+            breakup.setValue(claimAmountBreakupDetails);
+            claimAmountBreakup.add(breakup);
 
-            CaseData caseData = CaseData.builder().claimAmountBreakup(claimAmountBreakup).build();
+            ClaimAmountBreakupDetails claimAmountBreakupDetails2 = new ClaimAmountBreakupDetails();
+            claimAmountBreakupDetails2.setClaimAmount(new BigDecimal(2000));
+            claimAmountBreakupDetails2.setClaimReason("Test reason2");
+            ClaimAmountBreakup breakupAdditional = new ClaimAmountBreakup();
+            breakupAdditional.setValue(claimAmountBreakupDetails2);
+            claimAmountBreakup.add(breakupAdditional);
+
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setClaimAmountBreakup(claimAmountBreakup);
 
             CallbackParams params = callbackParamsOf(caseData, MID, "amount-breakup");
 
@@ -1195,25 +1251,31 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             // Then
+            String expectedSummary = " | Description | Amount | \n"
+                + " |---|---| \n"
+                + " | Test reason1 | £ 10.00 |\n"
+                + " | Test reason2 | £ 20.00 |\n"
+                + " | Test reason1 | £ 10.00 |\n"
+                + " | Test reason2 | £ 20.00 |\n"
+                + " | **Total** | £ 60.00 | ";
+
             assertThat(response.getData())
-                .containsEntry("claimAmountBreakupSummaryObject", " | Description | Amount | \n" +
-                    " |---|---| \n" +
-                    " | Test reason1 | £ 10.00 |\n" +
-                    " | Test reason2 | £ 20.00 |\n" +
-                    " | **Total** | £ 30.00 | ");
+                .containsEntry("claimAmountBreakupSummaryObject", expectedSummary);
         }
 
         @Test
         void shouldCalculateAmount_AndReturnNoErrorWhenAbove25kAndToggleActive() {
             // Given
             when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+            ClaimAmountBreakupDetails highAmountDetails = new ClaimAmountBreakupDetails();
+            highAmountDetails.setClaimAmount(new BigDecimal(10000000));
+            highAmountDetails.setClaimReason("Test reason1");
+            ClaimAmountBreakup highAmountBreakup = new ClaimAmountBreakup();
+            highAmountBreakup.setValue(highAmountDetails);
             List<ClaimAmountBreakup> claimAmountBreakup = new ArrayList<>();
-            claimAmountBreakup.add(ClaimAmountBreakup.builder()
-                .value(ClaimAmountBreakupDetails.builder()
-                    .claimAmount(new BigDecimal(10000000))
-                    .claimReason("Test reason1").build())
-                .build());
-            CaseData caseData = CaseData.builder().claimAmountBreakup(claimAmountBreakup).build();
+            claimAmountBreakup.add(highAmountBreakup);
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setClaimAmountBreakup(claimAmountBreakup);
             CallbackParams params = callbackParamsOf(caseData, MID, "amount-breakup");
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1228,50 +1290,54 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldCalculateInterest_whenPopulated() {
             // Given
-            CaseData caseData = CaseData.builder().claimInterest(YES)
-                .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
-                .sameRateInterestSelection(SameRateInterestSelection.builder()
-                    .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
-                .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
-                .totalClaimAmount(new BigDecimal(1000)).build();
+            SameRateInterestSelection sameRateInterestSelection = new SameRateInterestSelection();
+            sameRateInterestSelection.setSameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC);
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setClaimInterest(YES);
+            caseData.setInterestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST);
+            caseData.setSameRateInterestSelection(sameRateInterestSelection);
+            caseData.setInterestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE);
+            caseData.setTotalClaimAmount(new BigDecimal(1000));
 
             when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
             CallbackParams params = callbackParamsOf(caseData, MID, "interest-calc");
 
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = objMapper.convertValue(response.getData(), CaseData.class);
 
             // Then
-            assertThat(response.getData()).containsEntry("calculatedInterest", " | Description | Amount | \n" +
-                " |---|---| \n" +
-                " | Claim amount | £ 1000.00 | \n" +
-                " | Interest amount | £ 0.00 | \n" +
-                " | Total amount | £ 1000.00 |");
+            assertThat(updatedData.getCalculatedInterest()).isNotNull();
+            assertThat(updatedData.getCalculatedInterest()).contains("Claim amount | £ 1000.00");
+            assertThat(updatedData.getCalculatedInterest()).contains("Interest amount | £ 0.00");
+            assertThat(updatedData.getCalculatedInterest()).contains("Total amount | £ 1000.00");
         }
 
         @Test
         void shouldDefaultInterestUntil_whenInterestFromIsSubmittedDate() {
             // Given
-            CaseData caseData = CaseData.builder().claimInterest(YES)
-                .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
-                .sameRateInterestSelection(SameRateInterestSelection.builder()
-                    .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
-                .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
-                .totalClaimAmount(new BigDecimal(1000)).build();
+            SameRateInterestSelection sameRateSelection = new SameRateInterestSelection();
+            sameRateSelection.setSameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC);
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setClaimInterest(YES);
+            caseData.setInterestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST);
+            caseData.setSameRateInterestSelection(sameRateSelection);
+            caseData.setInterestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE);
+            caseData.setTotalClaimAmount(new BigDecimal(1000));
 
             when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(new BigDecimal(0));
             CallbackParams params = callbackParamsOf(caseData, MID, INTEREST_FROM_PAGE_ID);
 
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).containsEntry("interestClaimUntil", "UNTIL_SETTLED_OR_JUDGEMENT_MADE");
+            CaseData updatedData = objMapper.convertValue(response.getData(), CaseData.class);
 
             // Then
-            assertThat(response.getData()).containsEntry("calculatedInterest", " | Description | Amount | \n" +
-                " |---|---| \n" +
-                " | Claim amount | £ 1000.00 | \n" +
-                " | Interest amount | £ 0.00 | \n" +
-                " | Total amount | £ 1000.00 |");
+            assertThat(updatedData.getInterestClaimUntil()).isEqualTo(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE);
+            assertThat(updatedData.getCalculatedInterest()).isNotNull();
+            assertThat(updatedData.getCalculatedInterest()).contains("Claim amount | £ 1000.00");
+            assertThat(updatedData.getCalculatedInterest()).contains("Interest amount | £ 0.00");
+            assertThat(updatedData.getCalculatedInterest()).contains("Total amount | £ 1000.00");
         }
     }
 
@@ -1281,8 +1347,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldValidateClaimInterestDate_whenPopulated() {
             // Given
-            CaseData caseData = CaseData.builder().interestFromSpecificDate(LocalDate.now().minusDays(1))
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setInterestFromSpecificDate(LocalDate.now().minusDays(1));
 
             CallbackParams params = callbackParamsOf(caseData, MID, "ValidateClaimInterestDate");
             params.getRequest().setEventId("CREATE_CLAIM_SPEC");
@@ -1297,8 +1363,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnErrorWhenValidateClaimInterestDatePopulatedWithFutureDate() {
             // Given
-            CaseData caseData = CaseData.builder().interestFromSpecificDate(LocalDate.now().plusDays(1))
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setInterestFromSpecificDate(LocalDate.now().plusDays(1));
 
             CallbackParams params = callbackParamsOf(caseData, MID, "ValidateClaimInterestDate");
             params.getRequest().setEventId("CREATE_CLAIM_SPEC");
@@ -1318,10 +1384,13 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldValidateClaimTimelineDate_whenPopulated() {
             // Given
             List<TimelineOfEvents> timelineOfEvents = new ArrayList<>();
-            timelineOfEvents.add(
-                TimelineOfEvents.builder().value(TimelineOfEventDetails.builder().timelineDate(LocalDate.now().minusDays(1)).build()).build());
-            CaseData caseData = CaseData.builder().timelineOfEvents(timelineOfEvents)
-                .build();
+            TimelineOfEventDetails pastEventDetails = new TimelineOfEventDetails();
+            pastEventDetails.setTimelineDate(LocalDate.now().minusDays(1));
+            TimelineOfEvents pastEvent = new TimelineOfEvents();
+            pastEvent.setValue(pastEventDetails);
+            timelineOfEvents.add(pastEvent);
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setTimelineOfEvents(timelineOfEvents);
 
             CallbackParams params = callbackParamsOf(caseData, MID, "ValidateClaimTimelineDate");
             // When
@@ -1335,10 +1404,13 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnErrorWhenTimelineDatePopulatedWithFutureDate() {
             // Given
             List<TimelineOfEvents> timelineOfEvents = new ArrayList<>();
-            timelineOfEvents.add(
-                TimelineOfEvents.builder().value(TimelineOfEventDetails.builder().timelineDate(LocalDate.now().plusDays(1)).build()).build());
-            CaseData caseData = CaseData.builder().timelineOfEvents(timelineOfEvents)
-                .build();
+            TimelineOfEventDetails futureEventDetails = new TimelineOfEventDetails();
+            futureEventDetails.setTimelineDate(LocalDate.now().plusDays(1));
+            TimelineOfEvents futureEvent = new TimelineOfEvents();
+            futureEvent.setValue(futureEventDetails);
+            timelineOfEvents.add(futureEvent);
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setTimelineOfEvents(timelineOfEvents);
 
             CallbackParams params = callbackParamsOf(caseData, MID, "ValidateClaimTimelineDate");
             // When
@@ -1356,21 +1428,26 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldValidateClaimTimelineDate_whenPopulated() {
             // Given
             List<TimelineOfEvents> timelineOfEvents = new ArrayList<>();
-            timelineOfEvents.add(
-                TimelineOfEvents.builder().value(TimelineOfEventDetails.builder().timelineDate(LocalDate.now().minusDays(1)).build()).build());
-            CaseData caseData = CaseData.builder().totalClaimAmount(new BigDecimal(1000))
-                .build();
+            TimelineOfEventDetails specEventDetails = new TimelineOfEventDetails();
+            specEventDetails.setTimelineDate(LocalDate.now().minusDays(1));
+            TimelineOfEvents specEvent = new TimelineOfEvents();
+            specEvent.setValue(specEventDetails);
+            timelineOfEvents.add(specEvent);
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setTotalClaimAmount(new BigDecimal(1000));
 
             CallbackParams params = callbackParamsOf(caseData, MID, "ClaimInterest");
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             // Then
-            assertThat(response.getData()).containsEntry("calculatedInterest", " | Description | Amount | \n" +
-                " |---|---| \n" +
-                " | Claim amount | £ 1000.00 | \n" +
-                " | Interest amount | £ 0 | \n" +
-                " | Total amount | £ 1000.00 |");
+            assertThat(response.getData()).containsEntry(
+                "calculatedInterest", " | Description | Amount | \n" +
+                    " |---|---| \n" +
+                    " | Claim amount | £ 1000.00 | \n" +
+                    " | Interest amount | £ 0 | \n" +
+                    " | Total amount | £ 1000.00 |"
+            );
         }
     }
 
@@ -1381,15 +1458,19 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldCalculateSpecFee_whenPopulated() {
             // Given
             List<TimelineOfEvents> timelineOfEvents = new ArrayList<>();
-            timelineOfEvents.add(
-                TimelineOfEvents.builder().value(TimelineOfEventDetails.builder().timelineDate(LocalDate.now().minusDays(1)).build()).build());
-            CaseData caseData = CaseData.builder().claimInterest(YES)
-                .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
-                .sameRateInterestSelection(SameRateInterestSelection.builder()
-                    .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
-                .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
-                .totalClaimAmount(new BigDecimal(1000))
-                .build();
+            TimelineOfEventDetails feeTimelineDetails = new TimelineOfEventDetails();
+            feeTimelineDetails.setTimelineDate(LocalDate.now().minusDays(1));
+            TimelineOfEvents feeTimelineEvent = new TimelineOfEvents();
+            feeTimelineEvent.setValue(feeTimelineDetails);
+            timelineOfEvents.add(feeTimelineEvent);
+            SameRateInterestSelection specSameRateSelection = new SameRateInterestSelection();
+            specSameRateSelection.setSameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC);
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setClaimInterest(YES);
+            caseData.setInterestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST);
+            caseData.setSameRateInterestSelection(specSameRateSelection);
+            caseData.setInterestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE);
+            caseData.setTotalClaimAmount(new BigDecimal(1000));
             when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
             CallbackParams params = callbackParamsOf(caseData, MID, "spec-fee");
             // When
@@ -1406,15 +1487,16 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetRespondent2SameLegalRepToNo_whenPopulated() {
             // Given
-            CaseData caseData = CaseData.builder().specRespondent1Represented(NO)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setSpecRespondent1Represented(NO);
 
             CallbackParams params = callbackParamsOf(caseData, MID, "setRespondent2SameLegalRepresentativeToNo");
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = objMapper.convertValue(response.getData(), CaseData.class);
 
             // Then
-            assertThat(response.getData()).containsEntry("respondent2SameLegalRepresentative", "No");
+            assertThat(updatedData.getRespondent2SameLegalRepresentative()).isEqualTo(NO);
         }
     }
 
@@ -1427,9 +1509,10 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnNoErrors_whenIdamEmailIsCorrect() {
                 // Given
-                CaseData caseData = CaseData.builder()
-                    .applicantSolicitor1CheckEmail(CorrectEmail.builder().correct(YES).build())
-                    .build();
+                CorrectEmail correctEmail = new CorrectEmail();
+                correctEmail.setCorrect(YES);
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setApplicantSolicitor1CheckEmail(correctEmail);
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "validate-claimant-legal-rep-email");
 
@@ -1445,10 +1528,13 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 // Given
                 String validEmail = "john@example.com";
 
-                CaseData caseData = CaseData.builder()
-                    .applicantSolicitor1CheckEmail(CorrectEmail.builder().correct(NO).build())
-                    .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(validEmail).build())
-                    .build();
+                CorrectEmail incorrectIdamEmail = new CorrectEmail();
+                incorrectIdamEmail.setCorrect(NO);
+                IdamUserDetails userDetails = new IdamUserDetails();
+                userDetails.setEmail(validEmail);
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setApplicantSolicitor1CheckEmail(incorrectIdamEmail);
+                caseData.setApplicantSolicitor1UserDetails(userDetails);
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "validate-claimant-legal-rep-email");
 
@@ -1464,10 +1550,13 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 // Given
                 String invalidEmail = "a@a";
 
-                CaseData caseData = CaseData.builder()
-                    .applicantSolicitor1CheckEmail(CorrectEmail.builder().correct(NO).build())
-                    .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(invalidEmail).build())
-                    .build();
+                CorrectEmail incorrectEmail = new CorrectEmail();
+                incorrectEmail.setCorrect(NO);
+                IdamUserDetails idamUserDetails = new IdamUserDetails();
+                idamUserDetails.setEmail(invalidEmail);
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setApplicantSolicitor1CheckEmail(incorrectEmail);
+                caseData.setApplicantSolicitor1UserDetails(idamUserDetails);
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "validate-claimant-legal-rep-email");
 
@@ -1476,7 +1565,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 // Then
                 assertThat(response.getErrors()).containsExactly("Enter an email address in the correct format,"
-                    + " for example john.smith@example.com");
+                                                                     + " for example john.smith@example.com");
             }
         }
 
@@ -1488,9 +1577,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 // Given
                 String validEmail = "john@example.com";
 
-                CaseData caseData = CaseData.builder()
-                    .respondentSolicitor1EmailAddress(validEmail)
-                    .build();
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setRespondentSolicitor1EmailAddress(validEmail);
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "validate-defendant-legal-rep-email");
 
@@ -1506,9 +1594,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 // Given
                 String invalidEmail = "a@a";
 
-                CaseData caseData = CaseData.builder()
-                    .respondentSolicitor1EmailAddress(invalidEmail)
-                    .build();
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setRespondentSolicitor1EmailAddress(invalidEmail);
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "validate-defendant-legal-rep-email");
 
@@ -1517,7 +1604,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 // Then
                 assertThat(response.getErrors()).containsExactly("Enter an email address in the correct format,"
-                    + " for example john.smith@example.com");
+                                                                     + " for example john.smith@example.com");
             }
 
             @Test
@@ -1525,9 +1612,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 // Given
                 String validEmail = "john@example.com";
 
-                CaseData caseData = CaseData.builder()
-                    .respondentSolicitor1EmailAddress(validEmail)
-                    .build();
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setRespondentSolicitor1EmailAddress(validEmail);
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "validate-spec-defendant-legal-rep-email");
 
@@ -1543,9 +1629,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 // Given
                 String invalidEmail = "a@a";
 
-                CaseData caseData = CaseData.builder()
-                    .respondentSolicitor1EmailAddress(invalidEmail)
-                    .build();
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setRespondentSolicitor1EmailAddress(invalidEmail);
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "validate-spec-defendant-legal-rep-email");
 
@@ -1554,7 +1639,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 // Then
                 assertThat(response.getErrors()).containsExactly("Enter an email address in the correct format,"
-                    + " for example john.smith@example.com");
+                                                                     + " for example john.smith@example.com");
             }
 
             @Test
@@ -1562,9 +1647,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 // Given
                 String validEmail = "john@example.com";
 
-                CaseData caseData = CaseData.builder()
-                    .respondentSolicitor2EmailAddress(validEmail)
-                    .build();
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setRespondentSolicitor2EmailAddress(validEmail);
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "validate-spec-defendant2-legal-rep-email");
 
@@ -1580,9 +1664,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 // Given
                 String invalidEmail = "a@a";
 
-                CaseData caseData = CaseData.builder()
-                    .respondentSolicitor2EmailAddress(invalidEmail)
-                    .build();
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setRespondentSolicitor2EmailAddress(invalidEmail);
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "validate-spec-defendant2-legal-rep-email");
 
@@ -1591,7 +1674,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 // Then
                 assertThat(response.getErrors()).containsExactly("Enter an email address in the correct format,"
-                    + " for example john.smith@example.com");
+                                                                     + " for example john.smith@example.com");
             }
 
         }
@@ -1613,7 +1696,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 // Given
                 Party respondent1 = PartyBuilder.builder().company().build();
 
-                CaseData caseData = CaseData.builder().respondent1(respondent1).build();
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setRespondent1(respondent1);
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "respondent1");
 
@@ -1632,16 +1716,18 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnErrors_whenRespondent1AddressNotValid() {
                 // Given
+                Address invalidAddress = new Address();
+                invalidAddress.setAddressLine1("Line 1 test again for more than 35 characters");
+                invalidAddress.setAddressLine2("Line 1 test again for more than 35 characters");
+                invalidAddress.setAddressLine3("Line 1 test again for more than 35 characters");
+                invalidAddress.setCounty("Line 1 test again for more than 35 characters");
+                invalidAddress.setPostCode("PostCode test more than 8 characters");
+                invalidAddress.setPostTown("Line 1 test again for more than 35 characters");
+                Party respondent1 = new Party();
+                respondent1.setType(Party.Type.ORGANISATION);
+                respondent1.setPrimaryAddress(invalidAddress);
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                    .respondent1(Party.builder().type(Party.Type.ORGANISATION)
-                        .primaryAddress(Address.builder()
-                            .addressLine1("Line 1 test again for more than 35 characters")
-                            .addressLine2("Line 1 test again for more than 35 characters")
-                            .addressLine3("Line 1 test again for more than 35 characters")
-                            .county("Line 1 test again for more than 35 characters")
-                            .postCode("PostCode test more than 8 characters")
-                            .postTown("Line 1 test again for more than 35 characters").build())
-                        .build()).build();
+                    .respondent1(respondent1).build();
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "respondent1");
 
@@ -1667,7 +1753,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 // Given
                 Party respondent2 = PartyBuilder.builder().company().build();
 
-                CaseData caseData = CaseData.builder().respondent2(respondent2).build();
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setRespondent2(respondent2);
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "respondent2");
 
@@ -1686,16 +1773,18 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnErrors_whenRespondent2AddressNotValid() {
                 // Given
+                Address invalidAddress = new Address();
+                invalidAddress.setAddressLine1("Line 1 test again for more than 35 characters");
+                invalidAddress.setAddressLine2("Line 1 test again for more than 35 characters");
+                invalidAddress.setAddressLine3("Line 1 test again for more than 35 characters");
+                invalidAddress.setCounty("Line 1 test again for more than 35 characters");
+                invalidAddress.setPostCode("PostCode test more than 8 characters");
+                invalidAddress.setPostTown("Line 1 test again for more than 35 characters");
+                Party respondent2 = new Party();
+                respondent2.setType(Party.Type.ORGANISATION);
+                respondent2.setPrimaryAddress(invalidAddress);
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                    .respondent2(Party.builder().type(Party.Type.ORGANISATION)
-                        .primaryAddress(Address.builder()
-                            .addressLine1("Line 1 test again for more than 35 characters")
-                            .addressLine2("Line 1 test again for more than 35 characters")
-                            .addressLine3("Line 1 test again for more than 35 characters")
-                            .county("Line 1 test again for more than 35 characters")
-                            .postCode("PostCode test more than 8 characters")
-                            .postTown("Line 1 test again for more than 35 characters").build())
-                        .build()).build();
+                    .respondent2(respondent2).build();
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "respondent2");
 
@@ -1716,10 +1805,11 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             void shouldReturnNoErrors_whenSolicitor1AddressValid() {
                 // Given
                 SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails =
-                    SolicitorOrganisationDetails.builder().address(AddressBuilder.defaults().build()).build();
+                    new SolicitorOrganisationDetails();
+                respondentSolicitor1OrganisationDetails.setAddress(AddressBuilder.defaults().build());
 
-                CaseData caseData = CaseData.builder()
-                    .respondentSolicitor1OrganisationDetails(respondentSolicitor1OrganisationDetails).build();
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setRespondentSolicitor1OrganisationDetails(respondentSolicitor1OrganisationDetails);
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "respondentSolicitor1");
 
@@ -1739,14 +1829,14 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnErrors_whenSolicitor1AddressNotValid() {
                 // Given
+                Address invalidSolicitorAddress = new Address();
+                invalidSolicitorAddress.setPostCode(null);
                 SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails =
-                    SolicitorOrganisationDetails.builder()
-                        .address(Address.builder().postCode(null).build())
-                        .build();
+                    new SolicitorOrganisationDetails();
+                respondentSolicitor1OrganisationDetails.setAddress(invalidSolicitorAddress);
 
-                CaseData caseData = CaseData.builder()
-                    .respondentSolicitor1OrganisationDetails(respondentSolicitor1OrganisationDetails)
-                    .build();
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setRespondentSolicitor1OrganisationDetails(respondentSolicitor1OrganisationDetails);
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "respondentSolicitor1");
 
@@ -1773,13 +1863,11 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             void shouldReturnNoErrors_whenSolicitor2AddressValid() {
                 // Given
                 SolicitorOrganisationDetails respondentSolicitor2OrganisationDetails =
-                    SolicitorOrganisationDetails.builder()
-                        .address(AddressBuilder.defaults().build())
-                        .build();
+                    new SolicitorOrganisationDetails();
+                respondentSolicitor2OrganisationDetails.setAddress(AddressBuilder.defaults().build());
 
-                CaseData caseData = CaseData.builder()
-                    .respondentSolicitor2OrganisationDetails(respondentSolicitor2OrganisationDetails)
-                    .build();
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setRespondentSolicitor2OrganisationDetails(respondentSolicitor2OrganisationDetails);
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "respondentSolicitor2");
 
@@ -1799,11 +1887,14 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnErrors_whenSolicitor2AddressNotValid() {
                 // Given
+                Address invalidSolicitor2Address = new Address();
+                invalidSolicitor2Address.setPostCode(null);
                 SolicitorOrganisationDetails respondentSolicitor2OrganisationDetails =
-                    SolicitorOrganisationDetails.builder().address(Address.builder().postCode(null).build()).build();
+                    new SolicitorOrganisationDetails();
+                respondentSolicitor2OrganisationDetails.setAddress(invalidSolicitor2Address);
 
-                CaseData caseData = CaseData.builder()
-                    .respondentSolicitor2OrganisationDetails(respondentSolicitor2OrganisationDetails).build();
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setRespondentSolicitor2OrganisationDetails(respondentSolicitor2OrganisationDetails);
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "respondentSolicitor2");
 
@@ -1829,9 +1920,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnNoErrors_whenRequiredAddressIsNo() {
                 // Given
-                CaseData caseData = CaseData.builder()
-                    .specApplicantCorrespondenceAddressRequired(NO)
-                    .build();
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setSpecApplicantCorrespondenceAddressRequired(NO);
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "specCorrespondenceAddress");
 
@@ -1850,10 +1940,9 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnNoErrors_whenRequiredAddressIsYesAndValid() {
                 // Given
-                CaseData caseData = CaseData.builder()
-                    .specApplicantCorrespondenceAddressRequired(YES)
-                    .specApplicantCorrespondenceAddressdetails(AddressBuilder.defaults().build())
-                    .build();
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setSpecApplicantCorrespondenceAddressRequired(YES);
+                caseData.setSpecApplicantCorrespondenceAddressdetails(AddressBuilder.defaults().build());
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "specCorrespondenceAddress");
 
@@ -1873,10 +1962,11 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnErrors_whenRequiredAddressIsYesAndNotValid() {
                 // Given
-                CaseData caseData = CaseData.builder()
-                    .specApplicantCorrespondenceAddressRequired(YES)
-                    .specApplicantCorrespondenceAddressdetails(Address.builder().postCode(null).build())
-                    .build();
+                Address invalidApplicantAddress = new Address();
+                invalidApplicantAddress.setPostCode(null);
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setSpecApplicantCorrespondenceAddressRequired(YES);
+                caseData.setSpecApplicantCorrespondenceAddressdetails(invalidApplicantAddress);
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "specCorrespondenceAddress");
 
@@ -1902,9 +1992,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnNoErrors_whenRequiredAddressIsNo() {
                 // Given
-                CaseData caseData = CaseData.builder()
-                    .specRespondentCorrespondenceAddressRequired(NO)
-                    .build();
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setSpecRespondentCorrespondenceAddressRequired(NO);
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "specRespondentCorrespondenceAddress");
 
@@ -1923,10 +2012,9 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnNoErrors_whenRequiredAddressIsYesAndValid() {
                 // Given
-                CaseData caseData = CaseData.builder()
-                    .specRespondentCorrespondenceAddressRequired(YES)
-                    .specRespondentCorrespondenceAddressdetails(AddressBuilder.defaults().build())
-                    .build();
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setSpecRespondentCorrespondenceAddressRequired(YES);
+                caseData.setSpecRespondentCorrespondenceAddressdetails(AddressBuilder.defaults().build());
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "specRespondentCorrespondenceAddress");
 
@@ -1946,10 +2034,11 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnErrors_whenRequiredAddressIsYesAndNotValid() {
                 // Given
-                CaseData caseData = CaseData.builder()
-                    .specRespondentCorrespondenceAddressRequired(YES)
-                    .specRespondentCorrespondenceAddressdetails(Address.builder().postCode(null).build())
-                    .build();
+                Address invalidRespondentAddress = new Address();
+                invalidRespondentAddress.setPostCode(null);
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setSpecRespondentCorrespondenceAddressRequired(YES);
+                caseData.setSpecRespondentCorrespondenceAddressdetails(invalidRespondentAddress);
 
                 CallbackParams params = callbackParamsOf(caseData, MID, "specRespondentCorrespondenceAddress");
 
@@ -1978,11 +2067,13 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
+            Party respondent1 = new Party();
+            respondent1.setType(Party.Type.ORGANISATION);
+            respondent1.setOrganisationName(
+                "Line 1 test again for more than 70 characters on the company party name");
+            respondent1.setPrimaryAddress(AddressBuilder.defaults().build());
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .respondent1(Party.builder().type(Party.Type.ORGANISATION)
-                    .organisationName("Line 1 test again for more than 70 characters on the company party name")
-                    .primaryAddress(AddressBuilder.defaults().build())
-                    .build()).build();
+                .respondent1(respondent1).build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, "respondent1");
 
@@ -1999,13 +2090,17 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
+            Party respondent2 = new Party();
+            respondent2.setType(Party.Type.INDIVIDUAL);
+            respondent2.setIndividualTitle(
+                "Title test again for more than 70 characters on the company party name");
+            respondent2.setIndividualFirstName(
+                "Line 1 test again for more than 70 characters on the company party name");
+            respondent2.setIndividualLastName(
+                "Line 1 test again for more than 70 characters on the company party name");
+            respondent2.setPrimaryAddress(AddressBuilder.defaults().build());
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .respondent2(Party.builder().type(Party.Type.INDIVIDUAL)
-                    .individualTitle("Title test again for more than 70 characters on the company party name")
-                    .individualFirstName("Line 1 test again for more than 70 characters on the company party name")
-                    .individualLastName("Line 1 test again for more than 70 characters on the company party name")
-                    .primaryAddress(AddressBuilder.defaults().build())
-                    .build()).build();
+                .respondent2(respondent2).build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, "respondent2");
 
@@ -2025,13 +2120,15 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldGetAirlineList_whenRequired() {
             // Given
             List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>();
-            airlineEpimsIDList.add(AirlineEpimsId.builder().airline("BA/Cityflyer").epimsID("111000").build());
-            airlineEpimsIDList.add(AirlineEpimsId.builder().airline("OTHER").epimsID("111111").build());
+            AirlineEpimsId baAirline = new AirlineEpimsId("BA/Cityflyer", "111000");
+            airlineEpimsIDList.add(baAirline);
+            AirlineEpimsId otherAirline = new AirlineEpimsId("OTHER", "111111");
+            airlineEpimsIDList.add(otherAirline);
 
             given(airlineEpimsDataLoader.getAirlineEpimsIDList())
                 .willReturn(airlineEpimsIDList);
 
-            CaseData caseData = CaseData.builder().build();
+            CaseData caseData = CaseDataBuilder.builder().build();
             CallbackParams params = callbackParamsOf(caseData, MID, "get-airline-list");
 
             // When
@@ -2050,9 +2147,11 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnErrorWhenDateOfFlightIsInTheFuture() {
             // Given
-            CaseData caseData = CaseData.builder()
-                .isFlightDelayClaim(YES)
-                .flightDelayDetails(FlightDelayDetails.builder().scheduledDate(now().plusDays(1)).build()).build();
+            FlightDelayDetails flightDelayDetails = new FlightDelayDetails();
+            flightDelayDetails.setScheduledDate(now().plusDays(1));
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setIsFlightDelayClaim(YES);
+            caseData.setFlightDelayDetails(flightDelayDetails);
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validateFlightDelayDate");
             // When
@@ -2066,9 +2165,11 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @ValueSource(ints = {0, 1})
         void shouldNotReturnErrorWhenDateOfFlightIsTodayOrInThePast(Integer days) {
             // Given
-            CaseData caseData = CaseData.builder()
-                .isFlightDelayClaim(YES)
-                .flightDelayDetails(FlightDelayDetails.builder().scheduledDate(now().minusDays(days)).build()).build();
+            FlightDelayDetails flightDelayDetails = new FlightDelayDetails();
+            flightDelayDetails.setScheduledDate(now().minusDays(days));
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setIsFlightDelayClaim(YES);
+            caseData.setFlightDelayDetails(flightDelayDetails);
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validateFlightDelayDate");
             // When
@@ -2101,28 +2202,23 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             given(time.now()).willReturn(submittedDate);
             given(toggleConfiguration.getFeatureToggle()).willReturn("WA 4");
+            DefendantPinToPostLRspec pinToPost = new DefendantPinToPostLRspec();
+            pinToPost.setAccessCode(AccessCodeGenerator.generateAccessCode());
+            pinToPost.setRespondentCaseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName());
+            pinToPost.setExpiryDate(LocalDate.now().plusDays(180));
             given(defendantPinToPostLRspecService.buildDefendantPinToPost())
-                .willReturn(DefendantPinToPostLRspec.builder()
-                    .accessCode(
-                        AccessCodeGenerator.generateAccessCode())
-                    .respondentCaseRole(
-                        CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
-                    .expiryDate(LocalDate.now().plusDays(
-                        180))
-                    .build());
+                .willReturn(pinToPost);
         }
 
         @Test
         void shouldSetClaimFee_whenInvokedAndBulkClaim() {
             // Given
-            Fee feeData = Fee.builder()
-                .code("FeeCode")
-                .calculatedAmountInPence(BigDecimal.valueOf(19990))
-                .build();
-            CaseData localCaseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
-                .sdtRequestIdFromSdt("sdtRequestIdFromSdt")
-                .totalClaimAmount(BigDecimal.valueOf(1999))
-                .build();
+            Fee feeData = new Fee();
+            feeData.setCode("FeeCode");
+            feeData.setCalculatedAmountInPence(BigDecimal.valueOf(19990));
+            CaseData localCaseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
+            localCaseData.setSdtRequestIdFromSdt("sdtRequestIdFromSdt");
+            localCaseData.setTotalClaimAmount(BigDecimal.valueOf(1999));
             given(feesService.getFeeDataByTotalClaimAmount(any())).willReturn(feeData);
             when(interestCalculator.calculateBulkInterest(localCaseData)).thenReturn(new BigDecimal(0));
             given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
@@ -2137,10 +2233,9 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAddSdtRequestId_whenInvokedAndBulkClaim() {
             // Given
-            CaseData localCaseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
-                .sdtRequestIdFromSdt("sdtRequestIdFromSdt")
-                .totalClaimAmount(BigDecimal.valueOf(1999))
-                .build();
+            CaseData localCaseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
+            localCaseData.setSdtRequestIdFromSdt("sdtRequestIdFromSdt");
+            localCaseData.setTotalClaimAmount(BigDecimal.valueOf(1999));
             when(interestCalculator.calculateBulkInterest(localCaseData)).thenReturn(new BigDecimal(0));
             given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
             CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
@@ -2153,8 +2248,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotAddSdtRequestId_whenInvokedAndNotBulkClaim() {
             // Given
-            CaseData localCaseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
-                .build();
+            CaseData localCaseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
             CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
@@ -2165,10 +2259,9 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssignFirstPbaNumber_whenInvokedAndBulkClaim() {
             // Given
-            CaseData localCaseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build().toBuilder()
-                .sdtRequestIdFromSdt("sdtRequestIdFromSdt")
-                .totalClaimAmount(BigDecimal.valueOf(1999))
-                .build();
+            CaseData localCaseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
+            localCaseData.setSdtRequestIdFromSdt("sdtRequestIdFromSdt");
+            localCaseData.setTotalClaimAmount(BigDecimal.valueOf(1999));
             when(interestCalculator.calculateBulkInterest(localCaseData)).thenReturn(new BigDecimal(0));
             given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
             CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
@@ -2177,7 +2270,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Then
             System.out.println(response.getData().get("applicantSolicitor1PbaAccounts"));
             assertThat(response.getData()).extracting("applicantSolicitor1PbaAccounts").asString().contains("12345");
-            assertThat(response.getData()).extracting("applicantSolicitor1PbaAccounts").asString().doesNotContain("98765");
+            assertThat(response.getData()).extracting("applicantSolicitor1PbaAccounts").asString().doesNotContain(
+                "98765");
         }
 
         @Test
@@ -2287,18 +2381,17 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldCopyRespondent1OrgPolicyReferenceForSameRegisteredSolicitorScenario_whenInvoked() {
+            Party respondent2 = new Party();
+            respondent2.setType(Party.Type.COMPANY);
+            respondent2.setCompanyName("Company 3");
             caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameRepresentative()
-                .respondent2(Party.builder()
-                    .type(Party.Type.COMPANY)
-                    .companyName("Company 3")
-                    .build())
-                .build().toBuilder()
-                .specRespondentCorrespondenceAddressRequired(YES)
-                .specRespondentCorrespondenceAddressdetails(Address.builder()
-                    .postCode("Postcode")
-                    .addressLine1("Address")
-                    .build())
+                .respondent2(respondent2)
                 .build();
+            caseData.setSpecRespondentCorrespondenceAddressRequired(YES);
+            Address correspondenceAddress = new Address();
+            correspondenceAddress.setPostCode("Postcode");
+            correspondenceAddress.setAddressLine1("Address");
+            caseData.setSpecRespondentCorrespondenceAddressdetails(correspondenceAddress);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(
                     caseData,
@@ -2362,10 +2455,10 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAddMissingRespondent1OrgPolicyWithCaseRole_whenInvoked() {
             // Given
+            CaseData modifiedCaseData = objMapper.convertValue(params.getCaseData(), CaseData.class);
+            modifiedCaseData.setRespondent1OrganisationPolicy(null);
             var callbackParams = params.toBuilder()
-                .caseData(params.getCaseData().toBuilder()
-                    .respondent1OrganisationPolicy(null)
-                    .build())
+                .caseData(modifiedCaseData)
                 .build();
 
             // When
@@ -2381,7 +2474,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldAddMissingRespondent2OrgPolicyWithCaseRole_whenInvoked() {
             // Given
             var callbackParams = params.toBuilder()
-                .caseData(params.getCaseData().toBuilder().build())
+                .caseData(params.getCaseData())
                 .build();
 
             // When
@@ -2408,15 +2501,14 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldAddIdamEmailToIdamDetails_whenIdamEmailIsCorrect() {
                 // Given
-                CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                    .applicantSolicitor1CheckEmail(CorrectEmail.builder()
-                        .email(EMAIL)
-                        .correct(YES)
-                        .build())
-                    .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                        .email(DIFFERENT_EMAIL)
-                        .build())
-                    .build();
+                CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+                CorrectEmail correctEmail = new CorrectEmail();
+                correctEmail.setEmail(EMAIL);
+                correctEmail.setCorrect(YES);
+                localCaseData.setApplicantSolicitor1CheckEmail(correctEmail);
+                IdamUserDetails idamDetails = new IdamUserDetails();
+                idamDetails.setEmail(DIFFERENT_EMAIL);
+                localCaseData.setApplicantSolicitor1UserDetails(idamDetails);
 
                 params = callbackParamsOf(V_1, localCaseData, ABOUT_TO_SUBMIT);
 
@@ -2441,15 +2533,14 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 given(userService.getUserDetails(any()))
                     .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
-                CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                    .applicantSolicitor1CheckEmail(CorrectEmail.builder()
-                        .email(EMAIL)
-                        .correct(NO)
-                        .build())
-                    .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                        .email(DIFFERENT_EMAIL)
-                        .build())
-                    .build();
+                CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+                CorrectEmail incorrectEmail = new CorrectEmail();
+                incorrectEmail.setEmail(EMAIL);
+                incorrectEmail.setCorrect(NO);
+                localCaseData.setApplicantSolicitor1CheckEmail(incorrectEmail);
+                IdamUserDetails alternateDetails = new IdamUserDetails();
+                alternateDetails.setEmail(DIFFERENT_EMAIL);
+                localCaseData.setApplicantSolicitor1UserDetails(alternateDetails);
 
                 CallbackParams localParams = callbackParamsOf(V_1, localCaseData, ABOUT_TO_SUBMIT);
 
@@ -2477,9 +2568,11 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 String name = "John Smith";
                 String role = "Solicitor";
 
-                CaseData data = caseData.toBuilder()
-                    .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
-                    .build();
+                StatementOfTruth statementOfTruth = new StatementOfTruth();
+                statementOfTruth.setName(name);
+                statementOfTruth.setRole(role);
+                CaseData data = objMapper.convertValue(caseData, CaseData.class);
+                data.setUiStatementOfTruth(statementOfTruth);
 
                 // When
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
@@ -2512,7 +2605,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 List<LocationRefData> locations = new ArrayList<>();
                 locations.add(LocationRefData.builder().regionId("Site Name").epimmsId("36791")
-                    .build());
+                                  .build());
                 given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                     .willReturn(locations);
             }
@@ -2521,32 +2614,35 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             void shouldReturnExpectedCourtLocation_whenAirlineExists() {
                 // Given
 
+                DynamicListElement gulfAirElement = new DynamicListElement("GULF_AIR", "Gulf Air");
+                DynamicList airlineList = new DynamicList();
+                airlineList.setValue(gulfAirElement);
+                FlightDelayDetails flightDelayDetails = new FlightDelayDetails();
+                flightDelayDetails.setAirlineList(airlineList);
                 CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDraft()
                     .isFlightDelayClaim(YES)
-                    .flightDelay(FlightDelayDetails.builder()
-                        .airlineList(
-                            DynamicList.builder()
-                                .value(DynamicListElement.builder().code("GULF_AIR").label("Gulf Air")
-                                    .build()).build()).build()).build();
+                    .flightDelay(flightDelayDetails).build();
                 CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
 
                 // When
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
                 // Then
-                assertThat(response.getData()).extracting("flightDelayDetails").extracting("flightCourtLocation").extracting("region")
+                assertThat(response.getData()).extracting("flightDelayDetails").extracting("flightCourtLocation").extracting(
+                        "region")
                     .isEqualTo("Site Name");
             }
 
             @Test
             void shouldReturnExpectedCourtLocation_whenOtherAirlineSelected() {
                 // Given
+                DynamicListElement otherElement = new DynamicListElement("OTHER", "OTHER");
+                DynamicList otherAirlineList = new DynamicList();
+                otherAirlineList.setValue(otherElement);
+                FlightDelayDetails otherFlightDelayDetails = new FlightDelayDetails();
+                otherFlightDelayDetails.setAirlineList(otherAirlineList);
                 CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDraft()
-                    .flightDelay(FlightDelayDetails.builder()
-                        .airlineList(
-                            DynamicList.builder()
-                                .value(DynamicListElement.builder().code("OTHER").label("OTHER")
-                                    .build()).build()).build()).build();
+                    .flightDelay(otherFlightDelayDetails).build();
                 CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
 
                 given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
@@ -2556,7 +2652,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
                 // Then
-                assertThat(response.getData()).extracting("flightDelayDetails").doesNotHaveToString("flightCourtLocation");
+                assertThat(response.getData()).extracting("flightDelayDetails").doesNotHaveToString(
+                    "flightCourtLocation");
             }
         }
     }
@@ -2651,5 +2748,107 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                         ) + exitSurveyContentService.applicantSurvey())
                     .build());
         }
+    }
+
+    @Test
+    void shouldReturnPbaHeader_whenCaseIsMatched() {
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondent1Represented(NO);
+        caseData.setAddRespondent2(NO);
+        caseData.setAddApplicant2(NO);
+        caseData.setLegacyCaseReference("000MC001");
+        caseData.setCcdCaseReference(123L);
+
+        CallbackParams params = CallbackParams.builder()
+            .caseData(caseData)
+            .request(CallbackRequest.builder().eventId("CREATE_CLAIM_SPEC").build())
+            .build();
+
+        // When
+        SubmittedCallbackResponse response = handler.buildConfirmation(params);
+
+        // Then
+        Assertions.assertTrue(response.getConfirmationHeader().contains("Please now pay your claim fee"));
+        Assertions.assertTrue(response.getConfirmationBody().contains("Pay your claim fee"));
+    }
+
+    @Test
+    void shouldReturnPbaHeader_whenRespondentsAreRepresentedAndRegistered() {
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondent1Represented(YES);
+        caseData.setRespondent1OrgRegistered(YES);
+        caseData.setRespondent2Represented(YES);
+        caseData.setRespondent2OrgRegistered(YES);
+        caseData.setLegacyCaseReference("000MC001");
+        caseData.setCcdCaseReference(123L);
+
+        CallbackParams params = CallbackParams.builder()
+            .caseData(caseData)
+            .request(CallbackRequest.builder().eventId("CREATE_CLAIM_SPEC").build())
+            .build();
+
+        // When
+        SubmittedCallbackResponse response = handler.buildConfirmation(params);
+
+        // Then
+        Assertions.assertTrue(response.getConfirmationBody().contains("Pay your claim fee"));
+    }
+
+    @Test
+    void shouldReturnLipConfirmationBody_whenNotMatchedAndNotRepresented() {
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondent1Represented(NO);
+        caseData.setAddRespondent2(YES);
+        caseData.setAddApplicant2(YES);
+        caseData.setLegacyCaseReference("000MC001");
+        caseData.setCcdCaseReference(123L);
+
+        CallbackParams params = CallbackParams.builder()
+            .caseData(caseData)
+            .request(CallbackRequest.builder().eventId("CREATE_CLAIM_SPEC").build())
+            .build();
+
+        // When
+        SubmittedCallbackResponse response = handler.buildConfirmation(params);
+
+        // Then
+        Assertions.assertTrue(response.getConfirmationBody().contains(
+            "Your claim will not be issued until payment is confirmed"));
+        Assertions.assertTrue(response.getConfirmationBody().contains("sealed claim form"));
+    }
+
+    @Test
+    void shouldReturnOfflineHeader_whenNotMatchedAndNotRepresented() {
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondent1Represented(NO);
+        caseData.setRespondent1OrgRegistered(NO);
+        caseData.setRespondent2Represented(NO);
+        caseData.setRespondent2OrgRegistered(YES);
+        caseData.setAddRespondent2(YES);
+        caseData.setAddApplicant2(YES);
+        caseData.setLegacyCaseReference("000MC001");
+        caseData.setCcdCaseReference(123L);
+
+        CallbackParams params = CallbackParams.builder()
+            .caseData(caseData)
+            .request(CallbackRequest.builder().eventId(null).build())
+            .build();
+
+        // When
+        SubmittedCallbackResponse response = handler.buildConfirmation(params);
+
+        // Then
+        System.out.print(response.getConfirmationHeader());
+        Assertions.assertTrue(response.getConfirmationHeader().contains("Your claim has been received and will progress offline"));
+        Assertions.assertTrue(response.getConfirmationHeader().contains("000MC001"));
+    }
+
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvent() {
+        assertThat(handler.handledEvents()).contains(CREATE_CLAIM_SPEC);
     }
 }

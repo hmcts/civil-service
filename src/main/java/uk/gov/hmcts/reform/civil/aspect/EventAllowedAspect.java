@@ -12,13 +12,14 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.flowstate.AllowedEventService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 
 import java.util.List;
 
-import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 
 @Slf4j
@@ -30,7 +31,7 @@ public class EventAllowedAspect {
     private static final String ERROR_MESSAGE = "This action cannot currently be performed because it has either "
         + "already been completed or another action must be completed first.";
 
-    private final FlowStateAllowedEventService flowStateAllowedEventService;
+    private final AllowedEventService allowedEventService;
 
     private final IStateFlowEngine stateFlowEngine;
 
@@ -51,19 +52,28 @@ public class EventAllowedAspect {
         CaseDetails caseDetails = callbackParams.getRequest().getCaseDetails();
         CaseData caseData = callbackParams.getCaseData();
 
-        if (flowStateAllowedEventService.isAllowed(caseDetails, caseEvent)) {
+        if (allowedEventService.isAllowed(caseDetails, caseEvent)) {
             return joinPoint.proceed();
         } else {
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
             StringBuilder stateHistoryBuilder = new StringBuilder();
-            FlowState flowState = flowStateAllowedEventService.getFlowState(caseData);
-            stateFlowEngine.evaluate(caseData).getStateHistory().forEach(s -> {
+            stateFlow.getStateHistory().forEach(s -> {
                 stateHistoryBuilder.append(s.getName());
                 stateHistoryBuilder.append(", ");
             });
-            log.info(format(
-                "%s is not allowed on the case id %s, current FlowState: %s, stateFlowHistory: %s",
-                caseEvent.name(), caseDetails.getId(), flowState, stateHistoryBuilder.toString()
-            ));
+
+            try {
+                log.info(
+                    "{} is not allowed on the case id {}, current FlowState: {}, stateFlowHistory: {}",
+                    caseEvent.name(),
+                    caseData.getCcdCaseReference(),
+                    FlowState.fromFullName(stateFlow.getState().getName()),
+                    stateHistoryBuilder
+                );
+            } catch (StateFlowException e) {
+                log.warn("Error during state flow evaluation.", e);
+            }
+
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(ERROR_MESSAGE))
                 .build();

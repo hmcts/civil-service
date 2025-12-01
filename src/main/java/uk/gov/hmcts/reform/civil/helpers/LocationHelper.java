@@ -184,13 +184,12 @@ public class LocationHelper {
      * Updates both caseManagementLocation and locationName with the same LocationRefData to ease not forgetting
      * about one of those.
      *
-     * @param builder  (mandatory) to build a case data
+     * @param caseData  (mandatory) to build case data
      * @param location (mandatory) what to update with
      */
-    public static void updateWithLocation(CaseData.CaseDataBuilder<?, ?> builder, LocationRefData location) {
-        builder
-            .caseManagementLocation(buildCaseLocation(location))
-            .locationName(location.getSiteName());
+    public static void updateWithLocation(CaseData caseData, LocationRefData location) {
+        caseData.setCaseManagementLocation(buildCaseLocation(location));
+        caseData.setLocationName(location.getSiteName());
     }
 
     /**
@@ -202,11 +201,11 @@ public class LocationHelper {
      * @param getLocations   how to get the list of locations
      * @return matching location
      */
-    public Optional<LocationRefData> updateCaseManagementLocation(CaseData.CaseDataBuilder<?, ?> updatedData,
+    public Optional<LocationRefData> updateCaseManagementLocation(CaseData updatedData,
                                                                   RequestedCourt requestedCourt,
                                                                   Supplier<List<LocationRefData>> getLocations) {
         Optional<LocationRefData> matchingLocation = getMatching(getLocations.get(), requestedCourt);
-        Long reference = updatedData.build().getCcdCaseReference();
+        Long reference = updatedData.getCcdCaseReference();
         if (log.isInfoEnabled()) {
             Optional.ofNullable(requestedCourt)
                 .map(RequestedCourt::getCaseLocation)
@@ -221,14 +220,14 @@ public class LocationHelper {
             );
         }
         updatedData
-            .caseManagementLocation(Stream.of(
+            .setCaseManagementLocation(Stream.of(
                     Optional.ofNullable(requestedCourt).map(RequestedCourt::getCaseLocation),
                     matchingLocation.map(LocationHelper::buildCaseLocation)
                 ).filter(Optional::isPresent)
                                         .map(Optional::get)
                                         .filter(this::isValidCaseLocation)
                                         .findFirst().orElseGet(CaseLocationCivil::new));
-        matchingLocation.map(LocationRefData::getSiteName).ifPresent(updatedData::locationName);
+        matchingLocation.map(LocationRefData::getSiteName).ifPresent(updatedData::setLocationName);
         return matchingLocation;
     }
 

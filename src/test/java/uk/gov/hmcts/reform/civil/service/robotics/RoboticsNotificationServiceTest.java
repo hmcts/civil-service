@@ -43,7 +43,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
-import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
@@ -75,7 +75,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
         TransitionsTestConfiguration.class,
         EventHistorySequencer.class,
         EventHistoryMapper.class,
-        RoboticsDataMapper.class,
+        RoboticsDataMapperForUnspec.class,
         RoboticsAddressMapper.class,
         AddressLinesMapper.class,
         OrganisationService.class
@@ -96,7 +96,7 @@ class RoboticsNotificationServiceTest {
     @Autowired
     RoboticsEmailConfiguration emailConfiguration;
     @Autowired
-    RoboticsDataMapper roboticsDataMapper;
+    RoboticsDataMapperForUnspec roboticsDataMapper;
     @MockBean
     FeatureToggleService featureToggleService;
 
@@ -378,11 +378,10 @@ class RoboticsNotificationServiceTest {
     }
 
     @Test
-    void shouldNotifyJudgementLiP_whenPinInPostEnabledAndLipDefendant() {
+    void shouldNotifyJudgementLiP_whenLipDefendant() {
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
             .toBuilder().respondent1Represented(NO).caseAccessCategory(SPEC_CLAIM).build();
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder()
@@ -416,7 +415,6 @@ class RoboticsNotificationServiceTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
             .toBuilder().respondent1Represented(NO).caseAccessCategory(SPEC_CLAIM).paymentTypeSelection(
                 DJPaymentTypeSelection.SET_DATE).build();
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder()
@@ -450,7 +448,6 @@ class RoboticsNotificationServiceTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
             .toBuilder().respondent1Represented(NO).caseAccessCategory(SPEC_CLAIM)
             .ccjPaymentDetails(CCJPaymentDetails.builder().ccjPaymentPaidSomeOption(YES).build()).build();
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder()
@@ -483,7 +480,6 @@ class RoboticsNotificationServiceTest {
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
             .toBuilder().respondent1Represented(NO).applicant1Represented(NO).caseAccessCategory(SPEC_CLAIM).build();
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
@@ -526,7 +522,6 @@ class RoboticsNotificationServiceTest {
                 .camundaEvent(camundaEvent)
                 .build())
             .build();
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
@@ -563,7 +558,6 @@ class RoboticsNotificationServiceTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
             .toBuilder().respondent1Represented(NO).applicant1Represented(NO).caseAccessCategory(SPEC_CLAIM)
             .ccjPaymentDetails(CCJPaymentDetails.builder().ccjPaymentPaidSomeOption(YES).build()).build();
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()

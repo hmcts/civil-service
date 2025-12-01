@@ -46,11 +46,14 @@ public class FullRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest
     class AboutToSubmitCallback {
         @Test
         void shouldUpdateFullRemissionData_ClaimFee() {
-            CaseData caseData = CaseData.builder()
-                .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
-                .claimIssuedHwfDetails(HelpWithFeesDetails.builder().build())
-                .hwfFeeType(FeeType.CLAIMISSUED)
-                .build();
+            Fee claimFee = new Fee();
+            claimFee.setCalculatedAmountInPence(BigDecimal.valueOf(10000));
+            claimFee.setCode("OOOCM002");
+            HelpWithFeesDetails claimIssuedHwfDetails = new HelpWithFeesDetails();
+            CaseData caseData = CaseData.builder().build();
+            caseData.setClaimFee(claimFee);
+            caseData.setClaimIssuedHwfDetails(claimIssuedHwfDetails);
+            caseData.setHwfFeeType(FeeType.CLAIMISSUED);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -62,10 +65,12 @@ public class FullRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest
 
         @Test
         void shouldUpdateFullRemissionDataWithDetailsNull_ClaimFee() {
-            CaseData caseData = CaseData.builder()
-                .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
-                .hwfFeeType(FeeType.CLAIMISSUED)
-                .build();
+            Fee claimFee = new Fee();
+            claimFee.setCalculatedAmountInPence(BigDecimal.valueOf(10000));
+            claimFee.setCode("OOOCM002");
+            CaseData caseData = CaseData.builder().build();
+            caseData.setClaimFee(claimFee);
+            caseData.setHwfFeeType(FeeType.CLAIMISSUED);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -77,12 +82,14 @@ public class FullRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest
 
         @Test
         void shouldUpdateFullRemissionData_HearingFee() {
-            CaseData caseData = CaseData.builder()
-                .hearingReferenceNumber("000HN001")
-                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
-                .hearingHwfDetails(HelpWithFeesDetails.builder().build())
-                .hwfFeeType(FeeType.HEARING)
-                .build();
+            Fee hearingFee = new Fee();
+            hearingFee.setCalculatedAmountInPence(BigDecimal.valueOf(30000));
+            HelpWithFeesDetails hearingHwfDetails = new HelpWithFeesDetails();
+            CaseData caseData = CaseData.builder().build();
+            caseData.setHearingReferenceNumber("000HN001");
+            caseData.setHearingFee(hearingFee);
+            caseData.setHearingHwfDetails(hearingHwfDetails);
+            caseData.setHwfFeeType(FeeType.HEARING);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -94,11 +101,12 @@ public class FullRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest
 
         @Test
         void shouldUpdateFullRemissionDataWithDetailsNull_HearingFee() {
-            CaseData caseData = CaseData.builder()
-                .hearingReferenceNumber("000HN001")
-                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
-                .hwfFeeType(FeeType.HEARING)
-                .build();
+            Fee hearingFee = new Fee();
+            hearingFee.setCalculatedAmountInPence(BigDecimal.valueOf(30000));
+            CaseData caseData = CaseData.builder().build();
+            caseData.setHearingReferenceNumber("000HN001");
+            caseData.setHearingFee(hearingFee);
+            caseData.setHwfFeeType(FeeType.HEARING);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -110,11 +118,14 @@ public class FullRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest
 
         @Test
         void shouldNotUpdateFullRemissionData_ifClaimFeeIsZero() {
-            CaseData caseData = CaseData.builder()
-                .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.ZERO).code("OOOCM002").build())
-                .claimIssuedHwfDetails(HelpWithFeesDetails.builder().build())
-                .hwfFeeType(FeeType.CLAIMISSUED)
-                .build();
+            Fee claimFee = new Fee();
+            claimFee.setCalculatedAmountInPence(BigDecimal.ZERO);
+            claimFee.setCode("OOOCM002");
+            HelpWithFeesDetails claimIssuedHwfDetails = new HelpWithFeesDetails();
+            CaseData caseData = CaseData.builder().build();
+            caseData.setClaimFee(claimFee);
+            caseData.setClaimIssuedHwfDetails(claimIssuedHwfDetails);
+            caseData.setHwfFeeType(FeeType.CLAIMISSUED);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -125,12 +136,14 @@ public class FullRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest
 
         @Test
         void shouldNotUpdateFullRemissionData_ifHearingFeeIsZero() {
-            CaseData caseData = CaseData.builder()
-                .hearingReferenceNumber("000HN001")
-                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.ZERO).build())
-                .hearingHwfDetails(HelpWithFeesDetails.builder().build())
-                .hwfFeeType(FeeType.HEARING)
-                .build();
+            Fee hearingFee = new Fee();
+            hearingFee.setCalculatedAmountInPence(BigDecimal.ZERO);
+            HelpWithFeesDetails hearingHwfDetails = new HelpWithFeesDetails();
+            CaseData caseData = CaseData.builder().build();
+            caseData.setHearingReferenceNumber("000HN001");
+            caseData.setHearingFee(hearingFee);
+            caseData.setHearingHwfDetails(hearingHwfDetails);
+            caseData.setHwfFeeType(FeeType.HEARING);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

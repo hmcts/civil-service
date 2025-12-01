@@ -52,16 +52,15 @@ public class TriggerGenAppLocationUpdateCallbackHandler extends CallbackHandler 
 
     private CallbackResponse triggerGaEvent(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         try {
-            if (!(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(
+            if (!(featureToggleService.isLocationWhiteListed(
                 caseData.getCaseManagementLocation().getBaseLocation()))
                 && caseData.isLipCase()
                 && (Objects.nonNull(caseData.getGeneralApplications()) && !caseData.getGeneralApplications().isEmpty())
                 && !featureToggleService.isCuiGaNroEnabled()) {
-                caseDataBuilder.gaEaCourtLocation(YesOrNo.YES);
+                caseData.setGaEaCourtLocation(YesOrNo.YES);
             }
             if (caseData.getGeneralApplications() != null && !caseData.getGeneralApplications().isEmpty()) {
                 caseData = helperService.updateApplicationLocationDetailsInClaim(caseData, authToken);
@@ -78,7 +77,7 @@ public class TriggerGenAppLocationUpdateCallbackHandler extends CallbackHandler 
             return AboutToStartOrSubmitCallbackResponse.builder().errors(List.of(errorMessage)).build();
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

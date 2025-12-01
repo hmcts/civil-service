@@ -11,7 +11,7 @@ plugins {
   id 'org.sonarqube' version '6.2.0.5505'
   id 'au.com.dius.pact' version '4.6.17'
   id "io.freefair.lombok" version "8.14"
-  id 'com.github.hmcts.rse-cft-lib' version '0.19.1810'
+  id 'com.github.hmcts.rse-cft-lib' version '0.19.1903'
   id "org.flywaydb.flyway" version "10.22.0"
   id 'maven-publish'
 }
@@ -34,6 +34,9 @@ def versions = [
 ]
 
 allprojects {
+  sourceCompatibility = JavaVersion.VERSION_17
+  targetCompatibility = JavaVersion.VERSION_17
+
   java {
     toolchain {
       languageVersion = JavaLanguageVersion.of(17)
@@ -103,7 +106,7 @@ allprojects {
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.9.25'
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.9.25'
 
-      dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
+      dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '5.2.1'
 
       //Solves CVE-2023-34034
       dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.5.2'
@@ -111,6 +114,7 @@ allprojects {
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: versions.jackson
+      dependency group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: versions.jackson
 
       // To prevent other libraries using conflicting versions
       dependency group: 'org.slf4j', name: 'slf4j-nop', version: '2.0.17'
@@ -138,7 +142,7 @@ allprojects {
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.9'
-      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.22.0"
+      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.23.0"
     }
   }
 
@@ -271,6 +275,14 @@ sonarqube {
   }
 }
 
+configure(subprojects.findAll { it.name == 'dashboard-notifications' }) {
+  sonarqube {
+    properties {
+      property "sonar.coverage.jacoco.xmlReportPaths", "${rootProject.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+    }
+  }
+}
+
 jacocoTestReport {
   executionData(test, integration)
   executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
@@ -282,10 +294,22 @@ jacocoTestReport {
     csv.required.set(false)
     xml.outputLocation.set(file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml"))
   }
+  dependsOn tasks.named('bootStartScripts')
+  dependsOn tasks.named('startScripts')
 }
 
 jacocoTestReport.dependsOn {
   subprojects*.test
+}
+
+jacocoTestReport.dependsOn subprojects.collect { project ->
+  project.tasks.findByName('jacocoTestReport')
+}.findAll { it != null }
+
+jacocoTestReport.dependsOn tasks.matching { it.name.startsWith('compile') || it.name.startsWith('process') }
+
+tasks.named('test') {
+  finalizedBy jacocoTestReport
 }
 
 ext.libraries = [
@@ -391,7 +415,7 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core', version: versions.springSecurity
-  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.48'
+  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.5'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.12.6'
   implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.2'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.1'
@@ -419,13 +443,16 @@ dependencies {
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
-  implementation group: 'com.azure', name: 'azure-core', version: '1.55.5'
-  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.12'
+  implementation group: 'com.azure', name: 'azure-core', version: '1.57.0'
+  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.16'
 
   implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: versions.pdfbox
   implementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox
 
   implementation group: 'com.github.hmcts', name: 'auth-checker-lib', version: '2.1.5'
+
+  implementation 'org.apache.poi:poi:5.4.0'
+  implementation 'org.apache.poi:poi-ooxml:5.4.0'
 
   testImplementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox
   testImplementation group: 'org.apache.pdfbox', name: 'preflight', version: versions.pdfbox, withoutJunit4

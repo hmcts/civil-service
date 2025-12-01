@@ -103,7 +103,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isEligibleForCCJ() {
-        if (isCasedDiscontinued()) {
+        if (isCasedDiscontinued() || isPaperResponse()) {
             return false;
         }
         return (caseData.getRespondent1ResponseDeadline() != null
@@ -301,25 +301,23 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isSDOOrderInReview() {
-        return featureToggleService.isCaseProgressionEnabled()
-            && isSDOMadeByLegalAdviser()
-            && nonNull(caseData.getOrderRequestedForReviewDefendant())
-            && caseData.getOrderRequestedForReviewDefendant().equals(YES)
-            && !isDecisionForReconsiderationMade()
-            && !isSDODoneAfterDecisionForReconsiderationMade()
-            && !isGeneralOrderAfterDecisionForReconsiderationMade();
+        return isSDOMadeByLegalAdviser()
+                && nonNull(caseData.getOrderRequestedForReviewDefendant())
+                && caseData.getOrderRequestedForReviewDefendant().equals(YES)
+                && !isDecisionForReconsiderationMade()
+                && !isSDODoneAfterDecisionForReconsiderationMade()
+                && !isGeneralOrderAfterDecisionForReconsiderationMade();
     }
 
     @Override
     public boolean isSDOOrderInReviewOtherParty() {
-        return featureToggleService.isCaseProgressionEnabled()
-            && isSDOMadeByLegalAdviser()
-            && nonNull(caseData.getOrderRequestedForReviewClaimant())
-            && caseData.getOrderRequestedForReviewClaimant().equals(YES)
-            && !isSDOOrderInReview()
-            && !isDecisionForReconsiderationMade()
-            && !isSDODoneAfterDecisionForReconsiderationMade()
-            && !isGeneralOrderAfterDecisionForReconsiderationMade();
+        return isSDOMadeByLegalAdviser()
+                && nonNull(caseData.getOrderRequestedForReviewClaimant())
+                && caseData.getOrderRequestedForReviewClaimant().equals(YES)
+                && !isSDOOrderInReview()
+                && !isDecisionForReconsiderationMade()
+                && !isSDODoneAfterDecisionForReconsiderationMade()
+                && !isGeneralOrderAfterDecisionForReconsiderationMade();
     }
 
     @Override

@@ -766,8 +766,7 @@ public class EventHistoryMapper {
     }
 
     private BigDecimal totalInterestForLrClaim(CaseData caseData) {
-        return featureToggleService.isLrAdmissionBulkEnabled() ? ZERO : Optional.ofNullable(caseData.getTotalInterest()).orElse(
-            ZERO);
+        return Optional.ofNullable(caseData.getTotalInterest()).orElse(ZERO);
     }
 
     private void buildRespondentDivergentResponse(EventHistory.EventHistoryBuilder builder, CaseData caseData,
@@ -1245,18 +1244,21 @@ public class EventHistoryMapper {
     private void buildGeneralFormApplicationEventsStrikeOutOrder(EventHistory.EventHistoryBuilder builder,
                                                                  CaseData caseData) {
         if (caseData.getGeneralApplications() != null) {
+
             var generalApplications = caseData
-                    .getGeneralApplications()
-                    .stream()
-                    .filter(application -> application.getValue().getGeneralAppType().getTypes().contains(STRIKE_OUT)
-                            && getGeneralApplicationDetailsJudgeDecisionWithStruckOutDefence(
-                            application.getValue()
-                                    .getCaseLink()
-                                    .getCaseReference(),
-                            caseData
-                    )
-                            != null)
-                    .toList();
+                .getGeneralApplications()
+                .stream()
+                .filter(application -> {
+                    if (application.getValue().getCaseLink() == null) {
+                        return false;
+                    }
+
+                    return application.getValue().getGeneralAppType().getTypes().contains(STRIKE_OUT)
+                        && getGeneralApplicationDetailsJudgeDecisionWithStruckOutDefence(
+                        application.getValue().getCaseLink().getCaseReference(), caseData
+                    ) != null;
+                })
+                .toList();
 
             if (!generalApplications.isEmpty()) {
                 buildGeneralFormOfApplicationStrikeOut(builder, generalApplications);

@@ -17,9 +17,12 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
 
 import java.util.Collections;
@@ -48,13 +51,24 @@ import static uk.gov.hmcts.reform.civil.utils.CaseStateUtils.shouldMoveToInMedia
 @Slf4j
 public class DetermineNextState extends CallbackHandler {
 
-    private final List<CaseEvent> events = Collections.singletonList(UPDATE_CLAIM_STATE_AFTER_CLAIMANT_INTENTION_LR_DOC_UPLOADED);
-    private Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::updateClaimStatePostTranslation);
     private static final String TASK_ID = "UpdateClaimStateAfterClaimantIntentionLrTranslatedDocUploaded";
+    private final List<CaseEvent> events = Collections.singletonList(
+        UPDATE_CLAIM_STATE_AFTER_CLAIMANT_INTENTION_LR_DOC_UPLOADED);
     private final ObjectMapper objectMapper;
     private final FeatureToggleService featureToggleService;
     private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
-    private final FlowStateAllowedEventService flowStateAllowedEventService;
+    private final IStateFlowEngine stateFlowEngine;
+    private Map<String, Callback> callbackMap = Map.of(
+        callbackKey(ABOUT_TO_SUBMIT),
+        this::updateClaimStatePostTranslation
+    );
+
+    private static boolean isClaimNotSettled(CaseData caseData) {
+        return caseData.isClaimantNotSettlePartAdmitClaim()
+            && ((caseData.hasClaimantNotAgreedToFreeMediation()
+            || caseData.hasDefendantNotAgreedToFreeMediation())
+            || caseData.isFastTrackClaim());
+    }
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -87,9 +101,8 @@ public class DetermineNextState extends CallbackHandler {
         log.info("Determining next state (post translation) for Case: {}", caseData.getCcdCaseReference());
 
         if (V_2.equals(callbackParams.getVersion())
-            && featureToggleService.isPinInPostEnabled()
             && isOneVOne(caseData)) {
-            log.debug("Pin in Post enabled for Case: {}", caseData.getCcdCaseReference());
+            log.info("Pin in Post enabled for Case: {}", caseData.getCcdCaseReference());
             if (caseData.hasClaimantAgreedToFreeMediation()) {
                 nextState = CaseState.IN_MEDIATION.name();
             } else if (isDefenceAdmitPayImmediately(caseData)) {
@@ -117,7 +130,10 @@ public class DetermineNextState extends CallbackHandler {
 
     private String putCaseStateInJudicialReferral(CaseData caseData) {
         if (caseData.isRespondentResponseFullDefence()
-            && JudicialReferralUtils.shouldMoveToJudicialReferral(caseData, featureToggleService.isMultiOrIntermediateTrackEnabled(caseData))) {
+            && JudicialReferralUtils.shouldMoveToJudicialReferral(
+            caseData,
+            featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
+        )) {
             return CaseState.JUDICIAL_REFERRAL.name();
         }
         return null;
@@ -125,20 +141,18 @@ public class DetermineNextState extends CallbackHandler {
 
     public String determineNextState(CaseData caseData,
                                      CallbackParams callbackParams,
-                                     CaseData.CaseDataBuilder<?, ?> builder,
                                      String nextState,
                                      BusinessProcess businessProcess) {
 
         log.info("Determining next state for Case : {}", caseData.getCcdCaseReference());
         if (V_2.equals(callbackParams.getVersion())
-            && featureToggleService.isPinInPostEnabled()
             && isOneVOne(caseData)) {
 
-            log.debug("Pin in Post enabled for Case : {}", caseData.getCcdCaseReference());
+            log.info("Pin in Post enabled for Case : {}", caseData.getCcdCaseReference());
             if (!caseData.isFullAdmitClaimSpec() && caseData.hasClaimantAgreedToFreeMediation()) {
                 nextState = CaseState.IN_MEDIATION.name();
             } else if (caseData.hasApplicantAcceptedRepaymentPlan()) {
-                Pair<String, BusinessProcess> result = handleAcceptedRepaymentPlan(caseData, builder, businessProcess);
+                Pair<String, BusinessProcess> result = handleAcceptedRepaymentPlan(caseData, businessProcess);
                 nextState = result.getLeft();
                 businessProcess = result.getRight();
             } else if (isDefenceAdmitPayImmediately(caseData)) {
@@ -167,7 +181,7 @@ public class DetermineNextState extends CallbackHandler {
             nextState = CaseState.AWAITING_APPLICANT_INTENTION.name();
         }
 
-        builder.businessProcess(businessProcess);
+        caseData.setBusinessProcess(businessProcess);
         return nextState;
     }
 
@@ -202,13 +216,6 @@ public class DetermineNextState extends CallbackHandler {
         return CaseState.All_FINAL_ORDERS_ISSUED.name();
     }
 
-    private static boolean isClaimNotSettled(CaseData caseData) {
-        return caseData.isClaimantNotSettlePartAdmitClaim()
-            && ((caseData.hasClaimantNotAgreedToFreeMediation()
-            || caseData.hasDefendantNotAgreedToFreeMediation())
-            || caseData.isFastTrackClaim());
-    }
-
     private boolean isLipVLipOneVOne(CaseData caseData) {
         return featureToggleService.isLipVLipEnabled()
             && caseData.isLRvLipOneVOne()
@@ -216,7 +223,6 @@ public class DetermineNextState extends CallbackHandler {
     }
 
     private Pair<String, BusinessProcess> handleAcceptedRepaymentPlan(CaseData caseData,
-                                               CaseData.CaseDataBuilder<?, ?> builder,
                                                BusinessProcess businessProcess) {
         String nextState;
         if (featureToggleService.isJudgmentOnlineLive()
@@ -227,7 +233,8 @@ public class DetermineNextState extends CallbackHandler {
             nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
         }
         if (featureToggleService.isJudgmentOnlineLive()) {
-            judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData, builder);
+            JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
+            caseData.setActiveJudgment(activeJudgment);
         }
 
         return Pair.of(nextState, businessProcess);
@@ -242,11 +249,19 @@ public class DetermineNextState extends CallbackHandler {
     }
 
     public boolean translationRequiredInFlowState(CaseData caseData) {
-        FlowState flowState = flowStateAllowedEventService.getFlowState(caseData);
-        return flowState.equals(FULL_DEFENCE_PROCEED)
-            || flowState.equals(PART_ADMIT_NOT_SETTLED_NO_MEDIATION)
-            || flowState.equals(FULL_ADMIT_PROCEED)
-            || flowState.equals(PART_ADMIT_PROCEED)
-            || flowState.equals(IN_MEDIATION);
+        try {
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+            FlowState flowState = FlowState.fromFullName(stateFlow.getState().getName());
+            return List.<FlowState>of(
+                FULL_DEFENCE_PROCEED,
+                PART_ADMIT_NOT_SETTLED_NO_MEDIATION,
+                FULL_ADMIT_PROCEED,
+                PART_ADMIT_PROCEED,
+                IN_MEDIATION
+            ).contains(flowState);
+        } catch (StateFlowException e) {
+            log.error("Error during state flow evaluation.", e);
+        }
+        return false;
     }
 }

@@ -66,12 +66,11 @@ public class CaseProceedsInCasemanCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse addTakenOfflineDate(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData().toBuilder()
-            .businessProcess(BusinessProcess.ready(CASE_PROCEEDS_IN_CASEMAN))
-            .takenOfflineByStaffDate(time.now())
-            .coSCApplicationStatus(updateCoScApplicationStatus(callbackParams))
-            .previousCCDState(getPreviousCaseSate(callbackParams))
-            .build();
+        CaseData caseData = callbackParams.getCaseData();
+        caseData.setBusinessProcess(BusinessProcess.ready(CASE_PROCEEDS_IN_CASEMAN));
+        caseData.setTakenOfflineByStaffDate(time.now());
+        caseData.setCoSCApplicationStatus(updateCoScApplicationStatus(callbackParams));
+        caseData.setPreviousCCDState(getPreviousCaseSate(callbackParams));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(mapper))

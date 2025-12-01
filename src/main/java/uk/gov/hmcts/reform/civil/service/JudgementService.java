@@ -84,7 +84,8 @@ public class JudgementService {
     }
 
     public BigDecimal ccjJudgmentFixedCost(CaseData caseData) {
-        if ((isLrFullAdmitRepaymentPlan(caseData) || isLRPartAdmitRepaymentPlan(caseData) || isLrPayImmediatelyPlan(caseData))
+        if ((isLrFullAdmitRepaymentPlan(caseData) || isLRPartAdmitRepaymentPlan(caseData) || isLrPayImmediatelyPlan(
+            caseData))
             && nonNull(caseData.getFixedCosts())
             && YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
             BigDecimal claimIssueFixedCost = MonetaryConversions.penniesToPounds(BigDecimal.valueOf(
@@ -122,29 +123,26 @@ public class JudgementService {
     }
 
     private String ccjJudgmentStatement(CaseData caseData) {
-        if (caseData.isLRvLipOneVOne()
-            && featureToggleService.isPinInPostEnabled()) {
+        if (caseData.isLRvLipOneVOne()) {
             boolean hasPaymentOption = caseData.isPayImmediately() || caseData.isPayByInstallment() || caseData.isPayBySetDate();
-            if (featureToggleService.isLrAdmissionBulkEnabled()
-                && hasPaymentOption) {
-                return String.format(JUDGEMENT_ORDER_V2, ccjJudgementSubTotal(caseData).toString());
-            }
             if (featureToggleService.isJudgmentOnlineLive()
                 && hasPaymentOption) {
                 return JUDGEMENT_BY_COURT_NOT_OFFLINE;
+            }
+            if (hasPaymentOption) {
+                return String.format(JUDGEMENT_ORDER_V2, ccjJudgementSubTotal(caseData).toString());
             }
             return JUDGEMENT_BY_COURT;
         } else {
             return String.format(
                 isLrFullAdmitRepaymentPlan(caseData) || isLrPayImmediatelyPlan(caseData)
-                    ? JUDGEMENT_ORDER_V2 : JUDGEMENT_ORDER, ccjJudgementSubTotal(caseData).toString());
+                    ? JUDGEMENT_ORDER_V2 : JUDGEMENT_ORDER, ccjJudgementSubTotal(caseData).toString()
+            );
         }
     }
 
     public boolean isLRAdmissionRepaymentPlan(CaseData caseData) {
-        return featureToggleService.isLrAdmissionBulkEnabled()
-            && !caseData.isApplicantLiP()
-            && (caseData.isPayBySetDate() || caseData.isPayByInstallment());
+        return !caseData.isApplicantLiP() && (caseData.isPayBySetDate() || caseData.isPayByInstallment());
     }
 
     public boolean isLrFullAdmitRepaymentPlan(CaseData caseData) {
@@ -158,9 +156,7 @@ public class JudgementService {
     }
 
     public boolean isLrvLrOneVOneBulkAdmissionsEnabled(CaseData caseData) {
-        return featureToggleService.isLrAdmissionBulkEnabled()
-            && !caseData.isApplicantLiP()
-            && isOneVOne(caseData);
+        return !caseData.isApplicantLiP() && isOneVOne(caseData);
     }
 
     public boolean isLipvLip(CaseData caseData) {

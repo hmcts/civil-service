@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.ClaimantIntent.SettlementAgreement.DefendantAccepted.Defendant",
+  "role": "DEFENDANT",
+  "titleEn": "Settlement agreement",
+  "titleCy": "Cytundeb setlo",
+  "descriptionEn": "<p class=\"govuk-body\">You have accepted the <a href={VIEW_SETTLEMENT_AGREEMENT} target=\"_blank\" class=\"govuk-link\"> settlement agreement (opens in a new tab)</a>. The claimant cannot request a County Court Judgment (CCJ), unless you break the terms of the agreement.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Rydych wedi derbyn y <a href={VIEW_SETTLEMENT_AGREEMENT} target=\"_blank\" class=\"govuk-link\"> cytundeb setlo (yn agor mewn tab newydd)</a>. Ni all yr hawlydd wneud cais am Ddyfarniad Llys Sirol (CCJ) oni bai eich bod yn torri telerau’r cytundeb.</p>"
+}

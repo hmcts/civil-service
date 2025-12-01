@@ -48,15 +48,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsGAForLipInvoked(Boolean toggleStat) {
-        var caseFlagsKey = "GaForLips";
-        givenToggle(caseFlagsKey, toggleStat);
-
-        assertThat(featureToggleService.isGaForLipsEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsAmendBundleEnabledInvoked(Boolean toggleStat) {
         var caseFlagsKey = "amend-bundle-enabled";
         givenToggle(caseFlagsKey, toggleStat);
@@ -80,15 +71,6 @@ class FeatureToggleServiceTest {
         givenToggle(lipVlipKey, toggleStat);
 
         assertThat(featureToggleService.isLipVLipEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsPinInPostEnabledInvoked(Boolean toggleStat) {
-        var pinInPostKey = "pin-in-post";
-        givenToggle(pinInPostKey, toggleStat);
-
-        assertThat(featureToggleService.isPinInPostEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
@@ -126,30 +108,11 @@ class FeatureToggleServiceTest {
                 location,
                 false
             )).thenReturn(isFeatureEnabled);
-            when(featureToggleService.isGaForLipsEnabled()).thenReturn(isFeatureEnabled);
         }
 
-        boolean result = featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(location);
+        boolean result = featureToggleService.isLocationWhiteListed(location);
 
         assertEquals(expected, result);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsTransferCaseOnlineEnabled(Boolean toggleStat) {
-        var transferCaseOnlineKey = "isTransferOnlineCaseEnabled";
-        givenToggle(transferCaseOnlineKey, toggleStat);
-
-        assertThat(featureToggleService.isTransferOnlineCaseEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenCaseProgressionEnabled(Boolean toggleStat) {
-        var caseFileKey = "cui-case-progression";
-        givenToggle(caseFileKey, toggleStat);
-
-        assertThat(featureToggleService.isCaseProgressionEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
@@ -252,7 +215,6 @@ class FeatureToggleServiceTest {
                 location,
                 true
             )).thenReturn(isFeatureEnabled);
-            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isFeatureEnabled);
         }
 
         boolean result = featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(location);
@@ -292,15 +254,6 @@ class FeatureToggleServiceTest {
         givenToggle(caseFlagsKey, toggleStat);
 
         assertThat(featureToggleService.isQueryManagementLRsEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsLrAdmissionBulkEnabled(Boolean toggleStat) {
-        var lrAdmission = "lr-admission-bulk";
-        givenToggle(lrAdmission, toggleStat);
-
-        assertThat(featureToggleService.isLrAdmissionBulkEnabled()).isEqualTo(toggleStat);
     }
 
     @Test

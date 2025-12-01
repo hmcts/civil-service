@@ -108,17 +108,17 @@ class CaseFlagsInitialiserTest {
                         .details(List.of()).build()).build())
             .build();
 
-        var actual = CaseData.builder()
+        var caseData = CaseData.builder()
             .applicant1(applicant1)
             .applicant1LitigationFriend(applicant1LitFriend)
             .applicant2(applicant2)
             .applicant2LitigationFriend(applicant2LitFriend)
             .respondent1(respondent1)
-            .respondent2(respondent2);
+            .respondent2(respondent2).build();
 
-        caseFlagsInitialiser.initialiseCaseFlags(CaseEvent.CREATE_CLAIM, actual);
+        caseFlagsInitialiser.initialiseCaseFlags(CaseEvent.CREATE_CLAIM, caseData);
 
-        assertEquals(expected, actual.build());
+        assertEquals(expected, caseData);
     }
 
     @Test
@@ -144,13 +144,13 @@ class CaseFlagsInitialiserTest {
                     .build())
             .build();
 
-        var actual = CaseData.builder()
+        var caseData = CaseData.builder()
             .respondent1LitigationFriend(respondent1LitFriend)
-            .respondent2LitigationFriend(respondent2LitFriend);
+            .respondent2LitigationFriend(respondent2LitFriend).build();
 
-        caseFlagsInitialiser.initialiseCaseFlags(CaseEvent.ADD_DEFENDANT_LITIGATION_FRIEND, actual);
+        caseFlagsInitialiser.initialiseCaseFlags(CaseEvent.ADD_DEFENDANT_LITIGATION_FRIEND, caseData);
 
-        assertEquals(expected, actual.build());
+        assertEquals(expected, caseData);
     }
 
     @Test
@@ -166,7 +166,7 @@ class CaseFlagsInitialiserTest {
                                    .build())
             .build();
 
-        caseFlagsInitialiser.initialiseCaseFlags(CaseEvent.MANAGE_CONTACT_INFORMATION, caseData.toBuilder());
+        caseFlagsInitialiser.initialiseCaseFlags(CaseEvent.MANAGE_CONTACT_INFORMATION, caseData);
 
         verify(organisationService).findOrganisationById("id");
     }
@@ -315,7 +315,7 @@ class CaseFlagsInitialiserTest {
                         .build())))
             .build();
 
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder()
+        CaseData caseData = CaseData.builder()
             .applicant1(applicant1)
             .applicant1LitigationFriend(applicant1LitFriend)
             .applicant2(applicant2)
@@ -352,12 +352,11 @@ class CaseFlagsInitialiserTest {
                                                            .details(wrapElements(witness1, witness2))
                                                            .build())
                                .build())
-            .respondent1(respondent1);
+            .respondent1(respondent1).build();
 
-        caseFlagsInitialiser.initialiseMissingCaseFlags(builder);
-        CaseData actual = builder.build();
+        caseFlagsInitialiser.initialiseMissingCaseFlags(caseData);
 
-        assertFlags(expected, actual, false);
+        assertFlags(expected, caseData, false);
     }
 
     @Test
@@ -540,7 +539,7 @@ class CaseFlagsInitialiserTest {
                                                                     .build()).build())))
             .build();
 
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder()
+        CaseData caseData = CaseData.builder()
             .applicant1(applicant1)
             .applicant1LitigationFriend(applicant1LitFriend)
             .applicant2(applicant2)
@@ -654,12 +653,11 @@ class CaseFlagsInitialiserTest {
                                                                                                       .build())))
                                                                     .build()).build())))
             .respondent1(respondent1)
-            .respondent2(respondent2);
+            .respondent2(respondent2).build();
 
-        caseFlagsInitialiser.initialiseMissingCaseFlags(builder);
-        CaseData actual = builder.build();
+        caseFlagsInitialiser.initialiseMissingCaseFlags(caseData);
 
-        assertFlags(expected, actual, true);
+        assertFlags(expected, caseData, true);
     }
 
     @Test
@@ -842,7 +840,7 @@ class CaseFlagsInitialiserTest {
                                                                     .build()).build())))
             .build();
 
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder()
+        CaseData caseData = CaseData.builder()
             .applicant1(applicant1)
             .applicant1LitigationFriend(applicant1LitFriend)
             .applicant2(applicant2)
@@ -957,12 +955,11 @@ class CaseFlagsInitialiserTest {
                                .roleOnCase(APPLICANT_SOLICITOR_EXPERT)
                                .build())
                     .build()
-            )));
+            ))).build();
 
-        caseFlagsInitialiser.initialiseMissingCaseFlags(builder);
-        CaseData actual = builder.build();
+        caseFlagsInitialiser.initialiseMissingCaseFlags(caseData);
 
-        assertFlags(expected, actual, true);
+        assertFlags(expected, caseData, true);
     }
 
     private void assertFlags(CaseData expected, CaseData actual, boolean respondent2) {

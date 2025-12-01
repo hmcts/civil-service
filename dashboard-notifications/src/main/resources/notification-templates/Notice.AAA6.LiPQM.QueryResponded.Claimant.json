@@ -1,0 +1,9 @@
+{
+  "name": "Notice.AAA6.LiPQM.QueryResponded.Claimant",
+  "role": "CLAIMANT",
+  "titleEn": "Important",
+  "titleCy": "Pwysig",
+  "descriptionEn": "<p class=\"govuk-body\">The court has responded to a message on your case.<br> <a href=\"{QM_VIEW_MESSAGES_URL_CLICK}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View your messages</a></p>",
+  "descriptionCy": "<p class=\"govuk-body\">Mae’r llys wedi ymateb i neges ar eich achos.<br> <a href=\"{QM_VIEW_MESSAGES_URL_CLICK}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld eich negeseuon</a></p>",
+  "timeToLive": "Click"
+}

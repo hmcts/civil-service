@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -46,6 +47,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends CallbackHandler {
 
     private static final String NOT_VALID_DJ_BY_ADMISSION = "The Claim is not eligible for Request Judgment By Admission until %s.";
@@ -77,55 +79,53 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     private CallbackResponse validateDefaultJudgementEligibility(CallbackParams callbackParams) {
 
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
-        if (caseData.isJudgementDateNotPermitted()) {
-            errors.add(format(NOT_VALID_DJ_BY_ADMISSION, caseData.setUpJudgementFormattedPermittedDate(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())));
-        } else {
-            LocalDate whenWillThisAmountBePaid =
-                Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec()).map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(
-                    null);
-            if (featureToggleService.isJudgmentOnlineLive()
+        LocalDate whenWillThisAmountBePaid =
+            Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec()).map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(
+                null);
+        final boolean judgementNotAllowed =
+            caseData.isJudgementDateNotPermitted()
+                || (featureToggleService.isJudgmentOnlineLive()
                 && whenWillThisAmountBePaid != null
                 && caseData.isDateAfterToday(whenWillThisAmountBePaid)
-                && caseData.isPartAdmitPayImmediatelyClaimSpec()) {
-                errors.add(format(NOT_VALID_DJ_BY_ADMISSION, caseData.getFormattedJudgementPermittedDate(whenWillThisAmountBePaid)));
-            }
+                && caseData.isPartAdmitPayImmediatelyClaimSpec());
+
+        if (judgementNotAllowed) {
+            log.info("Case {} is not eligible for Request Judgment By Admission until {}", caseData.getCcdCaseReference(), whenWillThisAmountBePaid);
+            errors.add(format(NOT_VALID_DJ_BY_ADMISSION, whenWillThisAmountBePaid != null ? caseData.getFormattedJudgementPermittedDate(whenWillThisAmountBePaid) : null));
         }
 
         if (judgementService.isLrPayImmediatelyPlan(caseData)) {
-            caseDataBuilder.ccjJudgmentAmountShowInterest(YesOrNo.NO);
+            caseData.setCcjJudgmentAmountShowInterest(YesOrNo.NO);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .data(errors.isEmpty() ? caseDataBuilder.build().toMap(objectMapper) : null)
+            .data(errors.isEmpty() ? caseData.toMap(objectMapper) : null)
             .build();
     }
 
     private CallbackResponse buildJudgmentAmountSummaryDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
 
-        updatedCaseData.ccjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
+        caseData.setCcjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
     private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = judgementService.validateAmountPaid(caseData);
-        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
         if (judgementService.isLrPayImmediatelyPlan(caseData)
             && Objects.nonNull(caseData.getFixedCosts())
             && YesOrNo.NO.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
-            updatedCaseData.ccjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
+            caseData.setCcjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .data(errors.isEmpty() ? updatedCaseData.build().toMap(objectMapper) : null)
+            .data(errors.isEmpty() ? caseData.toMap(objectMapper) : null)
             .build();
     }
 
@@ -147,26 +147,25 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             businessProcess = BusinessProcess.ready(REQUEST_JUDGEMENT_ADMISSION_SPEC);
         }
 
-        CaseData.CaseDataBuilder caseDataBuilder = data.toBuilder()
-            .businessProcess(businessProcess)
-            .ccjPaymentDetails(ccjPaymentDetails);
+        data.setBusinessProcess(businessProcess);
+        data.setCcjPaymentDetails(ccjPaymentDetails);
 
         if (featureToggleService.isJudgmentOnlineLive()) {
-            JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseDataBuilder.build());
+            JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(data);
 
             BigDecimal interest = interestCalculator.calculateInterest(data);
 
             String joSummaryObject = data.isLipvLipOneVOne() ? JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(
                 activeJudgment, true) : getJudgmentRepaymentSummaryObject(data, interest, activeJudgment);
-            caseDataBuilder
-                .activeJudgment(activeJudgment)
-                .joIsLiveJudgmentExists(YesOrNo.YES)
-                .joRepaymentSummaryObject(joSummaryObject)
-                .joJudgementByAdmissionIssueDate(time.now());
+
+            data.setActiveJudgment(activeJudgment);
+            data.setJoIsLiveJudgmentExists(YesOrNo.YES);
+            data.setJoRepaymentSummaryObject(joSummaryObject);
+            data.setJoJudgementByAdmissionIssueDate(time.now());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(data.toMap(objectMapper))
             .state(nextState)
             .build();
     }

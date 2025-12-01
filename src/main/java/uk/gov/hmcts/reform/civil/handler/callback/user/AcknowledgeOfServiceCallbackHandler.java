@@ -72,14 +72,13 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
     private CallbackResponse populateRespondent1Copy(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         LocalDateTime dateTime = LocalDateTime.now();
-        var updatedCaseData = caseData.toBuilder()
-            .respondent1Copy(caseData.getRespondent1())
-            .build();
-
+        caseData.setRespondent1Copy(caseData.getRespondent1());
         ofNullable(caseData.getRespondent2())
-            .ifPresent(r2 -> updatedCaseData.toBuilder()
-                .respondent2Copy(r2)
-                .respondent2DetailsForClaimDetailsTab(r2.toBuilder().flags(null).build()).build());
+            .ifPresent(r2 -> {
+                caseData.setRespondent2Copy(r2);
+                r2.setFlags(null);
+                caseData.setRespondent2DetailsForClaimDetailsTab(r2);
+            });
 
         List<String> errors = new ArrayList<>();
         var responseDedline = caseData.getRespondent1ResponseDeadline();
@@ -88,7 +87,7 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .errors(errors)
             .build();
     }
@@ -119,35 +118,34 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
         LocalDateTime newResponseDate = deadlinesCalculator.plus14DaysAt4pmDeadline(responseDeadline);
-        var updatedRespondent1 = caseData.getRespondent1().toBuilder()
-            .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
-            .flags(caseData.getRespondent1Copy().getFlags())
-            .build();
+        var updatedRespondent1 = caseData.getRespondent1();
+        if (caseData.getRespondent1Copy() != null) {
+            updatedRespondent1.setPrimaryAddress(caseData.getRespondent1Copy().getPrimaryAddress());
+        }
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder()
-            .respondent1AcknowledgeNotificationDate(time.now())
-            .respondent1ResponseDeadline(newResponseDate)
-            .businessProcess(BusinessProcess.ready(ACKNOWLEDGEMENT_OF_SERVICE))
-            .respondent1(updatedRespondent1)
-            .respondent1Copy(null)
-            .specRespondentCorrespondenceAddressRequired(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())
-            .specRespondentCorrespondenceAddressdetails(caseData.getSpecAoSApplicantCorrespondenceAddressdetails())
-            .respondentSolicitor1ServiceAddressRequired(caseData.getSpecAoSRespondentCorrespondenceAddressRequired())
-            .respondentSolicitor1ServiceAddress(caseData.getSpecAoSRespondentCorrespondenceAddressdetails());
+        caseData.setRespondent1AcknowledgeNotificationDate(time.now());
+        caseData.setRespondent1ResponseDeadline(newResponseDate);
+        caseData.setBusinessProcess(BusinessProcess.ready(ACKNOWLEDGEMENT_OF_SERVICE));
+        caseData.setRespondent1(updatedRespondent1);
+        caseData.setRespondent1Copy(null);
+        caseData.setSpecRespondentCorrespondenceAddressRequired(caseData.getSpecAoSApplicantCorrespondenceAddressRequired());
+        caseData.setSpecRespondentCorrespondenceAddressdetails(caseData.getSpecAoSApplicantCorrespondenceAddressdetails());
+        caseData.setRespondentSolicitor1ServiceAddressRequired(caseData.getSpecAoSRespondentCorrespondenceAddressRequired());
+        caseData.setRespondentSolicitor1ServiceAddress(caseData.getSpecAoSRespondentCorrespondenceAddressdetails());
 
         // if present, persist the 2nd respondent address in the same fashion as above, i.e ignore for 1v1
         if (ofNullable(caseData.getRespondent2()).isPresent()
             && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
-            var updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
-                .flags(caseData.getRespondent2Copy().getFlags())
-                .build();
-            caseDataBuilder.respondent2(updatedRespondent2).respondent2Copy(null);
-            caseDataBuilder.respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
+            var updatedRespondent2 = caseData.getRespondent2();
+            updatedRespondent2.setPrimaryAddress(caseData.getRespondent2Copy().getPrimaryAddress());
+            caseData.setRespondent2(updatedRespondent2);
+            caseData.setRespondent2Copy(null);
+            updatedRespondent2.setFlags(null);
+            caseData.setRespondent2DetailsForClaimDetailsTab(updatedRespondent2);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

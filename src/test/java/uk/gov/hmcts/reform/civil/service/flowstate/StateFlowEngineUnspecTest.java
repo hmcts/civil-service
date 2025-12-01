@@ -57,23 +57,15 @@ public class StateFlowEngineUnspecTest {
             arguments(CaseDataBuilderUnspec.builder().atStateClaimSubmittedTwoRespondentRepresentatives().build()),
             //AC 4 (2v1)
             arguments(CaseDataBuilderUnspec.builder().atStateClaimSubmitted2v1().build()),
-            //AC 5 (1V1 unrepresented defendant)
-            arguments(CaseDataBuilderUnspec.builder().atState1v1DefendantUnrepresentedClaimSubmitted().build()),
-            //AC 6 (2V1 unrepresented defendant)
-            arguments(CaseDataBuilderUnspec.builder().atState2v1DefendantUnrepresentedClaimSubmitted().build()),
-            //AC 7 (1V2 one unrepresented defendant)
+            //AC 5 (1V2 one unrepresented defendant)
             arguments(CaseDataBuilderUnspec.builder().atState1v2OneDefendantUnrepresentedClaimSubmitted().build()),
-            //AC 8 (1V2 both defendants unrepresented )
-            arguments(CaseDataBuilderUnspec.builder().atState1v2BothDefendantUnrepresentedClaimSubmitted().build()),
-            //AC 9 (1V1  defendant represented, solicitor unregistered)
+            //AC 6 (1V1  defendant represented, solicitor unregistered)
             arguments(CaseDataBuilderUnspec.builder().atState1v1DefendantUnregisteredClaimSubmitted().build()),
-            //AC 10 (2V1  defendant represented, solicitor unregistered )
+            //AC 7 (2V1  defendant represented, solicitor unregistered )
             arguments(CaseDataBuilderUnspec.builder().atState2v1DefendantUnregisteredClaimSubmitted().build()),
-            //AC 11 1v2 def 1 represented solicitor unregistered, and def 2 solicitor registered
+            //AC 8 1v2 def 1 represented solicitor unregistered, and def 2 solicitor registered
             arguments(CaseDataBuilderUnspec.builder().atState1v2Solicitor1UnregisteredSolicitor2Registered().build()),
-            //AC 13 1v2 defendant 1 represented solicitor unregistered,and defendant 2 unrepresented
-            arguments(CaseDataBuilderUnspec.builder().atState1v2OneDefendantRepresentedUnregisteredOtherUnrepresentedClaimSubmitted().build()),
-            //AC 14 1v2 Both defendants represented and both defendant solicitors unregistered
+            //AC 9 1v2 Both defendants represented and both defendant solicitors unregistered
             arguments(CaseDataBuilderUnspec.builder().atState1v2BothDefendantRepresentedAndUnregistered().build())
         );
     }
@@ -135,7 +127,7 @@ public class StateFlowEngineUnspecTest {
         assertThat(stateFlow.getFlags()).contains(
             entry(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true)
         );
-        assertThat(stateFlow.getFlags()).hasSize(11);    // bonus: if this fails, a flag was added/removed but tests were not updated
+        assertThat(stateFlow.getFlags()).hasSize(10);    // bonus: if this fails, a flag was added/removed but tests were not updated
     }
 
     @ParameterizedTest(name = "{index}: The state flow flags ONE_RESPONDENT_REPRESENTATIVE " +
@@ -150,7 +142,7 @@ public class StateFlowEngineUnspecTest {
             entry(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false),
             entry(FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true)
         );
-        assertThat(stateFlow.getFlags()).hasSize(12);    // bonus: if this fails, a flag was added/removed but tests were not updated
+        assertThat(stateFlow.getFlags()).hasSize(11);    // bonus: if this fails, a flag was added/removed but tests were not updated
     }
 
     public interface StubbingFn extends Function<FeatureToggleService, OngoingStubbing<Boolean>> {
