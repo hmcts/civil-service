@@ -67,7 +67,9 @@ public non-sealed interface DismissedPredicate extends CaseDataPredicate {
     @BusinessRule(
         group = "Dismissed",
         summary = "Dismissed - acknowledged, no extension, no response",
-        description = "Dismissal deadline has passed; at least respondent 1 acknowledged service and has no time extension; not taken offline by staff; in 1v2 two‑solicitor cases both acknowledged with at least one still without a response"
+        description = "Dismissal deadline has passed; at least respondent 1 acknowledged service and has no time " +
+            "extension; not taken offline by staff; in 1v2 two‑solicitor cases both acknowledged with at least one still " +
+            "without a response"
     )
     Predicate<CaseData> afterClaimAcknowledged =
         CaseDataPredicate.Claim.hasPassedDismissalDeadline
@@ -89,7 +91,8 @@ public non-sealed interface DismissedPredicate extends CaseDataPredicate {
     @BusinessRule(
         group = "Dismissed",
         summary = "Dismissed - acknowledged with extension(s)",
-        description = "Dismissal deadline has passed; respondent(s) acknowledged service and at least one time extension applies; not marked 'not suitable for SDO' and not taken offline by staff"
+        description = "Dismissal deadline has passed; respondent(s) acknowledged service and at least one time extension " +
+            "applies; not marked 'not suitable for SDO' and not taken offline by staff"
     )
     Predicate<CaseData> afterClaimAcknowledgedExtension =
         CaseDataPredicate.Claim.hasPassedDismissalDeadline
@@ -111,7 +114,8 @@ public non-sealed interface DismissedPredicate extends CaseDataPredicate {
     @BusinessRule(
         group = "Dismissed",
         summary = "Dismissed - claim details deadline expired (no AoS/response/extension)",
-        description = "Dismissal deadline has passed; no acknowledgement, no response, no time extension or intention to proceed recorded; not taken offline by staff (supports 1v1 and 1v2 scenarios)"
+        description = "Dismissal deadline has passed; no acknowledgement, no response, no time extension or intention to " +
+            "proceed recorded; not taken offline by staff (supports 1v1 and 1v2 scenarios)"
     )
     Predicate<CaseData> afterClaimDetailNotified =
         CaseDataPredicate.Claim.hasPassedDismissalDeadline

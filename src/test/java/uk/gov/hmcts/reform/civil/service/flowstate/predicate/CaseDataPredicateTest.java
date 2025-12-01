@@ -819,17 +819,49 @@ class CaseDataPredicateTest {
     class MultiParty {
 
         @Test
+        void should_return_true_for_isOneVOne_by_default() {
+            when(caseData.getRespondent2()).thenReturn(null);
+            assertTrue(CaseDataPredicate.MultiParty.isOneVOne.test(caseData));
+        }
+
+        @Test
         void should_return_true_for_isOneVTwoOneLegalRep_when_respondent2_present_and_same_legal_rep_yes() {
-            when(caseData.getRespondent2()).thenReturn(uk.gov.hmcts.reform.civil.model.Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.YES);
             assertTrue(CaseDataPredicate.MultiParty.isOneVTwoOneLegalRep.test(caseData));
         }
 
         @Test
+        void should_return_false_for_isOneVTwoOneLegalRep_when_respondent2_present_and_same_legal_rep_no() {
+            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.NO);
+            assertFalse(CaseDataPredicate.MultiParty.isOneVTwoOneLegalRep.test(caseData));
+        }
+
+        @Test
         void should_return_true_for_isOneVTwoTwoLegalRep_when_respondent2_present_and_same_legal_rep_no() {
-            when(caseData.getRespondent2()).thenReturn(uk.gov.hmcts.reform.civil.model.Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.NO);
             assertTrue(CaseDataPredicate.MultiParty.isOneVTwoTwoLegalRep.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_isOneVTwoTwoLegalRep_when_respondent2_present_and_same_legal_rep_yes() {
+            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.YES);
+            assertFalse(CaseDataPredicate.MultiParty.isOneVTwoTwoLegalRep.test(caseData));
+        }
+
+        @Test
+        void should_return_true_for_isTwoVOne_when_AddApplicant2_yes() {
+            when(caseData.getAddApplicant2()).thenReturn(YesOrNo.YES);
+            assertTrue(CaseDataPredicate.MultiParty.isTwoVOne.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_isTwoVOne_when_AddApplicant2_no() {
+            when(caseData.getAddApplicant2()).thenReturn(YesOrNo.NO);
+            assertFalse(CaseDataPredicate.MultiParty.isTwoVOne.test(caseData));
         }
     }
 

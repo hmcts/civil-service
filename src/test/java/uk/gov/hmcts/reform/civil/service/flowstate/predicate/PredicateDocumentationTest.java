@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.flowstate.predicate;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.annotations.BusinessRule;
@@ -63,6 +64,7 @@ class PredicateDocumentationTest {
             "The following predicates are missing @BusinessRule documentation:\n" + String.join("\n", undocumentedMembers));
     }
 
+    @Disabled("Used to manually generate business rule documentation")
     @Test
     void generateMarkdownReport() throws Exception {
         StringBuilder md = new StringBuilder();
@@ -121,8 +123,7 @@ class PredicateDocumentationTest {
         }));
 
         for (Object member : composedMembers) {
-            if (member instanceof Field) {
-                Field field = (Field) member;
+            if (member instanceof Field field) {
                 BusinessRule rule = field.getAnnotation(BusinessRule.class);
                 md.append(String.format("| **%s** | `%s` | %s |%n",
                                         rule.group(),
@@ -182,8 +183,7 @@ class PredicateDocumentationTest {
         }));
 
         for (Object member : atomicMembers) {
-            if (member instanceof Field) {
-                Field field = (Field) member;
+            if (member instanceof Field field) {
                 BusinessRule rule = field.getAnnotation(BusinessRule.class);
                 md.append(String.format("| **%s** | `%s` | %s |%n",
                                         rule.group(),
@@ -201,7 +201,7 @@ class PredicateDocumentationTest {
             }
         }
 
-        File targetDir = new File("build/generated/documentation");
+        File targetDir = new File("docs");
         boolean buildDirOk = targetDir.exists() || targetDir.mkdirs();
         Assertions.assertTrue(buildDirOk, "Failed to create build directory");
 

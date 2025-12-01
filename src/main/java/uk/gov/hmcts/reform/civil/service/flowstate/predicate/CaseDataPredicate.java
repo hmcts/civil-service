@@ -32,8 +32,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.predicate.util.Predica
  * Summary: Small, null-safe predicates used as building blocks for flow guards.
  * Description: This class exposes concise, discoverable predicates grouped by domain
  * (Applicant, Claim, ClaimDetails, Respondent, Payment, Hearing, Lip, etc.). Predicates
- * are intentionally atomic and should be composed in `Composer` or other higher-level
- * compositions.
+ * are intentionally atomic and should be composed in other higher-level compositions.
  *
  * <p>
  * Naming and BusinessRule conventions:
@@ -46,8 +45,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.predicate.util.Predica
  */
 @SuppressWarnings("java:S1214")
 sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, DismissedPredicate, DivergencePredicate,
-HearingPredicate, LanguagePredicate, LipPredicate, NotificationPredicate, OutOfTimePredicate, PaymentPredicate,
-RepaymentPredicate, ResponsePredicate, TakenOfflinePredicate{
+    HearingPredicate, LanguagePredicate, LipPredicate, NotificationPredicate, OutOfTimePredicate, PaymentPredicate,
+    RepaymentPredicate, ResponsePredicate, TakenOfflinePredicate {
 
     interface Applicant {
 
@@ -199,7 +198,6 @@ RepaymentPredicate, ResponsePredicate, TakenOfflinePredicate{
         )
         Predicate<CaseData> isSpecClaim =
             nullSafe(c -> SPEC_CLAIM.equals(c.getCaseAccessCategory()));
-
 
         @BusinessRule(
             group = "Claim",
@@ -502,7 +500,6 @@ RepaymentPredicate, ResponsePredicate, TakenOfflinePredicate{
         )
         Predicate<CaseData> isTwoVOne =
             nullSafe(c -> MultiPartyScenario.TWO_V_ONE.equals(getMultiPartyScenario(c)));
-
     }
 
     interface RepaymentPlan {
@@ -1090,7 +1087,7 @@ RepaymentPredicate, ResponsePredicate, TakenOfflinePredicate{
             description = "Respondent 1 has Pin-In-Post enabled and LiP (LR,SPEC)"
         )
         Predicate<CaseData> hasPinInPost =
-            nullSafe(c ->c.getRespondent1PinToPostLRspec() != null);
+            nullSafe(c -> c.getRespondent1PinToPostLRspec() != null);
 
     }
 
