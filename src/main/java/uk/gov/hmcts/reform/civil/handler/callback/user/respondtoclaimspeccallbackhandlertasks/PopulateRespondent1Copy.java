@@ -110,11 +110,18 @@ public class PopulateRespondent1Copy implements CaseTask {
             updatedCaseData.showCarmFields(NO);
         }
 
-        if (toggleService.isLrAdmissionBulkEnabled()) {
-            log.debug("CaseId {}: LR Admission Bulk is enabled", caseData.getCcdCaseReference());
-            updatedCaseData.totalClaimAmountPlusInterest(caseData.getClaimAmountInPounds().setScale(2));
-            updatedCaseData.totalClaimAmountPlusInterestString(caseData.getClaimAmountInPounds().setScale(2).toString());
-            BigDecimal interest = interestCalculator.calculateInterest(caseData).setScale(2);
+        BigDecimal claimInPounds = caseData.getClaimAmountInPounds();
+        if (claimInPounds != null && caseData.getTotalClaimAmount() != null) {
+            log.debug("CaseId {}: Calculating total claim amount with interest", caseData.getCcdCaseReference());
+            BigDecimal claimScaled = claimInPounds.setScale(2);
+            updatedCaseData.totalClaimAmountPlusInterest(claimScaled);
+            updatedCaseData.totalClaimAmountPlusInterestString(claimScaled.toString());
+
+            BigDecimal interest = interestCalculator.calculateInterest(caseData);
+            if (interest == null) {
+                interest = BigDecimal.ZERO;
+            }
+            interest = interest.setScale(2);
             BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount().add(interest).setScale(2);
             updatedCaseData.totalClaimAmountPlusInterestAdmitPart(totalAmountWithInterest);
             updatedCaseData.totalClaimAmountPlusInterestAdmitPartString(totalAmountWithInterest.toString());

@@ -67,10 +67,11 @@ class EvidenceUploadedClaimantNotificationHandlerTest extends BaseCallbackHandle
 
         @Test
         void shouldRecordScenario_whenInvoked_whenDefendantUploadsDocument() {
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setApplicant1SettleClaim(YesOrNo.YES);
+            caseDataLiP.setApplicant1ClaimSettledDate(LocalDate.now());
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
-                .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
-                                 .applicant1ClaimSettledDate(
-                                     LocalDate.now()).build())
+                .caseDataLip(caseDataLiP)
                 .applicant1Represented(YesOrNo.NO).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -92,11 +93,13 @@ class EvidenceUploadedClaimantNotificationHandlerTest extends BaseCallbackHandle
 
         @Test
         void shouldRecordScenario_whenInvoked_whenClaimantUploadsDocument() {
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setApplicant1SettleClaim(YesOrNo.YES);
+            caseDataLiP.setApplicant1ClaimSettledDate(LocalDate.now());
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
-                .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
-                                 .applicant1ClaimSettledDate(
-                                     LocalDate.now()).build())
-                .applicant1Represented(YesOrNo.NO).build().toBuilder().caseDocumentUploadDate(LocalDateTime.now()).build();
+                .caseDataLip(caseDataLiP)
+                .applicant1Represented(YesOrNo.NO).build();
+            caseData.setCaseDocumentUploadDate(LocalDateTime.now());
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
