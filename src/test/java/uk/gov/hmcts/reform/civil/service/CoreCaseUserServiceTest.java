@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -291,8 +293,8 @@ class CoreCaseUserServiceTest {
 
             List<String> caseRoles = service.getUserCaseRoles(CASE_ID, USER_ID);
 
-            assertThat(caseRoles.contains("[RESPONDENTSOLICITORONE]"));
-            assertThat(!caseRoles.contains("[RESPONDENTSOLICITORTWO]"));
+            assertTrue(caseRoles.contains("[RESPONDENTSOLICITORONE]"));
+            assertFalse(caseRoles.contains("[RESPONDENTSOLICITORTWO]"));
         }
 
         @Test
@@ -309,7 +311,7 @@ class CoreCaseUserServiceTest {
                         .build()
                 ))
                 .build();
-            
+
             when(caseAssignmentApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
                 .thenReturn(caseAssignedUserRolesResource);
 

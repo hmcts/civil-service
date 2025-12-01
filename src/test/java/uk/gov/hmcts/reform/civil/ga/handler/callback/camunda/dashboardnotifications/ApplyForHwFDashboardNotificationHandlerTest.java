@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -91,8 +92,8 @@ public class ApplyForHwFDashboardNotificationHandlerTest extends GeneralApplicat
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             GeneralApplicationCaseData updatedData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
-            assertThat(updatedData.getGaHwfDetails().getHwfFeeType().getLabel().equals("application"));
-            assertThat(updatedData.getGaHwfDetails().getHwfReferenceNumber().equals("HWF-234-456"));
+            assertEquals("application", updatedData.getGaHwfDetails().getHwfFeeType().getLabel());
+            assertEquals("HWF-234-456", updatedData.getGaHwfDetails().getHwfReferenceNumber());
 
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
@@ -124,8 +125,8 @@ public class ApplyForHwFDashboardNotificationHandlerTest extends GeneralApplicat
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             GeneralApplicationCaseData updatedData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
-            assertThat(updatedData.getAdditionalHwfDetails().getHwfFeeType().getLabel().equals("additional"));
-            assertThat(updatedData.getAdditionalHwfDetails().getHwfReferenceNumber().equals("HWF-111-222"));
+            assertEquals("additional", updatedData.getAdditionalHwfDetails().getHwfFeeType().getLabel());
+            assertEquals("HWF-111-222", updatedData.getAdditionalHwfDetails().getHwfReferenceNumber());
 
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),

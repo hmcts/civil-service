@@ -395,19 +395,10 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
                     ? CLAIMANT : DEFENDANT,
                 DATE_FORMATTER.format(caseData.getCreatedDate()),
                 (helper.isApplicationCreatedWithoutNoticeByApplicant(caseData)
-                    == NO ? "" : "And the Judge considered the information provided by the " + identifySolicitor(
-                    caseData))
+                    == NO ? "" : judgeConsideredText(caseData))
             )).build();
 
         return gaJudicialRequestMoreInfoBuilder;
-    }
-
-    private String identifySolicitor(GeneralApplicationCaseData caseData) {
-
-        return (caseData.getParentClaimantIsApplicant() == null
-            || YES.equals(caseData.getParentClaimantIsApplicant()))
-            ? CLAIMANT : DEFENDANT;
-
     }
 
     public String dismissalOrderText(GeneralApplicationCaseData caseData) {
@@ -563,8 +554,7 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
                 ? CLAIMANT : DEFENDANT,
             DATE_FORMATTER.format(caseData.getCreatedDate()),
             (helper.isApplicationCreatedWithoutNoticeByApplicant(caseData)
-                == NO ? "" : "And the Judge considered the information provided by the "
-                + identifySolicitor(caseData))
+                == NO ? "" : judgeConsideredText(caseData))
         );
     }
 
@@ -577,9 +567,21 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
                 ? CLAIMANT : DEFENDANT,
             DATE_FORMATTER.format(caseData.getCreatedDate()),
             (helper.isApplicationCreatedWithoutNoticeByApplicant(caseData)
-                == NO ? "" : "And the Judge considered the information provided by the "
-                + identifySolicitor(caseData))
+                == NO ? "" : judgeConsideredText(caseData))
         );
+    }
+
+    private String judgeConsideredText(GeneralApplicationCaseData caseData) {
+        return "And the Judge considered the information provided by the " + identifySolicitor(
+            caseData);
+    }
+
+    private String identifySolicitor(GeneralApplicationCaseData caseData) {
+
+        return (caseData.getParentClaimantIsApplicant() == null
+            || YES.equals(caseData.getParentClaimantIsApplicant()))
+            ? CLAIMANT : DEFENDANT;
+
     }
 
     private CallbackResponse gaValidateMakeDecisionScreen(CallbackParams callbackParams) {

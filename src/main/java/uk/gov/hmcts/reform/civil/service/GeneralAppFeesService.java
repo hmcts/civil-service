@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -44,9 +43,7 @@ public class GeneralAppFeesService {
     private static final String OTHER = "other";
 
     protected static final List<GeneralApplicationTypes> VARY_TYPES
-        = Arrays.asList(
-        GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT
-    );
+        = List.of(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT);
     protected static final List<GeneralApplicationTypes> SET_ASIDE
         = List.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT);
     protected static final List<GeneralApplicationTypes> ADJOURN_TYPES
@@ -99,7 +96,7 @@ public class GeneralAppFeesService {
         if (CollectionUtils.containsAny(caseData.getGeneralAppType().getTypes(), VARY_TYPES)) {
             //only minus 1 as VARY_PAYMENT_TERMS_OF_JUDGMENT can't be multi selected
             typeSize--;
-            result = getFeeForGA(feesConfiguration.getAppnToVaryOrSuspend(), "miscellaneous", "other");
+            result = getFeeForGA(feesConfiguration.getAppnToVaryOrSuspend(), MISCELLANEOUS, OTHER);
         }
         if (typeSize > 0
             && CollectionUtils.containsAny(caseData.getGeneralAppType().getTypes(), SD_CONSENT_TYPES)) {
@@ -130,7 +127,7 @@ public class GeneralAppFeesService {
         }
         if (isUpdateCoScGATypeSize(typeSize, caseData.getGeneralAppType().getTypes())) {
             typeSize--;
-            Fee certOfSatisfactionOrCancel = getFeeForGA(feesConfiguration.getCertificateOfSatisfaction(), "miscellaneous", "other");
+            Fee certOfSatisfactionOrCancel = getFeeForGA(feesConfiguration.getCertificateOfSatisfaction(), MISCELLANEOUS, OTHER);
             result = getCoScFeeResult(result, certOfSatisfactionOrCancel);
         }
         if (typeSize > 0) {
@@ -186,7 +183,7 @@ public class GeneralAppFeesService {
         }
         if (isUpdateCoScGATypeSize(typeSize, types)) {
             typeSize--;
-            Fee certOfSatisfactionOrCancel = getFeeForGA(feesConfiguration.getCertificateOfSatisfaction(), "miscellaneous", "other");
+            Fee certOfSatisfactionOrCancel = getFeeForGA(feesConfiguration.getCertificateOfSatisfaction(), MISCELLANEOUS, OTHER);
             result = getCoScFeeResult(result, certOfSatisfactionOrCancel);
         }
         if (typeSize > 0) {

@@ -33,7 +33,7 @@ public class HwFFeeTypeUtilTest {
 
         // Assert
         assertThat(updatedCaseDataBuilder.build().getHwfFeeType()).isEqualTo(FeeType.ADDITIONAL);
-        assertThat(updatedCaseDataBuilder.build().getAdditionalHwfDetails().getHwfReferenceNumber().equals("HWF-111-222"));
+        assertThat(updatedCaseDataBuilder.build().getAdditionalHwfDetails().getHwfReferenceNumber()).isEqualTo("HWF-111-222");
     }
 
     @Test
@@ -53,7 +53,7 @@ public class HwFFeeTypeUtilTest {
 
         // Assert
         assertThat(updatedCaseDataBuilder.build().getHwfFeeType()).isEqualTo(FeeType.APPLICATION);
-        assertThat(updatedCaseDataBuilder.build().getGaHwfDetails().getHwfReferenceNumber().equals("HWF-111-222"));
+        assertThat(updatedCaseDataBuilder.build().getGaHwfDetails().getHwfReferenceNumber()).isEqualTo("HWF-111-222");
     }
 
     @Test

@@ -26,6 +26,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 @RequiredArgsConstructor
 public class DocUploadDashboardNotificationService {
 
+    public static final String APPLICANT = "APPLICANT";
+    public static final String RESPONDENT = "RESPONDENT";
     private final DashboardApiClient dashboardApiClient;
     private final GaForLipService gaForLipService;
     private final GaDashboardNotificationsParamsMapper mapper;
@@ -40,21 +42,20 @@ public class DocUploadDashboardNotificationService {
             List<String> scenarios = getDashboardScenario(role, caseData, itsUploadAddlDocEvent);
             ScenarioRequestParams scenarioParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(
                 caseData)).build();
-            if (scenarios != null) {
-                scenarios.forEach(scenario -> dashboardApiClient.recordScenario(
-                    caseData.getCcdCaseReference().toString(),
-                    scenario,
-                    authToken,
-                    scenarioParams
-                ));
-            }
+
+            scenarios.forEach(scenario -> dashboardApiClient.recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                scenario,
+                authToken,
+                scenarioParams
+            ));
         }
     }
 
     public void createResponseDashboardNotification(GeneralApplicationCaseData caseData, String role, String authToken) {
 
-        if ((role.equalsIgnoreCase("APPLICANT")
-            || (isWithNoticeOrConsent(caseData) && role.equalsIgnoreCase("RESPONDENT")))) {
+        if ((role.equalsIgnoreCase(APPLICANT)
+            || (isWithNoticeOrConsent(caseData) && role.equalsIgnoreCase(RESPONDENT)))) {
             String scenario = getResponseDashboardScenario(role, caseData);
             ScenarioRequestParams scenarioParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(
                 caseData)).build();
@@ -70,9 +71,9 @@ public class DocUploadDashboardNotificationService {
     }
 
     private String getResponseDashboardScenario(String role, GeneralApplicationCaseData caseData) {
-        if (role.equalsIgnoreCase("APPLICANT") && gaForLipService.isLipApp(caseData)) {
+        if (role.equalsIgnoreCase(APPLICANT) && gaForLipService.isLipApp(caseData)) {
             return SCENARIO_AAA6_GENERAL_APPLICATION_RESPONSE_SUBMITTED_APPLICANT.getScenario();
-        } else if (role.equalsIgnoreCase("RESPONDENT") && gaForLipService.isLipResp(caseData)) {
+        } else if (role.equalsIgnoreCase(RESPONDENT) && gaForLipService.isLipResp(caseData)) {
             return SCENARIO_AAA6_GENERAL_APPLICATION_RESPONSE_SUBMITTED_RESPONDENT.getScenario();
         }
         return null;
@@ -94,16 +95,16 @@ public class DocUploadDashboardNotificationService {
     }
 
     private String getResponseOfflineDashboardScenario(String role, GeneralApplicationCaseData caseData, String authToken) {
-        if (role.equalsIgnoreCase("RESPONDENT")) {
+        if (role.equalsIgnoreCase(RESPONDENT)) {
             dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
                 caseData.getCcdCaseReference().toString(),
-                "RESPONDENT", authToken
+                RESPONDENT, authToken
             );
             return SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_RESPONDENT.getScenario();
-        } else if (role.equalsIgnoreCase("APPLICANT")) {
+        } else if (role.equalsIgnoreCase(APPLICANT)) {
             dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
                 caseData.getCcdCaseReference().toString(),
-                "APPLICANT", authToken
+                APPLICANT, authToken
             );
             return SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_APPLICANT.getScenario();
         }

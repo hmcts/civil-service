@@ -49,8 +49,10 @@ public class SendTranslatedOrderToLiPCallbackHandler extends CallbackHandler imp
     private final CaseDetailsConverter caseDetailsConverter;
     private final SendFinalOrderPrintService sendFinalOrderPrintService;
 
-    private static final List<String> ENGLISH_TYPES = List.of("ENGLISH", "BOTH");
-    private static final List<String> WELSH_TYPES = List.of("WELSH", "BOTH");
+    private static final String ENGLISH_LANGUAGE = "ENGLISH";
+    private static final String WELSH_LANGUAGE = "WELSH";
+    private static final List<String> ENGLISH_TYPES = List.of(ENGLISH_LANGUAGE, "BOTH");
+    private static final List<String> WELSH_TYPES = List.of(WELSH_LANGUAGE, "BOTH");
 
     private static final List<TranslatedDocumentType> POST_TRANSLATED_DOCUMENT_TYPES = List.of(
         REQUEST_FOR_MORE_INFORMATION_ORDER,
@@ -101,8 +103,8 @@ public class SendTranslatedOrderToLiPCallbackHandler extends CallbackHandler imp
     private boolean shouldPrintInLanguage(GeneralApplicationCaseData caseData, GeneralApplicationCaseData parentCaseData, CaseEvent caseEvent, List<String> languageTypes) {
         boolean isClaimant = (caseEvent == SEND_TRANSLATED_ORDER_TO_LIP_APPLICANT && caseData.getParentClaimantIsApplicant() == YesOrNo.YES)
             || (caseEvent == SEND_TRANSLATED_ORDER_TO_LIP_RESPONDENT && caseData.getParentClaimantIsApplicant() == YesOrNo.NO);
-        String claimantLanguage = parentCaseData.getClaimantBilingualLanguagePreference() != null ? parentCaseData.getClaimantBilingualLanguagePreference() : "ENGLISH";
-        String defendantLanguage = parentCaseData.getDefendantBilingualLanguagePreference() != null ? parentCaseData.getDefendantBilingualLanguagePreference() : "ENGLISH";
+        String claimantLanguage = parentCaseData.getClaimantBilingualLanguagePreference() != null ? parentCaseData.getClaimantBilingualLanguagePreference() : ENGLISH_LANGUAGE;
+        String defendantLanguage = parentCaseData.getDefendantBilingualLanguagePreference() != null ? parentCaseData.getDefendantBilingualLanguagePreference() : ENGLISH_LANGUAGE;
         if (isClaimant) {
             return languageTypes.contains(claimantLanguage);
         } else {
@@ -117,7 +119,7 @@ public class SendTranslatedOrderToLiPCallbackHandler extends CallbackHandler imp
 
     private boolean isDocumentCorrectType(GeneralApplicationCaseData caseData) {
         List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocumentsBulkPrint();
-        if (translatedDocuments == null || translatedDocuments.size() == 0) {
+        if (translatedDocuments == null || translatedDocuments.isEmpty()) {
             return false;
         }
         TranslatedDocumentType documentType = translatedDocuments.get(translatedDocuments.size() - 1).getValue().getDocumentType();
