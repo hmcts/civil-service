@@ -43,7 +43,7 @@ import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTrans
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTransitionBuilder.isClaimantNotSettlePartAdmitClaim;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTransitionBuilder.isSpecSmallClaim;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTransitionBuilder.partAdmitPayImmediately;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTransitionBuilder.protectAgainstExuiBug;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTransitionBuilder.isNotPartAdmissionPaymentState;
 
 @ExtendWith(MockitoExtension.class)
 class PartAdmissionTransitionBuilderTest {
@@ -592,7 +592,16 @@ class PartAdmissionTransitionBuilderTest {
             .showResponseOneVOneFlag(tag)
             .build();
 
-        assertFalse(protectAgainstExuiBug.test(caseData));
+        assertFalse(isNotPartAdmissionPaymentState.test(caseData));
+    }
+
+    @Test
+    void shouldReturnTrueIfNotOneVOnePartAdmit() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued().build().toBuilder()
+            .build();
+
+        assertTrue(isNotPartAdmissionPaymentState.test(caseData));
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {

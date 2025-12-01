@@ -126,8 +126,7 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
         .and(isCarmApplicableCase.or(isCarmApplicableLipCase))
         .and(not(takenOfflineByStaff));
 
-    //EXUI-3404
-    public static final Predicate<CaseData> protectAgainstExuiBug = caseData ->
+    public static final Predicate<CaseData> isNotPartAdmissionPaymentState = caseData ->
         Optional.ofNullable(caseData)
             .filter(data -> data.getShowResponseOneVOneFlag() != ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_INSTALMENT)
             .filter(data -> data.getShowResponseOneVOneFlag() != ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_BY_SET_DATE)
@@ -136,6 +135,6 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
             .isPresent();
 
     public static final Predicate<CaseData> partAdmitProceed =  not(carmMediation).and(fullDefenceProceed).and(
-        protectAgainstExuiBug);
+        isNotPartAdmissionPaymentState);
 
 }
