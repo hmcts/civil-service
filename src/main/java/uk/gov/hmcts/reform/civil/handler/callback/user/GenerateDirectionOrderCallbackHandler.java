@@ -17,7 +17,9 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
 import uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -59,7 +61,6 @@ import java.util.Optional;
 
 import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static java.lang.String.format;
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -86,7 +87,6 @@ import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderDownload
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderDownloadTemplateOptions.FIX_DATE_CCMC;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderDownloadTemplateOptions.FIX_DATE_CMC;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.ASSISTED_ORDER;
-import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.FREE_FORM_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.CLAIMANT;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.STANDARD_BASIS;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.SUBJECT_DETAILED_ASSESSMENT;
@@ -189,7 +189,6 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
     private CallbackResponse nullPreviousSelections(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (isJudicialReferral(callbackParams)
             && caseData.isLipCase()) {
             return AboutToStartOrSubmitCallbackResponse.builder()
@@ -198,75 +197,78 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         }
 
         if (isJudicialReferral(callbackParams) || isMultiOrIntTrack(caseData)) {
-            caseDataBuilder.allowOrderTrackAllocation(YES).finalOrderTrackToggle(null);
+            caseData.setAllowOrderTrackAllocation(YES);
+            caseData.setFinalOrderTrackToggle(null);
         } else {
-            caseDataBuilder.allowOrderTrackAllocation(NO);
-            populateTrackToggle(caseData, caseDataBuilder);
+            caseData.setAllowOrderTrackAllocation(NO);
+            populateTrackToggle(caseData);
         }
 
         if (featureToggleService.isWelshEnabledForMainCase()
             && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
-            caseDataBuilder.bilingualHint(YesOrNo.YES);
+            caseData.setBilingualHint(YesOrNo.YES);
         }
 
-        caseDataBuilder.finalOrderFurtherHearingToggle(null);
-        return nullPreviousSelections(caseDataBuilder);
+        caseData.setFinalOrderFurtherHearingToggle(null);
+        return nullPreviousSelections(caseData);
     }
 
-    private CallbackResponse nullPreviousSelections(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
-        caseDataBuilder.finalOrderSelection(null);
+    private CallbackResponse nullPreviousSelections(CaseData caseData) {
+        caseData.setFinalOrderSelection(null);
         // Free form orders
-        caseDataBuilder
-            .freeFormRecordedTextArea(null)
-            .freeFormOrderedTextArea(null)
-            .orderOnCourtsList(null)
-            .freeFormHearingNotes(null);
+        caseData.setFreeFormRecordedTextArea(null);
+        caseData.setFreeFormOrderedTextArea(null);
+        caseData.setOrderOnCourtsList(null);
+        caseData.setFreeFormHearingNotes(null);
         // Assisted orders
-        caseDataBuilder
-            .finalOrderMadeSelection(null).finalOrderDateHeardComplex(null)
-            .finalOrderJudgePapers(null)
-            .finalOrderJudgeHeardFrom(null)
-            .finalOrderRepresentation(null)
-            .finalOrderRecitals(null)
-            .finalOrderRecitalsRecorded(null)
-            .finalOrderOrderedThatText(null)
-            .finalOrderFurtherHearingComplex(null)
-            .assistedOrderCostList(null).assistedOrderCostsReserved(null).assistedOrderMakeAnOrderForCosts(null).assistedOrderCostsBespoke(null)
-            .finalOrderAppealToggle(null).finalOrderAppealComplex(null)
-            .orderMadeOnDetailsList(null).finalOrderGiveReasonsComplex(null);
+        caseData.setFinalOrderMadeSelection(null);
+        caseData.setFinalOrderDateHeardComplex(null);
+        caseData.setFinalOrderJudgePapers(null);
+        caseData.setFinalOrderJudgeHeardFrom(null);
+        caseData.setFinalOrderRepresentation(null);
+        caseData.setFinalOrderRecitals(null);
+        caseData.setFinalOrderRecitalsRecorded(null);
+        caseData.setFinalOrderOrderedThatText(null);
+        caseData.setFinalOrderFurtherHearingComplex(null);
+        caseData.setAssistedOrderCostList(null);
+        caseData.setAssistedOrderCostsReserved(null);
+        caseData.setAssistedOrderMakeAnOrderForCosts(null);
+        caseData.setAssistedOrderCostsBespoke(null);
+        caseData.setFinalOrderAppealToggle(null);
+        caseData.setFinalOrderAppealComplex(null);
+        caseData.setOrderMadeOnDetailsList(null);
+        caseData.setFinalOrderGiveReasonsComplex(null);
 
-        caseDataBuilder.finalOrderTrackAllocation(null)
-            .finalOrderAllocateToTrack(null)
-            .finalOrderIntermediateTrackComplexityBand(null)
-            .finalOrderDownloadTemplateOptions(null)
-            .orderAfterHearingDate(null)
-            .showOrderAfterHearingDatePage(null);
+        caseData.setFinalOrderTrackAllocation(null);
+        caseData.setFinalOrderAllocateToTrack(null);
+        caseData.setFinalOrderIntermediateTrackComplexityBand(null);
+        caseData.setFinalOrderDownloadTemplateOptions(null);
+        caseData.setOrderAfterHearingDate(null);
+        caseData.setShowOrderAfterHearingDatePage(null);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
     private CallbackResponse generateTemplate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (!BLANK_TEMPLATE_TO_BE_USED_AFTER_A_HEARING.equals(caseData.getFinalOrderDownloadTemplateOptions().getValue().getLabel())) {
             CaseDocument documentDownload = judgeOrderDownloadGenerator.generate(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
-            caseDataBuilder.finalOrderDownloadTemplateDocument(documentDownload);
-            caseDataBuilder.showOrderAfterHearingDatePage(NO);
+            caseData.setFinalOrderDownloadTemplateDocument(documentDownload);
+            caseData.setShowOrderAfterHearingDatePage(NO);
         } else {
-            caseDataBuilder.showOrderAfterHearingDatePage(YES);
+            caseData.setShowOrderAfterHearingDatePage(YES);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
     private CallbackResponse addingHearingDateToTemplate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<String> errors = validateOrderAfterHearingDates(caseData);
 
         if (!errors.isEmpty()) {
@@ -276,16 +278,15 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         }
 
         CaseDocument documentDownload = judgeOrderDownloadGenerator.generate(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
-        caseDataBuilder.finalOrderDownloadTemplateDocument(documentDownload);
+        caseData.setFinalOrderDownloadTemplateDocument(documentDownload);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
     private CallbackResponse assignTrackToggle(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (NO.equals(caseData.getFinalOrderAllocateToTrack())
             && isJudicialReferral(callbackParams)
             && isSmallOrFastTrack(caseData)) {
@@ -294,38 +295,36 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                 .build();
         }
 
-        caseDataBuilder = populateDownloadTemplateOptions(caseDataBuilder);
+        populateDownloadTemplateOptions(caseData);
 
         if (YES.equals(caseData.getFinalOrderAllocateToTrack())) {
-            caseDataBuilder.finalOrderTrackToggle(caseData.getFinalOrderTrackAllocation().name());
+            caseData.setFinalOrderTrackToggle(caseData.getFinalOrderTrackAllocation().name());
         } else {
-            populateTrackToggle(caseData, caseDataBuilder);
+            populateTrackToggle(caseData);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
     private CallbackResponse populateFormValues(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (ASSISTED_ORDER.equals(caseData.getFinalOrderSelection())) {
             String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
             List<LocationRefData> locations = (locationRefDataService
                 .getHearingCourtLocations(authToken));
-            caseDataBuilder = populateFields(caseDataBuilder, locations, caseData, authToken);
+            populateFields(caseData, locations, authToken);
         } else  {
-            caseDataBuilder = populateFreeFormFields(caseDataBuilder);
+            populateFreeFormFields(caseData);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
     private CallbackResponse validateFormAndGeneratePreviewDocument(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<String> errors = new ArrayList<>();
 
         if (ASSISTED_ORDER.equals(caseData.getFinalOrderSelection())) {
@@ -337,10 +336,10 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
         CaseDocument finalDocument = judgeFinalOrderGenerator.generate(
             caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
-        caseDataBuilder.finalOrderDocument(finalDocument);
+        caseData.setFinalOrderDocument(finalDocument);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .errors(errors)
             .build();
     }
@@ -388,22 +387,21 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         }
     }
 
-    private CaseData.CaseDataBuilder<?, ?> populateFreeFormFields(CaseData.CaseDataBuilder<?, ?> builder) {
-        return builder
-            .orderOnCourtInitiative(FreeFormOrderValues.builder()
-                                        .onInitiativeSelectionTextArea(ON_INITIATIVE_SELECTION_TEXT)
-                                        .onInitiativeSelectionDate(workingDayIndicator
-                                                                       .getNextWorkingDay(LocalDate.now().plusDays(7)))
-                                        .build())
-            .orderWithoutNotice(FreeFormOrderValues.builder()
-                                    .withoutNoticeSelectionTextArea(WITHOUT_NOTICE_SELECTION_TEXT)
-                                    .withoutNoticeSelectionDate(workingDayIndicator
-                                                                    .getNextWorkingDay(LocalDate.now().plusDays(7)))
-                                    .build());
+    private void populateFreeFormFields(CaseData caseData) {
+        FreeFormOrderValues orderOnCourtInitiative = new FreeFormOrderValues();
+        orderOnCourtInitiative.setOnInitiativeSelectionTextArea(ON_INITIATIVE_SELECTION_TEXT);
+        orderOnCourtInitiative.setOnInitiativeSelectionDate(workingDayIndicator
+            .getNextWorkingDay(LocalDate.now().plusDays(7)));
+        caseData.setOrderOnCourtInitiative(orderOnCourtInitiative);
+
+        FreeFormOrderValues orderWithoutNotice = new FreeFormOrderValues();
+        orderWithoutNotice.setWithoutNoticeSelectionTextArea(WITHOUT_NOTICE_SELECTION_TEXT);
+        orderWithoutNotice.setWithoutNoticeSelectionDate(workingDayIndicator
+            .getNextWorkingDay(LocalDate.now().plusDays(7)));
+        caseData.setOrderWithoutNotice(orderWithoutNotice);
     }
 
-    private CaseData.CaseDataBuilder<?, ?> populateDownloadTemplateOptions(CaseData.CaseDataBuilder<?, ?> builder) {
-        CaseData caseData = builder.build();
+    private void populateDownloadTemplateOptions(CaseData caseData) {
         List<String> options = new ArrayList<>();
         if (isTrack(AllocatedTrack.INTERMEDIATE_CLAIM, caseData)) {
             options.add(BLANK_TEMPLATE_AFTER_HEARING.getLabel());
@@ -416,7 +414,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             options.add(FIX_DATE_CCMC.getLabel());
             options.add(FIX_DATE_CMC.getLabel());
         }
-        return builder.finalOrderDownloadTemplateOptions(fromList(options));
+        caseData.setFinalOrderDownloadTemplateOptions(fromList(options));
     }
 
     private DynamicList getLocationsFromList(final List<LocationRefData> locations) {
@@ -445,72 +443,83 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private CaseData.CaseDataBuilder<?, ?> populateFields(
-        CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> locations, CaseData caseData, String authToken) {
+    private void populateFields(
+        CaseData caseData, List<LocationRefData> locations, String authToken) {
         populateClaimant2Defendant2PartyNames(caseData);
-        return builder.finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders
-                                                                               .builder().singleDate(workingDayIndicator
-                                                                                                         .getNextWorkingDay(LocalDate.now()))
-                                                                               .build()).build())
-            .finalOrderRepresentation(FinalOrderRepresentation.builder()
-                                          .typeRepresentationComplex(ClaimantAndDefendantHeard
-                                                                         .builder()
-                                                                         .typeRepresentationClaimantOneDynamic(caseData.getApplicant1().getPartyName())
-                                                                         .typeRepresentationDefendantOneDynamic(caseData.getRespondent1().getPartyName())
-                                                                         .typeRepresentationDefendantTwoDynamic(defendantTwoPartyName)
-                                                                         .typeRepresentationClaimantTwoDynamic(claimantTwoPartyName)
-                                                                         .build()).build())
-            .finalOrderFurtherHearingComplex(
-                FinalOrderFurtherHearing.builder()
-                    .hearingLocationList(populateCurrentHearingLocation(caseData, authToken))
-                    .alternativeHearingList(getLocationsFromList(locations))
-                    .datesToAvoidDateDropdown(DatesFinalOrders.builder()
-                                           .datesToAvoidDates(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(7))).build()).build())
-            .orderMadeOnDetailsOrderCourt(
-                OrderMadeOnDetails.builder().ownInitiativeDate(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(7)))
-                    .ownInitiativeText(ON_INITIATIVE_SELECTION_TEXT).build())
-            .orderMadeOnDetailsOrderWithoutNotice(
-                OrderMadeOnDetailsOrderWithoutNotice.builder().withOutNoticeDate(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(7)))
-                    .withOutNoticeText(WITHOUT_NOTICE_SELECTION_TEXT).build())
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
-                                                  .assistedOrderCostsFirstDropdownDate(workingDayIndicator
-                                                                                           .getNextWorkingDay(LocalDate.now().plusDays(14)))
-                                                  .assistedOrderAssessmentThirdDropdownDate(workingDayIndicator
-                                                                                                .getNextWorkingDay(LocalDate.now().plusDays(14)))
-                                                  .makeAnOrderForCostsYesOrNo(NO)
-                                                  .makeAnOrderForCostsList(CLAIMANT)
-                                                  .assistedOrderClaimantDefendantFirstDropdown(SUBJECT_DETAILED_ASSESSMENT)
-                                                  .assistedOrderAssessmentSecondDropdownList1(STANDARD_BASIS)
-                                                  .assistedOrderAssessmentSecondDropdownList2(CostEnums.NO)
-                                                  .build())
-            .publicFundingCostsProtection(NO)
-            .finalOrderAppealComplex(FinalOrderAppeal.builder()
-                                         .appealGrantedDropdown(AppealGrantedRefused.builder()
-                                                                           .appealChoiceSecondDropdownA(
-                                                                               AppealChoiceSecondDropdown.builder()
-                                                                                   .appealGrantedRefusedDate(workingDayIndicator
-                                                                                                             .getNextWorkingDay(LocalDate.now().plusDays(21)))
-                                                                                   .build())
-                                                                           .appealChoiceSecondDropdownB(
-                                                                               AppealChoiceSecondDropdown.builder()
-                                                                                   .appealGrantedRefusedDate(workingDayIndicator
-                                                                                                            .getNextWorkingDay(LocalDate.now().plusDays(21)))
-                                                                                   .build())
-                                                                           .build())
-                                         .appealRefusedDropdown(AppealGrantedRefused.builder()
-                                                                    .appealChoiceSecondDropdownA(
-                                                                        AppealChoiceSecondDropdown.builder()
-                                                                            .appealGrantedRefusedDate(workingDayIndicator
-                                                                                                          .getNextWorkingDay(LocalDate.now().plusDays(21)))
-                                                                            .build())
-                                                                    .appealChoiceSecondDropdownB(
-                                                                        AppealChoiceSecondDropdown.builder()
-                                                                            .appealGrantedRefusedDate(workingDayIndicator
-                                                                                                          .getNextWorkingDay(LocalDate.now().plusDays(21)))
-                                                                            .build())
 
-                                                                    .build()).build())
-            .finalOrderGiveReasonsYesNo(NO);
+        DatesFinalOrders singleDateSelection = new DatesFinalOrders();
+        singleDateSelection.setSingleDate(workingDayIndicator.getNextWorkingDay(LocalDate.now()));
+        OrderMade finalOrderDateHeardComplex = new OrderMade();
+        finalOrderDateHeardComplex.setSingleDateSelection(singleDateSelection);
+        caseData.setFinalOrderDateHeardComplex(finalOrderDateHeardComplex);
+
+        ClaimantAndDefendantHeard typeRepresentationComplex = new ClaimantAndDefendantHeard();
+        typeRepresentationComplex.setTypeRepresentationClaimantOneDynamic(caseData.getApplicant1().getPartyName());
+        typeRepresentationComplex.setTypeRepresentationDefendantOneDynamic(caseData.getRespondent1().getPartyName());
+        typeRepresentationComplex.setTypeRepresentationDefendantTwoDynamic(defendantTwoPartyName);
+        typeRepresentationComplex.setTypeRepresentationClaimantTwoDynamic(claimantTwoPartyName);
+        FinalOrderRepresentation finalOrderRepresentation = new FinalOrderRepresentation();
+        finalOrderRepresentation.setTypeRepresentationComplex(typeRepresentationComplex);
+        caseData.setFinalOrderRepresentation(finalOrderRepresentation);
+
+        DatesFinalOrders datesToAvoidDateDropdown = new DatesFinalOrders();
+        datesToAvoidDateDropdown.setDatesToAvoidDates(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(7)));
+        FinalOrderFurtherHearing finalOrderFurtherHearingComplex = new FinalOrderFurtherHearing();
+        finalOrderFurtherHearingComplex.setHearingLocationList(populateCurrentHearingLocation(caseData, authToken));
+        finalOrderFurtherHearingComplex.setAlternativeHearingList(getLocationsFromList(locations));
+        finalOrderFurtherHearingComplex.setDatesToAvoidDateDropdown(datesToAvoidDateDropdown);
+        caseData.setFinalOrderFurtherHearingComplex(finalOrderFurtherHearingComplex);
+
+        OrderMadeOnDetails orderMadeOnDetailsOrderCourt = new OrderMadeOnDetails();
+        orderMadeOnDetailsOrderCourt.setOwnInitiativeDate(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(7)));
+        orderMadeOnDetailsOrderCourt.setOwnInitiativeText(ON_INITIATIVE_SELECTION_TEXT);
+        caseData.setOrderMadeOnDetailsOrderCourt(orderMadeOnDetailsOrderCourt);
+
+        OrderMadeOnDetailsOrderWithoutNotice orderMadeOnDetailsOrderWithoutNotice = new OrderMadeOnDetailsOrderWithoutNotice();
+        orderMadeOnDetailsOrderWithoutNotice.setWithOutNoticeDate(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(7)));
+        orderMadeOnDetailsOrderWithoutNotice.setWithOutNoticeText(WITHOUT_NOTICE_SELECTION_TEXT);
+        caseData.setOrderMadeOnDetailsOrderWithoutNotice(orderMadeOnDetailsOrderWithoutNotice);
+
+        AssistedOrderCostDetails assistedOrderMakeAnOrderForCosts = new AssistedOrderCostDetails();
+        assistedOrderMakeAnOrderForCosts.setAssistedOrderCostsFirstDropdownDate(workingDayIndicator
+            .getNextWorkingDay(LocalDate.now().plusDays(14)));
+        assistedOrderMakeAnOrderForCosts.setAssistedOrderAssessmentThirdDropdownDate(workingDayIndicator
+            .getNextWorkingDay(LocalDate.now().plusDays(14)));
+        assistedOrderMakeAnOrderForCosts.setMakeAnOrderForCostsYesOrNo(NO);
+        assistedOrderMakeAnOrderForCosts.setMakeAnOrderForCostsList(CLAIMANT);
+        assistedOrderMakeAnOrderForCosts.setAssistedOrderClaimantDefendantFirstDropdown(SUBJECT_DETAILED_ASSESSMENT);
+        assistedOrderMakeAnOrderForCosts.setAssistedOrderAssessmentSecondDropdownList1(STANDARD_BASIS);
+        assistedOrderMakeAnOrderForCosts.setAssistedOrderAssessmentSecondDropdownList2(CostEnums.NO);
+        caseData.setAssistedOrderMakeAnOrderForCosts(assistedOrderMakeAnOrderForCosts);
+
+        caseData.setPublicFundingCostsProtection(NO);
+
+        AppealChoiceSecondDropdown appealChoiceSecondDropdownA1 = new AppealChoiceSecondDropdown();
+        appealChoiceSecondDropdownA1.setAppealGrantedRefusedDate(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(21)));
+
+        AppealChoiceSecondDropdown appealChoiceSecondDropdownB1 = new AppealChoiceSecondDropdown();
+        appealChoiceSecondDropdownB1.setAppealGrantedRefusedDate(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(21)));
+
+        AppealGrantedRefused appealGrantedDropdown = new AppealGrantedRefused();
+        appealGrantedDropdown.setAppealChoiceSecondDropdownA(appealChoiceSecondDropdownA1);
+        appealGrantedDropdown.setAppealChoiceSecondDropdownB(appealChoiceSecondDropdownB1);
+
+        AppealChoiceSecondDropdown appealChoiceSecondDropdownA2 = new AppealChoiceSecondDropdown();
+        appealChoiceSecondDropdownA2.setAppealGrantedRefusedDate(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(21)));
+
+        AppealChoiceSecondDropdown appealChoiceSecondDropdownB2 = new AppealChoiceSecondDropdown();
+        appealChoiceSecondDropdownB2.setAppealGrantedRefusedDate(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusDays(21)));
+
+        AppealGrantedRefused appealRefusedDropdown = new AppealGrantedRefused();
+        appealRefusedDropdown.setAppealChoiceSecondDropdownA(appealChoiceSecondDropdownA2);
+        appealRefusedDropdown.setAppealChoiceSecondDropdownB(appealChoiceSecondDropdownB2);
+
+        FinalOrderAppeal finalOrderAppealComplex = new FinalOrderAppeal();
+        finalOrderAppealComplex.setAppealGrantedDropdown(appealGrantedDropdown);
+        finalOrderAppealComplex.setAppealRefusedDropdown(appealRefusedDropdown);
+        caseData.setFinalOrderAppealComplex(finalOrderAppealComplex);
+
+        caseData.setFinalOrderGiveReasonsYesNo(NO);
     }
 
     private void populateClaimant2Defendant2PartyNames(CaseData caseData) {
@@ -620,35 +629,34 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
         List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
         finalCaseDocuments.add(element(finalDocument));
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (featureToggleService.isWelshEnabledForMainCase()
                 && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
             preTranslationDocuments.addAll(finalCaseDocuments);
-            caseDataBuilder.preTranslationDocuments(preTranslationDocuments);
-            caseDataBuilder.bilingualHint(YesOrNo.YES);
+            caseData.setPreTranslationDocuments(preTranslationDocuments);
+            caseData.setBilingualHint(YesOrNo.YES);
             // Do not trigger business process when document is hidden
         } else {
             if (!isEmpty(caseData.getFinalOrderDocumentCollection())) {
                 finalCaseDocuments.addAll(caseData.getFinalOrderDocumentCollection());
             }
-            caseDataBuilder.finalOrderDocumentCollection(finalCaseDocuments);
+            caseData.setFinalOrderDocumentCollection(finalCaseDocuments);
         }
-        caseDataBuilder.businessProcess(BusinessProcess.ready(GENERATE_ORDER_NOTIFICATION));
+        caseData.setBusinessProcess(BusinessProcess.ready(GENERATE_ORDER_NOTIFICATION));
 
         // Casefileview will show any document uploaded even without an categoryID under uncategorized section,
         // we only use freeFormOrderDocument as a preview and do not want it shown on case file view, so to prevent it
         // showing, we remove.
-        caseDataBuilder.finalOrderDocument(null);
-        caseDataBuilder.uploadOrderDocumentFromTemplate(null);
-        caseDataBuilder.finalOrderDownloadTemplateDocument(null);
-        caseDataBuilder.allowOrderTrackAllocation(null);
+        caseData.setFinalOrderDocument(null);
+        caseData.setUploadOrderDocumentFromTemplate(null);
+        caseData.setFinalOrderDownloadTemplateDocument(null);
+        caseData.setAllowOrderTrackAllocation(null);
 
         if (YES.equals(caseData.getFinalOrderAllocateToTrack())) {
             if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-                caseDataBuilder.responseClaimTrack(caseData.getFinalOrderTrackAllocation().name());
+                caseData.setResponseClaimTrack(caseData.getFinalOrderTrackAllocation().name());
             } else {
-                caseDataBuilder.allocatedTrack(caseData.getFinalOrderTrackAllocation());
+                caseData.setAllocatedTrack(caseData.getFinalOrderTrackAllocation());
             }
         }
 
@@ -657,49 +665,56 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             if (caseData.getFinalOrderSelection().equals(ASSISTED_ORDER)) {
                 if (caseData.getFinalOrderFurtherHearingComplex() != null
                     && caseData.getFinalOrderFurtherHearingComplex().getHearingNotesText() != null) {
-                    caseDataBuilder.hearingNotes(HearingNotes.builder()
-                                                     .date(LocalDate.now())
-                                                     .notes(caseData.getFinalOrderFurtherHearingComplex().getHearingNotesText())
-                                                     .build());
+                    HearingNotes hearingNotes = new HearingNotes();
+                    hearingNotes.setDate(LocalDate.now());
+                    hearingNotes.setNotes(caseData.getFinalOrderFurtherHearingComplex().getHearingNotesText());
+                    caseData.setHearingNotes(hearingNotes);
                 }
             } else if (nonNull(caseData.getFreeFormHearingNotes())) {
-                caseDataBuilder.hearingNotes(HearingNotes.builder()
-                                                 .date(LocalDate.now())
-                                                 .notes(caseData.getFreeFormHearingNotes())
-                                                 .build());
+                HearingNotes hearingNotes = new HearingNotes();
+                hearingNotes.setDate(LocalDate.now());
+                hearingNotes.setNotes(caseData.getFreeFormHearingNotes());
+                caseData.setHearingNotes(hearingNotes);
             }
         }
 
-        updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
-            callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-            caseData
-        ));
-        nullPreviousSelections(caseDataBuilder);
+        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+            updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
+                callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
+                caseData
+            ));
+        }
 
+        // Save finalOrderSelection and toggle before they're cleared by nullPreviousSelections
+        // These are only used for state determination, not for early return logic
+        FinalOrderSelection savedFinalOrderSelection = caseData.getFinalOrderSelection();
+        List<FinalOrderToggle> savedFinalOrderFurtherHearingToggle = caseData.getFinalOrderFurtherHearingToggle();
+
+        nullPreviousSelections(caseData);
+
+        // Early return check uses the cleared selection to preserve original behavior
+        // where ASSISTED_ORDER and FREE_FORM_ORDER checks would always be false after nullPreviousSelections
         if (!JUDICIAL_REFERRAL.toString().equals(callbackParams.getRequest().getCaseDetails().getState())
-            && ((ASSISTED_ORDER.equals(caseData.getFinalOrderSelection())
-            && isNull(caseData.getFinalOrderFurtherHearingToggle()))
-            || FREE_FORM_ORDER.equals(caseData.getFinalOrderSelection())
-            || isMultiOrIntTrack(caseData))) {
+            && isMultiOrIntTrack(caseData)) {
 
-            caseDataBuilder.finalOrderFurtherHearingToggle(null);
+            caseData.setFinalOrderFurtherHearingToggle(null);
 
             return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseDataBuilder.build().toMap(objectMapper))
+                .data(caseData.toMap(objectMapper))
                 .build();
         }
         CaseState state = All_FINAL_ORDERS_ISSUED;
-        if ((ASSISTED_ORDER.equals(caseData.getFinalOrderSelection())
-            && caseData.getFinalOrderFurtherHearingToggle() != null)
+        if ((ASSISTED_ORDER.equals(savedFinalOrderSelection)
+            && savedFinalOrderFurtherHearingToggle != null)
             || isJudicialReferral(callbackParams)) {
             state = CASE_PROGRESSION;
         }
-        if (!ASSISTED_ORDER.equals(caseData.getFinalOrderSelection())) {
-            caseDataBuilder.finalOrderFurtherHearingToggle(null);
+        if (!ASSISTED_ORDER.equals(savedFinalOrderSelection)) {
+            caseData.setFinalOrderFurtherHearingToggle(null);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .state(state.name())
             .build();
     }
@@ -733,19 +748,19 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         return JUDICIAL_REFERRAL.toString().equals(callbackParams.getRequest().getCaseDetails().getState());
     }
 
-    private void populateTrackToggle(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+    private void populateTrackToggle(CaseData caseData) {
         if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
             if (caseData.getResponseClaimTrack() != null) {
-                caseDataBuilder.finalOrderTrackToggle(caseData.getResponseClaimTrack());
+                caseData.setFinalOrderTrackToggle(caseData.getResponseClaimTrack());
             } else {
                 // track is null when DJ is completed, default to small/fast track journey
                 // in this scenario
-                caseDataBuilder.finalOrderTrackToggle(AllocatedTrack.SMALL_CLAIM.name());
+                caseData.setFinalOrderTrackToggle(AllocatedTrack.SMALL_CLAIM.name());
             }
 
         }
         if (caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
-            caseDataBuilder.finalOrderTrackToggle(caseData.getAllocatedTrack().name());
+            caseData.setFinalOrderTrackToggle(caseData.getAllocatedTrack().name());
         }
     }
 

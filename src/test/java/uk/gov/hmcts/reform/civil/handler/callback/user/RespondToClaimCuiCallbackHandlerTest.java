@@ -207,7 +207,8 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .totalClaimAmount(BigDecimal.valueOf(5000))
                 .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(
                     "ENGLISH").build()).build())
-                .build().toBuilder().respondent1DQ(Respondent1DQ.builder()
+                .build();
+            caseData.setRespondent1DQ(Respondent1DQ.builder()
                                                        .respondent1DQHearing(Hearing.builder()
                                                                                  .hearingLength(ONE_DAY)
                                                                                  .unavailableDatesRequired(YES)
@@ -223,8 +224,7 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                                                              UnavailableDateType.SINGLE_DATE)
                                                                                          .build())))
                                                                                  .build())
-                                                       .build())
-                .build();
+                                                       .build());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 

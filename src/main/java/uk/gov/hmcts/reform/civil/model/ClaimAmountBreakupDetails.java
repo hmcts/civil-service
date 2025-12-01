@@ -5,11 +5,13 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Data
 @Builder
+@NoArgsConstructor
 public class ClaimAmountBreakupDetails {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)

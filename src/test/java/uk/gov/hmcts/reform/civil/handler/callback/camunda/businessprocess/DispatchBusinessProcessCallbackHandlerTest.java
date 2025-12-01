@@ -101,11 +101,11 @@ class DispatchBusinessProcessCallbackHandlerTest extends BaseCallbackHandlerTest
     }
 
     private BusinessProcess businessProcessWithStatus(BusinessProcessStatus status) {
-        return BusinessProcess.builder()
-            .camundaEvent("testCamundaEvent")
-            .activityId("testActivityId")
-            .processInstanceId("testProcessInstanceId")
-            .status(status)
-            .build();
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setCamundaEvent("testCamundaEvent");
+        businessProcess.setActivityId("testActivityId");
+        businessProcess.setProcessInstanceId("testProcessInstanceId");
+        businessProcess.setStatus(status);
+        return businessProcess;
     }
 }

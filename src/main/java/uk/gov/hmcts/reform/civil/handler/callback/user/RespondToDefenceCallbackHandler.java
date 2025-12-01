@@ -273,11 +273,11 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         caseData.setRespondentSharedClaimResponseDocument(null);
         if (caseData.getApplicant1DQ() != null
             && caseData.getApplicant1DQ() != null) {
-            caseData.setApplicant1DQ(caseData.getApplicant1DQ().toBuilder().applicant1DQDraftDirections(null).build());
+            caseData.getApplicant1DQ().setApplicant1DQDraftDirections(null);
         }
         if (caseData.getApplicant2DQ() != null
             && caseData.getApplicant2DQ() != null) {
-            caseData.setApplicant2DQ(caseData.getApplicant2DQ().toBuilder().applicant2DQDraftDirections(null).build());
+            caseData.getApplicant2DQ().setApplicant2DQDraftDirections(null);
         }
 
         updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
@@ -299,29 +299,24 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                                   CallbackParams callbackParams) {
         if (caseData.getApplicant1DQ() != null
             && caseData.getApplicant1DQ().getApplicant1DQFileDirectionsQuestionnaire() != null) {
-            Applicant1DQ.Applicant1DQBuilder applicant1DQBuilder = caseData.getApplicant1DQ().toBuilder();
-            applicant1DQBuilder.applicant1DQStatementOfTruth(statementOfTruth);
+            Applicant1DQ applicant1DQ = caseData.getApplicant1DQ();
+            applicant1DQ.setApplicant1DQStatementOfTruth(statementOfTruth);
 
             String responseCourtCode = locationRefDataUtil.getPreferredCourtData(
                 caseData,
                 callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(), true
             );
-            applicant1DQBuilder.applicant1DQRequestedCourt(
+            applicant1DQ.setApplicant1DQRequestedCourt(
                 RequestedCourt.builder()
                     .caseLocation(caseData.getCourtLocation().getCaseLocation())
                     .responseCourtCode(responseCourtCode)
                     .build());
-
-            caseData.setApplicant1DQ(applicant1DQBuilder.build());
         }
 
         if (caseData.getApplicant2DQ() != null
             && caseData.getApplicant2DQ().getApplicant2DQFileDirectionsQuestionnaire() != null) {
-            Applicant2DQ dq = caseData.getApplicant2DQ().toBuilder()
-                .applicant2DQStatementOfTruth(statementOfTruth)
-                .build();
-
-            caseData.setApplicant2DQ(dq);
+            Applicant2DQ applicant2DQ = caseData.getApplicant2DQ();
+            applicant2DQ.setApplicant2DQStatementOfTruth(statementOfTruth);
         }
     }
 

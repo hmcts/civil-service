@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -44,6 +45,7 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.DECISION_OUTCOME;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
@@ -64,6 +66,7 @@ public class HearingScheduledHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final Time time;
     private final HearingFeesService hearingFeesService;
+    private final FeatureToggleService  featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -88,22 +91,20 @@ public class HearingScheduledHandler extends CallbackHandler {
     // hearing notices can be retriggered i.e. relisted, in such case we clear previous selections
     private CallbackResponse clearPreviousSelections(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        caseDataBuilder
-            .hearingNoticeList(null)
-            .listingOrRelisting(null)
-            .hearingLocation(null)
-            .channel(null)
-            .hearingDate(null)
-            .hearingTimeHourMinute(null)
-            .hearingDuration(null)
-            .hearingDurationMinti(null)
-            .information(null)
-            .hearingNoticeListOther(null);
+        caseData.setHearingNoticeList(null);
+        caseData.setListingOrRelisting(null);
+        caseData.setHearingLocation(null);
+        caseData.setChannel(null);
+        caseData.setHearingDate(null);
+        caseData.setHearingTimeHourMinute(null);
+        caseData.setHearingDuration(null);
+        caseData.setHearingDurationMinti(null);
+        caseData.setInformation(null);
+        caseData.setHearingNoticeListOther(null);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
@@ -117,16 +118,14 @@ public class HearingScheduledHandler extends CallbackHandler {
 
     private CallbackResponse locationList(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
         List<LocationRefData> locations = (locationRefDataService
             .getHearingCourtLocations(authToken));
-        caseDataBuilder.hearingLocation(getLocationsFromList(locations))
-            .build();
+        caseData.setHearingLocation(getLocationsFromList(locations));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
@@ -147,10 +146,8 @@ public class HearingScheduledHandler extends CallbackHandler {
             checkTrueOrElseAddError(dateOfApplication.isBefore(time.now().toLocalDate()),
                                     "The Date must be in the past");
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .errors(errors)
             .build();
     }
@@ -170,21 +167,19 @@ public class HearingScheduledHandler extends CallbackHandler {
             errors.add("Time is required");
         }
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .errors(errors)
             .build();
     }
 
     private CallbackResponse handleAboutToSubmit(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.hearingReferenceNumber(HearingReferenceNumber.generateHearingReference());
+        caseData.setHearingReferenceNumber(HearingReferenceNumber.generateHearingReference());
         if (nonNull(caseData.getHearingLocation())) {
             DynamicList locationList = caseData.getHearingLocation();
             locationList.setListItems(null);
-            caseDataBuilder.hearingLocation(locationList);
+            caseData.setHearingLocation(locationList);
         }
 
         // Hearing fee will be different based on claim track.
@@ -196,15 +191,32 @@ public class HearingScheduledHandler extends CallbackHandler {
             claimTrack = caseData.getResponseClaimTrack();
         }
 
-        CaseState caseState = caseDataBuilder.build().getCcdState();
-        caseState = determinePostState(caseState, caseData);
-        calculateHearingFeeAndDueDate(caseDataBuilder, caseData, claimTrack);
+        CaseState caseState = caseData.getCcdState();
+        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+            caseState = determinePostState(caseState, caseData);
+            calculateHearingFeeAndDueDate(caseData, claimTrack);
+        } else {
+            // If hearing notice type if FAST or SMALL and it is a first time being listed, calculate fee and fee due date.
+            // If relisted, do not recalculate fee and fee due date, and move state to PREPARE_FOR_HEARING_CONDUCT_HEARING
+            if (!caseData.getHearingNoticeList().equals(HearingNoticeList.OTHER)) {
+                if (ListingOrRelisting.LISTING.equals(caseData.getListingOrRelisting())) {
+                    calculateHearingFeeAndDueDate(caseData, claimTrack);
+                    caseState = caseState.equals(CASE_PROGRESSION) ? HEARING_READINESS : caseState;
+                } else {
+                    caseState = caseState.equals(CASE_PROGRESSION) ? PREPARE_FOR_HEARING_CONDUCT_HEARING : caseState;
+                }
+                // If hearing notice type is OTHER and is being listed, do not calculate fee and fee due date
+                // If relisted, again do not calculate fee and fee due date, but move state to PREPARE_FOR_HEARING_CONDUCT_HEARING
+            } else if (caseData.getHearingNoticeList().equals(HearingNoticeList.OTHER)) {
+                caseState = caseState.equals(CASE_PROGRESSION) ? PREPARE_FOR_HEARING_CONDUCT_HEARING : caseState;
+            }
+        }
 
-        caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
-        caseDataBuilder.trialReadyNotified(null);
+        caseData.setBusinessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
+        caseData.setTrialReadyNotified(null);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .state(caseState.name())
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
@@ -232,16 +244,17 @@ public class HearingScheduledHandler extends CallbackHandler {
         }
     }
 
-    private void calculateHearingFeeAndDueDate(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseData caseData, String claimTrack) {
+    private void calculateHearingFeeAndDueDate(CaseData caseData, String claimTrack) {
         if (caseData.getHearingNoticeList().equals(HearingNoticeList.OTHER)) {
             return;
         }
-        if (ListingOrRelisting.RELISTING.equals(caseData.getListingOrRelisting())) {
-            caseDataBuilder.hearingDueDate(calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate()));
+        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
+            && ListingOrRelisting.RELISTING.equals(caseData.getListingOrRelisting())) {
+            caseData.setHearingDueDate(calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate()));
             return;
         }
-        caseDataBuilder.hearingDueDate(calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate()));
-        caseDataBuilder.hearingFee(calculateAndApplyFee(hearingFeesService, caseData, claimTrack));
+        caseData.setHearingDueDate(calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate()));
+        caseData.setHearingFee(calculateAndApplyFee(hearingFeesService, caseData, claimTrack));
     }
 
     private List<String> checkTrueOrElseAddError(boolean condition, String error) {
