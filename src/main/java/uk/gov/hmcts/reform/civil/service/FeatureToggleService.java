@@ -169,10 +169,6 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabledForDate("cui-query-management", epoch, false);
     }
 
-    public boolean isLrAdmissionBulkEnabled() {
-        return featureToggleApi.isFeatureEnabled("lr-admission-bulk");
-    }
-
     public boolean isCuiGaNroEnabled() {
         return featureToggleApi.isFeatureEnabled("cui-ga-nro");
     }
