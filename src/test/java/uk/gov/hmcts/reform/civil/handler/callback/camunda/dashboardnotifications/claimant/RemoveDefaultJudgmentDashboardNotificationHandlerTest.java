@@ -42,7 +42,7 @@ public class RemoveDefaultJudgmentDashboardNotificationHandlerTest extends BaseC
         @Test
         void shouldRemoveNotification_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
-            caseData = caseData.toBuilder().respondent1ResponseDeadline(LocalDateTime.MIN).build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.MIN);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(REMOVE_CLAIMANT_DJ_DASHBOARD_NOTIFICATION.name()).build()
             ).build();
@@ -59,7 +59,7 @@ public class RemoveDefaultJudgmentDashboardNotificationHandlerTest extends BaseC
         @Test
         void shouldNotRemoveNotification_IfResponseDeadlineNotPassed() {
             CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
-            caseData = caseData.toBuilder().respondent1ResponseDeadline(LocalDateTime.MAX).build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.MAX);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(REMOVE_CLAIMANT_DJ_DASHBOARD_NOTIFICATION.name()).build()
             ).build();

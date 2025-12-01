@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Mediation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -85,11 +86,10 @@ class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallbackHandler
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
-            CaseData caseData = CaseData.builder()
-                .legacyCaseReference("reference")
-                .applicant1Represented(YesOrNo.NO)
-                .ccdCaseReference(123455L)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setLegacyCaseReference("reference");
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setCcdCaseReference(123455L);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_MEDIATION_UNSUCCESSFUL.name()).build()
@@ -112,14 +112,14 @@ class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallbackHandler
 
             LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
 
-            CaseData caseData = CaseData.builder()
-                .legacyCaseReference("reference")
-                .applicant1Represented(YesOrNo.NO)
-                .ccdCaseReference(1234L)
-                .respondent1ResponseDeadline(dateTime)
-                .mediation(Mediation.builder()
-                               .mediationUnsuccessfulReasonsMultiSelect(List.of(APPOINTMENT_NO_AGREEMENT)).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setLegacyCaseReference("reference");
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setCcdCaseReference(1234L);
+            caseData.setRespondent1ResponseDeadline(dateTime);
+            Mediation mediation = new Mediation();
+            mediation.setMediationUnsuccessfulReasonsMultiSelect(List.of(APPOINTMENT_NO_AGREEMENT));
+            caseData.setMediation(mediation);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -140,16 +140,15 @@ class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallbackHandler
             scenarioParams.put("ccdCaseReference", "123");
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setLegacyCaseReference("reference");
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setCcdCaseReference(1234L);
             LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
-
-            CaseData caseData = CaseData.builder()
-                .legacyCaseReference("reference")
-                .applicant1Represented(YesOrNo.NO)
-                .ccdCaseReference(1234L)
-                .respondent1ResponseDeadline(dateTime)
-                .mediation(Mediation.builder()
-                               .mediationUnsuccessfulReasonsMultiSelect(List.of(NOT_CONTACTABLE_CLAIMANT_ONE)).build())
-                .build();
+            caseData.setRespondent1ResponseDeadline(dateTime);
+            Mediation mediation = new Mediation();
+            mediation.setMediationUnsuccessfulReasonsMultiSelect(List.of(NOT_CONTACTABLE_CLAIMANT_ONE));
+            caseData.setMediation(mediation);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
