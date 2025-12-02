@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.controllers.testingsupport.CaseAssignmentSuppor
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.List;
+import java.util.Map;
 
 @Component
 @Slf4j
@@ -51,17 +52,24 @@ public class UnassignCaseUserMigrationTask extends MigrationTask<CaseAssignmentM
     }
 
     private void validate(CaseAssignmentMigrationCaseReference caseReference) {
-        if (caseReference == null) {
-            throw new IllegalArgumentException("Case reference must not be null");
-        }
-        if (caseReference.getCaseReference() == null) {
-            throw new IllegalArgumentException("Case ID must not be null");
-        }
-        if (caseReference.getUserEmailAddress() == null || caseReference.getUserEmailAddress().isBlank()) {
-            throw new IllegalArgumentException("userEmailAddress must be provided");
-        }
-        if (caseReference.getOrganisationId() == null || caseReference.getOrganisationId().isBlank()) {
-            throw new IllegalArgumentException("organisationId must be provided");
+        ensurePresent(caseReference, "Case reference obj must not be null");
+        ensurePresent(caseReference.getCaseReference(), "Case reference must not be null");
+
+        Map<String, String> requiredFields = Map.of(
+            "userEmailAddress", caseReference.getUserEmailAddress(),
+            "organisationId", caseReference.getOrganisationId()
+        );
+
+        requiredFields.forEach((field, value) -> {
+            if (value == null || value.isBlank()) {
+                throw new IllegalArgumentException(field + " must be provided");
+            }
+        });
+    }
+
+    private void ensurePresent(Object value, String message) {
+        if (value == null) {
+            throw new IllegalArgumentException(message);
         }
     }
 }
