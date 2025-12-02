@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -209,7 +210,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         GeneralApplication result = helper
                 .setRespondentDetailsIfPresent(
                         GeneralApplication.builder().build(),
-                        getTestCaseData(CaseData.builder().build(), true, null),
+                        getTestCaseData(CaseDataBuilder.builder().build(), true, null),
                         getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
                         feesService
                 );
@@ -244,7 +245,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         assertDoesNotThrow(() -> helper
                 .setRespondentDetailsIfPresent(
                         GeneralApplication.builder().build(),
-                        getTestCaseData(CaseData.builder().build(), true, null),
+                        getTestCaseData(CaseDataBuilder.builder().build(), true, null),
                         getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
                         feesService
                 ));
@@ -617,7 +618,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         @Test
         void shouldReturnsRespondent1_Lr_Vs_Lip_Lr_Is_App() {
 
-            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, null).toBuilder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseDataBuilder.builder().build(), false, null).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                     .addApplicant2(YesOrNo.NO)
                     .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -664,7 +665,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         @Test
         void shouldReturnsApp_Lr_Vs_Lip_Lip_Is_App() {
 
-            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, null).toBuilder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseDataBuilder.builder().build(), false, null).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                     .addApplicant2(YesOrNo.NO)
                     .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -703,7 +704,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         @Test
         void shouldReturnsRespondent1_Lip_Vs_Lr_Lip_Is_App() {
 
-            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, null).toBuilder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseDataBuilder.builder().build(), false, null).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                     .addApplicant2(YesOrNo.NO)
                     .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -743,7 +744,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         @Test
         void shouldReturnsRespondent1_Lip_Vs_Lr_Lr_Is_App() {
 
-            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, null).toBuilder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseDataBuilder.builder().build(), false, null).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                     .addApplicant2(YesOrNo.NO)
                     .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -785,7 +786,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         @Test
         void shouldWork_Lip_Vs_Lip() {
-            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, null).toBuilder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseDataBuilder.builder().build(), false, null).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                     .addApplicant2(YesOrNo.NO)
                     .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -826,7 +827,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         @Test
         void shouldUrgency_Lip_Vs_Lip_at_10thDay() {
-            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, 10).toBuilder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseDataBuilder.builder().build(), false, 10).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                     .addApplicant2(YesOrNo.NO)
                     .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -871,7 +872,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         void should_Non_Urgency_Lip_Vs_Lip_At_25th() {
             LocalDate hearingDate = LocalDate.now().plusDays(25);
             CaseData.CaseDataBuilder<?, ?> caseDataBuilder =
-                getTestCaseData(CaseData.builder().build(), false, 25).toBuilder();
+                getTestCaseData(CaseDataBuilder.builder().build(), false, 25).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                 .addApplicant2(YesOrNo.NO)
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -914,7 +915,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         @Test
         void shouldNotUrgency_Lip_Vs_Lip_at_11thDay() {
-            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, 11).toBuilder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseDataBuilder.builder().build(), false, 11).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                     .addApplicant2(YesOrNo.NO)
                     .applicant1OrganisationPolicy(OrganisationPolicy.builder()

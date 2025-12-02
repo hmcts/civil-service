@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -273,11 +274,10 @@ class FeatureToggleServiceTest {
     })
     void shouldReturnCorrectValue_whenCuiQueryManagementEnabledLip(boolean toggleStat, YesOrNo applicant1Represented,
                                                                    YesOrNo respondent1Represented) {
-        CaseData caseData = CaseData.builder()
-            .applicant1Represented(applicant1Represented)
-            .respondent1Represented(respondent1Represented)
-            .submittedDate(LocalDateTime.of(LocalDate.now(), LocalTime.NOON))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setApplicant1Represented(applicant1Represented);
+        caseData.setRespondent1Represented(respondent1Represented);
+        caseData.setSubmittedDate(LocalDateTime.of(LocalDate.now(), LocalTime.NOON));
         when(featureToggleService.isLipQueryManagementEnabled(caseData)).thenReturn(toggleStat);
 
         assertThat(featureToggleService.isPublicQueryManagementEnabled(caseData)).isEqualTo(toggleStat);
