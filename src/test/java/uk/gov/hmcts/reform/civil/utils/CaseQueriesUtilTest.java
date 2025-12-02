@@ -315,75 +315,75 @@ class CaseQueriesUtilTest {
     void shouldUpdateApplicantSolicitorQueries_WhenRoleIsApplicantSolicitor() {
         List<String> roles = List.of("APPLICANTSOLICITORONE");
         MultiPartyScenario scenario = MultiPartyScenario.ONE_V_ONE;
-        CaseData.CaseDataBuilder builder = CaseData.builder()
-            .qmApplicantSolicitorQueries(CaseQueriesCollection.builder().partyName("Old Name").build());
+        CaseData caseData = CaseData.builder()
+            .qmApplicantSolicitorQueries(CaseQueriesCollection.builder().partyName("Old Name").build())
+            .build();
 
-        CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, builder);
-        CaseData updatedCaseData = builder.build();
+        CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, caseData);
 
-        assertEquals("Claimant", updatedCaseData.getQmApplicantSolicitorQueries().getPartyName());
+        assertEquals("Claimant", caseData.getQmApplicantSolicitorQueries().getPartyName());
     }
 
     @Test
     void shouldUpdateRespondentSolicitor1Queries_WhenRoleIsRespondentSolicitor1() {
         List<String> roles = List.of("RESPONDENTSOLICITORONE");
         MultiPartyScenario scenario = MultiPartyScenario.ONE_V_ONE;
-        CaseData.CaseDataBuilder builder = CaseData.builder()
-            .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Old Name").build());
+        CaseData caseData = CaseData.builder()
+            .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Old Name").build())
+            .build();
 
-        CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, builder);
-        CaseData updatedCaseData = builder.build();
+        CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, caseData);
 
-        assertEquals("Defendant", updatedCaseData.getQmRespondentSolicitor1Queries().getPartyName());
+        assertEquals("Defendant", caseData.getQmRespondentSolicitor1Queries().getPartyName());
     }
 
     @Test
     void shouldUpdateRespondentSolicitor1Queries_WhenRoleIsRespondentSolicitor1_1v2Diff() {
         List<String> roles = List.of("RESPONDENTSOLICITORONE");
         MultiPartyScenario scenario = MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
-        CaseData.CaseDataBuilder builder = CaseData.builder()
-            .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Old Name").build());
+        CaseData caseData = CaseData.builder()
+            .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Old Name").build())
+            .build();
 
-        CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, builder);
-        CaseData updatedCaseData = builder.build();
+        CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, caseData);
 
-        assertEquals("Defendant 1", updatedCaseData.getQmRespondentSolicitor1Queries().getPartyName());
+        assertEquals("Defendant 1", caseData.getQmRespondentSolicitor1Queries().getPartyName());
     }
 
     @Test
     void shouldUpdateRespondentSolicitor2Queries_WhenRoleIsRespondentSolicitor2() {
         List<String> roles = List.of("RESPONDENTSOLICITORTWO");
         MultiPartyScenario scenario = MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
-        CaseData.CaseDataBuilder builder = CaseData.builder()
-            .qmRespondentSolicitor2Queries(CaseQueriesCollection.builder().partyName("Old Name").build());
+        CaseData caseData = CaseData.builder()
+            .qmRespondentSolicitor2Queries(CaseQueriesCollection.builder().partyName("Old Name").build())
+            .build();
 
-        CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, builder);
-        CaseData updatedCaseData = builder.build();
+        CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, caseData);
 
-        assertEquals("Defendant 2", updatedCaseData.getQmRespondentSolicitor2Queries().getPartyName());
+        assertEquals("Defendant 2", caseData.getQmRespondentSolicitor2Queries().getPartyName());
     }
 
     @Test
     void shouldUpdateRespondentSolicitor1Queries_WhenRoleIsRespondentSolicitor1_1v2Same() {
         List<String> roles = List.of("RESPONDENTSOLICITORONE");
         MultiPartyScenario scenario = MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
-        CaseData.CaseDataBuilder builder = CaseData.builder()
-            .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Old Name").build());
+        CaseData caseData = CaseData.builder()
+            .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Old Name").build())
+            .build();
 
-        CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, builder);
-        CaseData updatedCaseData = builder.build();
+        CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, caseData);
 
-        assertEquals("Defendant", updatedCaseData.getQmRespondentSolicitor1Queries().getPartyName());
+        assertEquals("Defendant", caseData.getQmRespondentSolicitor1Queries().getPartyName());
     }
 
     @Test
     void shouldThrowException_WhenRoleIsUnsupported() {
         List<String> roles = List.of("UNSUPPORTEDROLE");
         MultiPartyScenario scenario = MultiPartyScenario.ONE_V_ONE;
-        CaseData.CaseDataBuilder builder = CaseData.builder();
+        CaseData caseData = CaseData.builder().build();
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-            CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, builder)
+            CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, caseData)
         );
 
         assertEquals("Unsupported case role for query management.", exception.getMessage());
