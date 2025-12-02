@@ -32,16 +32,18 @@ public class DirectionsQuestionnairePreparer {
 
     public CaseData prepareDirectionsQuestionnaire(CaseData caseData, String userToken) {
         MultiPartyScenario scenario = MultiPartyScenario.getMultiPartyScenario(caseData);
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (!SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             || uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionsQuestionnaireGenerator.isClaimantResponse(caseData)
             || scenario == MultiPartyScenario.ONE_V_ONE
             || scenario == MultiPartyScenario.TWO_V_ONE) {
             singleResponseFile(
                 userToken,
-                caseData
+                caseData,
+                caseDataBuilder
             );
         } else if (respondent2HasSameLegalRep(caseData)) {
-            prepareDQForSameLegalRepScenario(caseData, userToken);
+            prepareDQForSameLegalRepScenario(caseData, userToken, caseDataBuilder);
         } else {
             /*
             for MultiParty, when there is a single respondent, this block is executed (when only one respondent
@@ -65,7 +67,7 @@ public class DirectionsQuestionnairePreparer {
                     "ONE"
                 ).ifPresent(document -> {
                     updatedDocuments.add(element(document));
-                    caseData.setRespondent1DocumentURL(document.getDocumentLink().getDocumentUrl());
+                    caseDataBuilder.respondent1DocumentURL(document.getDocumentLink().getDocumentUrl());
                     assignCategoryId.assignCategoryIdToCaseDocument(document, DocCategory.DQ_DEF1.getValue());
                 });
             }
@@ -83,17 +85,19 @@ public class DirectionsQuestionnairePreparer {
                     "TWO"
                 ).ifPresent(document -> {
                     updatedDocuments.add(element(document));
-                    caseData.setRespondent2DocumentURL(document.getDocumentLink().getDocumentUrl());
+                    caseDataBuilder.respondent2DocumentURL(document.getDocumentLink().getDocumentUrl());
                     assignCategoryId.assignCategoryIdToCaseDocument(document, DocCategory.DQ_DEF2.getValue());
                 });
             }
 
-            caseData.setSystemGeneratedCaseDocuments(updatedDocuments);
+            caseDataBuilder.systemGeneratedCaseDocuments(updatedDocuments);
         }
-        return caseData;
+        return caseDataBuilder.build();
     }
 
-    private void prepareDQForSameLegalRepScenario(CaseData caseData, String userToken) {
+    private void prepareDQForSameLegalRepScenario(
+        CaseData caseData, String userToken,
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         if (caseData.getRespondentResponseIsSame() == NO) {
             if (caseData.getRespondent1DQ() != null
                 && caseData.getRespondent1ClaimResponseTypeForSpec() != null
@@ -111,7 +115,8 @@ public class DirectionsQuestionnairePreparer {
         } else {
             singleResponseFile(
                 userToken,
-                caseData
+                caseData,
+                caseDataBuilder
             );
         }
     }
@@ -127,10 +132,12 @@ public class DirectionsQuestionnairePreparer {
         List<Element<CaseDocument>> systemGeneratedCaseDocuments =
             caseData.getSystemGeneratedCaseDocuments();
         systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
-        caseData.setSystemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
     }
 
-    private void singleResponseFile(String bearerToken, CaseData caseData) {
+    private void singleResponseFile(String bearerToken, CaseData caseData,
+                                    CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
 
         if (featureToggleService.isWelshEnabledForMainCase() && caseData.isLRvLipOneVOne()
             && caseData.isRespondentResponseBilingual()
@@ -171,11 +178,11 @@ public class DirectionsQuestionnairePreparer {
             if (featureToggleService.isWelshEnabledForMainCase() && caseData.isLipvLROneVOne()
                 && caseData.isClaimantBilingual()
                 && CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.equals(caseData.getCcdState())) {
-                caseData.setRespondent1OriginalDqDoc(directionsQuestionnaire);
+                caseDataBuilder.respondent1OriginalDqDoc(directionsQuestionnaire);
             } else {
                 List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
                 systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
-                caseData.setSystemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
+                caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
             }
             if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
                 if (directionsQuestionnaire.getDocumentName().contains(claimant)) {

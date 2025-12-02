@@ -31,10 +31,6 @@ class JudgementServiceTest {
     @ParameterizedTest
     @EnumSource(RespondentResponsePartAdmissionPaymentTimeLRspec.class)
     void ccjJudgementSubTotal(RespondentResponsePartAdmissionPaymentTimeLRspec selection) {
-        HelpWithFeesDetails hearingHwfDetails = new HelpWithFeesDetails();
-        hearingHwfDetails.setOutstandingFeeInPounds(new BigDecimal(255));
-        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
-        ccjPaymentDetails.setCcjJudgmentFixedCostOption(YesOrNo.NO);
         CaseData mockData = CaseDataBuilder.builder()
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
@@ -42,10 +38,10 @@ class JudgementServiceTest {
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(selection)
             .hwfFeeType(FeeType.HEARING)
+            .hearingHwfDetails(HelpWithFeesDetails.builder().outstandingFeeInPounds(new BigDecimal(255)).build())
             .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(550))
+            .ccjPaymentDetails(CCJPaymentDetails.builder().ccjJudgmentFixedCostOption(YesOrNo.NO).build())
             .build();
-        mockData.setHearingHwfDetails(hearingHwfDetails);
-        mockData.setCcjPaymentDetails(ccjPaymentDetails);
         BigDecimal expected = new BigDecimal(805).setScale(2, RoundingMode.UNNECESSARY);
         assertEquals(expected, judgementService.ccjJudgementSubTotal(mockData));
     }

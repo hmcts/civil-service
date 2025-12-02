@@ -844,18 +844,25 @@ class SendAndReplyMessageServiceTest {
         void shouldCreateMessageSelectionList_withCorrectFormat() {
             DynamicList result = messageService.createMessageSelectionList(messages);
 
-            DynamicListElement element1 = new DynamicListElement();
-            element1.setCode(message1.getId().toString());
-            element1.setLabel(String.format("%s, 14 Nov 2024, 10:30:00 AM", message1.getValue().getSubject()));
-
-            DynamicListElement element2 = new DynamicListElement();
-            element2.setCode(message2.getId().toString());
-            element2.setLabel(String.format("%s, 14 Nov 2024, 12:45:00 PM", message2.getValue().getSubject()));
-
-            DynamicList expected = new DynamicList();
-            expected.setListItems(List.of(element1, element2));
-
-            assertEquals(expected, result);
+            assertEquals(DynamicList.builder()
+                             .listItems(List.of(
+                                 DynamicListElement.builder()
+                                     .code(message1.getId().toString())
+                                     .label(
+                                         String.format(
+                                             "%s, 14 Nov 2024, 10:30:00 AM",
+                                             message1.getValue().getSubject()
+                                         ))
+                                     .build(),
+                                 DynamicListElement.builder()
+                                     .code(message2.getId().toString())
+                                     .label(String.format(
+                                         "%s, 14 Nov 2024, 12:45:00 PM",
+                                         message2.getValue().getSubject()
+                                     ))
+                                     .build()
+                             ))
+                             .build(), result);
         }
 
         @Test

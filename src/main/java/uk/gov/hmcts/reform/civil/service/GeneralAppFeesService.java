@@ -36,13 +36,8 @@ public class GeneralAppFeesService {
     private final FeesApiClient feesApiClient;
     private final GeneralAppFeesConfiguration feesConfiguration;
     public static final String FREE_REF = "FREE";
-    private static final Fee FREE_FEE;
-    static {
-        FREE_FEE = new Fee();
-        FREE_FEE.setCalculatedAmountInPence(BigDecimal.ZERO);
-        FREE_FEE.setCode(FREE_REF);
-        FREE_FEE.setVersion("1");
-    }
+    private static final Fee FREE_FEE = Fee.builder()
+        .calculatedAmountInPence(BigDecimal.ZERO).code(FREE_REF).version("1").build();
     private static final String MISCELLANEOUS = "miscellaneous";
     private static final String OTHER = "other";
 
@@ -92,8 +87,7 @@ public class GeneralAppFeesService {
     }
 
     private Fee getFeeForGA(List<GeneralApplicationTypes> types, Boolean respondentAgreed, Boolean informOtherParty, LocalDate hearingScheduledDate) {
-        Fee result = new Fee();
-        result.setCalculatedAmountInPence(BigDecimal.valueOf(Integer.MAX_VALUE));
+        Fee result = Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(Integer.MAX_VALUE)).build();
         int typeSize = types.size();
         if (CollectionUtils.containsAny(types, VARY_TYPES)) {
             //only minus 1 as VARY_PAYMENT_TERMS_OF_JUDGMENT can't be multi selected
@@ -202,11 +196,11 @@ public class GeneralAppFeesService {
             .multiply(PENCE_PER_POUND)
             .setScale(0, RoundingMode.UNNECESSARY);
 
-        Fee fee = new Fee();
-        fee.setCalculatedAmountInPence(calculatedAmount);
-        fee.setCode(feeLookupResponseDto.getCode());
-        fee.setVersion(feeLookupResponseDto.getVersion().toString());
-        return fee;
+        return Fee.builder()
+            .calculatedAmountInPence(calculatedAmount)
+            .code(feeLookupResponseDto.getCode())
+            .version(feeLookupResponseDto.getVersion().toString())
+            .build();
     }
 
     protected Boolean getRespondentAgreed(CaseData caseData) {

@@ -87,17 +87,14 @@ class FeesPaymentServiceTest {
 
     @BeforeEach
     void before() {
-        Fee hearingFee = new Fee();
-        hearingFee.setCalculatedAmountInPence(new BigDecimal("23212"));
-
-        SRPbaDetails hearingFeePBADetails = new SRPbaDetails();
-        hearingFeePBADetails.setServiceReqReference("2023-1701090705688");
-        hearingFeePBADetails.setFee(hearingFee);
-
         CaseDetails expectedCaseDetails = CaseDetails.builder().id(1701090368574910L)
             .data(Map.of(
-                "hearingFeePBADetails", hearingFeePBADetails,
-                "hearingFee", hearingFee
+                "hearingFeePBADetails",
+                SRPbaDetails.builder().serviceReqReference("2023-1701090705688")
+                    .fee(Fee.builder().calculatedAmountInPence(new BigDecimal("23212")).build())
+                    .build(),
+                "hearingFee",
+                Fee.builder().calculatedAmountInPence(new BigDecimal("23212")).build()
             )).build();
 
         when(coreCaseDataService.getCase(1701090368574910L)).thenReturn(expectedCaseDetails);
@@ -127,11 +124,10 @@ class FeesPaymentServiceTest {
     @Test
     @SneakyThrows
     void shouldNotCreateGovPayPaymentUrlForMissingHearingFeePbaDetails() {
-        Fee hearingFee = new Fee();
-        hearingFee.setCalculatedAmountInPence(new BigDecimal("23200"));
         CaseDetails expectedCaseDetails = CaseDetails.builder().id(1701090368574910L)
             .data(Map.of(
-                "hearingFee", hearingFee
+                "hearingFee",
+                Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build()
             )).build();
 
         when(coreCaseDataService.getCase(1701090368574910L)).thenReturn(expectedCaseDetails);
@@ -147,13 +143,12 @@ class FeesPaymentServiceTest {
     @Test
     @SneakyThrows
     void shouldNotCreateGovPayPaymentUrlForMissingHearingFeeServiceRequest() {
-        Fee hearingFee = new Fee();
-        hearingFee.setCalculatedAmountInPence(new BigDecimal("23200"));
-        SRPbaDetails hearingFeePBADetails = new SRPbaDetails();
         CaseDetails expectedCaseDetails = CaseDetails.builder().id(1701090368574910L)
             .data(Map.of(
-                "hearingFeePBADetails", hearingFeePBADetails,
-                "hearingFee", hearingFee
+                "hearingFeePBADetails",
+                SRPbaDetails.builder().build(),
+                "hearingFee",
+                Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build()
             )).build();
 
         when(coreCaseDataService.getCase(1701090368574910L)).thenReturn(expectedCaseDetails);
@@ -336,18 +331,20 @@ class FeesPaymentServiceTest {
     }
 
     private CardPaymentStatusResponse expectedResponse(String status) {
-        CardPaymentStatusResponse.CardPaymentStatusResponseBuilder builder = CardPaymentStatusResponse.builder()
+        CardPaymentStatusResponse.CardPaymentStatusResponseBuilder payment
+            = CardPaymentStatusResponse.builder()
             .paymentReference("RC-1701-0909-0602-0418")
             .status(status)
             .paymentAmount(new BigDecimal(200))
-            .paymentFor("hearing");
+            .paymentFor("hearing")
+            .status(status);
 
         if (status.equals("Failed")) {
-            builder.errorCode("P0030");
-            builder.errorDescription("Payment was cancelled by the user");
+            payment.errorCode("P0030")
+                .errorDescription("Payment was cancelled by the user");
         }
 
-        return builder.build();
+        return payment.build();
     }
 
     private CardPaymentServiceRequestResponse buildServiceRequestResponse() {

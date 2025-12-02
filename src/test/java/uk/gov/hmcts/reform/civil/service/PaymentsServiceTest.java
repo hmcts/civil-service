@@ -107,9 +107,10 @@ class PaymentsServiceTest {
     void validateRequestShouldThrowAnError_whenFeeDetailsNotProvided() {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setClaimIssuedPBADetails(new SRPbaDetails());
-        caseData.setApplicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build());
+        CaseData caseData = CaseData.builder()
+            .claimIssuedPBADetails(SRPbaDetails.builder().build())
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .build();
 
         Exception exception = assertThrows(
             InvalidPaymentRequestException.class,
@@ -122,10 +123,11 @@ class PaymentsServiceTest {
     void validateRequestShouldThrowAnError_whenFeeDetailsNotProvided_withSpecAllocatedTrack() {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setResponseClaimTrack(FAST_CLAIM.name());
-        caseData.setClaimIssuedPBADetails(new SRPbaDetails());
-        caseData.setApplicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build());
+        CaseData caseData = CaseData.builder()
+            .responseClaimTrack(FAST_CLAIM.name())
+            .claimIssuedPBADetails(SRPbaDetails.builder().build())
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .build();
 
         Exception exception = assertThrows(
             InvalidPaymentRequestException.class,
@@ -138,14 +140,15 @@ class PaymentsServiceTest {
     void validateRequestShouldThrowAnError_whenFeeDetailsDoNotHaveFeeCode() {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
-        Fee fee = new Fee();
-        fee.setCalculatedAmountInPence(BigDecimal.valueOf(10800));
-        fee.setVersion("1");
-        SRPbaDetails claimIssuedPBADetails = new SRPbaDetails();
-        claimIssuedPBADetails.setFee(fee);
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setClaimIssuedPBADetails(claimIssuedPBADetails);
-        caseData.setApplicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build());
+        CaseData caseData = CaseData.builder()
+            .claimIssuedPBADetails(SRPbaDetails.builder()
+                                      .fee(Fee.builder()
+                                               .calculatedAmountInPence(BigDecimal.valueOf(10800))
+                                               .version("1")
+                                               .build())
+                                      .build())
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .build();
 
         Exception exception = assertThrows(
             InvalidPaymentRequestException.class,
@@ -158,14 +161,15 @@ class PaymentsServiceTest {
     void validateRequestShouldThrowAnError_whenFeeDetailsDoNotHaveFeeAmount() {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
-        Fee fee = new Fee();
-        fee.setCode("FEE0442");
-        fee.setVersion("1");
-        SRPbaDetails claimIssuedPBADetails = new SRPbaDetails();
-        claimIssuedPBADetails.setFee(fee);
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setClaimIssuedPBADetails(claimIssuedPBADetails);
-        caseData.setApplicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build());
+        CaseData caseData = CaseData.builder()
+            .claimIssuedPBADetails(SRPbaDetails.builder()
+                                      .fee(Fee.builder()
+                                               .code("FEE0442")
+                                               .version("1")
+                                               .build())
+                                      .build())
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .build();
 
         Exception exception = assertThrows(
             InvalidPaymentRequestException.class,
@@ -178,20 +182,21 @@ class PaymentsServiceTest {
     void shouldCreateCreditAccountPayment_whenValidCaseDetails() {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
                 .organisationID("OrgId").build();
-        DynamicListElement dynamicListElement = new DynamicListElement();
-        dynamicListElement.setLabel("account-no");
-        DynamicList applicantsPbaAccounts = new DynamicList();
-        applicantsPbaAccounts.setValue(dynamicListElement);
-        SRPbaDetails hfPbaDetails = new SRPbaDetails();
-        hfPbaDetails.setServiceReqReference("request-reference");
-        hfPbaDetails.setApplicantsPbaAccounts(applicantsPbaAccounts);
-
+        SRPbaDetails hfPbaDetails = SRPbaDetails.builder()
+                .serviceReqReference("request-reference")
+                .applicantsPbaAccounts(DynamicList.builder()
+                                           .value(DynamicListElement
+                                                      .builder().label("account-no")
+                                                      .build()
+                                           ).build()
+            )
+                .build();
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
                 .build();
-        caseData.setCaseAccessCategory(SPEC_CLAIM);
-        caseData.setClaimIssuedPBADetails(hfPbaDetails);
+        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
 
+        caseData = caseData.toBuilder().claimIssuedPBADetails(hfPbaDetails).build();
         PBAServiceRequestResponse paymentResponse = paymentsService
                 .createPbaPayment(caseData, AUTH_TOKEN);
 

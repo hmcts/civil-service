@@ -64,14 +64,14 @@ class PaymentRequestUpdateCallbackServiceTest {
     private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     private CaseData buildCaseData(CaseState state, BusinessProcessStatus businessProcessStatus, String camundaEvent, PaymentDetails paymentDetails) {
-        CaseData caseData = CaseDataBuilder.builder().receiveUpdatePaymentRequest().build();
-        caseData.setCcdState(state);
-        BusinessProcess businessProcess = new BusinessProcess();
-        businessProcess.setStatus(businessProcessStatus);
-        businessProcess.setCamundaEvent(camundaEvent);
-        caseData.setBusinessProcess(businessProcess);
-        caseData.setHearingFeePaymentDetails(paymentDetails);
-        return caseData;
+        return CaseDataBuilder.builder().receiveUpdatePaymentRequest().build().toBuilder()
+                .ccdState(state)
+                .businessProcess(BusinessProcess.builder()
+                        .status(businessProcessStatus)
+                        .camundaEvent(camundaEvent)
+                        .build())
+                .hearingFeePaymentDetails(paymentDetails)
+                .build();
     }
 
     private CaseDetails buildCaseDetails(CaseData caseData) {
@@ -126,11 +126,10 @@ class PaymentRequestUpdateCallbackServiceTest {
 
     @Test
     void shouldStartAndSubmitEventWithCaseDetailsForHearingAndPreviousFail() {
-        CaseData caseData = buildCaseData(CaseState.PENDING_CASE_ISSUED, null, null, null);
-        PaymentDetails claimIssuedPaymentDetails = new PaymentDetails();
-        claimIssuedPaymentDetails.setStatus(PaymentStatus.FAILED);
-        caseData.setClaimIssuedPaymentDetails(claimIssuedPaymentDetails);
-        caseData.setCaseAccessCategory(SPEC_CLAIM);
+        CaseData caseData = buildCaseData(CaseState.PENDING_CASE_ISSUED, null, null, null).toBuilder()
+                .claimIssuedPaymentDetails(PaymentDetails.builder().status(PaymentStatus.FAILED).build())
+                .caseAccessCategory(SPEC_CLAIM)
+                .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
@@ -150,8 +149,9 @@ class PaymentRequestUpdateCallbackServiceTest {
 
     @Test
     void shouldStartAndSubmitEventWithCaseDetailsForClaimIssued() {
-        CaseData caseData = buildCaseData(CaseState.PENDING_CASE_ISSUED, null, null, null);
-        caseData.setCaseAccessCategory(SPEC_CLAIM);
+        CaseData caseData = buildCaseData(CaseState.PENDING_CASE_ISSUED, null, null, null).toBuilder()
+                .caseAccessCategory(SPEC_CLAIM)
+                .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
@@ -171,11 +171,14 @@ class PaymentRequestUpdateCallbackServiceTest {
 
     @Test
     void shouldProceed_WhenAdditionalPaymentExist_WithPaymentFailForClaimIssued() {
-        PaymentDetails paymentDetails = new PaymentDetails();
-        paymentDetails.setStatus(PaymentStatus.FAILED);
-        paymentDetails.setReference(REFERENCE);
-        CaseData caseData = buildCaseData(CaseState.PENDING_CASE_ISSUED, null, null, paymentDetails);
-        caseData.setCaseAccessCategory(SPEC_CLAIM);
+        PaymentDetails paymentDetails = PaymentDetails.builder()
+                .status(PaymentStatus.FAILED)
+                .reference(REFERENCE)
+                .build();
+        CaseData caseData = buildCaseData(CaseState.PENDING_CASE_ISSUED, null, null, paymentDetails)
+                .toBuilder()
+                .caseAccessCategory(SPEC_CLAIM)
+                .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
@@ -195,9 +198,11 @@ class PaymentRequestUpdateCallbackServiceTest {
 
     @Test
     void shouldNotCallUpdatePaymentStatus_WhenLRvLR() {
-        CaseData caseData = buildCaseData(CaseState.CASE_PROGRESSION, BusinessProcessStatus.READY, BUSINESS_PROCESS, null);
-        caseData.setApplicant1Represented(YesOrNo.YES);
-        caseData.setRespondent1Represented(YesOrNo.YES);
+        CaseData caseData = buildCaseData(CaseState.CASE_PROGRESSION, BusinessProcessStatus.READY, BUSINESS_PROCESS, null)
+                .toBuilder()
+                .applicant1Represented(YesOrNo.YES)
+                .respondent1Represented(YesOrNo.YES)
+                .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
@@ -235,9 +240,11 @@ class PaymentRequestUpdateCallbackServiceTest {
 
     @Test
     void shouldPersistCustomerReferenceFromCallback() {
-        CaseData caseData = buildCaseData(CaseState.CASE_PROGRESSION, BusinessProcessStatus.READY, BUSINESS_PROCESS, null);
-        caseData.setApplicant1Represented(YesOrNo.YES);
-        caseData.setRespondent1Represented(YesOrNo.YES);
+        CaseData caseData = buildCaseData(CaseState.CASE_PROGRESSION, BusinessProcessStatus.READY, BUSINESS_PROCESS, null)
+                .toBuilder()
+                .applicant1Represented(YesOrNo.YES)
+                .respondent1Represented(YesOrNo.YES)
+                .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
@@ -261,14 +268,16 @@ class PaymentRequestUpdateCallbackServiceTest {
     @Test
     void shouldSubmitCitizenHearingFeePaymentEventIfFeeTypeIsHearing() {
         CaseData caseData = CaseDataBuilder.builder().receiveUpdatePaymentRequest().build();
-        caseData.setCcdState(CaseState.CASE_PROGRESSION);
-        BusinessProcess businessProcess = new BusinessProcess();
-        businessProcess.setStatus(BusinessProcessStatus.READY);
-        businessProcess.setCamundaEvent(BUSINESS_PROCESS);
-        caseData.setBusinessProcess(businessProcess);
-        caseData.setApplicant1Represented(YesOrNo.NO);
-        caseData.setRespondent1Represented(YesOrNo.NO);
-        caseData.setHearingFeePaymentDetails(null);
+        caseData = caseData.toBuilder()
+                .ccdState(CaseState.CASE_PROGRESSION)
+                .businessProcess(BusinessProcess.builder()
+                        .status(BusinessProcessStatus.READY)
+                        .camundaEvent(BUSINESS_PROCESS)
+                        .build())
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
+                .hearingFeePaymentDetails(null)
+                .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
@@ -289,14 +298,16 @@ class PaymentRequestUpdateCallbackServiceTest {
     @Test
     void shouldSubmitCitizenClaimIssuedFeePaymentEventIfFeeTypeIsClaimIssued() {
         CaseData caseData = CaseDataBuilder.builder().receiveUpdatePaymentRequest().build();
-        caseData.setCcdState(CaseState.CASE_PROGRESSION);
-        BusinessProcess businessProcess = new BusinessProcess();
-        businessProcess.setStatus(BusinessProcessStatus.READY);
-        businessProcess.setCamundaEvent(BUSINESS_PROCESS);
-        caseData.setBusinessProcess(businessProcess);
-        caseData.setApplicant1Represented(YesOrNo.NO);
-        caseData.setRespondent1Represented(YesOrNo.NO);
-        caseData.setHearingFeePaymentDetails(null);
+        caseData = caseData.toBuilder()
+                .ccdState(CaseState.CASE_PROGRESSION)
+                .businessProcess(BusinessProcess.builder()
+                        .status(BusinessProcessStatus.READY)
+                        .camundaEvent(BUSINESS_PROCESS)
+                        .build())
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
+                .hearingFeePaymentDetails(null)
+                .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
@@ -328,19 +339,21 @@ class PaymentRequestUpdateCallbackServiceTest {
 
     @Test
     void shouldRetainExistingCustomerReferenceWhenUpdatingWithCardPaymentStatusResponse() {
-        PaymentDetails existingDetails = new PaymentDetails();
-        existingDetails.setCustomerReference("EXISTING-REF");
-        existingDetails.setStatus(PaymentStatus.FAILED);
+        PaymentDetails existingDetails = PaymentDetails.builder()
+                .customerReference("EXISTING-REF")
+                .status(PaymentStatus.FAILED)
+                .build();
 
-        CaseData caseData = CaseDataBuilder.builder().receiveUpdatePaymentRequest().build();
-        caseData.setCcdState(CaseState.CASE_PROGRESSION);
-        BusinessProcess businessProcess = new BusinessProcess();
-        businessProcess.setStatus(BusinessProcessStatus.READY);
-        businessProcess.setCamundaEvent(BUSINESS_PROCESS);
-        caseData.setBusinessProcess(businessProcess);
-        caseData.setApplicant1Represented(YesOrNo.NO);
-        caseData.setRespondent1Represented(YesOrNo.NO);
-        caseData.setHearingFeePaymentDetails(existingDetails);
+        CaseData caseData = CaseDataBuilder.builder().receiveUpdatePaymentRequest().build().toBuilder()
+                .ccdState(CaseState.CASE_PROGRESSION)
+                .businessProcess(BusinessProcess.builder()
+                        .status(BusinessProcessStatus.READY)
+                        .camundaEvent(BUSINESS_PROCESS)
+                        .build())
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
+                .hearingFeePaymentDetails(existingDetails)
+                .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);

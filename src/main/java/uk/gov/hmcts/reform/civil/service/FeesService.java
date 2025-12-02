@@ -43,11 +43,11 @@ public class FeesService {
             .multiply(PENCE_PER_POUND)
             .setScale(0, RoundingMode.UNNECESSARY);
 
-        Fee fee = new Fee();
-        fee.setCalculatedAmountInPence(calculatedAmount);
-        fee.setCode(feeLookupResponseDto.getCode());
-        fee.setVersion(feeLookupResponseDto.getVersion().toString());
-        return fee;
+        return Fee.builder()
+            .calculatedAmountInPence(calculatedAmount)
+            .code(feeLookupResponseDto.getCode())
+            .version(feeLookupResponseDto.getVersion().toString())
+            .build();
     }
 
     //calculate fee for specified claim total amount

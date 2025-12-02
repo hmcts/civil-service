@@ -33,20 +33,20 @@ public class JudgementService {
     private final InterestCalculator interestCalculator;
 
     public CCJPaymentDetails buildJudgmentAmountSummaryDetails(CaseData caseData) {
-        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
-        ccjPaymentDetails.setCcjJudgmentAmountClaimAmount(ccjJudgmentClaimAmount(caseData));
-        ccjPaymentDetails.setCcjJudgmentAmountClaimFee(ccjJudgmentClaimFee(caseData));
-        ccjPaymentDetails.setCcjJudgmentSummarySubtotalAmount(ccjJudgementSubTotal(caseData));
-        ccjPaymentDetails.setCcjJudgmentTotalStillOwed(ccjJudgmentFinalTotal(caseData));
-        ccjPaymentDetails.setCcjJudgmentAmountInterestToDate(ccjJudgmentInterest(caseData));
-        ccjPaymentDetails.setCcjPaymentPaidSomeAmount(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount());
-        ccjPaymentDetails.setCcjPaymentPaidSomeAmountInPounds(ccjJudgmentPaidAmount(caseData));
-        ccjPaymentDetails.setCcjJudgmentFixedCostAmount(ccjJudgmentFixedCost(caseData));
-        ccjPaymentDetails.setCcjJudgmentFixedCostOption(checkFixedCostOption(caseData));
-        ccjPaymentDetails.setCcjJudgmentStatement(ccjJudgmentStatement(caseData));
-        ccjPaymentDetails.setCcjPaymentPaidSomeOption(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption());
-        ccjPaymentDetails.setCcjJudgmentLipInterest(caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest());
-        return ccjPaymentDetails;
+        return CCJPaymentDetails.builder()
+            .ccjJudgmentAmountClaimAmount(ccjJudgmentClaimAmount(caseData))
+            .ccjJudgmentAmountClaimFee(ccjJudgmentClaimFee(caseData))
+            .ccjJudgmentSummarySubtotalAmount(ccjJudgementSubTotal(caseData))
+            .ccjJudgmentTotalStillOwed(ccjJudgmentFinalTotal(caseData))
+            .ccjJudgmentAmountInterestToDate(ccjJudgmentInterest(caseData))
+            .ccjPaymentPaidSomeAmount(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount())
+            .ccjPaymentPaidSomeAmountInPounds(ccjJudgmentPaidAmount(caseData))
+            .ccjJudgmentFixedCostAmount(ccjJudgmentFixedCost(caseData))
+            .ccjJudgmentFixedCostOption(checkFixedCostOption(caseData))
+            .ccjJudgmentStatement(ccjJudgmentStatement(caseData))
+            .ccjPaymentPaidSomeOption(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption())
+            .ccjJudgmentLipInterest(caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest())
+            .build();
     }
 
     public List<String> validateAmountPaid(CaseData caseData) {

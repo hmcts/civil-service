@@ -88,14 +88,11 @@ public class FeesPaymentService {
             Arrays.stream(cardPaymentDetails.getStatusHistories())
                     .filter(h -> h.getStatus().equals(paymentStatus))
                     .findFirst()
-                    .ifPresent(h -> response
-                        .errorCode(h.getErrorCode())
-                        .errorDescription(h.getErrorMessage()));
+                    .ifPresent(h -> response.errorCode(h.getErrorCode()).errorDescription(h.getErrorMessage()));
         }
 
-        CardPaymentStatusResponse builtResponse = response.build();
         try {
-            paymentRequestUpdateCallbackService.updatePaymentStatus(feeType, caseReference, builtResponse);
+            paymentRequestUpdateCallbackService.updatePaymentStatus(feeType, caseReference, response.build());
 
         } catch (Exception e) {
             log.error(
@@ -107,6 +104,6 @@ public class FeesPaymentService {
             );
         }
 
-        return builtResponse;
+        return response.build();
     }
 }

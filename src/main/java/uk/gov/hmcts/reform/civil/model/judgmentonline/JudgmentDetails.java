@@ -4,11 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Accessors(chain = true)
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor

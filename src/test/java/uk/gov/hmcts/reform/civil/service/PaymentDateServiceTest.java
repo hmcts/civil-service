@@ -7,7 +7,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
@@ -34,10 +33,13 @@ public class PaymentDateServiceTest {
     void shouldGetWhenWillThisAmountBePaid_whenWhenWillThisAmountBePaidArePresent() {
         //Given
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
-        RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = new RespondToClaimAdmitPartLRspec();
-        respondToClaimAdmitPartLRspec.setWhenWillThisAmountBePaid(whenWillPay);
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setRespondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec);
+        CaseData caseData = CaseData.builder()
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
+            )
+            .build();
         //When
         Optional<LocalDate> payDate = paymentDateService.getPaymentDate(caseData);
         //Then
@@ -48,10 +50,11 @@ public class PaymentDateServiceTest {
     void shouldGetWhenWasThisAmountPaid_whenWhenWasThisAmountPaidArePresent() {
         //Given
         LocalDate whenWasPaid = LocalDate.now().plusDays(-5);
-        RespondToClaim respondToClaim = new RespondToClaim();
-        respondToClaim.setWhenWasThisAmountPaid(whenWasPaid);
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setRespondToAdmittedClaim(respondToClaim);
+        CaseData caseData = CaseData.builder()
+            .respondToAdmittedClaim(RespondToClaim.builder()
+                                        .whenWasThisAmountPaid(whenWasPaid).build()
+            )
+            .build();
         //When
         Optional<LocalDate> result = paymentDateService.getPaymentDate(caseData);
         //Then
@@ -63,8 +66,9 @@ public class PaymentDateServiceTest {
         //Given
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         when(deadlineCalculatorService.calculateExtendedDeadline(any(LocalDate.class), anyInt())).thenReturn(whenWillPay);
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setRespondent1ResponseDate(LocalDateTime.now());
+        CaseData caseData = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .build();
         //When
         Optional<LocalDate> result = paymentDateService.getPaymentDate(caseData);
         //Then
@@ -74,7 +78,7 @@ public class PaymentDateServiceTest {
     @Test
     void shouldReturnNull_whenAnythingIsSettled() {
         //Given
-        CaseData caseData = CaseDataBuilder.builder().build();
+        CaseData caseData = CaseData.builder().build();
         //When
         Optional<LocalDate> result = paymentDateService.getPaymentDate(caseData);
         //Then

@@ -193,7 +193,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         when(authTokenGenerator.generate()).thenReturn(STRING_CONSTANT);
 
         when(time.now()).thenReturn(SUBMITTED_DATE);
-        when(feesService.getFeeForGA(any(GeneralApplication.class), any())).thenReturn(new Fee());
+        when(feesService.getFeeForGA(any(GeneralApplication.class), any())).thenReturn(Fee.builder().build());
     }
 
     @Nested
@@ -418,7 +418,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     @Test
     void shouldReturnCaseDataPopulated_whenValidApplicationIsBeingInitiated() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithEmptyCollectionOfApps(CaseDataBuilder.builder().build());
+            .getTestCaseDataWithEmptyCollectionOfApps(CaseData.builder().build());
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
@@ -436,7 +436,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     @Test
     void shouldReturnCaseDataWithAdditionToCollection_whenAnotherApplicationIsBeingInitiated() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataCollectionOfApps(CaseDataBuilder.builder().build());
+            .getTestCaseDataCollectionOfApps(CaseData.builder().build());
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
@@ -525,7 +525,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
-        assertThat(result.getGeneralApplications()).hasSize(1);
+        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentOneLip())
             .isNotNull();
         assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentTwoLip())
@@ -1120,26 +1120,24 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     @Test
     void shouldPopulateCoScGeneralAppSubmittedForLipDefendant() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithEmptyCollectionOfApps(CaseDataBuilder.builder().build());
+            .getTestCaseDataWithEmptyCollectionOfApps(CaseData.builder().build());
         List<Element<Document>> documentList = new ArrayList<>();
-        Document document = new Document();
-        document.setDocumentUrl("fake-url");
-        document.setDocumentFileName("file-name");
-        document.setDocumentBinaryUrl("binary-url");
-        documentList.add(element(document));
-        DebtPaymentEvidence debtPaymentEvidence = new DebtPaymentEvidence();
-        debtPaymentEvidence.setDebtPaymentOption(DebtPaymentOptions.MADE_FULL_PAYMENT_TO_COURT);
-        CertOfSC certOfSC = new CertOfSC();
-        certOfSC.setDefendantFinalPaymentDate(LocalDate.now());
-        certOfSC.setDebtPaymentEvidence(debtPaymentEvidence);
-        GAApplicationType gaApplicationType = new GAApplicationType();
-        gaApplicationType.setTypes(singletonList(CONFIRM_CCJ_DEBT_PAID));
-        caseData.setCertOfSC(certOfSC);
-        caseData.setGeneralAppEvidenceDocument(documentList);
-        caseData.setGeneralAppType(gaApplicationType);
-        caseData.getGeneralAppHearingDetails().getHearingPreferredLocation().setValue(null);
+        documentList.add(element(Document.builder()
+                                     .documentUrl("fake-url")
+                                     .documentFileName("file-name")
+                                     .documentBinaryUrl("binary-url")
+                                     .build()));
+        CertOfSC certOfSC = CertOfSC.builder().defendantFinalPaymentDate(LocalDate.now())
+            .debtPaymentEvidence(DebtPaymentEvidence.builder().debtPaymentOption(
+                DebtPaymentOptions.MADE_FULL_PAYMENT_TO_COURT).build()).build();
+        CaseData data = caseData.toBuilder().certOfSC(certOfSC)
+            .generalAppEvidenceDocument(documentList)
+            .generalAppType(GAApplicationType.builder()
+            .types(singletonList(CONFIRM_CCJ_DEBT_PAID))
+            .build()).build();
+        data.getGeneralAppHearingDetails().getHearingPreferredLocation().setValue(null);
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(data.toBuilder(), data, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications()).hasSize(1);
@@ -1151,17 +1149,14 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     @Test
     void shouldPopulateCoScGeneralAppDataForLipDefendant() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithEmptyCollectionOfApps(CaseDataBuilder.builder().build());
-        DebtPaymentEvidence debtPaymentEvidence2 = new DebtPaymentEvidence();
-        debtPaymentEvidence2.setDebtPaymentOption(DebtPaymentOptions.UNABLE_TO_PROVIDE_EVIDENCE_OF_FULL_PAYMENT);
-        CertOfSC certOfSC2 = new CertOfSC();
-        certOfSC2.setDefendantFinalPaymentDate(LocalDate.now());
-        certOfSC2.setDebtPaymentEvidence(debtPaymentEvidence2);
-        GAApplicationType gaApplicationType2 = new GAApplicationType();
-        gaApplicationType2.setTypes(singletonList(CONFIRM_CCJ_DEBT_PAID));
-        caseData.setCertOfSC(certOfSC2);
-        caseData.setGeneralAppType(gaApplicationType2);
-        CaseData data = caseData;
+            .getTestCaseDataWithEmptyCollectionOfApps(CaseData.builder().build());
+        CertOfSC certOfSC = CertOfSC.builder().defendantFinalPaymentDate(LocalDate.now())
+            .debtPaymentEvidence(DebtPaymentEvidence.builder().debtPaymentOption(
+                DebtPaymentOptions.UNABLE_TO_PROVIDE_EVIDENCE_OF_FULL_PAYMENT).build()).build();
+        CaseData data = caseData.toBuilder().certOfSC(certOfSC)
+            .generalAppType(GAApplicationType.builder()
+                                .types(singletonList(CONFIRM_CCJ_DEBT_PAID))
+                                .build()).build();
         data.getGeneralAppHearingDetails().getHearingPreferredLocation().setValue(null);
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
         CaseData result = service.buildCaseData(data.toBuilder(), data, UserDetails.builder()
@@ -1176,7 +1171,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     @Test
     void shouldExtendDeadline_buildCaseData() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataCollectionOfApps(CaseDataBuilder.builder().build());
+            .getTestCaseDataCollectionOfApps(CaseData.builder().build());
         when(calc.addMonthsToDateToNextWorkingDayAtMidnight(36, LocalDate.now()))
             .thenReturn(LocalDateTime.now().plusMonths(36));
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));

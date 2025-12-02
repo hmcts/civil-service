@@ -63,40 +63,28 @@ class SendHearingBulkPrintServiceTest {
 
     private CaseData buildCaseData(Party party, DocumentType documentType, boolean addHearingDocuments,
                                    String respondentResponse, String claimIssueLang, Language appDocLang, Language defDocLang) {
-        CaseDocument caseDocument = new CaseDocument();
-        caseDocument.setDocumentType(documentType);
-        caseDocument.setDocumentLink(DOCUMENT_LINK);
-        
-        RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
-        respondentLiPResponse.setRespondent1ResponseLanguage(respondentResponse);
-        CaseDataLiP caseDataLiP = new CaseDataLiP();
-        caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
-        
-        WelshLanguageRequirements appWelshLang = new WelshLanguageRequirements();
-        appWelshLang.setDocuments(appDocLang);
-        Applicant1DQ applicant1DQ = new Applicant1DQ();
-        applicant1DQ.setApplicant1DQLanguage(appWelshLang);
-        
-        WelshLanguageRequirements defWelshLang = new WelshLanguageRequirements();
-        defWelshLang.setDocuments(defDocLang);
-        Respondent1DQ respondent1DQ = new Respondent1DQ();
-        respondent1DQ.setRespondent1DQLanguage(defWelshLang);
-        
-        CaseData caseData = CaseDataBuilder.builder()
+        CaseDocument caseDocument = CaseDocument.builder().documentType(documentType).documentLink(DOCUMENT_LINK).build();
+        CaseDataBuilder caseDataBuilder = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(caseDocument))
+            .claimantBilingualLanguagePreference(claimIssueLang)
+            .caseDataLip(CaseDataLiP.builder()
+                             .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                         .respondent1ResponseLanguage(respondentResponse).build()).build())
+            .applicant1DQ(Applicant1DQ.builder()
+                              .applicant1DQLanguage(WelshLanguageRequirements.builder()
+                                                        .documents(appDocLang).build()).build())
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQLanguage(WelshLanguageRequirements.builder()
+                                                          .documents(defDocLang).build()).build())
             .respondent1(party)
-            .applicant1(party).build();
-        caseData.setClaimantBilingualLanguagePreference(claimIssueLang);
-        caseData.setCaseDataLiP(caseDataLiP);
-        caseData.setApplicant1DQ(applicant1DQ);
-        caseData.setRespondent1DQ(respondent1DQ);
+            .applicant1(party);
 
         if (addHearingDocuments) {
-            caseData.setHearingDocuments(wrapElements(caseDocument));
-            caseData.setHearingDocumentsWelsh(wrapElements(caseDocument));
+            return caseDataBuilder.build().toBuilder().hearingDocuments(wrapElements(caseDocument))
+                .hearingDocumentsWelsh(wrapElements(caseDocument)).build();
         }
 
-        return caseData;
+        return caseDataBuilder.build();
     }
 
     private void verifyPrintLetter(CaseData caseData, Party party) {

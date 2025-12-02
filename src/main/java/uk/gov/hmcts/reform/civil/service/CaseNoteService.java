@@ -24,11 +24,11 @@ public class CaseNoteService {
     public CaseNote buildCaseNote(String authorisation, String note) {
         UserDetails userDetails = userService.getUserDetails(authorisation);
 
-        CaseNote caseNote = new CaseNote();
-        caseNote.setCreatedBy(userDetails.getFullName());
-        caseNote.setCreatedOn(time.now());
-        caseNote.setNote(note);
-        return caseNote;
+        return CaseNote.builder()
+            .createdBy(userDetails.getFullName())
+            .createdOn(time.now())
+            .note(note)
+            .build();
     }
 
     public List<Element<CaseNote>> addNoteToListStart(CaseNote caseNote, List<Element<CaseNote>> caseNotes) {
@@ -48,13 +48,13 @@ public class CaseNoteService {
     public List<Element<DocumentAndNote>> buildJudgeCaseNoteAndDocument(DocumentAndNote documentAndNote, String authorisation) {
         UserDetails userDetails = userService.getUserDetails(authorisation);
 
-        DocumentAndNote updatedJudgeNote = new DocumentAndNote();
-        updatedJudgeNote.setDocumentName(documentAndNote.getDocumentName());
-        updatedJudgeNote.setDocument(documentAndNote.getDocument());
-        updatedJudgeNote.setDocumentNote(documentAndNote.getDocumentNote());
-        updatedJudgeNote.setCreatedBy(userDetails.getFullName());
-        updatedJudgeNote.setDocumentNoteForTab(documentAndNote.getDocumentNote());
-
+        var updatedJudgeNote = DocumentAndNote.builder()
+            .documentName(documentAndNote.getDocumentName())
+            .document(documentAndNote.getDocument())
+            .documentNote(documentAndNote.getDocumentNote())
+            .createdBy(userDetails.getFullName())
+            .documentNoteForTab(documentAndNote.getDocumentNote())
+            .build();
         List<Element<DocumentAndNote>> updatedJudgeNoteAndDocument = newArrayList();
         updatedJudgeNoteAndDocument.add(element(updatedJudgeNote));
 
@@ -64,11 +64,11 @@ public class CaseNoteService {
     public List<Element<DocumentWithName>> buildJudgeCaseNoteDocumentAndName(DocumentWithName documentAndNote, String authorisation) {
         UserDetails userDetails = userService.getUserDetails(authorisation);
 
-        DocumentWithName updatedJudgeNote = new DocumentWithName();
-        updatedJudgeNote.setDocument(documentAndNote.getDocument());
-        updatedJudgeNote.setDocumentName(documentAndNote.getDocumentName());
-        updatedJudgeNote.setCreatedBy(userDetails.getFullName());
-
+        var updatedJudgeNote = DocumentWithName.builder()
+            .document(documentAndNote.getDocument())
+            .documentName(documentAndNote.getDocumentName())
+            .createdBy(userDetails.getFullName())
+            .build();
         List<Element<DocumentWithName>> updatedJudgeNoteDocumentAndName = newArrayList();
         updatedJudgeNoteDocumentAndName.add(element(updatedJudgeNote));
 
