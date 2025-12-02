@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.handler.migration;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -16,6 +18,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.verify;
+
+import java.util.stream.Stream;
 
 @ExtendWith(MockitoExtension.class)
 class UnassignCaseUserMigrationTaskTest {
@@ -72,45 +76,31 @@ class UnassignCaseUserMigrationTaskTest {
         assertThat(task.getEventDescription()).contains("Removes the provided user");
     }
 
-    @Test
-    void shouldThrowWhenCaseIdMissing() {
-        CaseAssignmentMigrationCaseReference reference = CaseAssignmentMigrationCaseReference.builder()
-            .caseReference(null)
-            .userEmailAddress("user@example.com")
-            .organisationId("ORG1")
-            .build();
-
+    @ParameterizedTest
+    @MethodSource("invalidReferences")
+    void shouldThrowWhenReferenceInvalid(CaseAssignmentMigrationCaseReference reference) {
         assertThatThrownBy(() -> task.migrateCaseData(CaseData.builder().build(), reference))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Test
-    void shouldThrowWhenUserEmailMissing() {
-        CaseAssignmentMigrationCaseReference reference = CaseAssignmentMigrationCaseReference.builder()
-            .caseReference("123")
-            .userEmailAddress(" ")
-            .organisationId("ORG1")
-            .build();
-
-        assertThatThrownBy(() -> task.migrateCaseData(CaseData.builder().build(), reference))
-            .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    void shouldThrowWhenOrganisationMissing() {
-        CaseAssignmentMigrationCaseReference reference = CaseAssignmentMigrationCaseReference.builder()
-            .caseReference("123")
-            .userEmailAddress("user@example.com")
-            .organisationId("")
-            .build();
-
-        assertThatThrownBy(() -> task.migrateCaseData(CaseData.builder().build(), reference))
-            .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    void shouldThrowWhenCaseReferenceObjectMissing() {
-        assertThatThrownBy(() -> task.migrateCaseData(CaseData.builder().build(), null))
-            .isInstanceOf(IllegalArgumentException.class);
+    private static Stream<CaseAssignmentMigrationCaseReference> invalidReferences() {
+        return Stream.of(
+            null,
+            CaseAssignmentMigrationCaseReference.builder()
+                .caseReference(null)
+                .userEmailAddress("user@example.com")
+                .organisationId("ORG1")
+                .build(),
+            CaseAssignmentMigrationCaseReference.builder()
+                .caseReference("123")
+                .userEmailAddress(" ")
+                .organisationId("ORG1")
+                .build(),
+            CaseAssignmentMigrationCaseReference.builder()
+                .caseReference("123")
+                .userEmailAddress("user@example.com")
+                .organisationId("")
+                .build()
+        );
     }
 }
