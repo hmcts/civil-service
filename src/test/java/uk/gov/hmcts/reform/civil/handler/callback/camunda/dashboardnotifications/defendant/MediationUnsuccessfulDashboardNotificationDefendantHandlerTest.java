@@ -13,13 +13,13 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Mediation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.HashMap;
 import java.util.List;
@@ -82,11 +82,10 @@ class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest extends Bas
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
 
-            CaseData caseData = CaseData.builder()
-                .respondent1Represented(YesOrNo.NO)
-                .legacyCaseReference("reference")
-                .ccdCaseReference(1234L)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setLegacyCaseReference("reference");
+            caseData.setCcdCaseReference(1234L);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -109,16 +108,15 @@ class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest extends Bas
             params.put("ccdCaseReference", "123");
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
-            LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
+            Mediation mediation = new Mediation();
+            mediation.setMediationUnsuccessfulReasonsMultiSelect(List.of(APPOINTMENT_NO_AGREEMENT));
 
-            CaseData caseData = CaseData.builder()
-                .legacyCaseReference("reference")
-                .respondent1Represented(YesOrNo.NO)
-                .ccdCaseReference(1234L)
-                .respondent1ResponseDeadline(dateTime)
-                .mediation(Mediation.builder()
-                               .mediationUnsuccessfulReasonsMultiSelect(List.of(APPOINTMENT_NO_AGREEMENT)).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setLegacyCaseReference("reference");
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setCcdCaseReference(1234L);
+            caseData.setRespondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay());
+            caseData.setMediation(mediation);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -140,16 +138,15 @@ class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest extends Bas
             params.put("ccdCaseReference", "123");
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
-            LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
+            Mediation mediation = new Mediation();
+            mediation.setMediationUnsuccessfulReasonsMultiSelect(List.of(NOT_CONTACTABLE_DEFENDANT_ONE));
 
-            CaseData caseData = CaseData.builder()
-                .legacyCaseReference("reference")
-                .respondent1Represented(YesOrNo.NO)
-                .ccdCaseReference(1234L)
-                .respondent1ResponseDeadline(dateTime)
-                .mediation(Mediation.builder()
-                               .mediationUnsuccessfulReasonsMultiSelect(List.of(NOT_CONTACTABLE_DEFENDANT_ONE)).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setLegacyCaseReference("reference");
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setCcdCaseReference(1234L);
+            caseData.setRespondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay());
+            caseData.setMediation(mediation);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
