@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,7 +40,7 @@ class EarlyAdoptersServiceTest {
     }
 
     private CaseData caseDataWithCML(String cmlEpimms) {
-        return CaseData.builder()
+        return CaseDataBuilder.builder()
             .caseManagementLocation(
             CaseLocationCivil.builder()
                 .baseLocation(cmlEpimms)

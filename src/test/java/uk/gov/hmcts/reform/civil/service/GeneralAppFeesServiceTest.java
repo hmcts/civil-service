@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.FeeLookupResponseDto;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
@@ -59,11 +60,20 @@ class GeneralAppFeesServiceTest {
     private static final BigDecimal TEST_FEE_AMOUNT_PENCE = new BigDecimal(TEST_FEE_AMOUNT_POUNDS.intValue() * 100);
     private static final FeeLookupResponseDto FEE_POUNDS = FeeLookupResponseDto.builder()
         .feeAmount(TEST_FEE_AMOUNT_POUNDS).code(TEST_FEE_CODE).version(1).build();
-    private static final Fee FEE_PENCE = Fee.builder()
-        .calculatedAmountInPence(TEST_FEE_AMOUNT_PENCE).code(TEST_FEE_CODE).version("1").build();
+    private static final Fee FEE_PENCE;
     public static final String FREE_REF = "FREE";
-    private static final Fee FEE_PENCE_0 = Fee.builder()
-        .calculatedAmountInPence(BigDecimal.ZERO).code(FREE_REF).version("1").build();
+    private static final Fee FEE_PENCE_0;
+    static {
+        FEE_PENCE = new Fee();
+        FEE_PENCE.setCalculatedAmountInPence(TEST_FEE_AMOUNT_PENCE);
+        FEE_PENCE.setCode(TEST_FEE_CODE);
+        FEE_PENCE.setVersion("1");
+
+        FEE_PENCE_0 = new Fee();
+        FEE_PENCE_0.setCalculatedAmountInPence(BigDecimal.ZERO);
+        FEE_PENCE_0.setCode(FREE_REF);
+        FEE_PENCE_0.setVersion("1");
+    }
     public static final String GENERAL_APPLICATION = "general application";
     public static final String GENERAL_SERVICE = "general";
 
@@ -118,8 +128,10 @@ class GeneralAppFeesServiceTest {
             when(feesConfiguration.getJurisdiction1()).thenReturn(CIVIL_JURISDICTION);
             when(feesConfiguration.getJurisdiction2()).thenReturn(CIVIL_JURISDICTION);
             when(feesConfiguration.getWithNoticeKeyword()).thenReturn(GENERAL_APPLICATION_WITH_NOTICE);
+            FeeLookupResponseDto feeLookupResponse = FeeLookupResponseDto.builder()
+                .code(TEST_FEE_CODE).version(1).build();
             when(feesApiClient.lookupFee(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
-                .thenReturn(FeeLookupResponseDto.builder().code(TEST_FEE_CODE).version(1).build());
+                .thenReturn(feeLookupResponse);
 
             RuntimeException exception = assertThrows(RuntimeException.class, () ->
                 generalAppFeesService.getFeeForJOWithApplicationType(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT)
@@ -453,21 +465,26 @@ class GeneralAppFeesServiceTest {
 
     private CaseData getFeeCase(List<GeneralApplicationTypes> types, YesOrNo hasAgreed,
                                 YesOrNo isWithNotice, LocalDate hearingScheduledDate) {
-        CaseData.CaseDataBuilder builder = CaseData.builder();
-        builder.generalAppType(GAApplicationType.builder().types(types).build());
+        CaseData caseData = CaseDataBuilder.builder().build();
+        GAApplicationType gaApplicationType = new GAApplicationType();
+        gaApplicationType.setTypes(types);
+        caseData.setGeneralAppType(gaApplicationType);
         if (Objects.nonNull(hasAgreed)) {
-            builder.generalAppRespondentAgreement(GARespondentOrderAgreement
-                                                      .builder().hasAgreed(hasAgreed).build());
+            GARespondentOrderAgreement respondentAgreement = new GARespondentOrderAgreement();
+            respondentAgreement.setHasAgreed(hasAgreed);
+            caseData.setGeneralAppRespondentAgreement(respondentAgreement);
         }
         if (Objects.nonNull(isWithNotice)) {
-            builder.generalAppInformOtherParty(
-                GAInformOtherParty.builder().isWithNotice(isWithNotice).build());
+            GAInformOtherParty informOtherParty = new GAInformOtherParty();
+            informOtherParty.setIsWithNotice(isWithNotice);
+            caseData.setGeneralAppInformOtherParty(informOtherParty);
         }
         if (Objects.nonNull(hearingScheduledDate)) {
-            builder.generalAppHearingDate(GAHearingDateGAspec.builder()
-                                              .hearingScheduledDate(hearingScheduledDate).build());
+            GAHearingDateGAspec hearingDate = new GAHearingDateGAspec();
+            hearingDate.setHearingScheduledDate(hearingScheduledDate);
+            caseData.setGeneralAppHearingDate(hearingDate);
         }
-        return builder.build();
+        return caseData;
     }
 
     private List<GeneralApplicationTypes> getGADefaultTypes() {

@@ -79,7 +79,6 @@ public class CoreCaseDataService {
         StartEventResponse startEventResponse = startUpdate(caseId.toString(), eventName);
 
         CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         List<LocationRefData> locationRefDataList = referenceDataService.getCourtLocationsByEpimmsId(
             getSystemUpdateUser().getUserToken(),
@@ -87,15 +86,18 @@ public class CoreCaseDataService {
         );
         LocationRefData locationRefData = locationRefDataList.get(0);
 
-        DynamicList transferCourtLocationList = DynamicList.builder()
-                .value(DynamicListElement.builder().code(UUID.randomUUID().toString())
-                .label(getCourtName(locationRefData)).build()).build();
+        DynamicListElement dynamicListElement = new DynamicListElement();
+        dynamicListElement.setCode(UUID.randomUUID().toString());
+        dynamicListElement.setLabel(getCourtName(locationRefData));
 
-        caseDataBuilder.transferCourtLocationList(transferCourtLocationList);
-        caseDataBuilder.reasonForTransfer(transferReason);
+        DynamicList transferCourtLocationList = new DynamicList();
+        transferCourtLocationList.setValue(dynamicListElement);
+
+        caseData.setTransferCourtLocationList(transferCourtLocationList);
+        caseData.setReasonForTransfer(transferReason);
 
         mapper.registerModule(new JavaTimeModule());
-        Map<String, Object> payload = caseDataBuilder.build().toMap(mapper);
+        Map<String, Object> payload = caseData.toMap(mapper);
 
         //set payload
         CaseDataContent caseDataContent = caseDataContentFromStartEventResponse(startEventResponse, Map.of());

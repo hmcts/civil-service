@@ -192,26 +192,25 @@ public class InitiateGeneralApplicationServiceHelper {
             && Objects.nonNull(caseData.getHearingDate())
             && caseData.getHearingDate().isBefore(lipUrgentEndDate.plusDays(noOfHoliday))) {
 
-            applicationBuilder.generalAppUrgencyRequirement(
-                    GAUrgencyRequirement
-                            .builder()
-                            .generalAppUrgency(YES)
-                            .urgentAppConsiderationDate(caseData.getHearingDate())
-                            .reasonsForUrgency(LIP_URGENT_REASON).build());
+            GAUrgencyRequirement urgencyRequirement = new GAUrgencyRequirement();
+            urgencyRequirement.setGeneralAppUrgency(YES);
+            urgencyRequirement.setUrgentAppConsiderationDate(caseData.getHearingDate());
+            urgencyRequirement.setReasonsForUrgency(LIP_URGENT_REASON);
+            applicationBuilder.generalAppUrgencyRequirement(urgencyRequirement);
         } else if (caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented()) {
-            applicationBuilder.generalAppUrgencyRequirement(
-                GAUrgencyRequirement
-                    .builder()
-                    .generalAppUrgency(NO)
-                    .urgentAppConsiderationDate(caseData.getHearingDate())
-                    .build());
+            GAUrgencyRequirement urgencyRequirement = new GAUrgencyRequirement();
+            urgencyRequirement.setGeneralAppUrgency(NO);
+            urgencyRequirement.setUrgentAppConsiderationDate(caseData.getHearingDate());
+            applicationBuilder.generalAppUrgencyRequirement(urgencyRequirement);
         }
         //set main case hearing date as ga hearing date
         if (Objects.nonNull(isGaAppSameAsParentCaseClLip) && Objects.nonNull(caseData.getHearingDate())) {
-            applicationBuilder
-                .generalAppHearingDate(GAHearingDateGAspec.builder().hearingScheduledDate(caseData.getHearingDate()).build());
+            GAHearingDateGAspec hearingDate = new GAHearingDateGAspec();
+            hearingDate.setHearingScheduledDate(caseData.getHearingDate());
+            applicationBuilder.generalAppHearingDate(hearingDate);
             Fee feeForGA = feesService.getFeeForGA(generalApplication, caseData.getHearingDate());
-            GAPbaDetails generalAppPBADetails = GAPbaDetails.builder().fee(feeForGA).build();
+            GAPbaDetails generalAppPBADetails = new GAPbaDetails();
+            generalAppPBADetails.setFee(feeForGA);
             applicationBuilder.generalAppPBADetails(generalAppPBADetails);
         }
     }
@@ -400,7 +399,6 @@ public class InitiateGeneralApplicationServiceHelper {
                         .litigiousPartyID(RESPONDENT2_ID)
                         .build();
             }
-
         }
         return GAParties.builder().build();
     }
