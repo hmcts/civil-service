@@ -15,14 +15,10 @@ import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeApi;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -42,6 +38,16 @@ class IncidentRetryEventHandlerTest {
 
     @InjectMocks
     private IncidentRetryEventHandler handler;
+
+    @SuppressWarnings("unchecked")
+    private static boolean matches(Map<String, Object> req) {
+        List<Map<String, Object>> instructions;
+        instructions = (List<Map<String, Object>>) req.get("instructions");
+
+        return instructions.size() == 1
+            && "startAfterActivity".equals(instructions.get(0).get("type"))
+            && "activity1".equals(instructions.get(0).get("activityId"));
+    }
 
     @Test
     void shouldReturnEmptyData_whenNoProcessInstancesFound() {
@@ -100,6 +106,48 @@ class IncidentRetryEventHandlerTest {
                 anyMap()
             );
         }
+    }
+
+    @Test
+    void shouldCompleteActivityWhenIncidentAlreadyProcessed() {
+        // GIVEN
+        ProcessInstanceDto pi = newProcessInstance("proc1");
+
+        IncidentDto incident = newIncident(pi.getId(), "inc1", "job1");
+        incident.setIncidentMessage("422 - already processed"); // KEY FOR THIS TEST
+
+        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
+
+        when(externalTask.getVariable(any()))
+            .thenReturn("2025-01-01T00:00:00Z");
+
+        // 1 process instance returned
+        when(camundaRuntimeApi.queryProcessInstances(
+            any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()))
+            .thenReturn(List.of(pi));
+
+        // Incident returned with message "already processed"
+        when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
+            any(), anyBoolean(), eq("proc1"), anyString(), anyString(), anyInt()))
+            .thenReturn(List.of(incident));
+
+        // caseId exists
+        HashMap<String, VariableValueDto> vars = new HashMap<>();
+        VariableValueDto var = new VariableValueDto();
+        var.setValue("case-proc1");
+        vars.put("caseId", var);
+        when(camundaRuntimeApi.getProcessVariables(eq("proc1"), any()))
+            .thenReturn(vars);
+
+        handler.handleTask(externalTask);
+
+        verify(camundaRuntimeApi).modifyProcessInstance(eq("serviceAuth"), eq("proc1"), anyMap());
+
+        verify(camundaRuntimeApi).modifyProcessInstance(
+            eq("serviceAuth"),
+            eq("proc1"),
+            argThat(IncidentRetryEventHandlerTest::matches)
+        );
     }
 
     @Test

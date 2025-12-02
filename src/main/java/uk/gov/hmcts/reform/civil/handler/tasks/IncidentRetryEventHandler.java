@@ -186,7 +186,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
     private String resolveStartTime(String incidentStartTime) {
         return (incidentStartTime == null || incidentStartTime.isBlank())
-            ? INCIDENT_FORMATTER.format(Instant.now().minus(23, ChronoUnit.HOURS))
+            ? INCIDENT_FORMATTER.format(Instant.now().minus(24, ChronoUnit.HOURS))
             : incidentStartTime;
     }
 
@@ -239,7 +239,12 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 incident.getId(), processInstanceId, jobId, incidentCaseId, failedActivityId
             );
 
-            retryProcessInstance(processInstanceId, serviceAuthorization, failedActivityId);
+            if (incident.getIncidentMessage() != null &&
+                incident.getIncidentMessage().contains("already processed")) {
+                completeAlreadyProcessedIncident(incident.getProcessInstanceId(), serviceAuthorization, failedActivityId);
+            } else {
+                retryProcessInstance(processInstanceId, serviceAuthorization, failedActivityId);
+            }
 
             log.info(
                 "Retries reset for job {} (processInstanceId={}, caseId={})",
@@ -258,6 +263,37 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 e
             );
             return false;
+        }
+    }
+
+    private void completeAlreadyProcessedIncident(String processInstanceId, String serviceAuthorization, String failedActivityId) {
+        try {
+            log.info("Completing incident for processInstance {} (already processed)",
+                      processInstanceId);
+
+            Map<String, Object> modificationRequest = new HashMap<>();
+            modificationRequest.put("skipCustomListeners", true);
+            modificationRequest.put("skipIoMappings", true);
+
+            List<Map<String, Object>> instructions = new ArrayList<>();
+            Map<String, Object> startAfterInstruction = new HashMap<>();
+            startAfterInstruction.put("type", "startAfterActivity");
+            startAfterInstruction.put("activityId", failedActivityId);
+            instructions.add(startAfterInstruction);
+
+            modificationRequest.put("instructions", instructions);
+
+            camundaRuntimeApi.modifyProcessInstance(
+                serviceAuthorization,
+                processInstanceId,
+                modificationRequest
+            );
+
+            log.info("Successfully completed activity {} for process instance {}", failedActivityId, processInstanceId);
+
+        } catch (Exception e) {
+            log.error("Failed to complete already processed activity {} for processInstance {}: {}",
+                      failedActivityId, processInstanceId, e.getMessage(), e);
         }
     }
 
