@@ -53,11 +53,48 @@ class UnassignCaseUserMigrationTaskTest {
     }
 
     @Test
-    void shouldThrowWhenMandatoryFieldsMissing() {
+    void shouldExposeCaseReferenceFields() {
+        CaseAssignmentMigrationCaseReference reference = CaseAssignmentMigrationCaseReference.builder()
+            .caseReference("123")
+            .userEmailAddress("user@example.com")
+            .organisationId("ORG1")
+            .build();
+
+        assertThat(reference.getCaseReference()).isEqualTo("123");
+        assertThat(reference.getUserEmailAddress()).isEqualTo("user@example.com");
+        assertThat(reference.getOrganisationId()).isEqualTo("ORG1");
+    }
+
+    @Test
+    void shouldThrowWhenCaseIdMissing() {
         CaseAssignmentMigrationCaseReference reference = CaseAssignmentMigrationCaseReference.builder()
             .caseReference(null)
-            .userEmailAddress(null)
-            .organisationId(null)
+            .userEmailAddress("user@example.com")
+            .organisationId("ORG1")
+            .build();
+
+        assertThatThrownBy(() -> task.migrateCaseData(CaseData.builder().build(), reference))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void shouldThrowWhenUserEmailMissing() {
+        CaseAssignmentMigrationCaseReference reference = CaseAssignmentMigrationCaseReference.builder()
+            .caseReference("123")
+            .userEmailAddress(" ")
+            .organisationId("ORG1")
+            .build();
+
+        assertThatThrownBy(() -> task.migrateCaseData(CaseData.builder().build(), reference))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void shouldThrowWhenOrganisationMissing() {
+        CaseAssignmentMigrationCaseReference reference = CaseAssignmentMigrationCaseReference.builder()
+            .caseReference("123")
+            .userEmailAddress("user@example.com")
+            .organisationId("")
             .build();
 
         assertThatThrownBy(() -> task.migrateCaseData(CaseData.builder().build(), reference))
