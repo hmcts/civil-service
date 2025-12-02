@@ -113,7 +113,7 @@ withNightlyPipeline(type, product, component) {
   def frontendUrl = resolvePreviewUrl(params.FRONTEND_URL, 'FRONTEND_URL')
   def ccdDataStoreUrl = resolvePreviewUrl(params.CCD_DATA_STORE_URL, 'CCD_DATA_STORE_URL')
   def civilServiceUrl = resolvePreviewUrl(params.CIVIL_SERVICE_URL, 'CIVIL_SERVICE_URL')
-  def AacApiUrl = resolvePreviewUrl(params.AAC_API_URL, 'AAC_API_URL')
+  def aacApiUrl = resolvePreviewUrl(params.AAC_API_URL, 'AAC_API_URL')
 
   env.URL=frontendUrl
   env.DM_STORE_URL=params.DM_STORE_URL
@@ -125,7 +125,7 @@ withNightlyPipeline(type, product, component) {
   env.URL_FOR_SECURITY_SCAN = civilServiceUrl
   env.TESTS_FOR_ACCESSIBILITY = true
   env.NIGHTLY_RUN = true
-  env.AAC_API_URL = AacApiUrl
+  env.AAC_API_URL = aacApiUrl
   overrideVaultEnvironments([
   'aat': params.ENVIRONMENT
   ])
