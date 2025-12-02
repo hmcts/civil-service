@@ -695,14 +695,14 @@ public class DashboardNotificationsParamsMapperTest {
     @Test
     void shouldMapParameters_whenCertOfSc() {
         LocalDate fullPaymentDate = LocalDate.now();
-        CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build();
-        caseData.setApplicant1Represented(YesOrNo.NO);
+        CaseData currentCaseData = CaseDataBuilder.builder().atCaseProgressionCheck().build();
+        currentCaseData.setApplicant1Represented(YesOrNo.NO);
         CertOfSC certOfSC = new CertOfSC();
         certOfSC.setDefendantFinalPaymentDate(fullPaymentDate);
-        caseData.setCertOfSC(certOfSC);
+        currentCaseData.setCertOfSC(certOfSC);
 
         Map<String, Object> result =
-            mapper.mapCaseDataToParams(caseData, null);
+            mapper.mapCaseDataToParams(currentCaseData, null);
         assertThat(result).extracting("coscFullPaymentDateEn")
             .isEqualTo(DateUtils.formatDate(fullPaymentDate));
         assertThat(result).extracting("coscFullPaymentDateCy")

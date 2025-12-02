@@ -71,8 +71,7 @@ public class PaymentRequestUpdateCallbackService {
     private void handlePaymentUpdate(ServiceRequestUpdateDto dto, CaseData caseData, FeeType feeType) {
         CardPaymentStatusResponse paymentStatusResponse = buildPaymentStatusResponse(dto);
         String customerReference = getCustomerReference(dto, caseData, feeType);
-        caseData = updateCaseDataWithPaymentDetails(paymentStatusResponse, caseData, feeType, customerReference);
-        updatePaymentStatus(feeType, dto.getCcdCaseNumber(), caseData);
+        updatePaymentStatus(feeType, dto.getCcdCaseNumber(), updateCaseDataWithPaymentDetails(paymentStatusResponse, caseData, feeType, customerReference));
     }
 
     private boolean isPaid(ServiceRequestUpdateDto dto) {
