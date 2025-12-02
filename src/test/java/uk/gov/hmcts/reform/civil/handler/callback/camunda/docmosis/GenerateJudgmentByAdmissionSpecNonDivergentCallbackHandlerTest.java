@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimantresponse.RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator;
 
@@ -49,48 +50,47 @@ class GenerateJudgmentByAdmissionSpecNonDivergentCallbackHandlerTest extends Bas
 
     @BeforeEach
     void addDocs() {
-        listForm.add(CaseDocument.builder()
-            .createdBy("John")
-            .documentName("document name")
-            .documentSize(0L)
-            .documentType(DEFENDANT_DEFENCE)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build());
+        Document documentLink = new Document();
+        documentLink.setDocumentUrl("fake-url");
+        documentLink.setDocumentFileName("file-name");
+        documentLink.setDocumentBinaryUrl("binary-url");
+
+        CaseDocument document1 = new CaseDocument();
+        document1.setCreatedBy("John");
+        document1.setDocumentName("document name");
+        document1.setDocumentSize(0L);
+        document1.setDocumentType(DEFENDANT_DEFENCE);
+        document1.setCreatedDatetime(LocalDateTime.now());
+        document1.setDocumentLink(documentLink);
+        listForm.add(document1);
     }
 
     @Test
     void shouldGenerateClaimantForm() {
-        CaseEvent event = CaseEvent.GEN_JUDGMENT_BY_ADMISSION_DOC_CLAIMANT;
         given(formGenerator.generateNonDivergentDocs(any(CaseData.class), anyString(), any(CaseEvent.class))).willReturn(listForm);
-        CaseData caseData = CaseData.builder()
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
-                                                        .build())
-                             .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+        claimantLiPResponse.setApplicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ);
+        CaseDataLiP caseDataLiP  = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+        caseData.setCaseDataLiP(caseDataLiP);
 
+        CaseEvent event = CaseEvent.GEN_JUDGMENT_BY_ADMISSION_DOC_CLAIMANT;
         handler.handle(callbackParamsOf(caseData, event, ABOUT_TO_SUBMIT));
         verify(formGenerator).generateNonDivergentDocs(caseData, BEARER_TOKEN, event);
     }
 
     @Test
     void shouldGenerateDefendantForm() {
-        CaseEvent event = CaseEvent.GEN_JUDGMENT_BY_ADMISSION_DOC_DEFENDANT;
         given(formGenerator.generateNonDivergentDocs(any(CaseData.class), anyString(), any(CaseEvent.class))).willReturn(listForm);
-        CaseData caseData = CaseData.builder()
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
-                                                        .build())
-                             .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+        claimantLiPResponse.setApplicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ);
+        CaseDataLiP caseDataLiP  = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+        caseData.setCaseDataLiP(caseDataLiP);
 
+        CaseEvent event = CaseEvent.GEN_JUDGMENT_BY_ADMISSION_DOC_DEFENDANT;
         handler.handle(callbackParamsOf(caseData, event, ABOUT_TO_SUBMIT));
         verify(formGenerator).generateNonDivergentDocs(caseData, BEARER_TOKEN, event);
     }

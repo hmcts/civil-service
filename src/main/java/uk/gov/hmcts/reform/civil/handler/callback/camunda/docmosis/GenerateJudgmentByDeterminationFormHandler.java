@@ -57,15 +57,14 @@ public class GenerateJudgmentByDeterminationFormHandler extends CallbackHandler 
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        buildDocument(callbackParams, caseDataBuilder);
+        buildDocument(callbackParams, caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
-    private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+    private void buildDocument(CallbackParams callbackParams, CaseData caseData) {
         List<CaseDocument> caseDocuments = judgmentByDeterminationDocGenerator.generateDocs(
             callbackParams.getCaseData(),
             callbackParams.getParams().get(BEARER_TOKEN).toString(),
@@ -80,7 +79,7 @@ public class GenerateJudgmentByDeterminationFormHandler extends CallbackHandler 
         caseDocuments.forEach(caseDocument ->
             systemGeneratedCaseDocuments.add(element(caseDocument))
         );
-        caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
+        caseData.setSystemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
     }
 
     private boolean isClaimantEvent(CallbackParams callbackParams) {
