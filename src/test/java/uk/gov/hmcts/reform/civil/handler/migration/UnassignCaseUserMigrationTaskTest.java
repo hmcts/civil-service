@@ -66,6 +66,13 @@ class UnassignCaseUserMigrationTaskTest {
     }
 
     @Test
+    void shouldExposeTaskMetadata() {
+        assertThat(task.getTaskName()).isEqualTo("UnassignCaseUserMigrationTask");
+        assertThat(task.getEventSummary()).isEqualTo("Unassign user from case via migration task");
+        assertThat(task.getEventDescription()).contains("Removes the provided user");
+    }
+
+    @Test
     void shouldThrowWhenCaseIdMissing() {
         CaseAssignmentMigrationCaseReference reference = CaseAssignmentMigrationCaseReference.builder()
             .caseReference(null)
@@ -98,6 +105,12 @@ class UnassignCaseUserMigrationTaskTest {
             .build();
 
         assertThatThrownBy(() -> task.migrateCaseData(CaseData.builder().build(), reference))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void shouldThrowWhenCaseReferenceObjectMissing() {
+        assertThatThrownBy(() -> task.migrateCaseData(CaseData.builder().build(), null))
             .isInstanceOf(IllegalArgumentException.class);
     }
 }
