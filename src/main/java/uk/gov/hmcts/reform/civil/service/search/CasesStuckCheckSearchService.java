@@ -26,12 +26,6 @@ public class CasesStuckCheckSearchService extends ElasticSearchService {
     }
 
     @Override
-    public Query query(int startIndex) {
-        log.info("Call to CasesStuckCheckSearchService query with index {} ", startIndex);
-        return query(startIndex, "now");
-    }
-
-    @Override
     public Set<CaseDetails> getCases() {
         String timeNow = ZonedDateTime.now(ZoneOffset.UTC).toString();
         SearchResult searchResult = coreCaseDataService.searchCases(query(START_INDEX, timeNow));
@@ -59,5 +53,11 @@ public class CasesStuckCheckSearchService extends ElasticSearchService {
             List.of("reference"),
             startIndex
         );
+    }
+
+    @Override
+    public Query query(int startIndex) {
+        log.info("Call to CasesStuckCheckSearchService query with index {} ", startIndex);
+        return query(startIndex, "now");
     }
 }
