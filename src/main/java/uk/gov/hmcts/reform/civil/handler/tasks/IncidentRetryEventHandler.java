@@ -44,6 +44,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
     private static final int PAGE_SIZE = 50;
     private static final Pattern ALREADY_PROCESSED_PATTERN =
         Pattern.compile("already processed|already performed", Pattern.CASE_INSENSITIVE);
+    private static final String ACTIVITY_ID = "activityId";
     private static final DateTimeFormatter INCIDENT_FORMATTER =
         DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
             .withZone(ZoneOffset.UTC);
@@ -287,7 +288,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             List<Map<String, Object>> instructions = new ArrayList<>();
             Map<String, Object> startAfterInstruction = new HashMap<>();
             startAfterInstruction.put("type", "startAfterActivity");
-            startAfterInstruction.put("activityId", failedActivityId);
+            startAfterInstruction.put(ACTIVITY_ID, failedActivityId);
             instructions.add(startAfterInstruction);
 
             modificationRequest.put("instructions", instructions);
@@ -314,12 +315,12 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         List<Map<String, Object>> instructions = new ArrayList<>();
         Map<String, Object> cancelInstruction = new HashMap<>();
         cancelInstruction.put("type", "cancel");
-        cancelInstruction.put("activityId", failedActivityId);
+        cancelInstruction.put(ACTIVITY_ID, failedActivityId);
         instructions.add(cancelInstruction);
 
         Map<String, Object> startBeforeInstruction = new HashMap<>();
         startBeforeInstruction.put("type", "startBeforeActivity");
-        startBeforeInstruction.put("activityId", failedActivityId);
+        startBeforeInstruction.put(ACTIVITY_ID, failedActivityId);
         instructions.add(startBeforeInstruction);
 
         modificationRequest.put("instructions", instructions);

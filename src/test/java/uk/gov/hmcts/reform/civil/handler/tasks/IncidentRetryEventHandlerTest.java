@@ -113,9 +113,9 @@ class IncidentRetryEventHandlerTest {
             )).thenReturn(List.of(incident));
 
             HashMap<String, VariableValueDto> vars = new HashMap<>();
-            VariableValueDto var = new VariableValueDto();
-            var.setValue("case-" + pi.getId());
-            vars.put("caseId", var);
+            VariableValueDto variable = new VariableValueDto();
+            variable.setValue("case-" + pi.getId());
+            vars.put("caseId", variable);
             when(camundaRuntimeApi.getProcessVariables(pi.getId(), "serviceAuth")).thenReturn(vars);
         }
 

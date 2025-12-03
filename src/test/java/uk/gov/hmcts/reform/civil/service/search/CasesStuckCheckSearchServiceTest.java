@@ -34,11 +34,13 @@ class CasesStuckCheckSearchServiceTest {
         Query query = service.query(0, timeNow);
         String queryStr = query.toString().replaceAll("\\s+", ""); // remove all spaces
 
-        assertThat(queryStr).contains("\"to\":\"" + timeNow + "\"");
-        assertThat(queryStr).contains("\"from\":0");
-        assertThat(queryStr).contains("\"_source\":[\"reference\"]");
-        assertThat(queryStr).contains("now-7d");
-        assertThat(queryStr).contains("FINISHED");
+        assertThat(queryStr).contains(
+            "\"to\":\"" + timeNow + "\"",
+            "\"from\":0",
+            "\"_source\":[\"reference\"]",
+            "now-7d",
+            "FINISHED"
+        );
     }
 
     @Test
