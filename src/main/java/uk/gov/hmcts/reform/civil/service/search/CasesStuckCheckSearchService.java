@@ -47,7 +47,7 @@ public class CasesStuckCheckSearchService {
         return caseDetailsSet;
     }
 
-    public Query query(int startIndex, String timeNow, String stuckCasesFromPastDays ) {
+    public Query query(int startIndex, String timeNow, String stuckCasesFromPastDays) {
         log.info("Call to CasesStuckCheckSearchService query with index {} and timeNow {}", startIndex, timeNow);
         String pastDaysExpression = "now-" + stuckCasesFromPastDays + "d";
 

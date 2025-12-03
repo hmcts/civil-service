@@ -54,7 +54,6 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         String incidentStartTime = resolveStartTime(externalTask.getVariable("incidentStartTime"));
         String incidentEndTime = resolveEndTime(externalTask.getVariable("incidentEndTime"));
         String incidentMessageLike = externalTask.getVariable("incidentMessageLike");
-        String stuckCasesFromPastDays = externalTask.getVariable("stuckCasesFromPastDays");
 
         log.info("Incident retry process using date range {} → {}", incidentStartTime, incidentEndTime);
 
@@ -88,6 +87,8 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         );
 
         log.info("Call cases stuck check search service to log cases being stuck in app insights");
+
+        String stuckCasesFromPastDays = externalTask.getVariable("stuckCasesFromPastDays");
         casesStuckCheckSearchService.getCases(stuckCasesFromPastDays != null ? stuckCasesFromPastDays : "7");
 
         return ExternalTaskData.builder().build();
