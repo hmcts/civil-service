@@ -72,52 +72,51 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
         mapper.registerModule(new JavaTimeModule());
     }
 
-    private static final CaseDocument FORM =
-            CaseDocument.builder()
-                    .createdBy("John")
-                    .documentName("document name")
-                    .documentSize(0L)
-                    .documentType(DEFENDANT_DEFENCE)
-                    .createdDatetime(LocalDateTime.now())
-                    .documentLink(Document.builder()
-                            .documentUrl("fake-url")
-                            .documentFileName("file-name")
-                            .documentBinaryUrl("binary-url")
-                            .build())
-                    .build();
-    private static final CaseDocument DIRECTIONS_QUESTIONNAIRE_DOC =
-            CaseDocument.builder()
-                    .createdBy("John")
-                    .documentName(String.format(N1.getDocumentTitle(), "000MC001"))
-                    .documentSize(0L)
-                    .documentType(DIRECTIONS_QUESTIONNAIRE)
-                    .createdDatetime(LocalDateTime.now())
-                    .documentLink(Document.builder()
-                            .documentUrl("fake-url")
-                            .documentFileName("file-name")
-                            .documentBinaryUrl("binary-url")
-                            .build())
-                    .build();
-    private static final CaseDocument STITCHED_DOC =
-            CaseDocument.builder()
-                    .createdBy("John")
-                    .documentName("Stitched document")
-                    .documentSize(0L)
-                    .documentType(SEALED_CLAIM)
-                    .createdDatetime(LocalDateTime.now())
-                    .documentLink(Document.builder()
-                            .documentUrl("fake-url")
-                            .documentFileName("file-name")
-                            .documentBinaryUrl("binary-url")
-                            .build())
-                    .build();
+    public static final CaseDocument FORM;
+    public static final CaseDocument STITCHED_DOC;
+    public static final CaseDocument DIRECTIONS_QUESTIONNAIRE_DOC;
+
+    static {
+        Document documentLink = new Document();
+        documentLink.setDocumentUrl("fake-url");
+        documentLink.setDocumentFileName("file-name");
+        documentLink.setDocumentBinaryUrl("binary-url");
+
+        CaseDocument document = new CaseDocument();
+        document.setCreatedBy("John");
+        document.setDocumentName("document name");
+        document.setDocumentSize(0L);
+        document.setDocumentType(DEFENDANT_DEFENCE);
+        document.setCreatedDatetime(LocalDateTime.now());
+        document.setDocumentLink(documentLink);
+        FORM = document;
+
+        CaseDocument document1 = new CaseDocument();
+        document1.setCreatedBy("John");
+        document1.setDocumentName(String.format(N1.getDocumentTitle(), "000MC001"));
+        document1.setDocumentSize(0L);
+        document1.setDocumentType(DIRECTIONS_QUESTIONNAIRE);
+        document1.setCreatedDatetime(LocalDateTime.now());
+        document1.setDocumentLink(documentLink);
+        DIRECTIONS_QUESTIONNAIRE_DOC = document1;
+
+        CaseDocument document2 = new CaseDocument();
+        document2.setCreatedBy("John");
+        document2.setDocumentName("Stitched document");
+        document2.setDocumentSize(0L);
+        document2.setDocumentType(SEALED_CLAIM);
+        document2.setCreatedDatetime(LocalDateTime.now());
+        document2.setDocumentLink(documentLink);
+        STITCHED_DOC = document2;
+    }
+
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
 
     @Test
     void shouldGenerateForm_whenAboutToSubmitCalled() {
         ReflectionTestUtils.setField(handler, "stitchEnabled", false);
         given(formGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         verify(formGenerator).generate(caseData, BEARER_TOKEN);
     }
@@ -126,7 +125,7 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
     void shouldGenerateForm_whenIsLipVLipEnabledStitchingDisabled() {
         //Given
         given(formGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         //When
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
@@ -141,9 +140,15 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         ReflectionTestUtils.setField(handler, "stitchEnabled", false);
+        CaseDocument doc1 = new CaseDocument();
+        doc1.setDocumentName("Stitched document");
+
+        CaseDocument doc2 = new CaseDocument();
+        doc2.setDocumentName("document name");
+
         List<Element<CaseDocument>> documents = List.of(
-                element(CaseDocument.builder().documentName("Stitched document").build()),
-                element(CaseDocument.builder().documentName("document name").build()));
+                element(doc1),
+                element(doc2));
         given(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(any(CaseDocument.class), any(CaseData.class))).willReturn(documents);
         when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(DEFENDANT_DEFENCE),
                                                              anyString())).thenReturn(STITCHED_DOC);
@@ -174,8 +179,9 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
     void shouldGenerateForm_whenIsLipVLipEnabledStitchingEnabledButRespondent1ClaimResponseTypeForSpecIsFullAdmissionSoNoDqWillGenerate() {
         //Given
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-        List<Element<CaseDocument>> documents = List.of(
-            element(CaseDocument.builder().documentName("responseForm.pdf").build()));
+        CaseDocument doc1 = new CaseDocument();
+        doc1.setDocumentName("responseForm.pdf");
+        List<Element<CaseDocument>> documents = List.of(element(doc1));
         given(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(any(CaseDocument.class), any(CaseData.class))).willReturn(documents);
         given(formGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
@@ -204,14 +210,15 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
-        
-        List<Element<CaseDocument>> documents = List.of(
-                element(CaseDocument.builder().documentName("Stitched document").build()));
+
+        CaseDocument doc1 = new CaseDocument();
+        doc1.setDocumentName("Stitched document");
+        List<Element<CaseDocument>> documents = List.of(element(doc1));
         given(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(any(CaseDocument.class), any(CaseData.class))).willReturn(documents);
         when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(DEFENDANT_DEFENCE),
                                                              anyString())).thenReturn(STITCHED_DOC);
         given(formGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
-        
+
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         systemGeneratedCaseDocuments.add(element(DIRECTIONS_QUESTIONNAIRE_DOC));
         CaseData caseData = CaseDataBuilder.builder()
@@ -232,10 +239,10 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
         long originalFormCount = updatedData.getSystemGeneratedCaseDocuments().stream()
                 .filter(doc -> doc.getValue().getDocumentName().equals(FORM.getDocumentName()))
                 .count();
-        
+
         assertThat(stitchedDocCount).isEqualTo(1);
         assertThat(originalFormCount).isEqualTo(0); // Original form should NOT be added when stitching occurs
-        
+
         verify(formGenerator).generate(caseData, BEARER_TOKEN);
     }
 
@@ -249,8 +256,10 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
             .claimantBilingualLanguagePreference(Language.WELSH.toString())
-            .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments).build().toBuilder()
-            .respondent1OriginalDqDoc(CaseDocument.builder().documentName("defendant-dq-form").build()).build();
+            .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments).build();
+        CaseDocument caseDocument = new CaseDocument();
+        caseDocument.setDocumentName("defendant-dq-form");
+        caseData.setRespondent1OriginalDqDoc(caseDocument);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
 

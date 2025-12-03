@@ -59,25 +59,23 @@ class GenerateCoscDocumentHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldGenerate_cosc_doc() {
-        CaseDocument document = CaseDocument.builder()
-            .createdBy("John")
-            .documentName("cosc document")
-            .documentSize(0L)
-            .documentType(CERTIFICATE_OF_DEBT_PAYMENT)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+        CaseDocument document = new CaseDocument();
+        document.setCreatedBy("John");
+        document.setDocumentName("cosc document");
+        document.setDocumentSize(0L);
+        document.setDocumentType(CERTIFICATE_OF_DEBT_PAYMENT);
+        document.setCreatedDatetime(LocalDateTime.now());
+        Document documentLink = new Document();
+        documentLink.setDocumentUrl("fake-url");
+        documentLink.setDocumentFileName("file-name");
+        documentLink.setDocumentBinaryUrl("binary-url");
+        document.setDocumentLink(documentLink);
 
         when(certificateOfDebtGenerator.generateDoc(any(CaseData.class), anyString(),
                                                     eq(DocmosisTemplates.CERTIFICATE_OF_DEBT_PAYMENT))).thenReturn(document);
 
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31DaysForCosc().toBuilder()
-            .build();
+            .buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31DaysForCosc();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_COSC_DOCUMENT.name());
 
@@ -101,18 +99,17 @@ class GenerateCoscDocumentHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldGenerate_cosc_bilingualdoc() {
-        CaseDocument document = CaseDocument.builder()
-            .createdBy("John")
-            .documentName("cosc document")
-            .documentSize(0L)
-            .documentType(CERTIFICATE_OF_DEBT_PAYMENT)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+        CaseDocument document = new CaseDocument();
+        document.setCreatedBy("John");
+        document.setDocumentName("cosc document");
+        document.setDocumentSize(0L);
+        document.setDocumentType(CERTIFICATE_OF_DEBT_PAYMENT);
+        document.setCreatedDatetime(LocalDateTime.now());
+        Document documentLink = new Document();
+        documentLink.setDocumentUrl("fake-url");
+        documentLink.setDocumentFileName("file-name");
+        documentLink.setDocumentBinaryUrl("binary-url");
+        document.setDocumentLink(documentLink);
 
         when(certificateOfDebtGenerator
                  .generateDoc(any(CaseData.class), anyString(), eq(DocmosisTemplates.CERTIFICATE_OF_DEBT_PAYMENT))).thenReturn(document);
@@ -120,13 +117,13 @@ class GenerateCoscDocumentHandlerTest extends BaseCallbackHandlerTest {
                  .generateDoc(any(CaseData.class), anyString(), eq(DocmosisTemplates.CERTIFICATE_OF_DEBT_PAYMENT_WELSH))).thenReturn(document);
 
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31DaysForCosc().toBuilder()
-            .ccdCaseReference(Long.valueOf("12345"))
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                         .respondent1ResponseLanguage(Language.BOTH.toString())
-                                                         .build()).build())
-            .build();
+            .buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31DaysForCosc();
+        caseData.setCcdCaseReference(Long.valueOf("12345"));
+        RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
+        respondentLiPResponse.setRespondent1ResponseLanguage(Language.BOTH.toString());
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
+        caseData.setCaseDataLiP(caseDataLiP);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_COSC_DOCUMENT.name());
 

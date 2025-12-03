@@ -73,9 +73,10 @@ class CreateClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldRecordScenario_whenFeePaymentOutcome() {
+            FeePaymentOutcomeDetails feePaymentOutcomeDetails = new FeePaymentOutcomeDetails();
+            feePaymentOutcomeDetails.setHwfFullRemissionGrantedForClaimIssue(YesOrNo.NO);
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().hwfFeeType(FeeType.CLAIMISSUED)
-                .feePaymentOutcomeDetails(
-                    FeePaymentOutcomeDetails.builder().hwfFullRemissionGrantedForClaimIssue(YesOrNo.NO).build())
+                .feePaymentOutcomeDetails(feePaymentOutcomeDetails)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_APPLICANT1.name())
@@ -98,9 +99,10 @@ class CreateClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldRecordScenario_ForAddingApplicationsAndMessagesToTheCourtTask() {
             when(featureToggleService.isLipQueryManagementEnabled(any())).thenReturn(true);
+            FeePaymentOutcomeDetails feePaymentOutcomeDetails = new FeePaymentOutcomeDetails();
+            feePaymentOutcomeDetails.setHwfFullRemissionGrantedForClaimIssue(YesOrNo.NO);
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().hwfFeeType(FeeType.CLAIMISSUED)
-                .feePaymentOutcomeDetails(
-                    FeePaymentOutcomeDetails.builder().hwfFullRemissionGrantedForClaimIssue(YesOrNo.NO).build())
+                .feePaymentOutcomeDetails(feePaymentOutcomeDetails)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_APPLICANT1.name())

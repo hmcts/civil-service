@@ -256,15 +256,6 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isQueryManagementLRsEnabled()).isEqualTo(toggleStat);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsLrAdmissionBulkEnabled(Boolean toggleStat) {
-        var lrAdmission = "lr-admission-bulk";
-        givenToggle(lrAdmission, toggleStat);
-
-        assertThat(featureToggleService.isLrAdmissionBulkEnabled()).isEqualTo(toggleStat);
-    }
-
     @Test
     void shouldReturnCorrectValue_whenNonLipCase() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();

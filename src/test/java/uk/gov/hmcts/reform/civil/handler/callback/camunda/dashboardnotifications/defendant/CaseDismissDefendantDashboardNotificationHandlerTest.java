@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -41,9 +40,6 @@ class CaseDismissDefendantDashboardNotificationHandlerTest extends BaseCallbackH
     private FeatureToggleService featureToggleService;
 
     @Mock
-    private ObjectMapper objectMapper;
-
-    @Mock
     private DashboardScenariosService dashboardScenariosService;
     @Mock
     private DashboardNotificationService dashboardNotificationService;
@@ -61,11 +57,11 @@ class CaseDismissDefendantDashboardNotificationHandlerTest extends BaseCallbackH
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-            .respondent1Represented(YesOrNo.NO)
-            .applicant1Represented(YesOrNo.NO)
-            .ccdCaseReference(1234L)
-            .previousCCDState(AWAITING_APPLICANT_INTENTION).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setCcdCaseReference(1234L);
+        caseData.setPreviousCCDState(AWAITING_APPLICANT_INTENTION);
 
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
             CallbackRequest.builder().eventId(CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DISMISS_CASE_DEFENDANT.name()).build()
@@ -101,11 +97,11 @@ class CaseDismissDefendantDashboardNotificationHandlerTest extends BaseCallbackH
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec()
             .includesRespondentCitizenQueryFollowUp(OffsetDateTime.now())
-            .build().toBuilder()
-            .respondent1Represented(YesOrNo.NO)
-            .applicant1Represented(YesOrNo.NO)
-            .ccdCaseReference(1234L)
-            .previousCCDState(AWAITING_APPLICANT_INTENTION).build();
+            .build();
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setCcdCaseReference(1234L);
+        caseData.setPreviousCCDState(AWAITING_APPLICANT_INTENTION);
 
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
             CallbackRequest.builder().eventId(CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DISMISS_CASE_DEFENDANT.name()).build()

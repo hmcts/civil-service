@@ -111,13 +111,12 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
         @Test
         void shouldReturnError_WhenAboutToStartIsInvoked() {
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .respondent1ResponseDate(LocalDateTime.now())
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .ccdState(AWAITING_APPLICANT_INTENTION)
-                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(whenWillPay).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+            caseData.setCcdState(AWAITING_APPLICANT_INTENTION);
+            caseData.setRespondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(whenWillPay).build());
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -127,13 +126,12 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
         @Test
         void shouldNotReturnError_WhenAboutToStartIsInvokedOneDefendant() {
             LocalDate whenWillPay = LocalDate.of(2023, 10, 11);
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .respondent1ResponseDate(LocalDateTime.now().minusDays(15))
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-                .ccdState(AWAITING_APPLICANT_INTENTION)
-                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(whenWillPay).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setRespondent1ResponseDate(LocalDateTime.now().minusDays(15));
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+            caseData.setCcdState(AWAITING_APPLICANT_INTENTION);
+            caseData.setRespondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(whenWillPay).build());
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -142,14 +140,13 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
         @Test
         void shouldReturnError_WhenAboutToStartIsInvokedForPAPayImmediately() {
-            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            final LocalDate whenWillPay = LocalDate.now().plusDays(5);
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .ccdState(AWAITING_APPLICANT_INTENTION)
-                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(whenWillPay).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+            caseData.setCcdState(AWAITING_APPLICANT_INTENTION);
+            caseData.setRespondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(whenWillPay).build());
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -159,14 +156,13 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
         @ParameterizedTest
         @CsvSource({"true,IMMEDIATELY", "true,BY_SET_DATE", "false,IMMEDIATELY"})
         void shouldNotReturnError_WhenAboutToStartIsInvokedForPAPayImmediately(boolean toggleState, RespondentResponsePartAdmissionPaymentTimeLRspec paymentOption) {
-            LocalDate whenWillPay = LocalDate.of(2024, 11, 11);
+            final LocalDate whenWillPay = LocalDate.of(2024, 11, 11);
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(toggleState);
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .defenceAdmitPartPaymentTimeRouteRequired(paymentOption)
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .ccdState(AWAITING_APPLICANT_INTENTION)
-                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(whenWillPay).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(paymentOption);
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+            caseData.setCcdState(AWAITING_APPLICANT_INTENTION);
+            caseData.setRespondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(whenWillPay).build());
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -175,16 +171,14 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
         @Test
         void shouldSetCcjJudgmentAmountShowInterestToNoWhenPayImmediatelyAndLrAdmissionBulkEnabled() {
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
             LocalDate whenWillPay = LocalDate.of(2024, 11, 11);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .respondent1ResponseDate(LocalDateTime.now())
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .ccdState(AWAITING_APPLICANT_INTENTION)
-                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(whenWillPay).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+            caseData.setCcdState(AWAITING_APPLICANT_INTENTION);
+            caseData.setRespondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(whenWillPay).build());
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -194,21 +188,19 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
         @Test
         void shouldNotSetCcjJudgmentAmountShowInterestToNoWhenPayImmediatelyAndLrAdmissionBulkEnabled_1v2() {
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
             LocalDate whenWillPay = LocalDate.of(2024, 11, 11);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .respondent1ResponseDate(LocalDateTime.now())
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .ccdState(AWAITING_APPLICANT_INTENTION)
-                .respondent2(Party.builder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+            caseData.setCcdState(AWAITING_APPLICANT_INTENTION);
+            caseData.setRespondent2(Party.builder()
                                  .type(Party.Type.INDIVIDUAL)
                                  .individualFirstName("John")
                                  .individualLastName("Doe")
-                                 .build())
-                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(whenWillPay).build())
-                .build();
+                                 .build());
+            caseData.setRespondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(whenWillPay).build());
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
 
@@ -219,22 +211,20 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
         @Test
         void shouldNotSetCcjJudgmentAmountShowInterestToNoWhenPayBySetDateAndLrAdmissionBulkEnabled() {
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
             when(interestCalculator.calculateInterest(any())).thenReturn(BigDecimal.valueOf(0));
             LocalDate whenWillPay = LocalDate.of(2024, 11, 11);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .respondent1ResponseDate(LocalDateTime.now())
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .ccdState(AWAITING_APPLICANT_INTENTION)
-                .respondent2(Party.builder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+            caseData.setCcdState(AWAITING_APPLICANT_INTENTION);
+            caseData.setRespondent2(Party.builder()
                                  .type(Party.Type.INDIVIDUAL)
                                  .individualFirstName("John")
                                  .individualLastName("Doe")
-                                 .build())
-                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(whenWillPay).build())
-                .build();
+                                 .build());
+            caseData.setRespondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(whenWillPay).build());
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
 
@@ -415,7 +405,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
         @Test
         void shouldShowSummaryForAllFinalOrdersIssued() {
-            String expected = "The judgment request will be processed and a County"
+            final String expected = "The judgment request will be processed and a County"
                 + " Court Judgment (CCJ) will be issued, you will receive any further updates by email.";
 
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
@@ -429,22 +419,21 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
             BigDecimal interestAmount = BigDecimal.valueOf(100);
 
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-                .respondent1Represented(NO)
-                .specRespondent1Represented(NO)
-                .applicant1Represented(YES)
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-                .defendantDetailsSpec(DynamicList.builder()
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setRespondent1Represented(NO);
+            caseData.setSpecRespondent1Represented(NO);
+            caseData.setApplicant1Represented(YES);
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+            caseData.setDefendantDetailsSpec(DynamicList.builder()
                                           .value(DynamicListElement.builder()
                                                      .label("John Doe")
                                                      .build())
-                                          .build())
-                .ccjPaymentDetails(ccjPaymentDetails)
-                .totalClaimAmount(BigDecimal.valueOf(1000))
-                .claimFee(fee)
-                .totalInterest(interestAmount)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
-                .build();
+                                          .build());
+            caseData.setCcjPaymentDetails(ccjPaymentDetails);
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(1000));
+            caseData.setClaimFee(fee);
+            caseData.setTotalInterest(interestAmount);
+            caseData.setCaseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build());
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -512,7 +501,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .fixedCosts(FixedCosts.builder().claimFixedCosts(NO).build())
                 .totalInterest(BigDecimal.valueOf(100))
                 .build();
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -545,7 +533,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .totalClaimAmount(new BigDecimal(1000))
                 .fixedCosts(FixedCosts.builder().claimFixedCosts(YES).build())
                 .build();
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -577,17 +564,16 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
         @Test
         void shouldSetUpBusinessProcessAndContinueOfflineAndCaseState_whenIsJudgmentOnlineLiveDisabled() {
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-                .respondent1Represented(YES)
-                .specRespondent1Represented(YES)
-                .applicant1Represented(YES)
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-                .defendantDetailsSpec(DynamicList.builder()
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setRespondent1Represented(YES);
+            caseData.setSpecRespondent1Represented(YES);
+            caseData.setApplicant1Represented(YES);
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+            caseData.setDefendantDetailsSpec(DynamicList.builder()
                                           .value(DynamicListElement.builder()
                                                      .label("John Doe")
                                                      .build())
-                                          .build())
-                .build();
+                                          .build());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
@@ -605,17 +591,16 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
         @Test
         void shouldSetUpBusinessProcessAndContinueOfflineAndCaseState_whenIsLRvLROneVOne() {
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-                .respondent1Represented(YES)
-                .specRespondent1Represented(YES)
-                .applicant1Represented(YES)
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-                .defendantDetailsSpec(DynamicList.builder()
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setRespondent1Represented(YES);
+            caseData.setSpecRespondent1Represented(YES);
+            caseData.setApplicant1Represented(YES);
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+            caseData.setDefendantDetailsSpec(DynamicList.builder()
                                           .value(DynamicListElement.builder()
                                                      .label("John Doe")
                                                      .build())
-                                          .build())
-                .build();
+                                          .build());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
@@ -633,20 +618,19 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
         @Test
         void shouldSetUpBusinessProcessAndContinueOfflineAndCaseState_whenIsLRvLiPOneVOneAndNotPaidImmediately() {
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-                .respondent1Represented(NO)
-                .specRespondent1Represented(NO)
-                .applicant1Represented(YES)
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-                .defendantDetailsSpec(DynamicList.builder()
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setRespondent1Represented(NO);
+            caseData.setSpecRespondent1Represented(NO);
+            caseData.setApplicant1Represented(YES);
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+            caseData.setDefendantDetailsSpec(DynamicList.builder()
                                           .value(DynamicListElement.builder()
                                                      .label("John Doe")
                                                      .build())
-                                          .build())
-                .respondent1(PartyBuilder.builder().individual().build())
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
-                .activeJudgment(activeJudgment)
-                .build();
+                                          .build());
+            caseData.setRespondent1(PartyBuilder.builder().individual().build());
+            caseData.setCaseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build());
+            caseData.setActiveJudgment(activeJudgment);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
@@ -673,21 +657,20 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
                 .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
                 .build();
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-                .respondent1Represented(NO)
-                .specRespondent1Represented(NO)
-                .applicant1Represented(YES)
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-                .defendantDetailsSpec(DynamicList.builder()
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setRespondent1Represented(NO);
+            caseData.setSpecRespondent1Represented(NO);
+            caseData.setApplicant1Represented(YES);
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+            caseData.setDefendantDetailsSpec(DynamicList.builder()
                                           .value(DynamicListElement.builder()
                                                      .label("John Doe")
                                                      .build())
-                                          .build())
-                .ccjPaymentDetails(ccjPaymentDetails)
-                .respondent1(PartyBuilder.builder().individual().build())
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
-                .activeJudgment(activeJudgment)
-                .build();
+                                          .build());
+            caseData.setCcjPaymentDetails(ccjPaymentDetails);
+            caseData.setRespondent1(PartyBuilder.builder().individual().build());
+            caseData.setCaseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build());
+            caseData.setActiveJudgment(activeJudgment);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
@@ -724,25 +707,24 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
                 .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
                 .build();
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-                .applicant1(PartyBuilder.builder().individual().build())
-                .respondent1(PartyBuilder.builder().individual().build())
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YesOrNo.YES)
-                .respondent2SameLegalRepresentative(YesOrNo.YES)
-                .specRespondent1Represented(YES)
-                .respondent1Represented(YES)
-                .applicant1Represented(YES)
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-                .defendantDetailsSpec(DynamicList.builder()
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setApplicant1(PartyBuilder.builder().individual().build());
+            caseData.setRespondent1(PartyBuilder.builder().individual().build());
+            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setAddRespondent2(YesOrNo.YES);
+            caseData.setRespondent2SameLegalRepresentative(YesOrNo.YES);
+            caseData.setSpecRespondent1Represented(YES);
+            caseData.setRespondent1Represented(YES);
+            caseData.setApplicant1Represented(YES);
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+            caseData.setDefendantDetailsSpec(DynamicList.builder()
                                                   .value(DynamicListElement.builder()
                                                              .label("John Doe")
                                                              .build())
-                                                  .build())
-                .ccjPaymentDetails(ccjPaymentDetails)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
-                .activeJudgment(activeJudgment)
-                .build();
+                                                  .build());
+            caseData.setCcjPaymentDetails(ccjPaymentDetails);
+            caseData.setCaseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build());
+            caseData.setActiveJudgment(activeJudgment);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
@@ -771,20 +753,19 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
                 .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
                 .build();
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-                .applicant1(PartyBuilder.builder().individual().build())
-                .applicant2(PartyBuilder.builder().individual().build())
-                .addApplicant2(YesOrNo.YES)
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-                .defendantDetailsSpec(DynamicList.builder()
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setApplicant1(PartyBuilder.builder().individual().build());
+            caseData.setApplicant2(PartyBuilder.builder().individual().build());
+            caseData.setAddApplicant2(YesOrNo.YES);
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+            caseData.setDefendantDetailsSpec(DynamicList.builder()
                                           .value(DynamicListElement.builder()
                                                      .label("John Doe")
                                                      .build())
-                                          .build())
-                .ccjPaymentDetails(ccjPaymentDetails)
-                .respondent1(PartyBuilder.builder().individual().build())
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
-                .build();
+                                          .build());
+            caseData.setCcjPaymentDetails(ccjPaymentDetails);
+            caseData.setRespondent1(PartyBuilder.builder().individual().build());
+            caseData.setCaseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
@@ -856,21 +837,19 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
                 .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
                 .build();
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-                .respondent1Represented(YES)
-                .specRespondent1Represented(YES)
-                .applicant1Represented(YES)
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-                .ccjPaymentDetails(ccjPaymentDetails)
-                .respondent1(PartyBuilder.builder().individual().build())
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
-                .activeJudgment(activeJudgment)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setRespondent1Represented(YES);
+            caseData.setSpecRespondent1Represented(YES);
+            caseData.setApplicant1Represented(YES);
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+            caseData.setCcjPaymentDetails(ccjPaymentDetails);
+            caseData.setRespondent1(PartyBuilder.builder().individual().build());
+            caseData.setCaseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build());
+            caseData.setActiveJudgment(activeJudgment);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
 
             AboutToStartOrSubmitCallbackResponse response;
             try (MockedStatic<LocalDateTime> mock = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
@@ -950,20 +929,19 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
                 .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
                 .build();
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-                .respondent1Represented(NO)
-                .specRespondent1Represented(NO)
-                .applicant1Represented(YES)
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-                .defendantDetailsSpec(DynamicList.builder()
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setRespondent1Represented(NO);
+            caseData.setSpecRespondent1Represented(NO);
+            caseData.setApplicant1Represented(YES);
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+            caseData.setDefendantDetailsSpec(DynamicList.builder()
                                           .value(DynamicListElement.builder()
                                                      .label("John Doe")
                                                      .build())
-                                          .build())
-                .ccjPaymentDetails(ccjPaymentDetails)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
-                .ccdState(All_FINAL_ORDERS_ISSUED)
-                .build();
+                                          .build());
+            caseData.setCcjPaymentDetails(ccjPaymentDetails);
+            caseData.setCaseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build());
+            caseData.setCcdState(All_FINAL_ORDERS_ISSUED);
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);

@@ -57,7 +57,6 @@ public class GenerateDJFormHandler extends CallbackHandler {
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         if (!((caseData.isLRvLipOneVOne() || caseData.isLipvLROneVOne())
             && isSpecHandler(callbackParams))
@@ -67,15 +66,15 @@ public class GenerateDJFormHandler extends CallbackHandler {
             || (ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
             && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")))
             || ofNullable(caseData.getRespondent2()).isEmpty())) {
-            buildDocument(callbackParams, caseDataBuilder);
+            buildDocument(callbackParams, caseData);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
-    private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder caseDataBuilder) {
+    private void buildDocument(CallbackParams callbackParams, CaseData caseData) {
         List<CaseDocument> caseDocuments = defaultJudgmentFormGenerator.generate(
             callbackParams.getCaseData(),
             callbackParams.getParams().get(BEARER_TOKEN).toString(),
@@ -88,7 +87,7 @@ public class GenerateDJFormHandler extends CallbackHandler {
         }
         assignCategoryId.assignCategoryIdToCollection(systemGeneratedCaseDocuments, document -> document.getValue().getDocumentLink(),
                                                  "detailsOfClaim");
-        caseDataBuilder.defaultJudgmentDocuments(systemGeneratedCaseDocuments);
+        caseData.setDefaultJudgmentDocuments(systemGeneratedCaseDocuments);
     }
 
     private boolean isSpecHandler(CallbackParams callbackParams) {

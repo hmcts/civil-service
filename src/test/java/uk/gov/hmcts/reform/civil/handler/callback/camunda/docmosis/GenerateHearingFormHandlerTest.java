@@ -60,29 +60,30 @@ class GenerateHearingFormHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldGenerateForm_when1v1() {
-        CaseDocument document = CaseDocument.builder()
-            .createdBy("John")
-            .documentName("document name")
-            .documentSize(0L)
-            .documentType(HEARING_FORM)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+        Document documentLink = new Document();
+        documentLink.setDocumentUrl("fake-url");
+        documentLink.setDocumentFileName("file-name");
+        documentLink.setDocumentBinaryUrl("binary-url");
+
+        CaseDocument document = new CaseDocument();
+        document.setCreatedBy("John");
+        document.setDocumentName("document name");
+        document.setDocumentSize(0L);
+        document.setDocumentType(HEARING_FORM);
+        document.setCreatedDatetime(LocalDateTime.now());
+        document.setDocumentLink(documentLink);
 
         List<CaseDocument> documents = new ArrayList<>();
         documents.add(document);
         when(hearingFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(documents);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .respondent2(PartyBuilder.builder().individual().build())
-            .addRespondent2(YES)
-            .respondent2SameLegalRepresentative(YES)
-            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setAddRespondent2(YES);
+        caseData.setRespondent2SameLegalRepresentative(YES);
+        BusinessProcess businessProcess =  new BusinessProcess();
+        businessProcess.setProcessInstanceId(PROCESS_INSTANCE_ID);
+        caseData.setBusinessProcess(businessProcess);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_HEARING_FORM.name());
 
@@ -97,30 +98,31 @@ class GenerateHearingFormHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldGenerateForm_when1v1ButHideIt_IfClaimantIsWelsh() {
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-        CaseDocument document = CaseDocument.builder()
-            .createdBy("John")
-            .documentName("document name")
-            .documentSize(0L)
-            .documentType(HEARING_FORM)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+        Document documentLink = new Document();
+        documentLink.setDocumentUrl("fake-url");
+        documentLink.setDocumentFileName("file-name");
+        documentLink.setDocumentBinaryUrl("binary-url");
+
+        CaseDocument document = new CaseDocument();
+        document.setCreatedBy("John");
+        document.setDocumentName("document name");
+        document.setDocumentSize(0L);
+        document.setDocumentType(HEARING_FORM);
+        document.setCreatedDatetime(LocalDateTime.now());
+        document.setDocumentLink(documentLink);
 
         List<CaseDocument> documents = new ArrayList<>();
         documents.add(document);
         when(hearingFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(documents);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1Represented(YesOrNo.NO)
-            .information("test")
-            .claimantBilingualLanguagePreference("WELSH")
-            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setInformation("test");
+        caseData.setClaimantBilingualLanguagePreference("WELSH");
+        BusinessProcess businessProcess =  new BusinessProcess();
+        businessProcess.setProcessInstanceId(PROCESS_INSTANCE_ID);
+        caseData.setBusinessProcess(businessProcess);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_HEARING_FORM.name());
 
@@ -135,18 +137,18 @@ class GenerateHearingFormHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldGenerate2Forms_whenListHave1PreviousForm() {
-        CaseDocument document = CaseDocument.builder()
-            .createdBy("John")
-            .documentName("document name")
-            .documentSize(0L)
-            .documentType(HEARING_FORM)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+        Document documentLink = new Document();
+        documentLink.setDocumentUrl("fake-url");
+        documentLink.setDocumentFileName("file-name");
+        documentLink.setDocumentBinaryUrl("binary-url");
+
+        CaseDocument document = new CaseDocument();
+        document.setCreatedBy("John");
+        document.setDocumentName("document name");
+        document.setDocumentSize(0L);
+        document.setDocumentType(HEARING_FORM);
+        document.setCreatedDatetime(LocalDateTime.now());
+        document.setDocumentLink(documentLink);
 
         List<CaseDocument> documents = new ArrayList<>();
         documents.add(document);
@@ -154,13 +156,14 @@ class GenerateHearingFormHandlerTest extends BaseCallbackHandlerTest {
 
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         systemGeneratedCaseDocuments.add(element(document));
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .respondent2(PartyBuilder.builder().individual().build())
-            .addRespondent2(YES)
-            .respondent2SameLegalRepresentative(YES)
-            .hearingDocuments(systemGeneratedCaseDocuments)
-            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setAddRespondent2(YES);
+        caseData.setRespondent2SameLegalRepresentative(YES);
+        caseData.setHearingDocuments(systemGeneratedCaseDocuments);
+        BusinessProcess businessProcess =  new BusinessProcess();
+        businessProcess.setProcessInstanceId(PROCESS_INSTANCE_ID);
+        caseData.setBusinessProcess(businessProcess);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_HEARING_FORM.name());
 

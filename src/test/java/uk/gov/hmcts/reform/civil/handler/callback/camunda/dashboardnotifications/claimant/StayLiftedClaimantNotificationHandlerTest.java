@@ -95,11 +95,9 @@ class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandlerTest 
         @Test
         void shouldNotRecordAnyScenarios_ifClaimantIsNotLip() {
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
-                .toBuilder()
-                .applicant1Represented(YesOrNo.YES)
-                .preStayState(IN_MEDIATION.toString())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setApplicant1Represented(YesOrNo.YES);
+            caseData.setPreStayState(IN_MEDIATION.toString());
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -115,11 +113,9 @@ class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandlerTest 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
-                .toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .preStayState(IN_MEDIATION.toString())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setPreStayState(IN_MEDIATION.toString());
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -137,11 +133,9 @@ class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandlerTest 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
-                .toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .preStayState(JUDICIAL_REFERRAL.toString())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setPreStayState(JUDICIAL_REFERRAL.toString());
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -159,11 +153,9 @@ class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandlerTest 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
-                .toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .preStayState(CASE_PROGRESSION.toString())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setPreStayState(CASE_PROGRESSION.toString());
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -182,11 +174,9 @@ class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandlerTest 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
-                .toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .preStayState(HEARING_READINESS.toString())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setPreStayState(HEARING_READINESS.toString());
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -207,12 +197,12 @@ class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandlerTest 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
-                .toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .preStayState(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString())
-                .hearingFeePaymentDetails(PaymentDetails.builder().status(SUCCESS).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setPreStayState(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString());
+            PaymentDetails paymentDetails = new PaymentDetails();
+            paymentDetails.setStatus(SUCCESS);
+            caseData.setHearingFeePaymentDetails(paymentDetails);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -232,11 +222,9 @@ class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandlerTest 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
-                .toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .preStayState(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setPreStayState(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString());
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -257,12 +245,10 @@ class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandlerTest 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
-                .toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .preStayState(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString())
-                .caseDocumentUploadDate(LocalDateTime.now())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setPreStayState(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString());
+            caseData.setCaseDocumentUploadDate(LocalDateTime.now());
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -284,12 +270,10 @@ class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandlerTest 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
-                .toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .preStayState(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString())
-                .caseDocumentUploadDate(LocalDateTime.now())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setPreStayState(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString());
+            caseData.setCaseDocumentUploadDate(LocalDateTime.now());
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)

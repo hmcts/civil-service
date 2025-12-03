@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.ClaimantResponseOnCourtDecisionType;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimantresponse.InterlocutoryJudgementDocGenerator;
@@ -39,19 +40,24 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.IN
 @ExtendWith(MockitoExtension.class)
 class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest {
 
-    private static final CaseDocument FORM = CaseDocument.builder()
-        .createdBy("John")
-        .documentName("document name")
-        .documentSize(0L)
-        .documentType(INTERLOCUTORY_JUDGEMENT)
-        .createdDatetime(LocalDateTime.now())
-        .documentLink(Document.builder()
-                          .documentUrl("fake-url")
-                          .documentFileName("file-name")
-                          .documentBinaryUrl("binary-url")
-                          .build())
+    public static final CaseDocument FORM;
 
-        .build();
+    static {
+        Document documentLink = new Document();
+        documentLink.setDocumentUrl("fake-url");
+        documentLink.setDocumentFileName("file-name");
+        documentLink.setDocumentBinaryUrl("binary-url");
+
+        CaseDocument document1 = new CaseDocument();
+        document1.setCreatedBy("John");
+        document1.setDocumentName("document name");
+        document1.setDocumentSize(0L);
+        document1.setDocumentType(INTERLOCUTORY_JUDGEMENT);
+        document1.setCreatedDatetime(LocalDateTime.now());
+        document1.setDocumentLink(documentLink);
+        FORM = document1;
+    }
+
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
     @Mock
     private InterlocutoryJudgementDocGenerator interlocutoryJudgementDocGenerator;
@@ -84,17 +90,15 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
             any(CaseData.class),
             anyString()
         )).willReturn(FORM);
-        CaseData caseData = CaseData.builder()
-            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
-            .caseDataLiP(CaseDataLiP.builder()
-
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .claimantResponseOnCourtDecision(
-                                                            ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE)
-                                                        .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
-                                                        .build())
-                             .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondent1(Party.builder().type(Party.Type.INDIVIDUAL).build());
+        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+        claimantLiPResponse.setClaimantResponseOnCourtDecision(
+            ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE);
+        claimantLiPResponse.setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+        caseData.setCaseDataLiP(caseDataLiP);
 
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         verify(interlocutoryJudgementDocGenerator).generateInterlocutoryJudgementDoc(caseData, BEARER_TOKEN);
@@ -108,17 +112,16 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
             any(CaseData.class),
             anyString()
         )).willReturn(FORM);
-        CaseData caseData = CaseData.builder()
-            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .claimantResponseOnCourtDecision(
-                                                            ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE)
-                                                        .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
-                                                        .build())
-                             .build())
-            .claimantBilingualLanguagePreference("WELSH")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondent1(Party.builder().type(Party.Type.INDIVIDUAL).build());
+        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+        claimantLiPResponse.setClaimantResponseOnCourtDecision(
+            ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE);
+        claimantLiPResponse.setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setClaimantBilingualLanguagePreference("WELSH");
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -134,17 +137,16 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
             any(CaseData.class),
             anyString()
         )).willReturn(FORM);
-        CaseData caseData = CaseData.builder()
-            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .claimantResponseOnCourtDecision(
-                                                            ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE)
-                                                        .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
-                                                        .build())
-                             .build())
-            .claimantBilingualLanguagePreference("WELSH")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondent1(Party.builder().type(Party.Type.INDIVIDUAL).build());
+        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+        claimantLiPResponse.setClaimantResponseOnCourtDecision(
+            ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE);
+        claimantLiPResponse.setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setClaimantBilingualLanguagePreference("WELSH");
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -161,17 +163,21 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
             any(CaseData.class),
             anyString()
         )).willReturn(FORM);
-        CaseData caseData = CaseData.builder()
-            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .claimantResponseOnCourtDecision(
-                                                            ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_PLAN)
-                                                        .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
-                                                        .build())
-                             .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("WELSH").build())
-                             .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        caseData.setRespondent1(party);
+        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+        claimantLiPResponse.setClaimantResponseOnCourtDecision(
+            ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_PLAN);
+        claimantLiPResponse.setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+        caseData.setCaseDataLiP(caseDataLiP);
+        RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
+        respondentLiPResponse.setRespondent1ResponseLanguage("WELSH");
+        caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
+        caseData.setCaseDataLiP(caseDataLiP);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -183,15 +189,16 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
     @Test
     void shouldNotGenerateDocWhenCourtDecisionInFavourClaimant() {
         //Given
-        CaseData caseData = CaseData.builder()
-            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
-                                                        .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                                                        .build())
-                             .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        caseData.setRespondent1(party);
+        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+        claimantLiPResponse.setApplicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ);
+        claimantLiPResponse.setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+        caseData.setCaseDataLiP(caseDataLiP);
 
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         verify(interlocutoryJudgementDocGenerator, times(0)).generateInterlocutoryJudgementDoc(caseData, BEARER_TOKEN);
@@ -200,15 +207,16 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
     @Test
     void shouldNotGenerateDocWhenChoosesHowToProceedSignSettlementAgreement() {
         //Given
-        CaseData caseData = CaseData.builder()
-            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .applicant1ChoosesHowToProceed(ChooseHowToProceed.SIGN_A_SETTLEMENT_AGREEMENT)
-                                                        .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
-                                                        .build())
-                             .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        caseData.setRespondent1(party);
+        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+        claimantLiPResponse.setApplicant1ChoosesHowToProceed(ChooseHowToProceed.SIGN_A_SETTLEMENT_AGREEMENT);
+        claimantLiPResponse.setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+        caseData.setCaseDataLiP(caseDataLiP);
 
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         verify(interlocutoryJudgementDocGenerator, times(0)).generateInterlocutoryJudgementDoc(caseData, BEARER_TOKEN);

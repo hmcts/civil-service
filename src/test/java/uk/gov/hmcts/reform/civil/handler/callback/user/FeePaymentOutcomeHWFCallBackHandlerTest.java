@@ -97,15 +97,16 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
 
         @Test
         void shouldUpdateTheDataBaseWithHWFRefNumber_WhenFeeType_Hearing() {
-            CaseData caseData = CaseData.builder()
-                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder().hwfNumberAvailable(YesOrNo.YES)
-                                              .hwfNumberForFeePaymentOutcome("HWF-1C4-E34")
-                                              .hwfFullRemissionGrantedForHearingFee(YesOrNo.YES).build())
-                .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                       .hwfCaseEvent(FEE_PAYMENT_OUTCOME)
-                                       .build())
-                .hwfFeeType(FeeType.HEARING)
-                .build();
+            FeePaymentOutcomeDetails feePaymentDetails = new FeePaymentOutcomeDetails();
+            feePaymentDetails.setHwfNumberAvailable(YesOrNo.YES);
+            feePaymentDetails.setHwfNumberForFeePaymentOutcome("HWF-1C4-E34");
+            feePaymentDetails.setHwfFullRemissionGrantedForHearingFee(YesOrNo.YES);
+            HelpWithFeesDetails hearingHwfDetails = new HelpWithFeesDetails();
+            hearingHwfDetails.setHwfCaseEvent(FEE_PAYMENT_OUTCOME);
+            CaseData caseData = CaseData.builder().build();
+            caseData.setFeePaymentOutcomeDetails(feePaymentDetails);
+            caseData.setHearingHwfDetails(hearingHwfDetails);
+            caseData.setHwfFeeType(FeeType.HEARING);
             when(hwfService.updateHwfReferenceNumber(any(CaseData.class)))
                 .thenAnswer((Answer<CaseData>) invocation -> invocation.getArgument(0));
 
@@ -120,15 +121,16 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
 
         @Test
         void shouldValidateRemissionTypeForHearingFee() {
-            CaseData caseData = CaseData.builder()
-                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder().hwfNumberAvailable(YesOrNo.YES)
-                                              .hwfNumberForFeePaymentOutcome("HWF-1C4-E34")
-                                              .hwfFullRemissionGrantedForHearingFee(YesOrNo.YES).build())
-                .hwfFeeType(FeeType.HEARING)
-                .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                         .outstandingFeeInPounds(BigDecimal.valueOf(100.00))
-                                         .build())
-                .build();
+            FeePaymentOutcomeDetails feePaymentDetails = new FeePaymentOutcomeDetails();
+            feePaymentDetails.setHwfNumberAvailable(YesOrNo.YES);
+            feePaymentDetails.setHwfNumberForFeePaymentOutcome("HWF-1C4-E34");
+            feePaymentDetails.setHwfFullRemissionGrantedForHearingFee(YesOrNo.YES);
+            HelpWithFeesDetails hearingHwfDetails = new HelpWithFeesDetails();
+            hearingHwfDetails.setOutstandingFeeInPounds(BigDecimal.valueOf(100.00));
+            CaseData caseData = CaseData.builder().build();
+            caseData.setFeePaymentOutcomeDetails(feePaymentDetails);
+            caseData.setHwfFeeType(FeeType.HEARING);
+            caseData.setHearingHwfDetails(hearingHwfDetails);
 
             CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "remission-type");
 
@@ -139,15 +141,16 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
 
         @Test
         void shouldValidateRemissionTypeForClaimIssFee() {
-            CaseData caseData = CaseData.builder()
-                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder().hwfNumberAvailable(YesOrNo.YES)
-                                              .hwfNumberForFeePaymentOutcome("HWF-1C4-E34")
-                                              .hwfFullRemissionGrantedForClaimIssue(YesOrNo.YES).build())
-                .hwfFeeType(FeeType.CLAIMISSUED)
-                .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
-                                           .outstandingFeeInPounds(BigDecimal.valueOf(100.00))
-                                           .build())
-                .build();
+            FeePaymentOutcomeDetails feePaymentDetails = new FeePaymentOutcomeDetails();
+            feePaymentDetails.setHwfNumberAvailable(YesOrNo.YES);
+            feePaymentDetails.setHwfNumberForFeePaymentOutcome("HWF-1C4-E34");
+            feePaymentDetails.setHwfFullRemissionGrantedForClaimIssue(YesOrNo.YES);
+            HelpWithFeesDetails claimIssuedHwfDetails = new HelpWithFeesDetails();
+            claimIssuedHwfDetails.setOutstandingFeeInPounds(BigDecimal.valueOf(100.00));
+            CaseData caseData = CaseData.builder().build();
+            caseData.setFeePaymentOutcomeDetails(feePaymentDetails);
+            caseData.setHwfFeeType(FeeType.CLAIMISSUED);
+            caseData.setClaimIssuedHwfDetails(claimIssuedHwfDetails);
 
             CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "remission-type");
 
@@ -158,9 +161,8 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
 
         @Test
         void shouldUpdateBusinessProcess_WhenFeeType_ClaimIssue() {
-            CaseData caseData = CaseData.builder()
-                .hwfFeeType(FeeType.CLAIMISSUED)
-                .build();
+            CaseData caseData = CaseData.builder().build();
+            caseData.setHwfFeeType(FeeType.CLAIMISSUED);
             when(hwfService.updateHwfReferenceNumber(any(CaseData.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 

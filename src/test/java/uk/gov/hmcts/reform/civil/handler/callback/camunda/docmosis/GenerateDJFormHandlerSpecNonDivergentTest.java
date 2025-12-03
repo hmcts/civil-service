@@ -65,54 +65,53 @@ class GenerateDJFormHandlerSpecNonDivergentTest extends BaseCallbackHandlerTest 
     @Nested
     class AboutToSubmitCallback {
 
-        CaseDocument documentClaimant = CaseDocument.builder()
-            .createdBy("John")
-            .documentName("document name")
-            .documentSize(0L)
-            .documentType(DEFAULT_JUDGMENT_CLAIMANT1)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
-        CaseDocument documentClaimant2 = CaseDocument.builder()
-            .createdBy("John")
-            .documentName("document name")
-            .documentSize(0L)
-            .documentType(DEFAULT_JUDGMENT_CLAIMANT2)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
-        CaseDocument documentDefendant = CaseDocument.builder()
-            .createdBy("John")
-            .documentName("document name")
-            .documentSize(0L)
-            .documentType(DEFAULT_JUDGMENT_DEFENDANT1)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
-        CaseDocument documentDefendant2 = CaseDocument.builder()
-            .createdBy("John")
-            .documentName("document name")
-            .documentSize(0L)
-            .documentType(DEFAULT_JUDGMENT_DEFENDANT2)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+        public static final CaseDocument documentClaimant;
+        public static final CaseDocument documentClaimant2;
+        public static final CaseDocument documentDefendant;
+        public static final CaseDocument documentDefendant2;
+
+        static {
+            Document documentLink = new Document();
+            documentLink.setDocumentUrl("fake-url");
+            documentLink.setDocumentFileName("file-name");
+            documentLink.setDocumentBinaryUrl("binary-url");
+
+            CaseDocument document1 = new CaseDocument();
+            document1.setCreatedBy("John");
+            document1.setDocumentName("document name");
+            document1.setDocumentSize(0L);
+            document1.setDocumentType(DEFAULT_JUDGMENT_CLAIMANT1);
+            document1.setCreatedDatetime(LocalDateTime.now());
+            document1.setDocumentLink(documentLink);
+            documentClaimant = document1;
+
+            CaseDocument document2 = new CaseDocument();
+            document2.setCreatedBy("John");
+            document2.setDocumentName("document name");
+            document2.setDocumentSize(0L);
+            document2.setDocumentType(DEFAULT_JUDGMENT_CLAIMANT2);
+            document2.setCreatedDatetime(LocalDateTime.now());
+            document2.setDocumentLink(documentLink);
+            documentClaimant2 = document2;
+
+            CaseDocument document3 = new CaseDocument();
+            document3.setCreatedBy("John");
+            document3.setDocumentName("document name");
+            document3.setDocumentSize(0L);
+            document3.setDocumentType(DEFAULT_JUDGMENT_DEFENDANT1);
+            document3.setCreatedDatetime(LocalDateTime.now());
+            document3.setDocumentLink(documentLink);
+            documentDefendant = document3;
+
+            CaseDocument document4 = new CaseDocument();
+            document4.setCreatedBy("John");
+            document4.setDocumentName("document name");
+            document4.setDocumentSize(0L);
+            document4.setDocumentType(DEFAULT_JUDGMENT_DEFENDANT2);
+            document4.setCreatedDatetime(LocalDateTime.now());
+            document4.setDocumentLink(documentLink);
+            documentDefendant2 = document4;
+        }
 
         @Test
         void shouldGenerateClaimantForm_when1v1ClaimantEvent() {
@@ -120,13 +119,13 @@ class GenerateDJFormHandlerSpecNonDivergentTest extends BaseCallbackHandlerTest 
             documents.add(documentClaimant);
             when(defaultJudgmentFormGenerator.generateNonDivergentDocs(any(CaseData.class), anyString(),
                                                        eq(GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT.name()))).thenReturn(documents);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .defendantDetails(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("Both")
-                                                 .build()).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            DynamicListElement dynamicListElement = new DynamicListElement();
+            dynamicListElement.setLabel("Both");
+            DynamicList dynamicList = new DynamicList();
+            dynamicList.setValue(dynamicListElement);
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setDefendantDetails(dynamicList);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().setEventId(GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT.name());
 
@@ -145,13 +144,13 @@ class GenerateDJFormHandlerSpecNonDivergentTest extends BaseCallbackHandlerTest 
             documents.add(documentClaimant);
             when(defaultJudgmentFormGenerator.generateNonDivergentDocs(any(CaseData.class), anyString(),
                                                                        eq(GEN_DJ_FORM_NON_DIVERGENT_SPEC_DEFENDANT.name()))).thenReturn(documents);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .defendantDetails(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("Both")
-                                                 .build()).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            DynamicListElement dynamicListElement = new DynamicListElement();
+            dynamicListElement.setLabel("Both");
+            DynamicList dynamicList = new DynamicList();
+            dynamicList.setValue(dynamicListElement);
+            caseData.setDefendantDetails(dynamicList);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().setEventId(GEN_DJ_FORM_NON_DIVERGENT_SPEC_DEFENDANT.name());
 
@@ -171,15 +170,15 @@ class GenerateDJFormHandlerSpecNonDivergentTest extends BaseCallbackHandlerTest 
             documents.add(documentDefendant2);
             when(defaultJudgmentFormGenerator.generateNonDivergentDocs(any(CaseData.class), anyString(),
                                                                        eq(GEN_DJ_FORM_NON_DIVERGENT_SPEC_DEFENDANT.name()))).thenReturn(documents);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .defendantDetails(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("Both")
-                                                 .build()).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setAddRespondent2(YES);
+            DynamicListElement dynamicListElement = new DynamicListElement();
+            dynamicListElement.setLabel("Both");
+            DynamicList dynamicList = new DynamicList();
+            dynamicList.setValue(dynamicListElement);
+            caseData.setDefendantDetails(dynamicList);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().setEventId(GEN_DJ_FORM_NON_DIVERGENT_SPEC_DEFENDANT.name());
 
@@ -199,15 +198,15 @@ class GenerateDJFormHandlerSpecNonDivergentTest extends BaseCallbackHandlerTest 
             documents.add(documentClaimant2);
             when(defaultJudgmentFormGenerator.generateNonDivergentDocs(any(CaseData.class), anyString(),
                                                                        eq(GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT.name()))).thenReturn(documents);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .applicant2(PartyBuilder.builder().individual().build())
-                .addApplicant2(YES)
-                .defendantDetails(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("Both")
-                                                 .build()).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setApplicant2(PartyBuilder.builder().individual().build());
+            caseData.setAddApplicant2(YES);
+            DynamicListElement dynamicListElement = new DynamicListElement();
+            dynamicListElement.setLabel("Both");
+            DynamicList dynamicList = new DynamicList();
+            dynamicList.setValue(dynamicListElement);
+            caseData.setDefendantDetails(dynamicList);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().setEventId(GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT.name());
 

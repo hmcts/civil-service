@@ -78,15 +78,17 @@ class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackHandlerT
 
         @Test
         void shouldRecordScenarioQmLrIsOnAndIsNonEaCourt_whenInvoked() {
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("test");
+            caseLocationCivil.setRegion("test");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setApplicant1SettleClaim(YesOrNo.YES);
+            caseDataLiP.setApplicant1ClaimSettledDate(LocalDate.now());
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimSubmittedSmallClaim()
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("test").region(
-                    "test").build())
+                .caseManagementLocation(caseLocationCivil)
                 .applicant1Represented(YesOrNo.NO)
-
-                .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
-                                 .applicant1ClaimSettledDate(
-                                     LocalDate.now()).build()).build();
+                .caseDataLip(caseDataLiP).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("applicant1ClaimSettledDateEn", caseData.getApplicant1ClaimSettleDate());
@@ -117,14 +119,17 @@ class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackHandlerT
 
         @Test
         void shouldRecordScenarioQmLrIsOnAndisEaCourt_whenInvoked() {
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("test");
+            caseLocationCivil.setRegion("test");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setApplicant1SettleClaim(YesOrNo.YES);
+            caseDataLiP.setApplicant1ClaimSettledDate(LocalDate.now());
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimSubmittedSmallClaim()
                 .applicant1Represented(YesOrNo.NO)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("test").region(
-                    "test").build())
-                .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
-                                 .applicant1ClaimSettledDate(
-                                     LocalDate.now()).build()).build();
+                .caseManagementLocation(caseLocationCivil)
+                .caseDataLip(caseDataLiP).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("applicant1ClaimSettledDateEn", caseData.getApplicant1ClaimSettleDate());
@@ -156,14 +161,17 @@ class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackHandlerT
 
         @Test
         void shouldRecordScenarioQmLrIsOnAndIsNonEaCourt_whenInvokedForNro() {
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("test");
+            caseLocationCivil.setRegion("test");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setApplicant1SettleClaim(YesOrNo.YES);
+            caseDataLiP.setApplicant1ClaimSettledDate(LocalDate.now());
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimSubmittedSmallClaim()
                 .applicant1Represented(YesOrNo.NO)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("test").region(
-                    "test").build())
-                .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
-                                 .applicant1ClaimSettledDate(
-                                     LocalDate.now()).build()).build();
+                .caseManagementLocation(caseLocationCivil)
+                .caseDataLip(caseDataLiP).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("applicant1ClaimSettledDateEn", caseData.getApplicant1ClaimSettleDate());

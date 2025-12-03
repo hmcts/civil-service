@@ -43,8 +43,7 @@ public class HearingFeePaidCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse setState(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData().toBuilder()
-            .build();
+        CaseData caseData = callbackParams.getCaseData();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(mapper))

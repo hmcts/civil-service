@@ -292,10 +292,6 @@ public class ShowConditionFlagsCaseUpdater implements HandleAdmitPartOfClaimCase
 
     private void check1v1PartAdmitLRBulkAdmission(CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
         log.info("Checking 1v1 Part Admit LR Bulk Admission");
-        CaseData caseData = updatedCaseData.build();
-        if (featureToggleService.isLrAdmissionBulkEnabled()) {
-            updatedCaseData.partAdmit1v1Defendant(MultiPartyScenario.isOneVOne(caseData)
-                    && caseData.isPartAdmitClaimSpec() ? YES : NO);
-        }
+        updatedCaseData.build();
     }
 }

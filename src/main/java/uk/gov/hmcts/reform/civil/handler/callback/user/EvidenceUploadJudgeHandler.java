@@ -61,22 +61,18 @@ public class EvidenceUploadJudgeHandler extends CallbackHandler {
 
     private AboutToStartOrSubmitCallbackResponse removeCaseNoteType(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        caseDataBuilder
-            .caseNoteType(null)
-            .documentAndNameToAdd(null)
-            .documentAndNoteToAdd(null)
-            .build();
+        caseData.setCaseNoteType(null);
+        caseData.setDocumentAndNameToAdd(null);
+        caseData.setDocumentAndNoteToAdd(null);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
     private AboutToStartOrSubmitCallbackResponse populateSubmittedDateTime(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String userAuth = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
         if (caseData.getCaseNoteType().equals(CaseNoteType.NOTE_ONLY)) {
@@ -87,10 +83,8 @@ public class EvidenceUploadJudgeHandler extends CallbackHandler {
 
             List<Element<CaseNote>> caseNotesTa = caseNoteService.addNoteToListEnd(caseNoteTA, caseData.getCaseNotesTA());
 
-            caseDataBuilder
-                .caseNotesTA(caseNotesTa)
-                .caseNoteTA(null)
-                .build();
+            caseData.setCaseNotesTA(caseNotesTa);
+            caseData.setCaseNoteTA(null);
         }
 
         if (caseData.getCaseNoteType().equals(CaseNoteType.DOCUMENT_ONLY)) {
@@ -103,7 +97,7 @@ public class EvidenceUploadJudgeHandler extends CallbackHandler {
                 List<Element<DocumentWithName>> newJudgeCaseNoteDocumentAndName =  caseNoteService.buildJudgeCaseNoteDocumentAndName(documentAndName.getValue(), userAuth);
                 documentAndNameCurrent.addAll(newJudgeCaseNoteDocumentAndName);
             });
-            caseDataBuilder.documentAndName(documentAndNameCurrent);
+            caseData.setDocumentAndName(documentAndNameCurrent);
         }
 
         if (caseData.getCaseNoteType().equals(CaseNoteType.DOCUMENT_AND_NOTE)) {
@@ -116,11 +110,11 @@ public class EvidenceUploadJudgeHandler extends CallbackHandler {
                 List<Element<DocumentAndNote>> newJudgeCaseNoteAndDocument =  caseNoteService.buildJudgeCaseNoteAndDocument(documentAndNote.getValue(), userAuth);
                 documentAndNoteCurrent.addAll(newJudgeCaseNoteAndDocument);
             });
-            caseDataBuilder.documentAndNote(documentAndNoteCurrent);
+            caseData.setDocumentAndNote(documentAndNoteCurrent);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

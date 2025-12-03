@@ -78,12 +78,12 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
         @Test
         void shouldRecordScenario_whenInvokedWithoutCPEnabled() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                    .respondent1Represented(YesOrNo.NO)
-                    .applicant1Represented(YesOrNo.NO)
-                    .ccdCaseReference(1234L)
-                .generalApplications(List.of(Element.<GeneralApplication>builder().build()))
-                    .previousCCDState(AWAITING_APPLICANT_INTENTION).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setCcdCaseReference(1234L);
+            caseData.setGeneralApplications(List.of(new Element<>(null, new GeneralApplication())));
+            caseData.setPreviousCCDState(AWAITING_APPLICANT_INTENTION);
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
@@ -122,12 +122,12 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
         @Test
         void shouldRecordScenarioForLipVsLr_whenInvokedWithoutCPEnabled() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                .respondent1Represented(YesOrNo.YES)
-                .applicant1Represented(YesOrNo.NO)
-                .ccdCaseReference(1234L)
-                .generalApplications(List.of(Element.<GeneralApplication>builder().build()))
-                .previousCCDState(AWAITING_APPLICANT_INTENTION).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
+            caseData.setRespondent1Represented(YesOrNo.YES);
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setCcdCaseReference(1234L);
+            caseData.setGeneralApplications(List.of(new Element<>(null, new GeneralApplication())));
+            caseData.setPreviousCCDState(AWAITING_APPLICANT_INTENTION);
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
@@ -166,11 +166,11 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
         @Test
         void shouldRecordScenario_whenInvokedForCaseProgressionFeatureToggle() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .applicant1Represented(YesOrNo.NO)
-                .ccdCaseReference(1234L)
-                .previousCCDState(All_FINAL_ORDERS_ISSUED).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setCcdCaseReference(1234L);
+            caseData.setPreviousCCDState(All_FINAL_ORDERS_ISSUED);
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
@@ -197,12 +197,11 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
         void shouldRecordQMScenario_whenInvokedForCaseWithOpenApplicantCitizenQuery() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec()
-                .includesApplicantCitizenQueryFollowUp(OffsetDateTime.now())
-                .build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .applicant1Represented(YesOrNo.NO)
-                .ccdCaseReference(1234L)
-                .previousCCDState(All_FINAL_ORDERS_ISSUED).build();
+                .includesApplicantCitizenQueryFollowUp(OffsetDateTime.now()).build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setCcdCaseReference(1234L);
+            caseData.setPreviousCCDState(All_FINAL_ORDERS_ISSUED);
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);

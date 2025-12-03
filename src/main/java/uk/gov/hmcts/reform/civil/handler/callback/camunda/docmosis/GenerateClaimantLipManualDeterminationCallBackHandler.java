@@ -62,7 +62,6 @@ public class GenerateClaimantLipManualDeterminationCallBackHandler extends Callb
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         CaseDocument claimantResponseForm = claimantLipManualDeterminationFormGenerator.generate(callbackParams.getCaseData(),
                 callbackParams.getParams().get(BEARER_TOKEN).toString());
         if (featureToggleService.isWelshEnabledForMainCase()
@@ -70,17 +69,17 @@ public class GenerateClaimantLipManualDeterminationCallBackHandler extends Callb
             List<Element<CaseDocument>> translatedDocuments = callbackParams.getCaseData()
                 .getPreTranslationDocuments();
             translatedDocuments.add(element(claimantResponseForm));
-            caseDataBuilder.preTranslationDocuments(translatedDocuments);
-            caseDataBuilder.bilingualHint(YesOrNo.YES);
-            caseDataBuilder.preTranslationDocumentType(PreTranslationDocumentType.MANUAL_DETERMINATION_DOCUMENT);
+            caseData.setPreTranslationDocuments(translatedDocuments);
+            caseData.setBilingualHint(YesOrNo.YES);
+            caseData.setPreTranslationDocumentType(PreTranslationDocumentType.MANUAL_DETERMINATION_DOCUMENT);
         } else {
-            caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedDocumentService
+            caseData.setSystemGeneratedCaseDocuments(systemGeneratedDocumentService
                                                              .getSystemGeneratedDocumentsWithAddedDocument(
                                                                  claimantResponseForm,
                                                                  caseData
                                                              ));
         }
-        return AboutToStartOrSubmitCallbackResponse.builder().data(caseDataBuilder.build().toMap(objectMapper)).build();
+        return AboutToStartOrSubmitCallbackResponse.builder().data(caseData.toMap(objectMapper)).build();
     }
 
 }

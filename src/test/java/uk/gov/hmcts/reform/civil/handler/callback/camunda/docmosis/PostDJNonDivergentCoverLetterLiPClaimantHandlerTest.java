@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.CoverLetterService;
@@ -55,25 +56,22 @@ class PostDJNonDivergentCoverLetterLiPClaimantHandlerTest {
 
     @Test
     void shouldHandlePostCoverLetterToLiPClaimant_whenApplicantIsLiP() {
-        Document document = Document.builder()
-            .documentUrl("http://docstore/documents/1234")
-            .documentFileName("dj.pdf")
-            .build();
+        Document document = new Document();
+        document.setDocumentUrl("http://docstore/documents/1234");
+        document.setDocumentFileName("dj.pdf");
 
-        CaseDocument caseDocument = CaseDocument.builder()
-            .documentLink(document)
-            .documentName("DJ Document")
-            .documentType(DEFAULT_JUDGMENT_CLAIMANT1)
-            .build();
+        CaseDocument caseDocument = new CaseDocument();
+        caseDocument.setDocumentLink(document);
+        caseDocument.setDocumentName("DJ Document");
+        caseDocument.setDocumentType(DEFAULT_JUDGMENT_CLAIMANT1);
 
-        CaseData caseData = CaseData.builder()
-            .ccdCaseReference(1L)
-            .legacyCaseReference("001MC001")
-            .applicant1(PartyBuilder.builder().individual("John").build())
-            .respondent1(PartyBuilder.builder().individual("Mike").build())
-            .defaultJudgmentDocuments(List.of(element(caseDocument)))
-            .applicant1Represented(NO)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1L);
+        caseData.setLegacyCaseReference("001MC001");
+        caseData.setApplicant1(PartyBuilder.builder().individual("John").build());
+        caseData.setRespondent1(PartyBuilder.builder().individual("Mike").build());
+        caseData.setDefaultJudgmentDocuments(List.of(element(caseDocument)));
+        caseData.setApplicant1Represented(NO);
 
         when(coverLetterService.generateDocumentWithCoverLetterBinary(any(Party.class), any(CaseData.class), any(), anyString(), anyString()))
             .thenReturn("PDF".getBytes());
@@ -97,13 +95,12 @@ class PostDJNonDivergentCoverLetterLiPClaimantHandlerTest {
 
     @Test
     void shouldNotPrintOrGenerate_whenApplicantIsNotLiP() {
-        CaseData caseData = CaseData.builder()
-            .ccdCaseReference(1L)
-            .legacyCaseReference("001MC001")
-            .applicant1(PartyBuilder.builder().individual("John").build())
-            .respondent1(PartyBuilder.builder().individual("Mike").build())
-            .applicant1Represented(YES)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1L);
+        caseData.setLegacyCaseReference("001MC001");
+        caseData.setApplicant1(PartyBuilder.builder().individual("John").build());
+        caseData.setRespondent1(PartyBuilder.builder().individual("Mike").build());
+        caseData.setApplicant1Represented(YES);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)

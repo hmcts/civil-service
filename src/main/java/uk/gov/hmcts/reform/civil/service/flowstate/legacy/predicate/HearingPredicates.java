@@ -18,8 +18,7 @@ public final class HearingPredicates {
 
     public static final Predicate<CaseData> isInHearingReadiness = caseData ->
         caseData.getHearingReferenceNumber() != null
-            && caseData.getListingOrRelisting() != null
-            && caseData.getListingOrRelisting().equals(LISTING)
+            && LISTING.equals(caseData.getListingOrRelisting())
             && caseData.getCaseDismissedHearingFeeDueDate() == null
             && caseData.getTakenOfflineDate() == null
             && caseData.getTakenOfflineByStaffDate() == null;

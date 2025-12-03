@@ -36,7 +36,7 @@ public class BundleCreationService {
         CaseDetails caseDetails = coreCaseDataService.getCase(event.getCaseId());
 
         return createNewBundleRequest(
-            "Bearer Token".equals(event.getAccessToken()) ? getAccessToken() : event.getAccessToken(),
+            event.getAccessToken(),
             serviceAuthTokenGenerator.generate(),
             bundleRequestMapper.mapCaseDataToBundleCreateRequest(
                 caseDetailsConverter.toCaseData(caseDetails),

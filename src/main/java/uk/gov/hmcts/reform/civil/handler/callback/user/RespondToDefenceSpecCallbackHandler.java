@@ -317,8 +317,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(PARTIAL_PAYMENT_OFFLINE))
                 .build();
-        } else if (featureToggleService.isLrAdmissionBulkEnabled()
-            && caseData.getFixedCosts() != null
+        } else if (caseData.getFixedCosts() != null
             && NO.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
             caseData.setCcjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
         }

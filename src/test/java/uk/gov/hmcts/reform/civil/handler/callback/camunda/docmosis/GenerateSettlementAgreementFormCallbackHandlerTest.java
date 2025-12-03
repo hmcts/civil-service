@@ -48,18 +48,23 @@ class GenerateSettlementAgreementFormCallbackHandlerTest extends BaseCallbackHan
     private ObjectMapper mapper;
 
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
-    private static final CaseDocument caseDocument = CaseDocument.builder()
-            .createdBy("John")
-            .documentName("document name")
-            .documentSize(0L)
-            .documentType(SETTLEMENT_AGREEMENT)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                    .documentUrl("fake-url")
-                    .documentFileName("file-name")
-                    .documentBinaryUrl("binary-url")
-                    .build())
-            .build();
+    public static final CaseDocument caseDocument;
+
+    static {
+        Document documentLink = new Document();
+        documentLink.setDocumentUrl("fake-url");
+        documentLink.setDocumentFileName("file-name");
+        documentLink.setDocumentBinaryUrl("binary-url");
+
+        CaseDocument document1 = new CaseDocument();
+        document1.setCreatedBy("John");
+        document1.setDocumentName("document name");
+        document1.setDocumentSize(0L);
+        document1.setDocumentType(SETTLEMENT_AGREEMENT);
+        document1.setCreatedDatetime(LocalDateTime.now());
+        document1.setDocumentLink(documentLink);
+        caseDocument = document1;
+    }
 
     @BeforeEach
     public void setup() {
@@ -105,9 +110,8 @@ class GenerateSettlementAgreementFormCallbackHandlerTest extends BaseCallbackHan
             any(CaseData.class),
             anyString()
         )).willReturn(caseDocument);
-        CaseData caseData = CaseData.builder()
-            .claimantBilingualLanguagePreference("WELSH")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setClaimantBilingualLanguagePreference("WELSH");
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -123,9 +127,8 @@ class GenerateSettlementAgreementFormCallbackHandlerTest extends BaseCallbackHan
             any(CaseData.class),
             anyString()
         )).willReturn(caseDocument);
-        CaseData caseData = CaseData.builder()
-            .claimantBilingualLanguagePreference("WELSH")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setClaimantBilingualLanguagePreference("WELSH");
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -141,11 +144,12 @@ class GenerateSettlementAgreementFormCallbackHandlerTest extends BaseCallbackHan
             any(CaseData.class),
             anyString()
         )).willReturn(caseDocument);
-        CaseData caseData = CaseData.builder()
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("WELSH").build())
-                             .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
+        respondentLiPResponse.setRespondent1ResponseLanguage("WELSH");
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
+        caseData.setCaseDataLiP(caseDataLiP);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);

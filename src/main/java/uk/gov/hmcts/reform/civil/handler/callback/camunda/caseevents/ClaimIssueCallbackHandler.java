@@ -46,23 +46,21 @@ public class ClaimIssueCallbackHandler extends CallbackHandler {
     private CallbackResponse addClaimNotificationDeadlineAndNextDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime deadline = deadlinesCalculator.addMonthsToDateAtMidnight(4, caseData.getIssueDate());
-        CaseData.CaseDataBuilder caseDataUpdated = caseData.toBuilder();
-        caseDataUpdated
-            .claimNotificationDeadline(deadline)
-            .nextDeadline(deadline.toLocalDate());
+        caseData.setClaimNotificationDeadline(deadline);
+        caseData.setNextDeadline(deadline.toLocalDate());
 
-        clearSubmitterId(caseData, caseDataUpdated);
+        clearSubmitterId(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataUpdated.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
-    private void clearSubmitterId(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
+    private void clearSubmitterId(CaseData caseData) {
         IdamUserDetails userDetails = caseData.getApplicantSolicitor1UserDetails();
-        caseDataBuilder
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(userDetails.getEmail()).build())
-            .build();
+        IdamUserDetails solicitorDetails = new IdamUserDetails();
+        solicitorDetails.setEmail(userDetails.getEmail());
+        caseData.setApplicantSolicitor1UserDetails(solicitorDetails);
     }
 
     @Override

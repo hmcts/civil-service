@@ -96,28 +96,22 @@ class TrialArrangementsClaimantNotificationHandlerTest extends BaseCallbackHandl
     }
 
     private static Stream<Arguments> provideCaseData() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setDrawDirectionsOrderRequired(YES);
+        caseData.setDrawDirectionsOrderSmallClaims(NO);
+        caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData.setOrderType(OrderType.DECIDE_DAMAGES);
+        CaseData caseDataReady = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseDataReady.setApplicant1Represented(YesOrNo.NO);
+        caseDataReady.setDrawDirectionsOrderRequired(YES);
+        caseDataReady.setDrawDirectionsOrderSmallClaims(NO);
+        caseDataReady.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseDataReady.setOrderType(OrderType.DECIDE_DAMAGES);
+        caseDataReady.setTrialReadyApplicant(YES);
         return Stream.of(
-            Arguments.of(
-                CaseDataBuilder.builder().atStateClaimIssued().build()
-                    .toBuilder().applicant1Represented(YesOrNo.NO)
-                    .drawDirectionsOrderRequired(YES)
-                    .drawDirectionsOrderSmallClaims(NO)
-                    .claimsTrack(ClaimsTrack.fastTrack)
-                    .orderType(OrderType.DECIDE_DAMAGES)
-                    .build(),
-                true
-            ),
-            Arguments.of(
-                CaseDataBuilder.builder().atStateClaimIssued().build()
-                    .toBuilder().applicant1Represented(YesOrNo.NO)
-                    .drawDirectionsOrderRequired(YES)
-                    .drawDirectionsOrderSmallClaims(NO)
-                    .claimsTrack(ClaimsTrack.fastTrack)
-                    .orderType(OrderType.DECIDE_DAMAGES)
-                    .trialReadyApplicant(YES)
-                    .build(),
-                false
-            )
+            Arguments.of(caseData, true),
+            Arguments.of(caseDataReady, false)
         );
     }
 

@@ -64,47 +64,43 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
     private AssignCategoryId assignCategoryId;
 
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
-    private static final CaseDocument CLAIM_FORM =
-        CaseDocument.builder()
-            .createdBy("John")
-            .documentName(String.format(N1.getDocumentTitle(), "000DC001"))
-            .documentSize(0L)
-            .documentType(SEALED_CLAIM)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+    public static final CaseDocument CLAIM_FORM;
+    public static final CaseDocument LIP_FORM;
+    public static final CaseDocument STITCHED_DOC;
 
-    private static final CaseDocument LIP_FORM =
-        CaseDocument.builder()
-            .createdBy("John")
-            .documentName(String.format(LIP_CLAIM_FORM.getDocumentTitle(), "000DC001"))
-            .documentSize(0L)
-            .documentType(LITIGANT_IN_PERSON_CLAIM_FORM)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+    static {
+        Document documentLink = new Document();
+        documentLink.setDocumentUrl("fake-url");
+        documentLink.setDocumentFileName("file-name");
+        documentLink.setDocumentBinaryUrl("binary-url");
 
-    private static final CaseDocument STITCHED_DOC =
-        CaseDocument.builder()
-            .createdBy("John")
-            .documentName("Stitched document")
-            .documentSize(0L)
-            .documentType(SEALED_CLAIM)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+        CaseDocument document = new CaseDocument();
+        document.setCreatedBy("John");
+        document.setDocumentName(String.format(N1.getDocumentTitle(), "000DC001"));
+        document.setDocumentSize(0L);
+        document.setDocumentType(SEALED_CLAIM);
+        document.setCreatedDatetime(LocalDateTime.now());
+        document.setDocumentLink(documentLink);
+        CLAIM_FORM = document;
+
+        CaseDocument document1 = new CaseDocument();
+        document1.setCreatedBy("John");
+        document1.setDocumentName(String.format(LIP_CLAIM_FORM.getDocumentTitle(), "000DC001"));
+        document1.setDocumentSize(0L);
+        document1.setDocumentType(LITIGANT_IN_PERSON_CLAIM_FORM);
+        document1.setCreatedDatetime(LocalDateTime.now());
+        document1.setDocumentLink(documentLink);
+        LIP_FORM = document1;
+
+        CaseDocument document2 = new CaseDocument();
+        document2.setCreatedBy("John");
+        document2.setDocumentName("Stitched document");
+        document2.setDocumentSize(0L);
+        document2.setDocumentType(SEALED_CLAIM);
+        document2.setCreatedDatetime(LocalDateTime.now());
+        document2.setDocumentLink(documentLink);
+        STITCHED_DOC = document2;
+    }
 
     private final LocalDate issueDate = now();
 

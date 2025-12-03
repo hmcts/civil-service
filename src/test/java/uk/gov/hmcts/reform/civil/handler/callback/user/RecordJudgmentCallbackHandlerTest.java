@@ -85,11 +85,10 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @EnumSource(YesOrNo.class)
         void shouldPopulateAllJoFieldsAsNull(YesOrNo yesOrNo) {
             //Given: Casedata in All_FINAL_ORDERS_ISSUED State
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().toBuilder()
-                .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
-                .joIsLiveJudgmentExists(yesOrNo)
-                .joIssuedDate(LocalDate.now())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            caseData.setCcdState(CaseState.All_FINAL_ORDERS_ISSUED);
+            caseData.setJoIsLiveJudgmentExists(yesOrNo);
+            caseData.setJoIssuedDate(LocalDate.now());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             //When: handler is called with ABOUT_TO_START event
@@ -110,11 +109,10 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotPopulateAllJoFieldsAsNull() {
             //Given: Casedata in All_FINAL_ORDERS_ISSUED State
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().toBuilder()
-                .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
-                .joIsLiveJudgmentExists(null)
-                .joIssuedDate(LocalDate.now())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            caseData.setCcdState(CaseState.All_FINAL_ORDERS_ISSUED);
+            caseData.setJoIsLiveJudgmentExists(null);
+            caseData.setJoIssuedDate(LocalDate.now());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             //When: handler is called with ABOUT_TO_START event
@@ -282,7 +280,9 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
-            when(recordJudgmentOnlineMapper.addUpdateActiveJudgment(any())).thenReturn(getJudgementDetailsPayImmediately().toBuilder().rtlState(null).build());
+            JudgmentDetails judgmentDetails = getJudgementDetailsPayImmediately();
+            judgmentDetails.setRtlState(null);
+            when(recordJudgmentOnlineMapper.addUpdateActiveJudgment(any())).thenReturn(judgmentDetails);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData().get("joIssuedDate")).isNull();

@@ -43,18 +43,24 @@ class GenerateJudgmentByDeterminationFormHandlerTest extends BaseCallbackHandler
     @Mock
     private JudgmentByDeterminationDocGenerator formGenerator;
 
-    private static final CaseDocument FORM = CaseDocument.builder()
-        .createdBy("John")
-        .documentName("document name")
-        .documentSize(0L)
-        .documentType(JUDGMENT_BY_DETERMINATION_CLAIMANT)
-        .createdDatetime(LocalDateTime.now())
-        .documentLink(Document.builder()
-                          .documentUrl("fake-url")
-                          .documentFileName("file-name")
-                          .documentBinaryUrl("binary-url")
-                          .build())
-        .build();
+    public static final CaseDocument FORM;
+
+    static {
+        Document documentLink = new Document();
+        documentLink.setDocumentUrl("fake-url");
+        documentLink.setDocumentFileName("file-name");
+        documentLink.setDocumentBinaryUrl("binary-url");
+
+        CaseDocument document1 = new CaseDocument();
+        document1.setCreatedBy("John");
+        document1.setDocumentName("document name");
+        document1.setDocumentSize(0L);
+        document1.setDocumentType(JUDGMENT_BY_DETERMINATION_CLAIMANT);
+        document1.setCreatedDatetime(LocalDateTime.now());
+        document1.setDocumentLink(documentLink);
+        FORM = document1;
+    }
+
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
 
     @Test

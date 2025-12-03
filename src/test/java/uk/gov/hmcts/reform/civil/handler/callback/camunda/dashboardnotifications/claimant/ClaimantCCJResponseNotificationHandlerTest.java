@@ -57,11 +57,9 @@ class ClaimantCCJResponseNotificationHandlerTest extends BaseCallbackHandlerTest
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder()
-                .build().toBuilder()
-                .ccdCaseReference(1234L)
-                .applicant1Represented(YesOrNo.NO)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCcdCaseReference(1234L);
+            caseData.setApplicant1Represented(YesOrNo.NO);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)

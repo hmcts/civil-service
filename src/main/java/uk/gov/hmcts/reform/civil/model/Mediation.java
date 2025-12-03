@@ -5,10 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason;
 
 import java.util.List;
 
+@Accessors(chain = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

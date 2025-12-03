@@ -122,8 +122,9 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
                 .build();
         }
 
+        caseData.setIsRespondent1(isRespondent1);
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toBuilder().isRespondent1(isRespondent1).build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
@@ -172,35 +173,33 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
         LocalDateTime newDeadline = deadlinesCalculator.calculateFirstWorkingDay(agreedExtension)
             .atTime(END_OF_BUSINESS_DAY);
 
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().isRespondent1(null);
+        caseData.setIsRespondent1(null);
 
         if (caseData.getRespondent2SameLegalRepresentative() != null
             && caseData.getRespondent2SameLegalRepresentative() == YES) {
 
-            caseDataBuilder
-                .businessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE_SPEC))
-                .respondent1TimeExtensionDate(time.now())
-                .respondent1ResponseDeadline(newDeadline)
-                .respondent2TimeExtensionDate(time.now())
-                .respondent2ResponseDeadline(newDeadline)
-                .respondentSolicitor2AgreedDeadlineExtension(caseData.getRespondentSolicitor1AgreedDeadlineExtension())
-                .nextDeadline(newDeadline.toLocalDate());
+            caseData.setBusinessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE_SPEC));
+            caseData.setRespondent1TimeExtensionDate(time.now());
+            caseData.setRespondent1ResponseDeadline(newDeadline);
+            caseData.setRespondent2TimeExtensionDate(time.now());
+            caseData.setRespondent2ResponseDeadline(newDeadline);
+            caseData.setRespondentSolicitor2AgreedDeadlineExtension(caseData.getRespondentSolicitor1AgreedDeadlineExtension());
+            caseData.setNextDeadline(newDeadline.toLocalDate());
         } else if (solicitorRepresentsOnlyRespondent2(callbackParams)) {
-            caseDataBuilder
-                .respondent2TimeExtensionDate(time.now())
-                .respondent2ResponseDeadline(newDeadline)
-                .nextDeadline(deadlinesCalculator.nextDeadline(
-                    Arrays.asList(newDeadline, caseData.getRespondent1ResponseDeadline())).toLocalDate());
+            caseData.setRespondent2TimeExtensionDate(time.now());
+            caseData.setRespondent2ResponseDeadline(newDeadline);
+            caseData.setNextDeadline(deadlinesCalculator.nextDeadline(
+                Arrays.asList(newDeadline, caseData.getRespondent1ResponseDeadline())).toLocalDate());
         } else {
-            caseDataBuilder.respondent1TimeExtensionDate(time.now())
-                .businessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE_SPEC))
-                .respondent1ResponseDeadline(newDeadline)
-                .nextDeadline(deadlinesCalculator.nextDeadline(
-                    Arrays.asList(newDeadline, caseData.getRespondent2ResponseDeadline())).toLocalDate());
+            caseData.setRespondent1TimeExtensionDate(time.now());
+            caseData.setBusinessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE_SPEC));
+            caseData.setRespondent1ResponseDeadline(newDeadline);
+            caseData.setNextDeadline(deadlinesCalculator.nextDeadline(
+                Arrays.asList(newDeadline, caseData.getRespondent2ResponseDeadline())).toLocalDate());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

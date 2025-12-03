@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 
 import java.util.HashMap;
@@ -38,9 +39,6 @@ class ApplicationOfflineUpdateClaimCallbackHandlerTest extends BaseCallbackHandl
     @InjectMocks
     private ApplicationOfflineUpdateClaimCallbackHandler handler;
 
-    @InjectMocks
-    private ObjectMapper mapper;
-
     @Mock
     private GenAppStateHelperService helperService;
 
@@ -61,7 +59,7 @@ class ApplicationOfflineUpdateClaimCallbackHandlerTest extends BaseCallbackHandl
     @Test
     void callHelperServiceToUpdateApplicationDetailsInClaimWhenGeneralApplicationsPresent() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDetails(CaseData.builder().build(),
+            .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),
                                         true,
                                         true,
                                         true, true,
@@ -90,7 +88,7 @@ class ApplicationOfflineUpdateClaimCallbackHandlerTest extends BaseCallbackHandl
     @Test
     void noCallToHelperServiceToUpdateApplicationDetailsInClaimWhenNoGeneralApplicationsPresent() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDetails(CaseData.builder().build(),
+            .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),
                                         false,
                                         false,
                                         false, false,
@@ -108,7 +106,7 @@ class ApplicationOfflineUpdateClaimCallbackHandlerTest extends BaseCallbackHandl
     @Test
     void returnErrorIfHelperServiceThrowsErrors() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDetails(CaseData.builder().build(),
+            .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),
                                         true,
                                         true,
                                         true, true,

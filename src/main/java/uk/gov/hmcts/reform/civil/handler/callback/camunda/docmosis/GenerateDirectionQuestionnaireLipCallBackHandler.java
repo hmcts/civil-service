@@ -61,7 +61,6 @@ public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHa
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .build();
         }
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         CaseDocument sealedDQForm = directionQuestionnaireLipGeneratorFactory
             .getDirectionQuestionnaire()
             .generate(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
@@ -72,17 +71,17 @@ public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHa
             List<Element<CaseDocument>> translatedDocuments = callbackParams.getCaseData()
                 .getPreTranslationDocuments();
             translatedDocuments.add(element(sealedDQForm));
-            caseDataBuilder.bilingualHint(YesOrNo.YES);
-            caseDataBuilder.preTranslationDocuments(translatedDocuments);
-            caseDataBuilder.preTranslationDocumentType(PreTranslationDocumentType.LIP_CLAIMANT_DQ);
+            caseData.setBilingualHint(YesOrNo.YES);
+            caseData.setPreTranslationDocuments(translatedDocuments);
+            caseData.setPreTranslationDocumentType(PreTranslationDocumentType.LIP_CLAIMANT_DQ);
         } else if (featureToggleService.isWelshEnabledForMainCase()
             && sealedDQForm.getDocumentName().contains("defendant")
             && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             assignCategoryId.assignCategoryIdToCaseDocument(sealedDQForm, DocCategory.DQ_DEF1.getValue());
-            caseDataBuilder.respondent1OriginalDqDoc(sealedDQForm);
+            caseData.setRespondent1OriginalDqDoc(sealedDQForm);
         } else {
-            caseDataBuilder
-                .systemGeneratedCaseDocuments(systemGeneratedDocumentService
+            caseData
+                .setSystemGeneratedCaseDocuments(systemGeneratedDocumentService
                                                   .getSystemGeneratedDocumentsWithAddedDocument(
                                                       sealedDQForm,
                                                       caseData
@@ -94,7 +93,7 @@ public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHa
             }
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 }

@@ -67,16 +67,15 @@ public class GenerateTrialReadyFormHandler extends CallbackHandler {
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        buildDocument(callbackParams, caseDataBuilder, caseData);
+        buildDocument(callbackParams, caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
-    private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
+    private void buildDocument(CallbackParams callbackParams,
                                CaseData caseData) {
         String activityID = camundaActivityId(callbackParams);
         CaseRole role = switch (activityID) {
@@ -94,15 +93,15 @@ public class GenerateTrialReadyFormHandler extends CallbackHandler {
         );
         var documents = caseData.getTrialReadyDocuments();
         documents.add(element(caseDocument));
-        caseDataBuilder.trialReadyDocuments(documents);
-        addDocumentCreatedDate(role, caseDataBuilder);
+        caseData.setTrialReadyDocuments(documents);
+        addDocumentCreatedDate(role, caseData);
     }
 
-    private void addDocumentCreatedDate(CaseRole role, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+    private void addDocumentCreatedDate(CaseRole role, CaseData caseData) {
         if (role == CaseRole.CLAIMANT) {
-            caseDataBuilder.claimantTrialReadyDocumentCreated(LocalDateTime.now());
+            caseData.setClaimantTrialReadyDocumentCreated(LocalDateTime.now());
         } else if (role == CaseRole.DEFENDANT) {
-            caseDataBuilder.defendantTrialReadyDocumentCreated(LocalDateTime.now());
+            caseData.setDefendantTrialReadyDocumentCreated(LocalDateTime.now());
         }
     }
 

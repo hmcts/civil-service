@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -73,13 +74,12 @@ class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest {
 
         LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .respondent1ResponseDeadline(dateTime)
-            .respondent1Represented(YesOrNo.NO)
-            .totalClaimAmount(new BigDecimal(1000))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1ResponseDeadline(dateTime);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setTotalClaimAmount(new BigDecimal(1000));
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -101,13 +101,12 @@ class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest {
 
         LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .respondent1ResponseDeadline(dateTime)
-            .respondent1Represented(YesOrNo.NO)
-            .totalClaimAmount(new BigDecimal(10001))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1ResponseDeadline(dateTime);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setTotalClaimAmount(new BigDecimal(10001));
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -135,13 +134,12 @@ class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest {
         when(featureToggleService.isLipQueryManagementEnabled(any())).thenReturn(true);
         LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .respondent1ResponseDeadline(dateTime)
-            .respondent1Represented(YesOrNo.NO)
-            .totalClaimAmount(new BigDecimal(10001))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1ResponseDeadline(dateTime);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setTotalClaimAmount(new BigDecimal(10001));
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -180,13 +178,12 @@ class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest {
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .respondent1ResponseDeadline(dateTime)
-            .respondent1Represented(YesOrNo.YES)
-            .totalClaimAmount(new BigDecimal(10001))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1ResponseDeadline(dateTime);
+        caseData.setRespondent1Represented(YesOrNo.YES);
+        caseData.setTotalClaimAmount(new BigDecimal(10001));
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)

@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 
@@ -61,7 +62,7 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
     @Test
     void callHelperServiceToUpdateApplicationDetailsInClaimWhenGeneralApplicationsPresent() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDetails(CaseData.builder().build(),
+            .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),
                                         true,
                                         true,
                                         true, true,
@@ -90,7 +91,7 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
     @Test
     void noCallToHelperServiceToUpdateApplicationDetailsInClaimWhenNoGeneralApplicationsPresent() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDetails(CaseData.builder().build(),
+            .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),
                                         false,
                                         false,
                                         false, false,
@@ -108,7 +109,7 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
     @Test
     void returnErrorIfHelperServiceThrowsErrors() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDetails(CaseData.builder().build(),
+            .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),
                                         true,
                                         true,
                                         true, true,
