@@ -14,20 +14,16 @@ public final class CaseTypeIdentifier {
     }
 
     public static boolean isGeneralApplication(final CaseDetails caseDetails) {
-        if (caseDetails != null) {
-            return Optional.ofNullable(caseDetails.getCaseTypeId())
-                .map(id -> id.equals(GENERALAPPLICATION_CASE_TYPE))
-                .orElse(false);
-        }
-        return false;
+        return Optional.ofNullable(caseDetails)
+            .map(CaseDetails::getCaseTypeId)
+            .map(id -> id.equals(GENERALAPPLICATION_CASE_TYPE))
+            .orElse(false);
     }
 
     public static boolean isCivil(final CaseDetails caseDetails) {
-        if (caseDetails != null) {
-            return Optional.ofNullable(caseDetails.getCaseTypeId())
-                .map(id -> id.equals(CASE_TYPE))
-                .orElse(false);
-        }
-        return false;
+        return Optional.ofNullable(caseDetails)
+            .map(CaseDetails::getCaseTypeId)
+            .map(id -> id.equals(CASE_TYPE))
+            .orElse(false);
     }
 }

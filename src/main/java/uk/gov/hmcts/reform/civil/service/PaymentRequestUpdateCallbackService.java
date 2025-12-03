@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.GENERALAPPLICATION_CASE_TYPE;
@@ -66,7 +67,7 @@ public class PaymentRequestUpdateCallbackService {
 
         CaseDetails caseDetails = coreCaseDataService.getCase(caseId);
 
-        if (caseDetails.getCaseTypeId().equals(GENERALAPPLICATION_CASE_TYPE) && dto.getServiceRequestStatus().equalsIgnoreCase(PAID)) {
+        if (Objects.equals(caseDetails.getCaseTypeId(), GENERALAPPLICATION_CASE_TYPE) && dto.getServiceRequestStatus().equalsIgnoreCase(PAID)) {
             log.info("Processing payment callback for General Application Case details for caseId {}", caseId);
 
             GeneralApplicationCaseData caseData = caseDetailsConverter.toGeneralApplicationCaseData(caseDetails);
