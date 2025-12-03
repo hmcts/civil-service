@@ -149,13 +149,13 @@ class DirectionsQuestionnairePreparerTest {
         caseData.setRespondent1(respondent1);
         caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
 
-        String userToken = "userToken";
-
         Document document1 = new Document();
         document1.setDocumentUrl("documentUrl1");
         CaseDocument caseDocument1 = new CaseDocument();
         caseDocument1.setDocumentName("directionsQuestionnaire1");
         caseDocument1.setDocumentLink(document1);
+
+        String userToken = "userToken";
         when(directionsQuestionnaireGenerator.generateDQFor1v2SingleSolDiffResponse(any(CaseData.class), eq(userToken), eq("ONE")))
             .thenReturn(caseDocument1);
 
@@ -185,7 +185,6 @@ class DirectionsQuestionnairePreparerTest {
         caseData.setRespondent2(respondent2);
         caseData.setRespondent1(respondent1);
         caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
-        String userToken = "userToken";
 
         Document document1 = new Document();
         document1.setDocumentUrl("documentUrl1");
@@ -198,6 +197,7 @@ class DirectionsQuestionnairePreparerTest {
         caseDocument2.setDocumentName("directionsQuestionnaire2");
         caseDocument2.setDocumentLink(document2);
 
+        String userToken = "userToken";
         when(directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(any(CaseData.class), eq(userToken), eq("ONE")))
             .thenReturn(Optional.of(caseDocument1));
         when(directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(any(CaseData.class), eq(userToken), eq("TWO")))

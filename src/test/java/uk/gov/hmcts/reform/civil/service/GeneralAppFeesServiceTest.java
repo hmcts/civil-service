@@ -63,6 +63,7 @@ class GeneralAppFeesServiceTest {
     private static final Fee FEE_PENCE;
     public static final String FREE_REF = "FREE";
     private static final Fee FEE_PENCE_0;
+
     static {
         FEE_PENCE = new Fee();
         FEE_PENCE.setCalculatedAmountInPence(TEST_FEE_AMOUNT_PENCE);
@@ -74,6 +75,7 @@ class GeneralAppFeesServiceTest {
         FEE_PENCE_0.setCode(FREE_REF);
         FEE_PENCE_0.setVersion("1");
     }
+
     public static final String GENERAL_APPLICATION = "general application";
     public static final String GENERAL_SERVICE = "general";
 

@@ -37,12 +37,14 @@ public class GeneralAppFeesService {
     private final GeneralAppFeesConfiguration feesConfiguration;
     public static final String FREE_REF = "FREE";
     private static final Fee FREE_FEE;
+
     static {
         FREE_FEE = new Fee();
         FREE_FEE.setCalculatedAmountInPence(BigDecimal.ZERO);
         FREE_FEE.setCode(FREE_REF);
         FREE_FEE.setVersion("1");
     }
+
     private static final String MISCELLANEOUS = "miscellaneous";
     private static final String OTHER = "other";
 

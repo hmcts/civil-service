@@ -130,7 +130,9 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         respondent2DQ = new Respondent2DQ();
         respondent2DQ.setRespondent2DQRequestedCourt(requestedCourt3);
     }
+
     private static final LocalDateTime SUBMITTED_DATE = LocalDateTime.of(2023, 6, 1, 0, 0, 0);
+
     @Autowired
     private InitiateGeneralApplicationService service;
 
@@ -833,7 +835,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     protected uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil getSampleCourtLocationsTransferred() {
-        uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil caseLocationCivil = 
+        uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil caseLocationCivil =
             new uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil();
         caseLocationCivil.setSiteName("transferred sitename");
         caseLocationCivil.setAddress("Transferred address");
@@ -844,7 +846,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     protected uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil getSampleCourLocationsRefObjectPreSdoCNBC() {
-        uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil caseLocationCivil = 
+        uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil caseLocationCivil =
             new uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil();
         caseLocationCivil.setSiteName("site name of CNBC");
         caseLocationCivil.setAddress("Address of CNBC");
@@ -855,7 +857,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     protected uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil getSampleCourLocationsRefObjectPostSdo() {
-        uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil caseLocationCivil = 
+        uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil caseLocationCivil =
             new uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil();
         caseLocationCivil.setRegion("2");
         caseLocationCivil.setBaseLocation("22222");
@@ -1130,13 +1132,11 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @Test
     void shouldPopulateCoScGeneralAppSubmittedForLipDefendant() {
-        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithEmptyCollectionOfApps(CaseDataBuilder.builder().build());
-        List<Element<Document>> documentList = new ArrayList<>();
         Document document = new Document();
         document.setDocumentUrl("fake-url");
         document.setDocumentFileName("file-name");
         document.setDocumentBinaryUrl("binary-url");
+        List<Element<Document>> documentList = new ArrayList<>();
         documentList.add(element(document));
         DebtPaymentEvidence debtPaymentEvidence = new DebtPaymentEvidence();
         debtPaymentEvidence.setDebtPaymentOption(DebtPaymentOptions.MADE_FULL_PAYMENT_TO_COURT);
@@ -1145,6 +1145,10 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         certOfSC.setDebtPaymentEvidence(debtPaymentEvidence);
         GAApplicationType gaApplicationType = new GAApplicationType();
         gaApplicationType.setTypes(singletonList(CONFIRM_CCJ_DEBT_PAID));
+
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithEmptyCollectionOfApps(CaseDataBuilder.builder().build());
+
         caseData.setCertOfSC(certOfSC);
         caseData.setGeneralAppEvidenceDocument(documentList);
         caseData.setGeneralAppType(gaApplicationType);
@@ -1161,8 +1165,6 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @Test
     void shouldPopulateCoScGeneralAppDataForLipDefendant() {
-        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithEmptyCollectionOfApps(CaseDataBuilder.builder().build());
         DebtPaymentEvidence debtPaymentEvidence2 = new DebtPaymentEvidence();
         debtPaymentEvidence2.setDebtPaymentOption(DebtPaymentOptions.UNABLE_TO_PROVIDE_EVIDENCE_OF_FULL_PAYMENT);
         CertOfSC certOfSC2 = new CertOfSC();
@@ -1170,6 +1172,10 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         certOfSC2.setDebtPaymentEvidence(debtPaymentEvidence2);
         GAApplicationType gaApplicationType2 = new GAApplicationType();
         gaApplicationType2.setTypes(singletonList(CONFIRM_CCJ_DEBT_PAID));
+
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithEmptyCollectionOfApps(CaseDataBuilder.builder().build());
+
         caseData.setCertOfSC(certOfSC2);
         caseData.setGeneralAppType(gaApplicationType2);
         CaseData data = caseData;

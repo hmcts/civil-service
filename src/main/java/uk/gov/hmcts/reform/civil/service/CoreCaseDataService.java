@@ -76,9 +76,6 @@ public class CoreCaseDataService {
                                               String transferReason,
                                               String eventSummary,
                                               String eventDescription) {
-        StartEventResponse startEventResponse = startUpdate(caseId.toString(), eventName);
-
-        CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
 
         List<LocationRefData> locationRefDataList = referenceDataService.getCourtLocationsByEpimmsId(
             getSystemUpdateUser().getUserToken(),
@@ -92,6 +89,9 @@ public class CoreCaseDataService {
 
         DynamicList transferCourtLocationList = new DynamicList();
         transferCourtLocationList.setValue(dynamicListElement);
+
+        StartEventResponse startEventResponse = startUpdate(caseId.toString(), eventName);
+        CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
 
         caseData.setTransferCourtLocationList(transferCourtLocationList);
         caseData.setReasonForTransfer(transferReason);

@@ -107,26 +107,20 @@ public class DashboardNotificationsParamsMapperTest {
 
     @Test
     public void shouldMapAllParameters_WhenIsRequested() {
-
-        LocalDate date = LocalDate.of(2024, Month.FEBRUARY, 22);
-        LocalDateTime now = LocalDateTime.now();
-        List<IdValue<Bundle>> bundles = List.of(
-            new IdValue<>("1", Bundle.builder().createdOn(Optional.of(now.minusDays(1))).build()),
-            new IdValue<>("2", Bundle.builder().createdOn(Optional.of(now)).build()),
-            new IdValue<>("3", Bundle.builder().createdOn(Optional.of(now.minusDays(2))).build())
-        );
         when(claimantResponseUtils.getDefendantAdmittedAmount(any(), anyBoolean())).thenReturn(BigDecimal.valueOf(100));
 
-        LocalDateTime applicant1ResponseDeadline = LocalDateTime.of(2024, 3, 21, 16, 0);
         caseData.setHwfFeeType(FeeType.CLAIMISSUED);
         caseData.setTotalClaimAmount(BigDecimal.valueOf(124.67));
         caseData.setRespondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(100));
+
+        LocalDate date = LocalDate.of(2024, Month.FEBRUARY, 22);
         caseData.setRespondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec(date));
         caseData.setRespondent1RespondToSettlementAgreementDeadline(LocalDateTime.now());
         caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YES);
         CaseDataLiP caseDataLiP = new CaseDataLiP();
         caseDataLiP.setApplicant1ClaimSettledDate(LocalDate.now());
         caseData.setCaseDataLiP(caseDataLiP);
+        LocalDateTime applicant1ResponseDeadline = LocalDateTime.of(2024, 3, 21, 16, 0);
         caseData.setApplicant1ResponseDeadline(applicant1ResponseDeadline);
         caseData.setHearingDate(LocalDate.of(2024, 4, 1));
         caseData.setHearingDueDate(LocalDate.of(2024, 4, 1));
@@ -139,6 +133,13 @@ public class DashboardNotificationsParamsMapperTest {
         caseData.setHearingLocationCourtName("County Court");
         caseData.setApplicant1Represented(NO);
         caseData.setRequestForReconsiderationDeadline(LocalDateTime.of(2024, 4, 1, 10, 20));
+
+        LocalDateTime now = LocalDateTime.now();
+        List<IdValue<Bundle>> bundles = List.of(
+            new IdValue<>("1", Bundle.builder().createdOn(Optional.of(now.minusDays(1))).build()),
+            new IdValue<>("2", Bundle.builder().createdOn(Optional.of(now)).build()),
+            new IdValue<>("3", Bundle.builder().createdOn(Optional.of(now.minusDays(2))).build())
+        );
         caseData.setCaseBundles(bundles);
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
@@ -662,7 +663,6 @@ public class DashboardNotificationsParamsMapperTest {
 
     @Test
     public void shouldMapParameters_whenHearingFast() {
-        LocalDate date = LocalDate.now();
         caseData.setRespondent1ResponseDeadline(null);
         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
         caseData.setApplicant1ResponseDeadline(LocalDate.parse("2020-03-29").atStartOfDay());
@@ -671,6 +671,7 @@ public class DashboardNotificationsParamsMapperTest {
         caseData.setDrawDirectionsOrderSmallClaims(YesOrNo.NO);
         caseData.setOrderType(OrderType.DECIDE_DAMAGES);
         FastTrackDisclosureOfDocuments fastTrackDisclosure = new FastTrackDisclosureOfDocuments();
+        LocalDate date = LocalDate.now();
         fastTrackDisclosure.setDate3(date);
         caseData.setFastTrackDisclosureOfDocuments(fastTrackDisclosure);
 
@@ -715,12 +716,12 @@ public class DashboardNotificationsParamsMapperTest {
 
     @Test
     void shouldMapParameters_whenClaimantMarkedPaidInFull() {
-        LocalDate markedPaidInFullDate = LocalDate.now();
         caseData.setLegacyCaseReference("reference");
         caseData.setCcdCaseReference(1234L);
         caseData.setRespondent1Represented(YesOrNo.NO);
         caseData.setMarkPaidConsent(MarkPaidConsentList.YES);
 
+        LocalDate markedPaidInFullDate = LocalDate.now();
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData, null);
         assertThat(result).extracting("settleClaimPaidInFullDateEn").isEqualTo(DateUtils.formatDate(markedPaidInFullDate));
         assertThat(result).extracting("settleClaimPaidInFullDateCy").isEqualTo(DateUtils.formatDateInWelsh(

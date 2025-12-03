@@ -136,8 +136,6 @@ class PaymentsServiceTest {
 
     @Test
     void validateRequestShouldThrowAnError_whenFeeDetailsDoNotHaveFeeCode() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
         Fee fee = new Fee();
         fee.setCalculatedAmountInPence(BigDecimal.valueOf(10800));
         fee.setVersion("1");
@@ -145,6 +143,10 @@ class PaymentsServiceTest {
         claimIssuedPBADetails.setFee(fee);
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setClaimIssuedPBADetails(claimIssuedPBADetails);
+
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+            .organisationID("OrgId").build();
+
         caseData.setApplicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build());
 
         Exception exception = assertThrows(
@@ -156,8 +158,6 @@ class PaymentsServiceTest {
 
     @Test
     void validateRequestShouldThrowAnError_whenFeeDetailsDoNotHaveFeeAmount() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
         Fee fee = new Fee();
         fee.setCode("FEE0442");
         fee.setVersion("1");
@@ -165,6 +165,10 @@ class PaymentsServiceTest {
         claimIssuedPBADetails.setFee(fee);
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setClaimIssuedPBADetails(claimIssuedPBADetails);
+
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+            .organisationID("OrgId").build();
+
         caseData.setApplicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build());
 
         Exception exception = assertThrows(
@@ -176,8 +180,6 @@ class PaymentsServiceTest {
 
     @Test
     void shouldCreateCreditAccountPayment_whenValidCaseDetails() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                .organisationID("OrgId").build();
         DynamicListElement dynamicListElement = new DynamicListElement();
         dynamicListElement.setLabel("account-no");
         DynamicList applicantsPbaAccounts = new DynamicList();
@@ -185,6 +187,9 @@ class PaymentsServiceTest {
         SRPbaDetails hfPbaDetails = new SRPbaDetails();
         hfPbaDetails.setServiceReqReference("request-reference");
         hfPbaDetails.setApplicantsPbaAccounts(applicantsPbaAccounts);
+
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+            .organisationID("OrgId").build();
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
