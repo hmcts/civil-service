@@ -31,18 +31,6 @@ public class CasesStuckCheckSearchService extends ElasticSearchService {
         return query(startIndex, "now");
     }
 
-    public Query query(int startIndex, String timeNow) {
-        log.info("Call to CasesStuckCheckSearchService query with index {} and timeNow {}", startIndex, timeNow);
-        return new Query(
-            boolQuery()
-                .should(rangeQuery("data.last_modified").lt(timeNow).gt(
-                    "now-7d"))
-                .should(boolQuery().mustNot(matchQuery("data.businessProcess.status", "FINISHED"))),
-            List.of("reference"),
-            startIndex
-        );
-    }
-
     @Override
     public Set<CaseDetails> getCases() {
         String timeNow = ZonedDateTime.now(ZoneOffset.UTC).toString();
@@ -59,5 +47,17 @@ public class CasesStuckCheckSearchService extends ElasticSearchService {
         log.info("CasesStuckCheckSearchService: Found {} stuck case(s) in the last 7 days with ids {} at time {}", ids.size(), ids, timeNow);
 
         return caseDetails;
+    }
+
+    public Query query(int startIndex, String timeNow) {
+        log.info("Call to CasesStuckCheckSearchService query with index {} and timeNow {}", startIndex, timeNow);
+        return new Query(
+            boolQuery()
+                .should(rangeQuery("data.last_modified").lt(timeNow).gt(
+                    "now-7d"))
+                .should(boolQuery().mustNot(matchQuery("data.businessProcess.status", "FINISHED"))),
+            List.of("reference"),
+            startIndex
+        );
     }
 }
