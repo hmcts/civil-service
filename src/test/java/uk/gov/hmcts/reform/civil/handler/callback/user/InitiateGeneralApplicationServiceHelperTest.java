@@ -209,7 +209,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         GeneralApplication result = helper
                 .setRespondentDetailsIfPresent(
-                        GeneralApplication.builder().build(),
+                        new GeneralApplication(),
                         getTestCaseData(CaseDataBuilder.builder().build(), true, null),
                         getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
                         feesService
@@ -244,7 +244,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         assertDoesNotThrow(() -> helper
                 .setRespondentDetailsIfPresent(
-                        GeneralApplication.builder().build(),
+                        new GeneralApplication(),
                         getTestCaseData(CaseDataBuilder.builder().build(), true, null),
                         getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
                         feesService
@@ -259,8 +259,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 IllegalArgumentException.class,
                 () -> helper
                         .setRespondentDetailsIfPresent(
-                                GeneralApplication.builder().build(),
-                                CaseData.builder().ccdCaseReference(1234L).build(),
+                                new GeneralApplication(),
+                                CaseDataBuilder.builder().ccdCaseReference(1234L).build(),
                                 getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
                                 feesService
                         )
@@ -275,8 +275,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 IllegalArgumentException.class,
                 () -> helper
                         .setRespondentDetailsIfPresent(
-                                GeneralApplication.builder().build(),
-                                CaseData.builder().ccdCaseReference(1234L)
+                                new GeneralApplication(),
+                                CaseDataBuilder.builder().ccdCaseReference(1234L)
                                         .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
                                         .respondent2(Party.builder().type(COMPANY).companyName("Respondent1").build())
                                         .applicant1OrganisationPolicy(OrganisationPolicy.builder().build()).build(),
@@ -294,8 +294,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 IllegalArgumentException.class,
                 () -> helper
                         .setRespondentDetailsIfPresent(
-                                GeneralApplication.builder().build(),
-                                CaseData.builder().ccdCaseReference(1234L)
+                                new GeneralApplication(),
+                                CaseDataBuilder.builder().ccdCaseReference(1234L)
                                         .respondent1OrganisationPolicy(OrganisationPolicy.builder().build())
                                         .addRespondent2(YesOrNo.YES)
                                         .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
@@ -315,8 +315,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                         .caseAssignmentUserRoles(getCaseUsersForApplicantCheck()).build());
 
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
-                GeneralApplication.builder().build(),
-                CaseData.builder().ccdCaseReference(1234L)
+                new GeneralApplication(),
+                CaseDataBuilder.builder().build().toBuilder().ccdCaseReference(1234L)
                         .respondent1OrganisationPolicy(OrganisationPolicy.builder()
                                 .organisation(Organisation.builder().organisationID("100").build())
                                 .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE.getFormattedName())
@@ -355,8 +355,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                         .caseAssignmentUserRoles(getCaseUsersForApplicantCheck()).build());
 
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
-                GeneralApplication.builder().build(),
-                CaseData.builder().ccdCaseReference(1234L)
+                new GeneralApplication(),
+                CaseDataBuilder.builder().build().toBuilder().ccdCaseReference(1234L)
                         .respondent1OrganisationPolicy(OrganisationPolicy.builder()
                                 .organisation(Organisation.builder().organisationID("100").build())
                                 .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE.getFormattedName())
@@ -397,8 +397,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                         .caseAssignmentUserRoles(getCaseUsersForApplicantCheck()).build());
 
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
-                GeneralApplication.builder().build(),
-                CaseData.builder().ccdCaseReference(1234L)
+                new GeneralApplication(),
+                CaseDataBuilder.builder().build().toBuilder().ccdCaseReference(1234L)
                         .respondent1OrganisationPolicy(OrganisationPolicy.builder()
                                 .organisation(Organisation.builder().organisationID("100").build())
                                 .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE.getFormattedName())
@@ -449,8 +449,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .thenReturn(CaseAssignmentUserRolesResource.builder()
                         .caseAssignmentUserRoles(getCaseUsers()).build());
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
-                GeneralApplication.builder().build(),
-                CaseData.builder().ccdCaseReference(1234L)
+                new GeneralApplication(),
+                CaseDataBuilder.builder().build().toBuilder().ccdCaseReference(1234L)
                         .respondent1OrganisationPolicy(OrganisationPolicy.builder()
                                 .organisation(Organisation.builder().organisationID("345").build())
                                 .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE.getFormattedName()).build())
@@ -498,8 +498,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .thenReturn(CaseAssignmentUserRolesResource.builder()
                         .caseAssignmentUserRoles(getCaseUsersForDefendant1ToBeApplicant()).build());
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
-                GeneralApplication.builder().build(),
-                CaseData.builder().ccdCaseReference(1234L)
+                new GeneralApplication(),
+                CaseDataBuilder.builder().build().toBuilder().ccdCaseReference(1234L)
                         .respondent1OrganisationPolicy(OrganisationPolicy.builder()
                                 .organisation(Organisation.builder().organisationID("345").build())
                                 .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE
@@ -550,8 +550,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .thenReturn(CaseAssignmentUserRolesResource.builder()
                         .caseAssignmentUserRoles(getCaseUsersForDefendant2ToBeApplicant()).build());
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
-                GeneralApplication.builder().build(),
-                CaseData.builder().ccdCaseReference(1234L)
+                new GeneralApplication(),
+                CaseDataBuilder.builder().build().toBuilder().ccdCaseReference(1234L)
                         .addRespondent2(YesOrNo.NO)
                         .addApplicant2(YesOrNo.NO)
                         .respondent1OrganisationPolicy(OrganisationPolicy.builder()
@@ -637,7 +637,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                             .caseAssignmentUserRoles(getCaseUsersForLrVLipAppLr()).build());
             GeneralApplication result = helper
                     .setRespondentDetailsIfPresent(
-                            GeneralApplication.builder().build(),
+                            new GeneralApplication(),
                             caseDataBuilder.build(),
                             getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
                             feesService
@@ -688,7 +688,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                             .caseAssignmentUserRoles(getCaseUsersForLrVLipAppLip()).build());
             GeneralApplication result = helper
                     .setRespondentDetailsIfPresent(
-                            GeneralApplication.builder().build(),
+                            new GeneralApplication(),
                             caseDataBuilder.build(),
                             getUserDetails(STRING_NUM_CONSTANT, RESPONDENT_EMAIL_ID_CONSTANT),
                             feesService
@@ -728,7 +728,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                             .caseAssignmentUserRoles(getCaseUsersForLipVLrAppLip()).build());
             GeneralApplication result = helper
                     .setRespondentDetailsIfPresent(
-                            GeneralApplication.builder().build(),
+                            new GeneralApplication(),
                             caseDataBuilder.build(),
                             getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
                             feesService
@@ -769,7 +769,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                             .caseAssignmentUserRoles(getCaseUsersForLipVLrAppLr()).build());
             GeneralApplication result = helper
                     .setRespondentDetailsIfPresent(
-                            GeneralApplication.builder().build(),
+                            new GeneralApplication(),
                             caseDataBuilder.build(),
                             getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
                             feesService
@@ -810,7 +810,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                             .caseAssignmentUserRoles(getCaseUsersForLipVLip()).build());
             GeneralApplication result = helper
                     .setRespondentDetailsIfPresent(
-                            GeneralApplication.builder().build(),
+                            new GeneralApplication(),
                             caseDataBuilder.build(),
                             getUserDetails(CL_LIP_USER_ID, APPLICANT_EMAIL_ID_CONSTANT),
                             feesService
@@ -852,7 +852,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
             CaseData caseData = caseDataBuilder.build();
             GeneralApplication result = helper
                     .setRespondentDetailsIfPresent(
-                            GeneralApplication.builder().build(),
+                            new GeneralApplication(),
                             caseData,
                             getUserDetails(CL_LIP_USER_ID, APPLICANT_EMAIL_ID_CONSTANT),
                             feesService
@@ -900,7 +900,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
             CaseData caseData = caseDataBuilder.build();
             GeneralApplication result = helper
                 .setRespondentDetailsIfPresent(
-                    GeneralApplication.builder().build(),
+                    new GeneralApplication(),
                     caseData,
                     getUserDetails(CL_LIP_USER_ID, APPLICANT_EMAIL_ID_CONSTANT),
                     feesService
@@ -939,7 +939,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                             .caseAssignmentUserRoles(getCaseUsersForLipVLip()).build());
             GeneralApplication result = helper
                     .setRespondentDetailsIfPresent(
-                            GeneralApplication.builder().build(),
+                            new GeneralApplication(),
                             caseDataBuilder.build(),
                             getUserDetails(CL_LIP_USER_ID, APPLICANT_EMAIL_ID_CONSTANT),
                             feesService
@@ -1035,10 +1035,10 @@ public class InitiateGeneralApplicationServiceHelperTest {
     }
 
     public GeneralApplication getGeneralApplication() {
-        GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
-        return builder.generalAppType(GAApplicationType.builder()
-                                          .types(singletonList(SUMMARY_JUDGEMENT))
-                                          .build())
-            .build();
+        GeneralApplication generalApplication = new GeneralApplication();
+        GAApplicationType gaApplicationType = new GAApplicationType();
+        gaApplicationType.setTypes(singletonList(SUMMARY_JUDGEMENT));
+        generalApplication.setGeneralAppType(gaApplicationType);
+        return generalApplication;
     }
 }

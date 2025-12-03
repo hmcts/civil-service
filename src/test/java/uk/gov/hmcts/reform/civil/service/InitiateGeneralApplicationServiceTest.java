@@ -679,10 +679,9 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @Test
     void shouldReturnDate_whenGeneralAppNotificationDeadlineIsInvoked() {
-        LocalDateTime givenDate = GeneralApplication.builder()
-            .generalAppDateDeadline(weekdayDate)
-            .build()
-            .getGeneralAppDateDeadline();
+        GeneralApplication generalApplication = new GeneralApplication();
+        generalApplication.setGeneralAppDateDeadline(weekdayDate);
+        LocalDateTime givenDate = generalApplication.getGeneralAppDateDeadline();
 
         String actual = "2022-02-15T12:00";
 
