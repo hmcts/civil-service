@@ -39,6 +39,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
     private static final int MAX_THREADS = 10;
     private static final String CASE_ID_VARIABLE = "caseId";
     private static final int PAGE_SIZE = 50;
+    private static final String ALREADY_PROCESSED = "already processed";
     private static final DateTimeFormatter INCIDENT_FORMATTER =
         DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
             .withZone(ZoneOffset.UTC);
@@ -240,7 +241,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             );
 
             if (incident.getIncidentMessage() != null &&
-                incident.getIncidentMessage().contains("already processed")) {
+                incident.getIncidentMessage().contains(ALREADY_PROCESSED)) {
                 completeAlreadyProcessedIncident(incident.getProcessInstanceId(), serviceAuthorization, failedActivityId);
             } else {
                 retryProcessInstance(processInstanceId, serviceAuthorization, failedActivityId);
