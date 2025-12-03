@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimform.ClaimFormGenerator;
@@ -71,7 +72,7 @@ class GenerateLipClaimFormCallBackHandlerTest extends BaseCallbackHandlerTest {
             anyString(),
             eq(CaseEvent.GENERATE_DRAFT_FORM)
         )).willReturn(generateForm(DRAFT_CLAIM_FORM));
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         CallbackParams callbackParams = buildCallbackParams(caseData, "GENERATE_DRAFT_FORM");
 
         // When
@@ -90,7 +91,7 @@ class GenerateLipClaimFormCallBackHandlerTest extends BaseCallbackHandlerTest {
             anyString(),
             eq(CaseEvent.GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC)
         )).willReturn(generateForm(DocumentType.CLAIMANT_CLAIM_FORM));
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         CallbackParams callbackParams = buildCallbackParams(caseData, "GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC");
 
         // When
@@ -112,7 +113,7 @@ class GenerateLipClaimFormCallBackHandlerTest extends BaseCallbackHandlerTest {
             eq(GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC)
         )).willReturn(generateForm(SEALED_CLAIM));
 
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         CallbackParams callbackParams = buildCallbackParams(caseData, "GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC");
 
         // When
@@ -134,7 +135,7 @@ class GenerateLipClaimFormCallBackHandlerTest extends BaseCallbackHandlerTest {
             eq(GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC)
         )).willReturn(generateForm(SEALED_CLAIM));
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .claimantBilingualLanguagePreference("WELSH").build();
         // When
         CallbackParams params = callbackParamsOf(caseData, GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC, ABOUT_TO_SUBMIT);
@@ -149,18 +150,19 @@ class GenerateLipClaimFormCallBackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     private CaseDocument generateForm(DocumentType documentType) {
-        return CaseDocument.builder()
-            .createdBy("John")
-            .documentName("document name")
-            .documentSize(0L)
-            .documentType(documentType)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+        Document documentLink = new Document();
+        documentLink.setDocumentUrl("fake-url");
+        documentLink.setDocumentFileName("file-name");
+        documentLink.setDocumentBinaryUrl("binary-url");
+
+        CaseDocument document1 = new CaseDocument();
+        document1.setCreatedBy("John");
+        document1.setDocumentName("document name");
+        document1.setDocumentSize(0L);
+        document1.setDocumentType(documentType);
+        document1.setCreatedDatetime(LocalDateTime.now());
+        document1.setDocumentLink(documentLink);
+        return document1;
     }
 
     private CallbackParams buildCallbackParams(CaseData caseData, String eventId) {

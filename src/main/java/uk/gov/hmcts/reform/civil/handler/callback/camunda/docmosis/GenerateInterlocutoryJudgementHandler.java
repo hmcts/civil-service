@@ -62,26 +62,21 @@ public class GenerateInterlocutoryJudgementHandler extends CallbackHandler {
             caseData,
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-        CaseData updatedCaseData;
         if (featureToggleService.isWelshEnabledForMainCase()
             && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
             preTranslationDocuments.add(element(interlocutoryJudgementDoc));
-            updatedCaseData = caseData.toBuilder()
-                .preTranslationDocuments(preTranslationDocuments)
-                .preTranslationDocumentType(PreTranslationDocumentType.INTERLOCUTORY_JUDGMENT)
-                .build();
+            caseData.setPreTranslationDocuments(preTranslationDocuments);
+            caseData.setPreTranslationDocumentType(PreTranslationDocumentType.INTERLOCUTORY_JUDGMENT);
         } else {
-            updatedCaseData = caseData.toBuilder()
-                .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
+            caseData.setSystemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
                     interlocutoryJudgementDoc,
                     caseData
-                ))
-                .build();
+                ));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

@@ -19,7 +19,7 @@ public class GAApplicationType {
     private List<GeneralApplicationTypes> types;
 
     @JsonCreator
-    GAApplicationType(@JsonProperty("types") List<GeneralApplicationTypes> types) {
+    public GAApplicationType(@JsonProperty("types") List<GeneralApplicationTypes> types) {
         this.types = types;
     }
 }
