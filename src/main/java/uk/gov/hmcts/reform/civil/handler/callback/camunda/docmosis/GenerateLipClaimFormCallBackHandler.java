@@ -100,9 +100,8 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
                 .toList();
         }
 
-        return caseData.toBuilder()
-            .preTranslationDocuments(translatedDocuments)
-            .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments)
-            .build();
+        caseData.setPreTranslationDocuments(translatedDocuments);
+        caseData.setSystemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
+        return caseData;
     }
 }
