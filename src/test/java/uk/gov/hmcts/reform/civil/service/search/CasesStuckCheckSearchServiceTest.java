@@ -31,7 +31,7 @@ class CasesStuckCheckSearchServiceTest {
     @Test
     void shouldBuildCorrectQuery() {
         String timeNow = "2025-01-01T00:00:00Z";
-        Query query = service.query(0, timeNow);
+        Query query = service.query(0, timeNow, "7");
         String queryStr = query.toString().replaceAll("\\s+", ""); // remove all spaces
 
         assertThat(queryStr).contains(
@@ -55,7 +55,7 @@ class CasesStuckCheckSearchServiceTest {
 
         when(coreCaseDataService.searchCases(any())).thenReturn(searchResult);
 
-        Set<CaseDetails> result = service.getCases();
+        Set<CaseDetails> result = service.getCases("8");
 
         assertThat(result).containsExactlyInAnyOrder(c1, c2);
         verify(coreCaseDataService, times(1)).searchCases(any());
@@ -73,7 +73,7 @@ class CasesStuckCheckSearchServiceTest {
 
         when(coreCaseDataService.searchCases(any())).thenReturn(firstPage);
 
-        Set<CaseDetails> result = service.getCases();
+        Set<CaseDetails> result = service.getCases("7");
 
         assertThat(result).containsExactlyInAnyOrder(c1, c2);
         verify(coreCaseDataService, times(1)).searchCases(any());

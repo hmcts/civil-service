@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.search;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -7,34 +8,36 @@ import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
+import java.math.BigDecimal;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static java.math.RoundingMode.UP;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
 @Service
 @Slf4j
-public class CasesStuckCheckSearchService extends ElasticSearchService {
+@RequiredArgsConstructor
+public class CasesStuckCheckSearchService {
 
-    public CasesStuckCheckSearchService(CoreCaseDataService coreCaseDataService) {
-        super(coreCaseDataService);
-    }
+    protected static final int START_INDEX = 0;
+    protected static final int ES_DEFAULT_SEARCH_LIMIT = 10;
+    protected final CoreCaseDataService coreCaseDataService;
 
-    @Override
-    public Set<CaseDetails> getCases() {
+    public Set<CaseDetails> getCases(String stuckCasesFromPastDays) {
         String timeNow = ZonedDateTime.now(ZoneOffset.UTC).toString();
-        SearchResult searchResult = coreCaseDataService.searchCases(query(START_INDEX, timeNow));
+        SearchResult searchResult = coreCaseDataService.searchCases(query(START_INDEX, timeNow, stuckCasesFromPastDays));
 
         Set<CaseDetails> caseDetailsSet = new HashSet<>(searchResult.getCases());
 
         int pages = calculatePages(searchResult);
         for (int i = 1; i < pages; i++) {
-            SearchResult result = coreCaseDataService.searchCases(query(i * ES_DEFAULT_SEARCH_LIMIT, timeNow));
+            SearchResult result = coreCaseDataService.searchCases(query(i * ES_DEFAULT_SEARCH_LIMIT, timeNow, stuckCasesFromPastDays));
             caseDetailsSet.addAll(result.getCases());
         }
 
@@ -44,21 +47,21 @@ public class CasesStuckCheckSearchService extends ElasticSearchService {
         return caseDetailsSet;
     }
 
-    public Query query(int startIndex, String timeNow) {
+    public Query query(int startIndex, String timeNow, String stuckCasesFromPastDays ) {
         log.info("Call to CasesStuckCheckSearchService query with index {} and timeNow {}", startIndex, timeNow);
+        String pastDaysExpression = "now-" + stuckCasesFromPastDays + "d";
+
         return new Query(
             boolQuery()
-                .should(rangeQuery("data.last_modified").lt(timeNow).gt(
-                    "now-7d"))
+                .should(rangeQuery("data.last_modified").lt(timeNow).gt(pastDaysExpression))
                 .should(boolQuery().mustNot(matchQuery("data.businessProcess.status", "FINISHED"))),
             List.of("reference"),
             startIndex
         );
     }
 
-    @Override
-    public Query query(int startIndex) {
-        log.info("Call to CasesStuckCheckSearchService query with index {} ", startIndex);
-        return query(startIndex, "now");
+    protected int calculatePages(SearchResult searchResult) {
+        log.info("Initially search service found {} case(s) ", searchResult.getTotal());
+        return new BigDecimal(searchResult.getTotal()).divide(new BigDecimal(ES_DEFAULT_SEARCH_LIMIT), UP).intValue();
     }
 }

@@ -64,13 +64,27 @@ class IncidentRetryEventHandlerTest {
         when(authTokenGenerator.generate()).thenReturn("serviceAuth");
         when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
         when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-12-31T23:59:59Z");
+        when(externalTask.getVariable("incidentMessageLike")).thenReturn("already processed");
+        when(externalTask.getVariable("stuckCasesFromPastDays")).thenReturn("8");
 
         when(camundaRuntimeApi.queryProcessInstances(any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()))
             .thenReturn(List.of());
 
         handler.handleTask(externalTask);
 
-        verify(casesStuckCheckSearchService).getCases();
+        verify(casesStuckCheckSearchService).getCases("8");
+    }
+
+    @Test
+    void shouldCallCasesStuckCheckSearchServiceWithDefault() {
+        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
+
+        when(camundaRuntimeApi.queryProcessInstances(any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()))
+            .thenReturn(List.of());
+
+        handler.handleTask(externalTask);
+
+        verify(casesStuckCheckSearchService).getCases("7");
     }
 
     @Test
