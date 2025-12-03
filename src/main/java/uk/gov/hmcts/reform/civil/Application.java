@@ -17,8 +17,7 @@ import org.springframework.context.annotation.ComponentScan;
     "uk.gov.hmcts.reform.civil.ras",
     "uk.gov.hmcts.reform.cmc",
     "uk.gov.hmcts.reform.civil.crd",
-    "uk.gov.hmcts.reform.hmc",
-    "uk.gov.hmcts.reform.civil.ga.client"
+    "uk.gov.hmcts.reform.hmc"
 })
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
 public class Application {
