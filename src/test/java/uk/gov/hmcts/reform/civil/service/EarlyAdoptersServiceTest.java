@@ -40,11 +40,10 @@ class EarlyAdoptersServiceTest {
     }
 
     private CaseData caseDataWithCML(String cmlEpimms) {
+        CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+        caseLocationCivil.setBaseLocation(cmlEpimms);
         return CaseDataBuilder.builder()
-            .caseManagementLocation(
-            CaseLocationCivil.builder()
-                .baseLocation(cmlEpimms)
-                .build()
-        ).build();
+            .caseManagementLocation(caseLocationCivil)
+            .build();
     }
 }

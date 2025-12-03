@@ -420,12 +420,13 @@ class GenAppStateHelperServiceTest {
                                             getOriginalStatusOfGeneralApplication_applicationClosed()
                 );
 
-            Pair<CaseLocationCivil, Boolean> caseLocation = Pair.of(CaseLocationCivil.builder()
-                                                         .region("2")
-                                                         .baseLocation("00000").siteName("locationOfRegion2")
-                                                                        .address("Prince William House, Peel Cross Road, Salford")
-                                                                        .postcode("M5 4RR")
-                                                         .build(), false);
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setRegion("2");
+            caseLocationCivil.setBaseLocation("00000");
+            caseLocationCivil.setSiteName("locationOfRegion2");
+            caseLocationCivil.setAddress("Prince William House, Peel Cross Road, Salford");
+            caseLocationCivil.setPostcode("M5 4RR");
+            Pair<CaseLocationCivil, Boolean> caseLocation = Pair.of(caseLocationCivil, false);
             CaseData updatedData = service.updateApplicationLocationDetailsInClaim(caseData, authToken);
 
             assertThat(getGADetailsFromUpdatedCaseData(updatedData, "1234")).isNotNull();

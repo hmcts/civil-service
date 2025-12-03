@@ -98,30 +98,38 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     public static final String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
     private static final String authToken = "Bearer TestAuthToken";
     private static final LocalDateTime weekdayDate = LocalDate.of(2022, 2, 15).atTime(12, 0);
-    private static final Applicant1DQ applicant1DQ =
-        Applicant1DQ.builder().applicant1DQRequestedCourt(RequestedCourt.builder()
-                                                              .responseCourtCode("applicant1DQRequestedCourt")
-                                                              .caseLocation(CaseLocationCivil.builder()
-                                                                                .region("2")
-                                                                                .baseLocation("00000")
-                                                                                .build())
-                                                              .build()).build();
-    private static final Respondent1DQ respondent1DQ =
-        Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder()
-                                                                .responseCourtCode("respondent1DQRequestedCourt")
-                                                                .caseLocation(CaseLocationCivil.builder()
-                                                                                  .region("2")
-                                                                                  .baseLocation("11111")
-                                                                                  .build())
-                                                                .build()).build();
-    private static final Respondent2DQ respondent2DQ =
-        Respondent2DQ.builder().respondent2DQRequestedCourt(RequestedCourt.builder()
-                                                                .responseCourtCode("respondent2DQRequestedCourt")
-                                                                .caseLocation(CaseLocationCivil.builder()
-                                                                                  .region("3")
-                                                                                  .baseLocation("22222")
-                                                                                  .build())
-                                                                .build()).build();
+    private static final Applicant1DQ applicant1DQ;
+    private static final Respondent1DQ respondent1DQ;
+    private static final Respondent2DQ respondent2DQ;
+
+    static {
+        CaseLocationCivil location1 = new CaseLocationCivil();
+        location1.setRegion("2");
+        location1.setBaseLocation("00000");
+        RequestedCourt requestedCourt1 = new RequestedCourt();
+        requestedCourt1.setResponseCourtCode("applicant1DQRequestedCourt");
+        requestedCourt1.setCaseLocation(location1);
+        applicant1DQ = new Applicant1DQ();
+        applicant1DQ.setApplicant1DQRequestedCourt(requestedCourt1);
+
+        CaseLocationCivil location2 = new CaseLocationCivil();
+        location2.setRegion("2");
+        location2.setBaseLocation("11111");
+        RequestedCourt requestedCourt2 = new RequestedCourt();
+        requestedCourt2.setResponseCourtCode("respondent1DQRequestedCourt");
+        requestedCourt2.setCaseLocation(location2);
+        respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt2);
+
+        CaseLocationCivil location3 = new CaseLocationCivil();
+        location3.setRegion("3");
+        location3.setBaseLocation("22222");
+        RequestedCourt requestedCourt3 = new RequestedCourt();
+        requestedCourt3.setResponseCourtCode("respondent2DQRequestedCourt");
+        requestedCourt3.setCaseLocation(location3);
+        respondent2DQ = new Respondent2DQ();
+        respondent2DQ.setRespondent2DQRequestedCourt(requestedCourt3);
+    }
     private static final LocalDateTime SUBMITTED_DATE = LocalDateTime.of(2023, 6, 1, 0, 0, 0);
     @Autowired
     private InitiateGeneralApplicationService service;
@@ -825,32 +833,36 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     protected uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil getSampleCourtLocationsTransferred() {
-        return uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil.builder()
-            .siteName("transferred sitename")
-            .address("Transferred address")
-            .postcode("M5 4RR")
-            .region("1")
-            .baseLocation("22222").build();
+        uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil caseLocationCivil = 
+            new uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil();
+        caseLocationCivil.setSiteName("transferred sitename");
+        caseLocationCivil.setAddress("Transferred address");
+        caseLocationCivil.setPostcode("M5 4RR");
+        caseLocationCivil.setRegion("1");
+        caseLocationCivil.setBaseLocation("22222");
+        return caseLocationCivil;
     }
 
     protected uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil getSampleCourLocationsRefObjectPreSdoCNBC() {
-        return uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil.builder()
-                .siteName("site name of CNBC")
-                .address("Address of CNBC")
-                .postcode("M5 4RR")
-                .region("2")
-                .baseLocation("420219").build();
+        uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil caseLocationCivil = 
+            new uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil();
+        caseLocationCivil.setSiteName("site name of CNBC");
+        caseLocationCivil.setAddress("Address of CNBC");
+        caseLocationCivil.setPostcode("M5 4RR");
+        caseLocationCivil.setRegion("2");
+        caseLocationCivil.setBaseLocation("420219");
+        return caseLocationCivil;
     }
 
     protected uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil getSampleCourLocationsRefObjectPostSdo() {
-
-        return uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil.builder()
-            .region("2")
-            .baseLocation("22222")
-            .siteName("site name of main case CML")
-            .address("Address of main case CML")
-            .postcode("M5 4RR")
-            .build();
+        uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil caseLocationCivil = 
+            new uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil();
+        caseLocationCivil.setRegion("2");
+        caseLocationCivil.setBaseLocation("22222");
+        caseLocationCivil.setSiteName("site name of main case CML");
+        caseLocationCivil.setAddress("Address of main case CML");
+        caseLocationCivil.setPostcode("M5 4RR");
+        return caseLocationCivil;
     }
 
     protected List<LocationRefData> getEmptyCourLocationsRefObject() {
