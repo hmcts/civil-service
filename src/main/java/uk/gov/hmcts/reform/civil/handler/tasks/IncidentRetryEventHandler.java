@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Component
@@ -39,7 +40,8 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
     private static final int MAX_THREADS = 10;
     private static final String CASE_ID_VARIABLE = "caseId";
     private static final int PAGE_SIZE = 50;
-    private static final String ALREADY_PROCESSED = "already processed";
+    private static final Pattern ALREADY_PROCESSED_PATTERN =
+        Pattern.compile("already processed|already performed", Pattern.CASE_INSENSITIVE);
     private static final DateTimeFormatter INCIDENT_FORMATTER =
         DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
             .withZone(ZoneOffset.UTC);
@@ -240,8 +242,9 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 incident.getId(), processInstanceId, jobId, incidentCaseId, failedActivityId
             );
 
-            if (incident.getIncidentMessage() != null
-                && incident.getIncidentMessage().contains(ALREADY_PROCESSED)) {
+            boolean alreadyProcessed = incident.getIncidentMessage() != null
+                && ALREADY_PROCESSED_PATTERN.matcher(incident.getIncidentMessage()).find();
+            if (alreadyProcessed) {
                 completeAlreadyProcessedIncident(incident.getProcessInstanceId(), serviceAuthorization, failedActivityId);
             } else {
                 retryProcessInstance(processInstanceId, serviceAuthorization, failedActivityId);
