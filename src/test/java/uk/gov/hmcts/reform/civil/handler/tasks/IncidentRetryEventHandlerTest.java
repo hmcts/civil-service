@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeApi;
+import uk.gov.hmcts.reform.civil.service.search.CasesStuckCheckSearchService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +43,9 @@ class IncidentRetryEventHandlerTest {
     @Mock
     private ExternalTask externalTask;
 
+    @Mock
+    private CasesStuckCheckSearchService casesStuckCheckSearchService;
+
     @InjectMocks
     private IncidentRetryEventHandler handler;
 
@@ -53,6 +57,20 @@ class IncidentRetryEventHandlerTest {
         return instructions.size() == 1
             && "startAfterActivity".equals(instructions.get(0).get("type"))
             && "activity1".equals(instructions.get(0).get("activityId"));
+    }
+
+    @Test
+    void shouldCallCasesStuckCheckSearchService() {
+        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
+        when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
+        when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-12-31T23:59:59Z");
+
+        when(camundaRuntimeApi.queryProcessInstances(any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()))
+            .thenReturn(List.of());
+
+        handler.handleTask(externalTask);
+
+        verify(casesStuckCheckSearchService).getCases();
     }
 
     @Test

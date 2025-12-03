@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeApi;
+import uk.gov.hmcts.reform.civil.service.search.CasesStuckCheckSearchService;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -34,6 +35,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
+    private final CasesStuckCheckSearchService casesStuckCheckSearchService;
     private final CamundaRuntimeApi camundaRuntimeApi;
     private final AuthTokenGenerator authTokenGenerator;
 
@@ -82,6 +84,9 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             incidentEndTime,
             caseIds
         );
+
+        log.info("Call cases stuck check search service to log cases being stuck in app insights");
+        casesStuckCheckSearchService.getCases();
 
         return ExternalTaskData.builder().build();
     }
