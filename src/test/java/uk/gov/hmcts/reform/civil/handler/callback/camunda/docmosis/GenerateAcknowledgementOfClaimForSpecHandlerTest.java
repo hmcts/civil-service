@@ -34,18 +34,24 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 })
 class GenerateAcknowledgementOfClaimForSpecHandlerTest extends BaseCallbackHandlerTest {
 
-    public static final CaseDocument DOCUMENT = CaseDocument.builder()
-        .createdBy("John")
-        .documentName("document name")
-        .documentSize(0L)
-        .documentType(ACKNOWLEDGEMENT_OF_CLAIM)
-        .createdDatetime(LocalDateTime.now())
-        .documentLink(Document.builder()
-                          .documentUrl("fake-url")
-                          .documentFileName("file-name")
-                          .documentBinaryUrl("binary-url")
-                          .build())
-        .build();
+    public static final CaseDocument DOCUMENT;
+
+    static {
+        Document documentLink = new Document();
+        documentLink.setDocumentUrl("fake-url");
+        documentLink.setDocumentFileName("file-name");
+        documentLink.setDocumentBinaryUrl("binary-url");
+
+        CaseDocument document = new CaseDocument();
+        document.setCreatedBy("John");
+        document.setDocumentName("document name");
+        document.setDocumentSize(0L);
+        document.setDocumentType(ACKNOWLEDGEMENT_OF_CLAIM);
+        document.setCreatedDatetime(LocalDateTime.now());
+        document.setDocumentLink(documentLink);
+        DOCUMENT = document;
+    }
+
     @Autowired
     private GenerateAcknowledgementOfClaimForSpecCallbackHandler handler;
 
@@ -68,8 +74,10 @@ class GenerateAcknowledgementOfClaimForSpecHandlerTest extends BaseCallbackHandl
 
     @Test
     void shouldAddDocumentToSystemGeneratedDocuments_whenInvoked() {
+        CaseDocument caseDocument = new CaseDocument();
+        caseDocument.setDocumentType(SEALED_CLAIM);
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
+            .systemGeneratedCaseDocuments(wrapElements(caseDocument))
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 

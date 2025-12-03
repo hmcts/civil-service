@@ -50,7 +50,6 @@ public class GenerateAcknowledgementOfClaimForSpecCallbackHandler extends Callba
 
     private CallbackResponse prepareAcknowledgementOfClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         CaseDocument acknowledgementOfClaim = acknowledgementOfClaimGenerator.generate(
             caseData,
@@ -59,10 +58,10 @@ public class GenerateAcknowledgementOfClaimForSpecCallbackHandler extends Callba
 
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
         systemGeneratedCaseDocuments.add(element(acknowledgementOfClaim));
-        caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
+        caseData.setSystemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 }
