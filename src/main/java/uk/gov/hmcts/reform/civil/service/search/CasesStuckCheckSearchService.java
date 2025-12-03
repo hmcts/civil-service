@@ -29,18 +29,19 @@ public class CasesStuckCheckSearchService extends ElasticSearchService {
     public Set<CaseDetails> getCases() {
         String timeNow = ZonedDateTime.now(ZoneOffset.UTC).toString();
         SearchResult searchResult = coreCaseDataService.searchCases(query(START_INDEX, timeNow));
-        int pages = calculatePages(searchResult);
-        Set<CaseDetails> caseDetails = new HashSet<>(searchResult.getCases());
 
+        Set<CaseDetails> caseDetailsSet = new HashSet<>(searchResult.getCases());
+
+        int pages = calculatePages(searchResult);
         for (int i = 1; i < pages; i++) {
             SearchResult result = coreCaseDataService.searchCases(query(i * ES_DEFAULT_SEARCH_LIMIT, timeNow));
-            caseDetails.addAll(result.getCases());
+            caseDetailsSet.addAll(result.getCases());
         }
 
-        List<Long> ids = caseDetails.stream().map(CaseDetails::getId).sorted().toList();
+        List<Long> ids = caseDetailsSet.stream().map(CaseDetails::getId).sorted().toList();
         log.info("CasesStuckCheckSearchService: Found {} stuck case(s) in the last 7 days with ids {} at time {}", ids.size(), ids, timeNow);
 
-        return caseDetails;
+        return caseDetailsSet;
     }
 
     public Query query(int startIndex, String timeNow) {
