@@ -240,8 +240,8 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 incident.getId(), processInstanceId, jobId, incidentCaseId, failedActivityId
             );
 
-            if (incident.getIncidentMessage() != null &&
-                incident.getIncidentMessage().contains(ALREADY_PROCESSED)) {
+            if (incident.getIncidentMessage() != null
+                && incident.getIncidentMessage().contains(ALREADY_PROCESSED)) {
                 completeAlreadyProcessedIncident(incident.getProcessInstanceId(), serviceAuthorization, failedActivityId);
             } else {
                 retryProcessInstance(processInstanceId, serviceAuthorization, failedActivityId);
