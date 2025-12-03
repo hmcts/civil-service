@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.GeneralApps.HwF.FullRemission.Applicant",
+  "role": "APPLICANT",
+  "titleEn": "Your help with fees application has been approved",
+  "titleCy": "Mae eich cais am help i dalu ffioedd wedi cael ei gymeradwyo",
+  "descriptionEn": "<p class=\"govuk-body\">The full ${applicationFeeTypeEn} fee of ${applicationFee} will be covered by fee remission. You do not need to make a payment.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Bydd y ffi ${applicationFeeTypeCy} llawn o ${applicationFee} yn cael ei ddileu. Nid oes angen i chi wneud taliad.</p>"
+}

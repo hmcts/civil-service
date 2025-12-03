@@ -1,0 +1,9 @@
+{
+  "name": "Notice.AAA6.CP.Hearing.Scheduled.Defendant",
+  "role": "DEFENDANT",
+  "titleEn": "A hearing has been scheduled",
+  "titleCy": "Mae gwrandawiad wedi'i drefnu",
+  "descriptionEn": "<p class=\"govuk-body\">Your hearing has been scheduled for ${hearingDateEn} at ${hearingCourtEn}. Please keep your contact details and anyone you wish to rely on in court up to date. You can update contact details by telephoning the court at 0300 123 7050.</p><p class=\"govuk-body\"><a href=\"{VIEW_HEARING_NOTICE_CLICK}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">View the hearing notice</a></p>",
+  "descriptionCy": "<p class=\"govuk-body\">Mae eich gwrandawiad wedi'i drefnu ar gyfer ${hearingDateCy} yn ${hearingCourtCy}. Cadwch eich manylion cyswllt chi a manylion cyswllt unrhyw un yr hoffech ddibynnu arnynt yn y llys yn gyfredol. Gallwch ddiweddaru manylion cyswllt drwy ffonio'r llys ar 0300 303 5174.</p><p class=\"govuk-body\"><a href=\"{VIEW_HEARING_NOTICE_CLICK}\" rel=\"noopener noreferrer\" target=\"_blank\" class=\"govuk-link\">Gweld yr hysbysiad o wrandawiad</a></p>",
+  "timeToLive": "Session"
+}
