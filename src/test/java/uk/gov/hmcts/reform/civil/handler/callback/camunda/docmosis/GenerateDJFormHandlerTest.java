@@ -66,18 +66,23 @@ class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmitCallback {
 
-        CaseDocument document = CaseDocument.builder()
-            .createdBy("John")
-            .documentName("document name")
-            .documentSize(0L)
-            .documentType(DEFAULT_JUDGMENT)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+        public static final CaseDocument document;
+
+        static {
+            Document documentLink = new Document();
+            documentLink.setDocumentUrl("fake-url");
+            documentLink.setDocumentFileName("file-name");
+            documentLink.setDocumentBinaryUrl("binary-url");
+
+            CaseDocument document1 = new CaseDocument();
+            document1.setCreatedBy("John");
+            document1.setDocumentName("document name");
+            document1.setDocumentSize(0L);
+            document1.setDocumentType(DEFAULT_JUDGMENT);
+            document1.setCreatedDatetime(LocalDateTime.now());
+            document1.setDocumentLink(documentLink);
+            document = document1;
+        }
 
         @Test
         void shouldGenerateTwoForm_when1v2() {
@@ -86,16 +91,16 @@ class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
             documents.add(document);
             when(defaultJudgmentFormGenerator.generate(any(CaseData.class), anyString(),
                                                        eq(GENERATE_DJ_FORM.name()))).thenReturn(documents);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .defendantDetails(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("Both")
-                                                 .build()).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setAddRespondent2(YES);
+            caseData.setRespondent2SameLegalRepresentative(YES);
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            DynamicList dynamicList = new DynamicList();
+            DynamicListElement dynamicListElement = new DynamicListElement();
+            dynamicListElement.setLabel("Both");
+            dynamicList.setValue(dynamicListElement);
+            caseData.setDefendantDetails(dynamicList);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().setEventId(GENERATE_DJ_FORM.name());
 
@@ -110,16 +115,16 @@ class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotGenerateTwoForm_when1v2And1DefSelectedSpecified() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("One")
-                                                 .build()).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setAddRespondent2(YES);
+            caseData.setRespondent2SameLegalRepresentative(YES);
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            DynamicList dynamicList = new DynamicList();
+            DynamicListElement dynamicListElement = new DynamicListElement();
+            dynamicListElement.setLabel("One");
+            dynamicList.setValue(dynamicListElement);
+            caseData.setDefendantDetailsSpec(dynamicList);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().setEventId(GENERATE_DJ_FORM.name());
 
@@ -136,14 +141,14 @@ class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
             documents.add(document);
             when(defaultJudgmentFormGenerator.generate(any(CaseData.class), anyString(),
                                                        eq(GENERATE_DJ_FORM.name()))).thenReturn(documents);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .addRespondent2(NO)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("One")
-                                                 .build()).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setAddRespondent2(NO);
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            DynamicList dynamicList = new DynamicList();
+            DynamicListElement dynamicListElement = new DynamicListElement();
+            dynamicListElement.setLabel("One");
+            dynamicList.setValue(dynamicListElement);
+            caseData.setDefendantDetailsSpec(dynamicList);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().setEventId(GENERATE_DJ_FORM.name());
 
@@ -159,14 +164,14 @@ class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotGenerateOneForm_whenLRvLiPSpecified() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-                .specClaim1v1LrVsLip().build().toBuilder()
-                .addRespondent2(NO)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("One")
-                                                     .build()).build())
-                .build();
+                .specClaim1v1LrVsLip().build();
+            caseData.setAddRespondent2(NO);
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            DynamicList dynamicList = new DynamicList();
+            DynamicListElement dynamicListElement = new DynamicListElement();
+            dynamicListElement.setLabel("One");
+            dynamicList.setValue(dynamicListElement);
+            caseData.setDefendantDetailsSpec(dynamicList);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().setEventId(GENERATE_DJ_FORM_SPEC.name());
 
@@ -179,14 +184,14 @@ class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotGenerateOneForm_whenLipvLRSpecified() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-                .specClaim1v1LipvLr().build().toBuilder()
-                .addRespondent2(NO)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("One")
-                                                     .build()).build())
-                .build();
+                .specClaim1v1LipvLr().build();
+            caseData.setAddRespondent2(NO);
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            DynamicList dynamicList = new DynamicList();
+            DynamicListElement dynamicListElement = new DynamicListElement();
+            dynamicListElement.setLabel("One");
+            dynamicList.setValue(dynamicListElement);
+            caseData.setDefendantDetailsSpec(dynamicList);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().setEventId(GENERATE_DJ_FORM_SPEC.name());
 
@@ -203,16 +208,16 @@ class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
             documents.add(document);
             when(defaultJudgmentFormGenerator.generate(any(CaseData.class), anyString(),
                                                        eq(GENERATE_DJ_FORM.name()))).thenReturn(documents);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("Both")
-                                                 .build()).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setAddRespondent2(YES);
+            caseData.setRespondent2SameLegalRepresentative(YES);
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            DynamicList dynamicList = new DynamicList();
+            DynamicListElement dynamicListElement = new DynamicListElement();
+            dynamicListElement.setLabel("Both");
+            dynamicList.setValue(dynamicListElement);
+            caseData.setDefendantDetailsSpec(dynamicList);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().setEventId(GENERATE_DJ_FORM.name());
 
@@ -227,16 +232,16 @@ class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotGenerateTwoForm_when1v2And1DefSelected() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .defendantDetails(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("One")
-                                                 .build()).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setAddRespondent2(YES);
+            caseData.setRespondent2SameLegalRepresentative(YES);
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            DynamicList dynamicList = new DynamicList();
+            DynamicListElement dynamicListElement = new DynamicListElement();
+            dynamicListElement.setLabel("One");
+            dynamicList.setValue(dynamicListElement);
+            caseData.setDefendantDetailsSpec(dynamicList);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().setEventId(GENERATE_DJ_FORM.name());
 
@@ -253,14 +258,14 @@ class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
             documents.add(document);
             when(defaultJudgmentFormGenerator.generate(any(CaseData.class), anyString(),
                                                        eq(GENERATE_DJ_FORM.name()))).thenReturn(documents);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .addRespondent2(NO)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .defendantDetails(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("One")
-                                                 .build()).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setAddRespondent2(NO);
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            DynamicList dynamicList = new DynamicList();
+            DynamicListElement dynamicListElement = new DynamicListElement();
+            dynamicListElement.setLabel("One");
+            dynamicList.setValue(dynamicListElement);
+            caseData.setDefendantDetailsSpec(dynamicList);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().setEventId(GENERATE_DJ_FORM.name());
 
@@ -282,13 +287,13 @@ class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
             when(defaultJudgmentFormGenerator.generate(any(CaseData.class), anyString(),
                                                        eq(GENERATE_DJ_FORM.name()))).thenReturn(documents);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .defendantDetailsSpec(DynamicList.builder()
-                                          .value(DynamicListElement.builder()
-                                                     .label("One")
-                                                     .build()).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            DynamicList dynamicList = new DynamicList();
+            DynamicListElement dynamicListElement = new DynamicListElement();
+            dynamicListElement.setLabel("One");
+            dynamicList.setValue(dynamicListElement);
+            caseData.setDefendantDetailsSpec(dynamicList);
             //When
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().setEventId(GENERATE_DJ_FORM.name());

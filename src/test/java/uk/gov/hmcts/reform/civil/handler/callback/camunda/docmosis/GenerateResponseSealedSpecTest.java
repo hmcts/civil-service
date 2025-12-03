@@ -77,66 +77,59 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         systemGeneratedCaseDocuments.add(element(DIRECTIONS_QUESTIONNAIRE_DOC));
         caseData = CaseDataBuilder.builder()
-            .atStatePendingClaimIssued().build().toBuilder()
-            .specRespondent1Represented(YES)
-            .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments)
-            .specResponseTimelineDocumentFiles(Document.builder()
-                                                             .documentUrl("fake-url")
-                                                             .documentFileName("file-name")
-                                                             .documentBinaryUrl("binary-url")
-                                                             .build())
-            .respondent1SpecDefenceResponseDocument(ResponseDocument.builder().file(Document.builder()
-                                                                                        .documentUrl("fake-url")
-                                                                                        .documentFileName("file-name")
-                                                                                        .documentBinaryUrl("binary-url")
-                                                                                        .build()).build())
-            .build();
+            .atStatePendingClaimIssued().build();
+        caseData.setSpecRespondent1Represented(YES);
+        caseData.setSystemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
+        Document documentLink = new Document();
+        documentLink.setDocumentUrl("fake-url");
+        documentLink.setDocumentFileName("file-name");
+        documentLink.setDocumentBinaryUrl("binary-url");
+        caseData.setSpecResponseTimelineDocumentFiles(documentLink);
+        ResponseDocument responseDocument = new ResponseDocument();
+        responseDocument.setFile(documentLink);
+        caseData.setRespondent1SpecDefenceResponseDocument(responseDocument);
     }
 
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
     private CaseData caseData;
 
-    private static final CaseDocument SEALED_FORM =
-        CaseDocument.builder()
-            .createdBy("John")
-            .documentName(String.format(N1.getDocumentTitle(), "000MC001"))
-            .documentSize(0L)
-            .documentType(SEALED_CLAIM)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+    public static final CaseDocument SEALED_FORM;
+    public static final CaseDocument DIRECTIONS_QUESTIONNAIRE_DOC;
+    public static final CaseDocument STITCHED_DOC;
 
-    private static final CaseDocument DIRECTIONS_QUESTIONNAIRE_DOC =
-        CaseDocument.builder()
-            .createdBy("John")
-            .documentName(String.format(N1.getDocumentTitle(), "000MC001"))
-            .documentSize(0L)
-            .documentType(DIRECTIONS_QUESTIONNAIRE)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+    static {
+        Document documentLink = new Document();
+        documentLink.setDocumentUrl("fake-url");
+        documentLink.setDocumentFileName("file-name");
+        documentLink.setDocumentBinaryUrl("binary-url");
 
-    private static final CaseDocument STITCHED_DOC =
-        CaseDocument.builder()
-            .createdBy("John")
-            .documentName("Stitched document")
-            .documentSize(0L)
-            .documentType(SEALED_CLAIM)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+        CaseDocument document1 = new CaseDocument();
+        document1.setCreatedBy("John");
+        document1.setDocumentName(String.format(N1.getDocumentTitle(), "000MC001"));
+        document1.setDocumentSize(0L);
+        document1.setDocumentType(SEALED_CLAIM);
+        document1.setCreatedDatetime(LocalDateTime.now());
+        document1.setDocumentLink(documentLink);
+        SEALED_FORM = document1;
+
+        CaseDocument document2 = new CaseDocument();
+        document2.setCreatedBy("John");
+        document2.setDocumentName(String.format(N1.getDocumentTitle(), "000MC001"));
+        document2.setDocumentSize(0L);
+        document2.setDocumentType(DIRECTIONS_QUESTIONNAIRE);
+        document2.setCreatedDatetime(LocalDateTime.now());
+        document2.setDocumentLink(documentLink);
+        DIRECTIONS_QUESTIONNAIRE_DOC = document2;
+
+        CaseDocument document3 = new CaseDocument();
+        document3.setCreatedBy("John");
+        document3.setDocumentName("Stitched document");
+        document3.setDocumentSize(0L);
+        document3.setDocumentType(SEALED_CLAIM);
+        document3.setCreatedDatetime(LocalDateTime.now());
+        document3.setDocumentLink(documentLink);
+        STITCHED_DOC = document3;
+    }
 
     @Test
     void shouldGenerateClaimForm_whenNotV1VersionAndIsPinInPostDisabled() {
@@ -262,9 +255,9 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         // Given: Case data with docs to stitch and no existing systemGeneratedCaseDocuments,
         // stitching is enabled,isPinInPostEnabled is false and callback version V1
         CaseData localCaseData = CaseDataBuilder.builder()
-            .atStatePendingClaimIssued().build().toBuilder()
-            .specRespondent1Represented(YES)
-            .systemGeneratedCaseDocuments(new ArrayList<>()).build();
+            .atStatePendingClaimIssued().build();
+        localCaseData.setSpecRespondent1Represented(YES);
+        localCaseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
         CallbackParams params = callbackParamsOf(CallbackVersion.V_1, localCaseData, ABOUT_TO_SUBMIT);
         when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
@@ -289,9 +282,10 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
 
         CaseData localCaseData = CaseDataBuilder.builder()
-            .atStatePendingClaimIssued().build().toBuilder()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
-            .build();
+            .atStatePendingClaimIssued().build();
+        CaseDocument caseDocument = new CaseDocument();
+        caseDocument.setDocumentType(SEALED_CLAIM);
+        localCaseData.setSystemGeneratedCaseDocuments(wrapElements(caseDocument));
         CallbackParams params = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -312,13 +306,14 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         )).thenReturn(SEALED_FORM);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         CaseData localCaseData = CaseDataBuilder.builder()
-            .atStatePendingClaimIssued().build().toBuilder()
-            .respondent1OriginalDqDoc(CaseDocument.builder().documentType(SEALED_CLAIM).build())
-            .claimantBilingualLanguagePreference("BOTH")
-            .respondent1Represented(YES)
-            .applicant1Represented(NO)
-            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
-            .build();
+            .atStatePendingClaimIssued().build();
+        CaseDocument caseDocument = new CaseDocument();
+        caseDocument.setDocumentType(SEALED_CLAIM);
+        localCaseData.setRespondent1OriginalDqDoc(caseDocument);
+        localCaseData.setClaimantBilingualLanguagePreference("BOTH");
+        localCaseData.setRespondent1Represented(YES);
+        localCaseData.setApplicant1Represented(NO);
+        localCaseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
         CallbackParams params = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -336,9 +331,10 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
 
         CaseData localCaseData = CaseDataBuilder.builder()
-            .atStatePendingClaimIssued().build().toBuilder()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
-            .build();
+            .atStatePendingClaimIssued().build();
+        CaseDocument caseDocument = new CaseDocument();
+        caseDocument.setDocumentType(SEALED_CLAIM);
+        localCaseData.setSystemGeneratedCaseDocuments(wrapElements(caseDocument));
         CallbackParams params = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
         when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(DEFENDANT_DEFENCE),
                                                              anyString())).thenReturn(STITCHED_DOC);
@@ -360,13 +356,14 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         )).thenReturn(SEALED_FORM);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         CaseData localCaseData = CaseDataBuilder.builder()
-            .atStatePendingClaimIssued().build().toBuilder()
-            .respondent1OriginalDqDoc(CaseDocument.builder().documentType(SEALED_CLAIM).build())
-            .claimantBilingualLanguagePreference("BOTH")
-            .respondent1Represented(YES)
-            .applicant1Represented(NO)
-            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
-            .build();
+            .atStatePendingClaimIssued().build();
+        CaseDocument caseDocument = new CaseDocument();
+        caseDocument.setDocumentType(SEALED_CLAIM);
+        localCaseData.setRespondent1OriginalDqDoc(caseDocument);
+        localCaseData.setClaimantBilingualLanguagePreference("BOTH");
+        localCaseData.setRespondent1Represented(YES);
+        localCaseData.setApplicant1Represented(NO);
+        localCaseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
         CallbackParams params = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
         when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(DEFENDANT_DEFENCE),
                                                              anyString()
@@ -387,10 +384,11 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
 
         CaseData localCaseData = CaseDataBuilder.builder()
-            .atStatePendingClaimIssued().build().toBuilder()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
-            .respondent2DocumentGeneration("userRespondent2")
-            .build();
+            .atStatePendingClaimIssued().build();
+        CaseDocument caseDocument = new CaseDocument();
+        caseDocument.setDocumentType(SEALED_CLAIM);
+        localCaseData.setSystemGeneratedCaseDocuments(wrapElements(caseDocument));
+        localCaseData.setRespondent2DocumentGeneration("userRespondent2");
         CallbackParams params = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -407,10 +405,11 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
 
         CaseData localCaseData = CaseDataBuilder.builder()
-            .atStatePendingClaimIssued().build().toBuilder()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
-            .respondent2DocumentGeneration("userRespondent2")
-            .build();
+            .atStatePendingClaimIssued().build();
+        CaseDocument caseDocument = new CaseDocument();
+        caseDocument.setDocumentType(SEALED_CLAIM);
+        localCaseData.setSystemGeneratedCaseDocuments(wrapElements(caseDocument));
+        localCaseData.setRespondent2DocumentGeneration("userRespondent2");
         CallbackParams params = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
         // When
         when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(DEFENDANT_DEFENCE),
