@@ -78,13 +78,12 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
         LocalDate issueDate = time.now().toLocalDate();
         LocalDateTime respondent1RespDeadline = deadlinesCalculator.plus28DaysNextWorkingDayAt4pmDeadline(issueDate);
         log.info("Respondent1RespDeadline is {} for caseId {} in caseData", respondent1RespDeadline, caseId);
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder().issueDate(issueDate)
-            .respondent1ResponseDeadline(respondent1RespDeadline)
-            .nextDeadline(respondent1RespDeadline.toLocalDate())
-            // .respondent1Represented(YES)
-            .claimDismissedDate(null);
+        caseData.setIssueDate(issueDate);
+        caseData.setRespondent1ResponseDeadline(respondent1RespDeadline);
+        caseData.setNextDeadline(respondent1RespDeadline.toLocalDate());
+        caseData.setClaimDismissedDate(null);
         CaseDocument sealedClaim = sealedClaimFormGeneratorForSpec.generate(
-            caseDataBuilder.build(),
+            caseData,
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
         String categoryId = DocCategory.CLAIMANT1_DETAILS_OF_CLAIM.getValue();
@@ -94,26 +93,23 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
             && caseData.getSpecClaimTemplateDocumentFiles() != null) {
             assignCategoryId.assignCategoryIdToDocument(caseData.getSpecClaimDetailsDocumentFiles(), PARTICULARS_OF_CLAIM.getValue());
             assignCategoryId.assignCategoryIdToDocument(caseData.getSpecClaimTemplateDocumentFiles(), PARTICULARS_OF_CLAIM.getValue());
-            ServedDocumentFiles.builder().particularsOfClaimDocument(wrapElements(
-                    caseData.getSpecClaimDetailsDocumentFiles()))
-                .timelineEventUpload(wrapElements(caseData.getSpecClaimTemplateDocumentFiles()))
-                .build();
-            caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder().particularsOfClaimDocument(
-                    wrapElements(caseData.getSpecClaimDetailsDocumentFiles()))
-                               .timelineEventUpload(wrapElements(caseData.getSpecClaimTemplateDocumentFiles()))
-                               .build());
+            ServedDocumentFiles servedDocumentFiles = new ServedDocumentFiles();
+            servedDocumentFiles.setParticularsOfClaimDocument(wrapElements(
+                caseData.getSpecClaimDetailsDocumentFiles()));
+            servedDocumentFiles.setTimelineEventUpload(wrapElements(caseData.getSpecClaimTemplateDocumentFiles()));
+            caseData.setServedDocumentFiles(servedDocumentFiles);
         } else if (caseData.getSpecClaimTemplateDocumentFiles() != null) {
             assignCategoryId.assignCategoryIdToDocument(caseData.getSpecClaimTemplateDocumentFiles(), PARTICULARS_OF_CLAIM.getValue());
-            ServedDocumentFiles.builder().timelineEventUpload(wrapElements(
-                caseData.getSpecClaimTemplateDocumentFiles())).build();
-            caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder().timelineEventUpload(
-                wrapElements(caseData.getSpecClaimTemplateDocumentFiles())).build());
+            ServedDocumentFiles servedDocumentFiles = new ServedDocumentFiles();
+            servedDocumentFiles.setTimelineEventUpload(wrapElements(
+                caseData.getSpecClaimTemplateDocumentFiles()));
+            caseData.setServedDocumentFiles(servedDocumentFiles);
         } else if (caseData.getSpecClaimDetailsDocumentFiles() != null) {
             assignCategoryId.assignCategoryIdToDocument(caseData.getSpecClaimDetailsDocumentFiles(), PARTICULARS_OF_CLAIM.getValue());
-            ServedDocumentFiles.builder().particularsOfClaimDocument(wrapElements(
-                caseData.getSpecClaimDetailsDocumentFiles())).build();
-            caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder().particularsOfClaimDocument(
-                wrapElements(caseData.getSpecClaimDetailsDocumentFiles())).build());
+            ServedDocumentFiles servedDocumentFiles = new ServedDocumentFiles();
+            servedDocumentFiles.setParticularsOfClaimDocument(
+                wrapElements(caseData.getSpecClaimDetailsDocumentFiles()));
+            caseData.setServedDocumentFiles(servedDocumentFiles);
         }
 
         if (documentMetaDataList.size() > 1) {
@@ -129,18 +125,18 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
             stitchedDocument.setDocumentName("Stitched document");
             log.info("Civil stitch service spec response {} for caseId {}", stitchedDocument, caseId);
             assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, categoryId);
-            caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(stitchedDocument));
+            caseData.setSystemGeneratedCaseDocuments(wrapElements(stitchedDocument));
         } else {
-            caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaim));
+            caseData.setSystemGeneratedCaseDocuments(wrapElements(sealedClaim));
         }
 
         // these documents are added servedDocumentFiles, if we do not remove/null the original,
         // case file view will show duplicate documents
-        caseDataBuilder.specClaimTemplateDocumentFiles(null);
-        caseDataBuilder.specClaimDetailsDocumentFiles(null);
+        caseData.setSpecClaimTemplateDocumentFiles(null);
+        caseData.setSpecClaimDetailsDocumentFiles(null);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
 
     }
