@@ -56,6 +56,7 @@ class RoboticsDataMapperForSpecTest {
             .respondent1(createPartyWithCompany("company 2"))
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build())
             .build();
+        caseData.setSubmittedDate(LocalDateTime.now().minusDays(14));
         caseData.setBreathing(BreathingSpaceInfo.builder()
             .enter(BreathingSpaceEnterInfo.builder()
                 .type(BreathingSpaceType.STANDARD)
@@ -138,6 +139,7 @@ class RoboticsDataMapperForSpecTest {
             .respondent1(createPartyWithCompany("company 2"))
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build())
             .build();
+        caseData.setSubmittedDate(LocalDateTime.now().minusDays(14));
         caseData.setBreathing(BreathingSpaceInfo.builder()
             .enter(BreathingSpaceEnterInfo.builder()
                 .type(BreathingSpaceType.STANDARD)
@@ -182,6 +184,7 @@ class RoboticsDataMapperForSpecTest {
             .respondent1(createPartyWithCompany("company 2"))
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build())
             .build();
+        caseData.setSubmittedDate(LocalDateTime.now().minusDays(14));
         caseData.setBreathing(BreathingSpaceInfo.builder()
             .enter(BreathingSpaceEnterInfo.builder()
                 .type(BreathingSpaceType.STANDARD)
