@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimantresponse.RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator;
 
@@ -41,62 +42,64 @@ class GenerateDocForReqJudgmentByAdmissionOrDeterminationTest extends BaseCallba
     @Mock
     private SystemGeneratedDocumentService systemGeneratedDocumentService;
 
-    private static final CaseDocument FORM = CaseDocument.builder()
-        .createdBy("John")
-        .documentName("document name")
-        .documentSize(0L)
-        .documentType(DEFENDANT_DEFENCE)
-        .createdDatetime(LocalDateTime.now())
-        .documentLink(Document.builder()
-                          .documentUrl("fake-url")
-                          .documentFileName("file-name")
-                          .documentBinaryUrl("binary-url")
-                          .build())
-        .build();
+    public static final CaseDocument FORM;
+
+    static {
+        Document documentLink = new Document();
+        documentLink.setDocumentUrl("fake-url");
+        documentLink.setDocumentFileName("file-name");
+        documentLink.setDocumentBinaryUrl("binary-url");
+
+        CaseDocument document1 = new CaseDocument();
+        document1.setCreatedBy("John");
+        document1.setDocumentName("document name");
+        document1.setDocumentSize(0L);
+        document1.setDocumentType(DEFENDANT_DEFENCE);
+        document1.setCreatedDatetime(LocalDateTime.now());
+        document1.setDocumentLink(documentLink);
+        FORM = document1;
+    }
+
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
 
     @Test
     void shouldGenerateForm_ifCcjHasBeenRequested() {
-        CaseEvent event = CaseEvent.GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
         given(formGenerator.generate(any(CaseEvent.class), any(CaseData.class), anyString())).willReturn(FORM);
-        CaseData caseData = CaseData.builder()
-            .caseDataLiP(CaseDataLiP.builder()
-                .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                    .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
-                    .build())
-                .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+        claimantLiPResponse.setApplicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+        caseData.setCaseDataLiP(caseDataLiP);
 
+        CaseEvent event = CaseEvent.GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
         handler.handle(callbackParamsOf(caseData, event, ABOUT_TO_SUBMIT));
         verify(formGenerator).generate(event, caseData, BEARER_TOKEN);
     }
 
     @Test
     void shouldNotGenerateForm_ifCcjHasNotBeenRequested() {
-        CaseEvent event = CaseEvent.GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
-        CaseData caseData = CaseData.builder()
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .applicant1ChoosesHowToProceed(ChooseHowToProceed.SIGN_A_SETTLEMENT_AGREEMENT)
-                                                        .build())
-                             .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+        claimantLiPResponse.setApplicant1ChoosesHowToProceed(ChooseHowToProceed.SIGN_A_SETTLEMENT_AGREEMENT);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+        caseData.setCaseDataLiP(caseDataLiP);
 
+        CaseEvent event = CaseEvent.GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
         handler.handle(callbackParamsOf(caseData, event, ABOUT_TO_SUBMIT));
         verifyNoInteractions(formGenerator);
     }
 
     @Test
     void shouldGenerateForm_ifDefaultCcjHasBeenRequested() {
-        CaseEvent event = CaseEvent.GENERATE_DEFAULT_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
         given(formGenerator.generate(any(CaseEvent.class), any(CaseData.class), anyString())).willReturn(FORM);
-        CaseData caseData = CaseData.builder()
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .build())
-                             .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(new ClaimantLiPResponse());
+        caseData.setCaseDataLiP(caseDataLiP);
 
+        CaseEvent event = CaseEvent.GENERATE_DEFAULT_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
         handler.handle(callbackParamsOf(caseData, event, ABOUT_TO_SUBMIT));
         verify(formGenerator).generate(event, caseData, BEARER_TOKEN);
     }
