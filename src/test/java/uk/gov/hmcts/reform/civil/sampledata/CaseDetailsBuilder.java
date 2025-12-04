@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.model.BaseCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.time.LocalDate;
@@ -34,6 +35,7 @@ public class CaseDetailsBuilder {
     private String state;
     private Map<String, Object> data;
     private Long id;
+    private LocalDateTime createdDate;
 
     public static CaseDetailsBuilder builder() {
         return new CaseDetailsBuilder();
@@ -44,13 +46,18 @@ public class CaseDetailsBuilder {
         return this;
     }
 
-    public CaseDetailsBuilder data(CaseData caseData) {
+    public CaseDetailsBuilder data(BaseCaseData caseData) {
         this.data = mapper.convertValue(caseData, Map.class);
         return this;
     }
 
     public CaseDetailsBuilder id(Long id) {
         this.id = id;
+        return this;
+    }
+
+    public CaseDetailsBuilder createdDate(LocalDateTime createdDate) {
+        this.createdDate = createdDate;
         return this;
     }
 
@@ -189,6 +196,7 @@ public class CaseDetailsBuilder {
             .data(data)
             .state(state)
             .id(id)
+            .createdDate(createdDate)
             .build();
     }
 }
