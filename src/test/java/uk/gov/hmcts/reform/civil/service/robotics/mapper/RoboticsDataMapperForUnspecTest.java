@@ -216,8 +216,6 @@ class RoboticsDataMapperForUnspecTest {
         solicitorServiceAddress.setPostCode("AB1 2XY");
         solicitorServiceAddress.setCounty("My county");
 
-        ContactInformation contactInformation = CONTACT_INFORMATION.toBuilder().addressLine1("line 1 provided").build();
-
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful()
             .applicantSolicitor1ServiceAddress(solicitorServiceAddress)
             .respondentSolicitor1ServiceAddress(solicitorServiceAddress)
@@ -236,6 +234,8 @@ class RoboticsDataMapperForUnspecTest {
         assertThat(firstSolicitor.getName()).isEqualTo("Org Name");
         assertThat(firstSolicitor.getContactDX()).isEqualTo("DX 12345");
         assertThat(firstSolicitor.getContactEmailAddress()).isEqualTo("applicantsolicitor@example.com");
+
+        ContactInformation contactInformation = CONTACT_INFORMATION.toBuilder().addressLine1("line 1 provided").build();
         CustomAssertions.assertThat(List.of(contactInformation))
             .isEqualTo(firstSolicitor.getAddresses().getContactAddress());
 
@@ -463,18 +463,18 @@ class RoboticsDataMapperForUnspecTest {
             .atStatePaymentSuccessful()
             .build();
         caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
-        var app1NocDate = LocalDateTime.parse("2022-01-01T12:00:00.000550439");
-        var res1NocDate = LocalDateTime.parse("2022-02-01T12:00:00.000550439");
-        var res2NocDate = LocalDateTime.parse("2022-03-01T12:00:00.000550439");
 
+        var app1NocDate = LocalDateTime.parse("2022-01-01T12:00:00.000550439");
         OrganisationPolicy app1OrgPolicy = caseData.getApplicant1OrganisationPolicy();
         app1OrgPolicy.setPreviousOrganisations(List.of(buildPreviousOrganisation("App 1 org", app1NocDate)));
         caseData.setApplicant1OrganisationPolicy(app1OrgPolicy);
 
+        var res1NocDate = LocalDateTime.parse("2022-02-01T12:00:00.000550439");
         OrganisationPolicy res1OrgPolicy = caseData.getRespondent1OrganisationPolicy();
         res1OrgPolicy.setPreviousOrganisations(List.of(buildPreviousOrganisation("Res 1 org", res1NocDate)));
         caseData.setRespondent1OrganisationPolicy(res1OrgPolicy);
 
+        var res2NocDate = LocalDateTime.parse("2022-03-01T12:00:00.000550439");
         OrganisationPolicy res2OrgPolicy = caseData.getRespondent2OrganisationPolicy();
         res2OrgPolicy.setPreviousOrganisations(List.of(buildPreviousOrganisation("Res 2 org", res2NocDate)));
         caseData.setRespondent2OrganisationPolicy(res2OrgPolicy);
@@ -495,18 +495,18 @@ class RoboticsDataMapperForUnspecTest {
             .atStatePaymentSuccessful()
             .build();
         caseData.setCcdState(CaseState.CASE_DISMISSED);
-        var app1NocDate = LocalDateTime.parse("2022-01-01T12:00:00.000550439");
-        var res1NocDate = LocalDateTime.parse("2022-02-01T12:00:00.000550439");
-        var res2NocDate = LocalDateTime.parse("2022-03-01T12:00:00.000550439");
 
+        var app1NocDate = LocalDateTime.parse("2022-01-01T12:00:00.000550439");
         OrganisationPolicy app1OrgPolicy = caseData.getApplicant1OrganisationPolicy();
         app1OrgPolicy.setPreviousOrganisations(List.of(buildPreviousOrganisation("App 1 org", app1NocDate)));
         caseData.setApplicant1OrganisationPolicy(app1OrgPolicy);
 
+        var res1NocDate = LocalDateTime.parse("2022-02-01T12:00:00.000550439");
         OrganisationPolicy res1OrgPolicy = caseData.getRespondent1OrganisationPolicy();
         res1OrgPolicy.setPreviousOrganisations(List.of(buildPreviousOrganisation("Res 1 org", res1NocDate)));
         caseData.setRespondent1OrganisationPolicy(res1OrgPolicy);
 
+        var res2NocDate = LocalDateTime.parse("2022-03-01T12:00:00.000550439");
         OrganisationPolicy res2OrgPolicy = caseData.getRespondent2OrganisationPolicy();
         res2OrgPolicy.setPreviousOrganisations(List.of(buildPreviousOrganisation("Res 2 org", res2NocDate)));
         caseData.setRespondent2OrganisationPolicy(res2OrgPolicy);
@@ -523,23 +523,23 @@ class RoboticsDataMapperForUnspecTest {
 
     @Test
     void shouldNotPopulateNoticeOfChangeSection_whenCaseIsStillOnline() {
-        var app1NocDate = LocalDateTime.parse("2022-01-01T12:00:00.000550439");
-        var res1NocDate = LocalDateTime.parse("2022-02-01T12:00:00.000550439");
-        var res2NocDate = LocalDateTime.parse("2022-03-01T12:00:00.000550439");
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePaymentSuccessful()
             .build();
         caseData.setCcdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION);
 
+        var app1NocDate = LocalDateTime.parse("2022-01-01T12:00:00.000550439");
         OrganisationPolicy app1OrgPolicy = caseData.getApplicant1OrganisationPolicy();
         app1OrgPolicy.setPreviousOrganisations(List.of(buildPreviousOrganisation("App 1 org", app1NocDate)));
         caseData.setApplicant1OrganisationPolicy(app1OrgPolicy);
 
+        var res1NocDate = LocalDateTime.parse("2022-02-01T12:00:00.000550439");
         OrganisationPolicy res1OrgPolicy = caseData.getRespondent1OrganisationPolicy();
         res1OrgPolicy.setPreviousOrganisations(List.of(buildPreviousOrganisation("Res 1 org", res1NocDate)));
         caseData.setRespondent1OrganisationPolicy(res1OrgPolicy);
 
+        var res2NocDate = LocalDateTime.parse("2022-03-01T12:00:00.000550439");
         OrganisationPolicy res2OrgPolicy = caseData.getRespondent2OrganisationPolicy();
         res2OrgPolicy.setPreviousOrganisations(List.of(buildPreviousOrganisation("Res 2 org", res2NocDate)));
         caseData.setRespondent2OrganisationPolicy(res2OrgPolicy);

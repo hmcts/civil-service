@@ -78,10 +78,6 @@ class RoboticsDataMapperForSpecTest {
     @Test
     void shouldMapExpectedNoticeOfChangeData_whenCaseGoesOffline() {
 
-        var app1NocDate = LocalDateTime.parse("2022-01-01T12:00:00.000550439");
-        var res1NocDate = LocalDateTime.parse("2022-02-01T12:00:00.000550439");
-        var res2NocDate = LocalDateTime.parse("2022-03-01T12:00:00.000550439");
-
         CaseData caseData = CaseDataBuilder.builder()
             .legacyCaseReference("reference")
             .totalInterest(BigDecimal.ZERO)
@@ -100,15 +96,17 @@ class RoboticsDataMapperForSpecTest {
                 .build())
             .build());
         caseData.setSubmittedDate(LocalDateTime.now().minusDays(14));
-
+        var app1NocDate = LocalDateTime.parse("2022-01-01T12:00:00.000550439");
         OrganisationPolicy app1OrgPolicy = new OrganisationPolicy();
         app1OrgPolicy.setPreviousOrganisations(List.of(buildPreviousOrganisation("App 1 org", app1NocDate)));
         caseData.setApplicant1OrganisationPolicy(app1OrgPolicy);
-        
+
+        var res1NocDate = LocalDateTime.parse("2022-02-01T12:00:00.000550439");
         OrganisationPolicy res1OrgPolicy = new OrganisationPolicy();
         res1OrgPolicy.setPreviousOrganisations(List.of(buildPreviousOrganisation("Res 1 org", res1NocDate)));
         caseData.setRespondent1OrganisationPolicy(res1OrgPolicy);
-        
+
+        var res2NocDate = LocalDateTime.parse("2022-03-01T12:00:00.000550439");
         OrganisationPolicy res2OrgPolicy = new OrganisationPolicy();
         res2OrgPolicy.setPreviousOrganisations(List.of(buildPreviousOrganisation("Res 2 org", res2NocDate)));
         caseData.setRespondent2OrganisationPolicy(res2OrgPolicy);
@@ -127,9 +125,6 @@ class RoboticsDataMapperForSpecTest {
 
     @Test
     void shouldMapExpectedNoticeOfChangeData_whenCaseDismissed() {
-        var app1NocDate = LocalDateTime.parse("2022-01-01T12:00:00.000550439");
-        var res1NocDate = LocalDateTime.parse("2022-02-01T12:00:00.000550439");
-        var res2NocDate = LocalDateTime.parse("2022-03-01T12:00:00.000550439");
 
         CaseData caseData = CaseDataBuilder.builder()
             .legacyCaseReference("reference")
@@ -150,14 +145,17 @@ class RoboticsDataMapperForSpecTest {
             .build());
         caseData.setCcdState(CaseState.CASE_DISMISSED);
 
+        var app1NocDate = LocalDateTime.parse("2022-01-01T12:00:00.000550439");
         OrganisationPolicy app1OrgPolicy = new OrganisationPolicy();
         app1OrgPolicy.setPreviousOrganisations(List.of(buildPreviousOrganisation("App 1 org", app1NocDate)));
         caseData.setApplicant1OrganisationPolicy(app1OrgPolicy);
-        
+
+        var res1NocDate = LocalDateTime.parse("2022-02-01T12:00:00.000550439");
         OrganisationPolicy res1OrgPolicy = new OrganisationPolicy();
         res1OrgPolicy.setPreviousOrganisations(List.of(buildPreviousOrganisation("Res 1 org", res1NocDate)));
         caseData.setRespondent1OrganisationPolicy(res1OrgPolicy);
-        
+
+        var res2NocDate = LocalDateTime.parse("2022-03-01T12:00:00.000550439");
         OrganisationPolicy res2OrgPolicy = new OrganisationPolicy();
         res2OrgPolicy.setPreviousOrganisations(List.of(buildPreviousOrganisation("Res 2 org", res2NocDate)));
         caseData.setRespondent2OrganisationPolicy(res2OrgPolicy);
