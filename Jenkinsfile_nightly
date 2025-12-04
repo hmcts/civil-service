@@ -10,6 +10,8 @@ properties([
       description: 'Runs the failed test files and test files that were not executed, contained within the \'testFilesReport.json\', from the latest previous pipeline run'),
     choice(name: 'ENVIRONMENT', choices: ['aat', 'demo', 'preview'],
       description: 'Environment to test'),
+    string(name: 'PR_NUMBER',
+      defaultValue: '', description: 'PR Number of deployed environment to be used to run tests against'),
     choice(name: 'FRONTEND_URL',
       choices: [
                   'https://manage-case.aat.platform.hmcts.net',
