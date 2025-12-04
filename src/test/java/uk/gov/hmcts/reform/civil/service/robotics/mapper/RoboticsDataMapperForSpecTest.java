@@ -112,20 +112,18 @@ class RoboticsDataMapperForSpecTest {
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .build();
 
-        caseData = caseData.toBuilder()
-            .applicant1OrganisationPolicy(
-                OrganisationPolicy.builder()
-                    .previousOrganisations(List.of(buildPreviousOrganisation("App 1 org", app1NocDate)))
-                    .build())
-            .respondent1OrganisationPolicy(
-                OrganisationPolicy.builder()
-                    .previousOrganisations(List.of(buildPreviousOrganisation("Res 1 org", res1NocDate)))
-                    .build())
-            .respondent2OrganisationPolicy(
-                OrganisationPolicy.builder()
-                    .previousOrganisations(List.of(buildPreviousOrganisation("Res 2 org", res2NocDate)))
-                    .build())
-            .build();
+        caseData.setApplicant1OrganisationPolicy(
+            OrganisationPolicy.builder()
+                .previousOrganisations(List.of(buildPreviousOrganisation("App 1 org", app1NocDate)))
+                .build());
+        caseData.setRespondent1OrganisationPolicy(
+            OrganisationPolicy.builder()
+                .previousOrganisations(List.of(buildPreviousOrganisation("Res 1 org", res1NocDate)))
+                .build());
+        caseData.setRespondent2OrganisationPolicy(
+            OrganisationPolicy.builder()
+                .previousOrganisations(List.of(buildPreviousOrganisation("Res 2 org", res2NocDate)))
+                .build());
 
         RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
@@ -170,20 +168,18 @@ class RoboticsDataMapperForSpecTest {
             .ccdState(CaseState.CASE_DISMISSED)
             .build();
 
-        caseData = caseData.toBuilder()
-            .applicant1OrganisationPolicy(
-                OrganisationPolicy.builder()
-                    .previousOrganisations(List.of(buildPreviousOrganisation("App 1 org", app1NocDate)))
-                    .build())
-            .respondent1OrganisationPolicy(
-                OrganisationPolicy.builder()
-                    .previousOrganisations(List.of(buildPreviousOrganisation("Res 1 org", res1NocDate)))
-                    .build())
-            .respondent2OrganisationPolicy(
-                OrganisationPolicy.builder()
-                    .previousOrganisations(List.of(buildPreviousOrganisation("Res 2 org", res2NocDate)))
-                    .build())
-            .build();
+        caseData.setApplicant1OrganisationPolicy(
+            OrganisationPolicy.builder()
+                .previousOrganisations(List.of(buildPreviousOrganisation("App 1 org", app1NocDate)))
+                .build());
+        caseData.setRespondent1OrganisationPolicy(
+            OrganisationPolicy.builder()
+                .previousOrganisations(List.of(buildPreviousOrganisation("Res 1 org", res1NocDate)))
+                .build());
+        caseData.setRespondent2OrganisationPolicy(
+            OrganisationPolicy.builder()
+                .previousOrganisations(List.of(buildPreviousOrganisation("Res 2 org", res2NocDate)))
+                .build());
 
         RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 

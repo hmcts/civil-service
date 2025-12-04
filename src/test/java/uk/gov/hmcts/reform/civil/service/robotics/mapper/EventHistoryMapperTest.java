@@ -258,9 +258,7 @@ class EventHistoryMapperTest {
                 .atStateProceedsOfflineUnrepresentedDefendant1UnregisteredDefendant2().build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             Event expectedEvent1 = Event.builder()
                 .eventSequence(1)
@@ -316,9 +314,7 @@ class EventHistoryMapperTest {
                 .atStateProceedsOfflineUnregisteredDefendant1UnrepresentedDefendant2().build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             Event expectedEvent1 = Event.builder()
                 .eventSequence(1)
@@ -378,9 +374,7 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             Event expectedEvent = Event.builder()
                 .eventSequence(1)
@@ -421,9 +415,7 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAfterClaimNotified().build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             List<Event> expectedMiscellaneousEvents = List.of(
                 Event.builder()
@@ -475,9 +467,7 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAfterClaimDetailsNotified().build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             List<Event> expectedEvent = List.of(
                 Event.builder()
@@ -538,9 +528,7 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             Event claimIssuedEvent = Event.builder()
                 .eventSequence(1)
@@ -646,9 +634,7 @@ class EventHistoryMapperTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
                 Event expectedAcknowledgementOfServiceReceived = Event.builder()
                     .eventSequence(4)
@@ -687,9 +673,7 @@ class EventHistoryMapperTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
                 List<Event> expectedAcknowledgementOfServiceReceived = List.of(
                     Event.builder()
@@ -744,9 +728,7 @@ class EventHistoryMapperTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
                 List<Event> expectedAcknowledgementOfServiceReceived = List.of(
                     Event.builder()
@@ -796,9 +778,7 @@ class EventHistoryMapperTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
                 Event expectedAcknowledgementOfServiceReceivedEvent =
                     Event.builder()
@@ -833,9 +813,7 @@ class EventHistoryMapperTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
                 Event expectedAcknowledgementOfServiceReceivedEvent =
                     Event.builder()
@@ -869,9 +847,7 @@ class EventHistoryMapperTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
                 Event expectedAcknowledgementOfServiceReceived = Event.builder()
                     .eventSequence(4)
@@ -912,9 +888,7 @@ class EventHistoryMapperTest {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension().build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
                 Event deadlineExtendedEvent = expectedDeadLineExtendedEvent(
                     PartyUtils.respondent1Data(caseData),
@@ -939,9 +913,7 @@ class EventHistoryMapperTest {
                     .atState1v2DifferentSolicitorClaimDetailsRespondent1NotifiedTimeExtension().build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
                 Event deadlineExtendedEvent = expectedDeadLineExtendedEvent(
                     PartyUtils.respondent1Data(caseData),
@@ -965,9 +937,7 @@ class EventHistoryMapperTest {
                     .atState1v2DifferentSolicitorClaimDetailsRespondent2NotifiedTimeExtension().build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
                 Event deadlineExtendedEvent = expectedDeadLineExtendedEvent(
                     PartyUtils.respondent2Data(caseData),
@@ -991,9 +961,7 @@ class EventHistoryMapperTest {
                     .atState1v2SameSolicitorClaimDetailsRespondentNotifiedTimeExtension().build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
                 Event deadlineExtendedEvent = expectedDeadLineExtendedEvent(
                     PartyUtils.respondent1Data(caseData),
@@ -1038,9 +1006,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             Event expectedReceiptOfAdmission = Event.builder()
                 .eventSequence(6)
@@ -1147,9 +1113,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             Event expectedReceiptOfAdmission = Event.builder()
                 .eventSequence(4)
@@ -1227,9 +1191,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             List<Event> expectedReceiptOfAdmission = List.of(
                 Event.builder()
@@ -1330,9 +1292,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             List<Event> expectedReceiptOfAdmission = List.of(
                 Event.builder()
@@ -1437,9 +1397,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             Event expectedDefenceFiled = Event.builder()
                 .eventSequence(2)
@@ -1593,9 +1551,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             Event expectedReceiptOfAdmission = Event.builder()
                 .eventSequence(2)
@@ -1644,9 +1600,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             Event expectedReceiptOfAdmission = Event.builder()
                 .eventSequence(2)
@@ -1695,9 +1649,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             Event expectedReceiptOfAdmission = Event.builder()
                 .eventSequence(2)
@@ -1750,9 +1702,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             Event expectedReceiptOfPartAdmission = Event.builder()
                 .eventSequence(2)
@@ -1823,9 +1773,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             List<Event> expectedMiscellaneousEvents = List.of(
@@ -1886,9 +1834,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             Event expectedReceiptOfPartAdmission = Event.builder()
                 .eventSequence(5)
@@ -2108,9 +2054,7 @@ class EventHistoryMapperTest {
 
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             List<Event> expectedReceiptOfPartAdmission = List.of(
                 Event.builder()
@@ -2250,19 +2194,17 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .respondent1DQ(
-                        Respondent1DQ.builder()
-                            .respondToCourtLocation(
-                                RequestedCourt.builder()
-                                    .responseCourtLocations(preferredCourt)
-                                    .reasonForHearingAtSpecificCourt("Reason")
-                                    .build()
-                            )
-                            .build()
-                    )
-                    .build();
+                caseData.setRespondent2Represented(YES);
+                caseData.setRespondent1DQ(
+                    Respondent1DQ.builder()
+                        .respondToCourtLocation(
+                            RequestedCourt.builder()
+                                .responseCourtLocations(preferredCourt)
+                                .reasonForHearingAtSpecificCourt("Reason")
+                                .build()
+                        )
+                        .build()
+                );
             }
             List<Event> expectedReceiptOfPartAdmission = List.of(
                 Event.builder()
@@ -2387,9 +2329,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             List<Event> expectedMiscellaneousEvents = List.of(
                 Event.builder()
@@ -2473,9 +2413,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             List<Event> expectedMiscellaneousEvents = List.of(
                 Event.builder()
@@ -2544,9 +2482,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             List<Event> expectedDefenceAndCounterClaim = List.of(
                 Event.builder()
@@ -2644,9 +2580,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
 
             List<Event> expectedDefenceAndCounterClaim = List.of(
@@ -2748,9 +2682,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             Event expectedDefenceFiled = Event.builder()
                 .eventSequence(4)
@@ -2840,9 +2772,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             Event expectedDefenceFiled = Event.builder()
                 .eventSequence(4)
@@ -2931,9 +2861,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             List<Event> expectedDefenceFiled = List.of(
                 Event.builder()
@@ -3050,9 +2978,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             List<Event> expectedDefenceFiled = List.of(
                 Event.builder()
@@ -3180,15 +3106,11 @@ class EventHistoryMapperTest {
                                  .build())
                 .build();
             if (caseData.getRespondent2Represented() == null && caseData.getRespondent2OrgRegistered() != null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YesOrNo.YES)
-                    .build();
+                caseData.setRespondent2Represented(YesOrNo.YES);
             }
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             String respondent1MiscText =
                 mapper.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
@@ -3257,9 +3179,7 @@ class EventHistoryMapperTest {
                                  .build())
                 .build();
             if (caseData.getRespondent2Represented() == null && caseData.getRespondent2OrgRegistered() != null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YesOrNo.YES)
-                    .build();
+                caseData.setRespondent2Represented(YesOrNo.YES);
             }
             String respondent1MiscText =
                 mapper.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
@@ -3322,9 +3242,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             String respondent1MiscText =
                 mapper.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
@@ -3424,9 +3342,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             String respondent1MiscText =
                 mapper.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
@@ -3536,9 +3452,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             String respondent1MiscText =
                 mapper.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
@@ -3639,9 +3553,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             String respondent1MiscText =
                 mapper.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
@@ -3753,9 +3665,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             String respondent1MiscText =
                 mapper.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
@@ -3849,9 +3759,7 @@ class EventHistoryMapperTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
                 List<Event> expectedDefenceFiled =
                     List.of(Event.builder()
@@ -3907,9 +3815,7 @@ class EventHistoryMapperTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
                 Event expectedReceiptOfAdmission = Event.builder()
                     .eventSequence(4)
@@ -3985,9 +3891,7 @@ class EventHistoryMapperTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
                 Event expectedReceiptOfPartAdmission = Event.builder()
                     .eventSequence(4)
@@ -4063,9 +3967,7 @@ class EventHistoryMapperTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
 
                 var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
@@ -4097,9 +3999,7 @@ class EventHistoryMapperTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
                 Event expectedDefenceFiled = Event.builder()
                     .eventSequence(5)
@@ -4192,9 +4092,7 @@ class EventHistoryMapperTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
                 Event expectedDefenceFiled = Event.builder()
                     .eventSequence(5)
@@ -4288,9 +4186,7 @@ class EventHistoryMapperTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
                 Event expectedDefenceFiled = Event.builder()
                     .eventSequence(5)
@@ -4400,9 +4296,7 @@ class EventHistoryMapperTest {
                                            .build())
                         .build();
                 if (caseData.getRespondent2OrgRegistered() != null && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
                 Event expectedDirectionsQuestionnaireRespondent = Event.builder()
                     .eventSequence(6)
@@ -4503,7 +4397,7 @@ class EventHistoryMapperTest {
                     .atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_ONE)
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder().respondent2Represented(YES).build();
+                    caseData.setRespondent2Represented(YES);
                 }
                 Event expectedDirectionsQuestionnaireRespondent = Event.builder()
                     .eventSequence(6)
@@ -4606,9 +4500,7 @@ class EventHistoryMapperTest {
                         .atStateApplicantProceedAllMediation(MultiPartyScenario.ONE_V_ONE)
                         .build();
                 if (caseData.getRespondent2OrgRegistered() != null && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                       .respondent2Represented(YES)
-                       .build();
+                    caseData.setRespondent2Represented(YES);
                 }
                 Event expectedDirectionsQuestionnaireRespondent = Event.builder()
                     .eventSequence(3)
@@ -4696,9 +4588,7 @@ class EventHistoryMapperTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
                 Event expectedDefence1 = Event.builder()
                     .eventSequence(5)
@@ -4850,17 +4740,15 @@ class EventHistoryMapperTest {
                         .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                         && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                            .respondent2Represented(YES)
-                            .respondent1DQ(Respondent1DQ.builder()
-                                               .respondent1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
-                                                                                             .oneMonthStayRequested(YES)
-                                                                                             .build())
-                                               .respondent1DQRequestedCourt(RequestedCourt.builder()
-                                                                                .responseCourtCode("444")
-                                                                                .build())
-                                               .build())
-                            .build();
+                    caseData.setRespondent2Represented(YES);
+                    caseData.setRespondent1DQ(Respondent1DQ.builder()
+                                           .respondent1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
+                                                                                         .oneMonthStayRequested(YES)
+                                                                                         .build())
+                                           .respondent1DQRequestedCourt(RequestedCourt.builder()
+                                                                            .responseCourtCode("444")
+                                                                            .build())
+                                           .build());
                 }
                 Event expectedDefence1 = Event.builder()
                         .eventSequence(2)
@@ -4981,9 +4869,7 @@ class EventHistoryMapperTest {
                         .respondentResponseIsSame(YES)
                         .build();
                 if (caseData.getRespondent2OrgRegistered() != null && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                            .respondent2Represented(YES)
-                            .build();
+                    caseData.setRespondent2Represented(YES);
                 }
                 Event expectedDefence1 = Event.builder()
                         .eventSequence(2)
@@ -5104,9 +4990,7 @@ class EventHistoryMapperTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
                 List<Event> expectedMiscEvents = List.of(
                     Event.builder()
@@ -5178,9 +5062,7 @@ class EventHistoryMapperTest {
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
+                    caseData.setRespondent2Represented(YES);
                 }
                 List<Event> expectedMiscEvents = List.of(
                     Event.builder()
@@ -6689,9 +6571,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             List<Event> expectedMiscellaneousEvents = List.of(
                 Event.builder()
@@ -6963,9 +6843,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             Event expectedDefenceFiled = Event.builder()
                 .eventSequence(4)
@@ -7072,9 +6950,7 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             Event claimIssuedEvent = Event.builder()
                 .eventSequence(1)
@@ -7127,9 +7003,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             Event claimIssuedEvent = Event.builder()
                 .eventSequence(1)
@@ -7188,9 +7062,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             Event claimIssuedEvent = Event.builder()
                 .eventSequence(1)
@@ -7258,9 +7130,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             Event claimIssuedEvent = Event.builder()
                 .eventSequence(1)
@@ -7322,9 +7192,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             Event claimIssuedEvent = Event.builder()
                 .eventSequence(1)
@@ -7456,9 +7324,7 @@ class EventHistoryMapperTest {
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
+                caseData.setRespondent2Represented(YES);
             }
             List<Event> expectedMiscEvents = List.of(
                 Event.builder()
@@ -7663,19 +7529,16 @@ class EventHistoryMapperTest {
                            .createdBy("createdBy")
                            .note("my note")
                            .build())
-            .build().toBuilder()
-            .caseAccessCategory(SPEC_CLAIM)
-            .respondent2(Party.builder()
-                             .type(Party.Type.COMPANY)
-                             .companyName("Company Name")
-                             .build())
-            .respondent2LitigationFriendCreatedDate(LocalDateTime.now())
             .build();
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
+        Party respondent2 = new Party();
+        respondent2.setType(Party.Type.COMPANY);
+        respondent2.setCompanyName("Company Name");
+        caseData.setRespondent2(respondent2);
+        caseData.setRespondent2LitigationFriendCreatedDate(LocalDateTime.now());
         if (caseData.getRespondent2OrgRegistered() != null
             && caseData.getRespondent2Represented() == null) {
-            caseData = caseData.toBuilder()
-                .respondent2Represented(YES)
-                .build();
+            caseData.setRespondent2Represented(YES);
         }
 
         Event claimIssuedEvent = Event.builder()
