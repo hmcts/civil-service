@@ -213,8 +213,10 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         private final String respondent2OrganizationID = "respondent1OrganizationID";
         private final String respondent2OrgPolicyReference = "respondentOrgPolicyReference";
 
-        private final OrganisationPolicy respondent1Organization = createOrganisationPolicyWithRoleAndRef(respondent1OrganizationID, respondent1OrgPolicyReference, RESPONDENTSOLICITORONE.getFormattedName());
-        private final OrganisationPolicy respondent2Organization = createOrganisationPolicyWithRoleAndRef(respondent2OrganizationID, respondent2OrgPolicyReference, RESPONDENTSOLICITORTWO.getFormattedName());
+        private final OrganisationPolicy respondent1Organization =
+            createOrganisationPolicyWithRoleAndRef(respondent1OrganizationID, respondent1OrgPolicyReference, RESPONDENTSOLICITORONE.getFormattedName());
+        private final OrganisationPolicy respondent2Organization =
+            createOrganisationPolicyWithRoleAndRef(respondent2OrganizationID, respondent2OrgPolicyReference, RESPONDENTSOLICITORTWO.getFormattedName());
 
         /* 1V1 scenarios */
         @Test
