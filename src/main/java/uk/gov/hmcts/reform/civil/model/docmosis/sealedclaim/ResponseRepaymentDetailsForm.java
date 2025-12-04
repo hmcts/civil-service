@@ -119,7 +119,7 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
     }
 
     private static BigDecimal getTotalClaimAmountWithInterest(CaseData caseData) {
-        return caseData.getTotalClaimAmountPlusInterest();
+        return caseData.getTotalClaimAmountPlusInterest() != null ? caseData.getTotalClaimAmountPlusInterest() : caseData.getTotalClaimAmount();
     }
 
     private static void addRepaymentMethodLip(CaseData caseData, ResponseRepaymentDetailsFormBuilder builder,

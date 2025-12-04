@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.ClaimantResponseOnCourtDecisionType;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -78,17 +79,18 @@ class ClaimantCCJResponseDefendantNotificationHandlerTest extends BaseCallbackHa
 
         @Test
         void shouldRecordScenario_whenClaimantAcceptsCourtDecision() {
-            CaseData caseData = CaseData.builder()
-                .ccdCaseReference(1234L)
-                .respondent1Represented(YesOrNo.NO)
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
-                                                            .claimantResponseOnCourtDecision(
-                                                                ClaimantResponseOnCourtDecisionType.ACCEPT_REPAYMENT_DATE)
-                                                            .build())
-                                 .build())
-                .build();
+            ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+            claimantLiPResponse.setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
+            claimantLiPResponse.setClaimantResponseOnCourtDecision(ClaimantResponseOnCourtDecisionType.ACCEPT_REPAYMENT_DATE);
+
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCcdCaseReference(1234L);
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setCaseDataLiP(caseDataLiP);
+
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DEFENDANT_CCJ_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE.name()).build()
             ).build();
@@ -111,16 +113,18 @@ class ClaimantCCJResponseDefendantNotificationHandlerTest extends BaseCallbackHa
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
-            CaseData caseData = CaseData.builder()
-                .legacyCaseReference("reference")
-                .ccdCaseReference(123674L)
-                .caseDataLiP(CaseDataLiP.builder().applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                                             .applicant1ChoosesHowToProceed(
-                                                                                 ChooseHowToProceed.REQUEST_A_CCJ).build())
-                                 .build())
-                .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
-                .respondent1Represented(YesOrNo.NO)
-                .build();
+            ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+            claimantLiPResponse.setApplicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ);
+
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setLegacyCaseReference("reference");
+            caseData.setCcdCaseReference(123674L);
+            caseData.setCaseDataLiP(caseDataLiP);
+            caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES);
+            caseData.setRespondent1Represented(YesOrNo.NO);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -141,24 +145,26 @@ class ClaimantCCJResponseDefendantNotificationHandlerTest extends BaseCallbackHa
             HashMap<String, Object> params = new HashMap<>();
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
-                .ccjPaymentPaidSomeOption(YesOrNo.YES)
-                .build();
-            CaseData caseData = CaseData.builder()
-                .legacyCaseReference("reference")
-                .ccdCaseReference(1234L)
-                .ccdState(CaseState.CASE_SETTLED)
-                .ccjPaymentDetails(ccjPaymentDetails)
-                .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
-                .specRespondent1Represented(YesOrNo.NO)
-                .respondent1Represented(YesOrNo.NO)
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                            .claimantCourtDecision(RepaymentDecisionType
-                                                                                       .IN_FAVOUR_OF_CLAIMANT).build())
-                                 .build())
-                .build();
+
+            CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
+            ccjPaymentDetails.setCcjPaymentPaidSomeAmount(BigDecimal.valueOf(10000));
+            ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
+
+            ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+            claimantLiPResponse.setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
+
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setLegacyCaseReference("reference");
+            caseData.setCcdCaseReference(1234L);
+            caseData.setCcdState(CaseState.CASE_SETTLED);
+            caseData.setCcjPaymentDetails(ccjPaymentDetails);
+            caseData.setApplicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES);
+            caseData.setSpecRespondent1Represented(YesOrNo.NO);
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setCaseDataLiP(caseDataLiP);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)

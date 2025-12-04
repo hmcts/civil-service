@@ -55,18 +55,23 @@ class GenerateClaimantLipManualDeterminationCallBackHandlerTest extends BaseCall
     private FeatureToggleService featureToggleService;
 
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
-    private static final CaseDocument FORM = CaseDocument.builder()
-        .createdBy("John")
-        .documentName("document name")
-        .documentSize(0L)
-        .documentType(LIP_MANUAL_DETERMINATION)
-        .createdDatetime(LocalDateTime.now())
-        .documentLink(Document.builder()
-                          .documentUrl("fake-url")
-                          .documentFileName("file-name")
-                          .documentBinaryUrl("binary-url")
-                          .build())
-        .build();
+    public static final CaseDocument FORM;
+
+    static {
+        Document documentLink = new Document();
+        documentLink.setDocumentUrl("fake-url");
+        documentLink.setDocumentFileName("file-name");
+        documentLink.setDocumentBinaryUrl("binary-url");
+
+        CaseDocument document = new CaseDocument();
+        document.setCreatedBy("John");
+        document.setDocumentName("document name");
+        document.setDocumentSize(0L);
+        document.setDocumentType(LIP_MANUAL_DETERMINATION);
+        document.setCreatedDatetime(LocalDateTime.now());
+        document.setDocumentLink(documentLink);
+        FORM = document;
+    }
 
     @BeforeEach
     public void setup() {
@@ -124,10 +129,11 @@ class GenerateClaimantLipManualDeterminationCallBackHandlerTest extends BaseCall
             any(CaseData.class),
             anyString()
         )).willReturn(FORM);
-        CaseData caseData = CaseData.builder()
-            .respondent1(Party.builder().type(Party.Type.COMPANY).build())
-            .claimantBilingualLanguagePreference("WELSH")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        Party party = new Party();
+        party.setType(Party.Type.COMPANY);
+        caseData.setRespondent1(party);
+        caseData.setClaimantBilingualLanguagePreference("WELSH");
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -143,10 +149,11 @@ class GenerateClaimantLipManualDeterminationCallBackHandlerTest extends BaseCall
             any(CaseData.class),
             anyString()
         )).willReturn(FORM);
-        CaseData caseData = CaseData.builder()
-            .respondent1(Party.builder().type(Party.Type.COMPANY).build())
-            .claimantBilingualLanguagePreference("WELSH")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        Party party = new Party();
+        party.setType(Party.Type.COMPANY);
+        caseData.setRespondent1(party);
+        caseData.setClaimantBilingualLanguagePreference("WELSH");
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -162,12 +169,15 @@ class GenerateClaimantLipManualDeterminationCallBackHandlerTest extends BaseCall
             any(CaseData.class),
             anyString()
         )).willReturn(FORM);
-        CaseData caseData = CaseData.builder()
-            .respondent1(Party.builder().type(Party.Type.COMPANY).build())
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("WELSH").build())
-                             .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        Party party = new Party();
+        party.setType(Party.Type.COMPANY);
+        caseData.setRespondent1(party);
+        RespondentLiPResponse respondentLiPResponse  = new RespondentLiPResponse();
+        respondentLiPResponse.setRespondent1ResponseLanguage("WELSH");
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
+        caseData.setCaseDataLiP(caseDataLiP);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);

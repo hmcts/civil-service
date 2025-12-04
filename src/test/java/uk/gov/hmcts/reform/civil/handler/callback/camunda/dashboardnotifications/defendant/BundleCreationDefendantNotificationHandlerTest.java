@@ -44,13 +44,12 @@ class BundleCreationDefendantNotificationHandlerTest extends BaseCallbackHandler
 
         @Test
         void shouldRecordScenario_whenInvokedWhenNotTrialReady() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
-                .toBuilder().respondent1Represented(YesOrNo.NO)
-                .drawDirectionsOrderRequired(YesOrNo.YES)
-                .drawDirectionsOrderSmallClaims(NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .orderType(OrderType.DECIDE_DAMAGES)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
+            caseData.setDrawDirectionsOrderSmallClaims(NO);
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setOrderType(OrderType.DECIDE_DAMAGES);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_BUNDLE_CREATED_FOR_DEFENDANT1.name()).build()
@@ -71,9 +70,8 @@ class BundleCreationDefendantNotificationHandlerTest extends BaseCallbackHandler
 
         @Test
         void shouldRecordScenario_whenInvokedWhenSmallClaims() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
-                .toBuilder().respondent1Represented(YesOrNo.NO)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_BUNDLE_CREATED_FOR_DEFENDANT1.name()).build()
@@ -94,14 +92,13 @@ class BundleCreationDefendantNotificationHandlerTest extends BaseCallbackHandler
 
         @Test
         void shouldRecordScenario_whenInvokedWhenTrialReady() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyRespondent1().build()
-                .toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .drawDirectionsOrderRequired(YesOrNo.YES)
-                .drawDirectionsOrderSmallClaims(NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .orderType(OrderType.DECIDE_DAMAGES)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyRespondent1().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
+            caseData.setDrawDirectionsOrderSmallClaims(NO);
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setOrderType(OrderType.DECIDE_DAMAGES);
+
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_BUNDLE_CREATED_FOR_DEFENDANT1.name()).build()
             ).build();
