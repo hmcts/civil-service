@@ -73,15 +73,14 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         updateCamundaVars(caseData);
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        buildDocuments(callbackParams, caseDataBuilder);
+        buildDocuments(callbackParams);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseDataBuilder.build().toMap(objectMapper))
+                .data(caseData.toMap(objectMapper))
                 .build();
     }
 
-    private void buildDocuments(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+    private void buildDocuments(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         boolean isRespondentLiP = false;
         Optional<Organisation> applicantLegalOrganisation = getLegalOrganization(caseData.getApplicant1OrganisationPolicy()
@@ -158,29 +157,29 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
             assignDiscontinuanceCategoryId(applicant1DiscontinueDoc);
             assignDiscontinuanceCategoryId(respondent1DiscontinueDoc);
             translatedDocuments.add(element(respondent1DiscontinueDoc));
-            caseDataBuilder.bilingualHint(YesOrNo.YES);
-            caseDataBuilder.preTranslationDocuments(translatedDocuments);
-            caseDataBuilder.preTranslationDocumentType(PreTranslationDocumentType.NOTICE_OF_DISCONTINUANCE);
-            caseDataBuilder.applicant1NoticeOfDiscontinueCWViewDoc(applicant1DiscontinueDoc);
+            caseData.setBilingualHint(YesOrNo.YES);
+            caseData.setPreTranslationDocuments(translatedDocuments);
+            caseData.setPreTranslationDocumentType(PreTranslationDocumentType.NOTICE_OF_DISCONTINUANCE);
+            caseData.setApplicant1NoticeOfDiscontinueCWViewDoc(applicant1DiscontinueDoc);
         } else if (caseData.isJudgeOrderVerificationRequired()) {
-            caseDataBuilder.applicant1NoticeOfDiscontinueCWViewDoc(applicant1DiscontinueDoc);
-            caseDataBuilder.respondent1NoticeOfDiscontinueCWViewDoc(respondent1DiscontinueDoc);
-            assignDiscontinuanceCategoryId(caseDataBuilder.build().getApplicant1NoticeOfDiscontinueCWViewDoc());
-            assignDiscontinuanceCategoryId(caseDataBuilder.build().getRespondent1NoticeOfDiscontinueCWViewDoc());
+            caseData.setApplicant1NoticeOfDiscontinueCWViewDoc(applicant1DiscontinueDoc);
+            caseData.setRespondent1NoticeOfDiscontinueCWViewDoc(respondent1DiscontinueDoc);
+            assignDiscontinuanceCategoryId(caseData.getApplicant1NoticeOfDiscontinueCWViewDoc());
+            assignDiscontinuanceCategoryId(caseData.getRespondent1NoticeOfDiscontinueCWViewDoc());
 
             if (respondent2DiscontinueDoc != null) {
-                caseDataBuilder.respondent2NoticeOfDiscontinueCWViewDoc(respondent2DiscontinueDoc);
-                assignDiscontinuanceCategoryId(caseDataBuilder.build().getRespondent2NoticeOfDiscontinueCWViewDoc());
+                caseData.setRespondent2NoticeOfDiscontinueCWViewDoc(respondent2DiscontinueDoc);
+                assignDiscontinuanceCategoryId(caseData.getRespondent2NoticeOfDiscontinueCWViewDoc());
             }
         } else {
-            caseDataBuilder.applicant1NoticeOfDiscontinueAllPartyViewDoc(applicant1DiscontinueDoc);
-            caseDataBuilder.respondent1NoticeOfDiscontinueAllPartyViewDoc(respondent1DiscontinueDoc);
-            assignDiscontinuanceCategoryId(caseDataBuilder.build().getApplicant1NoticeOfDiscontinueAllPartyViewDoc());
-            assignDiscontinuanceCategoryId(caseDataBuilder.build().getRespondent1NoticeOfDiscontinueAllPartyViewDoc());
+            caseData.setApplicant1NoticeOfDiscontinueAllPartyViewDoc(applicant1DiscontinueDoc);
+            caseData.setRespondent1NoticeOfDiscontinueAllPartyViewDoc(respondent1DiscontinueDoc);
+            assignDiscontinuanceCategoryId(caseData.getApplicant1NoticeOfDiscontinueAllPartyViewDoc());
+            assignDiscontinuanceCategoryId(caseData.getRespondent1NoticeOfDiscontinueAllPartyViewDoc());
 
             if (respondent2DiscontinueDoc != null) {
-                caseDataBuilder.respondent2NoticeOfDiscontinueAllPartyViewDoc(respondent2DiscontinueDoc);
-                assignDiscontinuanceCategoryId(caseDataBuilder.build().getRespondent2NoticeOfDiscontinueAllPartyViewDoc());
+                caseData.setRespondent2NoticeOfDiscontinueAllPartyViewDoc(respondent2DiscontinueDoc);
+                assignDiscontinuanceCategoryId(caseData.getRespondent2NoticeOfDiscontinueAllPartyViewDoc());
             }
         }
     }
@@ -225,7 +224,7 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
     protected Address getLegalAddress(Optional<Organisation> organisation,
                                      Address serviceAddress,
                                      Address correspondenceAddress, CaseCategory caseCategory) {
-        Address legalAddress = Address.builder().build();
+        Address legalAddress = new Address();
         if (organisation.isPresent()
             && nonNull(organisation.get().getContactInformation())
             && !organisation.get().getContactInformation().isEmpty()) {
