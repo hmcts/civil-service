@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -78,23 +79,27 @@ class RecordJudgementDefendantNotificationHandlerTest extends BaseCallbackHandle
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .respondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay())
-            .respondent1Represented(YesOrNo.NO)
-            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
-            .joJudgmentRecordReason(JudgmentRecordedReason.DETERMINATION_OF_MEANS)
-            .joInstalmentDetails(JudgmentInstalmentDetails.builder()
-                                     .startDate(LocalDate.of(2022, 12, 12))
-                                     .amount("120")
-                                     .paymentFrequency(PaymentFrequency.MONTHLY).build())
-            .joAmountOrdered("1200")
-            .joAmountCostOrdered("1100")
-            .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IN_INSTALMENTS).build())
-            .joOrderMadeDate(LocalDate.of(2022, 12, 12))
-            .joIsRegisteredWithRTL(YES)
-            .build();
+        JudgmentInstalmentDetails instalmentDetails = new JudgmentInstalmentDetails();
+        instalmentDetails.setStartDate(LocalDate.of(2022, 12, 12));
+        instalmentDetails.setAmount("120");
+        instalmentDetails.setPaymentFrequency(PaymentFrequency.MONTHLY);
+
+        JudgmentPaymentPlan paymentPlan = new JudgmentPaymentPlan();
+        paymentPlan.setType(PaymentPlanSelection.PAY_IN_INSTALMENTS);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay());
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setCcdState(CaseState.All_FINAL_ORDERS_ISSUED);
+        caseData.setJoJudgmentRecordReason(JudgmentRecordedReason.DETERMINATION_OF_MEANS);
+        caseData.setJoInstalmentDetails(instalmentDetails);
+        caseData.setJoAmountOrdered("1200");
+        caseData.setJoAmountCostOrdered("1100");
+        caseData.setJoPaymentPlan(paymentPlan);
+        caseData.setJoOrderMadeDate(LocalDate.of(2022, 12, 12));
+        caseData.setJoIsRegisteredWithRTL(YES);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)

@@ -56,16 +56,14 @@ public class GenerateHearingFormHandler extends CallbackHandler {
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        buildDocument(callbackParams, caseDataBuilder, caseData);
+        buildDocument(callbackParams, caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
-    private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
-                               CaseData caseData) {
+    private void buildDocument(CallbackParams callbackParams, CaseData caseData) {
         List<CaseDocument> caseDocuments = hearingFormGenerator.generate(
             callbackParams.getCaseData(),
             callbackParams.getParams().get(BEARER_TOKEN).toString()
@@ -78,12 +76,12 @@ public class GenerateHearingFormHandler extends CallbackHandler {
             && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             List<Element<CaseDocument>> translatedDocuments = callbackParams.getCaseData().getPreTranslationDocuments();
             translatedDocuments.add(element(caseDocuments.get(0)));
-            caseDataBuilder.preTranslationDocuments(translatedDocuments);
-            caseDataBuilder.bilingualHint(YesOrNo.YES);
-            caseDataBuilder.preTranslationDocumentType(PreTranslationDocumentType.HEARING_NOTICE);
+            caseData.setPreTranslationDocuments(translatedDocuments);
+            caseData.setBilingualHint(YesOrNo.YES);
+            caseData.setPreTranslationDocumentType(PreTranslationDocumentType.HEARING_NOTICE);
         } else {
             systemGeneratedCaseDocuments.add(element(caseDocuments.get(0)));
-            caseDataBuilder.hearingDocuments(systemGeneratedCaseDocuments);
+            caseData.setHearingDocuments(systemGeneratedCaseDocuments);
         }
     }
 
