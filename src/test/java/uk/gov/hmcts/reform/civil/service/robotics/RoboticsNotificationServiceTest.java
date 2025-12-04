@@ -297,7 +297,7 @@ class RoboticsNotificationServiceTest {
             .atState(FlowState.Main.FULL_DEFENCE)
             .respondent2Responds1v2SameSol(FULL_DEFENCE)
             .respondentResponseIsSame(YES)
-            .respondent1DQ(Respondent1DQ.builder().build())
+            .respondent1DQ(new Respondent1DQ())
             .respondent2ClaimResponseIntentionType(ResponseIntention.FULL_DEFENCE)
             .build();
         if (caseData.getRespondent2OrgRegistered() != null

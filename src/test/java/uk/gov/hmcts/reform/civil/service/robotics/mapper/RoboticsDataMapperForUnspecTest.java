@@ -132,14 +132,7 @@ class RoboticsDataMapperForUnspecTest {
     void shouldMapToRoboticsCaseData_whenDefendantIsNotRegistered() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePaymentSuccessful()
-            .respondentSolicitor1OrganisationDetails(SolicitorOrganisationDetails.builder()
-                .organisationName("My Organisation")
-                .email("me@server.net")
-                .phoneNumber("0123456789")
-                .fax("9999999999")
-                .dx("Dx")
-                .address(Address.builder().build())
-                .build())
+            .respondentSolicitor1OrganisationDetails(createSolicitorOrganisationDetails("My Organisation", "me@server.net", "0123456789", "9999999999", "Dx"))
             .build();
 
         caseData.setClaimTypeUnSpec(ClaimTypeUnspec.PERSONAL_INJURY);
@@ -154,14 +147,7 @@ class RoboticsDataMapperForUnspecTest {
     void shouldMapToRoboticsCaseData_whenDefendantIsNotRegistered_DtsCci_1478() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePaymentSuccessful()
-            .respondentSolicitor1OrganisationDetails(SolicitorOrganisationDetails.builder()
-                                                         .organisationName("My Organisation")
-                                                         .email("me@server.net")
-                                                         .phoneNumber("0123456789")
-                                                         .fax("9999999999")
-                                                         .dx("Dx")
-                                                         .address(Address.builder().build())
-                                                         .build())
+            .respondentSolicitor1OrganisationDetails(createSolicitorOrganisationDetails("My Organisation", "me@server.net", "0123456789", "9999999999", "Dx"))
             .build();
         caseData.setClaimTypeUnSpec(ClaimTypeUnspec.CLINICAL_NEGLIGENCE);
         caseData.setClaimType(ClaimType.PERSONAL_INJURY);
@@ -224,12 +210,11 @@ class RoboticsDataMapperForUnspecTest {
 
     @Test
     void shouldMapToRoboticsCaseData_whenOrganisationPolicyIsPresentWithProvidedServiceAddress() {
-        var solicitorServiceAddress = Address.builder()
-            .addressLine1("line 1 provided")
-            .addressLine2("line 2")
-            .postCode("AB1 2XY")
-            .county("My county")
-            .build();
+        Address solicitorServiceAddress = new Address();
+        solicitorServiceAddress.setAddressLine1("line 1 provided");
+        solicitorServiceAddress.setAddressLine2("line 2");
+        solicitorServiceAddress.setPostCode("AB1 2XY");
+        solicitorServiceAddress.setCounty("My county");
 
         ContactInformation contactInformation = CONTACT_INFORMATION.toBuilder().addressLine1("line 1 provided").build();
 
@@ -395,12 +380,11 @@ class RoboticsDataMapperForUnspecTest {
 
     @Test
     void shouldMapToRoboticsCaseDataWhen2ndDefendantIsRepresentedNotRegistered() {
-        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
-            .respondent2(PartyBuilder.builder().company().build())
-            .addRespondent2(YES)
-            .respondent2Represented(YES)
-            .respondent2OrgRegistered(NO)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
+        caseData.setRespondent2(PartyBuilder.builder().company().build());
+        caseData.setAddRespondent2(YES);
+        caseData.setRespondent2Represented(YES);
+        caseData.setRespondent2OrgRegistered(NO);
 
         caseData.setClaimTypeUnSpec(ClaimTypeUnspec.PERSONAL_INJURY);
         caseData.setClaimType(ClaimType.PERSONAL_INJURY);
@@ -431,10 +415,9 @@ class RoboticsDataMapperForUnspecTest {
         "INTERMEDIATE_CLAIM, INTERMEDIATE TRACK",
     })
     void shouldMapToRoboticsCaseDataWhenPreferredCourtCodeFetchedFromRefData(String claimTrack, String expectedName) {
-        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
-            .allocatedTrack(AllocatedTrack.valueOf(claimTrack))
-            .claimTypeUnSpec(ClaimTypeUnspec.PERSONAL_INJURY)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
+        caseData.setAllocatedTrack(AllocatedTrack.valueOf(claimTrack));
+        caseData.setClaimTypeUnSpec(ClaimTypeUnspec.PERSONAL_INJURY);
 
         RoboticsCaseData testHeader = RoboticsCaseData.builder()
             .header(CaseHeader.builder()
@@ -569,10 +552,9 @@ class RoboticsDataMapperForUnspecTest {
     @ParameterizedTest
     @CsvSource({"FAST_CLAIM, FAST TRACK", "SMALL_CLAIM, SMALL CLAIM TRACK", "OTHER_CLAIM, ''"})
     void shouldReturnCorrectTrackWhenAllocatedTrackIsNull(String responseClaimTrack, String expectedTrack) {
-        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
-                .allocatedTrack(null)
-                .responseClaimTrack(responseClaimTrack)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
+        caseData.setAllocatedTrack(null);
+        caseData.setResponseClaimTrack(responseClaimTrack);
 
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
@@ -582,5 +564,16 @@ class RoboticsDataMapperForUnspecTest {
     private PreviousOrganisationCollectionItem buildPreviousOrganisation(String name, LocalDateTime toDate) {
         return PreviousOrganisationCollectionItem.builder().value(
             PreviousOrganisation.builder().organisationName(name).toTimestamp(toDate).build()).build();
+    }
+
+    private SolicitorOrganisationDetails createSolicitorOrganisationDetails(String orgName, String email, String phone, String fax, String dx) {
+        SolicitorOrganisationDetails details = new SolicitorOrganisationDetails();
+        details.setOrganisationName(orgName);
+        details.setEmail(email);
+        details.setPhoneNumber(phone);
+        details.setFax(fax);
+        details.setDx(dx);
+        details.setAddress(new Address());
+        return details;
     }
 }

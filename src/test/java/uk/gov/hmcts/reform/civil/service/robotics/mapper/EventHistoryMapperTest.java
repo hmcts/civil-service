@@ -1471,11 +1471,10 @@ class EventHistoryMapperTest {
                 .atStateRespondent1v1FullDefenceSpec()
                 .respondent1AcknowledgeNotificationDate(null)
                 .totalClaimAmount(claimValue)
-                .build().toBuilder()
-                .respondToClaim(RespondToClaim.builder()
-                                    .howMuchWasPaid(BigDecimal.valueOf(100000))
-                                    .build())
                 .build();
+            caseData.setRespondToClaim(RespondToClaim.builder()
+                .howMuchWasPaid(BigDecimal.valueOf(100000))
+                .build());
             Event expectedDefenceFiled = Event.builder()
                 .eventSequence(2)
                 .eventCode("49")
@@ -1944,16 +1943,7 @@ class EventHistoryMapperTest {
                 .atStateRespondentPartAdmissionAfterNotificationAcknowledgement()
                 .respondent1AcknowledgeNotificationDate(null)
                 .respondent1ClaimResponseIntentionType(PART_DEFENCE)
-                .respondent1DQ(
-                    Respondent1DQ.builder()
-                        .respondToCourtLocation(
-                            RequestedCourt.builder()
-                                .responseCourtLocations(preferredCourt)
-                                .reasonForHearingAtSpecificCourt("Reason")
-                                .build()
-                        )
-                        .build()
-                )
+                .respondent1DQ(createRespondent1DQWithCourt(preferredCourt, "Reason"))
                 .build();
             Event expectedReceiptOfPartAdmission = Event.builder()
                 .eventSequence(4)
@@ -2195,16 +2185,7 @@ class EventHistoryMapperTest {
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
                 caseData.setRespondent2Represented(YES);
-                caseData.setRespondent1DQ(
-                    Respondent1DQ.builder()
-                        .respondToCourtLocation(
-                            RequestedCourt.builder()
-                                .responseCourtLocations(preferredCourt)
-                                .reasonForHearingAtSpecificCourt("Reason")
-                                .build()
-                        )
-                        .build()
-                );
+                caseData.setRespondent1DQ(createRespondent1DQWithCourt(preferredCourt, "Reason"));
             }
             List<Event> expectedReceiptOfPartAdmission = List.of(
                 Event.builder()
@@ -2765,11 +2746,10 @@ class EventHistoryMapperTest {
                 .atState(FlowState.Main.FULL_DEFENCE)
                 .respondent1AcknowledgeNotificationDate(null)
                 .totalClaimAmount(BigDecimal.valueOf(1200))
-                .build().toBuilder()
-                .respondToClaim(RespondToClaim.builder()
-                                    .howMuchWasPaid(BigDecimal.valueOf(120000))
-                                    .build())
                 .build();
+            caseData.setRespondToClaim(RespondToClaim.builder()
+                .howMuchWasPaid(BigDecimal.valueOf(120000))
+                .build());
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
                 caseData.setRespondent2Represented(YES);
@@ -2856,7 +2836,7 @@ class EventHistoryMapperTest {
                 .atState(FlowState.Main.FULL_DEFENCE)
                 .respondent2Responds1v2SameSol(FULL_DEFENCE)
                 .respondentResponseIsSame(YES)
-                .respondent2DQ(Respondent2DQ.builder().build())
+                .respondent2DQ(new Respondent2DQ())
                 .respondent2ClaimResponseIntentionType(ResponseIntention.FULL_DEFENCE)
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
@@ -4286,14 +4266,7 @@ class EventHistoryMapperTest {
                         .atState(TAKEN_OFFLINE_SDO_NOT_DRAWN)
                         .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_ONE)
                         .respondentResponseIsSame(YES)
-                        .respondent1DQ(Respondent1DQ.builder()
-                                           .respondent1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
-                                                                                         .oneMonthStayRequested(YES)
-                                                                                         .build())
-                                           .respondent1DQRequestedCourt(RequestedCourt.builder()
-                                                                            .responseCourtCode("444")
-                                                                            .build())
-                                           .build())
+                        .respondent1DQ(createRespondent1DQWithFileDirectionsAndCourt(YES, "444"))
                         .build();
                 if (caseData.getRespondent2OrgRegistered() != null && caseData.getRespondent2Represented() == null) {
                     caseData.setRespondent2Represented(YES);
@@ -4577,14 +4550,7 @@ class EventHistoryMapperTest {
                     .atState(TAKEN_OFFLINE_SDO_NOT_DRAWN)
                     .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                     .respondentResponseIsSame(YES)
-                    .respondent1DQ(Respondent1DQ.builder()
-                                       .respondent1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
-                                                                                     .oneMonthStayRequested(YES)
-                                                                                     .build())
-                                       .respondent1DQRequestedCourt(RequestedCourt.builder()
-                                                                        .responseCourtCode("444")
-                                                                        .build())
-                                       .build())
+                    .respondent1DQ(createRespondent1DQWithFileDirectionsAndCourt(YES, "444"))
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
@@ -4741,14 +4707,7 @@ class EventHistoryMapperTest {
                 if (caseData.getRespondent2OrgRegistered() != null
                         && caseData.getRespondent2Represented() == null) {
                     caseData.setRespondent2Represented(YES);
-                    caseData.setRespondent1DQ(Respondent1DQ.builder()
-                                           .respondent1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
-                                                                                         .oneMonthStayRequested(YES)
-                                                                                         .build())
-                                           .respondent1DQRequestedCourt(RequestedCourt.builder()
-                                                                            .responseCourtCode("444")
-                                                                            .build())
-                                           .build());
+                    caseData.setRespondent1DQ(createRespondent1DQWithFileDirectionsAndCourt(YES, "444"));
                 }
                 Event expectedDefence1 = Event.builder()
                         .eventSequence(2)
@@ -8159,16 +8118,7 @@ class EventHistoryMapperTest {
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .addRespondent2(NO)
                 .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
-                .respondent1DQ(
-                    Respondent1DQ.builder()
-                        .respondToCourtLocation(
-                            RequestedCourt.builder()
-                                .responseCourtLocations(preferredCourt)
-                                .reasonForHearingAtSpecificCourt("Reason")
-                                .build()
-                        )
-                        .build()
-                )
+                .respondent1DQ(createRespondent1DQWithCourt(preferredCourt, "Reason"))
                 .specDefenceAdmittedRequired(YES)
                 .build();
 
@@ -8243,25 +8193,8 @@ class EventHistoryMapperTest {
                 .caseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(
                     ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.Yes).build()).build())
                 .addRespondent2(NO)
-                .applicant1DQ(
-                    Applicant1DQ.builder()
-                        .applicant1DQRequestedCourt(
-                            RequestedCourt.builder()
-                                .responseCourtLocations(preferredCourt)
-                                .reasonForHearingAtSpecificCourt("test")
-                                .build()
-                        ).build()
-                )
-                .respondent1DQ(
-                    Respondent1DQ.builder()
-                        .respondToCourtLocation(
-                            RequestedCourt.builder()
-                                .responseCourtLocations(preferredCourt)
-                                .reasonForHearingAtSpecificCourt("Reason")
-                                .build()
-                        )
-                        .build()
-                )
+                .applicant1DQ(createApplicant1DQWithCourt(preferredCourt, "test"))
+                .respondent1DQ(createRespondent1DQWithCourt(preferredCourt, "Reason"))
                 .specDefenceAdmittedRequired(NO)
                 .build();
 
@@ -8312,25 +8245,8 @@ class EventHistoryMapperTest {
                 .totalClaimAmount(claimValue)
                 .caseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(
                     ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.Yes).build()).build())
-                .applicant1DQ(
-                    Applicant1DQ.builder()
-                        .applicant1DQRequestedCourt(
-                            RequestedCourt.builder()
-                                .responseCourtLocations(preferredCourt)
-                                .reasonForHearingAtSpecificCourt("test")
-                                .build()
-                        ).build()
-                )
-                .respondent1DQ(
-                Respondent1DQ.builder()
-                    .respondToCourtLocation(
-                        RequestedCourt.builder()
-                            .responseCourtLocations(preferredCourt)
-                            .reasonForHearingAtSpecificCourt("Reason")
-                            .build()
-                    )
-                    .build()
-            )
+                .applicant1DQ(createApplicant1DQWithCourt(preferredCourt, "test"))
+                .respondent1DQ(createRespondent1DQWithCourt(preferredCourt, "Reason"))
                 .build().toBuilder()
                 .respondToClaim(RespondToClaim.builder()
                                     .howMuchWasPaid(BigDecimal.valueOf(100000))
@@ -8402,25 +8318,8 @@ class EventHistoryMapperTest {
                 .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().build())
                 .caseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(
                     ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.Yes).build()).build())
-                .applicant1DQ(
-                    Applicant1DQ.builder()
-                        .applicant1DQRequestedCourt(
-                            RequestedCourt.builder()
-                                .responseCourtLocations(preferredCourt)
-                                .reasonForHearingAtSpecificCourt("test")
-                                .build()
-                        ).build()
-                )
-                .respondent1DQ(
-                    Respondent1DQ.builder()
-                        .respondToCourtLocation(
-                            RequestedCourt.builder()
-                                .responseCourtLocations(preferredCourt)
-                                .reasonForHearingAtSpecificCourt("Reason")
-                                .build()
-                        )
-                        .build()
-                )
+                .applicant1DQ(createApplicant1DQWithCourt(preferredCourt, "test"))
+                .respondent1DQ(createRespondent1DQWithCourt(preferredCourt, "Reason"))
                 .build().toBuilder()
                 .respondToClaim(RespondToClaim.builder()
                                     .howMuchWasPaid(BigDecimal.valueOf(100000))
@@ -11026,7 +10925,7 @@ class EventHistoryMapperTest {
                             .applicant1AcceptFullAdmitPaymentPlanSpec(NO)
                             .applicant1RepaymentOptionForDefendantSpec(PaymentType.SET_DATE)
                             .applicant1RequestedPaymentDateForDefendantSpec(PaymentBySetDate.builder().paymentSetDate(claimantSuggestedDate).build())
-                            .respondent1DQ(Respondent1DQ.builder().build())
+                            .respondent1DQ(new Respondent1DQ())
                             .build();
 
                         var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
@@ -11089,7 +10988,7 @@ class EventHistoryMapperTest {
                             .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(claimantSuggestedDate)
                             .applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec(PaymentFrequencyClaimantResponseLRspec.ONCE_ONE_WEEK)
                             .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(BigDecimal.valueOf(150))
-                            .respondent1DQ(Respondent1DQ.builder().build())
+                            .respondent1DQ(new Respondent1DQ())
                             .build();
 
                         var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
@@ -11113,6 +11012,35 @@ class EventHistoryMapperTest {
 
             }
         }
+    }
+
+    private Respondent1DQ createRespondent1DQWithCourt(DynamicList preferredCourt, String reason) {
+        Respondent1DQ dq = new Respondent1DQ();
+        RequestedCourt court = new RequestedCourt();
+        court.setResponseCourtLocations(preferredCourt);
+        court.setReasonForHearingAtSpecificCourt(reason);
+        dq.setRespondToCourtLocation(court);
+        return dq;
+    }
+
+    private Respondent1DQ createRespondent1DQWithFileDirectionsAndCourt(YesOrNo oneMonthStay, String courtCode) {
+        Respondent1DQ dq = new Respondent1DQ();
+        FileDirectionsQuestionnaire fileDQ = new FileDirectionsQuestionnaire();
+        fileDQ.setOneMonthStayRequested(oneMonthStay);
+        dq.setRespondent1DQFileDirectionsQuestionnaire(fileDQ);
+        RequestedCourt court = new RequestedCourt();
+        court.setResponseCourtCode(courtCode);
+        dq.setRespondent1DQRequestedCourt(court);
+        return dq;
+    }
+
+    private Applicant1DQ createApplicant1DQWithCourt(DynamicList preferredCourt, String reason) {
+        Applicant1DQ dq = new Applicant1DQ();
+        RequestedCourt court = new RequestedCourt();
+        court.setResponseCourtLocations(preferredCourt);
+        court.setReasonForHearingAtSpecificCourt(reason);
+        dq.setApplicant1DQRequestedCourt(court);
+        return dq;
     }
 
 }
