@@ -78,37 +78,36 @@ public class InitiateGeneralApplicationService {
     private final Time time;
     private final List<String> lipCaseRole = Arrays.asList("[DEFENDANT]", "[CLAIMANT]");
 
-    public CaseData buildCaseData(CaseData.CaseDataBuilder<?, ?> dataBuilder, CaseData caseData, UserDetails userDetails,
+    public CaseData buildCaseData(CaseData caseData, UserDetails userDetails,
                                   String authToken) {
         GeneralApplication generalApplication = buildApplication(caseData, userDetails, authToken);
         List<Element<GeneralApplication>> applications = addApplication(generalApplication, caseData.getGeneralApplications());
-        return populateGeneralApplicationData(dataBuilder, applications);
+        return populateGeneralApplicationData(caseData, applications);
     }
 
-    private CaseData populateGeneralApplicationData(CaseData.CaseDataBuilder<?, ?> dataBuilder, List<Element<GeneralApplication>> applications) {
-        return dataBuilder
-            .claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
-                GA_CLAIM_DEADLINE_EXTENSION_MONTHS,
-                LocalDate.now()
-            ))
-            .generalApplications(applications)
-            .generalAppType(new GAApplicationType())
-            .generalAppRespondentAgreement(new GARespondentOrderAgreement())
-            .generalAppPBADetails(new GAPbaDetails())
-            .generalAppDetailsOfOrder(EMPTY)
-            .generalAppReasonsOfOrder(EMPTY)
-            .generalAppParentClaimantIsApplicant(null)
-            .generalAppVaryJudgementType(null)
-            .generalAppN245FormUpload(new Document())
-            .generalAppHearingDate(new GAHearingDateGAspec())
-            .generalAppInformOtherParty(new GAInformOtherParty())
-            .generalAppUrgencyRequirement(new GAUrgencyRequirement())
-            .generalAppStatementOfTruth(new GAStatementOfTruth())
-            .generalAppHearingDetails(new GAHearingDetails())
-            .generalAppEvidenceDocument(java.util.Collections.emptyList())
-            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec())
-            .gaWaTrackLabel(null)
-            .build();
+    private CaseData populateGeneralApplicationData(CaseData caseData, List<Element<GeneralApplication>> applications) {
+        caseData.setClaimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
+            GA_CLAIM_DEADLINE_EXTENSION_MONTHS,
+            LocalDate.now()
+        ));
+        caseData.setGeneralApplications(applications);
+        caseData.setGeneralAppType(new GAApplicationType());
+        caseData.setGeneralAppRespondentAgreement(new GARespondentOrderAgreement());
+        caseData.setGeneralAppPBADetails(new GAPbaDetails());
+        caseData.setGeneralAppDetailsOfOrder(EMPTY);
+        caseData.setGeneralAppReasonsOfOrder(EMPTY);
+        caseData.setGeneralAppParentClaimantIsApplicant(null);
+        caseData.setGeneralAppVaryJudgementType(null);
+        caseData.setGeneralAppN245FormUpload(new Document());
+        caseData.setGeneralAppHearingDate(new GAHearingDateGAspec());
+        caseData.setGeneralAppInformOtherParty(new GAInformOtherParty());
+        caseData.setGeneralAppUrgencyRequirement(new GAUrgencyRequirement());
+        caseData.setGeneralAppStatementOfTruth(new GAStatementOfTruth());
+        caseData.setGeneralAppHearingDetails(new GAHearingDetails());
+        caseData.setGeneralAppEvidenceDocument(java.util.Collections.emptyList());
+        caseData.setGeneralAppApplnSolicitor(new GASolicitorDetailsGAspec());
+        caseData.setGaWaTrackLabel(null);
+        return caseData;
     }
 
     private GeneralApplication buildApplication(CaseData caseData, UserDetails userDetails, String authToken) {

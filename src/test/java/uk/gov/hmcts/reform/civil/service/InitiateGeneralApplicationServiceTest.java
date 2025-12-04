@@ -213,18 +213,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         private final String respondent2OrganizationID = "respondent1OrganizationID";
         private final String respondent2OrgPolicyReference = "respondentOrgPolicyReference";
 
-        private final OrganisationPolicy respondent1Organization = OrganisationPolicy.builder()
-            .organisation(Organisation.builder()
-                              .organisationID(respondent1OrganizationID).build())
-            .orgPolicyReference(respondent1OrgPolicyReference)
-            .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE.getFormattedName())
-            .build();
-        private final OrganisationPolicy respondent2Organization = OrganisationPolicy.builder()
-            .organisation(Organisation.builder()
-                              .organisationID(respondent2OrganizationID).build())
-            .orgPolicyReference(respondent2OrgPolicyReference)
-            .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName())
-            .build();
+        private final OrganisationPolicy respondent1Organization = createOrganisationPolicyWithRoleAndRef(respondent1OrganizationID, respondent1OrgPolicyReference, RESPONDENTSOLICITORONE.getFormattedName());
+        private final OrganisationPolicy respondent2Organization = createOrganisationPolicyWithRoleAndRef(respondent2OrganizationID, respondent2OrgPolicyReference, RESPONDENTSOLICITORTWO.getFormattedName());
 
         /* 1V1 scenarios */
         @Test
@@ -431,7 +421,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .getTestCaseDataWithEmptyCollectionOfApps(CaseDataBuilder.builder().build());
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertCollectionPopulated(result);
@@ -449,7 +439,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .getTestCaseDataCollectionOfApps(CaseDataBuilder.builder().build());
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(2);
@@ -462,7 +452,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
@@ -482,7 +472,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(null);
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
@@ -507,7 +497,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .getTestCaseDataForConsentUnconsentCheck(null).toBuilder()
             .applicant1Represented(YES).respondent1Represented(NO).respondent2Represented(NO).build();
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
@@ -532,7 +522,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .getTestCaseDataForConsentUnconsentCheck(null).toBuilder()
             .applicant1Represented(YES).respondent1Represented(NO).respondent2Represented(NO).build();
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications()).hasSize(1);
@@ -558,7 +548,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .applicant1Represented(YES).respondent1Represented(NO).respondent2Represented(NO).build()
             .toBuilder().ccdState(CASE_SETTLED).previousCCDState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT).build();
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
@@ -582,7 +572,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(YES).build());
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
@@ -606,7 +596,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForStatementOfTruthCheck(GARespondentOrderAgreement.builder().hasAgreed(YES).build());
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
@@ -631,7 +621,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .getTestCaseDataSPEC(SPEC_CLAIM);
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
@@ -645,7 +635,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .getTestCaseDataSPEC(SPEC_CLAIM);
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
@@ -659,7 +649,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .getTestCaseDataSPEC(UNSPEC_CLAIM);
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
@@ -673,7 +663,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
@@ -704,7 +694,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
@@ -723,7 +713,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
             .toBuilder().ccdState(CASE_SETTLED).previousCCDState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT).build();
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
@@ -740,15 +730,15 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseData(CaseDataBuilder.builder().build());
         List<String> userRoles = new ArrayList<>(Arrays.asList("[APPLICANTSOLICITORONE]"));
-        CaseData.CaseDataBuilder builder = caseData.toBuilder();
-        builder.applicant1OrganisationPolicy(OrganisationPolicy
-                                                 .builder().orgPolicyCaseAssignedRole("[APPLICANTSOLICITORONE]").build());
+        OrganisationPolicy orgPolicy = new OrganisationPolicy();
+        orgPolicy.setOrgPolicyCaseAssignedRole("[APPLICANTSOLICITORONE]");
+        caseData.setApplicant1OrganisationPolicy(orgPolicy);
         when(userRoleCaching.getUserRoles(any(), any())).thenReturn(userRoles);
         when(caseAssignmentApi.getUserRoles(any(), any(), any()))
             .thenReturn(CaseAssignmentUserRolesResource.builder()
                             .caseAssignmentUserRoles(onlyApplicantSolicitorAssigned()).build());
 
-        boolean result = service.isGAApplicantSameAsParentCaseClaimant(builder.build(), authToken);
+        boolean result = service.isGAApplicantSameAsParentCaseClaimant(caseData, authToken);
         assertTrue(result);
     }
 
@@ -758,15 +748,15 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .getTestCaseData(CaseDataBuilder.builder().build());
         List<String> userRoles = new ArrayList<>(Arrays.asList("[APPLICANTSOLICITORONE]", "[RESPONDENTSOLICITORTWO]"));
 
-        CaseData.CaseDataBuilder builder = caseData.toBuilder();
-        builder.applicant1OrganisationPolicy(OrganisationPolicy
-                                                 .builder().orgPolicyCaseAssignedRole("[APPLICANTSOLICITORONE]").build());
+        OrganisationPolicy orgPolicy = new OrganisationPolicy();
+        orgPolicy.setOrgPolicyCaseAssignedRole("[APPLICANTSOLICITORONE]");
+        caseData.setApplicant1OrganisationPolicy(orgPolicy);
         when(userRoleCaching.getUserRoles(any(), any())).thenReturn(userRoles);
         when(caseAssignmentApi.getUserRoles(any(), any(), any()))
             .thenReturn(CaseAssignmentUserRolesResource.builder()
                             .caseAssignmentUserRoles(applicant1Respondent2SolAssigned()).build());
 
-        boolean result = service.isGAApplicantSameAsParentCaseClaimant(builder.build(), authToken);
+        boolean result = service.isGAApplicantSameAsParentCaseClaimant(caseData, authToken);
 
         assertFalse(result);
     }
@@ -777,7 +767,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).id(STRING_NUM_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
@@ -804,7 +794,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
             .toBuilder().ccdState(CASE_DISCONTINUED).previousCCDState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT).build();
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).id(STRING_NUM_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
@@ -881,7 +871,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         )).thenReturn(getEmptyCourLocationsRefObject().get(0));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForCaseManagementLocation(SPEC_CLAIM, JUDICIAL_REFERRAL);
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
@@ -902,7 +892,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         )).thenReturn(getSampleCourLocationsRefObject().get(0));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForCaseManagementLocation(SPEC_CLAIM, JUDICIAL_REFERRAL);
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
@@ -934,7 +924,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForCaseManagementLocation(UNSPEC_CLAIM, AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
@@ -966,7 +956,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getCaseDataForWorkAllocation(CASE_ISSUED, UNSPEC_CLAIM, INDIVIDUAL, applicant1DQ, respondent1DQ,
                                               respondent2DQ);
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
@@ -984,7 +974,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getCaseDataForWorkAllocation(CASE_DISCONTINUED, UNSPEC_CLAIM, INDIVIDUAL, applicant1DQ, respondent1DQ,
                                           respondent2DQ).toBuilder().previousCCDState(CASE_ISSUED).build();
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
@@ -1004,7 +994,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .getCaseDataForWorkAllocation(CASE_ISSUED,  SPEC_CLAIM, INDIVIDUAL, applicant1DQ, respondent1DQ,
                                           respondent2DQ);
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
@@ -1026,7 +1016,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             );
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
             .isEqualTo("22222");
@@ -1040,7 +1030,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             );
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
             .isEqualTo("22222");
@@ -1053,7 +1043,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                                           respondent2DQ).toBuilder().previousCCDState(null).build();
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
             .isEqualTo("22222");
@@ -1065,7 +1055,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .getVaryJudgmentWithN245TestData();
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
         assertThat(result.getGeneralApplications().get(0)
                        .getValue().getGeneralAppEvidenceDocument()).hasSize(2);
@@ -1084,7 +1074,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .toBuilder()
             .applicant1Represented(YES).respondent1Represented(NO).build();
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
@@ -1102,7 +1092,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .toBuilder()
             .applicant1Represented(YES).respondent1Represented(YES).respondent2Represented(NO).build();
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
@@ -1120,7 +1110,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .toBuilder()
             .applicant1Represented(NO).respondent1Represented(YES).build();
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
@@ -1154,7 +1144,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         caseData.setGeneralAppType(gaApplicationType);
         caseData.getGeneralAppHearingDetails().getHearingPreferredLocation().setValue(null);
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications()).hasSize(1);
@@ -1181,7 +1171,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData data = caseData;
         data.getGeneralAppHearingDetails().getHearingPreferredLocation().setValue(null);
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
-        CaseData result = service.buildCaseData(data.toBuilder(), data, UserDetails.builder()
+        CaseData result = service.buildCaseData(data, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications()).hasSize(1);
@@ -1198,7 +1188,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .thenReturn(LocalDateTime.now().plusMonths(36));
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
 
-        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+        CaseData result = service.buildCaseData(caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getClaimDismissedDeadline().toLocalDate())
@@ -1330,6 +1320,16 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                 .significantItem(null)
                 .build()
         );
+    }
+
+    private OrganisationPolicy createOrganisationPolicyWithRoleAndRef(String orgId, String reference, String role) {
+        OrganisationPolicy policy = new OrganisationPolicy();
+        Organisation org = new Organisation();
+        org.setOrganisationID(orgId);
+        policy.setOrganisation(org);
+        policy.setOrgPolicyReference(reference);
+        policy.setOrgPolicyCaseAssignedRole(role);
+        return policy;
     }
 }
 

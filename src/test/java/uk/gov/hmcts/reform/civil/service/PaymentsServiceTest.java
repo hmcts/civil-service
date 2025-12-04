@@ -109,7 +109,9 @@ class PaymentsServiceTest {
             .organisationID("OrgId").build();
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setClaimIssuedPBADetails(new SRPbaDetails());
-        caseData.setApplicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build());
+        OrganisationPolicy policy = new OrganisationPolicy();
+        policy.setOrganisation(orgId);
+        caseData.setApplicant1OrganisationPolicy(policy);
 
         Exception exception = assertThrows(
             InvalidPaymentRequestException.class,
@@ -125,7 +127,9 @@ class PaymentsServiceTest {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setResponseClaimTrack(FAST_CLAIM.name());
         caseData.setClaimIssuedPBADetails(new SRPbaDetails());
-        caseData.setApplicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build());
+        OrganisationPolicy policy = new OrganisationPolicy();
+        policy.setOrganisation(orgId);
+        caseData.setApplicant1OrganisationPolicy(policy);
 
         Exception exception = assertThrows(
             InvalidPaymentRequestException.class,
@@ -147,7 +151,9 @@ class PaymentsServiceTest {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
 
-        caseData.setApplicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build());
+        OrganisationPolicy policy = new OrganisationPolicy();
+        policy.setOrganisation(orgId);
+        caseData.setApplicant1OrganisationPolicy(policy);
 
         Exception exception = assertThrows(
             InvalidPaymentRequestException.class,
@@ -169,7 +175,9 @@ class PaymentsServiceTest {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
 
-        caseData.setApplicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build());
+        OrganisationPolicy policy = new OrganisationPolicy();
+        policy.setOrganisation(orgId);
+        caseData.setApplicant1OrganisationPolicy(policy);
 
         Exception exception = assertThrows(
             InvalidPaymentRequestException.class,
@@ -191,8 +199,10 @@ class PaymentsServiceTest {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
 
+        OrganisationPolicy policy = new OrganisationPolicy();
+        policy.setOrganisation(orgId);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+                .applicant1OrganisationPolicy(policy)
                 .build();
         caseData.setCaseAccessCategory(SPEC_CLAIM);
         caseData.setClaimIssuedPBADetails(hfPbaDetails);

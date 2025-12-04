@@ -146,7 +146,7 @@ class SendSDOBulkPrintServiceTest {
     void shouldPrintLetterSuccessfullyForClaimantLIPInEnglishIfWelshNotEnabled() {
         Party applicant1 = createSoleTraderParty();
         CaseData caseData = createCaseDataWithSDOOrder(applicant1);
-        caseData = caseData.toBuilder().claimantBilingualLanguagePreference("WELSH").build();
+        caseData.setClaimantBilingualLanguagePreference("WELSH");
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
@@ -163,7 +163,7 @@ class SendSDOBulkPrintServiceTest {
     void shouldPrintLetterSuccessfullyForClaimantLIPInWelsh() {
         Party applicant1 = createSoleTraderParty();
         CaseData caseData = createCaseDataWithTranslatedSDOOrder(applicant1);
-        caseData = caseData.toBuilder().claimantBilingualLanguagePreference("WELSH").build();
+        caseData.setClaimantBilingualLanguagePreference("WELSH");
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
@@ -180,7 +180,7 @@ class SendSDOBulkPrintServiceTest {
     void shouldPrintLetterSuccessfullyForClaimantLIPInBothLanguages() {
         Party applicant1 = createSoleTraderParty();
         CaseData caseData = createCaseDataWithEnglishAndTranslatedSDOOrder(applicant1);
-        caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
+        caseData.setClaimantBilingualLanguagePreference("BOTH");
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());

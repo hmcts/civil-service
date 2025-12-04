@@ -307,7 +307,7 @@ class SendFinalOrderBulkPrintServiceTest {
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, FINAL_ORDER_TRANSLATED_DOCUMENT, true);
-        caseData = caseData.toBuilder().claimantBilingualLanguagePreference("WELSH").build();
+        caseData.setClaimantBilingualLanguagePreference("WELSH");
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
@@ -328,7 +328,7 @@ class SendFinalOrderBulkPrintServiceTest {
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, JUDGE_FINAL_ORDER, FINAL_ORDER_TRANSLATED_DOCUMENT, true);
-        caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
+        caseData.setClaimantBilingualLanguagePreference("BOTH");
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
