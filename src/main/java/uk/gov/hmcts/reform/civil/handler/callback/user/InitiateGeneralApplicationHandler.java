@@ -343,7 +343,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         }
 
         Map<String, Object> data = initiateGeneralApplicationService
-                .buildCaseData(dataBuilder, caseData, userDetails, callbackParams.getParams().get(BEARER_TOKEN)
+                .buildCaseData(caseData, userDetails, callbackParams.getParams().get(BEARER_TOKEN)
                         .toString()).toMap(objectMapper);
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(data).build();

@@ -13,6 +13,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import uk.gov.hmcts.reform.civil.event.DispatchBusinessProcessEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 
@@ -141,19 +142,19 @@ class EventEmitterServiceTest {
     }
 
     private CaseData createCaseData(String event, long caseId) {
-        BusinessProcess businessProcess = BusinessProcess.builder().camundaEvent(event).build();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder()
-            .businessProcess(businessProcess)
-            .ccdCaseReference(caseId);
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setCamundaEvent(event);
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setBusinessProcess(businessProcess);
+        caseData.setCcdCaseReference(caseId);
 
         if (TEST_EVENT_QM.equals(event) || TEST_EVENT_QM_RESPONSE.equals(event)) {
-            caseDataBuilder.queries(CaseQueriesCollection.builder()
-                                                            .caseMessages(wrapElements(
-                                                                CaseMessage.builder()
-                                                                    .id("1")
-                                                                    .build()))
-                                                            .build());
+            CaseMessage caseMessage = new CaseMessage();
+            caseMessage.setId("1");
+            CaseQueriesCollection caseQueriesCollection = new CaseQueriesCollection();
+            caseQueriesCollection.setCaseMessages(wrapElements(caseMessage));
+            caseData.setQueries(caseQueriesCollection);
         }
-        return caseDataBuilder.build();
+        return caseData;
     }
 }

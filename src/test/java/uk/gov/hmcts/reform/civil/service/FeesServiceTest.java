@@ -43,12 +43,13 @@ class FeesServiceTest {
 
     @BeforeEach
     void setUp() {
+        FeeLookupResponseDto feeLookupResponse = FeeLookupResponseDto.builder()
+            .feeAmount(TEST_FEE_AMOUNT_POUNDS)
+            .code("test_fee_code")
+            .version(1)
+            .build();
         given(feesClient.lookupFee(any(), any(), any()))
-            .willReturn(FeeLookupResponseDto.builder()
-                            .feeAmount(TEST_FEE_AMOUNT_POUNDS)
-                            .code("test_fee_code")
-                            .version(1)
-                            .build());
+            .willReturn(feeLookupResponse);
         given(feesClient.findRangeGroup(any(), any())).willReturn(buildFeeRangeResponse());
         given(feesConfiguration.getChannel()).willReturn(CHANNEL);
         given(feesConfiguration.getEvent()).willReturn(EVENT);
@@ -57,15 +58,13 @@ class FeesServiceTest {
 
     @Test
     void shouldReturnFeeData_whenValidClaimValue() {
-        var claimValue = ClaimValue.builder()
-            .statementOfValueInPennies(BigDecimal.valueOf(5000))
-            .build();
+        ClaimValue claimValue = new ClaimValue();
+        claimValue.setStatementOfValueInPennies(BigDecimal.valueOf(5000));
 
-        Fee expectedFeeDto = Fee.builder()
-            .calculatedAmountInPence(TEST_FEE_AMOUNT_PENCE)
-            .code("test_fee_code")
-            .version("1")
-            .build();
+        Fee expectedFeeDto = new Fee();
+        expectedFeeDto.setCalculatedAmountInPence(TEST_FEE_AMOUNT_PENCE);
+        expectedFeeDto.setCode("test_fee_code");
+        expectedFeeDto.setVersion("1");
 
         Fee feeDto = feesService.getFeeDataByClaimValue(claimValue);
 
@@ -76,11 +75,10 @@ class FeesServiceTest {
     @Test
     void shouldReturnFeeDataByTotalClaimAmount() {
 
-        Fee expectedFeeDto = Fee.builder()
-            .calculatedAmountInPence(TEST_FEE_AMOUNT_PENCE)
-            .code("test_fee_code")
-            .version("1")
-            .build();
+        Fee expectedFeeDto = new Fee();
+        expectedFeeDto.setCalculatedAmountInPence(TEST_FEE_AMOUNT_PENCE);
+        expectedFeeDto.setCode("test_fee_code");
+        expectedFeeDto.setVersion("1");
 
         Fee feeDto = feesService.getFeeDataByTotalClaimAmount(new BigDecimal("7000.00"));
 
@@ -90,11 +88,10 @@ class FeesServiceTest {
 
     @Test
     void shouldReturnHearingFeeData() {
-        Fee expectedFeeDto = Fee.builder()
-            .calculatedAmountInPence(TEST_FEE_AMOUNT_PENCE)
-            .code("test_fee_code")
-            .version("1")
-            .build();
+        Fee expectedFeeDto = new Fee();
+        expectedFeeDto.setCalculatedAmountInPence(TEST_FEE_AMOUNT_PENCE);
+        expectedFeeDto.setCode("test_fee_code");
+        expectedFeeDto.setVersion("1");
 
         Fee feeDto = feesService.getHearingFeeDataByTotalClaimAmount(new BigDecimal("7000.00"));
 
@@ -111,17 +108,14 @@ class FeesServiceTest {
     }
 
     private Fee2Dto[] buildFeeRangeResponse() {
-        return new Fee2Dto[]{Fee2Dto
-            .builder()
-            .minRange(MIN_RANGE)
-            .maxRange(MAX_RANGE)
-            .currentVersion(FeeVersionDto
-                                .builder()
-                                .flatAmount(FlatAmountDto
-                                                .builder()
-                                                .amount(TEST_FEE_AMOUNT_POUNDS)
-                                                .build())
-                                .build())
-            .build()};
+        return new Fee2Dto[]{
+            Fee2Dto.builder()
+                .minRange(MIN_RANGE)
+                .maxRange(MAX_RANGE)
+                .currentVersion(FeeVersionDto.builder()
+                    .flatAmount(FlatAmountDto.builder().amount(TEST_FEE_AMOUNT_POUNDS).build())
+                    .build())
+                .build()
+        };
     }
 }

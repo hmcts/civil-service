@@ -1279,8 +1279,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                                                                       .email(APPLICANT_EMAIL_ID_CONSTANT)
                                                                       .build());
-            when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
-                                                         any(CaseData.class), any(UserDetails.class), anyString()))
+            when(initiateGeneralAppService.buildCaseData(any(CaseData.class), any(UserDetails.class), anyString()))
                 .thenReturn(caseData);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -1299,8 +1298,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                     .email(APPLICANT_EMAIL_ID_CONSTANT)
                     .build());
 
-            when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
-                    any(CaseData.class), any(UserDetails.class), anyString()))
+            when(initiateGeneralAppService.buildCaseData(any(CaseData.class), any(UserDetails.class), anyString()))
                     .thenReturn(getMockServiceData(caseData));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1360,8 +1358,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                                                                         .email(APPLICANT_EMAIL_ID_CONSTANT)
                                                                         .build());
-            when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
-                                                         any(CaseData.class), any(UserDetails.class), anyString()))
+            when(initiateGeneralAppService.buildCaseData(any(CaseData.class), any(UserDetails.class), anyString()))
                 .thenReturn(getMockServiceData(caseData));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1393,8 +1390,8 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                     .email(APPLICANT_EMAIL_ID_CONSTANT)
                     .build());
 
-            when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
-                    any(CaseData.class), any(UserDetails.class), anyString())).thenAnswer((Answer) invocation -> invocation.getArguments()[1]
+            when(initiateGeneralAppService.buildCaseData(
+                any(CaseData.class), any(UserDetails.class), anyString())).thenAnswer((Answer) invocation -> invocation.getArguments()[0]
             );
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1423,8 +1420,8 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                                                             .email(APPLICANT_EMAIL_ID_CONSTANT)
                                                                             .build());
             when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
-                    any(CaseData.class), any(UserDetails.class), anyString())).thenAnswer((Answer) invocation -> invocation.getArguments()[1]
+            when(initiateGeneralAppService.buildCaseData(
+                any(CaseData.class), any(UserDetails.class), anyString())).thenAnswer((Answer) invocation -> invocation.getArguments()[0]
             );
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1516,28 +1513,11 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             .build();
     }
 
-    private static UserDetails createUserDetails(String id, String email) {
-        return UserDetails.builder()
-            .id(id)
-            .email(email)
-            .build();
-    }
-
     private static Fee createFee(String code, BigDecimal calculatedAmountInPence, String version) {
         return Fee.builder()
             .code(code)
             .calculatedAmountInPence(calculatedAmountInPence)
             .version(version)
             .build();
-    }
-
-    private static GAPbaDetails createGAPbaDetails(Fee fee) {
-        return GAPbaDetails.builder()
-            .fee(fee)
-            .build();
-    }
-
-    private static GAHearingDetails createGAHearingDetails() {
-        return GAHearingDetails.builder().build();
     }
 }

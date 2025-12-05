@@ -78,37 +78,36 @@ public class InitiateGeneralApplicationService {
     private final Time time;
     private final List<String> lipCaseRole = Arrays.asList("[DEFENDANT]", "[CLAIMANT]");
 
-    public CaseData buildCaseData(CaseData.CaseDataBuilder<?, ?> dataBuilder, CaseData caseData, UserDetails userDetails,
+    public CaseData buildCaseData(CaseData caseData, UserDetails userDetails,
                                   String authToken) {
         GeneralApplication generalApplication = buildApplication(caseData, userDetails, authToken);
         List<Element<GeneralApplication>> applications = addApplication(generalApplication, caseData.getGeneralApplications());
-        return populateGeneralApplicationData(dataBuilder, applications);
+        return populateGeneralApplicationData(caseData, applications);
     }
 
-    private CaseData populateGeneralApplicationData(CaseData.CaseDataBuilder<?, ?> dataBuilder, List<Element<GeneralApplication>> applications) {
-        return dataBuilder
-            .claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
-                GA_CLAIM_DEADLINE_EXTENSION_MONTHS,
-                LocalDate.now()
-            ))
-            .generalApplications(applications)
-            .generalAppType(GAApplicationType.builder().build())
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().build())
-            .generalAppPBADetails(GAPbaDetails.builder().build())
-            .generalAppDetailsOfOrder(EMPTY)
-            .generalAppReasonsOfOrder(EMPTY)
-            .generalAppParentClaimantIsApplicant(null)
-            .generalAppVaryJudgementType(null)
-            .generalAppN245FormUpload(Document.builder().build())
-            .generalAppHearingDate(GAHearingDateGAspec.builder().build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder().build())
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().build())
-            .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
-            .generalAppHearingDetails(GAHearingDetails.builder().build())
-            .generalAppEvidenceDocument(java.util.Collections.emptyList())
-            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().build())
-            .gaWaTrackLabel(null)
-            .build();
+    private CaseData populateGeneralApplicationData(CaseData caseData, List<Element<GeneralApplication>> applications) {
+        caseData.setClaimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
+            GA_CLAIM_DEADLINE_EXTENSION_MONTHS,
+            LocalDate.now()
+        ));
+        caseData.setGeneralApplications(applications);
+        caseData.setGeneralAppType(new GAApplicationType());
+        caseData.setGeneralAppRespondentAgreement(new GARespondentOrderAgreement());
+        caseData.setGeneralAppPBADetails(new GAPbaDetails());
+        caseData.setGeneralAppDetailsOfOrder(EMPTY);
+        caseData.setGeneralAppReasonsOfOrder(EMPTY);
+        caseData.setGeneralAppParentClaimantIsApplicant(null);
+        caseData.setGeneralAppVaryJudgementType(null);
+        caseData.setGeneralAppN245FormUpload(new Document());
+        caseData.setGeneralAppHearingDate(new GAHearingDateGAspec());
+        caseData.setGeneralAppInformOtherParty(new GAInformOtherParty());
+        caseData.setGeneralAppUrgencyRequirement(new GAUrgencyRequirement());
+        caseData.setGeneralAppStatementOfTruth(new GAStatementOfTruth());
+        caseData.setGeneralAppHearingDetails(new GAHearingDetails());
+        caseData.setGeneralAppEvidenceDocument(java.util.Collections.emptyList());
+        caseData.setGeneralAppApplnSolicitor(new GASolicitorDetailsGAspec());
+        caseData.setGaWaTrackLabel(null);
+        return caseData;
     }
 
     private GeneralApplication buildApplication(CaseData caseData, UserDetails userDetails, String authToken) {
@@ -284,11 +283,11 @@ public class InitiateGeneralApplicationService {
             if (YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())
                 && !caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {
                 GAStatementOfTruth gaStatementOfTruth = ofNullable(caseData.getGeneralAppStatementOfTruth())
-                    .map(GAStatementOfTruth::toBuilder)
-                    .orElse(GAStatementOfTruth.builder())
-                    .build();
+                    .orElseGet(GAStatementOfTruth::new);
+                GAInformOtherParty informOtherParty = new GAInformOtherParty();
+                informOtherParty.setIsWithNotice(YES);
                 applicationBuilder
-                    .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
+                    .generalAppInformOtherParty(informOtherParty)
                     .generalAppConsentOrder(NO)
                     .generalAppStatementOfTruth(gaStatementOfTruth);
             } else {
@@ -298,16 +297,21 @@ public class InitiateGeneralApplicationService {
             }
         } else {
             applicationBuilder
-                .generalAppInformOtherParty(GAInformOtherParty.builder().build())
-                .generalAppStatementOfTruth(GAStatementOfTruth.builder().build());
+                .generalAppInformOtherParty(new GAInformOtherParty())
+                .generalAppStatementOfTruth(new GAStatementOfTruth());
         }
     }
 
     private void setCaseManagementCategory(GeneralApplication.GeneralApplicationBuilder applicationBuilder) {
-        GACaseManagementCategoryElement civil = GACaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
+        GACaseManagementCategoryElement civil = new GACaseManagementCategoryElement();
+        civil.setCode("Civil");
+        civil.setLabel("Civil");
         List<Element<GACaseManagementCategoryElement>> itemList = new ArrayList<>();
         itemList.add(element(civil));
-        applicationBuilder.caseManagementCategory(GACaseManagementCategory.builder().value(civil).list_items(itemList).build());
+        GACaseManagementCategory caseManagementCategory = new GACaseManagementCategory();
+        caseManagementCategory.setValue(civil);
+        caseManagementCategory.setList_items(itemList);
+        applicationBuilder.caseManagementCategory(caseManagementCategory);
     }
 
     private void setCaseManagementLocation(CaseData caseData, String authToken, GeneralApplication.GeneralApplicationBuilder applicationBuilder) {
@@ -320,13 +324,13 @@ public class InitiateGeneralApplicationService {
 
     private void setLocationDetails(CaseData caseData, String authToken, GeneralApplication.GeneralApplicationBuilder applicationBuilder) {
         LocationRefData locationDetails = locationService.getWorkAllocationLocationDetails(caseData.getCaseManagementLocation().getBaseLocation(), authToken);
-        applicationBuilder.caseManagementLocation(CaseLocationCivil.builder()
-                                                      .region(caseData.getCaseManagementLocation().getRegion())
-                                                      .baseLocation(caseData.getCaseManagementLocation().getBaseLocation())
-                                                      .siteName(locationDetails.getSiteName())
-                                                      .address(locationDetails.getCourtAddress())
-                                                      .postcode(locationDetails.getPostcode())
-                                                      .build());
+        CaseLocationCivil caseManagementLocation = new CaseLocationCivil();
+        caseManagementLocation.setRegion(caseData.getCaseManagementLocation().getRegion());
+        caseManagementLocation.setBaseLocation(caseData.getCaseManagementLocation().getBaseLocation());
+        caseManagementLocation.setSiteName(locationDetails.getSiteName());
+        caseManagementLocation.setAddress(locationDetails.getCourtAddress());
+        caseManagementLocation.setPostcode(locationDetails.getPostcode());
+        applicationBuilder.caseManagementLocation(caseManagementLocation);
         applicationBuilder.locationName(locationDetails.getSiteName());
         applicationBuilder.isCcmccLocation(NO);
     }
@@ -384,7 +388,14 @@ public class InitiateGeneralApplicationService {
             .generalAppAskForCosts(caseData.getGeneralAppAskForCosts())
             .generalAppDateDeadline(deadline)
             .generalAppSubmittedDateGAspec(LocalDateTime.now())
-            .civilServiceUserRoles(IdamUserDetails.builder().id(userDetails.getId()).email(userDetails.getEmail()).build());
+            .civilServiceUserRoles(createIdamUserDetails(userDetails));
+    }
+
+    private IdamUserDetails createIdamUserDetails(UserDetails userDetails) {
+        IdamUserDetails idamUserDetails = new IdamUserDetails();
+        idamUserDetails.setId(userDetails.getId());
+        idamUserDetails.setEmail(userDetails.getEmail());
+        return idamUserDetails;
     }
 
     private void setFeatureToggles(CaseData caseData, GeneralApplication.GeneralApplicationBuilder applicationBuilder) {

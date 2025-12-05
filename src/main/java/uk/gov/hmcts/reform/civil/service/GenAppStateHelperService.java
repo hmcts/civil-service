@@ -95,7 +95,7 @@ public class GenAppStateHelperService {
                 generalApplication = objectMapper.convertValue(genAppMap, GeneralApplication.class);
                 genApps.add((generalApplication));
             });
-            caseData = caseData.toBuilder().generalApplications(wrapElements(genApps)).build();
+            caseData.setGeneralApplications(wrapElements(genApps));
         }
         return caseData;
     }

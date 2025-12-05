@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
@@ -22,6 +23,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.CoverLetterAppendService;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,50 +63,58 @@ class SendFinalOrderBulkPrintServiceTest {
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
 
     private CaseData buildCaseData(Party party, DocumentType documentType, boolean addFinalOrder) {
-        CaseDocument caseDocument = CaseDocument.builder().documentType(documentType).documentLink(DOCUMENT_LINK).build();
-        CaseDataBuilder caseDataBuilder = CaseDataBuilder.builder()
+        CaseDocument caseDocument = new CaseDocument();
+        caseDocument.setDocumentType(documentType);
+        caseDocument.setDocumentLink(DOCUMENT_LINK);
+        CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(caseDocument))
             .respondent1(party)
-            .applicant1(party);
+            .applicant1(party).build();
 
         if (addFinalOrder) {
-            return caseDataBuilder.build().toBuilder().finalOrderDocumentCollection(wrapElements(caseDocument)).build();
+            caseData.setFinalOrderDocumentCollection(wrapElements(caseDocument));
         }
 
-        return caseDataBuilder.build();
+        return caseData;
     }
 
     private CaseData buildCaseData(Party party, DocumentType documentType1, DocumentType documentType2, boolean addFinalOrder) {
-        CaseDocument caseDocument1 = CaseDocument.builder().documentType(documentType1).documentLink(DOCUMENT_LINK).build();
-        CaseDocument caseDocument2 = CaseDocument.builder().documentType(documentType2).documentLink(DOCUMENT_LINK).build();
+        CaseDocument caseDocument1 = new CaseDocument();
+        caseDocument1.setDocumentType(documentType1);
+        caseDocument1.setDocumentLink(DOCUMENT_LINK);
+        CaseDocument caseDocument2 = new CaseDocument();
+        caseDocument2.setDocumentType(documentType2);
+        caseDocument2.setDocumentLink(DOCUMENT_LINK);
 
-        CaseDataBuilder caseDataBuilder = CaseDataBuilder.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(caseDocument1, caseDocument2))
             .respondent1(party)
-            .applicant1(party);
+            .applicant1(party).build();
 
         if (addFinalOrder) {
-            return caseDataBuilder.build().toBuilder().finalOrderDocumentCollection(wrapElements(caseDocument1, caseDocument2)).build();
+            caseData.setFinalOrderDocumentCollection(wrapElements(caseDocument1, caseDocument2));
         }
 
-        return caseDataBuilder.build();
+        return caseData;
     }
 
     private CaseData buildCaseDataForTranslatedOrder(Party party) {
-        CaseDocument translatedDocument = CaseDocument.builder()
-            .documentType(DocumentType.ORDER_NOTICE_TRANSLATED_DOCUMENT).documentLink(DOCUMENT_LINK).build();
-        CaseDataBuilder caseDataBuilder =
-            CaseDataBuilder.builder().caseDataLip(
-                CaseDataLiP.builder()
-                    .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build())
-                    .build())
+        CaseDocument translatedDocument = new CaseDocument();
+        translatedDocument.setDocumentType(DocumentType.ORDER_NOTICE_TRANSLATED_DOCUMENT);
+        translatedDocument.setDocumentLink(DOCUMENT_LINK);
+        RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
+        respondentLiPResponse.setRespondent1ResponseLanguage("BOTH");
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
+        CaseData caseData = CaseDataBuilder.builder()
             .respondent1(party)
-                .systemGeneratedCaseDocuments(wrapElements(translatedDocument))
-                .claimantBilingualLanguagePreference(Language.BOTH.toString())
-                .respondent1Represented(YesOrNo.NO)
-                .applicant1Represented(YesOrNo.NO)
-            .applicant1(party);
-        return caseDataBuilder.build();
+            .applicant1(party).build();
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setSystemGeneratedCaseDocuments(wrapElements(translatedDocument));
+        caseData.setClaimantBilingualLanguagePreference(Language.BOTH.toString());
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        return caseData;
     }
 
     private void verifyPrintLetter(CaseData caseData, Party party) {
@@ -257,13 +267,13 @@ class SendFinalOrderBulkPrintServiceTest {
     @Test
     void shouldNotDownloadDocumentAndNotPrintTranslatedLetterToClaimantLiPWhenCaseProgressionIsFalse() {
         // given
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .respondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay())
-            .respondent1Represented(YesOrNo.NO)
-            .applicant1Represented(YesOrNo.NO)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay());
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
 
         // when
         sendFinalOrderBulkPrintService.sendTranslatedFinalOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
@@ -275,14 +285,14 @@ class SendFinalOrderBulkPrintServiceTest {
     @Test
     void shouldNotDownloadDocumentAndNotPrintTranslatedLetterToClaimantLiPWhenThereIsNoTranslatedOrder() {
         // given
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .respondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay())
-            .respondent1Represented(YesOrNo.NO)
-            .applicant1Represented(YesOrNo.NO)
-            .claimantBilingualLanguagePreference(Language.BOTH.toString())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay());
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setClaimantBilingualLanguagePreference(Language.BOTH.toString());
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
 
         // when
         sendFinalOrderBulkPrintService.sendTranslatedFinalOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
@@ -297,7 +307,7 @@ class SendFinalOrderBulkPrintServiceTest {
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, FINAL_ORDER_TRANSLATED_DOCUMENT, true);
-        caseData = caseData.toBuilder().claimantBilingualLanguagePreference("WELSH").build();
+        caseData.setClaimantBilingualLanguagePreference("WELSH");
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
@@ -318,7 +328,7 @@ class SendFinalOrderBulkPrintServiceTest {
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, JUDGE_FINAL_ORDER, FINAL_ORDER_TRANSLATED_DOCUMENT, true);
-        caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
+        caseData.setClaimantBilingualLanguagePreference("BOTH");
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
