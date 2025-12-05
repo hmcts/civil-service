@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
@@ -37,7 +38,7 @@ class DefaultJudgmentRoboticsNotifierTest {
 
     @Test
     void shouldNotifyDefaultJudgementLip_whenCaseSpec() {
-        CaseData data = CaseData.builder()
+        CaseData data = CaseDataBuilder.builder()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .respondent1Represented(YesOrNo.NO)
             .build();
@@ -49,7 +50,7 @@ class DefaultJudgmentRoboticsNotifierTest {
 
     @Test
     void shouldNotNotifyDefaultJudgementLip_whenCaseNotSpec() {
-        CaseData data = CaseData.builder()
+        CaseData data = CaseDataBuilder.builder()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
             .respondent1Represented(YesOrNo.YES)
             .build();
