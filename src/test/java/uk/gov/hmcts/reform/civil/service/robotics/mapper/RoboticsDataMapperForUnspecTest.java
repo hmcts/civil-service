@@ -325,12 +325,11 @@ class RoboticsDataMapperForUnspecTest {
 
     @Test
     void shouldCheck_whenFeignException() {
-        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
-            .respondent2(PartyBuilder.builder().company().build())
-            .addRespondent2(YES)
-            .respondent2Represented(YES)
-            .respondent2SameLegalRepresentative(YES)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
+        caseData.setRespondent2(PartyBuilder.builder().company().build());
+        caseData.setAddRespondent2(YES);
+        caseData.setRespondent2Represented(YES);
+        caseData.setRespondent2SameLegalRepresentative(YES);
         given(organisationApi.findOrganisationById(any(), any(), any()))
             .willThrow(Mockito.mock(FeignException.class));
         caseData.setClaimTypeUnSpec(ClaimTypeUnspec.PERSONAL_INJURY);
@@ -395,11 +394,10 @@ class RoboticsDataMapperForUnspecTest {
 
     @Test
     void shouldMapToRoboticsCaseDataWhen2ndDefendantIsNotRepresented() {
-        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
-            .respondent2(PartyBuilder.builder().company().build())
-            .addRespondent2(YES)
-            .respondent2Represented(NO)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
+        caseData.setRespondent2(PartyBuilder.builder().company().build());
+        caseData.setAddRespondent2(YES);
+        caseData.setRespondent2Represented(NO);
         caseData.setClaimTypeUnSpec(ClaimTypeUnspec.PERSONAL_INJURY);
         caseData.setClaimType(ClaimType.PERSONAL_INJURY);
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
