@@ -39,12 +39,11 @@ public class ProceedOfflineForSpecCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse captureTakenOfflineDate(CallbackParams callbackParams) {
-        CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
-            .takenOfflineDate(LocalDateTime.now())
-            .build();
+        CaseData caseData = callbackParams.getCaseData();
+        caseData.setTakenOfflineDate(LocalDateTime.now());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataUpdated.toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

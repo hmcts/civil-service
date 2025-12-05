@@ -56,15 +56,14 @@ public class GenerateDJFormHandlerSpecNonDivergent extends CallbackHandler {
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        buildDocument(callbackParams, caseDataBuilder);
+        buildDocument(callbackParams, caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
-    private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder caseDataBuilder) {
+    private void buildDocument(CallbackParams callbackParams, CaseData caseData) {
         List<CaseDocument> caseDocuments = defaultJudgmentFormGenerator.generateNonDivergentDocs(
             callbackParams.getCaseData(),
             callbackParams.getParams().get(BEARER_TOKEN).toString(),
@@ -79,7 +78,7 @@ public class GenerateDJFormHandlerSpecNonDivergent extends CallbackHandler {
         caseDocuments.forEach(caseDocument ->
             systemGeneratedCaseDocuments.add(element(caseDocument))
         );
-        caseDataBuilder.defaultJudgmentDocuments(systemGeneratedCaseDocuments);
+        caseData.setDefaultJudgmentDocuments(systemGeneratedCaseDocuments);
     }
 
     private boolean isClaimantEvent(CallbackParams callbackParams) {
