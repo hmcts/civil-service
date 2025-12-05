@@ -9,6 +9,8 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.DismissedPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.time.LocalDateTime;
@@ -19,9 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterSDO;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimDetailsNotifiedTimeExtensionTransitionBuilder.caseDismissedAfterDetailNotifiedExtension;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimDetailsNotifiedTimeExtensionTransitionBuilder.takenOfflineByStaffAfterClaimDetailsNotifiedExtension;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimDetailsNotifiedTimeExtensionTransitionBuilder.takenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class ClaimDetailsNotifiedTimeExtensionTransitionBuilderTest {
@@ -60,7 +59,7 @@ public class ClaimDetailsNotifiedTimeExtensionTransitionBuilderTest {
         CaseData caseData = caseDataBuilder
             .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension(true)
             .build();
-        assertTrue(takenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension.test(caseData));
+        assertTrue(TakenOfflinePredicate.sdoNotDrawn.and(TakenOfflinePredicate.afterClaimNotifiedExtension).test(caseData));
         assertFalse(takenOfflineAfterSDO.test(caseData));
     }
 
@@ -69,7 +68,7 @@ public class ClaimDetailsNotifiedTimeExtensionTransitionBuilderTest {
         CaseData caseData = caseDataBuilder
             .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension(false)
             .build();
-        assertFalse(takenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension.test(caseData));
+        assertFalse(TakenOfflinePredicate.sdoNotDrawn.and(TakenOfflinePredicate.afterClaimNotifiedExtension).test(caseData));
     }
 
     @Test
@@ -77,7 +76,7 @@ public class ClaimDetailsNotifiedTimeExtensionTransitionBuilderTest {
         CaseData caseData = caseDataBuilder
             .atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_ONE)
             .build();
-        assertFalse(takenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension.test(caseData));
+        assertFalse(TakenOfflinePredicate.sdoNotDrawn.and(TakenOfflinePredicate.afterClaimNotifiedExtension).test(caseData));
         assertTrue(takenOfflineAfterSDO.test(caseData));
     }
 
@@ -86,7 +85,7 @@ public class ClaimDetailsNotifiedTimeExtensionTransitionBuilderTest {
         CaseData caseData = caseDataBuilder
             .atStateTakenOfflineByStaffAfterClaimDetailsNotifiedExtension()
             .build();
-        assertTrue(takenOfflineByStaffAfterClaimDetailsNotifiedExtension.test(caseData));
+        assertTrue(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.afterClaimNotifiedExtension).test(caseData));
     }
 
     @Test
@@ -95,7 +94,7 @@ public class ClaimDetailsNotifiedTimeExtensionTransitionBuilderTest {
             .atStateClaimDetailsNotifiedTimeExtension()
             .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
             .build();
-        assertTrue(caseDismissedAfterDetailNotifiedExtension.test(caseData));
+        assertTrue(DismissedPredicate.afterClaimNotifiedExtension.test(caseData));
     }
 
     @Test
@@ -104,7 +103,7 @@ public class ClaimDetailsNotifiedTimeExtensionTransitionBuilderTest {
             .atStateClaimDetailsNotifiedTimeExtension_Defendent2()
             .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
             .build();
-        assertTrue(caseDismissedAfterDetailNotifiedExtension.test(caseData));
+        assertTrue(DismissedPredicate.afterClaimNotifiedExtension.test(caseData));
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {
