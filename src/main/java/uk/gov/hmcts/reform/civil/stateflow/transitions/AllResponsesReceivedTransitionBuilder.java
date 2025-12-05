@@ -4,17 +4,14 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ResponsePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaimSpec;
@@ -45,10 +42,10 @@ public class AllResponsesReceivedTransitionBuilder extends MidTransitionBuilder 
 
     @Override
     void setUpTransitions(List<Transition> transitions) {
-        this.moveTo(FULL_DEFENCE, transitions).onlyWhen(fullDefence, transitions)
+        this.moveTo(FULL_DEFENCE, transitions).onlyWhen(ResponsePredicate.isType(RespondentResponseType.FULL_DEFENCE), transitions)
             .moveTo(FULL_DEFENCE, transitions).onlyWhen(fullDefenceSpec, transitions)
-            .moveTo(FULL_ADMISSION, transitions).onlyWhen(fullAdmission.and(not(divergentRespondGoOffline)), transitions)
-            .moveTo(PART_ADMISSION, transitions).onlyWhen(partAdmission.and(not(divergentRespondGoOffline)), transitions)
+            .moveTo(FULL_ADMISSION, transitions).onlyWhen(ResponsePredicate.isType(RespondentResponseType.FULL_ADMISSION).and(not(divergentRespondGoOffline)), transitions)
+            .moveTo(PART_ADMISSION, transitions).onlyWhen(ResponsePredicate.isType(RespondentResponseType.PART_ADMISSION).and(not(divergentRespondGoOffline)), transitions)
             .moveTo(COUNTER_CLAIM, transitions).onlyWhen(counterClaim.and(not(divergentRespondGoOffline)), transitions)
             .moveTo(DIVERGENT_RESPOND_GO_OFFLINE, transitions).onlyWhen(divergentRespondGoOffline, transitions)
             .moveTo(DIVERGENT_RESPOND_GO_OFFLINE, transitions).onlyWhen(divergentRespondGoOfflineSpec, transitions)
@@ -61,24 +58,4 @@ public class AllResponsesReceivedTransitionBuilder extends MidTransitionBuilder 
             .moveTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA, transitions).onlyWhen(caseDismissedAfterDetailNotified, transitions);
     }
 
-    public static final Predicate<CaseData> fullDefence = caseData ->
-        getPredicateForResponseType(caseData, RespondentResponseType.FULL_DEFENCE);
-
-    public static final Predicate<CaseData> fullAdmission = caseData ->
-        getPredicateForResponseType(caseData, RespondentResponseType.FULL_ADMISSION);
-
-    public static final Predicate<CaseData> partAdmission = caseData ->
-        getPredicateForResponseType(caseData, RespondentResponseType.PART_ADMISSION);
-
-    public static boolean getPredicateForResponseType(CaseData caseData, RespondentResponseType responseType) {
-        boolean basePredicate = caseData.getRespondent1ResponseDate() != null
-            && caseData.getRespondent1ClaimResponseType() == responseType;
-        return switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_ONE_LEGAL_REP -> basePredicate && (caseData.getRespondentResponseIsSame() == YES
-                || caseData.getRespondent2ClaimResponseType() == responseType);
-            case ONE_V_TWO_TWO_LEGAL_REP -> basePredicate && caseData.getRespondent2ClaimResponseType() == responseType;
-            case ONE_V_ONE -> basePredicate;
-            case TWO_V_ONE -> basePredicate && caseData.getRespondent1ClaimResponseTypeToApplicant2() == responseType;
-        };
-    }
 }
