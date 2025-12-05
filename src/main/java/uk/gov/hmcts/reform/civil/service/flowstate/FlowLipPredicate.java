@@ -1,27 +1,19 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.flowstate.legacy.LegacyFlowDelegate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LipPredicate;
 
 import java.util.function.Predicate;
 
-public class FlowLipPredicate {
+@SuppressWarnings("java:S1214")
+public interface FlowLipPredicate {
 
-    private FlowLipPredicate() {
-        //Utility classes require a private constructor for checkstyle
-    }
+    Predicate<CaseData> isLipCase = LipPredicate.isLiPvLiPCase;
+    Predicate<CaseData> agreedToMediation = LipPredicate.agreedToMediation;
+    Predicate<CaseData> isTranslatedDocumentUploaded = LipPredicate.isTranslatedDocumentUploaded;
+    Predicate<CaseData> ccjRequestJudgmentByAdmission = LipPredicate.ccjRequestJudgmentByAdmission;
+    Predicate<CaseData> isRespondentSignSettlementAgreement = LipPredicate.isRespondentSignSettlementAgreement;
+    Predicate<CaseData> nocSubmittedForLiPDefendantBeforeOffline = LipPredicate.nocSubmittedForLiPDefendantBeforeOffline;
+    Predicate<CaseData> nocSubmittedForLiPDefendant = LipPredicate.nocSubmittedForLiPDefendant;
 
-    public static final Predicate<CaseData> isLipCase = LegacyFlowDelegate.isLipCase;
-
-    public static final Predicate<CaseData> agreedToMediation = LegacyFlowDelegate.agreedToMediation;
-
-    public static final Predicate<CaseData> isTranslatedDocumentUploaded = LegacyFlowDelegate.isTranslatedDocumentUploaded;
-
-    public static final Predicate<CaseData> ccjRequestJudgmentByAdmission = LegacyFlowDelegate.ccjRequestJudgmentByAdmission;
-
-    public static final Predicate<CaseData> isRespondentSignSettlementAgreement = LegacyFlowDelegate.isRespondentSignSettlementAgreement;
-
-    public static final Predicate<CaseData> nocSubmittedForLiPDefendantBeforeOffline = LegacyFlowDelegate.nocSubmittedForLiPDefendantBeforeOffline;
-
-    public static final Predicate<CaseData> nocSubmittedForLiPDefendant = LegacyFlowDelegate.nocSubmittedForLiPDefendant;
 }
