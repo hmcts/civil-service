@@ -62,8 +62,7 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
             .set((c, flags) -> {
                 flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), isRespondentResponseLangIsBilingual.test(c));
                 flags.put(FlowFlag.SDO_ENABLED.name(),
-                    JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
-                flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMultiOrIntermediateTrackEnabled(c));
+                    JudicialReferralUtils.shouldMoveToJudicialReferral(c));
             }, transitions)
             .moveTo(PART_ADMIT_PROCEED, transitions).onlyWhen(partAdmitProceed, transitions)
             .set((c, flags) -> {

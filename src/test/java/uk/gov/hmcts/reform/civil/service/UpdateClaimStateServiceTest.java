@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -49,15 +48,8 @@ class UpdateClaimStateServiceTest {
     @Mock
     FeatureToggleService featureToggleService;
 
-    @BeforeEach
-    void before() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(false);
-    }
-
     @Test
     void shouldNotUpdateCaseState_WhenMultiClaimClaimantLiP() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-
         CaseData caseData =
             CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -74,8 +66,6 @@ class UpdateClaimStateServiceTest {
 
     @Test
     void shouldNotUpdateCaseState_WhenMultiClaimRespondentLiP() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-
         CaseData caseData =
             CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -93,8 +83,6 @@ class UpdateClaimStateServiceTest {
 
     @Test
     void shouldNotUpdateCaseState_WhenIntermediateClaimClaimantLiP() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-
         CaseData caseData =
             CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -111,8 +99,6 @@ class UpdateClaimStateServiceTest {
 
     @Test
     void shouldNotUpdateCaseState_WhenIntermediateClaimRespondentLiP() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-
         CaseData caseData =
             CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()

@@ -74,9 +74,8 @@ public class UpdateClaimStateService {
         return isProceedOrNotSettleClaim(caseData)
             && (isClaimantOrDefendantRejectMediation(caseData)
             || caseData.isFastTrackClaim()
-            || ((MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack())
-            || INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack()))
-            && featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)));
+            || MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack())
+            || INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack()));
     }
 
     private boolean isProceedOrNotSettleClaim(CaseData caseData) {
@@ -93,8 +92,7 @@ public class UpdateClaimStateService {
     }
 
     private boolean shouldNotChangeStateMinti(CaseData caseData) {
-        return featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
-            && CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+        return CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && isMultiOrIntermediateSpecClaim(caseData)
             && isLipCase(caseData)
             && isProceedOrNotSettleClaim(caseData);

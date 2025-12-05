@@ -419,8 +419,7 @@ public class HandleDefendAllClaim implements CaseTask {
 
     private AllocatedTrack getAllocatedTrack(CaseData caseData) {
         log.info("Determining allocated track for caseId: {}", caseData.getCcdCaseReference());
-        return AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null,
-                toggleService, caseData);
+        return AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null);
     }
 
     private Optional<DefendantResponseShowTag> fullDefenceAndPaidLess(

@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -41,7 +40,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -66,14 +64,11 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private Time time;
 
-    @Mock
-    private FeatureToggleService featureToggleService;
-
     @BeforeEach
     public void setUp() {
         mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
-        handler = new HearingScheduledHandler(locationRefDataService, mapper, time, feesService, featureToggleService);
+        handler = new HearingScheduledHandler(locationRefDataService, mapper, time, feesService);
     }
 
     @Test
@@ -223,13 +218,12 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     @CsvSource({
         // listing/relisting,case state
         "LISTING,SMALL_CLAIMS,HEARING_READINESS",
-        "RELISTING,SMALL_CLAIMS,PREPARE_FOR_HEARING_CONDUCT_HEARING",
-        "LISTING,OTHER,PREPARE_FOR_HEARING_CONDUCT_HEARING",
-        "RELISTING,OTHER,PREPARE_FOR_HEARING_CONDUCT_HEARING"
+        "RELISTING,SMALL_CLAIMS,HEARING_READINESS",
+        "LISTING,OTHER,HEARING_READINESS",
+        "RELISTING,OTHER,HEARING_READINESS"
     })
     void shouldSetHearingReadinessStateOnListing_whenAboutToSubmitNonMinti(String listingType, String hearingNoticeType, String expectedStateStr) {
         given(time.now()).willReturn(LocalDateTime.now());
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(false);
 
         // Given: a case either in listing or relisting
         ListingOrRelisting listingOrRelisting = ListingOrRelisting.valueOf(listingType);
@@ -273,7 +267,6 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     })
     void shouldSetExpectedPostState_MintiEnabled_FastOrSmallTrack(String claimTrack, String listingType, String hearingNoticeType, String currentState, String expectedStateStr) {
         given(time.now()).willReturn(LocalDateTime.now());
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
         // Given: a case either in listing or relisting
         ListingOrRelisting listingOrRelisting = ListingOrRelisting.valueOf(listingType);
@@ -318,7 +311,6 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     void shouldSetExpectedPostState_MintiEnabled_MultiOrIntermediate(String claimTrack, String listingType, String hearingNoticeType,
                                                                      String currentState, String expectedStateStr) {
         given(time.now()).willReturn(LocalDateTime.now());
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
         // Given: a case either in listing or relisting
         ListingOrRelisting listingOrRelisting = ListingOrRelisting.valueOf(listingType);
@@ -346,7 +338,6 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldGetDueDateAndFeeSmallClaim_whenAboutToSubmit(boolean toggle) {
         given(time.now()).willReturn(LocalDateTime.now());
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(toggle);
 
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
@@ -425,7 +416,6 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldGetDueDateAndFeeFastAndClaimValueClaim_whenAboutToSubmit(boolean toggle) {
         given(time.now()).willReturn(LocalDateTime.now());
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(toggle);
 
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
@@ -454,7 +444,6 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldGetDueDateAndFeeFastAndNoClaimValueClaim_whenAboutToSubmit(boolean toggle) {
         given(time.now()).willReturn(LocalDateTime.now());
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(toggle);
 
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
@@ -487,7 +476,6 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldGetDueDateAndFeeFastClaim_whenAboutToSubmit(boolean toggle) {
         given(time.now()).willReturn(LocalDateTime.now());
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(toggle);
 
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
@@ -517,7 +505,6 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldGetDueDateAndFeeMultiClaim_whenAboutToSubmit(boolean toggle) {
         given(time.now()).willReturn(LocalDateTime.now());
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(toggle);
 
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
@@ -570,7 +557,10 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         // Then
-        assertThat(response.getState()).isEqualTo(caseState.toString());
+        CaseState expectedState = caseState.equals(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING)
+            || caseState.equals(CaseState.HEARING_READINESS)
+            ? caseState : CaseState.HEARING_READINESS;
+        assertThat(response.getState()).isEqualTo(expectedState.toString());
     }
 
     @ParameterizedTest
@@ -601,7 +591,10 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         // Then
-        assertThat(response.getState()).isEqualTo(caseState.toString());
+        CaseState expectedState = caseState.equals(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING)
+            || caseState.equals(CaseState.HEARING_READINESS)
+            ? caseState : CaseState.HEARING_READINESS;
+        assertThat(response.getState()).isEqualTo(expectedState.toString());
     }
 
     @ParameterizedTest
@@ -632,7 +625,10 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         // Then
-        assertThat(response.getState()).isEqualTo(caseState.toString());
+        CaseState expectedState = caseState.equals(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING)
+            || caseState.equals(CaseState.HEARING_READINESS)
+            ? caseState : CaseState.HEARING_READINESS;
+        assertThat(response.getState()).isEqualTo(expectedState.toString());
     }
 
     @Test
@@ -662,7 +658,6 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldNotGetDueDateAndFeeCalculationAndIsOther_whenAboutToSubmit(boolean toggle) {
         given(time.now()).willReturn(LocalDateTime.now());
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(toggle);
 
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
@@ -684,7 +679,6 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldNotGetHearingFee_shouldRecalculateHearingDueDate_whenAboutToSubmitRelisting() {
         given(time.now()).willReturn(LocalDateTime.now());
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         caseData.setHearingNoticeList(HearingNoticeList.SMALL_CLAIMS);

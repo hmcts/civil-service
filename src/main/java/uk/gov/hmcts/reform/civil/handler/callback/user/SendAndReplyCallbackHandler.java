@@ -166,9 +166,7 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
             allocatedTrack = AllocatedTrack.getAllocatedTrack(
                 caseData.getClaimAmountInPounds(),
                 caseData.getClaimType(),
-                caseData.getPersonalInjuryType(),
-                featureToggleService,
-                caseData
+                caseData.getPersonalInjuryType()
             );
         }
         builder.lastMessageAllocatedTrack(AllocatedTrack.toStringValueForMessage(allocatedTrack));
