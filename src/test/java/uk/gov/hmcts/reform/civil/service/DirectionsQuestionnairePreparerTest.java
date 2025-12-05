@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -54,12 +55,14 @@ class DirectionsQuestionnairePreparerTest {
     @Test
     void shouldPrepareDirectionsQuestionnaire_singleResponse() {
         // Given
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+        caseData.setDuplicateSystemGeneratedCaseDocs(new ArrayList<>());
         String userToken = "userToken";
 
-        CaseDocument caseDocument = CaseDocument.builder().documentName("directionsQuestionnaire").build();
+        CaseDocument caseDocument = new CaseDocument();
+        caseDocument.setDocumentName("directionsQuestionnaire");
         when(directionsQuestionnaireGenerator.generate(any(CaseData.class), eq(userToken)))
             .thenReturn(caseDocument);
 
@@ -76,20 +79,21 @@ class DirectionsQuestionnairePreparerTest {
     void shouldPrepareDirectionsQuestionnaire_singleResponse_ClaimantDqPreTranslation() {
         // Given
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-        CaseData caseData = CaseData.builder()
-            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .applicant1Represented(YES)
-            .respondent1Represented(NO)
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                         .respondent1ResponseLanguage("WELSH")
-                                                         .build())
-                             .build())
-            .build();
+        RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
+        respondentLiPResponse.setRespondent1ResponseLanguage("WELSH");
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdState(CaseState.AWAITING_APPLICANT_INTENTION);
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        caseData.setApplicant1Represented(YES);
+        caseData.setRespondent1Represented(NO);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setPreTranslationDocuments(new ArrayList<>());
         String userToken = "userToken";
 
-        CaseDocument caseDocument = CaseDocument.builder().documentName("directionsQuestionnaire").build();
+        CaseDocument caseDocument = new CaseDocument();
+        caseDocument.setDocumentName("directionsQuestionnaire");
         when(directionsQuestionnaireGenerator.generate(any(CaseData.class), eq(userToken)))
             .thenReturn(caseDocument);
 
@@ -104,16 +108,17 @@ class DirectionsQuestionnairePreparerTest {
     @Test
     void shouldPrepareDirectionsQuestionnaire_singleResponseForWelshLip() {
         // Given
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
-            .claimantBilingualLanguagePreference("BOTH")
-            .specRespondent1Represented(YES)
-            .applicant1Represented(NO)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+        caseData.setClaimantBilingualLanguagePreference("BOTH");
+        caseData.setSpecRespondent1Represented(YES);
+        caseData.setApplicant1Represented(NO);
+        caseData.setDuplicateSystemGeneratedCaseDocs(new ArrayList<>());
         String userToken = "userToken";
 
-        CaseDocument caseDocument = CaseDocument.builder().documentName("directionsQuestionnaire").build();
+        CaseDocument caseDocument = new CaseDocument();
+        caseDocument.setDocumentName("directionsQuestionnaire");
         when(directionsQuestionnaireGenerator.generate(any(CaseData.class), eq(userToken)))
             .thenReturn(caseDocument);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
@@ -129,25 +134,28 @@ class DirectionsQuestionnairePreparerTest {
     @Test
     void shouldPrepareDirectionsQuestionnaire_respondent2HasSameLegalRep() {
         // Given
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .respondentResponseIsSame(NO)
-            .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
-            .respondent2SameLegalRepresentative(YES)
-            .respondent1DQ(Respondent1DQ.builder().build())
-            .respondent2DQ(Respondent2DQ.builder().build())
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .respondent2(Party.builder().type(Party.Type.ORGANISATION).build())
-            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
-            .systemGeneratedCaseDocuments(new ArrayList<>())
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+        Party respondent2 = new Party();
+        respondent2.setType(Party.Type.ORGANISATION);
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        caseData.setRespondentResponseIsSame(NO);
+        caseData.setRespondent1ClaimResponseTypeForSpec(FULL_DEFENCE);
+        caseData.setRespondent2SameLegalRepresentative(YES);
+        caseData.setRespondent1DQ(new Respondent1DQ());
+        caseData.setRespondent2DQ(new Respondent2DQ());
+        caseData.setRespondent2(respondent2);
+        caseData.setRespondent1(respondent1);
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
 
-            .build();
+        Document document1 = new Document();
+        document1.setDocumentUrl("documentUrl1");
+        CaseDocument caseDocument1 = new CaseDocument();
+        caseDocument1.setDocumentName("directionsQuestionnaire1");
+        caseDocument1.setDocumentLink(document1);
 
         String userToken = "userToken";
-
-        CaseDocument caseDocument1 =
-            CaseDocument.builder().documentName("directionsQuestionnaire1").documentLink(Document.builder().documentUrl("documentUrl1").build())
-                .build();
         when(directionsQuestionnaireGenerator.generateDQFor1v2SingleSolDiffResponse(any(CaseData.class), eq(userToken), eq("ONE")))
             .thenReturn(caseDocument1);
 
@@ -163,26 +171,33 @@ class DirectionsQuestionnairePreparerTest {
     @Test
     void shouldPrepareDirectionsQuestionnaire_differentLegalRep() {
         // Given
-        CaseData caseData = CaseData.builder()
-            .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
-            .respondent2ClaimResponseTypeForSpec(PART_ADMISSION)
-            .respondent2SameLegalRepresentative(NO)
-            .respondent1DQ(Respondent1DQ.builder().build())
-            .respondent2DQ(Respondent2DQ.builder().build())
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .respondent2(Party.builder().type(Party.Type.ORGANISATION).build())
-            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
-            .systemGeneratedCaseDocuments(new ArrayList<>())
-            .build();
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+        Party respondent2 = new Party();
+        respondent2.setType(Party.Type.ORGANISATION);
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondent1ClaimResponseTypeForSpec(FULL_DEFENCE);
+        caseData.setRespondent2ClaimResponseTypeForSpec(PART_ADMISSION);
+        caseData.setRespondent2SameLegalRepresentative(NO);
+        caseData.setRespondent1DQ(new Respondent1DQ());
+        caseData.setRespondent2DQ(new Respondent2DQ());
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        caseData.setRespondent2(respondent2);
+        caseData.setRespondent1(respondent1);
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+
+        Document document1 = new Document();
+        document1.setDocumentUrl("documentUrl1");
+        CaseDocument caseDocument1 = new CaseDocument();
+        caseDocument1.setDocumentName("directionsQuestionnaire1");
+        caseDocument1.setDocumentLink(document1);
+        Document document2 = new Document();
+        document2.setDocumentUrl("documentUrl1");
+        CaseDocument caseDocument2 = new CaseDocument();
+        caseDocument2.setDocumentName("directionsQuestionnaire2");
+        caseDocument2.setDocumentLink(document2);
+
         String userToken = "userToken";
-
-        CaseDocument caseDocument1 =
-            CaseDocument.builder().documentName("directionsQuestionnaire1").documentLink(Document.builder().documentUrl("documentUrl1").build())
-                .build();
-        CaseDocument caseDocument2 =
-            CaseDocument.builder().documentName("directionsQuestionnaire2").documentLink(Document.builder().documentUrl("documentUrl1").build())
-                .build();
-
         when(directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(any(CaseData.class), eq(userToken), eq("ONE")))
             .thenReturn(Optional.of(caseDocument1));
         when(directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(any(CaseData.class), eq(userToken), eq("TWO")))

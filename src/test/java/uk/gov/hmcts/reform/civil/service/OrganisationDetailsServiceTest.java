@@ -35,11 +35,7 @@ public class OrganisationDetailsServiceTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimDraft()
             .legacyCaseReference("100MC001")
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                              .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                                                .organisationID("test org")
-                                                                .build())
-                                              .build())
+            .applicant1OrganisationPolicy(createOrganisationPolicy("test org"))
             .build();
 
         caseData.getApplicantSolicitor1ClaimStatementOfTruth().setName("OrgClaimName");
@@ -56,11 +52,7 @@ public class OrganisationDetailsServiceTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimDraft()
             .legacyCaseReference("100MC001")
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                              .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                                                .organisationID("test org")
-                                                                .build())
-                                              .build())
+            .applicant1OrganisationPolicy(createOrganisationPolicy("test org"))
             .build();
         caseData.getApplicantSolicitor1ClaimStatementOfTruth().setName("OrgClaimName");
 
@@ -77,11 +69,7 @@ public class OrganisationDetailsServiceTest {
         //Given
         CaseData caseData = CaseDataBuilder.builder()
             .legacyCaseReference("100MC001")
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                              .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                                                .organisationID("test org")
-                                                                .build())
-                                              .build())
+            .applicant1OrganisationPolicy(createOrganisationPolicy("test org"))
             .build();
         //When
         String organisationID = organisationDetailsService.getRespondent1LegalOrganisationName(caseData);
@@ -95,15 +83,19 @@ public class OrganisationDetailsServiceTest {
         //Given
         CaseData caseData = CaseDataBuilder.builder()
             .legacyCaseReference("100MC001")
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                              .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                                                .organisationID("test org")
-                                                                .build())
-                                              .build())
+            .applicant1OrganisationPolicy(createOrganisationPolicy("test org"))
             .build();
         //When
         String organisationID = organisationDetailsService.getRespondent1LegalOrganisationName(caseData);
         //Then
         assertNull(organisationID);
+    }
+
+    private OrganisationPolicy createOrganisationPolicy(String orgId) {
+        OrganisationPolicy policy = new OrganisationPolicy();
+        uk.gov.hmcts.reform.ccd.model.Organisation org = new uk.gov.hmcts.reform.ccd.model.Organisation();
+        org.setOrganisationID(orgId);
+        policy.setOrganisation(org);
+        return policy;
     }
 }
