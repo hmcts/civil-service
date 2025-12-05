@@ -57,6 +57,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DECISION_MADE_ON_APPLICATIONS;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 
 @ExtendWith(MockitoExtension.class)
@@ -122,6 +123,7 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void given_isEligibleForCCJ_whenGetStatus_thenReturnDefaultJudgementStatus() {
         CaseData claim = CaseData.builder()
+            .ccdState(All_FINAL_ORDERS_ISSUED)
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ResponseDeadline(LocalDateTime.of(2022, 2, 2, 16, 0))
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
