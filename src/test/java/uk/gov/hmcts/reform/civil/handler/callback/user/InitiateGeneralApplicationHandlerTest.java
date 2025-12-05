@@ -1116,8 +1116,10 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                             .calculatedAmountInPence(fee275)
                             .version(FEE_VERSION).build());
             List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
+            GAApplicationType gaApplicationType = new GAApplicationType();
+            gaApplicationType.setTypes(types);
             CaseData caseData = CaseDataBuilder
-                .builder().generalAppType(GAApplicationType.builder().types(types).build())
+                .builder().generalAppType(gaApplicationType)
                 .build()
                 .toBuilder()
                 .generalAppRespondentAgreement(createRespondentNoAgreement())
@@ -1173,9 +1175,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
                 CaseDataBuilder.builder().build(), false, false);
             CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.generalAppType(GAApplicationType.builder()
-                                               .types(singletonList(VARY_ORDER))
-                                               .build());
+            GAApplicationType gaApplicationType = new GAApplicationType();
+            gaApplicationType.setTypes(singletonList(VARY_ORDER));
+            caseDataBuilder.generalAppType(gaApplicationType);
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, SET_FEES_AND_PBA);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1222,9 +1224,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                 CaseDataBuilder.builder().build(), false, false);
             CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
             List<GeneralApplicationTypes> types = List.of(VARY_ORDER, STAY_THE_CLAIM);
-            caseDataBuilder.generalAppType(GAApplicationType.builder()
-                                               .types(types)
-                                               .build());
+            GAApplicationType gaApplicationType = new GAApplicationType();
+            gaApplicationType.setTypes(types);
+            caseDataBuilder.generalAppType(gaApplicationType);
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, SET_FEES_AND_PBA);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1380,8 +1382,10 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             GAPbaDetails generalAppPBADetails = GAPbaDetails.builder().fee(feeFromFeeService).build();
 
             List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
+            GAApplicationType gaApplicationType = new GAApplicationType();
+            gaApplicationType.setTypes(types);
             CaseData caseData = CaseDataBuilder
-                    .builder().generalAppType(GAApplicationType.builder().types(types).build())
+                    .builder().generalAppType(gaApplicationType)
                     .build()
                     .toBuilder()
                 .ccdCaseReference(1234L)
@@ -1485,9 +1489,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     }
 
     private static GAApplicationType createGAApplicationType(List<GeneralApplicationTypes> types) {
-        return GAApplicationType.builder()
-            .types(types)
-            .build();
+        GAApplicationType gaApplicationType = new GAApplicationType();
+        gaApplicationType.setTypes(types);
+        return gaApplicationType;
     }
 
     private static GAApplicationTypeLR createGAApplicationTypeLR(List<GeneralApplicationTypesLR> types) {
