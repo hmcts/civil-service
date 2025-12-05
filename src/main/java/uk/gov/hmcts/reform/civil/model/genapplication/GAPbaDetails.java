@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
@@ -13,13 +14,14 @@ import java.time.LocalDateTime;
 @Setter
 @Data
 @Builder(toBuilder = true)
+@NoArgsConstructor
 public class GAPbaDetails {
 
-    private final Fee fee;
-    private final PaymentDetails paymentDetails;
-    private final LocalDateTime paymentSuccessfulDate;
-    private final String generalAppFeeToPayInText;
-    private final String generalAppPayInformationText;
+    private Fee fee;
+    private PaymentDetails paymentDetails;
+    private LocalDateTime paymentSuccessfulDate;
+    private String generalAppFeeToPayInText;
+    private String generalAppPayInformationText;
 
     @JsonCreator
     GAPbaDetails(@JsonProperty("fee") Fee fee,

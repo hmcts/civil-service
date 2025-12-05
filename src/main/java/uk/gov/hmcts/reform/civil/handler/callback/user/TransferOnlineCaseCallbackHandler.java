@@ -68,14 +68,13 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
 
     private CallbackResponse validateCourtLocation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<String> errors = new ArrayList<>();
 
         if (ifSameCourtSelected(callbackParams)) {
             errors.add(ERROR_SELECT_DIFF_LOCATION);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .errors(errors)
             .build();
     }
@@ -93,12 +92,11 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
 
     private CallbackResponse locationList(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<LocationRefData> locations = fetchLocationData(callbackParams);
-        caseDataBuilder.transferCourtLocationList(getLocationsFromList(locations));
+        caseData.setTransferCourtLocationList(getLocationsFromList(locations));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
@@ -118,18 +116,17 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
 
     private CallbackResponse saveTransferOnlineCase(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         LocationRefData newCourtLocation = courtLocationUtils.findPreferredLocationData(
             fetchLocationData(callbackParams),
             callbackParams.getCaseData().getTransferCourtLocationList()
         );
         if (nonNull(newCourtLocation)) {
-            caseDataBuilder.caseManagementLocation(LocationHelper.buildCaseLocation(newCourtLocation));
-            caseDataBuilder.locationName(newCourtLocation.getSiteName());
+            caseData.setCaseManagementLocation(LocationHelper.buildCaseLocation(newCourtLocation));
+            caseData.setLocationName(newCourtLocation.getSiteName());
             if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
                 updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
                     callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                    caseDataBuilder
+                    caseData
                 ));
             }
         }
@@ -137,24 +134,24 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
         if (nonNull(newCourtLocation)) {
             boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
             if (featureToggleService.isWelshEnabledForMainCase()) {
-                caseDataBuilder.eaCourtLocation(YES);
+                caseData.setEaCourtLocation(YES);
             } else {
                 if (!isLipCase) {
                     log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
-                    caseDataBuilder.eaCourtLocation(YES);
+                    caseData.setEaCourtLocation(YES);
                 } else {
                     boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData, newCourtLocation.getEpimmsId());
-                    caseDataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
+                    caseData.setEaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
                 }
             }
         }
 
         DynamicList tempLocationList = caseData.getTransferCourtLocationList();
         tempLocationList.setListItems(null);
-        caseDataBuilder.transferCourtLocationList(tempLocationList);
-        caseDataBuilder.businessProcess(BusinessProcess.ready(TRIGGER_TASK_RECONFIG_GA));
+        caseData.setTransferCourtLocationList(tempLocationList);
+        caseData.setBusinessProcess(BusinessProcess.ready(TRIGGER_TASK_RECONFIG_GA));
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

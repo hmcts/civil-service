@@ -117,15 +117,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenCaseProgressionEnabled(Boolean toggleStat) {
-        var caseFileKey = "cui-case-progression";
-        givenToggle(caseFileKey, toggleStat);
-
-        assertThat(featureToggleService.isCaseProgressionEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsJudgmentOnlineLive(Boolean toggleStat) {
         var isJudgmentOnlineLiveKey = "isJudgmentOnlineLive";
         givenToggle(isJudgmentOnlineLiveKey, toggleStat);
@@ -224,7 +215,6 @@ class FeatureToggleServiceTest {
                 location,
                 true
             )).thenReturn(isFeatureEnabled);
-            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isFeatureEnabled);
         }
 
         boolean result = featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(location);
@@ -266,15 +256,6 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isQueryManagementLRsEnabled()).isEqualTo(toggleStat);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsLrAdmissionBulkEnabled(Boolean toggleStat) {
-        var lrAdmission = "lr-admission-bulk";
-        givenToggle(lrAdmission, toggleStat);
-
-        assertThat(featureToggleService.isLrAdmissionBulkEnabled()).isEqualTo(toggleStat);
-    }
-
     @Test
     void shouldReturnCorrectValue_whenNonLipCase() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
@@ -292,11 +273,10 @@ class FeatureToggleServiceTest {
     })
     void shouldReturnCorrectValue_whenCuiQueryManagementEnabledLip(boolean toggleStat, YesOrNo applicant1Represented,
                                                                    YesOrNo respondent1Represented) {
-        CaseData caseData = CaseData.builder()
-            .applicant1Represented(applicant1Represented)
-            .respondent1Represented(respondent1Represented)
-            .submittedDate(LocalDateTime.of(LocalDate.now(), LocalTime.NOON))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setApplicant1Represented(applicant1Represented);
+        caseData.setRespondent1Represented(respondent1Represented);
+        caseData.setSubmittedDate(LocalDateTime.of(LocalDate.now(), LocalTime.NOON));
         when(featureToggleService.isLipQueryManagementEnabled(caseData)).thenReturn(toggleStat);
 
         assertThat(featureToggleService.isPublicQueryManagementEnabled(caseData)).isEqualTo(toggleStat);

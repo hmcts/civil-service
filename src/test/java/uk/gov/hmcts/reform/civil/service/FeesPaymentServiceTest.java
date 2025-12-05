@@ -38,6 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -77,26 +78,26 @@ class FeesPaymentServiceTest {
     private PaymentsClient paymentsClient;
     @MockBean
     private CoreCaseDataService coreCaseDataService;
-    @Autowired
-    private CaseDetailsConverter caseDetailsConverter;
-    private ObjectMapper objectMapper = new ObjectMapper();
     @MockBean
     private PinInPostConfiguration pinInPostConfiguration;
     @MockBean
-    private UpdatePaymentStatusService updatePaymentStatusService;
-    @MockBean
     private FeatureToggleService featureToggleService;
+    @MockBean
+    private PaymentRequestUpdateCallbackService paymentRequestUpdateCallbackService;
 
     @BeforeEach
     void before() {
+        Fee hearingFee = new Fee();
+        hearingFee.setCalculatedAmountInPence(new BigDecimal("23212"));
+
+        SRPbaDetails hearingFeePBADetails = new SRPbaDetails();
+        hearingFeePBADetails.setServiceReqReference("2023-1701090705688");
+        hearingFeePBADetails.setFee(hearingFee);
+
         CaseDetails expectedCaseDetails = CaseDetails.builder().id(1701090368574910L)
             .data(Map.of(
-                "hearingFeePBADetails",
-                SRPbaDetails.builder().serviceReqReference("2023-1701090705688")
-                    .fee(Fee.builder().calculatedAmountInPence(new BigDecimal("23212")).build())
-                    .build(),
-                "hearingFee",
-                Fee.builder().calculatedAmountInPence(new BigDecimal("23212")).build()
+                "hearingFeePBADetails", hearingFeePBADetails,
+                "hearingFee", hearingFee
             )).build();
 
         when(coreCaseDataService.getCase(1701090368574910L)).thenReturn(expectedCaseDetails);
@@ -126,10 +127,11 @@ class FeesPaymentServiceTest {
     @Test
     @SneakyThrows
     void shouldNotCreateGovPayPaymentUrlForMissingHearingFeePbaDetails() {
+        Fee hearingFee = new Fee();
+        hearingFee.setCalculatedAmountInPence(new BigDecimal("23200"));
         CaseDetails expectedCaseDetails = CaseDetails.builder().id(1701090368574910L)
             .data(Map.of(
-                "hearingFee",
-                Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build()
+                "hearingFee", hearingFee
             )).build();
 
         when(coreCaseDataService.getCase(1701090368574910L)).thenReturn(expectedCaseDetails);
@@ -145,12 +147,13 @@ class FeesPaymentServiceTest {
     @Test
     @SneakyThrows
     void shouldNotCreateGovPayPaymentUrlForMissingHearingFeeServiceRequest() {
+        Fee hearingFee = new Fee();
+        hearingFee.setCalculatedAmountInPence(new BigDecimal("23200"));
+        SRPbaDetails hearingFeePBADetails = new SRPbaDetails();
         CaseDetails expectedCaseDetails = CaseDetails.builder().id(1701090368574910L)
             .data(Map.of(
-                "hearingFeePBADetails",
-                SRPbaDetails.builder().build(),
-                "hearingFee",
-                Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build()
+                "hearingFeePBADetails", hearingFeePBADetails,
+                "hearingFee", hearingFee
             )).build();
 
         when(coreCaseDataService.getCase(1701090368574910L)).thenReturn(expectedCaseDetails);
@@ -242,7 +245,7 @@ class FeesPaymentServiceTest {
         );
 
         assertThat(govPaymentRequestStatus).isEqualTo(expectedResponse(status));
-        verify(updatePaymentStatusService, times(1)).updatePaymentStatus(any(), any(), any());
+        verify(paymentRequestUpdateCallbackService, times(1)).updatePaymentStatus(any(), any(), any(CardPaymentStatusResponse.class));
     }
 
     @Test
@@ -289,16 +292,19 @@ class FeesPaymentServiceTest {
     void shouldReturnResponseWhenExceptionOccurs() {
         PaymentDto response = buildGovPayCardPaymentStatusResponse("Success");
         when(paymentsClient.getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN))
-            .thenReturn(response);
+                .thenReturn(response);
 
-        doThrow(new CaseDataUpdateException()).when(updatePaymentStatusService).updatePaymentStatus(any(), any(), any());
+        doThrow(new CaseDataUpdateException())
+                .when(paymentRequestUpdateCallbackService)
+                .updatePaymentStatus(any(), any(), any(CardPaymentStatusResponse.class));
 
         CardPaymentStatusResponse result =
-            feesPaymentService.getGovPaymentRequestStatus(HEARING, "123", "RC-1701-0909-0602-0418", BEARER_TOKEN);
+                feesPaymentService.getGovPaymentRequestStatus(HEARING, "123", "RC-1701-0909-0602-0418", BEARER_TOKEN);
 
-        verify(updatePaymentStatusService).updatePaymentStatus(HEARING, "123", result);
+        verify(paymentRequestUpdateCallbackService)
+                .updatePaymentStatus(eq(HEARING), eq("123"), any(CardPaymentStatusResponse.class));
+
         assertThat(result).isEqualTo(expectedResponse("Success"));
-
     }
 
     private PaymentDto buildGovPayCardPaymentStatusResponse(String status) {
@@ -330,20 +336,18 @@ class FeesPaymentServiceTest {
     }
 
     private CardPaymentStatusResponse expectedResponse(String status) {
-        CardPaymentStatusResponse.CardPaymentStatusResponseBuilder payment
-            = CardPaymentStatusResponse.builder()
+        CardPaymentStatusResponse.CardPaymentStatusResponseBuilder builder = CardPaymentStatusResponse.builder()
             .paymentReference("RC-1701-0909-0602-0418")
             .status(status)
             .paymentAmount(new BigDecimal(200))
-            .paymentFor("hearing")
-            .status(status);
+            .paymentFor("hearing");
 
         if (status.equals("Failed")) {
-            payment.errorCode("P0030")
-                .errorDescription("Payment was cancelled by the user");
+            builder.errorCode("P0030");
+            builder.errorDescription("Payment was cancelled by the user");
         }
 
-        return payment.build();
+        return builder.build();
     }
 
     private CardPaymentServiceRequestResponse buildServiceRequestResponse() {

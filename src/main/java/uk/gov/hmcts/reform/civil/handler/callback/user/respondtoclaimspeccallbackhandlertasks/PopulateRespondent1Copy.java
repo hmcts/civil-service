@@ -86,13 +86,13 @@ public class PopulateRespondent1Copy implements CaseTask {
                 .respondent2ClaimResponseTestForSpec(caseData.getRespondent2ClaimResponseTypeForSpec())
                 .showConditionFlags(initialShowTags);
 
-        log.debug("CaseId {}: Updating CARM fields", caseData.getCcdCaseReference());
+        log.info("CaseId {}: Updating CARM fields", caseData.getCcdCaseReference());
         updateCarmFields(caseData, updatedCaseData);
 
-        log.debug("CaseId {}: Updating respondent details", caseData.getCcdCaseReference());
+        log.info("CaseId {}: Updating respondent details", caseData.getCcdCaseReference());
         updateRespondentDetails(caseData, updatedCaseData);
 
-        log.debug("CaseId {}: Updating court location", caseData.getCcdCaseReference());
+        log.info("CaseId {}: Updating court location", caseData.getCcdCaseReference());
         updateCourtLocation(initialShowTags, updatedCaseData, callbackParams);
 
         log.info("CaseId {}: Case data update complete", caseData.getCcdCaseReference());
@@ -110,11 +110,18 @@ public class PopulateRespondent1Copy implements CaseTask {
             updatedCaseData.showCarmFields(NO);
         }
 
-        if (toggleService.isLrAdmissionBulkEnabled()) {
-            log.debug("CaseId {}: LR Admission Bulk is enabled", caseData.getCcdCaseReference());
-            updatedCaseData.totalClaimAmountPlusInterest(caseData.getClaimAmountInPounds().setScale(2));
-            updatedCaseData.totalClaimAmountPlusInterestString(caseData.getClaimAmountInPounds().setScale(2).toString());
-            BigDecimal interest = interestCalculator.calculateInterest(caseData).setScale(2);
+        BigDecimal claimInPounds = caseData.getClaimAmountInPounds();
+        if (claimInPounds != null && caseData.getTotalClaimAmount() != null) {
+            log.debug("CaseId {}: Calculating total claim amount with interest", caseData.getCcdCaseReference());
+            BigDecimal claimScaled = claimInPounds.setScale(2);
+            updatedCaseData.totalClaimAmountPlusInterest(claimScaled);
+            updatedCaseData.totalClaimAmountPlusInterestString(claimScaled.toString());
+
+            BigDecimal interest = interestCalculator.calculateInterest(caseData);
+            if (interest == null) {
+                interest = BigDecimal.ZERO;
+            }
+            interest = interest.setScale(2);
             BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount().add(interest).setScale(2);
             updatedCaseData.totalClaimAmountPlusInterestAdmitPart(totalAmountWithInterest);
             updatedCaseData.totalClaimAmountPlusInterestAdmitPartString(totalAmountWithInterest.toString());

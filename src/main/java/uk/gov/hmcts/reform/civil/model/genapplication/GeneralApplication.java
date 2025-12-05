@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -21,64 +23,65 @@ import java.util.List;
 @Data
 @Builder(toBuilder = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@NoArgsConstructor
 public class GeneralApplication implements MappableObject {
 
-    private final String generalApplicationState;
-    private final GAApplicationType generalAppType;
-    private final GAApplicationTypeLR generalAppTypeLR;
-    private final GARespondentOrderAgreement generalAppRespondentAgreement;
-    private final BusinessProcess businessProcess;
-    private final GAPbaDetails generalAppPBADetails;
-    private final YesOrNo generalAppAskForCosts;
-    private final String generalAppDetailsOfOrder;
-    private final List<Element<String>> generalAppDetailsOfOrderColl;
-    private final String generalAppReasonsOfOrder;
-    private final List<Element<String>> generalAppReasonsOfOrderColl;
-    private final GAInformOtherParty generalAppInformOtherParty;
-    private final YesOrNo generalAppConsentOrder;
-    private final GAUrgencyRequirement generalAppUrgencyRequirement;
-    private final GAStatementOfTruth generalAppStatementOfTruth;
-    private final GAHearingDetails generalAppHearingDetails;
-    private final GASolicitorDetailsGAspec generalAppApplnSolicitor;
-    private final List<Element<GASolicitorDetailsGAspec>> generalAppRespondentSolicitors;
-    private final List<Element<Document>> generalAppEvidenceDocument;
-    private final LocalDateTime generalAppDateDeadline;
-    private final YesOrNo isMultiParty;
-    private final YesOrNo parentClaimantIsApplicant;
-    private final String gaApplicantDisplayName;
-    private final CaseLink caseLink;
-    private final LocalDateTime generalAppSubmittedDateGAspec;
-    private final IdamUserDetails civilServiceUserRoles;
-    private final String applicantPartyName;
-    private final String claimant1PartyName;
-    private final String claimant2PartyName;
-    private final String defendant1PartyName;
-    private final String defendant2PartyName;
-    private final String litigiousPartyID;
-    private final String generalAppSuperClaimType;
-    private final CaseLocationCivil caseManagementLocation;
-    private final YesOrNo isCcmccLocation;
-    private final GACaseManagementCategory caseManagementCategory;
-    private final CaseCategory caseAccessCategory;
-    private final String locationName;
-    private final LocalDateTime applicationClosedDate;
-    private final LocalDateTime applicationTakenOfflineDate;
-    private final YesOrNo generalAppVaryJudgementType;
-    private final Document generalAppN245FormUpload;
-    private final GAHearingDateGAspec generalAppHearingDate;
+    private String generalApplicationState;
+    private GAApplicationType generalAppType;
+    private GAApplicationTypeLR generalAppTypeLR;
+    private GARespondentOrderAgreement generalAppRespondentAgreement;
+    private BusinessProcess businessProcess;
+    private GAPbaDetails generalAppPBADetails;
+    private YesOrNo generalAppAskForCosts;
+    private String generalAppDetailsOfOrder;
+    private List<Element<String>> generalAppDetailsOfOrderColl;
+    private String generalAppReasonsOfOrder;
+    private List<Element<String>> generalAppReasonsOfOrderColl;
+    private GAInformOtherParty generalAppInformOtherParty;
+    private YesOrNo generalAppConsentOrder;
+    private GAUrgencyRequirement generalAppUrgencyRequirement;
+    private GAStatementOfTruth generalAppStatementOfTruth;
+    private GAHearingDetails generalAppHearingDetails;
+    private GASolicitorDetailsGAspec generalAppApplnSolicitor;
+    private List<Element<GASolicitorDetailsGAspec>> generalAppRespondentSolicitors;
+    private List<Element<Document>> generalAppEvidenceDocument;
+    private LocalDateTime generalAppDateDeadline;
+    private YesOrNo isMultiParty;
+    private YesOrNo parentClaimantIsApplicant;
+    private String gaApplicantDisplayName;
+    private CaseLink caseLink;
+    private LocalDateTime generalAppSubmittedDateGAspec;
+    private IdamUserDetails civilServiceUserRoles;
+    private String applicantPartyName;
+    private String claimant1PartyName;
+    private String claimant2PartyName;
+    private String defendant1PartyName;
+    private String defendant2PartyName;
+    private String litigiousPartyID;
+    private String generalAppSuperClaimType;
+    private CaseLocationCivil caseManagementLocation;
+    private YesOrNo isCcmccLocation;
+    private GACaseManagementCategory caseManagementCategory;
+    private CaseCategory caseAccessCategory;
+    private String locationName;
+    private LocalDateTime applicationClosedDate;
+    private LocalDateTime applicationTakenOfflineDate;
+    private YesOrNo generalAppVaryJudgementType;
+    private Document generalAppN245FormUpload;
+    private GAHearingDateGAspec generalAppHearingDate;
     // GA for LIP
-    private final YesOrNo isGaApplicantLip;
-    private final YesOrNo isGaRespondentOneLip;
-    private final YesOrNo isGaRespondentTwoLip;
-    private final HelpWithFees generalAppHelpWithFees;
-    private final CertOfSC certOfSC;
+    private YesOrNo isGaApplicantLip;
+    private YesOrNo isGaRespondentOneLip;
+    private YesOrNo isGaRespondentTwoLip;
+    private HelpWithFees generalAppHelpWithFees;
+    private CertOfSC certOfSC;
     //caseName
-    private final String caseNameGaInternal;
+    private String caseNameGaInternal;
     //WA claim track description
-    private final String gaWaTrackLabel;
-    private final String emailPartyReference;
+    private String gaWaTrackLabel;
+    private String emailPartyReference;
     //dates
-    private final LocalDateTime mainCaseSubmittedDate;
+    private LocalDateTime mainCaseSubmittedDate;
 
     @JsonCreator
     GeneralApplication(@JsonProperty("generalApplicationState") String generalApplicationState,

@@ -5,18 +5,20 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Data
 @Builder
+@NoArgsConstructor
 public class DefendantPinToPostLRspec {
 
-    private final String accessCode;
-    private final String respondentCaseRole;
+    private String accessCode;
+    private String respondentCaseRole;
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private final LocalDate expiryDate;
-    private final String citizenCaseRole;
+    private LocalDate expiryDate;
+    private String citizenCaseRole;
 
     @JsonCreator
     public DefendantPinToPostLRspec(@JsonProperty("accessCode") String accessCode,
