@@ -95,8 +95,12 @@ class CaseNoteServiceTest {
         void shouldBuildJudgeNote_whenInvokedAndDocumentAndNote() {
             given(userService.getUserDetails(BEARER_TOKEN)).willReturn(USER_DETAILS);
 
-            Document document = Document.builder().documentFileName("fileName").build();
-            DocumentAndNote testDocument = DocumentAndNote.builder().documentName("testDocument").document(document).documentNote("Note").build();
+            Document document = new Document();
+            document.setDocumentFileName("fileName");
+            DocumentAndNote testDocument = new DocumentAndNote();
+            testDocument.setDocumentName("testDocument");
+            testDocument.setDocument(document);
+            testDocument.setDocumentNote("Note");
 
             var builtDoc = caseNoteService.buildJudgeCaseNoteAndDocument(testDocument, BEARER_TOKEN);
 
@@ -107,8 +111,11 @@ class CaseNoteServiceTest {
         void shouldBuildJudgeNote_whenInvokedAndDocumentAndName() {
             given(userService.getUserDetails(BEARER_TOKEN)).willReturn(USER_DETAILS);
 
-            Document document = Document.builder().documentFileName("fileName").build();
-            DocumentWithName testDocument = DocumentWithName.builder().documentName("testDocument").document(document).build();
+            Document document = new Document();
+            document.setDocumentFileName("fileName");
+            DocumentWithName testDocument = new DocumentWithName();
+            testDocument.setDocumentName("testDocument");
+            testDocument.setDocument(document);
 
             var builtDoc = caseNoteService.buildJudgeCaseNoteDocumentAndName(testDocument, BEARER_TOKEN);
 
@@ -136,18 +143,18 @@ class CaseNoteServiceTest {
     }
 
     private CaseNote caseNoteForToday(String note) {
-        return CaseNote.builder()
-            .note(note)
-            .createdBy(USER_DETAILS.getFullName())
-            .createdOn(time.now())
-            .build();
+        CaseNote caseNote = new CaseNote();
+        caseNote.setNote(note);
+        caseNote.setCreatedBy(USER_DETAILS.getFullName());
+        caseNote.setCreatedOn(time.now());
+        return caseNote;
     }
 
     private CaseNote caseNoteWithDate(LocalDateTime timestamp) {
-        return CaseNote.builder()
-            .note("note")
-            .createdBy(USER_DETAILS.getFullName())
-            .createdOn(timestamp)
-            .build();
+        CaseNote caseNote = new CaseNote();
+        caseNote.setNote("note");
+        caseNote.setCreatedBy(USER_DETAILS.getFullName());
+        caseNote.setCreatedOn(timestamp);
+        return caseNote;
     }
 }
