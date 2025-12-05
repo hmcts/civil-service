@@ -69,11 +69,10 @@ class MakeBulkClaimPaymentCallbackHandlerTest extends BaseCallbackHandlerTest {
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         handler = new MakeBulkClaimPaymentCallbackHandler(paymentsService, objectMapper, time);
 
-        caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
-            .hearingDate(null)
-            .sdtRequestIdFromSdt("testRequestId")
-            .claimIssuedPBADetails(SRPbaDetails.builder().serviceReqReference("12345").build())
-            .build();
+        caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+        caseData.setHearingDate(null);
+        caseData.setSdtRequestIdFromSdt("testRequestId");
+        caseData.setClaimIssuedPBADetails(SRPbaDetails.builder().serviceReqReference("12345").build());
         params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
     }
 

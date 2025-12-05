@@ -56,9 +56,8 @@ public class ServiceRequestCUICallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldMakePaymentServiceRequestForClaimFee_whenInvoked() {
             // GIVEN
-            caseData = CaseDataBuilder.builder().buildCuiCaseDataWithFee().toBuilder()
-                .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE)
-                .build();
+            caseData = CaseDataBuilder.builder().buildCuiCaseDataWithFee();
+            caseData.setServiceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE);
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_CUI_CLAIM_ISSUE, ABOUT_TO_SUBMIT);
 
             // WHEN
@@ -73,9 +72,8 @@ public class ServiceRequestCUICallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldNotMakeAnyServiceRequest_whenServiceRequestHasBeenInvokedPreviously() {
             // GIVEN
-            caseData = CaseDataBuilder.builder().buildCuiCaseDataWithFee().toBuilder()
-                .serviceRequestReference(CaseDataBuilder.CUSTOMER_REFERENCE)
-                .build();
+            caseData = CaseDataBuilder.builder().buildCuiCaseDataWithFee();
+            caseData.setServiceRequestReference(CaseDataBuilder.CUSTOMER_REFERENCE);
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_CUI_CLAIM_ISSUE, ABOUT_TO_SUBMIT);
 
             // WHEN
@@ -91,14 +89,13 @@ public class ServiceRequestCUICallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldNotMakeAnyServiceRequest_whenClaimantHasRequestedHelpWithFees() {
             // GIVEN
-            caseData = CaseDataBuilder.builder().buildCuiCaseDataWithFee().toBuilder()
-                .caseDataLiP(CaseDataLiP.builder()
+            caseData = CaseDataBuilder.builder().buildCuiCaseDataWithFee();
+            caseData.setCaseDataLiP(CaseDataLiP.builder()
                                  .helpWithFees(
                                      HelpWithFees.builder()
                                          .helpWithFee(YesOrNo.YES)
                                          .build()
-                                 ).build())
-                .build();
+                                 ).build());
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_CUI_CLAIM_ISSUE, ABOUT_TO_SUBMIT);
 
             // THEN

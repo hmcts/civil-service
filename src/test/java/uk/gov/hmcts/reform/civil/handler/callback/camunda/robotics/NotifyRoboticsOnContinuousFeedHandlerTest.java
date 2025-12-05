@@ -114,7 +114,7 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentAdmitPartOfClaimFastTrack()
                 .build();
-            caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             // When

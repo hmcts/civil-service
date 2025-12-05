@@ -65,15 +65,14 @@ public class PaymentsCallbackHandler extends CallbackHandler {
     }
 
     private CaseData updateWithDuplicatePaymentError(CaseData caseData, InvalidPaymentRequestException e) {
-        var paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
-            .map(PaymentDetails::toBuilder)
-            .orElse(PaymentDetails.builder())
-            .status(FAILED)
-            .errorCode(null)
-            .errorMessage(DUPLICATE_PAYMENT_MESSAGE)
-            .build();
+        PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
+            .orElse(new PaymentDetails());
+        paymentDetails.setStatus(FAILED);
+        paymentDetails.setErrorCode(null);
+        paymentDetails.setErrorMessage(DUPLICATE_PAYMENT_MESSAGE);
 
-        return caseData.toBuilder().claimIssuedPaymentDetails(paymentDetails).build();
+        caseData.setClaimIssuedPaymentDetails(paymentDetails);
+        return caseData;
     }
 
     private CallbackResponse makePbaPayment(CallbackParams callbackParams) {
@@ -84,24 +83,20 @@ public class PaymentsCallbackHandler extends CallbackHandler {
             log.info("processing payment for case " + caseData.getCcdCaseReference());
             var paymentReference = paymentsService.createCreditAccountPayment(caseData, authToken).getReference();
             PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
-                .map(PaymentDetails::toBuilder)
-                .orElse(PaymentDetails.builder())
-                .status(SUCCESS)
-                .reference(paymentReference)
-                .errorCode(null)
-                .errorMessage(null)
-                .build();
+                .orElse(new PaymentDetails());
+            paymentDetails.setStatus(SUCCESS);
+            paymentDetails.setReference(paymentReference);
+            paymentDetails.setErrorCode(null);
+            paymentDetails.setErrorMessage(null);
 
-            caseData = caseData.toBuilder()
-                .claimIssuedPaymentDetails(paymentDetails)
-                .paymentSuccessfulDate(time.now())
-                .ccdState(CaseState.CASE_ISSUED)
-                .build();
+            caseData.setClaimIssuedPaymentDetails(paymentDetails);
+            caseData.setPaymentSuccessfulDate(time.now());
+            caseData.setCcdState(CaseState.CASE_ISSUED);
 
         } catch (FeignException e) {
             log.info(String.format("Http Status %s ", e.status()), e);
             if (e.status() == 403 || e.status() == 422 || e.status() == 504) {
-                caseData = updateWithBusinessError(caseData, e);
+                updateWithBusinessError(caseData, e);
             } else {
                 errors.add(ERROR_MESSAGE);
             }
@@ -109,7 +104,7 @@ public class PaymentsCallbackHandler extends CallbackHandler {
             log.error(String.format("Duplicate Payment error status code 400 for case: %s, response body: %s",
                                     caseData.getCcdCaseReference(), e.getMessage()
             ));
-            caseData = updateWithDuplicatePaymentError(caseData, e);
+            updateWithDuplicatePaymentError(caseData, e);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -118,20 +113,17 @@ public class PaymentsCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private CaseData updateWithBusinessError(CaseData caseData, FeignException e) {
+    private void updateWithBusinessError(CaseData caseData, FeignException e) {
         try {
             var paymentDto = objectMapper.readValue(e.contentUTF8(), PaymentDto.class);
             var statusHistory = paymentDto.getStatusHistories()[0];
             PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
-                .map(PaymentDetails::toBuilder).orElse(PaymentDetails.builder())
-                .status(FAILED)
-                .errorCode(statusHistory.getErrorCode())
-                .errorMessage(statusHistory.getErrorMessage())
-                .build();
+                .orElse(new PaymentDetails());
+            paymentDetails.setStatus(FAILED);
+            paymentDetails.setErrorCode(statusHistory.getErrorCode());
+            paymentDetails.setErrorMessage(statusHistory.getErrorMessage());
 
-            return caseData.toBuilder()
-                .claimIssuedPaymentDetails(paymentDetails)
-                .build();
+            caseData.setClaimIssuedPaymentDetails(paymentDetails);
         } catch (JsonProcessingException jsonException) {
             log.error(jsonException.getMessage());
             log.error(String.format("Unknown payment error for case: %s, response body: %s",

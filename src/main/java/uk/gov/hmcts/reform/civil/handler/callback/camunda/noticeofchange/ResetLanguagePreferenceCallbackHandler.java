@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESET_LANGUAGE_PREFERENCE;
@@ -51,24 +52,19 @@ public class ResetLanguagePreferenceCallbackHandler extends CallbackHandler {
 
     private CallbackResponse resetLanguagePreference(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         String caseRole = caseData.getChangeOfRepresentation().getCaseRole();
         if (CaseRole.APPLICANTSOLICITORONE.getFormattedName().equals(caseRole) && caseData.isClaimantBilingual()) {
-            caseDataBuilder
-                .claimantBilingualLanguagePreference(null)
-                .claimantLanguagePreferenceDisplay(null);
+            caseData.setClaimantBilingualLanguagePreference(null);
+            caseData.setClaimantLanguagePreferenceDisplay(null);
         } else if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(caseRole) && caseData.isRespondentResponseBilingual()) {
-            CaseDataLiP caseDataLiP = caseData.getCaseDataLiP();
-            caseDataBuilder
-                .caseDataLiP(caseDataLiP.toBuilder()
-                                 .respondent1LiPResponse(
-                                     caseDataLiP.getRespondent1LiPResponse().toBuilder().respondent1ResponseLanguage(null).build()
-                                 ).build())
-                .defendantLanguagePreferenceDisplay(null);
+            Optional.ofNullable(caseData.getCaseDataLiP())
+                .map(CaseDataLiP::getRespondent1LiPResponse)
+                .ifPresent(response -> response.setRespondent1ResponseLanguage(null));
+            caseData.setDefendantLanguagePreferenceDisplay(null);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 }
