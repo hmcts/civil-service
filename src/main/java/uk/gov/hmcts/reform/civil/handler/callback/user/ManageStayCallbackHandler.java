@@ -46,7 +46,9 @@ public class ManageStayCallbackHandler extends CallbackHandler {
         CaseState.JUDICIAL_REFERRAL.name(), CaseState.JUDICIAL_REFERRAL,
         CaseState.CASE_PROGRESSION.name(), CaseState.CASE_PROGRESSION,
         CaseState.HEARING_READINESS.name(), CaseState.CASE_PROGRESSION,
-        CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.name(), CaseState.CASE_PROGRESSION
+        CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.name(), CaseState.CASE_PROGRESSION,
+        CaseState.DECISION_OUTCOME.name(), CaseState.CASE_PROGRESSION,
+        CaseState.All_FINAL_ORDERS_ISSUED.name(), CaseState.CASE_PROGRESSION
     );
 
     private final ObjectMapper mapper;
@@ -83,7 +85,7 @@ public class ManageStayCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         CaseState newState = nonNull(caseData.getManageStayOption()) && caseData.getManageStayOption().equals(LIFT_STAY)
-            ? STATE_MAP.getOrDefault(caseData.getPreStayState(), caseData.getCcdState())
+            ? STATE_MAP.getOrDefault(caseData.getPreStayState(), CaseState.valueOf(caseData.getPreStayState()))
             : caseData.getCcdState();
         caseDataBuilder.businessProcess(BusinessProcess.ready(
             LIFT_STAY.equals(caseData.getManageStayOption()) ? STAY_LIFTED : STAY_UPDATE_REQUESTED

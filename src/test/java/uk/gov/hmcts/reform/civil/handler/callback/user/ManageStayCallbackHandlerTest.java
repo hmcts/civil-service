@@ -151,7 +151,11 @@ public class ManageStayCallbackHandlerTest {
                 Arguments.of(CaseState.JUDICIAL_REFERRAL, CaseState.JUDICIAL_REFERRAL),
                 Arguments.of(CaseState.CASE_PROGRESSION, CaseState.CASE_PROGRESSION),
                 Arguments.of(CaseState.HEARING_READINESS, CaseState.CASE_PROGRESSION),
-                Arguments.of(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING, CaseState.CASE_PROGRESSION)
+                Arguments.of(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING, CaseState.CASE_PROGRESSION),
+                Arguments.of(CaseState.DECISION_OUTCOME, CaseState.CASE_PROGRESSION),
+                Arguments.of(CaseState.All_FINAL_ORDERS_ISSUED, CaseState.CASE_PROGRESSION),
+                Arguments.of(CaseState.AWAITING_APPLICANT_INTENTION, CaseState.AWAITING_APPLICANT_INTENTION),
+                Arguments.of(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT, CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
             );
         }
     }
