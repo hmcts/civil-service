@@ -265,7 +265,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     public boolean hasClaimEnded() {
         return (Objects.nonNull(caseData.getApplicant1ProceedsWithClaimSpec())
             && caseData.getApplicant1ProceedsWithClaimSpec().equals(YesOrNo.NO)
-            && caseData.isRespondentResponseFullDefence()) || caseData.getApplicant1ResponseDeadlinePassed();
+            && caseData.isRespondentResponseFullDefence());
     }
 
     @Override
