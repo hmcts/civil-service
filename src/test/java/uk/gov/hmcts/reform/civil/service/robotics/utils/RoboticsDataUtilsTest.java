@@ -20,9 +20,9 @@ class RoboticsDataUtilsTest {
         @Test
         void shouldReturnNull_whenNoPreviousOrganisationsExist() {
             var caseData = CaseDataBuilder.builder()
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder().build())
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder().build())
-                .respondent2OrganisationPolicy(OrganisationPolicy.builder().build())
+                .applicant1OrganisationPolicy(new OrganisationPolicy())
+                .respondent1OrganisationPolicy(new OrganisationPolicy())
+                .respondent2OrganisationPolicy(new OrganisationPolicy())
                 .build();
 
             assertNull(RoboticsDataUtil.buildNoticeOfChange(caseData));
@@ -34,22 +34,15 @@ class RoboticsDataUtilsTest {
             var oldestDate = LocalDateTime.parse("2022-01-01T12:00:00.000550439");
 
             var caseData = CaseDataBuilder.builder()
-                .applicant1OrganisationPolicy(
-                    OrganisationPolicy.builder().previousOrganisations(List.of(
-                        buildPreviousOrganisation("app-1-latest", latestDate),
-                        buildPreviousOrganisation("app-1-old", oldestDate)
-                    )).build()
-                )
-                .respondent1OrganisationPolicy(
-                    OrganisationPolicy.builder().previousOrganisations(List.of(
-                        buildPreviousOrganisation("res-1-latest", latestDate),
-                        buildPreviousOrganisation("res-1-old", oldestDate)
-                    )).build())
-                .respondent2OrganisationPolicy(
-                    OrganisationPolicy.builder().previousOrganisations(List.of(
-                        buildPreviousOrganisation("res-2-old", oldestDate),
-                        buildPreviousOrganisation("res-2-latest", latestDate)
-                    )).build())
+                .applicant1OrganisationPolicy(createOrganisationPolicyWithPreviousOrgs(
+                    List.of(buildPreviousOrganisation("app-1-latest", latestDate),
+                        buildPreviousOrganisation("app-1-old", oldestDate))))
+                .respondent1OrganisationPolicy(createOrganisationPolicyWithPreviousOrgs(
+                    List.of(buildPreviousOrganisation("res-1-latest", latestDate),
+                        buildPreviousOrganisation("res-1-old", oldestDate))))
+                .respondent2OrganisationPolicy(createOrganisationPolicyWithPreviousOrgs(
+                    List.of(buildPreviousOrganisation("res-2-old", oldestDate),
+                        buildPreviousOrganisation("res-2-latest", latestDate))))
                 .build();
 
             var actual = RoboticsDataUtil.buildNoticeOfChange(caseData);
@@ -71,17 +64,13 @@ class RoboticsDataUtilsTest {
             var oldestDate = LocalDateTime.parse("2022-01-01T12:00:00.000550439");
 
             var caseData = CaseDataBuilder.builder()
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder().build())
-                .respondent1OrganisationPolicy(
-                    OrganisationPolicy.builder().previousOrganisations(List.of(
-                        buildPreviousOrganisation("res-1-latest", latestDate),
-                        buildPreviousOrganisation("res-1-old", oldestDate)
-                    )).build())
-                .respondent2OrganisationPolicy(
-                    OrganisationPolicy.builder().previousOrganisations(List.of(
-                        buildPreviousOrganisation("res-2-old", oldestDate),
-                        buildPreviousOrganisation("res-2-latest", latestDate)
-                    )).build())
+                .applicant1OrganisationPolicy(new OrganisationPolicy())
+                .respondent1OrganisationPolicy(createOrganisationPolicyWithPreviousOrgs(
+                    List.of(buildPreviousOrganisation("res-1-latest", latestDate),
+                        buildPreviousOrganisation("res-1-old", oldestDate))))
+                .respondent2OrganisationPolicy(createOrganisationPolicyWithPreviousOrgs(
+                    List.of(buildPreviousOrganisation("res-2-old", oldestDate),
+                        buildPreviousOrganisation("res-2-latest", latestDate))))
                 .build();
 
             var actual = RoboticsDataUtil.buildNoticeOfChange(caseData);
@@ -98,6 +87,12 @@ class RoboticsDataUtilsTest {
             return PreviousOrganisationCollectionItem.builder().value(
                 PreviousOrganisation.builder().organisationName(name).toTimestamp(toDate).build()).build();
         }
+    }
+
+    private OrganisationPolicy createOrganisationPolicyWithPreviousOrgs(List<PreviousOrganisationCollectionItem> previousOrgs) {
+        OrganisationPolicy policy = new OrganisationPolicy();
+        policy.setPreviousOrganisations(previousOrgs);
+        return policy;
     }
 
 }

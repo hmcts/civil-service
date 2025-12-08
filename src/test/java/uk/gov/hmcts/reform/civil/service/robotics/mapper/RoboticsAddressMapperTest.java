@@ -40,9 +40,9 @@ class RoboticsAddressMapperTest {
 
         @Test
         void shouldMapToRoboticsAddressWithDefaultForAddressLine2_whenAddressLine2IsNull() {
-            Address address = Address.builder()
-                .addressLine1("address line 1")
-                .postCode("SW1 1AA").build();
+            Address address = new Address();
+            address.setAddressLine1("address line 1");
+            address.setPostCode("SW1 1AA");
 
             RoboticsAddress roboticsAddress = mapper.toRoboticsAddress(address);
 
@@ -60,9 +60,9 @@ class RoboticsAddressMapperTest {
 
         @Test
         void shouldRollOverToAddressLine2_whenAddressLine1IsMoreThan35CharactersWithCommas() {
-            Address address = Address.builder()
-                .addressLine1("address line 1, address line 1, address line 2")
-                .postCode("SW1 1AA").build();
+            Address address = new Address();
+            address.setAddressLine1("address line 1, address line 1, address line 2");
+            address.setPostCode("SW1 1AA");
 
             RoboticsAddress roboticsAddress = mapper.toRoboticsAddress(address);
 
@@ -76,10 +76,10 @@ class RoboticsAddressMapperTest {
 
         @Test
         void shouldRollOverToAddressLine3_whenAddressLine2IsMoreThan35CharactersWithCommas() {
-            Address address = Address.builder()
-                .addressLine1("address line 1, address line 1")
-                .addressLine2("address line 2, address line 2, address line 3")
-                .postCode("SW1 1AA").build();
+            Address address = new Address();
+            address.setAddressLine1("address line 1, address line 1");
+            address.setAddressLine2("address line 2, address line 2, address line 3");
+            address.setPostCode("SW1 1AA");
 
             RoboticsAddress roboticsAddress = mapper.toRoboticsAddress(address);
 
