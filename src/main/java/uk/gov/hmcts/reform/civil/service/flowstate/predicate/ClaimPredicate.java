@@ -42,10 +42,16 @@ public non-sealed interface ClaimPredicate extends CaseDataPredicate {
         summary = "",
         description = ""
     )
-    Predicate<CaseData> issuedRespondentUnrepresented =
+    Predicate<CaseData> issuedRespondent1Unrepresented =
         CaseDataPredicate.Claim.hasIssueDate.and(CaseDataPredicate.Respondent.isUnrepresentedRespondent1);
 
-
+    @BusinessRule(
+        group = "Claim",
+        summary = "",
+        description = ""
+    )
+    Predicate<CaseData> issuedRespondent2Unrepresented =
+        CaseDataPredicate.Claim.hasIssueDate.and(CaseDataPredicate.Respondent.isUnrepresentedRespondent2);
 
     @BusinessRule(
         group = "Claim",

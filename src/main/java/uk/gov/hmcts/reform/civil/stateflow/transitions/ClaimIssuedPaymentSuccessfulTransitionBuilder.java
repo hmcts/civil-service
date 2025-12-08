@@ -45,19 +45,19 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilder extends MidTransition
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT, transitions)
             .onlyWhen(ClaimPredicate.pendingIssuedUnrepresented, transitions)
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, transitions)
-            .onlyWhen(oneVsOneCase.and(ClaimPredicate.issuedRespondentUnrepresented).and(ClaimPredicate.isSpec), transitions)
+            .onlyWhen(oneVsOneCase.and(ClaimPredicate.issuedRespondent1Unrepresented).and(ClaimPredicate.isSpec), transitions)
             .set(flags -> flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true), transitions)
             // Unregistered
             // 1. Both def1 and def2 unregistered
             // 2. Def1 unregistered, Def2 registered
             // 3. Def1 registered, Def 2 unregistered
             .moveTo(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT, transitions).onlyWhen(
-                ((respondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondentUnrepresented.negate()))
-                    .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
-                    .or((respondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondentUnrepresented.negate()))
-                        .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate())))
-                    .or((respondent1OrgNotRegistered.negate().and(ClaimPredicate.issuedRespondentUnrepresented.negate()))
-                        .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate()))
+                ((respondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
+                    .and(respondent2OrgNotRegistered.and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
+                    .or((respondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
+                        .and(respondent2OrgNotRegistered.negate().and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
+                    .or((respondent1OrgNotRegistered.negate().and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
+                        .and(respondent2OrgNotRegistered.and(ClaimPredicate.issuedRespondent2Unrepresented.negate()))
                         .and(bothDefSameLegalRep.negate())
                     ), transitions
             )
@@ -65,18 +65,15 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilder extends MidTransition
             // 1. Def1 unrepresented, Def2 unregistered
             // 2. Def1 unregistered, Def 2 unrepresented
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT, transitions).onlyWhen(
-                (ClaimPredicate.issuedRespondentUnrepresented.and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
-                    .or(respondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondentUnrepresented.negate())
-                        .and(respondent2NotRepresented)), transitions);
+                (ClaimPredicate.issuedRespondent1Unrepresented.and(respondent2OrgNotRegistered.and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
+                    .or(respondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondent1Unrepresented.negate())
+                        .and(ClaimPredicate.issuedRespondent2Unrepresented)), transitions);
     }
 
     public static final Predicate<CaseData> respondent1OrgNotRegistered = caseData ->
         caseData.getIssueDate() != null
             && caseData.getRespondent1OrgRegistered() == NO
             && caseData.getRespondent1Represented() == YES;
-
-    public static final Predicate<CaseData> respondent2NotRepresented = caseData ->
-        caseData.getIssueDate() != null && caseData.getRespondent2Represented() == NO;
 
     public static final Predicate<CaseData> respondent2OrgNotRegistered = caseData ->
         caseData.getIssueDate() != null
