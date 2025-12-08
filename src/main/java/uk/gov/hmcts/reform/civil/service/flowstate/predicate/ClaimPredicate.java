@@ -38,6 +38,13 @@ public non-sealed interface ClaimPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Claim",
+        summary = "Respondent have same legal representative",
+        description = "Same legal representation for both defendants"
+    )
+    Predicate<CaseData> sameRepresentationBoth = CaseDataPredicate.Respondent.isSameLegalRepresentative;
+
+    @BusinessRule(
+        group = "Claim",
         summary = "",
         description = "Issue date is set and respondent 1 is unrepresented"
     )
