@@ -329,8 +329,10 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isClaimantDefaultJudgement() {
-        return CaseState.All_FINAL_ORDERS_ISSUED.equals(caseData.getCcdState())
-            && caseData.getRespondent1ResponseDeadline() != null
+        return (
+            caseData.isCcjRequestJudgmentByAdmission() &&
+            CaseState.All_FINAL_ORDERS_ISSUED.equals(caseData.getCcdState()))
+            || caseData.getRespondent1ResponseDeadline() != null
             && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
             && caseData.getPaymentTypeSelection() != null;
     }
