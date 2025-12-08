@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -73,10 +74,10 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .build();
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -98,17 +99,20 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(12376868L)
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                               .whenWillThisAmountBePaid(LocalDate.now().minusDays(1)).build())
-            .caseDataLiP(CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.YES)
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                                         .applicant1SignedSettlementAgreement(
-                                                                             YesOrNo.YES).build()).build())
-            .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.now().minusDays(1))
-            .build();
+
+        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+        claimantLiPResponse.setApplicant1SignedSettlementAgreement(YesOrNo.YES);
+
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setRespondentSignSettlementAgreement(YesOrNo.YES);
+        caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(12376868L);
+        caseData.setRespondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec(LocalDate.now().minusDays(1)));
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setRespondent1RespondToSettlementAgreementDeadline(LocalDateTime.now().minusDays(1));
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -130,14 +134,18 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder().applicant1SignedSettlementAgreement(YesOrNo.YES).build())
-                             .respondentSignSettlementAgreement(YesOrNo.NO)
-                             .build())
-            .build();
+
+        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+        claimantLiPResponse.setApplicant1SignedSettlementAgreement(YesOrNo.YES);
+
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+        caseDataLiP.setRespondentSignSettlementAgreement(YesOrNo.NO);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setCaseDataLiP(caseDataLiP);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -159,14 +167,18 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder().applicant1SignedSettlementAgreement(YesOrNo.YES).build())
-                             .build())
-            .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.now().minusDays(1))
-            .build();
+
+        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+        claimantLiPResponse.setApplicant1SignedSettlementAgreement(YesOrNo.YES);
+
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setRespondent1RespondToSettlementAgreementDeadline(LocalDateTime.now().minusDays(1));
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)

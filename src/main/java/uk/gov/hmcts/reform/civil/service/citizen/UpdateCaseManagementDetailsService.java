@@ -63,7 +63,6 @@ public class UpdateCaseManagementDetailsService {
         itemList.add(element(civil));
         caseData.setCaseManagementCategory(
             CaseManagementCategory.builder().value(civil).list_items(itemList).build());
-
     }
 
     private void updateFlightDelayCaseManagementLocation(
@@ -162,5 +161,4 @@ public class UpdateCaseManagementDetailsService {
         return participantString;
 
     }
-
 }

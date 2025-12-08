@@ -766,8 +766,7 @@ public class EventHistoryMapper {
     }
 
     private BigDecimal totalInterestForLrClaim(CaseData caseData) {
-        return featureToggleService.isLrAdmissionBulkEnabled() ? ZERO : Optional.ofNullable(caseData.getTotalInterest()).orElse(
-            ZERO);
+        return Optional.ofNullable(caseData.getTotalInterest()).orElse(ZERO);
     }
 
     private void buildRespondentDivergentResponse(EventHistory.EventHistoryBuilder builder, CaseData caseData,
@@ -1322,7 +1321,12 @@ public class EventHistoryMapper {
 
     private Element<GeneralApplicationsDetails> getGeneralApplicationDetailsJudgeDecisionWithStruckOutDefence(
             String caseLinkId, CaseData caseData) {
-        return caseData.getGaDetailsMasterCollection().stream()
+
+        List<Element<GeneralApplicationsDetails>> gaDetailsMasterCollection = caseData.getGaDetailsMasterCollection();
+        if (gaDetailsMasterCollection == null) {
+            return null;
+        }
+        return gaDetailsMasterCollection.stream()
                 .filter(generalApplicationsDetailsElement ->
                         generalApplicationsDetailsElement
                                 .getValue()

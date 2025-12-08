@@ -11,9 +11,9 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -67,23 +67,17 @@ class UploadHearingDocumentsDefendantHandlerTest extends BaseCallbackHandlerTest
 
     @Test
     void createDashboardNotifications() {
-
         params.put("ccdCaseReference", "1239988");
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
-
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .respondent1Represented(YesOrNo.NO)
-            .ccdCaseReference(12349988L)
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setCcdCaseReference(12349988L);
+        caseData.setCcdState(CaseState.CASE_PROGRESSION);
+        caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("00002"));
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -103,21 +97,16 @@ class UploadHearingDocumentsDefendantHandlerTest extends BaseCallbackHandlerTest
 
         params.put("ccdCaseReference", "1239988");
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
-
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .respondent1Represented(YesOrNo.NO)
-            .ccdCaseReference(12349988L)
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setCcdCaseReference(12349988L);
+        caseData.setCcdState(CaseState.CASE_PROGRESSION);
+        caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("00002"));
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
@@ -137,21 +126,16 @@ class UploadHearingDocumentsDefendantHandlerTest extends BaseCallbackHandlerTest
 
         params.put("ccdCaseReference", "1239988");
 
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
-
-        CaseData caseData = CaseData.builder()
-            .legacyCaseReference("reference")
-            .respondent1Represented(YesOrNo.NO)
-            .ccdCaseReference(12349988L)
-            .ccdState(CaseState.CASE_PROGRESSION)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setCcdCaseReference(12349988L);
+        caseData.setCcdState(CaseState.CASE_PROGRESSION);
+        caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("00002"));
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
