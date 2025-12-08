@@ -13,6 +13,13 @@ public non-sealed interface ClaimantPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Claimant",
+        summary = "todo",
+        description = "Applicant correspondence address not required (Spec)"
+    )
+    Predicate<CaseData> correspondenceAddressNotRequired = Applicant.isNotApplicantCorrespondenceAddressRequiredSpec;
+
+    @BusinessRule(
+        group = "Claimant",
         summary = "Before applicant response",
         description = "Applicant initial response has not been recorded yet (for UNSPEC with applicant 2, neither applicant has responded)"
     )
