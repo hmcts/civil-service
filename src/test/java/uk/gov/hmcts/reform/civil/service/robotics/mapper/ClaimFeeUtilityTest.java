@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 
@@ -21,7 +22,7 @@ class ClaimFeeUtilityTest {
         @Test
         void shouldReturnNull_whenClaimFeeIsNull() {
             // Given
-            CaseData caseData = CaseData.builder().build();
+            CaseData caseData = CaseDataBuilder.builder().build();
 
             // When
             BigDecimal courtFee = ClaimFeeUtility.getCourtFee(caseData);
@@ -33,7 +34,7 @@ class ClaimFeeUtilityTest {
         @Test
         void shouldReturnCalculatedFee_whenHwfDetailsAreNull() {
             // Given
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .claimFee(Fee.builder().calculatedAmountInPence(CLAIM_FEE_IN_PENCE).build())
                 .claimIssuedHwfDetails(null)
                 .build();
@@ -48,7 +49,7 @@ class ClaimFeeUtilityTest {
         @Test
         void shouldReturnCalculatedFee_whenHwfDetailsArePresentButRemissionAndOutstandingAreNull() {
             // Given
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .claimFee(Fee.builder().calculatedAmountInPence(CLAIM_FEE_IN_PENCE).build())
                 .claimIssuedHwfDetails(HelpWithFeesDetails.builder().build())
                 .build();
@@ -63,7 +64,7 @@ class ClaimFeeUtilityTest {
         @Test
         void shouldReturnZero_whenFullRemissionIsGranted() {
             // Given
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .claimFee(Fee.builder().calculatedAmountInPence(CLAIM_FEE_IN_PENCE).build())
                 .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
                                            .remissionAmount(CLAIM_FEE_IN_PENCE)
@@ -82,7 +83,7 @@ class ClaimFeeUtilityTest {
             // Given
             BigDecimal outstandingFee = new BigDecimal("25.00");
             BigDecimal remissionAmount = new BigDecimal("7500"); // 75 pounds
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .claimFee(Fee.builder().calculatedAmountInPence(CLAIM_FEE_IN_PENCE).build())
                 .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
                                            .remissionAmount(remissionAmount)
@@ -101,7 +102,7 @@ class ClaimFeeUtilityTest {
         void shouldReturnCalculatedFee_whenPartialRemissionIsGrantedAndOutstandingFeeIsNull() {
             // Given
             BigDecimal remissionAmount = new BigDecimal("7500"); // 75 pounds
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .claimFee(Fee.builder().calculatedAmountInPence(CLAIM_FEE_IN_PENCE).build())
                 .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
                                            .remissionAmount(remissionAmount)
