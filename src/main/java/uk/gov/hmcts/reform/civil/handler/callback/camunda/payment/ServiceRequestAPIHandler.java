@@ -77,7 +77,6 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
             HearingNoticeVariables camundaVars = camundaService.getProcessVariables(processInstanceId);
             boolean requiresHearingFee = hearingFeeRequired(camundaVars.getHearingType());
 
-            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
             if (isServiceRequestNotRequested(caseData.getHearingFeePBADetails()) && requiresHearingFee) {
                 try {
                     SRPbaDetails.SRPbaDetailsBuilder paymentDetails = prepareCommonPaymentDetails(caseData, authToken)
@@ -85,7 +84,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
                             hearingFeesService,
                             caseData,
                             caseData.getAssignedTrack()));
-                    caseDataBuilder.hearingFeePBADetails(paymentDetails.build());
+                    caseData.setHearingFeePBADetails(paymentDetails.build());
                 } catch (FeignException e) {
                     log.error("Failed creating a payment service request for case {}. Http status: {}. Exception: {}",
                               caseData.getCcdCaseReference(), e.status(), e);
@@ -93,7 +92,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
                 }
             }
             return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseDataBuilder.build().toMap(objectMapper))
+                .data(caseData.toMap(objectMapper))
                 .errors(errors)
                 .build();
         }
@@ -103,12 +102,12 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
                 log.info("Calling payment service request (hearing fee) for case {}", caseData.getCcdCaseReference());
                 SRPbaDetails.SRPbaDetailsBuilder paymentDetails = prepareCommonPaymentDetails(caseData, authToken)
                     .fee(caseData.getHearingFee());
-                caseData = caseData.toBuilder().hearingFeePBADetails(paymentDetails.build()).build();
+                caseData.setHearingFeePBADetails(paymentDetails.build());
             } else if (isClaimFeeServiceRequest(caseData)) {
                 log.info("Calling payment service request (claim fee) for case {}", caseData.getCcdCaseReference());
                 SRPbaDetails.SRPbaDetailsBuilder paymentDetails = prepareCommonPaymentDetails(caseData, authToken)
                     .fee(caseData.getClaimFee());
-                caseData = caseData.toBuilder().claimIssuedPBADetails(paymentDetails.build()).build();
+                caseData.setClaimIssuedPBADetails(paymentDetails.build());
             }
         } catch (FeignException e) {
             log.error("Failed creating a payment service request for case {}. Http status: {}. Exception: {}",

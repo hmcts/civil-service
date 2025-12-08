@@ -85,7 +85,7 @@ class BaseRoboticsDataMapperTest {
 
     @Test
     void shouldUseProvidedAddressWhenPresent() {
-        Address provided = Address.builder().build();
+        Address provided = new Address();
         RoboticsAddresses roboticsAddresses = RoboticsAddresses.builder().build();
 
         when(addressMapper.toRoboticsAddresses(provided)).thenReturn(roboticsAddresses);
@@ -113,7 +113,8 @@ class BaseRoboticsDataMapperTest {
     void shouldReturnOrganisationId() {
         uk.gov.hmcts.reform.ccd.model.Organisation org =
             uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID("ORG123").build();
-        OrganisationPolicy policy = OrganisationPolicy.builder().organisation(org).build();
+        OrganisationPolicy policy = new OrganisationPolicy();
+        policy.setOrganisation(org);
 
         Optional<String> result = mapper.getOrganisationId(policy);
 
@@ -129,14 +130,13 @@ class BaseRoboticsDataMapperTest {
 
     @Test
     void shouldBuildOrganisationDetails() {
-        SolicitorOrganisationDetails orgDetails = SolicitorOrganisationDetails.builder()
-            .organisationName("Solicitor Org")
-            .phoneNumber("012345")
-            .fax("fax123")
-            .dx("dx123")
-            .email("email@test.com")
-            .address(Address.builder().build())
-            .build();
+        SolicitorOrganisationDetails orgDetails = new SolicitorOrganisationDetails();
+        orgDetails.setOrganisationName("Solicitor Org");
+        orgDetails.setPhoneNumber("012345");
+        orgDetails.setFax("fax123");
+        orgDetails.setDx("dx123");
+        orgDetails.setEmail("email@test.com");
+        orgDetails.setAddress(new Address());
 
         RoboticsAddresses roboticsAddresses = RoboticsAddresses.builder().build();
         when(addressMapper.toRoboticsAddresses(orgDetails.getAddress())).thenReturn(roboticsAddresses);
