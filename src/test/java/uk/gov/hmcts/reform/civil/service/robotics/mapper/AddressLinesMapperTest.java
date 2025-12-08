@@ -16,9 +16,8 @@ class AddressLinesMapperTest {
 
         @Test
         void shouldSplitAddressLine1_whenExceedsLimitAndContainsComma() {
-            Address address = Address.builder()
-                .addressLine1("1234567890, 12345678901234567890, abcdefghijk")
-                .build();
+            Address address = new Address();
+            address.setAddressLine1("1234567890, 12345678901234567890, abcdefghijk");
 
             Address result = mapper.splitLongerLines(address);
 
@@ -32,9 +31,8 @@ class AddressLinesMapperTest {
 
         @Test
         void shouldSplitAddressLine1_whenExceedsLimitAndContainsCommaAsLastChar() {
-            Address address = Address.builder()
-                .addressLine1("12345678901234567890,1234567890abcdefghij,")
-                .build();
+            Address address = new Address();
+            address.setAddressLine1("12345678901234567890,1234567890abcdefghij,");
 
             Address result = mapper.splitLongerLines(address);
 
@@ -48,10 +46,9 @@ class AddressLinesMapperTest {
 
         @Test
         void shouldSplitAddressLine1AndPushDown_whenExceedsLimitAndContainsComma() {
-            Address address = Address.builder()
-                .addressLine1("12345678901234567890,12345678909876543210")
-                .addressLine2("abcdefghijk")
-                .build();
+            Address address = new Address();
+            address.setAddressLine1("12345678901234567890,12345678909876543210");
+            address.setAddressLine2("abcdefghijk");
 
             Address result = mapper.splitLongerLines(address);
 
@@ -65,10 +62,9 @@ class AddressLinesMapperTest {
 
         @Test
         void shouldSplitAddressLine2_whenExceedsLimitAndContainsComma() {
-            Address address = Address.builder()
-                .addressLine1("12345678901234567890")
-                .addressLine2("abcdefghijk12345678901234567890,zxcvbnmzxcvbnm")
-                .build();
+            Address address = new Address();
+            address.setAddressLine1("12345678901234567890");
+            address.setAddressLine2("abcdefghijk12345678901234567890,zxcvbnmzxcvbnm");
 
             Address result = mapper.splitLongerLines(address);
 
@@ -82,9 +78,8 @@ class AddressLinesMapperTest {
 
         @Test
         void shouldSplitAndTrimExtraSpace_whenSpaceAroundComma() {
-            Address address = Address.builder()
-                .addressLine1("12345678901234567890123456789012345 , 1234567890")
-                .build();
+            Address address = new Address();
+            address.setAddressLine1("12345678901234567890123456789012345 , 1234567890");
 
             Address result = mapper.splitLongerLines(address);
 
@@ -98,9 +93,8 @@ class AddressLinesMapperTest {
 
         @Test
         void shouldSplitAndTrimExtraSpace_whenMutipleSpaceWithinText() {
-            Address address = Address.builder()
-                .addressLine1("123456 6 78   91011 12131415 16171819")
-                .build();
+            Address address = new Address();
+            address.setAddressLine1("123456 6 78   91011 12131415 16171819");
 
             Address result = mapper.splitLongerLines(address);
 
@@ -114,13 +108,12 @@ class AddressLinesMapperTest {
 
         @Test
         void shouldSplitAddressBySpace_Line2MissingButLine3Present() {
-            Address address = Address.builder()
-                .addressLine1("21 Belgian Place")
-                .addressLine3("Gateshead")
-                .postTown("Newcastle upon Tyne")
-                .postCode("NW10 3PX")
-                .country("United Kingdom")
-                .build();
+            Address address = new Address();
+            address.setAddressLine1("21 Belgian Place");
+            address.setAddressLine3("Gateshead");
+            address.setPostTown("Newcastle upon Tyne");
+            address.setPostCode("NW10 3PX");
+            address.setCountry("United Kingdom");
 
             Address result = mapper.splitLongerLines(address);
 
@@ -138,13 +131,12 @@ class AddressLinesMapperTest {
 
         @Test
         void shouldSplitAddressBySpace_LongLine1Line3Missing() {
-            Address address = Address.builder()
-                .addressLine1("The aaaa bbbbbb and Aesthetics uuuuuu")
-                .addressLine2("10Z Stockwell Door")
-                .postTown("Edinburgh")
-                .postCode("NE23 8ZZ")
-                .country("United Kingdom")
-                .build();
+            Address address = new Address();
+            address.setAddressLine1("The aaaa bbbbbb and Aesthetics uuuuuu");
+            address.setAddressLine2("10Z Stockwell Door");
+            address.setPostTown("Edinburgh");
+            address.setPostCode("NE23 8ZZ");
+            address.setCountry("United Kingdom");
 
             Address result = mapper.splitLongerLines(address);
 
@@ -158,13 +150,12 @@ class AddressLinesMapperTest {
 
         @Test
         void shouldSplitAddressBySpace_LongLine1Line2MissingLine3Present() {
-            Address address = Address.builder()
-                .addressLine1("ttttttttttt Group, ttttttttttt House, Unit 77, Nelson Court")
-                .addressLine3("Broadbridge")
-                .postTown("Manchester")
-                .postCode("NW12 3AC")
-                .country("United Kingdom")
-                .build();
+            Address address = new Address();
+            address.setAddressLine1("ttttttttttt Group, ttttttttttt House, Unit 77, Nelson Court");
+            address.setAddressLine3("Broadbridge");
+            address.setPostTown("Manchester");
+            address.setPostCode("NW12 3AC");
+            address.setCountry("United Kingdom");
 
             Address result = mapper.splitLongerLines(address);
 
@@ -178,12 +169,11 @@ class AddressLinesMapperTest {
 
         @Test
         void shouldSplitAddressBySpace_LongLine1Line2And3Missing() {
-            Address address = Address.builder()
-                .addressLine1("vvvvv zzzzzzzz, 7th Floor, Rusmore Building, 70 Rusmore Circus")
-                .postTown("Birmingham")
-                .postCode("N32 3AX")
-                .country("United Kingdom")
-                .build();
+            Address address = new Address();
+            address.setAddressLine1("vvvvv zzzzzzzz, 7th Floor, Rusmore Building, 70 Rusmore Circus");
+            address.setPostTown("Birmingham");
+            address.setPostCode("N32 3AX");
+            address.setCountry("United Kingdom");
 
             Address result = mapper.splitLongerLines(address);
 
@@ -197,11 +187,10 @@ class AddressLinesMapperTest {
 
         @Test
         void shouldSplitAddressBySpace_whenSplittingSpreadsOverThreeLines() {
-            Address address = Address.builder()
-                .addressLine1("12345678901234567890")
-                .addressLine2("I am the second line")
-                .addressLine3("abcdefghijk12345678901234567890,zxcvbnmzxcvbnm")
-                .build();
+            Address address = new Address();
+            address.setAddressLine1("12345678901234567890");
+            address.setAddressLine2("I am the second line");
+            address.setAddressLine3("abcdefghijk12345678901234567890,zxcvbnmzxcvbnm");
 
             Address result = mapper.splitLongerLines(address);
 
@@ -212,13 +201,12 @@ class AddressLinesMapperTest {
 
         @Test
         void shouldSplitAddressBySpace_whenSplittingSpreadsOverThreeLines_ExcessOccupiesAbsentAddLine4() {
-            Address address = Address.builder()
-                .addressLine1("denhamdrivdenhamdrivdenhamdrivden, denhamdrivdenhamdrivdenhamdriv,")
-                .addressLine2("drivdenhamdrivdenhamdrivdenh sdsdsdsdsd")
-                .addressLine3("drivdenhamdrivdenhamdrivdenh adsdsdsdsb")
-                .county("drivdenhamdrivdenhamdrivdenh sdsdsdsdsd")
-                .postCode("wcwec2c33x ff3")
-                .build();
+            Address address = new Address();
+            address.setAddressLine1("denhamdrivdenhamdrivdenhamdrivden, denhamdrivdenhamdrivdenhamdriv,");
+            address.setAddressLine2("drivdenhamdrivdenhamdrivdenh sdsdsdsdsd");
+            address.setAddressLine3("drivdenhamdrivdenhamdrivdenh adsdsdsdsb");
+            address.setCounty("drivdenhamdrivdenhamdrivdenh sdsdsdsdsd");
+            address.setPostCode("wcwec2c33x ff3");
 
             Address result = mapper.splitLongerLines(address);
 
@@ -232,15 +220,14 @@ class AddressLinesMapperTest {
 
         @Test
         void shouldSplitAddressBySpace_whenSplittingSpreadsOverThreeLines_OverflowInLimit() {
-            Address address = Address.builder()
-                .addressLine1("Flat 3 Knighton court, second floor, 823-827 Cranbrook Road")
-                .addressLine2("Barkingside South")
-                .addressLine3("Barkingside South")
-                .postTown("Ilford")
-                .county("Essex")
-                .postCode("IG11 6QW")
-                .country("United Kingdom")
-                .build();
+            Address address = new Address();
+            address.setAddressLine1("Flat 3 Knighton court, second floor, 823-827 Cranbrook Road");
+            address.setAddressLine2("Barkingside South");
+            address.setAddressLine3("Barkingside South");
+            address.setPostTown("Ilford");
+            address.setCounty("Essex");
+            address.setPostCode("IG11 6QW");
+            address.setCountry("United Kingdom");
 
             Address result = mapper.splitLongerLines(address);
 
@@ -252,15 +239,14 @@ class AddressLinesMapperTest {
 
         @Test
         void shouldSplitAddressBySpace_whenSplittingExcessOverflowIgnored() {
-            Address address = Address.builder()
-                .addressLine1("Flat 3 Knighton court, second floor, 823-827 Cranbrook Road")
-                .addressLine2("Flat 4 Knighton court, second floor, 823-827 Cran")
-                .addressLine3("Flat 5 Knighton court, second floor, 823-827 Cran")
-                .postTown("Ilford")
-                .county("Essex")
-                .postCode("IG11 6QW")
-                .country("United Kingdom")
-                .build();
+            Address address = new Address();
+            address.setAddressLine1("Flat 3 Knighton court, second floor, 823-827 Cranbrook Road");
+            address.setAddressLine2("Flat 4 Knighton court, second floor, 823-827 Cran");
+            address.setAddressLine3("Flat 5 Knighton court, second floor, 823-827 Cran");
+            address.setPostTown("Ilford");
+            address.setCounty("Essex");
+            address.setPostCode("IG11 6QW");
+            address.setCountry("United Kingdom");
 
             Address result = mapper.splitLongerLines(address);
 
@@ -275,12 +261,11 @@ class AddressLinesMapperTest {
         @Test
         void shouldSplitAddressBySpace_whenSplittingSpreadsOverFourLines_ExcessOverflowIgnore() {
 
-            Address address = Address.builder()
-                .addressLine1("12345678901234567890")
-                .addressLine2("I am the second line")
-                .addressLine3("abcdefghijk12345678901234567890 zxcvbnmzxcvbnm")
-                .postTown("there is something here")
-                .build();
+            Address address = new Address();
+            address.setAddressLine1("12345678901234567890");
+            address.setAddressLine2("I am the second line");
+            address.setAddressLine3("abcdefghijk12345678901234567890 zxcvbnmzxcvbnm");
+            address.setPostTown("there is something here");
 
             Address result = mapper.splitLongerLines(address);
 
@@ -292,11 +277,10 @@ class AddressLinesMapperTest {
 
         @Test
         void shouldSplitAddressBySpace_whenSplittingSpreadsOverThreeLinesWithSpaces() {
-            Address address = Address.builder()
-                .addressLine1("1234567890 1234567890")
-                .addressLine2("I am the second line")
-                .addressLine3("abcdefghijk 1234567890   1234567890 1234567899,zxcvbnmzxcvbnm 12345")
-                .build();
+            Address address = new Address();
+            address.setAddressLine1("1234567890 1234567890");
+            address.setAddressLine2("I am the second line");
+            address.setAddressLine3("abcdefghijk 1234567890   1234567890 1234567899,zxcvbnmzxcvbnm 12345");
 
             Address result = mapper.splitLongerLines(address);
 
@@ -308,10 +292,9 @@ class AddressLinesMapperTest {
 
         @Test
         void shouldSplitAddressBySpace_whenSplittingLeavesIndividualLineExceedingLimit() {
-            Address address = Address.builder()
-                .addressLine1("12345678901234567890")
-                .addressLine2("12345678901234567890abcdefghijk12345678901234567890,zxcvbnmzxcvbnm")
-                .build();
+            Address address = new Address();
+            address.setAddressLine1("12345678901234567890");
+            address.setAddressLine2("12345678901234567890abcdefghijk12345678901234567890,zxcvbnmzxcvbnm");
 
             Address result = mapper.splitLongerLines(address);
 
@@ -323,10 +306,9 @@ class AddressLinesMapperTest {
 
         @Test
         void shouldSplitAddressBySpace_whenSplittingBySpaceLeavesIndividualLineExceedingLimit() {
-            Address address = Address.builder()
-                .addressLine1("12345678901234567890abcdefghijk 12345678901234567890, zxcvbnmzxcvbnm")
-                .addressLine2("123456789012345678901")
-                .build();
+            Address address = new Address();
+            address.setAddressLine1("12345678901234567890abcdefghijk 12345678901234567890, zxcvbnmzxcvbnm");
+            address.setAddressLine2("123456789012345678901");
 
             Address result = mapper.splitLongerLines(address);
 
@@ -355,9 +337,8 @@ class AddressLinesMapperTest {
 
         @Test
         void shouldReturnOriginalAddress_whenLineLongerThanLimitButNoComma() {
-            Address address = Address.builder()
-                .addressLine1("12345678901234567890abcdefghijk12345678901234567890")
-                .build();
+            Address address = new Address();
+            address.setAddressLine1("12345678901234567890abcdefghijk12345678901234567890");
 
             Address result = mapper.splitLongerLines(address);
 

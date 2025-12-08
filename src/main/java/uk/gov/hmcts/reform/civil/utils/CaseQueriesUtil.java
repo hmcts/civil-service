@@ -48,22 +48,21 @@ public class CaseQueriesUtil {
     }
 
     // Still required as QM collections are not migrated after NOC so still necessary to update the old query collection party name.
-    public static void updateQueryCollectionPartyName(List<String> roles, MultiPartyScenario scenario, CaseData.CaseDataBuilder builder) {
-        CaseData caseData = builder.build();
+    public static void updateQueryCollectionPartyName(List<String> roles, MultiPartyScenario scenario, CaseData caseData) {
         String partyName = getQueryCollectionPartyName(roles, scenario);
 
         if (isApplicantSolicitor(roles)) {
-            builder.qmApplicantSolicitorQueries(updateQueryCollectionPartyName(
+            caseData.setQmApplicantSolicitorQueries(updateQueryCollectionPartyName(
                 caseData.getQmApplicantSolicitorQueries(),
                 partyName
             ));
         } else if (isRespondentSolicitorOne(roles)) {
-            builder.qmRespondentSolicitor1Queries(updateQueryCollectionPartyName(
+            caseData.setQmRespondentSolicitor1Queries(updateQueryCollectionPartyName(
                 caseData.getQmRespondentSolicitor1Queries(),
                 partyName
             ));
         } else if (isRespondentSolicitorTwo(roles)) {
-            builder.qmRespondentSolicitor2Queries(updateQueryCollectionPartyName(
+            caseData.setQmRespondentSolicitor2Queries(updateQueryCollectionPartyName(
                 caseData.getQmRespondentSolicitor2Queries(),
                 partyName
             ));
@@ -73,7 +72,10 @@ public class CaseQueriesUtil {
     }
 
     private static CaseQueriesCollection updateQueryCollectionPartyName(CaseQueriesCollection collection, String partyName) {
-        return nonNull(collection) && nonNull(partyName) ? collection.toBuilder().partyName(partyName).build() : collection;
+        if (nonNull(collection) && nonNull(partyName)) {
+            collection.setPartyName(partyName);
+        }
+        return collection;
     }
 
     public static String getQueryCollectionPartyName(List<String> roles, MultiPartyScenario scenario) {
