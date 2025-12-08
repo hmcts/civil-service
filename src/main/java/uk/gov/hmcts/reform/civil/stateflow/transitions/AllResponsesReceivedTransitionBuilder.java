@@ -54,8 +54,8 @@ public class AllResponsesReceivedTransitionBuilder extends MidTransitionBuilder 
             .onlyWhen(DivergencePredicate.divergentRespondGoOfflineSpec, transitions)
             .moveTo(DIVERGENT_RESPOND_GO_OFFLINE, transitions)
             .onlyWhen(ResponsePredicate.isType(RespondentResponseTypeSpec.FULL_ADMISSION), transitions)
-            .moveTo(DIVERGENT_RESPOND_GO_OFFLINE, transitions).
-            onlyWhen(ResponsePredicate.isType(RespondentResponseTypeSpec.PART_ADMISSION), transitions)
+            .moveTo(DIVERGENT_RESPOND_GO_OFFLINE, transitions)
+            .onlyWhen(ResponsePredicate.isType(RespondentResponseTypeSpec.PART_ADMISSION), transitions)
             .moveTo(DIVERGENT_RESPOND_GO_OFFLINE, transitions)
             .onlyWhen(ResponsePredicate.isType(RespondentResponseTypeSpec.COUNTER_CLAIM), transitions)
             .moveTo(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE, transitions)
