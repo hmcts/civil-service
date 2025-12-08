@@ -491,7 +491,7 @@ class CcdClaimStatusDashboardFactoryTest {
         DashboardClaimStatus status =
             ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
                 claim, featureToggleService, Collections.emptyList()));
-        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIM_ENDED);
+        assertThat(status).isEqualTo(DashboardClaimStatus.NO_STATUS);
     }
 
     @Test
