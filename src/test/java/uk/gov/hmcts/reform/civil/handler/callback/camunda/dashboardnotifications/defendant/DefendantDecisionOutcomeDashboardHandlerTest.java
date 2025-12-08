@@ -66,15 +66,13 @@ class DefendantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldRecordScenario_whenInvokedWhenCaseProgressionSmallClaims() {
-            CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .responseClaimTrack("SMALL_CLAIM")
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setResponseClaimTrack("SMALL_CLAIM");
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(UPDATE_DASHBOARD_TASK_LIST_DEFENDANT_DECISION_OUTCOME.name()).build()
             ).build();
 
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             handler.handle(params);
@@ -91,16 +89,14 @@ class DefendantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldRecordScenario_whenInvokedWhenCaseProgressionFastTrack() {
-            CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .responseClaimTrack("FAST_CLAIM")
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setResponseClaimTrack("FAST_CLAIM");
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(UPDATE_DASHBOARD_TASK_LIST_DEFENDANT_DECISION_OUTCOME.name()).build()
             ).build();
 
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             handler.handle(params);
@@ -117,11 +113,10 @@ class DefendantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldRecordScenario_whenInvokedWhenCaseProgressionFastTrack_TrialReadinessDone() {
-            CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .responseClaimTrack("FAST_CLAIM")
-                .trialReadyRespondent1(YesOrNo.YES)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setResponseClaimTrack("FAST_CLAIM");
+            caseData.setTrialReadyRespondent1(YesOrNo.YES);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(UPDATE_DASHBOARD_TASK_LIST_DEFENDANT_DECISION_OUTCOME.name()).build()
@@ -130,7 +125,6 @@ class DefendantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHandlerTe
             HashMap<String, Object> scenarioParams = new HashMap<>();
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
 
             handler.handle(params);
 

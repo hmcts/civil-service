@@ -184,13 +184,12 @@ public class LocationHelper {
      * Updates both caseManagementLocation and locationName with the same LocationRefData to ease not forgetting
      * about one of those.
      *
-     * @param builder  (mandatory) to build a case data
+     * @param caseData  (mandatory) to build case data
      * @param location (mandatory) what to update with
      */
-    public static void updateWithLocation(CaseData.CaseDataBuilder<?, ?> builder, LocationRefData location) {
-        builder
-            .caseManagementLocation(buildCaseLocation(location))
-            .locationName(location.getSiteName());
+    public static void updateWithLocation(CaseData caseData, LocationRefData location) {
+        caseData.setCaseManagementLocation(buildCaseLocation(location));
+        caseData.setLocationName(location.getSiteName());
     }
 
     /**

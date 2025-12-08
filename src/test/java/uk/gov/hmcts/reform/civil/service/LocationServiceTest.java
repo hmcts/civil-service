@@ -42,22 +42,28 @@ class LocationServiceTest {
     @MockBean
     private FeatureToggleService featureToggleService;
 
-    private static final Respondent1DQ respondent1DQ =
-        Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder()
-                                                                .responseCourtCode("respondent1DQRequestedCourt")
-                                                                .caseLocation(CaseLocationCivil.builder()
-                                                                                  .region("2")
-                                                                                  .baseLocation("11111")
-                                                                                  .build())
-                                                                .build()).build();
-    private static final Respondent2DQ respondent2DQ =
-        Respondent2DQ.builder().respondent2DQRequestedCourt(RequestedCourt.builder()
-                                                                .responseCourtCode("respondent2DQRequestedCourt")
-                                                                .caseLocation(CaseLocationCivil.builder()
-                                                                                  .region("3")
-                                                                                  .baseLocation("22222")
-                                                                                  .build())
-                                                                .build()).build();
+    private static final Respondent1DQ respondent1DQ;
+    private static final Respondent2DQ respondent2DQ;
+
+    static {
+        CaseLocationCivil location1 = new CaseLocationCivil();
+        location1.setRegion("2");
+        location1.setBaseLocation("11111");
+        RequestedCourt requestedCourt1 = new RequestedCourt();
+        requestedCourt1.setResponseCourtCode("respondent1DQRequestedCourt");
+        requestedCourt1.setCaseLocation(location1);
+        respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt1);
+
+        CaseLocationCivil location2 = new CaseLocationCivil();
+        location2.setRegion("3");
+        location2.setBaseLocation("22222");
+        RequestedCourt requestedCourt2 = new RequestedCourt();
+        requestedCourt2.setResponseCourtCode("respondent2DQRequestedCourt");
+        requestedCourt2.setCaseLocation(location2);
+        respondent2DQ = new Respondent2DQ();
+        respondent2DQ.setRespondent2DQRequestedCourt(requestedCourt2);
+    }
 
     @Test
     void shouldThrowException_whenApplicationMadeAfterSDOMainCaseCMLNotInRefDataQMoff() {
@@ -125,12 +131,13 @@ class LocationServiceTest {
     }
 
     protected  uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil getExpectedGACaseLocation() {
-        return uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil.builder()
-            .region("xxxxx")
-            .baseLocation("xxxxx")
-            .siteName("xxxxx")
-            .address("xxxxx")
-            .postcode("xxxxx")
-            .build();
+        uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil caseLocationCivil = 
+            new uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil();
+        caseLocationCivil.setRegion("xxxxx");
+        caseLocationCivil.setBaseLocation("xxxxx");
+        caseLocationCivil.setSiteName("xxxxx");
+        caseLocationCivil.setAddress("xxxxx");
+        caseLocationCivil.setPostcode("xxxxx");
+        return caseLocationCivil;
     }
 }

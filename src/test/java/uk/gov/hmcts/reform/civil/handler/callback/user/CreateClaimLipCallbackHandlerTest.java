@@ -140,15 +140,17 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldInitializePartyID_whenInvoked() {
+            Party party = new Party();
+            party.setType(Party.Type.INDIVIDUAL);
+            party.setPartyName(DEFENDANT_PARTY_NAME);
+            party.setPartyEmail(DEFENDANT_EMAIL_ADDRESS);
+            Party party1 = new Party();
+            party1.setType(Party.Type.ORGANISATION);
+            party1.setPartyName("Test Inc");
+            party1.setPartyEmail("claimant@email.com");
             caseData = CaseDataBuilder.builder()
-                .respondent1(Party.builder()
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName(DEFENDANT_PARTY_NAME)
-                                 .partyEmail(DEFENDANT_EMAIL_ADDRESS).build())
-                .applicant1(Party.builder()
-                                .type(Party.Type.ORGANISATION)
-                                .partyName("Test Inc")
-                                .partyEmail("claimant@email.com").build())
+                .respondent1(party)
+                .applicant1(party1)
                 .build();
 
             caseData.setRespondent1(PartyUtils.appendWithNewPartyId(caseData.getRespondent1()));
@@ -167,19 +169,20 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAddCaseReferenceSubmittedDateAndAllocatedTrack_whenInvoked() {
+            Party party = new Party();
+            party.setType(Party.Type.INDIVIDUAL);
+            party.setPartyName(CLAIMANT_PARTY_NAME);
+            party.setIndividualFirstName("Clay");
+            party.setIndividualLastName("Mint");
+            Party party1 = new Party();
+            party1.setType(Party.Type.INDIVIDUAL);
+            party1.setPartyName(DEFENDANT_PARTY_NAME);
+            party1.setIndividualFirstName("Dave");
+            party1.setIndividualLastName("Indent");
+            party1.setPartyEmail(DEFENDANT_EMAIL_ADDRESS);
             caseData = CaseDataBuilder.builder()
-                .applicant1(Party.builder()
-                                .type(Party.Type.INDIVIDUAL)
-                                .partyName(CLAIMANT_PARTY_NAME)
-                                .individualFirstName("Clay")
-                                .individualLastName("Mint")
-                                .build())
-                .respondent1(Party.builder()
-                    .type(Party.Type.INDIVIDUAL)
-                    .partyName(DEFENDANT_PARTY_NAME)
-                    .individualFirstName("Dave")
-                    .individualLastName("Indent")
-                    .partyEmail(DEFENDANT_EMAIL_ADDRESS).build())
+                .applicant1(party)
+                .respondent1(party1)
                 .build();
 
             CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(

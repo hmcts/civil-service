@@ -68,14 +68,14 @@ class HearingFeePaidClaimantNotificationHandlerTest extends BaseCallbackHandlerT
 
         @Test
         void shouldRecordScenario_whenInvokedWhenHwFRemissionNotGranted() {
+            FeePaymentOutcomeDetails feePaymentOutcomeDetails = new FeePaymentOutcomeDetails();
+            feePaymentOutcomeDetails.setHwfFullRemissionGrantedForHearingFee(YesOrNo.NO);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim().hwfFeeType(FeeType.HEARING)
-                .feePaymentOutcomeDetails(
-                    FeePaymentOutcomeDetails.builder().hwfFullRemissionGrantedForHearingFee(YesOrNo.NO).build())
+                .feePaymentOutcomeDetails(feePaymentOutcomeDetails)
                 .applicant1Represented(YesOrNo.NO).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_HEARING_FEE_PAID_CLAIMANT.name()).build()
@@ -95,11 +95,13 @@ class HearingFeePaidClaimantNotificationHandlerTest extends BaseCallbackHandlerT
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
                 .applicant1Represented(YesOrNo.NO)
                 .build();
-            caseData = caseData.toBuilder().hearingFeePaymentDetails(PaymentDetails.builder().status(SUCCESS).reference("REFERENCE").build()).build();
+            PaymentDetails paymentDetails = new PaymentDetails();
+            paymentDetails.setStatus(SUCCESS);
+            paymentDetails.setReference("REFERENCE");
+            caseData.setHearingFeePaymentDetails(paymentDetails);
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_HEARING_FEE_PAID_CLAIMANT.name()).build()
@@ -119,8 +121,6 @@ class HearingFeePaidClaimantNotificationHandlerTest extends BaseCallbackHandlerT
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
                 .applicant1Represented(YesOrNo.YES)
                 .build();
-
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_HEARING_FEE_PAID_CLAIMANT.name()).build()

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +16,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
@@ -40,26 +38,18 @@ class BundleCreationClaimantNotificationHandlerTest extends BaseCallbackHandlerT
     private DashboardScenariosService dashboardScenariosService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
-    @Mock
-    private FeatureToggleService toggleService;
 
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void setup() {
-            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
-        }
-
         @Test
         void shouldRecordScenario_whenInvokedWhenNotTrialReady() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .drawDirectionsOrderRequired(YesOrNo.YES)
-                .drawDirectionsOrderSmallClaims(NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .orderType(OrderType.DECIDE_DAMAGES)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
+            caseData.setDrawDirectionsOrderSmallClaims(NO);
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setOrderType(OrderType.DECIDE_DAMAGES);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_BUNDLE_CREATED_FOR_CLAIMANT1.name()).build()
             ).build();
@@ -100,13 +90,12 @@ class BundleCreationClaimantNotificationHandlerTest extends BaseCallbackHandlerT
 
         @Test
         void shouldRecordScenario_whenInvokedWhenTrialReady() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyApplicant().build().toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .drawDirectionsOrderRequired(YesOrNo.YES)
-                .drawDirectionsOrderSmallClaims(NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .orderType(OrderType.DECIDE_DAMAGES)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyApplicant().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
+            caseData.setDrawDirectionsOrderSmallClaims(NO);
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setOrderType(OrderType.DECIDE_DAMAGES);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_BUNDLE_CREATED_FOR_CLAIMANT1.name()).build()
             ).build();
