@@ -74,8 +74,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime claimNotificationDate = time.now();
 
-        final CaseData.CaseDataBuilder caseDataBuilder
-            = caseData.toBuilder().claimNotificationDate(claimNotificationDate);
+        caseData.setClaimNotificationDate(claimNotificationDate);
         String targetEmail = isRespondent1Event(callbackParams)
             || caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES
             ? caseData.getRespondentSolicitor1EmailAddress()
@@ -98,17 +97,17 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
 
         if (!isRespondent1Event(callbackParams) && !YesOrNo.YES.equals(caseData.getAddRespondent2())) {
             return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseDataBuilder.build().toMap(objectMapper))
+                .data(caseData.toMap(objectMapper))
                 .build();
         } else if (YesOrNo.YES.equals(caseData.getRespondent2SameLegalRepresentative())) {
             return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseDataBuilder.build().toMap(objectMapper))
+                .data(caseData.toMap(objectMapper))
                 .state("AWAITING_RESPONDENT_ACKNOWLEDGEMENT")
                 .build();
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .state("AWAITING_RESPONDENT_ACKNOWLEDGEMENT")
             .build();
     }
