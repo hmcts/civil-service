@@ -20,10 +20,6 @@ import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimResponseFormForSpec;
-import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
-import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
-import uk.gov.hmcts.reform.civil.model.referencedata.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
@@ -130,8 +126,7 @@ class SealedClaimResponseFormGeneratorForSpecTest {
                     .build()))
             .respondToAdmittedClaim(RespondToClaim.builder()
                                         .howMuchWasPaid(new BigDecimal("1000")) // £10.00
-                                        .howWasThisAmountPaid(
-                                          .CREDIT_CARD)
+                                        .howWasThisAmountPaid(PaymentMethod.CREDIT_CARD)
                                         .whenWasThisAmountPaid(LocalDate.now().minusDays(1))
                                         .build())
             .build();
