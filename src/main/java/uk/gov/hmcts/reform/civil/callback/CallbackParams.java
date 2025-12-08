@@ -1,19 +1,14 @@
 package uk.gov.hmcts.reform.civil.callback;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import lombok.Getter;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.Map;
 
 @Builder(toBuilder = true)
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
 public class CallbackParams {
 
     private CallbackType type;

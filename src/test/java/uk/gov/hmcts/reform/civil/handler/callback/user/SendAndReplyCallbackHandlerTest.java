@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -60,7 +61,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @SuppressWarnings("unchecked")
 @ExtendWith(MockitoExtension.class)
-class SendAndReplyCallbackHandlerTest {
+class SendAndReplyCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private static final String AUTH_TOKEN = "BEARER_TOKEN";
     private static final Long CASE_ID = 1L;
@@ -191,11 +192,7 @@ class SendAndReplyCallbackHandlerTest {
         void shouldNotInteractWithMessageService_whenSendAndReplyOptionIsSend() {
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setSendAndReplyOption(SEND);
-
-            CallbackParams params = new CallbackParams();
-            params.setCaseData(caseData);
-            params.setType(CallbackType.MID);
-            params.setPageId("populate-message-history");
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "populate-message-history");
 
             handler.handle(params);
 
@@ -218,10 +215,7 @@ class SendAndReplyCallbackHandlerTest {
             when(messageService.renderMessageTableList(message))
                 .thenReturn(expectedTableMarkup);
 
-            CallbackParams params = new CallbackParams();
-            params.setCaseData(caseData);
-            params.setType(CallbackType.MID);
-            params.setPageId("populate-message-history");
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "populate-message-history");
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
