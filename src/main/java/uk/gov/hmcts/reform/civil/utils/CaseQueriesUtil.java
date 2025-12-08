@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.CASEWORKER_QUERY_DOCUMENT_ATTACHMENTS;
 import static java.util.Objects.nonNull;
@@ -109,18 +108,21 @@ public class CaseQueriesUtil {
     }
 
     public static LatestQuery buildLatestQuery(CaseMessage latestCaseMessage) {
-        return Optional.ofNullable(latestCaseMessage)
-            .map(caseMessage -> LatestQuery.builder()
-                .queryId(caseMessage.getId())
-                .isHearingRelated(caseMessage.getIsHearingRelated())
-                .build())
-            .orElse(null);
+        if (latestCaseMessage == null) {
+            return null;
+        }
+        LatestQuery latestQuery = new LatestQuery();
+        latestQuery.setQueryId(latestCaseMessage.getId());
+        latestQuery.setIsHearingRelated(latestCaseMessage.getIsHearingRelated());
+        return latestQuery;
     }
 
     public static LatestQuery buildLatestQuery(CaseMessage latestCaseMessage, CaseData caseData, List<String> roles) {
-        return buildLatestQuery(latestCaseMessage).toBuilder()
-            .isWelsh(isWelshQuery(caseData, roles) ? YesOrNo.YES : YesOrNo.NO)
-            .build();
+        LatestQuery latestQuery = buildLatestQuery(latestCaseMessage);
+        if (latestQuery != null) {
+            latestQuery.setIsWelsh(isWelshQuery(caseData, roles) ? YesOrNo.YES : YesOrNo.NO);
+        }
+        return latestQuery;
     }
 
     public static void assignCategoryIdToAttachments(CaseMessage latestCaseMessage,
@@ -171,10 +173,10 @@ public class CaseQueriesUtil {
         if (hasOldQueries(caseData)) {
             String collectionOwner = "";
             try {
-                caseData.setQueries(CaseQueriesCollection.builder()
-                                    .partyName("All queries")
-                                    .caseMessages(new ArrayList<>())
-                                    .build());
+                CaseQueriesCollection queriesCollection = new CaseQueriesCollection();
+                queriesCollection.setPartyName("All queries");
+                queriesCollection.setCaseMessages(new ArrayList<>());
+                caseData.setQueries(queriesCollection);
                 collectionOwner = "Claimant";
                 migrateQueries(caseData.getQmApplicantSolicitorQueries(), caseData);
                 collectionOwner = "Defendant 1";
@@ -198,7 +200,7 @@ public class CaseQueriesUtil {
             );
             List<Element<CaseMessage>> messages = caseData.getQueries().getCaseMessages();
             messages.addAll(collectionToMigrate.getCaseMessages());
-            caseData.setQueries(caseData.getQueries().toBuilder().caseMessages(messages).build());
+            caseData.getQueries().setCaseMessages(messages);
         }
     }
 

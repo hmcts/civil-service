@@ -58,10 +58,8 @@ class CaseQueriesUtilTest {
     @Test
     void shouldBuildLatestQueryFromCaseMessage() {
         OffsetDateTime createdOn = OffsetDateTime.now();
-        CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
-            .toBuilder()
-            .createdOn(createdOn)
-            .build();
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 3");
+        caseMessage.setCreatedOn(createdOn);
 
         LatestQuery result = CaseQueriesUtil.buildLatestQuery(caseMessage);
         assertEquals("id", result.getQueryId());
@@ -84,16 +82,13 @@ class CaseQueriesUtilTest {
     }, nullValues = "NULL")
     void shouldBuildLatestQueryFromCaseMessage_withLanguagePreference(String caseRole, String claimantLanguage, String defendantLanguage, YesOrNo expected) {
         OffsetDateTime createdOn = OffsetDateTime.now();
-        List<String> roles = List.of(caseRole);
-        CaseData caseData = CaseData.builder()
-            .claimantBilingualLanguagePreference(claimantLanguage)
-            .caseDataLiP(respondentResponseWithLanguagePreference(defendantLanguage))
-            .build();
-        CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
-            .toBuilder()
-            .createdOn(createdOn)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setClaimantBilingualLanguagePreference(claimantLanguage);
+        caseData.setCaseDataLiP(respondentResponseWithLanguagePreference(defendantLanguage));
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 3");
+        caseMessage.setCreatedOn(createdOn);
 
+        List<String> roles = List.of(caseRole);
         LatestQuery result = CaseQueriesUtil.buildLatestQuery(caseMessage, caseData, roles);
 
         assertEquals("id", result.getQueryId());
@@ -102,13 +97,13 @@ class CaseQueriesUtilTest {
 
     @Test
     void shouldAssignCategoryIDToAttachments_whenApplicantUploadsAttachment() {
-        CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
-            .toBuilder()
-            .createdOn(OffsetDateTime.now())
-            .attachments(wrapElements(
-                Document.builder().documentFileName("a").build(),
-                Document.builder().documentFileName("b").build()))
-            .build();
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 3");
+        caseMessage.setCreatedOn(OffsetDateTime.now());
+        Document doc1 = new Document();
+        doc1.setDocumentFileName("a");
+        Document doc2 = new Document();
+        doc2.setDocumentFileName("b");
+        caseMessage.setAttachments(wrapElements(doc1, doc2));
 
         CaseQueriesUtil.assignCategoryIdToAttachments(caseMessage, assignCategoryId,
                                                       List.of(CaseRole.APPLICANTSOLICITORONE.toString()));
@@ -121,14 +116,13 @@ class CaseQueriesUtilTest {
 
     @Test
     void shouldAssignCategoryIDToAttachments_whenDefendantUploadsAttachment() {
-        CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
-            .toBuilder()
-            .createdOn(OffsetDateTime.now())
-            .attachments(wrapElements(
-                Document.builder().documentFileName("a").build(),
-                Document.builder().documentFileName("b").build()
-            ))
-            .build();
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 3");
+        caseMessage.setCreatedOn(OffsetDateTime.now());
+        Document doc1 = new Document();
+        doc1.setDocumentFileName("a");
+        Document doc2 = new Document();
+        doc2.setDocumentFileName("b");
+        caseMessage.setAttachments(wrapElements(doc1, doc2));
 
         CaseQueriesUtil.assignCategoryIdToAttachments(caseMessage, assignCategoryId,
                                                       List.of(CaseRole.DEFENDANT.toString())
@@ -142,14 +136,13 @@ class CaseQueriesUtilTest {
 
     @Test
     void shouldAssignCategoryIDToAttachments_whenClaimantUploadsAttachment() {
-        CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
-            .toBuilder()
-            .createdOn(OffsetDateTime.now())
-            .attachments(wrapElements(
-                Document.builder().documentFileName("a").build(),
-                Document.builder().documentFileName("b").build()
-            ))
-            .build();
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 3");
+        caseMessage.setCreatedOn(OffsetDateTime.now());
+        Document doc1 = new Document();
+        doc1.setDocumentFileName("a");
+        Document doc2 = new Document();
+        doc2.setDocumentFileName("b");
+        caseMessage.setAttachments(wrapElements(doc1, doc2));
 
         CaseQueriesUtil.assignCategoryIdToAttachments(caseMessage, assignCategoryId,
                                                       List.of(CaseRole.CLAIMANT.toString())
@@ -163,13 +156,13 @@ class CaseQueriesUtilTest {
 
     @Test
     void shouldAssignCategoryIDToAttachments_whenRespondent1UploadsAttachment() {
-        CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
-            .toBuilder()
-            .createdOn(OffsetDateTime.now())
-            .attachments(wrapElements(
-                Document.builder().documentFileName("a").build(),
-                Document.builder().documentFileName("b").build()))
-            .build();
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 3");
+        caseMessage.setCreatedOn(OffsetDateTime.now());
+        Document doc1 = new Document();
+        doc1.setDocumentFileName("a");
+        Document doc2 = new Document();
+        doc2.setDocumentFileName("b");
+        caseMessage.setAttachments(wrapElements(doc1, doc2));
 
         CaseQueriesUtil.assignCategoryIdToAttachments(caseMessage, assignCategoryId,
                                                       List.of(CaseRole.RESPONDENTSOLICITORONE.toString()));
@@ -182,13 +175,13 @@ class CaseQueriesUtilTest {
 
     @Test
     void shouldAssignCategoryIDToAttachments_whenRespondent2UploadsAttachment() {
-        CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
-            .toBuilder()
-            .createdOn(OffsetDateTime.now())
-            .attachments(wrapElements(
-                Document.builder().documentFileName("a").build(),
-                Document.builder().documentFileName("b").build()))
-            .build();
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 3");
+        caseMessage.setCreatedOn(OffsetDateTime.now());
+        Document doc1 = new Document();
+        doc1.setDocumentFileName("a");
+        Document doc2 = new Document();
+        doc2.setDocumentFileName("b");
+        caseMessage.setAttachments(wrapElements(doc1, doc2));
 
         CaseQueriesUtil.assignCategoryIdToAttachments(caseMessage, assignCategoryId,
                                                       List.of(CaseRole.RESPONDENTSOLICITORTWO.toString()));
@@ -201,13 +194,13 @@ class CaseQueriesUtilTest {
 
     @Test
     void shouldThrowError_whenUserHasUnsupportedRole() {
-        CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
-            .toBuilder()
-            .createdOn(OffsetDateTime.now())
-            .attachments(wrapElements(
-                Document.builder().documentFileName("a").build(),
-                Document.builder().documentFileName("b").build()))
-            .build();
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 3");
+        caseMessage.setCreatedOn(OffsetDateTime.now());
+        Document doc1 = new Document();
+        doc1.setDocumentFileName("a");
+        Document doc2 = new Document();
+        doc2.setDocumentFileName("b");
+        caseMessage.setAttachments(wrapElements(doc1, doc2));
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
             CaseQueriesUtil.assignCategoryIdToAttachments(caseMessage, assignCategoryId,
@@ -219,9 +212,10 @@ class CaseQueriesUtilTest {
 
     @Test
     void shouldReturnNull_whenNoQueryFoundForId() {
-        CaseData caseData = CaseData.builder()
-            .queries(CaseQueriesCollection.builder().caseMessages(List.of()).build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        CaseQueriesCollection queries = new CaseQueriesCollection();
+        queries.setCaseMessages(List.of());
+        caseData.setQueries(queries);
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
             CaseQueriesUtil.getQueryById(caseData, "1")
@@ -232,20 +226,17 @@ class CaseQueriesUtilTest {
 
     @Test
     void shouldReturnQuery_whenQueryFoundForId() {
-        CaseQueriesCollection queries = CaseQueriesCollection.builder()
-            .caseMessages(wrapElements(CaseMessage.builder()
-                                           .id("1")
-                                           .build(),
-                                       CaseMessage.builder()
-                                           .id("2")
-                                           .build(),
-                                       CaseMessage.builder()
-                                           .id("3")
-                                           .build()))
-            .build();
-        CaseData caseData = CaseData.builder()
-            .ccdCaseReference(1L)
-            .queries(queries).build();
+        CaseMessage msg1 = new CaseMessage();
+        msg1.setId("1");
+        CaseMessage msg2 = new CaseMessage();
+        msg2.setId("2");
+        CaseMessage msg3 = new CaseMessage();
+        msg3.setId("3");
+        CaseQueriesCollection queries = new CaseQueriesCollection();
+        queries.setCaseMessages(wrapElements(msg1, msg2, msg3));
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1L);
+        caseData.setQueries(queries);
 
         CaseMessage latestQuery = CaseQueriesUtil.getQueryById(caseData, "2");
 
@@ -255,17 +246,15 @@ class CaseQueriesUtilTest {
     @Test
     void shouldReturnApplicantRole_whenQueryFoundForId() {
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.toString()));
-        CaseQueriesCollection applicantQuery = CaseQueriesCollection.builder()
-            .roleOnCase("applicant-solicitor")
-            .caseMessages(wrapElements(CaseMessage.builder()
-                                           .id("1")
-                                           .build()))
-            .build();
+        CaseMessage applicantMsg = new CaseMessage();
+        applicantMsg.setId("1");
+        CaseQueriesCollection applicantQuery = new CaseQueriesCollection();
+        applicantQuery.setRoleOnCase("applicant-solicitor");
+        applicantQuery.setCaseMessages(wrapElements(applicantMsg));
 
-        CaseData caseData = CaseData.builder()
-            .ccdCaseReference(1L)
-            .queries(applicantQuery)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1L);
+        caseData.setQueries(applicantQuery);
 
         List<String> roles = CaseQueriesUtil.getUserRoleForQuery(caseData, coreCaseUserService, "1");
 
@@ -276,17 +265,15 @@ class CaseQueriesUtilTest {
     void shouldReturnRespondent1Role_whenQueryFoundForId() {
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CaseRole.RESPONDENTSOLICITORONE.toString()));
 
-        CaseQueriesCollection respondent1Query = CaseQueriesCollection.builder()
-            .roleOnCase("respondent-solicitor-1")
-            .caseMessages(wrapElements(CaseMessage.builder()
-                                           .id("2")
-                                           .build()))
-            .build();
+        CaseMessage respondent1Msg = new CaseMessage();
+        respondent1Msg.setId("2");
+        CaseQueriesCollection respondent1Query = new CaseQueriesCollection();
+        respondent1Query.setRoleOnCase("respondent-solicitor-1");
+        respondent1Query.setCaseMessages(wrapElements(respondent1Msg));
 
-        CaseData caseData = CaseData.builder()
-            .ccdCaseReference(1L)
-            .queries(respondent1Query)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1L);
+        caseData.setQueries(respondent1Query);
 
         List<String> roles = CaseQueriesUtil.getUserRoleForQuery(caseData, coreCaseUserService, "2");
 
@@ -297,15 +284,14 @@ class CaseQueriesUtilTest {
     void shouldReturnRespondent2Role_whenQueryFoundForId() {
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CaseRole.RESPONDENTSOLICITORTWO.toString()));
 
-        CaseQueriesCollection respondent2Query = CaseQueriesCollection.builder()
-            .roleOnCase("respondent-solicitor-2")
-            .caseMessages(wrapElements(CaseMessage.builder()
-                                           .id("3")
-                                           .build()))
-            .build();
-        CaseData caseData = CaseData.builder()
-            .ccdCaseReference(1L)
-            .queries(respondent2Query).build();
+        CaseMessage respondent2Msg = new CaseMessage();
+        respondent2Msg.setId("3");
+        CaseQueriesCollection respondent2Query = new CaseQueriesCollection();
+        respondent2Query.setRoleOnCase("respondent-solicitor-2");
+        respondent2Query.setCaseMessages(wrapElements(respondent2Msg));
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1L);
+        caseData.setQueries(respondent2Query);
 
         List<String> roles = CaseQueriesUtil.getUserRoleForQuery(caseData, coreCaseUserService, "3");
 
@@ -316,9 +302,10 @@ class CaseQueriesUtilTest {
     void shouldUpdateApplicantSolicitorQueries_WhenRoleIsApplicantSolicitor() {
         List<String> roles = List.of("APPLICANTSOLICITORONE");
         MultiPartyScenario scenario = MultiPartyScenario.ONE_V_ONE;
-        CaseData caseData = CaseData.builder()
-            .qmApplicantSolicitorQueries(CaseQueriesCollection.builder().partyName("Old Name").build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        CaseQueriesCollection applicantQueries = new CaseQueriesCollection();
+        applicantQueries.setPartyName("Old Name");
+        caseData.setQmApplicantSolicitorQueries(applicantQueries);
 
         CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, caseData);
 
@@ -329,9 +316,10 @@ class CaseQueriesUtilTest {
     void shouldUpdateRespondentSolicitor1Queries_WhenRoleIsRespondentSolicitor1() {
         List<String> roles = List.of("RESPONDENTSOLICITORONE");
         MultiPartyScenario scenario = MultiPartyScenario.ONE_V_ONE;
-        CaseData caseData = CaseData.builder()
-            .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Old Name").build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        CaseQueriesCollection respondent1Queries = new CaseQueriesCollection();
+        respondent1Queries.setPartyName("Old Name");
+        caseData.setQmRespondentSolicitor1Queries(respondent1Queries);
 
         CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, caseData);
 
@@ -342,9 +330,10 @@ class CaseQueriesUtilTest {
     void shouldUpdateRespondentSolicitor1Queries_WhenRoleIsRespondentSolicitor1_1v2Diff() {
         List<String> roles = List.of("RESPONDENTSOLICITORONE");
         MultiPartyScenario scenario = MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
-        CaseData caseData = CaseData.builder()
-            .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Old Name").build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        CaseQueriesCollection respondent1Queries = new CaseQueriesCollection();
+        respondent1Queries.setPartyName("Old Name");
+        caseData.setQmRespondentSolicitor1Queries(respondent1Queries);
 
         CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, caseData);
 
@@ -355,9 +344,10 @@ class CaseQueriesUtilTest {
     void shouldUpdateRespondentSolicitor2Queries_WhenRoleIsRespondentSolicitor2() {
         List<String> roles = List.of("RESPONDENTSOLICITORTWO");
         MultiPartyScenario scenario = MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
-        CaseData caseData = CaseData.builder()
-            .qmRespondentSolicitor2Queries(CaseQueriesCollection.builder().partyName("Old Name").build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        CaseQueriesCollection respondent2Queries = new CaseQueriesCollection();
+        respondent2Queries.setPartyName("Old Name");
+        caseData.setQmRespondentSolicitor2Queries(respondent2Queries);
 
         CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, caseData);
 
@@ -368,9 +358,10 @@ class CaseQueriesUtilTest {
     void shouldUpdateRespondentSolicitor1Queries_WhenRoleIsRespondentSolicitor1_1v2Same() {
         List<String> roles = List.of("RESPONDENTSOLICITORONE");
         MultiPartyScenario scenario = MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
-        CaseData caseData = CaseData.builder()
-            .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Old Name").build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        CaseQueriesCollection respondent1Queries = new CaseQueriesCollection();
+        respondent1Queries.setPartyName("Old Name");
+        caseData.setQmRespondentSolicitor1Queries(respondent1Queries);
 
         CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, caseData);
 
@@ -381,7 +372,7 @@ class CaseQueriesUtilTest {
     void shouldThrowException_WhenRoleIsUnsupported() {
         List<String> roles = List.of("UNSUPPORTEDROLE");
         MultiPartyScenario scenario = MultiPartyScenario.ONE_V_ONE;
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
             CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, caseData)
@@ -391,29 +382,43 @@ class CaseQueriesUtilTest {
     }
 
     private CaseMessage buildCaseMessage(String id, String subject) {
-        return CaseMessage.builder()
-            .id(id)
-            .subject(subject)
-            .name("John Doe")
-            .body("Sample body text")
-            .attachments(List.of())
-            .isHearingRelated(NO)
-            .hearingDate(LocalDate.now())
-            .createdOn(OffsetDateTime.now())
-            .createdBy("System")
-            .build();
+        CaseMessage caseMessage = new CaseMessage();
+        caseMessage.setId(id);
+        caseMessage.setSubject(subject);
+        caseMessage.setName("John Doe");
+        caseMessage.setBody("Sample body text");
+        caseMessage.setAttachments(List.of());
+        caseMessage.setIsHearingRelated(NO);
+        caseMessage.setHearingDate(LocalDate.now());
+        caseMessage.setCreatedOn(OffsetDateTime.now());
+        caseMessage.setCreatedBy("System");
+        return caseMessage;
     }
 
     @Test
     void shouldMigrateAllQueries_whenOldQueriesExist() {
-        List<Element<CaseMessage>> applicantMessages = wrapElements(CaseMessage.builder().id("app1").createdOn(OffsetDateTime.now()).build());
-        List<Element<CaseMessage>> respondent1Messages = wrapElements(CaseMessage.builder().id("res1").createdOn(OffsetDateTime.now().plusHours(1)).build());
-        List<Element<CaseMessage>> respondent2Messages = wrapElements(CaseMessage.builder().id("res2").createdOn(OffsetDateTime.now().plusHours(2)).build());
-
+        CaseMessage appMsg = new CaseMessage();
+        appMsg.setId("app1");
+        appMsg.setCreatedOn(OffsetDateTime.now());
+        List<Element<CaseMessage>> applicantMessages = wrapElements(appMsg);
+        CaseMessage res1Msg = new CaseMessage();
+        res1Msg.setId("res1");
+        res1Msg.setCreatedOn(OffsetDateTime.now().plusHours(1));
+        List<Element<CaseMessage>> respondent1Messages = wrapElements(res1Msg);
+        CaseQueriesCollection applicantQueries = new CaseQueriesCollection();
+        applicantQueries.setCaseMessages(applicantMessages);
         CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setQmApplicantSolicitorQueries(CaseQueriesCollection.builder().caseMessages(applicantMessages).build());
-        caseData.setQmRespondentSolicitor1Queries(CaseQueriesCollection.builder().caseMessages(respondent1Messages).build());
-        caseData.setQmRespondentSolicitor2Queries(CaseQueriesCollection.builder().caseMessages(respondent2Messages).build());
+        caseData.setQmApplicantSolicitorQueries(applicantQueries);
+        CaseQueriesCollection respondent1Queries = new CaseQueriesCollection();
+        respondent1Queries.setCaseMessages(respondent1Messages);
+        caseData.setQmRespondentSolicitor1Queries(respondent1Queries);
+        CaseQueriesCollection respondent2Queries = new CaseQueriesCollection();
+        CaseMessage res2Msg = new CaseMessage();
+        res2Msg.setId("res2");
+        res2Msg.setCreatedOn(OffsetDateTime.now().plusHours(2));
+        List<Element<CaseMessage>> respondent2Messages = wrapElements(res2Msg);
+        respondent2Queries.setCaseMessages(respondent2Messages);
+        caseData.setQmRespondentSolicitor2Queries(respondent2Queries);
 
         CaseQueriesUtil.migrateAllQueries(caseData);
 
@@ -436,7 +441,10 @@ class CaseQueriesUtilTest {
     @Test
     void shouldNotConsumeOriginalException() {
         CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setQmApplicantSolicitorQueries(CaseQueriesCollection.builder().caseMessages(List.of(element(CaseMessage.builder().build()))).build());
+        CaseMessage caseMsg = new CaseMessage();
+        CaseQueriesCollection applicantQueries = new CaseQueriesCollection();
+        applicantQueries.setCaseMessages(List.of(element(caseMsg)));
+        caseData.setQmApplicantSolicitorQueries(applicantQueries);
 
         try (MockedStatic<CaseQueriesUtil> mockedStatic = mockStatic(CaseQueriesUtil.class)) {
             NullPointerException expectedException = new NullPointerException("Simulated migration failure");
@@ -457,9 +465,9 @@ class CaseQueriesUtilTest {
     @Test
     void shouldClearOldQueryCollections_whenOldQueriesExist() {
         CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setQmApplicantSolicitorQueries(CaseQueriesCollection.builder().build());
-        caseData.setQmRespondentSolicitor1Queries(CaseQueriesCollection.builder().build());
-        caseData.setQmRespondentSolicitor2Queries(CaseQueriesCollection.builder().build());
+        caseData.setQmApplicantSolicitorQueries(new CaseQueriesCollection());
+        caseData.setQmRespondentSolicitor1Queries(new CaseQueriesCollection());
+        caseData.setQmRespondentSolicitor2Queries(new CaseQueriesCollection());
 
         CaseQueriesUtil.clearOldQueryCollections(caseData);
 
@@ -481,27 +489,42 @@ class CaseQueriesUtilTest {
 
     @Test
     void shouldNotError_whenOldQueriesExistWhileLoggingMigrationSuccess() {
-        List<Element<CaseMessage>> applicantMessages = wrapElements(CaseMessage.builder().id("app1").createdOn(OffsetDateTime.now()).build());
-        List<Element<CaseMessage>> respondent1Messages = wrapElements(CaseMessage.builder().id("res1").createdOn(OffsetDateTime.now().plusHours(1)).build());
-        List<Element<CaseMessage>> respondent2Messages = wrapElements(CaseMessage.builder().id("res2").createdOn(OffsetDateTime.now().plusHours(2)).build());
+        CaseMessage appMsg = new CaseMessage();
+        appMsg.setId("app1");
+        appMsg.setCreatedOn(OffsetDateTime.now());
+        List<Element<CaseMessage>> applicantMessages = wrapElements(appMsg);
+        CaseMessage res1Msg = new CaseMessage();
+        res1Msg.setId("res1");
+        res1Msg.setCreatedOn(OffsetDateTime.now().plusHours(1));
+        List<Element<CaseMessage>> respondent1Messages = wrapElements(res1Msg);
+        CaseQueriesCollection applicantQueries = new CaseQueriesCollection();
+        applicantQueries.setCaseMessages(applicantMessages);
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setQmApplicantSolicitorQueries(applicantQueries);
+        CaseQueriesCollection respondent1Queries = new CaseQueriesCollection();
+        respondent1Queries.setCaseMessages(respondent1Messages);
+        caseData.setQmRespondentSolicitor1Queries(respondent1Queries);
+        CaseQueriesCollection respondent2Queries = new CaseQueriesCollection();
+        CaseMessage res2Msg = new CaseMessage();
+        res2Msg.setId("res2");
+        res2Msg.setCreatedOn(OffsetDateTime.now().plusHours(2));
+        List<Element<CaseMessage>> respondent2Messages = wrapElements(res2Msg);
+        respondent2Queries.setCaseMessages(respondent2Messages);
+        caseData.setQmRespondentSolicitor2Queries(respondent2Queries);
 
-        CaseData.CaseDataBuilder builder = CaseData.builder()
-            .qmApplicantSolicitorQueries(CaseQueriesCollection.builder().caseMessages(applicantMessages).build())
-            .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().caseMessages(respondent1Messages).build())
-            .qmRespondentSolicitor2Queries(CaseQueriesCollection.builder().caseMessages(respondent2Messages).build());
-
-        CaseQueriesUtil.logMigrationSuccess(builder.build());
+        CaseQueriesUtil.logMigrationSuccess(caseData);
     }
 
     @Test
     void shouldNotError_whenNoOldQueriesExistWhileLoggingMigrationSuccess() {
-        CaseQueriesUtil.logMigrationSuccess(CaseData.builder().build());
+        CaseQueriesUtil.logMigrationSuccess(CaseDataBuilder.builder().build());
     }
 
     private CaseDataLiP respondentResponseWithLanguagePreference(String languagePreference) {
-        return CaseDataLiP.builder()
-            .respondent1LiPResponse(
-                RespondentLiPResponse.builder().respondent1ResponseLanguage(languagePreference).build()
-            ).build();
+        RespondentLiPResponse respondentResponse = new RespondentLiPResponse();
+        respondentResponse.setRespondent1ResponseLanguage(languagePreference);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setRespondent1LiPResponse(respondentResponse);
+        return caseDataLiP;
     }
 }
