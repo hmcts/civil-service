@@ -36,6 +36,17 @@ public non-sealed interface ClaimPredicate extends CaseDataPredicate {
     )
     Predicate<CaseData> changeOfRepresentation = CaseDataPredicate.Claim.hasChangeOfRepresentation;
 
+    //
+    @BusinessRule(
+        group = "Claim",
+        summary = "",
+        description = ""
+    )
+    Predicate<CaseData> issuedRespondentUnrepresented =
+        CaseDataPredicate.Claim.hasIssueDate.and(CaseDataPredicate.Respondent.isUnrepresentedRespondent1);
+
+
+
     @BusinessRule(
         group = "Claim",
         summary = "Submitted - one respondent representative",
