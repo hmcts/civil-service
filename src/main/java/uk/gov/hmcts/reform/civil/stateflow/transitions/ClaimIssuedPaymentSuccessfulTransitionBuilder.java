@@ -17,7 +17,6 @@ import java.util.function.Predicate;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
@@ -57,7 +56,7 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilder extends MidTransition
                         .and(ClaimPredicate.issuedRespondent2OrgNotRegistered.negate().and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
                     .or((ClaimPredicate.issuedRespondent1OrgNotRegistered.negate().and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
                         .and(ClaimPredicate.issuedRespondent2OrgNotRegistered.and(ClaimPredicate.issuedRespondent2Unrepresented.negate()))
-                        .and(bothDefSameLegalRep.negate())
+                        .and(ClaimPredicate.sameRepresentationBoth.negate())
                     ), transitions
             )
             // Unrepresented and Unregistered
@@ -68,9 +67,6 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilder extends MidTransition
                     .or(ClaimPredicate.issuedRespondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondent1Unrepresented.negate())
                         .and(ClaimPredicate.issuedRespondent2Unrepresented)), transitions);
     }
-
-    public static final Predicate<CaseData> bothDefSameLegalRep = caseData ->
-        caseData.getRespondent2SameLegalRepresentative() == YES;
 
     public static final Predicate<CaseData> oneVsOneCase = ClaimIssuedPaymentSuccessfulTransitionBuilder::getPredicateFor1v1Case;
 
