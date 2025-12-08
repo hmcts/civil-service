@@ -124,7 +124,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .atStateClaimIssued()
                 .build();
 
-            caseData.toBuilder().changeOfRepresentation(null);
+            caseData.setChangeOfRepresentation(null);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -148,9 +148,8 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .addRespondent1LRIndividual("Legal", "Rep")
                 .setUnassignedCaseListDisplayOrganisationReferences()
                 .anyRepresented(NO)
-                .build().toBuilder()
-                .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Defendant").build())
                 .build();
+            caseData.setQmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Defendant").build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -387,6 +386,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .addRespondent2LRIndividual("Legal", "Rep2")
                 .build();
 
+            final var expectedRespondent2LRIndividuals = caseData.getRespondent2LRIndividuals();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -406,7 +406,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .isEqualTo("requester@example.com");
             assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_ONE_LEGAL_REP);
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
-            assertThat(updatedCaseData.getRespondent1LRIndividuals()).isEqualTo(caseData.getRespondent2LRIndividuals());
+            assertThat(updatedCaseData.getRespondent1LRIndividuals()).isEqualTo(expectedRespondent2LRIndividuals);
             assertThat(updatedCaseData.getRespondent2LRIndividuals()).isNull();
         }
 
@@ -421,9 +421,8 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .updateOrgPolicyAfterNoC(false, true, NEW_ORG_ID)
                 .addApplicantLRIndividual("Legal", "Rep")
                 .addRespondent1LRIndividual("Legal", "Rep")
-                .build().toBuilder()
-                .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Defendant").build())
                 .build();
+            caseData.setQmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Defendant").build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -460,10 +459,10 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .updateOrgPolicyAfterNoC(false, false, NEW_ORG_ID)
                 .addApplicantLRIndividual("Legal", "Rep")
                 .addRespondent1LRIndividual("Legal", "Rep1")
-                .build().toBuilder()
-                .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Defendant").build())
                 .build();
+            caseData.setQmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Defendant").build());
 
+            final var expectedRespondent1LRIndividuals = caseData.getRespondent1LRIndividuals();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -484,7 +483,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_TWO_LEGAL_REP);
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNull();
-            assertThat(updatedCaseData.getRespondent2LRIndividuals()).isEqualTo(caseData.getRespondent1LRIndividuals());
+            assertThat(updatedCaseData.getRespondent2LRIndividuals()).isEqualTo(expectedRespondent1LRIndividuals);
             assertThat(updatedCaseData.getQmRespondentSolicitor1Queries().getPartyName()).isEqualTo("Defendant 1");
         }
 
