@@ -67,7 +67,7 @@ public class ResetLanguagePreferenceCallbackHandlerTest extends BaseCallbackHand
                 .claimantUserDetails(IdamUserDetails.builder().email("xyz@hmcts.com").id("1234").build())
                 .claimantBilingualLanguagePreference("WELSH")
                 .build();
-            caseData = caseData.toBuilder().claimantLanguagePreferenceDisplay(PreferredLanguage.WELSH).build();
+            caseData.setClaimantLanguagePreferenceDisplay(PreferredLanguage.WELSH);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -85,12 +85,11 @@ public class ResetLanguagePreferenceCallbackHandlerTest extends BaseCallbackHand
                 .changeOfRepresentation(false, false, NEW_ORG_ID, null, null)
                 .claimantUserDetails(IdamUserDetails.builder().email("xyz@hmcts.com").id("1234").build())
                 .build();
-            caseData = caseData.toBuilder()
-                .caseDataLiP(CaseDataLiP.builder()
+            caseData.setCaseDataLiP(CaseDataLiP.builder()
                                  .respondent1LiPResponse(
                                      RespondentLiPResponse.builder().respondent1ResponseLanguage("WELSH").build()
-                                 ).build())
-                .defendantLanguagePreferenceDisplay(PreferredLanguage.WELSH).build();
+                                 ).build());
+            caseData.setDefendantLanguagePreferenceDisplay(PreferredLanguage.WELSH);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
