@@ -131,60 +131,69 @@ public class StatementsOfCaseMapper {
                     )));
             }
             List<Element<DocumentWithRegex>> medicalReport = caseData.getServedDocumentFiles().getMedicalReport();
-            if (Objects.nonNull(medicalReport)) {
-                medicalReport.forEach(mr -> bundlingRequestDocuments.add(
-                    buildBundlingRequestDoc(
-                        bundleDocumentsRetrieval.getParticularsOfClaimName(caseData, BundleFileNameList.MEDICAL_REPORT),
-                        mr.getValue().getDocument(), ""
-                    )));
-            }
+            addParticularsOfClaimDocuments(
+                medicalReport,
+                bundlingRequestDocuments,
+                caseData,
+                BundleFileNameList.MEDICAL_REPORT
+            );
 
             List<Element<DocumentWithRegex>> scheduleOfLoss = caseData.getServedDocumentFiles().getScheduleOfLoss();
-            if (Objects.nonNull(scheduleOfLoss)) {
-                scheduleOfLoss.forEach(poc -> bundlingRequestDocuments.add(
-                    buildBundlingRequestDoc(
-                        bundleDocumentsRetrieval.getParticularsOfClaimName(caseData, BundleFileNameList.SCHEDULE_OF_LOSS),
-                        poc.getValue().getDocument(), ""
-                    )));
-            }
+            addParticularsOfClaimDocuments(
+                scheduleOfLoss,
+                bundlingRequestDocuments,
+                caseData,
+                BundleFileNameList.SCHEDULE_OF_LOSS
+            );
 
             List<Element<DocumentWithRegex>> cos = caseData.getServedDocumentFiles().getCertificateOfSuitability();
-            if (Objects.nonNull(cos)) {
-                cos.forEach(poc -> bundlingRequestDocuments.add(
-                    buildBundlingRequestDoc(
-                        bundleDocumentsRetrieval.getParticularsOfClaimName(caseData, BundleFileNameList.CERTIFICATE_OF_SUITABILITY),
-                        poc.getValue().getDocument(), ""
-                    )));
-            }
+            addParticularsOfClaimDocuments(
+                cos,
+                bundlingRequestDocuments,
+                caseData,
+                BundleFileNameList.CERTIFICATE_OF_SUITABILITY
+            );
 
             List<Element<DocumentWithRegex>> other = caseData.getServedDocumentFiles().getOther();
-            if (Objects.nonNull(other)) {
-                other.forEach(poc -> bundlingRequestDocuments.add(
-                    buildBundlingRequestDoc(
-                        bundleDocumentsRetrieval.getParticularsOfClaimName(caseData, BundleFileNameList.OTHER),
-                        poc.getValue().getDocument(), ""
-                    )));
-            }
+            addParticularsOfClaimDocuments(other, bundlingRequestDocuments, caseData, BundleFileNameList.OTHER);
 
-            List<Element<ManageDocument>> manageDocuments = caseData.getManageDocumentsList();
-            if (!manageDocuments.isEmpty()) {
-                manageDocuments.forEach(md -> {
-                    if (DocCategory.PARTICULARS_OF_CLAIM.getValue()
-                        .equals(md.getValue().getDocumentLink().getCategoryID())) {
-                        bundlingRequestDocuments.add(
-                            buildBundlingRequestDoc(
-                                bundleDocumentsRetrieval.getParticularsOfClaimName(
-                                    caseData,
-                                    BundleFileNameList.PARTICULARS_OF_CLAIM
-                                ),
-                                md.getValue().getDocumentLink(),
-                                md.getValue().getDocumentType().name()
-                            )
-                        );
-                    }
-                });
-            }
+            addManageDocuments(caseData, bundlingRequestDocuments);
         }
         return bundlingRequestDocuments;
+    }
+
+    private void addManageDocuments(CaseData caseData, List<BundlingRequestDocument> bundlingRequestDocuments) {
+        List<Element<ManageDocument>> manageDocuments = caseData.getManageDocumentsList();
+        if (!manageDocuments.isEmpty()) {
+            manageDocuments.forEach(md -> {
+                if (DocCategory.PARTICULARS_OF_CLAIM.getValue().equals(md.getValue().getDocumentLink().getCategoryID())) {
+                    bundlingRequestDocuments.add(
+                        buildBundlingRequestDoc(
+                            generateDocName(
+                                BundleFileNameList.PARTICULARS_OF_CLAIM.getDisplayName(),
+                                md.getValue().getDocumentName(),
+                                null,
+                                md.getValue().getCreatedDatetime().toLocalDate()
+                            ),
+                            md.getValue().getDocumentLink(),
+                            md.getValue().getDocumentType().name()
+                        )
+                    );
+                }
+            });
+        }
+    }
+
+    private void addParticularsOfClaimDocuments(List<Element<DocumentWithRegex>> document,
+                                                List<BundlingRequestDocument> bundlingRequestDocuments,
+                                                CaseData caseData,
+                                                BundleFileNameList bundleFileNameList) {
+        if (Objects.nonNull(document)) {
+            document.forEach(mr -> bundlingRequestDocuments.add(
+                buildBundlingRequestDoc(
+                    bundleDocumentsRetrieval.getParticularsOfClaimName(caseData, bundleFileNameList),
+                    mr.getValue().getDocument(), ""
+                )));
+        }
     }
 }

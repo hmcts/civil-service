@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.civil.helpers.bundle.mappers;
 
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.BundleFileNameList;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.bundle.BundlingRequestDocument;
+import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
@@ -12,6 +14,9 @@ import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleUtils.buildBundlingRequestDoc;
+import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleUtils.generateDocName;
 
 @Service
 @RequiredArgsConstructor
@@ -51,7 +56,35 @@ public class OrdersMapper {
                 BundleFileNameList.ORDER.getDisplayName()
             ));
         }
-
+        //ManageDocuments
+        List<Element<ManageDocument>> manageDocuments = caseData.getManageDocumentsList();
+        if (!manageDocuments.isEmpty()) {
+            manageDocuments.forEach(md ->
+                                        addDocumentByCategoryId(md, bundlingRequestDocuments, DocCategory.NOTICE_OF_DISCONTINUE));
+            manageDocuments.forEach(md ->
+                                        addDocumentByCategoryId(md, bundlingRequestDocuments, DocCategory.CASE_MAANGEMENT_ORDERS));
+            manageDocuments.forEach(md ->
+                                        addDocumentByCategoryId(md, bundlingRequestDocuments, DocCategory.HEARING_NOTICES));
+            manageDocuments.forEach(md ->
+                                        addDocumentByCategoryId(md, bundlingRequestDocuments, DocCategory.APPLICATION_ORDERS));
+            manageDocuments.forEach(md ->
+                                        addDocumentByCategoryId(md, bundlingRequestDocuments, DocCategory.JUDGEMENTS));
+        }
         return ElementUtils.wrapElements(bundlingRequestDocuments);
+    }
+
+    private void addDocumentByCategoryId(Element<ManageDocument> md,
+                                                List<BundlingRequestDocument> bundlingRequestDocuments,
+                                                DocCategory docCategory) {
+        if (docCategory.getValue().equals(md.getValue().getDocumentLink().getCategoryID())) {
+            bundlingRequestDocuments.add(
+                buildBundlingRequestDoc(
+                    generateDocName(BundleFileNameList.ORDER.getDisplayName(), null, null,
+                                    md.getValue().getCreatedDatetime().toLocalDate()),
+                    md.getValue().getDocumentLink(),
+                    md.getValue().getDocumentType().name()
+                )
+            );
+        }
     }
 }

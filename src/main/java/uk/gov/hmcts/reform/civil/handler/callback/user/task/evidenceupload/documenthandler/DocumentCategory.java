@@ -32,6 +32,8 @@ public enum DocumentCategory {
     APPLICANT_ONE_WITNESS_REFERRED("ApplicantWitnessReferred"),
     APPLICANT_TWO_WITNESS_REFERRED("ApplicantTwoWitnessReferred"),
     APPLICANT_ONE_WITNESS_STATEMENT("ApplicantWitnessStatement"),
+    APPLICANT_ONE_WITNESS_OTHER_STATEMENT("ApplicantOneOtherWitnessStatement"),
+    APPLICANT_TWO_WITNESS_OTHER_STATEMENT("ApplicantTwoOtherWitnessStatement"),
     APPLICANT_TWO_WITNESS_STATEMENT("ApplicantTwoWitnessStatement"),
     APPLICANT_ONE_WITNESS_SUMMARY("ApplicantWitnessSummary"),
     APPLICANT_TWO_WITNESS_SUMMARY("ApplicantTwoWitnessSummary"),
@@ -64,6 +66,28 @@ public enum DocumentCategory {
     RESPONDENT_TWO_WITNESS_STATEMENT("RespondentTwoWitnessStatement"),
     RESPONDENT_ONE_WITNESS_SUMMARY("RespondentOneWitnessSummary"),
     RESPONDENT_TWO_WITNESS_SUMMARY("RespondentTwoWitnessSummary"),
+    RESPONDENT_ONE_WITNESS_OTHER_STATEMENT("RespondentOneOtherWitnessStatement"),
+    RESPONDENT_TWO_WITNESS_OTHER_STATEMENT("RespondentTwoOtherWitnessStatement"),
+
+    APPLICANT_ONE_UPLOADED_PRECEDENT_H("ApplicantUploadedPrecedentH"),
+    APPLICANT_ONE_PRECEDENT_AGREED("ApplicantPrecedentAgreed"),
+    APPLICANT_ONE_ANY_PRECEDENT_H("ApplicantAnyPrecedentH"),
+    APPLICANT_TWO_UPLOADED_PRECEDENT_H("ApplicantTwoUploadedPrecedentH"),
+    APPLICANT_TWO_PRECEDENT_AGREED("ApplicantTwoPrecedentAgreed"),
+    APPLICANT_TWO_ANY_PRECEDENT_H("ApplicantTwoAnyPrecedentH"),
+    RESPONDENT_ONE_UPLOADED_PRECEDENT_H("RespondentUploadedPrecedentH"),
+    RESPONDENT_ONE_PRECEDENT_AGREED("RespondentPrecedentAgreed"),
+    RESPONDENT_ONE_ANY_PRECEDENT_H("RespondentAnyPrecedentH"),
+    RESPONDENT_TWO_UPLOADED_PRECEDENT_H("RespondentTwoUploadedPrecedentH"),
+    RESPONDENT_TWO_PRECEDENT_AGREED("RespondentTwoPrecedentAgreed"),
+    RESPONDENT_TWO_ANY_PRECEDENT_H("RespondentTwoAnyPrecedentH"),
+
+    APPLICANT_ONE_TRIAL_DOC_TIME_TABLE("ApplicantTrialDocTimetable"),
+    RESPONDENT_ONE_TRIAL_DOC_TIME_TABLE("RespondentOneTrialDocTimetable"),
+    APPLICANT_TWO_TRIAL_DOC_TIME_TABLE("ApplicantTwoTrialDocTimetable"),
+    RESPONDENT_TWO_TRIAL_DOC_TIME_TABLE("RespondentTwoTrialDocTimetable"),
+
+
     BUNDLE_EVIDENCE_UPLOAD("bundles");
 
     private final String categoryId;
