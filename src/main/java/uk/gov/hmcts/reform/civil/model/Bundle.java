@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-@Builder(toBuilder = true)
+@Accessors(chain = true)
 @AllArgsConstructor
 public class Bundle implements MappableObject {
 
@@ -36,7 +36,7 @@ public class Bundle implements MappableObject {
     private Optional<LocalDate> bundleHearingDate;
     private Optional<String> stitchingFailureMessage;
 
-    private Bundle() {
+    public Bundle() {
         // noop -- for deserializer
     }
 

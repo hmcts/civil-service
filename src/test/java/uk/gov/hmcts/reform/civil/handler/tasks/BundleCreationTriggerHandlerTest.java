@@ -87,10 +87,9 @@ class BundleCreationTriggerHandlerTest {
         when(noCacheUserService.getAccessToken(TEST, TEST)).thenReturn(ACCESS_TOKEN);
 
         caseBundles = new ArrayList<>();
-        caseBundles.add(new IdValue<>("1", uk.gov.hmcts.reform.civil.model.Bundle.builder().id("1")
-            .title("Trial Bundle")
-            .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
-            .build()));
+        caseBundles.add(new IdValue<>("1", new uk.gov.hmcts.reform.civil.model.Bundle().setId("1")
+            .setTitle("Trial Bundle")
+            .setStitchStatus(Optional.of("NEW")).setDescription("Trial Bundle")));
         caseData = CaseData.builder().caseBundles(caseBundles).build();
     }
 
@@ -197,10 +196,9 @@ class BundleCreationTriggerHandlerTest {
     void shouldReturnFalseWhenBundleHearingDateIsNull() {
         //Given: caseBundles with bundle hearing date null
         List<IdValue<Bundle>> caseBundles = new ArrayList<>();
-        caseBundles.add(new IdValue<>("1", uk.gov.hmcts.reform.civil.model.Bundle.builder().id("1")
-            .title("Trial Bundle")
-            .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
-            .build()));
+        caseBundles.add(new IdValue<>("1", new uk.gov.hmcts.reform.civil.model.Bundle().setId("1")
+            .setTitle("Trial Bundle")
+            .setStitchStatus(Optional.of("NEW")).setDescription("Trial Bundle")));
 
         caseData = CaseData.builder().caseBundles(caseBundles).hearingDate(LocalDate.now()).build();
         when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
@@ -218,16 +216,14 @@ class BundleCreationTriggerHandlerTest {
         caseData = CaseData.builder().caseBundles(caseBundles).hearingDate(LocalDate.now()).build();
         caseData.setHearingDate(LocalDate.of(2023, 12, 12));
         List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> caseBundles = new ArrayList<>();
-        caseBundles.add(new IdValue<>("1", uk.gov.hmcts.reform.civil.model.Bundle.builder().id("1")
-            .title("Trial Bundle")
-            .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
-            .build()));
-        caseBundles.add(new IdValue<>("2", uk.gov.hmcts.reform.civil.model.Bundle.builder().id("1")
-            .title("Trial Bundle")
-            .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
-            .createdOn(Optional.of(LocalDateTime.now()))
-            .bundleHearingDate(Optional.of(LocalDate.of(2023, 12, 12)))
-            .build()));
+        caseBundles.add(new IdValue<>("1", new uk.gov.hmcts.reform.civil.model.Bundle().setId("1")
+            .setTitle("Trial Bundle")
+            .setStitchStatus(Optional.of("NEW")).setDescription("Trial Bundle")));
+        caseBundles.add(new IdValue<>("2", new uk.gov.hmcts.reform.civil.model.Bundle().setId("1")
+            .setTitle("Trial Bundle")
+            .setStitchStatus(Optional.of("NEW")).setDescription("Trial Bundle")
+            .setCreatedOn(Optional.of(LocalDateTime.now()))
+            .setBundleHearingDate(Optional.of(LocalDate.of(2023, 12, 12)))));
         caseData = CaseData.builder().caseBundles(caseBundles).hearingDate(LocalDate.of(2023, 12, 12)).build();
         caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
@@ -239,12 +235,11 @@ class BundleCreationTriggerHandlerTest {
 
     @Test
     void shouldReturnTrueWhenBundleHearingDateIsEqualToHearingDate() {
-        caseBundles.add(new IdValue<>("2", uk.gov.hmcts.reform.civil.model.Bundle.builder().id("1")
-            .title("Trial Bundle")
-            .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
-            .createdOn(Optional.of(LocalDateTime.now()))
-            .bundleHearingDate(Optional.of(LocalDate.of(2023, 12, 12)))
-            .build()));
+        caseBundles.add(new IdValue<>("2", new uk.gov.hmcts.reform.civil.model.Bundle().setId("1")
+            .setTitle("Trial Bundle")
+            .setStitchStatus(Optional.of("NEW")).setDescription("Trial Bundle")
+            .setCreatedOn(Optional.of(LocalDateTime.now()))
+            .setBundleHearingDate(Optional.of(LocalDate.of(2023, 12, 12)))));
         //Given : caseData with hearing date same as caseBundles hearing date
         caseData.setHearingDate(LocalDate.of(2023, 12, 12));
         caseDetails = CaseDetailsBuilder.builder().data(caseData).build();

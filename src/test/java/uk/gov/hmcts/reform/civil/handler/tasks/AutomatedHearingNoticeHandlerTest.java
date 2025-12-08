@@ -98,11 +98,10 @@ class AutomatedHearingNoticeHandlerTest {
                 .dispatchedHearingIds(dispatchedHearingIds)
                 .build());
         when(mapper.convertValue(any(), eq(HearingNoticeMessageVars.class))).thenReturn(
-            HearingNoticeMessageVars.builder()
-                .caseId(CASE_ID)
-                .hearingId(HEARING_ID)
-                .triggeredViaScheduler(true)
-                .build());
+            new HearingNoticeMessageVars()
+                .setCaseId(CASE_ID)
+                .setHearingId(HEARING_ID)
+                .setTriggeredViaScheduler(true));
         when(hearingsService.getUnNotifiedHearingResponses(
             anyString(), anyString(), any(LocalDateTime.class), any())).thenReturn(
             createUnnotifiedHearings(List.of()));
@@ -130,11 +129,10 @@ class AutomatedHearingNoticeHandlerTest {
                 .dispatchedHearingIds(dispatchedHearingIds)
                 .build());
         when(mapper.convertValue(any(), eq(HearingNoticeMessageVars.class))).thenReturn(
-            HearingNoticeMessageVars.builder()
-                .caseId(CASE_ID)
-                .hearingId(HEARING_ID)
-                .triggeredViaScheduler(true)
-                .build());
+            new HearingNoticeMessageVars()
+                .setCaseId(CASE_ID)
+                .setHearingId(HEARING_ID)
+                .setTriggeredViaScheduler(true));
         when(hearingsService.getUnNotifiedHearingResponses(
             anyString(), anyString(), any(LocalDateTime.class), any())).thenReturn(
             createUnnotifiedHearings(List.of(HEARING_ID)));
@@ -166,11 +164,10 @@ class AutomatedHearingNoticeHandlerTest {
                 .dispatchedHearingIds(dispatchedHearingIds)
                 .build());
         when(mapper.convertValue(any(), eq(HearingNoticeMessageVars.class))).thenReturn(
-            HearingNoticeMessageVars.builder()
-                .caseId(CASE_ID)
-                .hearingId(HEARING_ID)
-                .triggeredViaScheduler(true)
-                .build());
+            new HearingNoticeMessageVars()
+                .setCaseId(CASE_ID)
+                .setHearingId(HEARING_ID)
+                .setTriggeredViaScheduler(true));
         when(hearingsService.getUnNotifiedHearingResponses(
             anyString(), anyString(), any(LocalDateTime.class), any())).thenReturn(
             createUnnotifiedHearings(hearingIds));
