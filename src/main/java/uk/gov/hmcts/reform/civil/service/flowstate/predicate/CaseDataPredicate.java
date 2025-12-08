@@ -187,6 +187,14 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         Predicate<CaseData> willProceedApplicant2Multi_2v1 =
             nullSafe(c -> YES.equals(c.getApplicant2ProceedWithClaimMultiParty2v1()));
 
+        @BusinessRule(
+            group = "Applicant",
+            summary = "Applicant correspondence address not required (Spec)",
+            description = "Applicant correspondence address not required (Spec)"
+        )
+        Predicate<CaseData> isNotApplicantCorrespondenceAddressRequiredSpec =
+            nullSafe(c -> NO.equals(c.getSpecAoSApplicantCorrespondenceAddressRequired()));
+
     }
 
     interface Claim {
