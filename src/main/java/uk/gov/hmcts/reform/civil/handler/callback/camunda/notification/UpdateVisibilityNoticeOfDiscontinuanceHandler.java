@@ -54,37 +54,31 @@ public class UpdateVisibilityNoticeOfDiscontinuanceHandler extends CallbackHandl
         CaseData caseData = callbackParams.getCaseData();
         updateCamundaVars(caseData);
         if (ConfirmOrderGivesPermission.YES.equals(caseData.getConfirmOrderGivesPermission())) {
-            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            updateVisibilityForAllParties(caseData);
+            removeCaseWorkerViewDocuments(caseData);
 
-            updateVisibilityForAllParties(caseData, caseDataBuilder);
-            removeCaseWorkerViewDocuments(caseDataBuilder);
-
-            CaseData updatedData = caseDataBuilder.build();
-            assignCategoryIdForAllParties(updatedData);
+            assignCategoryIdForAllParties(caseData);
 
             return AboutToStartOrSubmitCallbackResponse.builder()
-                    .data(updatedData.toMap(objectMapper))
+                    .data(caseData.toMap(objectMapper))
                     .build();
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    private void updateVisibilityForAllParties(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
-        caseDataBuilder
-            .applicant1NoticeOfDiscontinueAllPartyViewDoc(caseData.getApplicant1NoticeOfDiscontinueCWViewDoc())
-            .respondent1NoticeOfDiscontinueAllPartyViewDoc(caseData.getRespondent1NoticeOfDiscontinueCWViewDoc());
+    private void updateVisibilityForAllParties(CaseData caseData) {
+        caseData.setApplicant1NoticeOfDiscontinueAllPartyViewDoc(caseData.getApplicant1NoticeOfDiscontinueCWViewDoc());
+        caseData.setRespondent1NoticeOfDiscontinueAllPartyViewDoc(caseData.getRespondent1NoticeOfDiscontinueCWViewDoc());
 
         if (caseData.getRespondent2NoticeOfDiscontinueCWViewDoc() != null) {
-            caseDataBuilder
-                .respondent2NoticeOfDiscontinueAllPartyViewDoc(caseData.getRespondent2NoticeOfDiscontinueCWViewDoc());
+            caseData.setRespondent2NoticeOfDiscontinueAllPartyViewDoc(caseData.getRespondent2NoticeOfDiscontinueCWViewDoc());
         }
     }
 
-    private void removeCaseWorkerViewDocuments(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
-        caseDataBuilder
-            .applicant1NoticeOfDiscontinueCWViewDoc(null)
-            .respondent1NoticeOfDiscontinueCWViewDoc(null)
-            .respondent2NoticeOfDiscontinueCWViewDoc(null);
+    private void removeCaseWorkerViewDocuments(CaseData caseData) {
+        caseData.setApplicant1NoticeOfDiscontinueCWViewDoc(null);
+        caseData.setRespondent1NoticeOfDiscontinueCWViewDoc(null);
+        caseData.setRespondent2NoticeOfDiscontinueCWViewDoc(null);
     }
 
     private void assignCategoryIdForAllParties(CaseData caseData) {
