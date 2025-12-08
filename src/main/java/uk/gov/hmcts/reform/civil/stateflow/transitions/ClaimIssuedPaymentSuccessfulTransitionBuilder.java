@@ -45,18 +45,18 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilder extends MidTransition
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT, transitions)
             .onlyWhen(ClaimPredicate.pendingIssuedUnrepresented, transitions)
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, transitions)
-            .onlyWhen(oneVsOneCase.and(respondent1NotRepresented).and(ClaimPredicate.isSpec), transitions)
+            .onlyWhen(oneVsOneCase.and(ClaimPredicate.issuedRespondentUnrepresented).and(ClaimPredicate.isSpec), transitions)
             .set(flags -> flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true), transitions)
             // Unregistered
             // 1. Both def1 and def2 unregistered
             // 2. Def1 unregistered, Def2 registered
             // 3. Def1 registered, Def 2 unregistered
             .moveTo(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT, transitions).onlyWhen(
-                ((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
+                ((respondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondentUnrepresented.negate()))
                     .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
-                    .or((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
+                    .or((respondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondentUnrepresented.negate()))
                         .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate())))
-                    .or((respondent1OrgNotRegistered.negate().and(respondent1NotRepresented.negate()))
+                    .or((respondent1OrgNotRegistered.negate().and(ClaimPredicate.issuedRespondentUnrepresented.negate()))
                         .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate()))
                         .and(bothDefSameLegalRep.negate())
                     ), transitions
@@ -65,13 +65,10 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilder extends MidTransition
             // 1. Def1 unrepresented, Def2 unregistered
             // 2. Def1 unregistered, Def 2 unrepresented
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT, transitions).onlyWhen(
-                (respondent1NotRepresented.and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
-                    .or(respondent1OrgNotRegistered.and(respondent1NotRepresented.negate())
+                (ClaimPredicate.issuedRespondentUnrepresented.and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
+                    .or(respondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondentUnrepresented.negate())
                         .and(respondent2NotRepresented)), transitions);
     }
-
-    public static final Predicate<CaseData> respondent1NotRepresented = caseData ->
-        caseData.getIssueDate() != null && caseData.getRespondent1Represented() == NO;
 
     public static final Predicate<CaseData> respondent1OrgNotRegistered = caseData ->
         caseData.getIssueDate() != null
