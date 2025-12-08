@@ -23,8 +23,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedPaymentSuccessfulTransitionBuilder.multipartyCase;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedPaymentSuccessfulTransitionBuilder.oneVsOneCase;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedPaymentSuccessfulTransitionBuilder.respondent1OrgNotRegistered;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedPaymentSuccessfulTransitionBuilder.respondent2OrgNotRegistered;
 
 @ExtendWith(MockitoExtension.class)
 public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
@@ -68,13 +66,13 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
     @Test
     void shouldReturnTrue_whenRespondent1IsNotRegistered() {
         CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnregisteredDefendant().build();
-        assertTrue(respondent1OrgNotRegistered.test(caseData));
+        assertTrue(ClaimPredicate.issuedRespondent1OrgNotRegistered.test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenRespondent1IsRegisteredAndAtPendingClaimIssuedState() {
         CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
-        assertFalse(respondent1OrgNotRegistered.test(caseData));
+        assertFalse(ClaimPredicate.issuedRespondent1OrgNotRegistered.test(caseData));
     }
 
     @Test
@@ -92,13 +90,13 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
     @Test
     void shouldReturnTrue_whenRespondent2IsNotRegistered() {
         CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnregisteredDefendant().build();
-        assertTrue(respondent1OrgNotRegistered.test(caseData));
+        assertTrue(ClaimPredicate.issuedRespondent1OrgNotRegistered.test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenRespondent2IsRegisteredAndAtPendingClaimIssuedState() {
         CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
-        assertFalse(respondent2OrgNotRegistered.test(caseData));
+        assertFalse(ClaimPredicate.issuedRespondent2OrgNotRegistered.test(caseData));
     }
 
     @Test
@@ -145,13 +143,13 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
 
         assertTrue(ClaimPredicate.pendingIssued.test(caseData));
         assertFalse(
-            ((respondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
-                .and(respondent2OrgNotRegistered.and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
-                .or((respondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
-                        .and(respondent2OrgNotRegistered.negate().and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
-                .or((respondent1OrgNotRegistered.negate()
+            ((ClaimPredicate.issuedRespondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
+                .and(ClaimPredicate.issuedRespondent2OrgNotRegistered.and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
+                .or((ClaimPredicate.issuedRespondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
+                        .and(ClaimPredicate.issuedRespondent2OrgNotRegistered.negate().and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
+                .or((ClaimPredicate.issuedRespondent1OrgNotRegistered.negate()
                     .and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
-                        .and(respondent2OrgNotRegistered.and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
+                        .and(ClaimPredicate.issuedRespondent2OrgNotRegistered.and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
                 .and(ClaimIssuedPaymentSuccessfulTransitionBuilder
                          .bothDefSameLegalRep.negate()).test(caseData));
     }
@@ -170,12 +168,12 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
 
         assertTrue(ClaimPredicate.pendingIssued.test(caseData));
         assertFalse(
-            ((respondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
-                .and(respondent2OrgNotRegistered.and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
-                .or((respondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
-                        .and(respondent2OrgNotRegistered.negate().and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
-                .or((respondent1OrgNotRegistered.negate().and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
-                        .and(respondent2OrgNotRegistered.and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
+            ((ClaimPredicate.issuedRespondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
+                .and(ClaimPredicate.issuedRespondent2OrgNotRegistered.and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
+                .or((ClaimPredicate.issuedRespondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
+                        .and(ClaimPredicate.issuedRespondent2OrgNotRegistered.negate().and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
+                .or((ClaimPredicate.issuedRespondent1OrgNotRegistered.negate().and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
+                        .and(ClaimPredicate.issuedRespondent2OrgNotRegistered.and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
                 .and(ClaimIssuedPaymentSuccessfulTransitionBuilder
                          .bothDefSameLegalRep.negate()).test(caseData));
     }
@@ -190,12 +188,12 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
 
         assertTrue(ClaimPredicate.pendingIssued.test(caseData));
         assertFalse(
-            ((respondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
-                .and(respondent2OrgNotRegistered.and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
-                .or((respondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
-                        .and(respondent2OrgNotRegistered.negate().and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
-                .or((respondent1OrgNotRegistered.negate().and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
-                        .and(respondent2OrgNotRegistered.and(
+            ((ClaimPredicate.issuedRespondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
+                .and(ClaimPredicate.issuedRespondent2OrgNotRegistered.and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
+                .or((ClaimPredicate.issuedRespondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
+                        .and(ClaimPredicate.issuedRespondent2OrgNotRegistered.negate().and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
+                .or((ClaimPredicate.issuedRespondent1OrgNotRegistered.negate().and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
+                        .and(ClaimPredicate.issuedRespondent2OrgNotRegistered.and(
                             ClaimPredicate.issuedRespondent2Unrepresented.negate())))
                 .and(ClaimIssuedPaymentSuccessfulTransitionBuilder
                          .bothDefSameLegalRep.negate()).test(caseData));
