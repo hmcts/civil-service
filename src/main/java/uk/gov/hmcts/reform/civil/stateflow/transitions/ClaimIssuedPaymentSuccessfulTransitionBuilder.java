@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.stateflow.transitions;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -9,12 +8,12 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimPredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
 import java.util.function.Predicate;
 
-import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
@@ -39,13 +38,13 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilder extends MidTransition
 
     @Override
     void setUpTransitions(List<Transition> transitions) {
-        this.moveTo(PENDING_CLAIM_ISSUED, transitions).onlyWhen(pendingClaimIssued, transitions)
+        this.moveTo(PENDING_CLAIM_ISSUED, transitions).onlyWhen(ClaimPredicate.pendingIssued, transitions)
             // Unrepresented
             // 1. Both def1 and def2 unrepresented
             // 2. Def1 unrepresented, Def2 registered
             // 3. Def1 registered, Def 2 unrepresented
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT, transitions)
-            .onlyWhen(pendingClaimIssuedUnrepresentedDefendentPredicate(), transitions)
+            .onlyWhen(ClaimPredicate.pendingIssuedUnrepresented, transitions)
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, transitions)
             .onlyWhen(oneVsOneCase.and(respondent1NotRepresented).and(specClaim), transitions)
             .set(flags -> flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true), transitions)
@@ -81,17 +80,6 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilder extends MidTransition
             && (caseData.getRespondent2OrgRegistered() == YES
             || caseData.getRespondent2SameLegalRepresentative() == YES)));
 
-    @NotNull
-    public static Predicate<CaseData> pendingClaimIssuedUnrepresentedDefendentPredicate() {
-        return respondent1NotRepresented.and(respondent2NotRepresented)
-            .or(respondent1NotRepresented.and(not(respondent2OrgNotRegistered)))
-            .or(not(respondent1OrgNotRegistered).and(respondent2NotRepresented))
-            .and(not(specClaim))
-            .or(multipartyCase.and(respondent1NotRepresented.and(respondent2NotRepresented)
-                    .or(respondent1NotRepresented.and(not(respondent2OrgNotRegistered)))
-                    .or(not(respondent1OrgNotRegistered).and(respondent2NotRepresented)))
-                .and(specClaim));
-    }
 
     public static final Predicate<CaseData> respondent1NotRepresented = caseData ->
         caseData.getIssueDate() != null && caseData.getRespondent1Represented() == NO;
