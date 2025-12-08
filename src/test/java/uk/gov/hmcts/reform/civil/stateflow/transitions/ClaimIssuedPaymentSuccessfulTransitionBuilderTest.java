@@ -150,8 +150,7 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
                 .or((ClaimPredicate.issuedRespondent1OrgNotRegistered.negate()
                     .and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
                         .and(ClaimPredicate.issuedRespondent2OrgNotRegistered.and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
-                .and(ClaimIssuedPaymentSuccessfulTransitionBuilder
-                         .bothDefSameLegalRep.negate()).test(caseData));
+                .and(ClaimPredicate.sameRepresentationBoth.negate()).test(caseData));
     }
 
     @Test
@@ -174,8 +173,7 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
                         .and(ClaimPredicate.issuedRespondent2OrgNotRegistered.negate().and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
                 .or((ClaimPredicate.issuedRespondent1OrgNotRegistered.negate().and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
                         .and(ClaimPredicate.issuedRespondent2OrgNotRegistered.and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
-                .and(ClaimIssuedPaymentSuccessfulTransitionBuilder
-                         .bothDefSameLegalRep.negate()).test(caseData));
+                .and(ClaimPredicate.sameRepresentationBoth.negate()).test(caseData));
     }
 
     @Test
@@ -195,8 +193,7 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
                 .or((ClaimPredicate.issuedRespondent1OrgNotRegistered.negate().and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
                         .and(ClaimPredicate.issuedRespondent2OrgNotRegistered.and(
                             ClaimPredicate.issuedRespondent2Unrepresented.negate())))
-                .and(ClaimIssuedPaymentSuccessfulTransitionBuilder
-                         .bothDefSameLegalRep.negate()).test(caseData));
+                .and(ClaimPredicate.sameRepresentationBoth.negate()).test(caseData));
     }
 
     @Test
