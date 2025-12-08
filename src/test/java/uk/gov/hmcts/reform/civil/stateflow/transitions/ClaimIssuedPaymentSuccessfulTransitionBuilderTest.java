@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimPredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.time.LocalDate;
@@ -22,7 +23,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedPaymentSuccessfulTransitionBuilder.multipartyCase;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedPaymentSuccessfulTransitionBuilder.oneVsOneCase;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedPaymentSuccessfulTransitionBuilder.pendingClaimIssued;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedPaymentSuccessfulTransitionBuilder.respondent1NotRepresented;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedPaymentSuccessfulTransitionBuilder.respondent1OrgNotRegistered;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedPaymentSuccessfulTransitionBuilder.respondent2NotRepresented;
@@ -145,7 +145,7 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
             .respondent2SameLegalRepresentative(YES)
             .build();
 
-        assertTrue(pendingClaimIssued.test(caseData));
+        assertTrue(ClaimPredicate.pendingIssued.test(caseData));
         assertFalse(
             ((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
                 .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
@@ -170,7 +170,7 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
             .respondent2OrgRegistered(YES)
             .build();
 
-        assertTrue(pendingClaimIssued.test(caseData));
+        assertTrue(ClaimPredicate.pendingIssued.test(caseData));
         assertFalse(
             ((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
                 .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
@@ -190,7 +190,7 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
             .respondent1OrgRegistered(YES)
             .build();
 
-        assertTrue(pendingClaimIssued.test(caseData));
+        assertTrue(ClaimPredicate.pendingIssued.test(caseData));
         assertFalse(
             ((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
                 .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
@@ -206,13 +206,13 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
     @Test
     void shouldReturnTrue_whenCaseDataIsAtPendingClaimIssuedState() {
         CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
-        assertTrue(pendingClaimIssued.test(caseData));
+        assertTrue(ClaimPredicate.pendingIssued.test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenCaseDataAtDraftState() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
-        assertFalse(pendingClaimIssued.test(caseData));
+        assertFalse(ClaimPredicate.pendingIssued.test(caseData));
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {
