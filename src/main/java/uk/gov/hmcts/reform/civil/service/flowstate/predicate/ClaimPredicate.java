@@ -36,11 +36,10 @@ public non-sealed interface ClaimPredicate extends CaseDataPredicate {
     )
     Predicate<CaseData> changeOfRepresentation = CaseDataPredicate.Claim.hasChangeOfRepresentation;
 
-    //
     @BusinessRule(
         group = "Claim",
         summary = "",
-        description = ""
+        description = "Issue date is set and respondent 1 is unrepresented"
     )
     Predicate<CaseData> issuedRespondent1Unrepresented =
         CaseDataPredicate.Claim.hasIssueDate.and(CaseDataPredicate.Respondent.isUnrepresentedRespondent1);
@@ -48,10 +47,31 @@ public non-sealed interface ClaimPredicate extends CaseDataPredicate {
     @BusinessRule(
         group = "Claim",
         summary = "",
-        description = ""
+        description = "Issue date is set and respondent 2 is unrepresented"
     )
     Predicate<CaseData> issuedRespondent2Unrepresented =
         CaseDataPredicate.Claim.hasIssueDate.and(CaseDataPredicate.Respondent.isUnrepresentedRespondent2);
+
+
+    @BusinessRule(
+        group = "Claim",
+        summary = "Issued - respondent 1 is represented with unregistered org",
+        description = "Issue date is set where defendant is represented but their organisation is not registered"
+    )
+    Predicate<CaseData> issuedRespondent1OrgNotRegistered =
+        CaseDataPredicate.Claim.hasIssueDate
+            .and(CaseDataPredicate.Respondent.isRepresentedRespondent1)
+            .and(CaseDataPredicate.Respondent.isNotOrgRegisteredRespondent1);
+
+    @BusinessRule(
+        group = "Claim",
+        summary = "Issued - respondent 2 is represented with unregistered org",
+        description = "Issue date is set where defendant is represented but their organisation is not registered"
+    )
+    Predicate<CaseData> issuedRespondent2OrgNotRegistered =
+        CaseDataPredicate.Claim.hasIssueDate
+            .and(CaseDataPredicate.Respondent.isRepresentedRespondent2)
+            .and(CaseDataPredicate.Respondent.isNotOrgRegisteredRespondent2);
 
     @BusinessRule(
         group = "Claim",

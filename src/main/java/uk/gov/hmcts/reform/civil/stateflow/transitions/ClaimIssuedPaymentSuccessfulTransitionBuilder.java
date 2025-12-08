@@ -17,7 +17,6 @@ import java.util.function.Predicate;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
@@ -52,12 +51,12 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilder extends MidTransition
             // 2. Def1 unregistered, Def2 registered
             // 3. Def1 registered, Def 2 unregistered
             .moveTo(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT, transitions).onlyWhen(
-                ((respondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
-                    .and(respondent2OrgNotRegistered.and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
-                    .or((respondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
-                        .and(respondent2OrgNotRegistered.negate().and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
-                    .or((respondent1OrgNotRegistered.negate().and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
-                        .and(respondent2OrgNotRegistered.and(ClaimPredicate.issuedRespondent2Unrepresented.negate()))
+                ((ClaimPredicate.issuedRespondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
+                    .and(ClaimPredicate.issuedRespondent2OrgNotRegistered.and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
+                    .or((ClaimPredicate.issuedRespondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
+                        .and(ClaimPredicate.issuedRespondent2OrgNotRegistered.negate().and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
+                    .or((ClaimPredicate.issuedRespondent1OrgNotRegistered.negate().and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
+                        .and(ClaimPredicate.issuedRespondent2OrgNotRegistered.and(ClaimPredicate.issuedRespondent2Unrepresented.negate()))
                         .and(bothDefSameLegalRep.negate())
                     ), transitions
             )
@@ -65,20 +64,10 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilder extends MidTransition
             // 1. Def1 unrepresented, Def2 unregistered
             // 2. Def1 unregistered, Def 2 unrepresented
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT, transitions).onlyWhen(
-                (ClaimPredicate.issuedRespondent1Unrepresented.and(respondent2OrgNotRegistered.and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
-                    .or(respondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondent1Unrepresented.negate())
+                (ClaimPredicate.issuedRespondent1Unrepresented.and(ClaimPredicate.issuedRespondent2OrgNotRegistered.and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
+                    .or(ClaimPredicate.issuedRespondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondent1Unrepresented.negate())
                         .and(ClaimPredicate.issuedRespondent2Unrepresented)), transitions);
     }
-
-    public static final Predicate<CaseData> respondent1OrgNotRegistered = caseData ->
-        caseData.getIssueDate() != null
-            && caseData.getRespondent1OrgRegistered() == NO
-            && caseData.getRespondent1Represented() == YES;
-
-    public static final Predicate<CaseData> respondent2OrgNotRegistered = caseData ->
-        caseData.getIssueDate() != null
-            && caseData.getRespondent2Represented() == YES
-            && caseData.getRespondent2OrgRegistered() != YES;
 
     public static final Predicate<CaseData> bothDefSameLegalRep = caseData ->
         caseData.getRespondent2SameLegalRepresentative() == YES;
