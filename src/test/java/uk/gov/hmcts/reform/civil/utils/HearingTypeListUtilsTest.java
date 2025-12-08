@@ -72,7 +72,9 @@ class HearingTypeListUtilsTest {
             .map(DynamicListElement::getCode)
             .toList();
 
-        assertThat(intermediateListCodes).doesNotContain("COSTS_CASE_MANAGEMENT_CONFERENCE");
+        assertThat(intermediateListCodes)
+            .isNotEmpty()
+            .doesNotContain("COSTS_CASE_MANAGEMENT_CONFERENCE");
     }
 }
 
