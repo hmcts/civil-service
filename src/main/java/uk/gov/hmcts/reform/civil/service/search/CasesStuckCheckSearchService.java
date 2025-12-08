@@ -53,7 +53,7 @@ public class CasesStuckCheckSearchService {
 
         return new Query(
             boolQuery()
-                .should(rangeQuery("data.last_modified").lt(timeNow).gt(pastDaysExpression))
+                .should(rangeQuery("last_modified").lt(timeNow).gt(pastDaysExpression))
                 .should(boolQuery().mustNot(matchQuery("data.businessProcess.status", "FINISHED"))),
             List.of("reference"),
             startIndex

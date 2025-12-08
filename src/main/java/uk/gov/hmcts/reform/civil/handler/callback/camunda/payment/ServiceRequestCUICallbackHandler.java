@@ -66,9 +66,8 @@ public class ServiceRequestCUICallbackHandler extends CallbackHandler {
             if (isServiceRequestNotRequested(caseData) && !caseData.isHelpWithFees()) {
                 log.info("Calling payment service request (claim fee) for case {}", caseData.getCcdCaseReference());
                 String serviceRequestReference = getServiceRequestReference(caseData, authToken);
-                caseData = caseData.toBuilder().serviceRequestReference(serviceRequestReference)
-                    .claimIssuedPBADetails(getClaimIssuePbaDetails(serviceRequestReference, caseData.getClaimFee()))
-                    .build();
+                caseData.setServiceRequestReference(serviceRequestReference);
+                caseData.setClaimIssuedPBADetails(getClaimIssuePbaDetails(serviceRequestReference, caseData.getClaimFee()));
             }
         } catch (FeignException e) {
             log.error("Failed creating a payment service request for case {}. Http status: {}. Exception: {}",

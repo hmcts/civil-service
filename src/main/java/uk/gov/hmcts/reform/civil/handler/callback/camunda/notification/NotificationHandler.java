@@ -67,8 +67,10 @@ public class NotificationHandler extends CallbackHandler {
 
         final String summary = notifier.notifyParties(caseData, NOTIFY_EVENT.toString(), taskId);
 
+        caseData.setNotificationSummary(summary);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toBuilder().notificationSummary(summary).build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
