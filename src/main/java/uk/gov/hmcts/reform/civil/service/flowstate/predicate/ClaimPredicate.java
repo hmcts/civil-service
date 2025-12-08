@@ -17,6 +17,20 @@ public non-sealed interface ClaimPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Claim",
+        summary = "One V One claim",
+        description = "Case is One V One based on case party scenario"
+    )
+    Predicate<CaseData> isOneVOne = CaseDataPredicate.MultiParty.isOneVOne;
+
+    @BusinessRule(
+        group = "Claim",
+        summary = "Multi party claim",
+        description = "Case is multi party based on two applicants or respondents"
+    )
+    Predicate<CaseData> isMultiParty = CaseDataPredicate.Claim.isMultiParty;
+
+    @BusinessRule(
+        group = "Claim",
         summary = "Claim notified",
         description = "Acknowledgement deadline exists - claim notification has been sent (State Flow: claim notified)"
     )
@@ -45,7 +59,7 @@ public non-sealed interface ClaimPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Claim",
-        summary = "",
+        summary = "todo",
         description = "Issue date is set and respondent 1 is unrepresented"
     )
     Predicate<CaseData> issuedRespondent1Unrepresented =
@@ -53,12 +67,11 @@ public non-sealed interface ClaimPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Claim",
-        summary = "",
+        summary = "todo",
         description = "Issue date is set and respondent 2 is unrepresented"
     )
     Predicate<CaseData> issuedRespondent2Unrepresented =
         CaseDataPredicate.Claim.hasIssueDate.and(CaseDataPredicate.Respondent.isUnrepresentedRespondent2);
-
 
     @BusinessRule(
         group = "Claim",

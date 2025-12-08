@@ -21,8 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedPaymentSuccessfulTransitionBuilder.multipartyCase;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedPaymentSuccessfulTransitionBuilder.oneVsOneCase;
 
 @ExtendWith(MockitoExtension.class)
 public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
@@ -103,7 +101,7 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
     void shouldReturnTrue_forOneVsOneCase() {
         CaseData caseData = CaseDataBuilder.builder()
             .setClaimTypeToSpecClaim().build().toBuilder().build();
-        assertTrue(oneVsOneCase.test(caseData));
+        assertTrue(ClaimPredicate.isOneVOne.test(caseData));
     }
 
     @Test
@@ -111,7 +109,7 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .multiPartyClaimTwoDefendantSolicitors()
             .setClaimTypeToSpecClaim().build().toBuilder().build();
-        assertTrue(multipartyCase.test(caseData));
+        assertTrue(ClaimPredicate.isMultiParty.test(caseData));
     }
 
     @Test
@@ -119,7 +117,7 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .multiPartyClaimOneDefendantSolicitor()
             .setClaimTypeToSpecClaim().build().toBuilder().build();
-        assertTrue(multipartyCase.test(caseData));
+        assertTrue(ClaimPredicate.isMultiParty.test(caseData));
     }
 
     @Test
@@ -127,7 +125,7 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .multiPartyClaimTwoApplicants()
             .setClaimTypeToSpecClaim().build().toBuilder().build();
-        assertTrue(multipartyCase.test(caseData));
+        assertTrue(ClaimPredicate.isMultiParty.test(caseData));
     }
 
     @Test
