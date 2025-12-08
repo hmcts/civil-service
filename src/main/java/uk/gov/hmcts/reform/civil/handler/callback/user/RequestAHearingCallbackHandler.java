@@ -35,42 +35,45 @@ public class RequestAHearingCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     public static final String LISTING_REQUESTED = "## Listing Requested";
     public static final String LISTING_REQUESTED_TASKS = "A work allocation task will be created for a listing officer to list the hearing.";
-    private static final DynamicList INTERMEDIATE_LIST = DynamicList.builder().listItems(List.of(DynamicListElement.builder()
-                                                                                                     .code("CASE_MANAGEMENT_CONFERENCE")
-                                                                                                     .label("Case Management Conference (CMC)")
-                                                                                                     .build(),
-                                                                                                 DynamicListElement.builder()
-                                                                                                     .code("PRE_TRIAL_REVIEW")
-                                                                                                     .label("Pre Trial Review (PTR)")
-                                                                                                     .build(),
-                                                                                                 DynamicListElement.builder()
-                                                                                                     .code("TRIAL")
-                                                                                                     .label("Trial")
-                                                                                                     .build(),
-                                                                                                 DynamicListElement.builder()
-                                                                                                     .code("OTHER")
-                                                                                                     .label("Other")
-                                                                                                     .build())).build();
-    private static final DynamicList MULTI_LIST = DynamicList.builder().listItems(List.of(DynamicListElement.builder()
-                                                                                              .code("CASE_MANAGEMENT_CONFERENCE")
-                                                                                              .label("Case Management Conference (CMC)")
-                                                                                              .build(),
-                                                                                          DynamicListElement.builder()
-                                                                                              .code("COSTS_CASE_MANAGEMENT_CONFERENCE")
-                                                                                              .label("Costs and Case Management Conference (CCMC)")
-                                                                                              .build(),
-                                                                                          DynamicListElement.builder()
-                                                                                              .code("PRE_TRIAL_REVIEW")
-                                                                                              .label("Pre Trial Review (PTR)")
-                                                                                              .build(),
-                                                                                          DynamicListElement.builder()
-                                                                                              .code("TRIAL")
-                                                                                              .label("Trial")
-                                                                                              .build(),
-                                                                                          DynamicListElement.builder()
-                                                                                              .code("OTHER")
-                                                                                              .label("Other")
-                                                                                              .build())).build();
+    private static final DynamicList INTERMEDIATE_LIST;
+    private static final DynamicList MULTI_LIST;
+
+    static {
+        DynamicListElement element1 = new DynamicListElement();
+        element1.setCode("CASE_MANAGEMENT_CONFERENCE");
+        element1.setLabel("Case Management Conference (CMC)");
+        DynamicListElement element2 = new DynamicListElement();
+        element2.setCode("PRE_TRIAL_REVIEW");
+        element2.setLabel("Pre Trial Review (PTR)");
+        DynamicListElement element3 = new DynamicListElement();
+        element3.setCode("TRIAL");
+        element3.setLabel("Trial");
+        DynamicListElement element4 = new DynamicListElement();
+        element4.setCode("OTHER");
+        element4.setLabel("Other");
+        DynamicList intermediateList = new DynamicList();
+        intermediateList.setListItems(List.of(element1, element2, element3, element4));
+        INTERMEDIATE_LIST = intermediateList;
+
+        DynamicListElement element5 = new DynamicListElement();
+        element5.setCode("CASE_MANAGEMENT_CONFERENCE");
+        element5.setLabel("Case Management Conference (CMC)");
+        DynamicListElement element6 = new DynamicListElement();
+        element6.setCode("COSTS_CASE_MANAGEMENT_CONFERENCE");
+        element6.setLabel("Costs and Case Management Conference (CCMC)");
+        DynamicListElement element7 = new DynamicListElement();
+        element7.setCode("PRE_TRIAL_REVIEW");
+        element7.setLabel("Pre Trial Review (PTR)");
+        DynamicListElement element8 = new DynamicListElement();
+        element8.setCode("TRIAL");
+        element8.setLabel("Trial");
+        DynamicListElement element9 = new DynamicListElement();
+        element9.setCode("OTHER");
+        element9.setLabel("Other");
+        DynamicList multiList = new DynamicList();
+        multiList.setListItems(List.of(element5, element6, element7, element8, element9));
+        MULTI_LIST = multiList;
+    }
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -88,17 +91,16 @@ public class RequestAHearingCallbackHandler extends CallbackHandler {
 
     private CallbackResponse clearFieldsAndPopulateHearingTypeList(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataUpdated = caseData.toBuilder();
 
         String claimTrack = getClaimTrack(caseData);
         if (nonNull(claimTrack) && claimTrack.equals("INTERMEDIATE_CLAIM")) {
-            caseDataUpdated.requestHearingNoticeDynamic(INTERMEDIATE_LIST);
+            caseData.setRequestHearingNoticeDynamic(INTERMEDIATE_LIST);
         } else if (nonNull(claimTrack) && claimTrack.equals("MULTI_CLAIM")) {
-            caseDataUpdated.requestHearingNoticeDynamic(MULTI_LIST);
+            caseData.setRequestHearingNoticeDynamic(MULTI_LIST);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataUpdated.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

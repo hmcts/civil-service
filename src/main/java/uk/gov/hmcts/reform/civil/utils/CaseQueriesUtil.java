@@ -165,21 +165,20 @@ public class CaseQueriesUtil {
             || nonNull(caseData.getQmRespondentSolicitor2Queries());
     }
 
-    public static void migrateAllQueries(CaseData.CaseDataBuilder builder) {
-        CaseData caseData = builder.build();
+    public static void migrateAllQueries(CaseData caseData) {
         if (hasOldQueries(caseData)) {
             String collectionOwner = "";
             try {
-                builder.queries(CaseQueriesCollection.builder()
+                caseData.setQueries(CaseQueriesCollection.builder()
                                     .partyName("All queries")
                                     .caseMessages(new ArrayList<>())
                                     .build());
                 collectionOwner = "Claimant";
-                migrateQueries(caseData.getQmApplicantSolicitorQueries(), builder);
+                migrateQueries(caseData.getQmApplicantSolicitorQueries(), caseData);
                 collectionOwner = "Defendant 1";
-                migrateQueries(caseData.getQmRespondentSolicitor1Queries(), builder);
+                migrateQueries(caseData.getQmRespondentSolicitor1Queries(), caseData);
                 collectionOwner = "Defendant 2";
-                migrateQueries(caseData.getQmRespondentSolicitor2Queries(), builder);
+                migrateQueries(caseData.getQmRespondentSolicitor2Queries(), caseData);
             } catch (Exception e) {
                 log.error("There was a problem migrating the [{}] queries ", collectionOwner, e);
                 // Continue to throw the original error since all queries must be migrated successfully.
@@ -188,9 +187,8 @@ public class CaseQueriesUtil {
         }
     }
 
-    public static void migrateQueries(CaseQueriesCollection collectionToMigrate, CaseData.CaseDataBuilder builder) {
+    public static void migrateQueries(CaseQueriesCollection collectionToMigrate, CaseData caseData) {
         if (nonNull(collectionToMigrate) && nonNull(collectionToMigrate.getCaseMessages())) {
-            CaseData caseData = builder.build();
             log.info(
                 "Started to migrate [{}] queries",
                 collectionToMigrate.getPartyName(),
@@ -198,15 +196,15 @@ public class CaseQueriesUtil {
             );
             List<Element<CaseMessage>> messages = caseData.getQueries().getCaseMessages();
             messages.addAll(collectionToMigrate.getCaseMessages());
-            builder.queries(caseData.getQueries().toBuilder().caseMessages(messages).build());
+            caseData.setQueries(caseData.getQueries().toBuilder().caseMessages(messages).build());
         }
     }
 
-    public static void clearOldQueryCollections(CaseData.CaseDataBuilder builder) {
-        if (hasOldQueries(builder.build())) {
-            builder.qmApplicantSolicitorQueries(null);
-            builder.qmRespondentSolicitor1Queries(null);
-            builder.qmRespondentSolicitor2Queries(null);
+    public static void clearOldQueryCollections(CaseData caseData) {
+        if (hasOldQueries(caseData)) {
+            caseData.setQmApplicantSolicitorQueries(null);
+            caseData.setQmRespondentSolicitor1Queries(null);
+            caseData.setQmRespondentSolicitor2Queries(null);
         }
     }
 
