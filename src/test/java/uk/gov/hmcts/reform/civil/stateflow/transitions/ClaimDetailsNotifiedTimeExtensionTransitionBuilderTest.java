@@ -20,7 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterSDO;
 
 @ExtendWith(MockitoExtension.class)
 public class ClaimDetailsNotifiedTimeExtensionTransitionBuilderTest {
@@ -60,7 +59,7 @@ public class ClaimDetailsNotifiedTimeExtensionTransitionBuilderTest {
             .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension(true)
             .build();
         assertTrue(TakenOfflinePredicate.sdoNotDrawn.and(TakenOfflinePredicate.afterClaimNotifiedExtension).test(caseData));
-        assertFalse(takenOfflineAfterSDO.test(caseData));
+        assertFalse(TakenOfflinePredicate.byStaff.negate().and(TakenOfflinePredicate.afterSdo.and(TakenOfflinePredicate.bySystem)).test(caseData));
     }
 
     @Test
@@ -77,7 +76,7 @@ public class ClaimDetailsNotifiedTimeExtensionTransitionBuilderTest {
             .atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_ONE)
             .build();
         assertFalse(TakenOfflinePredicate.sdoNotDrawn.and(TakenOfflinePredicate.afterClaimNotifiedExtension).test(caseData));
-        assertTrue(takenOfflineAfterSDO.test(caseData));
+        assertTrue(TakenOfflinePredicate.byStaff.negate().and(TakenOfflinePredicate.afterSdo.and(TakenOfflinePredicate.bySystem)).test(caseData));
     }
 
     @Test
