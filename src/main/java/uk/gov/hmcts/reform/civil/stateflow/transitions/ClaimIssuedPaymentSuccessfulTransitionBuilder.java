@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
@@ -12,11 +11,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimPredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
-import java.util.function.Predicate;
 
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
@@ -43,7 +38,7 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilder extends MidTransition
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT, transitions)
             .onlyWhen(ClaimPredicate.pendingIssuedUnrepresented, transitions)
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, transitions)
-            .onlyWhen(oneVsOneCase.and(ClaimPredicate.issuedRespondent1Unrepresented).and(ClaimPredicate.isSpec), transitions)
+            .onlyWhen(ClaimPredicate.isOneVOne.and(ClaimPredicate.issuedRespondent1Unrepresented).and(ClaimPredicate.isSpec), transitions)
             .set(flags -> flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true), transitions)
             // Unregistered
             // 1. Both def1 and def2 unregistered
@@ -68,15 +63,4 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilder extends MidTransition
                         .and(ClaimPredicate.issuedRespondent2Unrepresented)), transitions);
     }
 
-    public static final Predicate<CaseData> oneVsOneCase = ClaimIssuedPaymentSuccessfulTransitionBuilder::getPredicateFor1v1Case;
-
-    private static boolean getPredicateFor1v1Case(CaseData caseData) {
-        return ONE_V_ONE.equals(getMultiPartyScenario(caseData));
-    }
-
-    public static final Predicate<CaseData> multipartyCase = ClaimIssuedPaymentSuccessfulTransitionBuilder::getPredicateForMultipartyCase;
-
-    private static boolean getPredicateForMultipartyCase(CaseData caseData) {
-        return isMultiPartyScenario(caseData);
-    }
 }
