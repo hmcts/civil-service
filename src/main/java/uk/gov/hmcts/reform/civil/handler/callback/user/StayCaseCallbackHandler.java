@@ -58,15 +58,15 @@ public class StayCaseCallbackHandler extends CallbackHandler {
         caseData.setBusinessProcess(BusinessProcess.ready(STAY_CASE));
         caseData.setPreStayState(callbackParams.getRequest().getCaseDetailsBefore().getState());
         caseData.setHearingDate(null);
-        caseData.setHearingDueDate(null);
-        caseData.setHearingNoticeList(null);
         caseData.setListingOrRelisting(null);
-        caseData.setHearingLocation(null);
-        caseData.setChannel(null);
         caseData.setHearingTimeHourMinute(null);
         caseData.setHearingDuration(null);
         caseData.setInformation(null);
+        caseData.setHearingLocation(null);
+        caseData.setChannel(null);
         caseData.setHearingNoticeListOther(null);
+        caseData.setHearingDueDate(null);
+        caseData.setHearingNoticeList(null);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(mapper))

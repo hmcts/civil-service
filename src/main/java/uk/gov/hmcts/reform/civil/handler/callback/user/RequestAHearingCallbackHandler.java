@@ -11,8 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.utils.HearingTypeListUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -35,45 +34,6 @@ public class RequestAHearingCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     public static final String LISTING_REQUESTED = "## Listing Requested";
     public static final String LISTING_REQUESTED_TASKS = "A work allocation task will be created for a listing officer to list the hearing.";
-    private static final DynamicList INTERMEDIATE_LIST;
-    private static final DynamicList MULTI_LIST;
-
-    static {
-        DynamicListElement element1 = new DynamicListElement();
-        element1.setCode("CASE_MANAGEMENT_CONFERENCE");
-        element1.setLabel("Case Management Conference (CMC)");
-        DynamicListElement element2 = new DynamicListElement();
-        element2.setCode("PRE_TRIAL_REVIEW");
-        element2.setLabel("Pre Trial Review (PTR)");
-        DynamicListElement element3 = new DynamicListElement();
-        element3.setCode("TRIAL");
-        element3.setLabel("Trial");
-        DynamicListElement element4 = new DynamicListElement();
-        element4.setCode("OTHER");
-        element4.setLabel("Other");
-        DynamicList intermediateList = new DynamicList();
-        intermediateList.setListItems(List.of(element1, element2, element3, element4));
-        INTERMEDIATE_LIST = intermediateList;
-
-        DynamicListElement element5 = new DynamicListElement();
-        element5.setCode("CASE_MANAGEMENT_CONFERENCE");
-        element5.setLabel("Case Management Conference (CMC)");
-        DynamicListElement element6 = new DynamicListElement();
-        element6.setCode("COSTS_CASE_MANAGEMENT_CONFERENCE");
-        element6.setLabel("Costs and Case Management Conference (CCMC)");
-        DynamicListElement element7 = new DynamicListElement();
-        element7.setCode("PRE_TRIAL_REVIEW");
-        element7.setLabel("Pre Trial Review (PTR)");
-        DynamicListElement element8 = new DynamicListElement();
-        element8.setCode("TRIAL");
-        element8.setLabel("Trial");
-        DynamicListElement element9 = new DynamicListElement();
-        element9.setCode("OTHER");
-        element9.setLabel("Other");
-        DynamicList multiList = new DynamicList();
-        multiList.setListItems(List.of(element5, element6, element7, element8, element9));
-        MULTI_LIST = multiList;
-    }
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -94,9 +54,9 @@ public class RequestAHearingCallbackHandler extends CallbackHandler {
 
         String claimTrack = getClaimTrack(caseData);
         if (nonNull(claimTrack) && claimTrack.equals("INTERMEDIATE_CLAIM")) {
-            caseData.setRequestHearingNoticeDynamic(INTERMEDIATE_LIST);
+            caseData.setRequestHearingNoticeDynamic(HearingTypeListUtils.INTERMEDIATE_LIST);
         } else if (nonNull(claimTrack) && claimTrack.equals("MULTI_CLAIM")) {
-            caseData.setRequestHearingNoticeDynamic(MULTI_LIST);
+            caseData.setRequestHearingNoticeDynamic(HearingTypeListUtils.MULTI_LIST);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
