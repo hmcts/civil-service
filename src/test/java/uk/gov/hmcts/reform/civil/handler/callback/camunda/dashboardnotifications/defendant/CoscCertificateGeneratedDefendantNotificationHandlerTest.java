@@ -77,8 +77,11 @@ class CoscCertificateGeneratedDefendantNotificationHandlerTest extends BaseCallb
 
         @Test
         void shouldRecordScenario_whenInvoked() {
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setApplicant1SettleClaim(YesOrNo.YES);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
-                .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES).build())
+                .caseDataLip(caseDataLiP)
                 .respondent1Represented(YesOrNo.NO).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -108,19 +111,26 @@ class CoscCertificateGeneratedDefendantNotificationHandlerTest extends BaseCallb
         @Test
         void shouldRecordScenario_whenPaymentCompletedAndCertificateAvailable() {
             // Given
-            List<Element<GeneralApplication>> gaApplications = wrapElements(
-                GeneralApplication.builder()
-                    .caseLink(CaseLink.builder().caseReference("54326781").build())
-                    .generalAppType(GAApplicationType.builder().types(singletonList(CONFIRM_CCJ_DEBT_PAID)).build())
-                    .build());
+            CaseLink caseLink = new CaseLink();
+            caseLink.setCaseReference("54326781");
+
+            GeneralApplication generalApplication = new GeneralApplication();
+            generalApplication.setCaseLink(caseLink);
+            GAApplicationType gaApplicationType = new GAApplicationType();
+            gaApplicationType.setTypes(singletonList(CONFIRM_CCJ_DEBT_PAID));
+            generalApplication.setGeneralAppType(gaApplicationType);
+
+            List<Element<GeneralApplication>> gaApplications = wrapElements(generalApplication);
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
 
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setApplicant1SettleClaim(YesOrNo.YES);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
-                .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES).build())
-                .respondent1Represented(YesOrNo.NO).build().toBuilder()
-                .generalApplications(gaApplications)
-                .build();
+                .caseDataLip(caseDataLiP)
+                .respondent1Represented(YesOrNo.NO).build();
+            caseData.setGeneralApplications(gaApplications);
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);

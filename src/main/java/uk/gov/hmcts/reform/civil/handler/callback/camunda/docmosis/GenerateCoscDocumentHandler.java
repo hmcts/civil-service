@@ -54,16 +54,15 @@ public class GenerateCoscDocumentHandler extends CallbackHandler {
 
     private CallbackResponse generateCoscDocument(CallbackParams callbackParams) {
         CaseData caseDataInfo = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseDataInfo.toBuilder();
-        buildCoscDocument(callbackParams, caseDataBuilder);
-        caseDataBuilder.coSCApplicationStatus(PROCESSED);
+        buildCoscDocument(callbackParams);
+        caseDataInfo.setCoSCApplicationStatus(PROCESSED);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseDataInfo.toMap(objectMapper))
             .build();
     }
 
-    private void buildCoscDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+    private void buildCoscDocument(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String authorisation = callbackParams.getParams().get(BEARER_TOKEN).toString();
         CaseDocument englishDocument = coscDocumentGenerartor.generateDoc(
@@ -98,7 +97,7 @@ public class GenerateCoscDocumentHandler extends CallbackHandler {
         }
         systemGeneratedCaseDocuments.add(element(caseDocument));
 
-        caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
+        caseData.setSystemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
     }
 
     @Override

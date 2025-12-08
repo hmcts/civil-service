@@ -43,10 +43,9 @@ public class ServiceRequestUpdateCallbackHandler extends CallbackHandler {
 
     private CallbackResponse changeApplicationState(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(dataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
