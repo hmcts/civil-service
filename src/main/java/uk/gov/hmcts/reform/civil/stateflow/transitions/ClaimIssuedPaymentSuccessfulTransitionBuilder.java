@@ -19,7 +19,6 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
@@ -46,7 +45,7 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilder extends MidTransition
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT, transitions)
             .onlyWhen(ClaimPredicate.pendingIssuedUnrepresented, transitions)
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, transitions)
-            .onlyWhen(oneVsOneCase.and(respondent1NotRepresented).and(specClaim), transitions)
+            .onlyWhen(oneVsOneCase.and(respondent1NotRepresented).and(ClaimPredicate.isSpec), transitions)
             .set(flags -> flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true), transitions)
             // Unregistered
             // 1. Both def1 and def2 unregistered
@@ -70,16 +69,6 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilder extends MidTransition
                     .or(respondent1OrgNotRegistered.and(respondent1NotRepresented.negate())
                         .and(respondent2NotRepresented)), transitions);
     }
-
-    public static final Predicate<CaseData> pendingClaimIssued = caseData ->
-        caseData.getIssueDate() != null
-            && caseData.getRespondent1Represented() == YES
-            && caseData.getRespondent1OrgRegistered() == YES
-            && (caseData.getRespondent2() == null
-            || (caseData.getRespondent2Represented() == YES
-            && (caseData.getRespondent2OrgRegistered() == YES
-            || caseData.getRespondent2SameLegalRepresentative() == YES)));
-
 
     public static final Predicate<CaseData> respondent1NotRepresented = caseData ->
         caseData.getIssueDate() != null && caseData.getRespondent1Represented() == NO;
