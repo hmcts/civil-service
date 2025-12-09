@@ -47,7 +47,7 @@ properties([
                                                   'https://civil-citizen-ui-pr-{PR_NUMBER}-civil-service.preview.platform.hmcts.net',
                                                 ],
       description: 'The URL of civil service'),
-    choice(name: 'AAC_API_URL', choices: [
+    choice(name: 'AAC_API_URL', choices: [ 
                                             'http://aac-manage-case-assignment-aat.service.core-compute-aat.internal',
                                             'http://aac-manage-case-assignment-demo.service.core-compute-demo.internal',
                                             'https://manage-case-assignment-civil-ccd-pr-{PR_NUMBER}.preview.platform.hmcts.net',
