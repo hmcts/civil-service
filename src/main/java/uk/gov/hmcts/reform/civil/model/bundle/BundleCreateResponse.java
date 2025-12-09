@@ -2,7 +2,10 @@ package uk.gov.hmcts.reform.civil.model.bundle;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Value;
 
 import java.util.List;
@@ -10,6 +13,9 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Value
 @Builder(toBuilder = true)
+@Data
+@NoArgsConstructor(force = true)
+@AllArgsConstructor
 public class BundleCreateResponse {
 
     @JsonProperty("data")

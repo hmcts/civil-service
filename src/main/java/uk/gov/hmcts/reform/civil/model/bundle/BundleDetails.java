@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 
 import java.time.LocalDate;
@@ -13,6 +15,7 @@ import java.time.LocalDateTime;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 @Builder(toBuilder = true)
+@NoArgsConstructor
 public class BundleDetails {
 
     private String id;
