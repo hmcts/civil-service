@@ -48,11 +48,10 @@ public class ResetRpaNotificationBusinessProcessHandler extends CallbackHandler 
     }
 
     private CallbackResponse resetBusinessProcess(CallbackParams callbackParams) {
-        CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
-            .businessProcess(BusinessProcess.ready(RETRY_NOTIFY_RPA_ON_CASE_HANDED_OFFLINE))
-            .build();
+        CaseData caseData = callbackParams.getCaseData();
+        caseData.setBusinessProcess(BusinessProcess.ready(RETRY_NOTIFY_RPA_ON_CASE_HANDED_OFFLINE));
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataUpdated.toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 }

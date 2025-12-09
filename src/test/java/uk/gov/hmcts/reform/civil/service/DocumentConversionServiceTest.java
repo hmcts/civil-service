@@ -48,11 +48,10 @@ class DocumentConversionServiceTest {
 
     @BeforeEach
     public void setUp() {
-        documentToConvert = Document.builder()
-            .documentFileName("file.docx")
-            .documentUrl("docUrl.com")
-            .documentBinaryUrl("binaryUrl.com")
-            .build();
+        documentToConvert = new Document();
+        documentToConvert.setDocumentFileName("file.docx");
+        documentToConvert.setDocumentUrl("docUrl.com");
+        documentToConvert.setDocumentBinaryUrl("binaryUrl.com");
     }
 
     @Test

@@ -181,9 +181,9 @@ public class SendAndReplyMessageService {
     }
 
     public DynamicList createMessageSelectionList(List<Element<Message>> messages) {
-        return DynamicList.builder()
-            .listItems(messages.stream().map(this::createMessageListItems).toList())
-            .build();
+        DynamicList dynamicList = new DynamicList();
+        dynamicList.setListItems(messages.stream().map(this::createMessageListItems).toList());
+        return dynamicList;
     }
 
     private DynamicListElement createMessageListItems(Element<Message> message) {

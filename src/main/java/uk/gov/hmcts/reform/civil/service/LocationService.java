@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.model.referencedata.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
 import java.util.EnumSet;
@@ -63,13 +63,12 @@ public class LocationService {
             return Pair.of(courtLocation, true);
         } else {
             LocationRefData cnbcLocation = locationRefDataService.getCnbcLocation(authToken);
-            courtLocation = CaseLocationCivil.builder()
-                .region(cnbcLocation.getRegionId())
-                .baseLocation(cnbcLocation.getEpimmsId())
-                .siteName(cnbcLocation.getSiteName())
-                .address(cnbcLocation.getCourtAddress())
-                .postcode(cnbcLocation.getPostcode())
-                .build();
+            courtLocation = new CaseLocationCivil();
+            courtLocation.setRegion(cnbcLocation.getRegionId());
+            courtLocation.setBaseLocation(cnbcLocation.getEpimmsId());
+            courtLocation.setSiteName(cnbcLocation.getSiteName());
+            courtLocation.setAddress(cnbcLocation.getCourtAddress());
+            courtLocation.setPostcode(cnbcLocation.getPostcode());
         }
         return Pair.of(courtLocation, true);
     }
@@ -127,12 +126,12 @@ public class LocationService {
 
         LocationRefData caseManagementLocationDetails = locationRefDataList.get(0);
 
-        return CaseLocationCivil.builder()
-            .region(caseManagementLocationDetails.getRegionId())
-            .baseLocation(caseManagementLocationDetails.getEpimmsId())
-            .siteName(caseManagementLocationDetails.getSiteName())
-            .address(caseManagementLocationDetails.getCourtAddress())
-            .postcode(caseManagementLocationDetails.getPostcode())
-            .build();
+        CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+        caseLocationCivil.setRegion(caseManagementLocationDetails.getRegionId());
+        caseLocationCivil.setBaseLocation(caseManagementLocationDetails.getEpimmsId());
+        caseLocationCivil.setSiteName(caseManagementLocationDetails.getSiteName());
+        caseLocationCivil.setAddress(caseManagementLocationDetails.getCourtAddress());
+        caseLocationCivil.setPostcode(caseManagementLocationDetails.getPostcode());
+        return caseLocationCivil;
     }
 }

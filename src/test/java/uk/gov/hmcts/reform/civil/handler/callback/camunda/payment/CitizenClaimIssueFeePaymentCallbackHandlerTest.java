@@ -30,7 +30,7 @@ class CitizenClaimIssueFeePaymentCallbackHandlerTest extends BaseCallbackHandler
     @Test
     void citizenClaimIssuePayment() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-        caseData = caseData.toBuilder().claimIssuedPaymentDetails(buildPaymentDetails()).build();
+        caseData.setClaimIssuedPaymentDetails(buildPaymentDetails());
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

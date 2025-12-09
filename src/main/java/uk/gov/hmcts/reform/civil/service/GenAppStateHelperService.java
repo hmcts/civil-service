@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.model.referencedata.LocationRefData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -95,7 +95,7 @@ public class GenAppStateHelperService {
                 generalApplication = objectMapper.convertValue(genAppMap, GeneralApplication.class);
                 genApps.add((generalApplication));
             });
-            caseData = caseData.toBuilder().generalApplications(wrapElements(genApps)).build();
+            caseData.setGeneralApplications(wrapElements(genApps));
         }
         return caseData;
     }

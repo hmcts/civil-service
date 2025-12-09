@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.model.referencedata.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -141,7 +141,7 @@ class GenAppStateHelperServiceTest {
         public void updateApplicationDetailsListsToReflectLatestApplicationStatusChange_AC() {
             setupForApplicationClosed();
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseData.builder().build(),
+                .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),
                                             true,
                                             true,
                                             true, true,
@@ -169,7 +169,7 @@ class GenAppStateHelperServiceTest {
         public void noUpdatesToCaseDataIfThereAreNoGeneralApplications_AC() {
             setupForApplicationClosed();
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseData.builder().build(),
+                .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),
                                             false,
                                             false,
                                             false, false,
@@ -198,7 +198,7 @@ class GenAppStateHelperServiceTest {
             Map<String, String> applications = new HashMap<>();
             applications.put("9999", "Application Submitted - Awaiting Judicial Decision");
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseData.builder().build(),
+                .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),
                                             true,
                                             true,
                                             true, true,
@@ -217,7 +217,7 @@ class GenAppStateHelperServiceTest {
         public void updateApplicationDetailsListsToReflectLatestApplicationStatusChange_AO() {
             setupForApplicationOffline();
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseData.builder().build(),
+                .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),
                                             true,
                                             true,
                                             true, true,
@@ -246,7 +246,7 @@ class GenAppStateHelperServiceTest {
         public void noUpdatesToCaseDataIfThereAreNoGeneralApplications_AO() {
             setupForApplicationOffline();
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseData.builder().build(),
+                .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),
                                             false,
                                             false,
                                             false, false,
@@ -275,7 +275,7 @@ class GenAppStateHelperServiceTest {
             Map<String, String> applications = new HashMap<>();
             applications.put("9999", "Application Submitted - Awaiting Judicial Decision");
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseData.builder().build(),
+                .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),
                                             true,
                                             true,
                                             true, true,
@@ -413,19 +413,20 @@ class GenAppStateHelperServiceTest {
             when(locationService.getWorkAllocationLocationDetails(any(), any()))
                 .thenReturn(getSampleCourLocationsRefObject1());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseData.builder().build(),
+                .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),
                                             true,
                                             true,
                                             true, true,
                                             getOriginalStatusOfGeneralApplication_applicationClosed()
                 );
 
-            Pair<CaseLocationCivil, Boolean> caseLocation = Pair.of(CaseLocationCivil.builder()
-                                                         .region("2")
-                                                         .baseLocation("00000").siteName("locationOfRegion2")
-                                                                        .address("Prince William House, Peel Cross Road, Salford")
-                                                                        .postcode("M5 4RR")
-                                                         .build(), false);
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setRegion("2");
+            caseLocationCivil.setBaseLocation("00000");
+            caseLocationCivil.setSiteName("locationOfRegion2");
+            caseLocationCivil.setAddress("Prince William House, Peel Cross Road, Salford");
+            caseLocationCivil.setPostcode("M5 4RR");
+            Pair<CaseLocationCivil, Boolean> caseLocation = Pair.of(caseLocationCivil, false);
             CaseData updatedData = service.updateApplicationLocationDetailsInClaim(caseData, authToken);
 
             assertThat(getGADetailsFromUpdatedCaseData(updatedData, "1234")).isNotNull();
@@ -458,7 +459,7 @@ class GenAppStateHelperServiceTest {
          void noLocationUpdatesToCaseDataIfThereAreNoGeneralApplications() {
             setupForApplicationOffline();
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseData.builder().build(),
+                .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),
                                             false,
                                             false,
                                             false, false,
@@ -479,7 +480,7 @@ class GenAppStateHelperServiceTest {
         @Test
         void shouldTriggerGeneralApplicationEvent_whenCaseHasGeneralApplication() {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseData.builder().build(),
+                .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),
                                             true,
                                             true,
                                             true, true,
