@@ -25,8 +25,11 @@ public class InMediationTransitionBuilder extends MidTransitionBuilder {
 
     @Override
     void setUpTransitions(List<Transition> transitions) {
-        this.moveTo(MEDIATION_UNSUCCESSFUL_PROCEED, transitions).onlyWhen(casemanMarksMediationUnsuccessful, transitions)
-            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaffBeforeMediationUnsuccessful, transitions);
+        this.moveTo(MEDIATION_UNSUCCESSFUL_PROCEED, transitions)
+            .onlyWhen(casemanMarksMediationUnsuccessful, transitions)
+
+            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions)
+            .onlyWhen(takenOfflineByStaffBeforeMediationUnsuccessful, transitions);
     }
 
     public static final Predicate<CaseData> casemanMarksMediationUnsuccessful = caseData ->

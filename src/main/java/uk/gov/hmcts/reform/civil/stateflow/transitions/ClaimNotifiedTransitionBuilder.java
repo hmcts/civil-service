@@ -30,10 +30,13 @@ public class ClaimNotifiedTransitionBuilder extends MidTransitionBuilder {
     void setUpTransitions(List<Transition> transitions) {
         this.moveTo(CLAIM_DETAILS_NOTIFIED, transitions).onlyWhen(ClaimPredicate.isSpec.negate()
                 .and(NotificationPredicate.hasClaimDetailsNotifiedToBoth), transitions)
+
             .moveTo(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED, transitions)
             .onlyWhen(TakenOfflinePredicate.afterClaimDetailsNotified, transitions)
+
             .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions)
             .onlyWhen(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.afterClaimNotifiedFutureDeadline), transitions)
+
             .moveTo(PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA, transitions)
             .onlyWhen(DismissedPredicate.pastClaimDetailsNotificationDeadline, transitions);
     }

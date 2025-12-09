@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
@@ -13,9 +15,6 @@ import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssued;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineBySystem;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
 
@@ -30,11 +29,12 @@ public class PendingClaimIssuedUnrepresentedDefendantTransitionBuilder extends M
 
     @Override
     void setUpTransitions(List<Transition> transitions) {
-        this.moveTo(CLAIM_ISSUED, transitions).onlyWhen(claimIssued
-                .and(not(specClaim))
-                .and(certificateOfServiceEnabled), transitions)
-            .moveTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT, transitions).onlyWhen(takenOfflineBySystem
-                .and(specClaim), transitions);
+        this.moveTo(CLAIM_ISSUED, transitions)
+            .onlyWhen(ClaimPredicate.issued.and(not(ClaimPredicate.isSpec)).and(certificateOfServiceEnabled), transitions)
+
+            .moveTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT, transitions)
+            .onlyWhen(TakenOfflinePredicate.bySystem
+                .and(ClaimPredicate.changeOfRepresentation.negate()).and(ClaimPredicate.isSpec), transitions);
     }
 
     public static final Predicate<CaseData> certificateOfServiceEnabled = caseData ->
