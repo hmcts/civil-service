@@ -3,13 +3,12 @@ package uk.gov.hmcts.reform.civil.stateflow.transitions;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LipPredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssued;
@@ -29,11 +28,9 @@ public class PendingClaimIssuedUnrepresentedDefendantOneVOneSpecTransitionBuilde
     @Override
     void setUpTransitions(List<Transition> transitions) {
         this.moveTo(CLAIM_ISSUED, transitions)
-            .onlyWhen(claimIssued.and(pinInPostEnabledAndLiP), transitions)
+            .onlyWhen(claimIssued.and(LipPredicate.pinInPostEnabled), transitions)
             .moveTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT, transitions)
-            .onlyWhen(takenOfflineBySystem.and(not(pinInPostEnabledAndLiP)), transitions);
+            .onlyWhen(takenOfflineBySystem.and(not(LipPredicate.pinInPostEnabled)), transitions);
     }
 
-    public static final Predicate<CaseData> pinInPostEnabledAndLiP = caseData ->
-        caseData.getRespondent1PinToPostLRspec() != null;
 }
