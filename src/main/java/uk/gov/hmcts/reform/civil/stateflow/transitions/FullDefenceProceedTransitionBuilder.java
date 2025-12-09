@@ -31,16 +31,20 @@ public class FullDefenceProceedTransitionBuilder extends MidTransitionBuilder {
     void setUpTransitions(List<Transition> transitions) {
         this.moveTo(IN_HEARING_READINESS, transitions)
             .onlyWhen(HearingPredicate.isInReadiness, transitions)
+
             .moveTo(CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE, transitions)
             .onlyWhen(DismissedPredicate.pastHearingFeeDue, transitions)
+
             .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions)
             .onlyWhen((TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.beforeSdo)
                 .or(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.afterSdo))
                 .or(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.afterSdoNotSuitable)))
                 .and(not(DismissedPredicate.pastHearingFeeDue)), transitions)
+
             .moveTo(TAKEN_OFFLINE_AFTER_SDO, transitions)
             .onlyWhen(TakenOfflinePredicate.byStaff.negate()
                 .and(TakenOfflinePredicate.afterSdo.and(TakenOfflinePredicate.bySystem)), transitions)
+
             .moveTo(TAKEN_OFFLINE_SDO_NOT_DRAWN, transitions)
             .onlyWhen(TakenOfflinePredicate.byStaff.negate().and(TakenOfflinePredicate.sdoNotDrawn), transitions);
     }
