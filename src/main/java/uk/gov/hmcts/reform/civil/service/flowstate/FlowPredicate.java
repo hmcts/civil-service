@@ -28,28 +28,31 @@ public interface FlowPredicate {
 
     Predicate<CaseData> claimIssued = ClaimPredicate.issued;
     Predicate<CaseData> specClaim = ClaimPredicate.isSpec;
-    Predicate<CaseData> hasNotifiedClaimDetailsToBoth = ClaimPredicate.isSpec.negate()
-        .and(NotificationPredicate.hasClaimDetailsNotifiedToBoth);
+
     Predicate<CaseData> claimDetailsNotifiedTimeExtension = NotificationPredicate.notifiedTimeExtension;
-    Predicate<CaseData> takenOfflineAfterClaimDetailsNotified = TakenOfflinePredicate.afterClaimDetailsNotified;
+
     Predicate<CaseData> takenOfflineSDONotDrawn = TakenOfflinePredicate.byStaff.negate()
         .and(TakenOfflinePredicate.sdoNotDrawn);
+
     Predicate<CaseData> takenOfflineBySystem = TakenOfflinePredicate.bySystem
         .and(ClaimPredicate.changeOfRepresentation.negate());
+
     Predicate<CaseData> takenOfflineByStaff = TakenOfflinePredicate.byStaff;
+
     Predicate<CaseData> takenOfflineAfterSDO = TakenOfflinePredicate.byStaff.negate()
         .and(TakenOfflinePredicate.afterSdo.and(TakenOfflinePredicate.bySystem));
+
     Predicate<CaseData> takenOfflineByStaffAfterClaimNotified = TakenOfflinePredicate.byStaff
         .and(TakenOfflinePredicate.afterClaimNotifiedFutureDeadline);
+
     Predicate<CaseData> takenOfflineByStaffAfterClaimDetailsNotified = TakenOfflinePredicate.byStaff.and(
         TakenOfflinePredicate.afterClaimNotifiedNoAckNoResponseNoExtension);
-    Predicate<CaseData> isDefendantNoCOnlineForCaseAfterJBA = TakenOfflinePredicate.isDefendantNoCOnlineForCaseAfterJBA;
+
     Predicate<CaseData> applicantOutOfTimeNotBeingTakenOffline = OutOfTimePredicate.notBeingTakenOffline;
     Predicate<CaseData> applicantOutOfTimeProcessedByCamunda = OutOfTimePredicate.processedByCamunda;
     Predicate<CaseData> paymentSuccessful = PaymentPredicate.successful;
     Predicate<CaseData> acceptRepaymentPlan = RepaymentPredicate.acceptRepaymentPlan;
     Predicate<CaseData> rejectRepaymentPlan = RepaymentPredicate.rejectRepaymentPlan;
-    Predicate<CaseData> isRespondentResponseLangIsBilingual = LanguagePredicate.respondentIsBilingual;
     Predicate<CaseData> onlyInitialRespondentResponseLangIsBilingual = LanguagePredicate.onlyInitialResponseIsBilingual;
     Predicate<CaseData> isInHearingReadiness = HearingPredicate.isInReadiness;
     Predicate<CaseData> fullAdmissionSpec = ResponsePredicate.isType(FULL_ADMISSION);
@@ -63,8 +66,10 @@ public interface FlowPredicate {
     Predicate<CaseData> allResponsesReceived = ResponsePredicate.allResponsesReceived;
     Predicate<CaseData> awaitingResponsesFullDefenceReceived = ResponsePredicate.awaitingResponsesFullDefenceReceived;
     Predicate<CaseData> awaitingResponsesFullAdmitReceived = ResponsePredicate.awaitingResponsesFullAdmitReceived;
+
     Predicate<CaseData> awaitingResponsesNonFullDefenceOrFullAdmitReceived
         = ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceived;
+
     Predicate<CaseData> caseDismissedAfterDetailNotified = DismissedPredicate.afterClaimDetailNotified;
     Predicate<CaseData> pastClaimDetailsNotificationDeadline = DismissedPredicate.pastClaimDetailsNotificationDeadline;
     Predicate<CaseData> claimDismissedByCamunda = DismissedPredicate.byCamunda;

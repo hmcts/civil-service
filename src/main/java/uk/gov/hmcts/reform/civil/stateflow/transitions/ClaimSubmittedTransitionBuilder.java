@@ -36,10 +36,15 @@ public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
 
     @Override
     void setUpTransitions(List<Transition> transitions) {
-        this.moveTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL, transitions).onlyWhen(PaymentPredicate.successful, transitions)
+        this.moveTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL, transitions)
+            .onlyWhen(PaymentPredicate.successful, transitions)
+
             .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions)
             .onlyWhen(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.beforeClaimIssue), transitions)
-            .moveTo(CLAIM_ISSUED_PAYMENT_FAILED, transitions).onlyWhen(PaymentPredicate.failed, transitions)
+
+            .moveTo(CLAIM_ISSUED_PAYMENT_FAILED, transitions)
+            .onlyWhen(PaymentPredicate.failed, transitions)
+
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, transitions)
             .onlyWhen(LipPredicate.isLiPvLiPCase
                 .and(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.beforeClaimIssue).negate()), transitions)
@@ -54,6 +59,7 @@ public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
                     flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
                     flags.put(FlowFlag.LIP_CASE.name(), true);
                 }, transitions)
+
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, transitions)
             .onlyWhen(LipPredicate.nocApplyForLiPClaimant, transitions)
             .set(flags -> flags.putAll(
@@ -61,6 +67,7 @@ public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
                     FlowFlag.LIP_CASE.name(), false,
                     FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true
                 )), transitions)
+
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, transitions)
             .onlyWhen(not(isDefendantNoCOnlineForCase)
                 .and(LipPredicate.isLiPvLRCase.and(not(LipPredicate.nocSubmittedForLiPDefendant))
@@ -70,6 +77,7 @@ public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
                     FlowFlag.LIP_CASE.name(), true,
                     FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
                 )), transitions)
+
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, transitions)
             .onlyWhen(isDefendantNoCOnlineForCase.and(LipPredicate.isLiPvLRCase), transitions)
             .set(
@@ -84,6 +92,7 @@ public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
                         flags.put(FlowFlag.CLAIM_ISSUE_BILINGUAL.name(), true);
                     }
                 }, transitions)
+
             .moveTo(SPEC_DEFENDANT_NOC, transitions).onlyWhen(not(isDefendantNoCOnlineForCase).and(
                 LipPredicate.nocSubmittedForLiPDefendantBeforeOffline), transitions)
             .set(flags -> flags.putAll(

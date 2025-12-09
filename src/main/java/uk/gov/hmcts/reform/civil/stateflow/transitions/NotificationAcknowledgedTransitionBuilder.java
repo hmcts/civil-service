@@ -34,25 +34,32 @@ public class NotificationAcknowledgedTransitionBuilder extends MidTransitionBuil
     void setUpTransitions(List<Transition> transitions) {
         this.moveTo(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION, transitions)
             .onlyWhen(ResponsePredicate.notificationAcknowledged.and(ResponsePredicate.respondentTimeExtension), transitions)
+
             .moveTo(ALL_RESPONSES_RECEIVED, transitions)
             .onlyWhen(ResponsePredicate.notificationAcknowledged.and(not(ResponsePredicate.respondentTimeExtension))
                 .and(ResponsePredicate.allResponsesReceived), transitions)
+
             .moveTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED, transitions)
             .onlyWhen(ResponsePredicate.notificationAcknowledged.and(not(ResponsePredicate.respondentTimeExtension))
                 .and(ResponsePredicate.awaitingResponsesFullDefenceReceived)
                 .and(not(DismissedPredicate.afterClaimAcknowledged)), transitions)
+
             .moveTo(AWAITING_RESPONSES_FULL_ADMIT_RECEIVED, transitions)
             .onlyWhen(ResponsePredicate.notificationAcknowledged.and(not(ResponsePredicate.respondentTimeExtension))
                 .and(ResponsePredicate.awaitingResponsesFullAdmitReceived), transitions)
+
             .moveTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED, transitions)
             .onlyWhen(ResponsePredicate.notificationAcknowledged.and(not(ResponsePredicate.respondentTimeExtension))
                 .and(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceived), transitions)
+
             .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions)
             .onlyWhen(TakenOfflinePredicate.byStaff
                 .and(TakenOfflinePredicate.afterClaimNotifiedAckNoResponseNoExtension), transitions)
+
             .moveTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA, transitions)
             .onlyWhen(DismissedPredicate.afterClaimAcknowledged
                 .and(TakenOfflinePredicate.sdoNotSuitable.negate()), transitions)
+
             .moveTo(TAKEN_OFFLINE_SDO_NOT_DRAWN, transitions)
             .onlyWhen(TakenOfflinePredicate.sdoNotDrawn
                 .and(TakenOfflinePredicate.afterClaimNotifiedAckNoResponseNoExtension), transitions);

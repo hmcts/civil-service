@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimPredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
@@ -17,10 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.DraftTransitionBuilder.claimSubmittedOneRespondentRepresentative;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.DraftTransitionBuilder.claimSubmittedOneUnrepresentedDefendantOnly;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.DraftTransitionBuilder.claimSubmittedRespondent1Unrepresented;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.DraftTransitionBuilder.claimSubmittedRespondent2Unrepresented;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.PendingClaimIssuedUnrepresentedDefendantTransitionBuilder.certificateOfServiceEnabled;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,7 +47,7 @@ public class PendingClaimIssuedUnrepresentedDefendantTransitionBuilderTest {
     @Test
     void shouldReturnTrue_whenCaseDataAtClaimSubmittedState() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-        assertTrue(claimSubmittedOneRespondentRepresentative.test(caseData));
+        assertTrue(ClaimPredicate.submittedOneRespondentRepresentative.test(caseData));
         assertFalse(certificateOfServiceEnabled.test(caseData));
     }
 
@@ -63,7 +60,7 @@ public class PendingClaimIssuedUnrepresentedDefendantTransitionBuilderTest {
     @Test
     void shouldReturnTrue_whenCaseDataAtClaimSubmittedOneRespondentRepresentativeState() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedOneRespondentRepresentative().build();
-        assertTrue(claimSubmittedOneRespondentRepresentative.test(caseData));
+        assertTrue(ClaimPredicate.submittedOneRespondentRepresentative.test(caseData));
         assertFalse(certificateOfServiceEnabled.test(caseData));
     }
 
@@ -76,7 +73,7 @@ public class PendingClaimIssuedUnrepresentedDefendantTransitionBuilderTest {
     @Test
     void shouldReturnFalse_whenCaseDataAtClaimSubmittedTwoRespondentRepresentativesState() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedTwoRespondentRepresentatives().build();
-        assertFalse(claimSubmittedOneRespondentRepresentative.test(caseData));
+        assertFalse(ClaimPredicate.submittedOneRespondentRepresentative.test(caseData));
         assertFalse(certificateOfServiceEnabled.test(caseData));
     }
 
@@ -86,8 +83,8 @@ public class PendingClaimIssuedUnrepresentedDefendantTransitionBuilderTest {
             .defendant1LIPAtClaimIssued(YES).build();
 
         assertTrue(certificateOfServiceEnabled.test(caseData));
-        assertTrue(claimSubmittedOneUnrepresentedDefendantOnly.test(caseData));
-        assertTrue(claimSubmittedRespondent1Unrepresented.test(caseData));
+        assertTrue(ClaimPredicate.submittedOneUnrepresentedDefendantOnly.test(caseData));
+        assertTrue(ClaimPredicate.submittedRespondent1Unrepresented.test(caseData));
     }
 
     @Test
@@ -96,9 +93,9 @@ public class PendingClaimIssuedUnrepresentedDefendantTransitionBuilderTest {
             .defendant1LIPAtClaimIssued(YES).build();
 
         assertTrue(certificateOfServiceEnabled.test(caseData));
-        assertFalse(claimSubmittedOneUnrepresentedDefendantOnly.test(caseData));
-        assertTrue(claimSubmittedRespondent1Unrepresented.test(caseData));
-        assertFalse(claimSubmittedRespondent2Unrepresented.test(caseData));
+        assertFalse(ClaimPredicate.submittedOneUnrepresentedDefendantOnly.test(caseData));
+        assertTrue(ClaimPredicate.submittedRespondent1Unrepresented.test(caseData));
+        assertFalse(ClaimPredicate.submittedRespondent2Unrepresented.test(caseData));
     }
 
     @Test
@@ -108,9 +105,9 @@ public class PendingClaimIssuedUnrepresentedDefendantTransitionBuilderTest {
             .defendant2LIPAtClaimIssued(YES).build();
 
         assertTrue(certificateOfServiceEnabled.test(caseData));
-        assertFalse(claimSubmittedOneUnrepresentedDefendantOnly.test(caseData));
-        assertFalse(claimSubmittedRespondent1Unrepresented.test(caseData));
-        assertTrue(claimSubmittedRespondent2Unrepresented.test(caseData));
+        assertFalse(ClaimPredicate.submittedOneUnrepresentedDefendantOnly.test(caseData));
+        assertFalse(ClaimPredicate.submittedRespondent1Unrepresented.test(caseData));
+        assertTrue(ClaimPredicate.submittedRespondent2Unrepresented.test(caseData));
     }
 
     @Test
@@ -121,9 +118,9 @@ public class PendingClaimIssuedUnrepresentedDefendantTransitionBuilderTest {
             .atStateClaimIssuedUnrepresentedDefendants().build();
 
         assertTrue(certificateOfServiceEnabled.test(caseData));
-        assertFalse(claimSubmittedOneUnrepresentedDefendantOnly.test(caseData));
-        assertTrue(claimSubmittedRespondent1Unrepresented.test(caseData));
-        assertTrue(claimSubmittedRespondent2Unrepresented.test(caseData));
+        assertFalse(ClaimPredicate.submittedOneUnrepresentedDefendantOnly.test(caseData));
+        assertTrue(ClaimPredicate.submittedRespondent1Unrepresented.test(caseData));
+        assertTrue(ClaimPredicate.submittedRespondent2Unrepresented.test(caseData));
     }
 
     @Test

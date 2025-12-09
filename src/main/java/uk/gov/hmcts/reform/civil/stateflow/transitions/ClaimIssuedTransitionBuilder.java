@@ -48,44 +48,58 @@ public class ClaimIssuedTransitionBuilder extends MidTransitionBuilder {
     void setUpTransitions(List<Transition> transitions) {
         this.moveTo(CLAIM_NOTIFIED, transitions)
             .onlyWhen(ClaimPredicate.isSpec.negate().and(NotificationPredicate.hasClaimNotifiedToBoth), transitions)
+
             .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions)
             .onlyWhen(TakenOfflinePredicate.byStaff.and(ClaimPredicate.afterIssued), transitions)
+
             .moveTo(TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED, transitions)
             .onlyWhen(TakenOfflinePredicate.afterClaimNotified, transitions)
+
             .moveTo(PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA, transitions)
             .onlyWhen(DismissedPredicate.pastClaimNotificationDeadline, transitions)
+
             .moveTo(CONTACT_DETAILS_CHANGE, transitions)
             .onlyWhen(ClaimantPredicate.correspondenceAddressNotRequired, transitions)
             .set(flags -> flags.put(FlowFlag.CONTACT_DETAILS_CHANGE.name(), true), transitions)
+
             .moveTo(RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL, transitions)
             .onlyWhen(LanguagePredicate.onlyInitialResponseIsBilingual
                   .and(not(ClaimantPredicate.correspondenceAddressNotRequired)), transitions)
             .set(flags -> flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true), transitions)
+
             .moveTo(FULL_DEFENCE, transitions)
             .onlyWhen(ResponsePredicate.isType(RespondentResponseTypeSpec.FULL_DEFENCE)
                   .and(not(ClaimantPredicate.correspondenceAddressNotRequired))
                   .and(not(LanguagePredicate.onlyInitialResponseIsBilingual))
                   .and(not(DismissedPredicate.pastClaimNotificationDeadline)), transitions)
+
             .moveTo(PART_ADMISSION, transitions)
             .onlyWhen(ResponsePredicate.isType(RespondentResponseTypeSpec.PART_ADMISSION)
                   .and(not(ClaimantPredicate.correspondenceAddressNotRequired))
                   .and(not(LanguagePredicate.onlyInitialResponseIsBilingual)), transitions)
+
             .moveTo(FULL_ADMISSION, transitions)
             .onlyWhen(ResponsePredicate.isType(RespondentResponseTypeSpec.FULL_ADMISSION)
                   .and(not(ClaimantPredicate.correspondenceAddressNotRequired))
                   .and(not(LanguagePredicate.onlyInitialResponseIsBilingual)), transitions)
+
             .moveTo(COUNTER_CLAIM, transitions)
             .onlyWhen(ResponsePredicate.isType(RespondentResponseTypeSpec.COUNTER_CLAIM)
                   .and(not(ClaimantPredicate.correspondenceAddressNotRequired))
                   .and(not(LanguagePredicate.onlyInitialResponseIsBilingual)), transitions)
+
             .moveTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED, transitions)
             .onlyWhen(ResponsePredicate.awaitingResponsesFullDefenceReceivedSpec.and(ClaimPredicate.isSpec), transitions)
+
             .moveTo(AWAITING_RESPONSES_FULL_ADMIT_RECEIVED, transitions)
             .onlyWhen(ResponsePredicate.awaitingResponsesFullAdmitReceivedSpec.and(ClaimPredicate.isSpec), transitions)
+
             .moveTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED, transitions)
             .onlyWhen(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.and(ClaimPredicate.isSpec), transitions)
+
             .moveTo(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE, transitions)
             .onlyWhen(DivergencePredicate.divergentRespondWithDQAndGoOfflineSpec.and(ClaimPredicate.isSpec), transitions)
+
             .moveTo(DIVERGENT_RESPOND_GO_OFFLINE, transitions)
             .onlyWhen(DivergencePredicate.divergentRespondGoOfflineSpec.and(ClaimPredicate.isSpec), transitions);
     }

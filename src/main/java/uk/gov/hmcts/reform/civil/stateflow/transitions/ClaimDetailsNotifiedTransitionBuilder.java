@@ -38,28 +38,37 @@ public class ClaimDetailsNotifiedTransitionBuilder extends MidTransitionBuilder 
         this.moveTo(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION, transitions)
             .onlyWhen(ResponsePredicate.respondentTimeExtension
                 .and(not(ResponsePredicate.notificationAcknowledged)).and(not(HearingPredicate.isInReadiness)), transitions)
+
             // Acknowledging Claim First
             .moveTo(NOTIFICATION_ACKNOWLEDGED, transitions)
             .onlyWhen(ResponsePredicate.notificationAcknowledged.and(not(HearingPredicate.isInReadiness)), transitions)
+
             // Direct Response, without Acknowledging
             .moveTo(ALL_RESPONSES_RECEIVED, transitions)
             .onlyWhen(ResponsePredicate.allResponsesReceived.and(not(ResponsePredicate.notificationAcknowledged)
                 .and(not(ResponsePredicate.respondentTimeExtension)).and(not(HearingPredicate.isInReadiness))), transitions)
+
             .moveTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED, transitions)
             .onlyWhen(ResponsePredicate.awaitingResponsesFullDefenceReceived
                 .and(not(ResponsePredicate.notificationAcknowledged)).and(not(ResponsePredicate.respondentTimeExtension))
                 .and(not(DismissedPredicate.afterClaimDetailNotified)), transitions)
+
             .moveTo(AWAITING_RESPONSES_FULL_ADMIT_RECEIVED, transitions)
             .onlyWhen(ResponsePredicate.awaitingResponsesFullAdmitReceived
                 .and(not(ResponsePredicate.notificationAcknowledged)).and(not(ResponsePredicate.respondentTimeExtension)), transitions)
+
             .moveTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED, transitions)
             .onlyWhen(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceived
                 .and(not(ResponsePredicate.notificationAcknowledged)).and(not(ResponsePredicate.respondentTimeExtension)), transitions)
+
             .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions)
             .onlyWhen(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.afterClaimNotifiedNoAckNoResponseNoExtension), transitions)
+
             .moveTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA, transitions)
             .onlyWhen(DismissedPredicate.afterClaimDetailNotified.and(not(HearingPredicate.isInReadiness)), transitions)
+
             .moveTo(IN_HEARING_READINESS, transitions).onlyWhen(HearingPredicate.isInReadiness, transitions)
+
             .moveTo(TAKEN_OFFLINE_SDO_NOT_DRAWN, transitions)
             .onlyWhen(TakenOfflinePredicate.sdoNotDrawn.and(TakenOfflinePredicate.afterClaimNotifiedNoAckNoResponseNoExtension), transitions);
     }

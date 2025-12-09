@@ -49,15 +49,15 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
                 // for carm cases, fullDefenceProcced is tracked with lipFullDefenceProceed
                 // and move to in mediation if applicant does not settle
                 .or(isCarmApplicableLipCase.and(LipPredicate.fullDefenceProceed.or(ClaimantPredicate.fullDefenceProceed))), transitions)
-            .set((c, flags) -> {
-                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), LanguagePredicate.respondentIsBilingual.test(c));
-            }, transitions)
+            .set((c, flags) ->
+                     flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), LanguagePredicate.respondentIsBilingual.test(c)), transitions)
+
             .moveTo(IN_MEDIATION, transitions)
             // for carm LR cases
             .onlyWhen(isCarmApplicableCase.and(ClaimantPredicate.fullDefenceProceed), transitions)
-            .set((c, flags) -> {
-                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), LanguagePredicate.respondentIsBilingual.test(c));
-            }, transitions)
+            .set((c, flags) ->
+                     flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), LanguagePredicate.respondentIsBilingual.test(c)), transitions)
+
             .moveTo(FULL_DEFENCE_PROCEED, transitions)
             .onlyWhen(ClaimantPredicate.fullDefenceProceed.and(allAgreedToLrMediationSpec).and(LipPredicate.agreedToMediation.negate()).and(declinedMediation.negate())
                 .and(isCarmApplicableLipCase.negate()).and(isCarmApplicableCase.negate()), transitions)
@@ -68,6 +68,7 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
                 flags.put(FlowFlag.SDO_ENABLED.name(),
                     JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
             }, transitions)
+
             .moveTo(FULL_DEFENCE_PROCEED, transitions)
             .onlyWhen(ClaimantPredicate.fullDefenceProceed
                 .and(allAgreedToLrMediationSpec.negate().and(LipPredicate.agreedToMediation.negate()).or(declinedMediation))
@@ -79,6 +80,7 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
                 flags.put(FlowFlag.SDO_ENABLED.name(),
                     JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
             }, transitions)
+
             .moveTo(FULL_DEFENCE_PROCEED, transitions)
             .onlyWhen(ClaimantPredicate.fullDefenceProceed
                 .and(isCarmApplicableLipCase.negate()).and(isCarmApplicableCase.negate())
@@ -91,6 +93,7 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
                     JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
                 flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMultiOrIntermediateTrackEnabled(c));
             }, transitions)
+
             .moveTo(FULL_DEFENCE_PROCEED, transitions)
             .onlyWhen((ClaimantPredicate.fullDefenceProceed.or(isClaimantNotSettleFullDefenceClaim).or(isDefendantNotPaidFullDefenceClaim)
                 .or(LipPredicate.fullDefenceProceed)).and(not(LipPredicate.agreedToMediation)).and(isCarmApplicableLipCase.negate())
@@ -100,14 +103,21 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
                 flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), false);
             }, transitions)
-            .moveTo(FULL_DEFENCE_PROCEED, transitions).onlyWhen(isClaimantSettleTheClaim.and(not(LipPredicate.agreedToMediation)), transitions)
+
+            .moveTo(FULL_DEFENCE_PROCEED, transitions)
+            .onlyWhen(isClaimantSettleTheClaim.and(not(LipPredicate.agreedToMediation)), transitions)
             .set((c, flags) -> {
                 flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), LanguagePredicate.respondentIsBilingual.test(c));
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
                 flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), true);
             }, transitions)
-            .moveTo(FULL_DEFENCE_NOT_PROCEED, transitions).onlyWhen(ClaimantPredicate.fullDefenceNotProceed, transitions)
-            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(TakenOfflinePredicate.byStaff.and(ClaimantPredicate.beforeResponse), transitions)
+
+            .moveTo(FULL_DEFENCE_NOT_PROCEED, transitions)
+            .onlyWhen(ClaimantPredicate.fullDefenceNotProceed, transitions)
+
+            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions)
+            .onlyWhen(TakenOfflinePredicate.byStaff.and(ClaimantPredicate.beforeResponse), transitions)
+
             .moveTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA, transitions)
             .onlyWhen(OutOfTimePredicate.notBeingTakenOffline, transitions);
     }
