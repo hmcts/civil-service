@@ -13,7 +13,6 @@ public interface FlowLipPredicate {
     Predicate<CaseData> isTranslatedDocumentUploaded = LipPredicate.isTranslatedDocumentUploaded;
     Predicate<CaseData> ccjRequestJudgmentByAdmission = LipPredicate.ccjRequestJudgmentByAdmission;
     Predicate<CaseData> isRespondentSignSettlementAgreement = LipPredicate.isRespondentSignSettlementAgreement;
-    Predicate<CaseData> nocSubmittedForLiPDefendantBeforeOffline = LipPredicate.nocSubmittedForLiPDefendantBeforeOffline;
     Predicate<CaseData> nocSubmittedForLiPDefendant = LipPredicate.nocSubmittedForLiPDefendant;
 
 }
