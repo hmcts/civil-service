@@ -11,6 +11,11 @@ import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimantPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LanguagePredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LipPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.OutOfTimePredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
 
@@ -21,15 +26,8 @@ import java.util.function.Predicate;
 import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.agreedToMediation;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLipCase;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeNotBeingTakenOffline;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceNotProceed;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isRespondentResponseLangIsBilingual;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_NOT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_MEDIATION;
@@ -46,80 +44,72 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
 
     @Override
     void setUpTransitions(List<Transition> transitions) {
-        this.moveTo(IN_MEDIATION, transitions).onlyWhen((agreedToMediation.and(allAgreedToLrMediationSpec.negate()).and(fullDefenceNotProceed.negate()))
+        this.moveTo(IN_MEDIATION, transitions)
+            .onlyWhen((LipPredicate.agreedToMediation.and(allAgreedToLrMediationSpec.negate()).and(ClaimantPredicate.fullDefenceNotProceed.negate()))
                 // for carm cases, fullDefenceProcced is tracked with lipFullDefenceProceed
                 // and move to in mediation if applicant does not settle
-                .or(isCarmApplicableLipCase.and(lipFullDefenceProceed.or(fullDefenceProceed))), transitions)
+                .or(isCarmApplicableLipCase.and(LipPredicate.fullDefenceProceed.or(ClaimantPredicate.fullDefenceProceed))), transitions)
             .set((c, flags) -> {
-                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), isRespondentResponseLangIsBilingual.test(c));
+                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), LanguagePredicate.respondentIsBilingual.test(c));
             }, transitions)
             .moveTo(IN_MEDIATION, transitions)
             // for carm LR cases
-            .onlyWhen(isCarmApplicableCase.and(fullDefenceProceed), transitions)
+            .onlyWhen(isCarmApplicableCase.and(ClaimantPredicate.fullDefenceProceed), transitions)
             .set((c, flags) -> {
-                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), isRespondentResponseLangIsBilingual.test(c));
+                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), LanguagePredicate.respondentIsBilingual.test(c));
             }, transitions)
             .moveTo(FULL_DEFENCE_PROCEED, transitions)
-            .onlyWhen(fullDefenceProceed.and(allAgreedToLrMediationSpec).and(agreedToMediation.negate()).and(declinedMediation.negate())
-                          .and(isCarmApplicableLipCase.negate()).and(isCarmApplicableCase.negate()), transitions)
+            .onlyWhen(ClaimantPredicate.fullDefenceProceed.and(allAgreedToLrMediationSpec).and(LipPredicate.agreedToMediation.negate()).and(declinedMediation.negate())
+                .and(isCarmApplicableLipCase.negate()).and(isCarmApplicableCase.negate()), transitions)
             .set((c, flags) -> {
-                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), isRespondentResponseLangIsBilingual.test(c));
+                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), LanguagePredicate.respondentIsBilingual.test(c));
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
                 flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMultiOrIntermediateTrackEnabled(c));
                 flags.put(FlowFlag.SDO_ENABLED.name(),
                     JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
             }, transitions)
             .moveTo(FULL_DEFENCE_PROCEED, transitions)
-            .onlyWhen(fullDefenceProceed
-                          .and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()).or(declinedMediation))
-                          .and(applicantOutOfTimeNotBeingTakenOffline.negate()).and(demageMultiClaim), transitions)
+            .onlyWhen(ClaimantPredicate.fullDefenceProceed
+                .and(allAgreedToLrMediationSpec.negate().and(LipPredicate.agreedToMediation.negate()).or(declinedMediation))
+                .and(OutOfTimePredicate.notBeingTakenOffline.negate()).and(demageMultiClaim), transitions)
             .set((c, flags) -> {
-                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), isRespondentResponseLangIsBilingual.test(c));
+                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), LanguagePredicate.respondentIsBilingual.test(c));
                 flags.put(FlowFlag.IS_MULTI_TRACK.name(), true);
                 flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMultiOrIntermediateTrackEnabled(c));
                 flags.put(FlowFlag.SDO_ENABLED.name(),
                     JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
             }, transitions)
             .moveTo(FULL_DEFENCE_PROCEED, transitions)
-            .onlyWhen(fullDefenceProceed
-                          .and(isCarmApplicableLipCase.negate()).and(isCarmApplicableCase.negate())
-                .and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()).or(declinedMediation))
-                          .and(applicantOutOfTimeNotBeingTakenOffline.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate()
-                                                                                                                       .and(not(CaseData::isLipvLROneVOne))), transitions)
+            .onlyWhen(ClaimantPredicate.fullDefenceProceed
+                .and(isCarmApplicableLipCase.negate()).and(isCarmApplicableCase.negate())
+                .and(allAgreedToLrMediationSpec.negate().and(LipPredicate.agreedToMediation.negate()).or(declinedMediation))
+                .and(OutOfTimePredicate.notBeingTakenOffline.negate()).and(demageMultiClaim.negate()).and(LipPredicate.isLiPvLiPCase.negate()
+                .and(not(CaseData::isLipvLROneVOne))), transitions)
             .set((c, flags) -> {
-                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), isRespondentResponseLangIsBilingual.test(c));
+                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), LanguagePredicate.respondentIsBilingual.test(c));
                 flags.put(FlowFlag.SDO_ENABLED.name(),
                     JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
                 flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMultiOrIntermediateTrackEnabled(c));
             }, transitions)
             .moveTo(FULL_DEFENCE_PROCEED, transitions)
-            .onlyWhen((fullDefenceProceed.or(isClaimantNotSettleFullDefenceClaim).or(isDefendantNotPaidFullDefenceClaim).or(lipFullDefenceProceed))
-                .and(not(agreedToMediation)).and(isCarmApplicableLipCase.negate()).and(isLipCase.or(CaseData::isLipvLROneVOne)), transitions)
+            .onlyWhen((ClaimantPredicate.fullDefenceProceed.or(isClaimantNotSettleFullDefenceClaim).or(isDefendantNotPaidFullDefenceClaim)
+                .or(LipPredicate.fullDefenceProceed)).and(not(LipPredicate.agreedToMediation)).and(isCarmApplicableLipCase.negate())
+                .and(LipPredicate.isLiPvLiPCase.or(CaseData::isLipvLROneVOne)), transitions)
             .set((c, flags) -> {
-                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), isRespondentResponseLangIsBilingual.test(c));
+                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), LanguagePredicate.respondentIsBilingual.test(c));
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
                 flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), false);
             }, transitions)
-            .moveTo(FULL_DEFENCE_PROCEED, transitions).onlyWhen(isClaimantSettleTheClaim.and(not(agreedToMediation)), transitions)
+            .moveTo(FULL_DEFENCE_PROCEED, transitions).onlyWhen(isClaimantSettleTheClaim.and(not(LipPredicate.agreedToMediation)), transitions)
             .set((c, flags) -> {
-                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), isRespondentResponseLangIsBilingual.test(c));
+                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), LanguagePredicate.respondentIsBilingual.test(c));
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
                 flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), true);
             }, transitions)
-            .moveTo(FULL_DEFENCE_NOT_PROCEED, transitions).onlyWhen(fullDefenceNotProceed, transitions)
-            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaffAfterDefendantResponse, transitions)
+            .moveTo(FULL_DEFENCE_NOT_PROCEED, transitions).onlyWhen(ClaimantPredicate.fullDefenceNotProceed, transitions)
+            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(TakenOfflinePredicate.byStaff.and(ClaimantPredicate.beforeResponse), transitions)
             .moveTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA, transitions)
-            .onlyWhen(applicantOutOfTimeNotBeingTakenOffline, transitions);
-    }
-
-    public static final Predicate<CaseData> lipFullDefenceProceed = FullDefenceTransitionBuilder::getPredicateForLipClaimantIntentionProceed;
-
-    public static boolean getPredicateForLipClaimantIntentionProceed(CaseData caseData) {
-        boolean predicate = false;
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            predicate = NO.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim());
-        }
-        return predicate;
+            .onlyWhen(OutOfTimePredicate.notBeingTakenOffline, transitions);
     }
 
     public static final Predicate<CaseData> isCarmApplicableCase = caseData ->
@@ -152,21 +142,6 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
         return caseData.getApp1MediationContactInfo() != null
             || caseData.getResp1MediationContactInfo() != null
             || caseData.getResp2MediationContactInfo() != null;
-    }
-
-    public static final Predicate<CaseData> takenOfflineByStaffAfterDefendantResponse =
-        FullDefenceTransitionBuilder::getPredicateTakenOfflineByStaffAfterDefendantResponseBeforeClaimantResponse;
-
-    public static boolean getPredicateTakenOfflineByStaffAfterDefendantResponseBeforeClaimantResponse(CaseData caseData) {
-        boolean basePredicate = caseData.getTakenOfflineByStaffDate() != null
-            && caseData.getApplicant1ResponseDate() == null;
-
-        if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && YES.equals(caseData.getAddApplicant2())) {
-            return basePredicate && caseData.getApplicant2ResponseDate() == null;
-        }
-
-        return basePredicate;
     }
 
     public static final Predicate<CaseData> demageMultiClaim = caseData ->
