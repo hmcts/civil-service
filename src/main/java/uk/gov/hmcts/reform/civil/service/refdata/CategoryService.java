@@ -42,7 +42,7 @@ public class CategoryService {
         } catch (FeignException.NotFound ex) {
             log.error("Category not found", ex);
             return Optional.empty();
-        } catch (FeignException.Forbidden ex) {
+        } catch (Exception ex) {
             log.error("Access forbidden for this user", ex);
             return Optional.empty();
         }
