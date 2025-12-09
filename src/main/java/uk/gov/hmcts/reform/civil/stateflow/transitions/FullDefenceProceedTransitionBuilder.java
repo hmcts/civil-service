@@ -1,22 +1,18 @@
 package uk.gov.hmcts.reform.civil.stateflow.transitions;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.DismissedPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.HearingPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedPastHearingFeeDue;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isInHearingReadiness;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterSDO;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineSDONotDrawn;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_SDO;
@@ -33,30 +29,20 @@ public class FullDefenceProceedTransitionBuilder extends MidTransitionBuilder {
 
     @Override
     void setUpTransitions(List<Transition> transitions) {
-        this.moveTo(IN_HEARING_READINESS, transitions).onlyWhen(isInHearingReadiness, transitions)
-            .moveTo(CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE, transitions).onlyWhen(caseDismissedPastHearingFeeDue, transitions)
-            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen((takenOfflineByStaffAfterClaimantResponseBeforeSDO
-                .or(takenOfflineByStaffAfterSDO)
-                .or(takenOfflineAfterNotSuitableForSdo))
-                .and(not(caseDismissedPastHearingFeeDue)), transitions)
-            .moveTo(TAKEN_OFFLINE_AFTER_SDO, transitions).onlyWhen(takenOfflineAfterSDO, transitions)
-            .moveTo(TAKEN_OFFLINE_SDO_NOT_DRAWN, transitions).onlyWhen(takenOfflineSDONotDrawn, transitions);
+        this.moveTo(IN_HEARING_READINESS, transitions)
+            .onlyWhen(HearingPredicate.isInReadiness, transitions)
+            .moveTo(CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE, transitions)
+            .onlyWhen(DismissedPredicate.pastHearingFeeDue, transitions)
+            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions)
+            .onlyWhen((TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.beforeSdo)
+                .or(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.afterSdo))
+                .or(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.afterSdoNotSuitable)))
+                .and(not(DismissedPredicate.pastHearingFeeDue)), transitions)
+            .moveTo(TAKEN_OFFLINE_AFTER_SDO, transitions)
+            .onlyWhen(TakenOfflinePredicate.byStaff.negate()
+                .and(TakenOfflinePredicate.afterSdo.and(TakenOfflinePredicate.bySystem)), transitions)
+            .moveTo(TAKEN_OFFLINE_SDO_NOT_DRAWN, transitions)
+            .onlyWhen(TakenOfflinePredicate.byStaff.negate().and(TakenOfflinePredicate.sdoNotDrawn), transitions);
     }
 
-    public static final Predicate<CaseData> takenOfflineByStaffAfterClaimantResponseBeforeSDO = caseData ->
-        caseData.getTakenOfflineByStaffDate() != null
-            && caseData.getApplicant1ResponseDate() != null
-            && caseData.getDrawDirectionsOrderRequired() == null
-            && caseData.getReasonNotSuitableSDO() == null;
-
-    public static final Predicate<CaseData> takenOfflineByStaffAfterSDO = caseData ->
-        caseData.getTakenOfflineByStaffDate() != null
-            && caseData.getDrawDirectionsOrderRequired() != null
-            && caseData.getReasonNotSuitableSDO() == null;
-
-    public static final Predicate<CaseData> takenOfflineAfterNotSuitableForSdo = caseData ->
-        caseData.getTakenOfflineByStaffDate() != null
-            && caseData.getDrawDirectionsOrderRequired() == null
-            && caseData.getReasonNotSuitableSDO() != null
-            && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput());
 }
