@@ -25,8 +25,20 @@ public class CategoryService {
     public Optional<CategorySearchResult> findCategoryByCategoryIdAndServiceId(String authToken, String categoryId, String serviceId) {
         try {
             log.info("[CategoryService] Cache MISS → calling RD Common Data API to fetch all case categories");
-            return Optional.ofNullable(listOfValuesApi.findCategoryByCategoryIdAndServiceId(categoryId, serviceId, authToken,
-                                                                                            authTokenGenerator.generate()));
+            var result = listOfValuesApi.findCategoryByCategoryIdAndServiceId(categoryId, serviceId, authToken,
+                                                                                            authTokenGenerator.generate());
+            if (result != null) {
+                log.info("[CategoryService] Category received → id={}, serviceId={}, authToken={}, authTokenGeneratorgenerate={}",
+                         categoryId,
+                         serviceId,
+                         authToken,
+                         authTokenGenerator.generate()
+                );
+            } else {
+                log.warn("[CategoryService] API returned null for categoryId={}, serviceId={}", categoryId, serviceId);
+            }
+
+            return Optional.ofNullable(result);
         } catch (FeignException.NotFound ex) {
             log.error("Category not found", ex);
             return Optional.empty();
