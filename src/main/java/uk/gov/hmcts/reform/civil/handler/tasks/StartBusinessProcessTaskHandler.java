@@ -41,7 +41,7 @@ public class StartBusinessProcessTaskHandler extends BaseExternalTaskHandler {
         variables.putValue(FLOW_STATE, stateFlow.getState().getName());
         variables.putValue(FLOW_FLAGS, stateFlow.getFlags());
 
-        return ExternalTaskData.builder().variables(variables).build();
+        return new ExternalTaskData().setVariables(variables);
     }
 
     @Override
