@@ -8,6 +8,10 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimantPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LanguagePredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LipPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.OutOfTimePredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.RepaymentPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 import uk.gov.hmcts.reform.civil.utils.JudgmentAdmissionUtils;
@@ -22,14 +26,7 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.agreedToMediation;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.acceptRepaymentPlan;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeNotBeingTakenOffline;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceNotProceed;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isRespondentResponseLangIsBilingual;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.rejectRepaymentPlan;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaff;
+
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_AGREE_REPAYMENT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_AGREE_SETTLE;
@@ -51,38 +48,54 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
 
     @Override
     void setUpTransitions(List<Transition> transitions) {
-        this.moveTo(IN_MEDIATION, transitions).onlyWhen(agreedToMediation.and(not(takenOfflineByStaff))
+        this.moveTo(IN_MEDIATION, transitions)
+            .onlyWhen(LipPredicate.agreedToMediation
+                .and(not(TakenOfflinePredicate.byStaff))
                 .and(not(partAdmitPayImmediately))
-                .and(not(acceptRepaymentPlan))
-                .and(not(rejectRepaymentPlan)), transitions)
-            .moveTo(IN_MEDIATION, transitions).onlyWhen(carmMediation, transitions)
+                .and(not(RepaymentPredicate.acceptRepaymentPlan))
+                .and(not(RepaymentPredicate.rejectRepaymentPlan)), transitions)
+
+            .moveTo(IN_MEDIATION, transitions)
+            .onlyWhen(carmMediation, transitions)
+
             .moveTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION, transitions)
-            .onlyWhen(isClaimantNotSettlePartAdmitClaim.and(not(agreedToMediation)).and(not(isCarmApplicableCase))
+            .onlyWhen(isClaimantNotSettlePartAdmitClaim.and(not(LipPredicate.agreedToMediation)).and(not(isCarmApplicableCase))
                 .and(not(isCarmApplicableLipCase))
-                .and(not(takenOfflineByStaff)), transitions)
+                .and(not(TakenOfflinePredicate.byStaff)), transitions)
             .set((c, flags) -> {
-                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), isRespondentResponseLangIsBilingual.test(c));
+                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), LanguagePredicate.respondentIsBilingual.test(c));
                 flags.put(FlowFlag.SDO_ENABLED.name(),
                     JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
                 flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMultiOrIntermediateTrackEnabled(c));
             }, transitions)
-            .moveTo(PART_ADMIT_PROCEED, transitions).onlyWhen(partAdmitProceed, transitions)
-            .set((c, flags) -> {
-                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), isRespondentResponseLangIsBilingual.test(c));
-            }, transitions)
-            .moveTo(PART_ADMIT_NOT_PROCEED, transitions).onlyWhen(fullDefenceNotProceed, transitions)
-            .moveTo(PART_ADMIT_PAY_IMMEDIATELY, transitions).onlyWhen(partAdmitPayImmediately, transitions)
-            .moveTo(PART_ADMIT_AGREE_SETTLE, transitions).onlyWhen(agreePartAdmitSettle, transitions)
-            .moveTo(PART_ADMIT_AGREE_REPAYMENT, transitions).onlyWhen(acceptRepaymentPlan, transitions)
+
+            .moveTo(PART_ADMIT_PROCEED, transitions)
+            .onlyWhen(partAdmitProceed, transitions)
             .set((c, flags) ->
-                     flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)), transitions)
-            .moveTo(PART_ADMIT_REJECT_REPAYMENT, transitions).onlyWhen(rejectRepaymentPlan, transitions)
-            .set((c, flags) ->
-                     flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)), transitions)
-            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions)
-            .onlyWhen(TakenOfflinePredicate.byStaff.and(ClaimantPredicate.beforeResponse), transitions)
+                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), LanguagePredicate.respondentIsBilingual.test(c)), transitions)
+
+            .moveTo(PART_ADMIT_NOT_PROCEED, transitions)
+            .onlyWhen(ClaimantPredicate.fullDefenceNotProceed, transitions)
+
+            .moveTo(PART_ADMIT_PAY_IMMEDIATELY, transitions)
+            .onlyWhen(partAdmitPayImmediately, transitions)
+
+            .moveTo(PART_ADMIT_AGREE_SETTLE, transitions)
+            .onlyWhen(agreePartAdmitSettle, transitions)
+
+            .moveTo(PART_ADMIT_AGREE_REPAYMENT, transitions)
+            .onlyWhen(RepaymentPredicate.acceptRepaymentPlan, transitions)
+            .set((c, flags) -> flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)), transitions)
+
+            .moveTo(PART_ADMIT_REJECT_REPAYMENT, transitions)
+            .onlyWhen(RepaymentPredicate.rejectRepaymentPlan, transitions)
+            .set((c, flags) -> flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)), transitions)
+
+            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(
+                TakenOfflinePredicate.byStaff.and(ClaimantPredicate.beforeResponse), transitions)
+
             .moveTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA, transitions)
-            .onlyWhen(applicantOutOfTimeNotBeingTakenOffline, transitions);
+            .onlyWhen(OutOfTimePredicate.notBeingTakenOffline, transitions);
     }
 
     public static final Predicate<CaseData> agreePartAdmitSettle = CaseData::isPartAdmitClaimSettled;
@@ -124,10 +137,10 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
     }
 
     public static final Predicate<CaseData> carmMediation = isClaimantNotSettlePartAdmitClaim
-        .and(agreedToMediation.negate())
+        .and(LipPredicate.agreedToMediation.negate())
         .and(isCarmApplicableCase.or(isCarmApplicableLipCase))
-        .and(not(takenOfflineByStaff));
+        .and(not(TakenOfflinePredicate.byStaff));
 
-    public static final Predicate<CaseData> partAdmitProceed =  not(carmMediation).and(fullDefenceProceed);
+    public static final Predicate<CaseData> partAdmitProceed =  not(carmMediation).and(ClaimantPredicate.fullDefenceProceed);
 
 }

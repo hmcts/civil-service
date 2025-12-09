@@ -43,26 +43,37 @@ public class FullAdmissionTransitionBuilder extends MidTransitionBuilder {
     void setUpTransitions(List<Transition> transitions) {
         this.moveTo(FULL_ADMIT_PAY_IMMEDIATELY, transitions)
             .onlyWhen(PaymentPredicate.payImmediatelyFullAdmission, transitions)
-            .moveTo(FULL_ADMIT_PROCEED, transitions).onlyWhen(ClaimantPredicate.fullDefenceProceed, transitions)
-            .set((c, flags) -> {
-                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), LanguagePredicate.respondentIsBilingual.test(c));
-            }, transitions)
-            .moveTo(FULL_ADMIT_NOT_PROCEED, transitions).onlyWhen(ClaimantPredicate.fullDefenceNotProceed, transitions)
-            .moveTo(FULL_ADMIT_AGREE_REPAYMENT, transitions).onlyWhen(RepaymentPredicate.acceptRepaymentPlan, transitions)
+
+            .moveTo(FULL_ADMIT_PROCEED, transitions)
+            .onlyWhen(ClaimantPredicate.fullDefenceProceed, transitions)
+            .set((c, flags) ->
+                     flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), LanguagePredicate.respondentIsBilingual.test(c)), transitions)
+
+            .moveTo(FULL_ADMIT_NOT_PROCEED, transitions)
+            .onlyWhen(ClaimantPredicate.fullDefenceNotProceed, transitions)
+
+            .moveTo(FULL_ADMIT_AGREE_REPAYMENT, transitions)
+            .onlyWhen(RepaymentPredicate.acceptRepaymentPlan, transitions)
             .set((c, flags) ->
                 flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)), transitions)
-            .moveTo(FULL_ADMIT_REJECT_REPAYMENT, transitions).onlyWhen(RepaymentPredicate.rejectRepaymentPlan, transitions)
+
+            .moveTo(FULL_ADMIT_REJECT_REPAYMENT, transitions)
+            .onlyWhen(RepaymentPredicate.rejectRepaymentPlan, transitions)
             .set((c, flags) ->
                 flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)), transitions)
+
             // For lip journeys
             .moveTo(FULL_ADMIT_JUDGMENT_ADMISSION, transitions)
             .onlyWhen(LipPredicate.ccjRequestJudgmentByAdmission
                 .and(PaymentPredicate.payImmediatelyPartAdmission).and(LipPredicate.isLiPvLiPCase), transitions)
+
             .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions)
             .onlyWhen(TakenOfflinePredicate.byStaff
                 .and(ClaimantPredicate.beforeResponse).and(not(LipPredicate.ccjRequestJudgmentByAdmission)), transitions)
+
             .moveTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA, transitions)
             .onlyWhen(OutOfTimePredicate.notBeingTakenOffline, transitions)
+
             .moveTo(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA, transitions)
             .onlyWhen(isDefendantNoCOnlineForCase.and(PaymentPredicate.payImmediatelyPartAdmission)
                 .and(TakenOfflinePredicate.isDefendantNoCOnlineForCaseAfterJBA), transitions);
