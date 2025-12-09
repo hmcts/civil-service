@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsPPI;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsUploadDoc;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.model.referencedata.LocationRefData;
 
 import java.time.LocalDate;
 import java.util.List;

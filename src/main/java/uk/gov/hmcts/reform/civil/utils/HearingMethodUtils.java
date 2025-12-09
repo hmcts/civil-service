@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.utils;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.crd.model.Category;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
-import uk.gov.hmcts.reform.civil.service.CategoryService;
+import uk.gov.hmcts.reform.civil.service.refdata.CategoryService;
 
 import java.util.List;
 import java.util.Map;
