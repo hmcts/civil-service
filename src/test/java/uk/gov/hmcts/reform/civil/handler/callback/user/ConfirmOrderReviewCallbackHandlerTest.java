@@ -102,9 +102,13 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldThrowError_ifObligationDateIsNotInTheFuture() {
-            CaseData caseData = CaseData.builder().obligationData(
-                List.of(Element.<ObligationData>builder().id(UUID.randomUUID()).value(
-                ObligationData.builder().obligationDate(LocalDate.now().minusDays(1)).build()).build())).build();
+            ObligationData obligationData = new ObligationData();
+            obligationData.setObligationDate(LocalDate.now().minusDays(1));
+            Element<ObligationData> element = new Element<>();
+            element.setId(UUID.randomUUID());
+            element.setValue(obligationData);
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setObligationData(List.of(element));
 
             CallbackParams params = callbackParamsOf(caseData, MID, eventName);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -120,10 +124,9 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldThrowError_ifStillTasksLeft() {
-            CaseData caseData = CaseData.builder()
-                .obligationDatePresent(NO)
-                .courtStaffNextSteps(CourtStaffNextSteps.STILL_TASKS)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setObligationDatePresent(NO);
+            caseData.setCourtStaffNextSteps(CourtStaffNextSteps.STILL_TASKS);
 
             CallbackParams params = callbackParamsOf(caseData, MID, eventName);
 
@@ -139,10 +142,9 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldThrowNoError_ifNoTasksLeft() {
-            CaseData caseData = CaseData.builder()
-                .obligationDatePresent(NO)
-                .courtStaffNextSteps(CourtStaffNextSteps.NO_TASKS)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setObligationDatePresent(NO);
+            caseData.setCourtStaffNextSteps(CourtStaffNextSteps.NO_TASKS);
 
             CallbackParams params = callbackParamsOf(caseData, MID, eventName);
 
@@ -157,10 +159,9 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldConfirmOrderReview_whenInvoked() {
-            CaseData caseData = CaseData.builder()
-                .obligationDatePresent(YesOrNo.YES)
-                .courtStaffNextSteps(CourtStaffNextSteps.NO_TASKS)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setObligationDatePresent(YesOrNo.YES);
+            caseData.setCourtStaffNextSteps(CourtStaffNextSteps.NO_TASKS);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -174,9 +175,8 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetAllFinalOrdersIssuedState_whenIsFinalOrder() {
-            CaseData caseData = CaseData.builder()
-                .isFinalOrder(YesOrNo.YES)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setIsFinalOrder(YesOrNo.YES);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -189,7 +189,6 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetStoredObligationData_whenObligationDataIsPresent() {
             LocalDateTime localDateTime = LocalDateTime.of(2024, 01, 01, 10, 10, 10);
             Mockito.when(time.now()).thenReturn(localDateTime);
-            UUID uuid = UUID.fromString("818da749-8920-40c2-a083-722645735e02");
             Mockito.when(userService.getUserDetails(any())).thenReturn(UserDetails
                                                                            .builder()
                                                                            .forename("John")
@@ -197,32 +196,26 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                                            .build());
 
             LocalDate obligationDate = LocalDate.of(2024, 12, 12);
-            CaseData caseData = CaseData.builder()
-                .isFinalOrder(YesOrNo.YES)
-                .obligationData(List.of(Element.<ObligationData>builder()
-                                            .id(uuid)
-                                            .value(ObligationData.builder()
-                                                       .obligationReason(ObligationReason.STAY_A_CASE)
-                                                       .obligationDate(obligationDate)
-                                                       .obligationAction("Main text")
-                                                       .build()
-                                            )
-                                            .build()
-                                )
-                )
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setIsFinalOrder(YesOrNo.YES);
+            ObligationData obligationData = new ObligationData();
+            obligationData.setObligationReason(ObligationReason.STAY_A_CASE);
+            obligationData.setObligationDate(obligationDate);
+            obligationData.setObligationAction("Main text");
+            UUID uuid = UUID.fromString("818da749-8920-40c2-a083-722645735e02");
+            Element<ObligationData> element = new Element<>();
+            element.setId(uuid);
+            element.setValue(obligationData);
+            caseData.setObligationData(List.of(element));
 
-            StoredObligationData expectedData = StoredObligationData
-                                                  .builder()
-                                                  .createdBy("John Smith")
-                                                  .createdOn(time.now())
-                                                  .obligationDate(obligationDate)
-                                                  .obligationAction("Main text")
-                                                  .obligationReason(ObligationReason.STAY_A_CASE)
-                                                  .reasonText(ObligationReason.STAY_A_CASE
-                                                                  .getDisplayedValue())
-                                                  .obligationWATaskRaised(NO)
-                                                  .build();
+            StoredObligationData expectedData = new StoredObligationData();
+            expectedData.setCreatedBy("John Smith");
+            expectedData.setCreatedOn(time.now());
+            expectedData.setObligationDate(obligationDate);
+            expectedData.setObligationAction("Main text");
+            expectedData.setObligationReason(ObligationReason.STAY_A_CASE);
+            expectedData.setReasonText(ObligationReason.STAY_A_CASE.getDisplayedValue());
+            expectedData.setObligationWATaskRaised(NO);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -236,42 +229,36 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetStoredObligationData_whenObligationDataIsPresent_withOtherReason() {
             LocalDateTime localDateTime = LocalDateTime.of(2024, 01, 01, 10, 10, 10);
             Mockito.when(time.now()).thenReturn(localDateTime);
-            UUID uuid = UUID.fromString("818da749-8920-40c2-a083-722645735e02");
             Mockito.when(userService.getUserDetails(any())).thenReturn(UserDetails
                                                                            .builder()
                                                                            .forename("John")
                                                                            .surname("Smith")
                                                                            .build());
 
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setIsFinalOrder(YesOrNo.YES);
+            ObligationData obligationData = new ObligationData();
+            obligationData.setObligationReason(ObligationReason.OTHER);
+            obligationData.setOtherObligationReason("Reason for othering");
             LocalDate obligationDate = LocalDate.of(2024, 12, 12);
-            CaseData caseData = CaseData.builder()
-                .isFinalOrder(YesOrNo.YES)
-                .obligationData(List.of(Element.<ObligationData>builder()
-                                            .id(uuid)
-                                            .value(ObligationData.builder()
-                                                       .obligationReason(ObligationReason.OTHER)
-                                                       .otherObligationReason("Reason for othering")
-                                                       .obligationDate(obligationDate)
-                                                       .obligationAction("Main text")
-                                                       .build()
-                                            )
-                                            .build()
-                                )
-                )
-                .build();
+            obligationData.setObligationDate(obligationDate);
+            obligationData.setObligationAction("Main text");
+            UUID uuid = UUID.fromString("818da749-8920-40c2-a083-722645735e02");
+            Element<ObligationData> element = new Element<>();
+            element.setId(uuid);
+            element.setValue(obligationData);
+            caseData.setObligationData(List.of(element));
 
-            StoredObligationData expectedData = StoredObligationData
-                .builder()
-                .createdBy("John Smith")
-                .createdOn(time.now())
-                .obligationDate(obligationDate)
-                .obligationAction("Main text")
-                .obligationReason(ObligationReason.OTHER)
-                .otherObligationReason("Reason for othering")
-                .reasonText(ObligationReason.OTHER
-                                .getDisplayedValue() + ": Reason for othering")
-                .obligationWATaskRaised(NO)
-                .build();
+            StoredObligationData expectedData = new StoredObligationData();
+            expectedData.setCreatedBy("John Smith");
+            expectedData.setCreatedOn(time.now());
+            expectedData.setObligationDate(obligationDate);
+            expectedData.setObligationAction("Main text");
+            expectedData.setObligationReason(ObligationReason.OTHER);
+            expectedData.setOtherObligationReason("Reason for othering");
+            expectedData.setReasonText(ObligationReason.OTHER
+                                .getDisplayedValue() + ": Reason for othering");
+            expectedData.setObligationWATaskRaised(NO);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -289,7 +276,7 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnConfirmationBodyInResponse_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
                 .build();
-            caseData.builder().obligationDatePresent(NO).build();
+            caseData.setObligationDatePresent(NO);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
@@ -305,7 +292,7 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnConfirmationBodyWithTextInResponse_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
                 .build();
-            caseData = caseData.builder().obligationDatePresent(YesOrNo.YES).build();
+            caseData.setObligationDatePresent(YesOrNo.YES);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);

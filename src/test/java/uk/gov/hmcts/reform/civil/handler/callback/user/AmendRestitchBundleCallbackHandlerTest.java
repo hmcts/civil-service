@@ -75,6 +75,20 @@ class AmendRestitchBundleCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     private List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> prepareCaseBundles() {
+        uk.gov.hmcts.reform.civil.model.Bundle bundle1 = new uk.gov.hmcts.reform.civil.model.Bundle(
+            "1",
+            "Trial Bundle - Static",
+            "Trial Bundle - Static",
+            null,
+            null,
+            Optional.of("NEW"),
+            Optional.empty(),
+            uk.gov.hmcts.reform.civil.enums.YesOrNo.NO,
+            uk.gov.hmcts.reform.civil.enums.YesOrNo.NO,
+            null
+        );
+        bundle1.setCreatedOn(Optional.of(LocalDateTime.now()));
+        bundle1.setBundleHearingDate(Optional.of(LocalDate.of(2023, 12, 12)));
         List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> caseBundles = new ArrayList<>();
         caseBundles.add(new IdValue<>("1", new uk.gov.hmcts.reform.civil.model.Bundle().setId("1")
             .setTitle("Trial Bundle - Static")
@@ -122,20 +136,28 @@ class AmendRestitchBundleCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnBundle_AndOverwriteExistingBundleForHearingDate() {
             when(featureToggleService.isAmendBundleEnabled()).thenReturn(true);
-            Bundle bundle = Bundle.builder().value(BundleDetails.builder().title("Trial Bundle - New").id("2")
-                                                       .stitchStatus("new")
-                                                       .fileName("Trial Bundle.pdf")
-                                                       .description("Trial Bundle - New")
-                                                       .bundleHearingDate(LocalDate.of(2023, 12, 12))
-                                                       .stitchedDocument(Document.builder()
-                                                                             .documentUrl(TEST_URL)
-                                                                             .documentFileName(TEST_FILE_NAME)
-                                                                             .build())
-                                                       .createdOn(LocalDateTime.of(2023, 11, 12, 1, 1, 1))
-                                                       .build()).build();
+
+            Document stitchedDocument = new Document();
+            stitchedDocument.setDocumentUrl(TEST_URL);
+            stitchedDocument.setDocumentFileName(TEST_FILE_NAME);
+
+            BundleDetails bundleDetails = new BundleDetails();
+            bundleDetails.setTitle("Trial Bundle - New");
+            bundleDetails.setId("2");
+            bundleDetails.setStitchStatus("new");
+            bundleDetails.setFileName("Trial Bundle.pdf");
+            bundleDetails.setDescription("Trial Bundle - New");
+            bundleDetails.setBundleHearingDate(LocalDate.of(2023, 12, 12));
+            bundleDetails.setStitchedDocument(stitchedDocument);
+            bundleDetails.setCreatedOn(LocalDateTime.of(2023, 11, 12, 1, 1, 1));
+
+            Bundle bundle = new Bundle(bundleDetails);
+
             IdValue<Bundle> packedBundle = new IdValue<>("2", bundle);
-            BundleCreateResponse bundleCreateResponse =
-                BundleCreateResponse.builder().data(BundleData.builder().caseBundles(List.of(bundle)).build()).build();
+
+            BundleData bundleData = new BundleData(List.of(bundle));
+
+            BundleCreateResponse bundleCreateResponse = new BundleCreateResponse(bundleData, null);
             CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome()
                 .caseBundles(prepareCaseBundles())
                 .build();
