@@ -53,7 +53,6 @@ public class OrderReviewObligationCheckCallbackHandler extends CallbackHandler {
             .filter(data -> !data.getObligationDate().isAfter(currentDate) && YesOrNo.NO.equals(data.getObligationWATaskRaised()))
             .findFirst()
             .ifPresent(data -> {
-                ObligationWAFlag.ObligationWAFlagBuilder obligationWAFlagBuilder = ObligationWAFlag.builder();
                 boolean isLiftAStay = ObligationReason.LIFT_A_STAY.equals(data.getObligationReason());
                 boolean isDismissCase = ObligationReason.DISMISS_CASE.equals(data.getObligationReason());
                 boolean isStayACase = ObligationReason.STAY_A_CASE.equals(data.getObligationReason());
@@ -61,22 +60,20 @@ public class OrderReviewObligationCheckCallbackHandler extends CallbackHandler {
                 boolean isCaseStayed = CaseState.CASE_STAYED.equals(caseData.getCcdState());
                 String manageStayOption = caseData.getManageStayOption();
 
+                ObligationWAFlag obligationWAFlag = new ObligationWAFlag();
                 if ((!isLiftAStay && !isDismissCase && !isStayACase) || (isLiftAStay && isNull(manageStayOption))
                     || (isDismissCase && !isCaseDismissed) || (isStayACase && !isCaseStayed)) {
-                    obligationWAFlagBuilder.currentDate(currentDate.format(formatter))
-                        .obligationReason(data.getObligationReason().name())
-                        .obligationReasonDisplayValue(data.getObligationReason().getDisplayedValue());
+                    obligationWAFlag.setCurrentDate(currentDate.format(formatter));
+                    obligationWAFlag.setObligationReason(data.getObligationReason().name());
+                    obligationWAFlag.setObligationReasonDisplayValue(data.getObligationReason().getDisplayedValue());
                 }
 
                 data.setObligationWATaskRaised(YesOrNo.YES);
-                caseData.setObligationWAFlag(obligationWAFlagBuilder.build());
+                caseData.setObligationWAFlag(obligationWAFlag);
             });
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toBuilder()
-                      .storedObligationData(caseData.getStoredObligationData())
-                      .obligationWAFlag(caseData.getObligationWAFlag())
-                      .build().toMap(mapper))
+            .data(caseData.toMap(mapper))
             .build();
     }
 
