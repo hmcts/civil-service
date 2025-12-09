@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimPredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.HashMap;
@@ -28,14 +29,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.DraftTransitionBuilder.claimSubmitted1v1RespondentOneUnregistered;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.DraftTransitionBuilder.claimSubmittedBothUnregisteredSolicitors;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.DraftTransitionBuilder.claimSubmittedOneRespondentRepresentative;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.DraftTransitionBuilder.claimSubmittedOneUnrepresentedDefendantOnly;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.DraftTransitionBuilder.claimSubmittedRespondent1Unrepresented;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.DraftTransitionBuilder.claimSubmittedRespondent2Unrepresented;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.DraftTransitionBuilder.claimSubmittedTwoRegisteredRespondentRepresentatives;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.DraftTransitionBuilder.claimSubmittedTwoRespondentRepresentativesOneUnregistered;
 
 @ExtendWith(MockitoExtension.class)
 public class DraftTransitionBuilderTest {
@@ -71,7 +64,7 @@ public class DraftTransitionBuilderTest {
     @Test
     void shouldReturnTrue_whenCaseDataAtClaimSubmittedState() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-        assertTrue(claimSubmittedOneRespondentRepresentative.test(caseData));
+        assertTrue(ClaimPredicate.submittedOneRespondentRepresentative.test(caseData));
         assertThat(getCaseFlags(result.get(0), caseData)).hasSize(10).contains(
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
@@ -90,7 +83,7 @@ public class DraftTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedOneRespondentRepresentative().build();
         when(mockFeatureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
 
-        assertTrue(claimSubmittedOneRespondentRepresentative.test(caseData));
+        assertTrue(ClaimPredicate.submittedOneRespondentRepresentative.test(caseData));
         assertThat(getCaseFlags(result.get(0), caseData)).hasSize(10).contains(
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
@@ -107,13 +100,13 @@ public class DraftTransitionBuilderTest {
     @Test
     void shouldReturnFalse_whenCaseDataAtClaimSubmittedTwoRespondentRepresentativesState() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedTwoRespondentRepresentatives().build();
-        assertFalse(claimSubmittedOneRespondentRepresentative.test(caseData));
+        assertFalse(ClaimPredicate.submittedOneRespondentRepresentative.test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenCaseDataAtDraftState1() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-        assertFalse(claimSubmittedOneRespondentRepresentative.test(caseData));
+        assertFalse(ClaimPredicate.submittedOneRespondentRepresentative.test(caseData));
     }
 
     @Test
@@ -122,8 +115,8 @@ public class DraftTransitionBuilderTest {
             .respondent2Represented(YES)
             .respondent2OrgRegistered(YES)
             .build();
-        assertTrue(claimSubmittedTwoRegisteredRespondentRepresentatives.test(caseData));
-        assertFalse(claimSubmittedBothUnregisteredSolicitors.test(caseData));
+        assertTrue(ClaimPredicate.submittedTwoRegisteredRespondentRepresentatives.test(caseData));
+        assertFalse(ClaimPredicate.submittedBothUnregisteredSolicitors.test(caseData));
     }
 
     @Test
@@ -131,9 +124,9 @@ public class DraftTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimSubmittedTwoRespondentRepresentativesBothUnregistered()
             .build();
-        assertFalse(claimSubmittedTwoRegisteredRespondentRepresentatives.test(caseData));
-        assertFalse(claimSubmittedTwoRespondentRepresentativesOneUnregistered.test(caseData));
-        assertTrue(claimSubmittedBothUnregisteredSolicitors.test(caseData));
+        assertFalse(ClaimPredicate.submittedTwoRegisteredRespondentRepresentatives.test(caseData));
+        assertFalse(ClaimPredicate.submittedTwoRespondentRepresentativesOneUnregistered.test(caseData));
+        assertTrue(ClaimPredicate.submittedBothUnregisteredSolicitors.test(caseData));
     }
 
     @Test
@@ -142,17 +135,17 @@ public class DraftTransitionBuilderTest {
             .atStateClaimSubmittedTwoRespondentRepresentativesBothUnregistered()
             .respondent2SameLegalRepresentative(null)
             .build();
-        assertFalse(claimSubmittedTwoRegisteredRespondentRepresentatives.test(caseData));
-        assertFalse(claimSubmittedTwoRespondentRepresentativesOneUnregistered.test(caseData));
-        assertTrue(claimSubmittedBothUnregisteredSolicitors.test(caseData));
+        assertFalse(ClaimPredicate.submittedTwoRegisteredRespondentRepresentatives.test(caseData));
+        assertFalse(ClaimPredicate.submittedTwoRespondentRepresentativesOneUnregistered.test(caseData));
+        assertTrue(ClaimPredicate.submittedBothUnregisteredSolicitors.test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenCaseDataAtDraftState() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-        assertFalse(claimSubmittedTwoRegisteredRespondentRepresentatives.test(caseData));
-        assertFalse(claimSubmittedTwoRespondentRepresentativesOneUnregistered.test(caseData));
-        assertFalse(claimSubmittedBothUnregisteredSolicitors.test(caseData));
+        assertFalse(ClaimPredicate.submittedTwoRegisteredRespondentRepresentatives.test(caseData));
+        assertFalse(ClaimPredicate.submittedTwoRespondentRepresentativesOneUnregistered.test(caseData));
+        assertFalse(ClaimPredicate.submittedBothUnregisteredSolicitors.test(caseData));
     }
 
     @Test
@@ -165,8 +158,8 @@ public class DraftTransitionBuilderTest {
             .build();
         when(mockFeatureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
 
-        assertFalse(claimSubmittedTwoRegisteredRespondentRepresentatives.test(caseData));
-        assertTrue(claimSubmittedTwoRespondentRepresentativesOneUnregistered.test(caseData));
+        assertFalse(ClaimPredicate.submittedTwoRegisteredRespondentRepresentatives.test(caseData));
+        assertTrue(ClaimPredicate.submittedTwoRespondentRepresentativesOneUnregistered.test(caseData));
         assertThat(getCaseFlags(result.get(1), caseData)).hasSize(11).contains(
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
@@ -189,8 +182,8 @@ public class DraftTransitionBuilderTest {
             .respondent1OrgRegistered(YES)
             .respondent2SameLegalRepresentative(NO)
             .build();
-        assertFalse(claimSubmittedTwoRegisteredRespondentRepresentatives.test(caseData));
-        assertTrue(claimSubmittedTwoRespondentRepresentativesOneUnregistered.test(caseData));
+        assertFalse(ClaimPredicate.submittedTwoRegisteredRespondentRepresentatives.test(caseData));
+        assertTrue(ClaimPredicate.submittedTwoRespondentRepresentativesOneUnregistered.test(caseData));
     }
 
     @Test
@@ -202,9 +195,9 @@ public class DraftTransitionBuilderTest {
         when(mockFeatureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
         when(mockFeatureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
 
-        assertFalse(claimSubmittedTwoRegisteredRespondentRepresentatives.test(caseData));
-        assertTrue(claimSubmittedRespondent1Unrepresented.test(caseData));
-        assertTrue(claimSubmittedRespondent2Unrepresented.test(caseData));
+        assertFalse(ClaimPredicate.submittedTwoRegisteredRespondentRepresentatives.test(caseData));
+        assertTrue(ClaimPredicate.submittedRespondent1Unrepresented.test(caseData));
+        assertTrue(ClaimPredicate.submittedRespondent2Unrepresented.test(caseData));
         assertThat(getCaseFlags(result.get(5), caseData)).hasSize(11).contains(
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
@@ -225,8 +218,8 @@ public class DraftTransitionBuilderTest {
             .respondent1Represented(YES)
             .respondent2Represented(NO)
             .build();
-        assertFalse(claimSubmittedTwoRegisteredRespondentRepresentatives.test(caseData));
-        assertTrue(claimSubmittedRespondent2Unrepresented.test(caseData));
+        assertFalse(ClaimPredicate.submittedTwoRegisteredRespondentRepresentatives.test(caseData));
+        assertTrue(ClaimPredicate.submittedRespondent2Unrepresented.test(caseData));
     }
 
     @Test
@@ -235,13 +228,13 @@ public class DraftTransitionBuilderTest {
             .atStateClaimSubmittedRespondent1Unregistered()
             .addRespondent2(NO)
             .build();
-        assertTrue(claimSubmitted1v1RespondentOneUnregistered.test(caseData));
+        assertTrue(ClaimPredicate.submitted1v1RespondentOneUnregistered.test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenRespondentSolicitorRegistered() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-        assertFalse(claimSubmitted1v1RespondentOneUnregistered.test(caseData));
+        assertFalse(ClaimPredicate.submitted1v1RespondentOneUnregistered.test(caseData));
     }
 
     @Test
@@ -252,8 +245,8 @@ public class DraftTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendant()
             .defendant1LIPAtClaimIssued(YES).build();
 
-        assertTrue(claimSubmittedOneUnrepresentedDefendantOnly.test(caseData));
-        assertTrue(claimSubmittedRespondent1Unrepresented.test(caseData));
+        assertTrue(ClaimPredicate.submittedOneUnrepresentedDefendantOnly.test(caseData));
+        assertTrue(ClaimPredicate.submittedRespondent1Unrepresented.test(caseData));
         assertThat(getCaseFlags(result.get(2), caseData)).hasSize(10).contains(
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
@@ -272,8 +265,8 @@ public class DraftTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant1()
             .defendant1LIPAtClaimIssued(YES).build();
 
-        assertTrue(claimSubmittedRespondent1Unrepresented.test(caseData));
-        assertFalse(claimSubmittedRespondent2Unrepresented.test(caseData));
+        assertTrue(ClaimPredicate.submittedRespondent1Unrepresented.test(caseData));
+        assertFalse(ClaimPredicate.submittedRespondent2Unrepresented.test(caseData));
     }
 
     @Test
@@ -283,8 +276,8 @@ public class DraftTransitionBuilderTest {
             .defendant2LIPAtClaimIssued(YES).build();
         when(mockFeatureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
 
-        assertFalse(claimSubmittedRespondent1Unrepresented.test(caseData));
-        assertTrue(claimSubmittedRespondent2Unrepresented.test(caseData));
+        assertFalse(ClaimPredicate.submittedRespondent1Unrepresented.test(caseData));
+        assertTrue(ClaimPredicate.submittedRespondent2Unrepresented.test(caseData));
         assertThat(getCaseFlags(result.get(3), caseData)).hasSize(11).contains(
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
@@ -306,8 +299,8 @@ public class DraftTransitionBuilderTest {
             .defendant2LIPAtClaimIssued(YES)
             .atStateClaimIssuedUnrepresentedDefendants().build();
 
-        assertTrue(claimSubmittedRespondent1Unrepresented.test(caseData));
-        assertTrue(claimSubmittedRespondent2Unrepresented.test(caseData));
+        assertTrue(ClaimPredicate.submittedRespondent1Unrepresented.test(caseData));
+        assertTrue(ClaimPredicate.submittedRespondent2Unrepresented.test(caseData));
     }
 
     @Test
