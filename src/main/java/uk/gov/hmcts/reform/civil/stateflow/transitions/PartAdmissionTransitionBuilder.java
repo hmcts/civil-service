@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimantPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 import uk.gov.hmcts.reform.civil.utils.JudgmentAdmissionUtils;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
@@ -38,7 +40,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_AD
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_REJECT_REPAYMENT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceTransitionBuilder.takenOfflineByStaffAfterDefendantResponse;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -51,14 +52,14 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
     @Override
     void setUpTransitions(List<Transition> transitions) {
         this.moveTo(IN_MEDIATION, transitions).onlyWhen(agreedToMediation.and(not(takenOfflineByStaff))
-                                                            .and(not(partAdmitPayImmediately))
-                                                            .and(not(acceptRepaymentPlan))
-                                                            .and(not(rejectRepaymentPlan)), transitions)
+                .and(not(partAdmitPayImmediately))
+                .and(not(acceptRepaymentPlan))
+                .and(not(rejectRepaymentPlan)), transitions)
             .moveTo(IN_MEDIATION, transitions).onlyWhen(carmMediation, transitions)
             .moveTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION, transitions)
             .onlyWhen(isClaimantNotSettlePartAdmitClaim.and(not(agreedToMediation)).and(not(isCarmApplicableCase))
-                          .and(not(isCarmApplicableLipCase))
-                          .and(not(takenOfflineByStaff)), transitions)
+                .and(not(isCarmApplicableLipCase))
+                .and(not(takenOfflineByStaff)), transitions)
             .set((c, flags) -> {
                 flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), isRespondentResponseLangIsBilingual.test(c));
                 flags.put(FlowFlag.SDO_ENABLED.name(),
@@ -73,10 +74,13 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
             .moveTo(PART_ADMIT_PAY_IMMEDIATELY, transitions).onlyWhen(partAdmitPayImmediately, transitions)
             .moveTo(PART_ADMIT_AGREE_SETTLE, transitions).onlyWhen(agreePartAdmitSettle, transitions)
             .moveTo(PART_ADMIT_AGREE_REPAYMENT, transitions).onlyWhen(acceptRepaymentPlan, transitions)
-            .set((c, flags) -> flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)), transitions)
+            .set((c, flags) ->
+                     flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)), transitions)
             .moveTo(PART_ADMIT_REJECT_REPAYMENT, transitions).onlyWhen(rejectRepaymentPlan, transitions)
-            .set((c, flags) -> flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)), transitions)
-            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaffAfterDefendantResponse, transitions)
+            .set((c, flags) ->
+                     flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)), transitions)
+            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions)
+            .onlyWhen(TakenOfflinePredicate.byStaff.and(ClaimantPredicate.beforeResponse), transitions)
             .moveTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA, transitions)
             .onlyWhen(applicantOutOfTimeNotBeingTakenOffline, transitions);
     }
