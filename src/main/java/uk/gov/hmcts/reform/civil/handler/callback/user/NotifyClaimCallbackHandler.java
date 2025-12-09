@@ -139,8 +139,6 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         List<String> dateValidationErrorMessages = serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(certificateOfService);
         errors.addAll(dateValidationErrorMessages);
 
-        caseData.setCosNotifyClaimDefendant1(certificateOfService.toBuilder().build());
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .errors(errors)
@@ -153,8 +151,6 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         ArrayList<String> errors = new ArrayList<>();
         List<String> dateValidationErrorMessages = serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(certificateOfServiceDef2);
         errors.addAll(dateValidationErrorMessages);
-
-        caseData.setCosNotifyClaimDefendant2(certificateOfServiceDef2.toBuilder().build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
@@ -323,8 +319,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     private CertificateOfService updateStatementOfTruthForLip(CertificateOfService certificateOfService) {
         List<String> cosUISenderStatementOfTruthLabel = new ArrayList<>();
         cosUISenderStatementOfTruthLabel.add("CERTIFIED");
-        return certificateOfService.toBuilder()
-            .cosSenderStatementOfTruthLabel(cosUISenderStatementOfTruthLabel)
-            .build();
+        certificateOfService.setCosSenderStatementOfTruthLabel(cosUISenderStatementOfTruthLabel);
+        return certificateOfService;
     }
 }
