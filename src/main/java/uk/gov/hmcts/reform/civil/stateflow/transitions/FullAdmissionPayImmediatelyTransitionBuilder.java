@@ -3,12 +3,12 @@ package uk.gov.hmcts.reform.civil.stateflow.transitions;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.PaymentPredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 import java.util.List;
-import java.util.function.Predicate;
+
 import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.ccjRequestJudgmentByAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaff;
@@ -26,9 +26,8 @@ public class FullAdmissionPayImmediatelyTransitionBuilder extends MidTransitionB
     @Override
     void setUpTransitions(List<Transition> transitions) {
         this.moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaff.and(not(ccjRequestJudgmentByAdmission)), transitions)
-            .moveTo(FULL_ADMIT_JUDGMENT_ADMISSION, transitions).onlyWhen(ccjRequestJudgmentByAdmission.and(isPayImmediately), transitions);
+            .moveTo(FULL_ADMIT_JUDGMENT_ADMISSION, transitions).onlyWhen(ccjRequestJudgmentByAdmission.and(PaymentPredicate.payImmediatelyPartAdmission), transitions);
 
     }
 
-    public static final Predicate<CaseData> isPayImmediately = CaseData::isPayImmediately;
 }
