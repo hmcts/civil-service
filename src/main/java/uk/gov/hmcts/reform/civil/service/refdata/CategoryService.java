@@ -34,6 +34,7 @@ public class CategoryService {
                          authToken,
                          authTokenGenerator.generate()
                 );
+                log.info("[CategoryService] result {}", result);
             } else {
                 log.warn("[CategoryService] API returned null for categoryId={}, serviceId={}", categoryId, serviceId);
             }
