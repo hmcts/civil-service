@@ -6,14 +6,13 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LipPredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.BULK_CLAIM_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.CLAIM_STATE_DURING_NOC;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.DASHBOARD_SERVICE_ENABLED;
@@ -23,7 +22,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.JO_ONLINE_LIV
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.WELSH_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.JBA_ISSUED_BEFORE_NOC;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.IS_CJES_SERVICE_ENABLED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseContainsLiP;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_SUBMITTED;
 
 public abstract class DraftTransitionBuilder extends TransitionBuilder {
@@ -35,7 +33,8 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
     @Override
     void setUpTransitions(List<Transition> transitions) {
         this.moveTo(CLAIM_SUBMITTED, transitions)
-            .onlyWhen(claimSubmittedOneRespondentRepresentative.or(claimSubmitted1v1RespondentOneUnregistered), transitions)
+            .onlyWhen(ClaimPredicate.submittedOneRespondentRepresentative
+                .or(ClaimPredicate.submitted1v1RespondentOneUnregistered), transitions)
             .set((c, flags) -> flags.putAll(
                 // Do not set UNREPRESENTED_DEFENDANT_ONE or UNREPRESENTED_DEFENDANT_TWO to false here unless
                 // camunda diagram for TAKE_CASE_OFFLINE is changed
@@ -52,9 +51,11 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(IS_CJES_SERVICE_ENABLED.name(), featureToggleService.isCjesServiceAvailable())
                 )), transitions)
             .moveTo(CLAIM_SUBMITTED, transitions)
-            .onlyWhen(claimSubmittedTwoRegisteredRespondentRepresentatives
-                .or(claimSubmittedTwoRespondentRepresentativesOneUnregistered)
-                .or(claimSubmittedBothUnregisteredSolicitors), transitions)
+            .onlyWhen(
+                ClaimPredicate.submittedTwoRegisteredRespondentRepresentatives
+                    .or(ClaimPredicate.submittedTwoRespondentRepresentativesOneUnregistered)
+                    .or(ClaimPredicate.submittedBothUnregisteredSolicitors), transitions
+            )
             .set((c, flags) -> flags.putAll(
                 // Do not set UNREPRESENTED_DEFENDANT_ONE or UNREPRESENTED_DEFENDANT_TWO to false here unless
                 // camunda diagram for TAKE_CASE_OFFLINE is changed
@@ -73,7 +74,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                 )), transitions)
             // Only one unrepresented defendant
             .moveTo(CLAIM_SUBMITTED, transitions)
-            .onlyWhen(claimSubmittedOneUnrepresentedDefendantOnly, transitions)
+            .onlyWhen(ClaimPredicate.submittedOneUnrepresentedDefendantOnly, transitions)
             .set((c, flags) -> flags.putAll(
                 Map.ofEntries(
                     Map.entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
@@ -89,9 +90,11 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                 )), transitions)
             // Unrepresented defendant 1
             .moveTo(CLAIM_SUBMITTED, transitions)
-            .onlyWhen(claimSubmittedRespondent1Unrepresented
-                .and(claimSubmittedOneUnrepresentedDefendantOnly.negate())
-                .and(claimSubmittedRespondent2Unrepresented.negate()), transitions)
+            .onlyWhen(
+                ClaimPredicate.submittedRespondent1Unrepresented
+                    .and(ClaimPredicate.submittedOneUnrepresentedDefendantOnly.negate())
+                    .and(ClaimPredicate.submittedRespondent2Unrepresented.negate()), transitions
+            )
             .set((c, flags) -> flags.putAll(
                 Map.ofEntries(
                     Map.entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
@@ -108,8 +111,10 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                 )), transitions)
             // Unrepresented defendant 2
             .moveTo(CLAIM_SUBMITTED, transitions)
-            .onlyWhen(claimSubmittedRespondent2Unrepresented
-                .and(claimSubmittedRespondent1Unrepresented.negate()), transitions)
+            .onlyWhen(
+                ClaimPredicate.submittedRespondent2Unrepresented
+                    .and(ClaimPredicate.submittedRespondent1Unrepresented.negate()), transitions
+            )
             .set((c, flags) -> flags.putAll(
                 Map.ofEntries(
                     Map.entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false),
@@ -126,8 +131,8 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                 )), transitions)
             // Unrepresented defendants
             .moveTo(CLAIM_SUBMITTED, transitions)
-            .onlyWhen(claimSubmittedRespondent1Unrepresented.and(
-                claimSubmittedRespondent2Unrepresented), transitions)
+            .onlyWhen(ClaimPredicate.submittedRespondent1Unrepresented
+                .and(ClaimPredicate.submittedRespondent2Unrepresented), transitions)
             .set((c, flags) -> flags.putAll(
                 Map.ofEntries(
                     Map.entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
@@ -144,61 +149,8 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                 )), transitions);
     }
 
-    public static final Predicate<CaseData> claimSubmittedOneRespondentRepresentative = caseData ->
-        caseData.getSubmittedDate() != null
-            && caseData.getRespondent1Represented() != NO
-            && (caseData.getAddRespondent2() == null
-            || caseData.getAddRespondent2() == NO
-            || (caseData.getAddRespondent2() == YES && caseData.getRespondent2SameLegalRepresentative() == YES));
-
-    public static final Predicate<CaseData> claimSubmittedTwoRegisteredRespondentRepresentatives = caseData ->
-        caseData.getSubmittedDate() != null
-            && caseData.getAddRespondent2() == YES
-            && caseData.getRespondent2SameLegalRepresentative() == NO
-            && caseData.getRespondent1Represented() == YES
-            && caseData.getRespondent2Represented() == YES
-            && caseData.getRespondent1OrgRegistered() == YES
-            && caseData.getRespondent2OrgRegistered() == YES;
-
-    public static final Predicate<CaseData> claimSubmittedTwoRespondentRepresentativesOneUnregistered = caseData ->
-        caseData.getSubmittedDate() != null
-            && caseData.getAddRespondent2() == YES
-            && caseData.getRespondent2SameLegalRepresentative() == NO
-            && caseData.getRespondent1Represented() == YES
-            && caseData.getRespondent2Represented() == YES
-            && ((caseData.getRespondent1OrgRegistered() == YES && caseData.getRespondent2OrgRegistered() == NO)
-            || (caseData.getRespondent2OrgRegistered() == YES && caseData.getRespondent1OrgRegistered() == NO));
-
-    public static final Predicate<CaseData> claimSubmitted1v1RespondentOneUnregistered = caseData ->
-        caseData.getSubmittedDate() != null
-            && caseData.getAddRespondent2() == NO
-            && caseData.getRespondent1Represented() == YES
-            && caseData.getRespondent1OrgRegistered() == NO;
-
-    public static final Predicate<CaseData> claimSubmittedOneUnrepresentedDefendantOnly = caseData ->
-        caseData.getSubmittedDate() != null
-            && caseData.getRespondent1Represented() == NO
-            && caseData.getAddRespondent2() != YES;
-
-    public static final Predicate<CaseData> claimSubmittedRespondent1Unrepresented = caseData ->
-        caseData.getSubmittedDate() != null
-            && caseData.getRespondent1Represented() == NO;
-
-    public static final Predicate<CaseData> claimSubmittedRespondent2Unrepresented = caseData ->
-        caseData.getSubmittedDate() != null
-            && caseData.getAddRespondent2() == YES
-            && caseData.getRespondent2Represented() == NO;
-
-    public static final Predicate<CaseData> claimSubmittedBothUnregisteredSolicitors = caseData ->
-        caseData.getSubmittedDate() != null
-            && caseData.getRespondent1OrgRegistered() == NO
-            && caseData.getAddRespondent2() == YES
-            && caseData.getRespondent2OrgRegistered() == NO
-            && (caseData.getRespondent2SameLegalRepresentative() == NO
-            || caseData.getRespondent2SameLegalRepresentative() == null);
-
     public boolean isDashBoardEnabledForCase(CaseData caseData) {
-        return featureToggleService.isDashboardEnabledForCase(caseData) && caseContainsLiP.test(caseData);
+        return featureToggleService.isDashboardEnabledForCase(caseData) && LipPredicate.caseContainsLiP.test(caseData);
     }
 
     private Boolean getMainClaimCcdState(CaseData caseData) {
@@ -206,7 +158,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
     }
 
     public boolean isJudgmentByAdmissionIssuedForCase(CaseData caseData) {
-        return caseContainsLiP.test(caseData)
+        return LipPredicate.caseContainsLiP.test(caseData)
             && featureToggleService.isJudgmentOnlineLive()
             && caseData.getActiveJudgment() != null
             && JudgmentType.JUDGMENT_BY_ADMISSION.equals(caseData.getActiveJudgment().getType())
