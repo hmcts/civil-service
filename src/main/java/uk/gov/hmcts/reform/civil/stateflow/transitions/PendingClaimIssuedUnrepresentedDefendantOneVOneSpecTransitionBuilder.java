@@ -5,14 +5,14 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LipPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
 
 import static java.util.function.Predicate.not;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssued;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineBySystem;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
 
@@ -28,9 +28,11 @@ public class PendingClaimIssuedUnrepresentedDefendantOneVOneSpecTransitionBuilde
     @Override
     void setUpTransitions(List<Transition> transitions) {
         this.moveTo(CLAIM_ISSUED, transitions)
-            .onlyWhen(claimIssued.and(LipPredicate.pinInPostEnabled), transitions)
+            .onlyWhen(ClaimPredicate.issued.and(LipPredicate.pinInPostEnabled), transitions)
+
             .moveTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT, transitions)
-            .onlyWhen(takenOfflineBySystem.and(not(LipPredicate.pinInPostEnabled)), transitions);
+            .onlyWhen(TakenOfflinePredicate.bySystem
+                .and(ClaimPredicate.changeOfRepresentation.negate()).and(not(LipPredicate.pinInPostEnabled)), transitions);
     }
 
 }

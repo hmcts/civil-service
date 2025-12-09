@@ -26,8 +26,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ClaimDetailsNotifiedTimeExtensionTransitionBuilder extends MidTransitionBuilder {
 
-    public ClaimDetailsNotifiedTimeExtensionTransitionBuilder(
-        FeatureToggleService featureToggleService) {
+    public ClaimDetailsNotifiedTimeExtensionTransitionBuilder(FeatureToggleService featureToggleService) {
         super(FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION, featureToggleService);
     }
 
@@ -35,33 +34,29 @@ public class ClaimDetailsNotifiedTimeExtensionTransitionBuilder extends MidTrans
     void setUpTransitions(List<Transition> transitions) {
         this.moveTo(NOTIFICATION_ACKNOWLEDGED, transitions)
             .onlyWhen(ResponsePredicate.notificationAcknowledged, transitions)
+
             .moveTo(ALL_RESPONSES_RECEIVED, transitions)
-            .onlyWhen(
-                (ResponsePredicate.respondentTimeExtension)
-                    .and(ResponsePredicate.allResponsesReceived), transitions
-            )
+            .onlyWhen(ResponsePredicate.respondentTimeExtension.and(ResponsePredicate.allResponsesReceived), transitions)
+
             .moveTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED, transitions)
-            .onlyWhen(
-                (ResponsePredicate.awaitingResponsesFullDefenceReceived).and(ResponsePredicate.respondentTimeExtension)
-                    .and(not(DismissedPredicate.afterClaimNotifiedExtension)), transitions
-            )
+            .onlyWhen(ResponsePredicate.awaitingResponsesFullDefenceReceived.and(ResponsePredicate.respondentTimeExtension)
+                .and(not(DismissedPredicate.afterClaimNotifiedExtension)), transitions)
+
             .moveTo(AWAITING_RESPONSES_FULL_ADMIT_RECEIVED, transitions)
-            .onlyWhen(
-                (ResponsePredicate.awaitingResponsesFullAdmitReceived)
-                    .and(ResponsePredicate.respondentTimeExtension), transitions
-            )
+            .onlyWhen(ResponsePredicate.awaitingResponsesFullAdmitReceived
+                .and(ResponsePredicate.respondentTimeExtension), transitions)
+
             .moveTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED, transitions)
-            .onlyWhen(
-                (ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceived)
-                    .and(ResponsePredicate.respondentTimeExtension), transitions
-            )
+            .onlyWhen(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceived
+                .and(ResponsePredicate.respondentTimeExtension), transitions)
+
             .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions)
             .onlyWhen(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.afterClaimNotifiedExtension), transitions)
+
             .moveTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA, transitions)
             .onlyWhen(DismissedPredicate.afterClaimNotifiedExtension, transitions)
+
             .moveTo(TAKEN_OFFLINE_SDO_NOT_DRAWN, transitions)
-            .onlyWhen(
-                TakenOfflinePredicate.sdoNotDrawn.and(TakenOfflinePredicate.afterClaimNotifiedExtension), transitions
-            );
+            .onlyWhen(TakenOfflinePredicate.sdoNotDrawn.and(TakenOfflinePredicate.afterClaimNotifiedExtension), transitions);
     }
 }
