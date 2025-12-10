@@ -3,18 +3,16 @@ package uk.gov.hmcts.reform.civil.stateflow.transitions;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LipPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
 
@@ -30,13 +28,13 @@ public class PendingClaimIssuedUnrepresentedDefendantTransitionBuilder extends M
     @Override
     void setUpTransitions(List<Transition> transitions) {
         this.moveTo(CLAIM_ISSUED, transitions)
-            .onlyWhen(ClaimPredicate.issued.and(not(ClaimPredicate.isSpec)).and(certificateOfServiceEnabled), transitions)
+            .onlyWhen(ClaimPredicate.issued.and(not(ClaimPredicate.isSpec))
+                .and(LipPredicate.certificateOfServiceEnabled), transitions)
 
             .moveTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT, transitions)
             .onlyWhen(TakenOfflinePredicate.bySystem
-                .and(ClaimPredicate.changeOfRepresentation.negate()).and(ClaimPredicate.isSpec), transitions);
+                .and(ClaimPredicate.changeOfRepresentation.negate())
+                .and(ClaimPredicate.isSpec), transitions);
     }
 
-    public static final Predicate<CaseData> certificateOfServiceEnabled = caseData ->
-        (YES.equals(caseData.getDefendant1LIPAtClaimIssued()) || YES.equals(caseData.getDefendant2LIPAtClaimIssued()));
 }
