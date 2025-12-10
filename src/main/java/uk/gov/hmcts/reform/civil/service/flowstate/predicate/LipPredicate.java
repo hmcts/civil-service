@@ -31,13 +31,6 @@ public non-sealed interface LipPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Lip",
-        summary = "Claimant agreed to mediation",
-        description = "Claimant has opted into free mediation"
-    )
-    Predicate<CaseData> agreedToMediation = CaseDataPredicate.Claimant.agreedToMediation;
-
-    @BusinessRule(
-        group = "Lip",
         summary = "Translated response document uploaded",
         description = "A translated response document has been uploaded"
     )

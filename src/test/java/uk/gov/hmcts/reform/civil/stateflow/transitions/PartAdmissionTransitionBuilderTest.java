@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.MediationPredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
@@ -26,14 +27,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceTransitionBuilder.isCarmApplicableCase;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceTransitionBuilder.isCarmApplicableLipCase;
+
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTransitionBuilder.agreePartAdmitSettle;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTransitionBuilder.getCarmEnabledForCase;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTransitionBuilder.getCarmEnabledForLipCase;
@@ -227,7 +228,7 @@ class PartAdmissionTransitionBuilderTest {
                              .build())
             .build();
 
-        assertTrue(isCarmApplicableLipCase.test(caseData));
+        assertTrue(MediationPredicate.isCarmApplicableCaseLiP.test(caseData));
     }
 
     @Test
@@ -244,7 +245,7 @@ class PartAdmissionTransitionBuilderTest {
                                                                                               .build())
                                                          .build()).build()).build();
 
-        assertFalse(isCarmApplicableLipCase.test(caseData));
+        assertFalse(MediationPredicate.isCarmApplicableCaseLiP.test(caseData));
     }
 
     @Test
@@ -261,7 +262,7 @@ class PartAdmissionTransitionBuilderTest {
                              .build())
             .build();
 
-        assertFalse(isCarmApplicableLipCase.test(caseData));
+        assertFalse(MediationPredicate.isCarmApplicableCaseLiP.test(caseData));
     }
 
     @Test
@@ -280,7 +281,7 @@ class PartAdmissionTransitionBuilderTest {
                              .build())
             .build();
 
-        assertFalse(isCarmApplicableLipCase.test(caseData));
+        assertFalse(MediationPredicate.isCarmApplicableCaseLiP.test(caseData));
     }
 
     @Test
@@ -299,7 +300,7 @@ class PartAdmissionTransitionBuilderTest {
                              .build())
             .build();
 
-        assertFalse(isCarmApplicableLipCase.test(caseData));
+        assertFalse(MediationPredicate.isCarmApplicableCaseLiP.test(caseData));
     }
 
     @Test
@@ -316,7 +317,7 @@ class PartAdmissionTransitionBuilderTest {
                              .build())
             .build();
 
-        assertTrue(isCarmApplicableLipCase.test(caseData));
+        assertTrue(MediationPredicate.isCarmApplicableCaseLiP.test(caseData));
     }
 
     @Test
@@ -331,7 +332,7 @@ class PartAdmissionTransitionBuilderTest {
                              .build())
             .build();
 
-        assertFalse(isCarmApplicableLipCase.test(caseData));
+        assertFalse(MediationPredicate.isCarmApplicableCaseLiP.test(caseData));
     }
 
     @Test
@@ -347,7 +348,7 @@ class PartAdmissionTransitionBuilderTest {
                              .build())
             .build();
 
-        assertFalse(isCarmApplicableLipCase.test(caseData));
+        assertFalse(MediationPredicate.isCarmApplicableCaseLiP.test(caseData));
     }
 
     @Test
@@ -362,7 +363,7 @@ class PartAdmissionTransitionBuilderTest {
                                           .build())
             .build();
 
-        assertTrue(isCarmApplicableCase.test(caseData));
+        assertTrue(MediationPredicate.isCarmApplicableCase.test(caseData));
     }
 
     @Test
@@ -377,7 +378,7 @@ class PartAdmissionTransitionBuilderTest {
                                            .build())
             .build();
 
-        assertTrue(isCarmApplicableCase.test(caseData));
+        assertTrue(MediationPredicate.isCarmApplicableCase.test(caseData));
     }
 
     @Test
@@ -392,7 +393,7 @@ class PartAdmissionTransitionBuilderTest {
                                            .build())
             .build();
 
-        assertTrue(isCarmApplicableCase.test(caseData));
+        assertTrue(MediationPredicate.isCarmApplicableCase.test(caseData));
     }
 
     @Test
@@ -408,7 +409,7 @@ class PartAdmissionTransitionBuilderTest {
                                            .build())
             .build();
 
-        assertFalse(isCarmApplicableCase.test(caseData));
+        assertFalse(MediationPredicate.isCarmApplicableCase.test(caseData));
     }
 
     @Test
@@ -424,7 +425,7 @@ class PartAdmissionTransitionBuilderTest {
                                            .build())
             .build();
 
-        assertFalse(isCarmApplicableCase.test(caseData));
+        assertFalse(MediationPredicate.isCarmApplicableCase.test(caseData));
     }
 
     @Test
@@ -439,7 +440,7 @@ class PartAdmissionTransitionBuilderTest {
                                            .build())
             .build();
 
-        assertFalse(isCarmApplicableCase.test(caseData));
+        assertFalse(MediationPredicate.isCarmApplicableCase.test(caseData));
     }
 
     @Test
@@ -453,7 +454,7 @@ class PartAdmissionTransitionBuilderTest {
                                            .build())
             .build();
 
-        assertFalse(isCarmApplicableCase.test(caseData));
+        assertFalse(MediationPredicate.isCarmApplicableCase.test(caseData));
     }
 
     @Test

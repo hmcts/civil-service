@@ -20,8 +20,10 @@ import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimantPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LipPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.MediationPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
@@ -41,13 +43,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceTransitionBuilder.allAgreedToLrMediationSpec;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceTransitionBuilder.declinedMediation;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceTransitionBuilder.demageMultiClaim;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceTransitionBuilder.isCarmApplicableCase;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceTransitionBuilder.isCarmApplicableLipCase;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceTransitionBuilder.isClaimantNotSettleFullDefenceClaim;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceTransitionBuilder.isDefendantNotPaidFullDefenceClaim;
 
 @ExtendWith(MockitoExtension.class)
 public class FullDefenceTransitionBuilderTest {
@@ -85,8 +80,8 @@ public class FullDefenceTransitionBuilderTest {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1SettleClaim(YES)
-                             .build())
+             .applicant1SettleClaim(YES)
+             .build())
             .build();
 
         assertFalse(LipPredicate.fullDefenceProceed.test(caseData));
@@ -100,13 +95,13 @@ public class FullDefenceTransitionBuilderTest {
             .build().toBuilder()
             .responseClaimTrack(SMALL_CLAIM.name())
             .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
-                                                            .isMediationContactNameCorrect(YES)
-                                                            .build())
-                             .build())
+                 .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
+                    .isMediationContactNameCorrect(YES)
+                    .build())
+                 .build())
             .build();
 
-        assertTrue(isCarmApplicableLipCase.test(caseData));
+        assertTrue(MediationPredicate.isCarmApplicableCaseLiP.test(caseData));
     }
 
     @Test
@@ -117,13 +112,13 @@ public class FullDefenceTransitionBuilderTest {
             .build().toBuilder()
             .responseClaimTrack(SMALL_CLAIM.name())
             .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                         .respondent1MediationLiPResponse(MediationLiP.builder()
-                                                                                              .canWeUseMediationLiP(YES)
-                                                                                              .build())
-                                                         .build()).build()).build();
+             .respondent1LiPResponse(RespondentLiPResponse.builder()
+                 .respondent1MediationLiPResponse(MediationLiP.builder()
+                  .canWeUseMediationLiP(YES)
+                  .build())
+                 .build()).build()).build();
 
-        assertFalse(isCarmApplicableLipCase.test(caseData));
+        assertFalse(MediationPredicate.isCarmApplicableCaseLiP.test(caseData));
     }
 
     @Test
@@ -134,13 +129,13 @@ public class FullDefenceTransitionBuilderTest {
             .build().toBuilder()
             .responseClaimTrack(FAST_CLAIM.name())
             .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
-                                                                      .isMediationContactNameCorrect(YES)
-                                                                      .build())
-                             .build())
+             .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
+              .isMediationContactNameCorrect(YES)
+              .build())
+             .build())
             .build();
 
-        assertFalse(isCarmApplicableLipCase.test(caseData));
+        assertFalse(MediationPredicate.isCarmApplicableCaseLiP.test(caseData));
     }
 
     @Test
@@ -151,13 +146,13 @@ public class FullDefenceTransitionBuilderTest {
             .build().toBuilder()
             .responseClaimTrack(SMALL_CLAIM.name())
             .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponseCarm(MediationLiPCarm.builder()
-                                                                      .isMediationContactNameCorrect(YES)
-                                                                      .build())
-                             .build())
+             .applicant1LiPResponseCarm(MediationLiPCarm.builder()
+              .isMediationContactNameCorrect(YES)
+              .build())
+             .build())
             .build();
 
-        assertTrue(isCarmApplicableLipCase.test(caseData));
+        assertTrue(MediationPredicate.isCarmApplicableCaseLiP.test(caseData));
     }
 
     @Test
@@ -168,11 +163,11 @@ public class FullDefenceTransitionBuilderTest {
             .build().toBuilder()
             .responseClaimTrack(SMALL_CLAIM.name())
             .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().build())
-                             .build())
+             .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().build())
+             .build())
             .build();
 
-        assertFalse(isCarmApplicableLipCase.test(caseData));
+        assertFalse(MediationPredicate.isCarmApplicableCaseLiP.test(caseData));
     }
 
     @Test
@@ -182,13 +177,13 @@ public class FullDefenceTransitionBuilderTest {
             .build().toBuilder()
             .responseClaimTrack(SMALL_CLAIM.name())
             .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponseCarm(MediationLiPCarm.builder()
-                                                            .isMediationContactNameCorrect(YES)
-                                                            .build())
-                             .build())
+             .applicant1LiPResponseCarm(MediationLiPCarm.builder()
+                .isMediationContactNameCorrect(YES)
+                .build())
+             .build())
             .build();
 
-        assertFalse(isCarmApplicableLipCase.test(caseData));
+        assertFalse(MediationPredicate.isCarmApplicableCaseLiP.test(caseData));
     }
 
     @Test
@@ -199,11 +194,11 @@ public class FullDefenceTransitionBuilderTest {
             .build().toBuilder()
             .responseClaimTrack(SMALL_CLAIM.name())
             .app1MediationContactInfo(MediationContactInformation.builder()
-                                          .firstName("name")
-                                          .build())
+              .firstName("name")
+              .build())
             .build();
 
-        assertTrue(isCarmApplicableCase.test(caseData));
+        assertTrue(MediationPredicate.isCarmApplicableCase.test(caseData));
     }
 
     @Test
@@ -214,11 +209,11 @@ public class FullDefenceTransitionBuilderTest {
             .build().toBuilder()
             .responseClaimTrack(SMALL_CLAIM.name())
             .resp1MediationContactInfo(MediationContactInformation.builder()
-                                          .firstName("name")
-                                          .build())
+              .firstName("name")
+              .build())
             .build();
 
-        assertTrue(isCarmApplicableCase.test(caseData));
+        assertTrue(MediationPredicate.isCarmApplicableCase.test(caseData));
     }
 
     @Test
@@ -229,11 +224,11 @@ public class FullDefenceTransitionBuilderTest {
             .build().toBuilder()
             .responseClaimTrack(SMALL_CLAIM.name())
             .resp2MediationContactInfo(MediationContactInformation.builder()
-                                           .firstName("name")
-                                           .build())
+               .firstName("name")
+               .build())
             .build();
 
-        assertTrue(isCarmApplicableCase.test(caseData));
+        assertTrue(MediationPredicate.isCarmApplicableCase.test(caseData));
     }
 
     @Test
@@ -244,11 +239,11 @@ public class FullDefenceTransitionBuilderTest {
             .build().toBuilder()
             .responseClaimTrack(FAST_CLAIM.name())
             .resp1MediationContactInfo(MediationContactInformation.builder()
-                                           .firstName("name")
-                                           .build())
+               .firstName("name")
+               .build())
             .build();
 
-        assertFalse(isCarmApplicableCase.test(caseData));
+        assertFalse(MediationPredicate.isCarmApplicableCase.test(caseData));
     }
 
     @Test
@@ -258,11 +253,11 @@ public class FullDefenceTransitionBuilderTest {
             .build().toBuilder()
             .responseClaimTrack(FAST_CLAIM.name())
             .resp1MediationContactInfo(MediationContactInformation.builder()
-                                           .firstName("name")
-                                           .build())
+               .firstName("name")
+               .build())
             .build();
 
-        assertFalse(isCarmApplicableCase.test(caseData));
+        assertFalse(MediationPredicate.isCarmApplicableCase.test(caseData));
     }
 
     @Test
@@ -316,7 +311,7 @@ public class FullDefenceTransitionBuilderTest {
             .caseAccessCategory(UNSPEC_CLAIM)
             .build();
 
-        assertTrue(demageMultiClaim.test(caseData));
+        assertTrue(ClaimPredicate.isMulti.and(ClaimPredicate.isUnspec).test(caseData));
     }
 
     @Test
@@ -326,7 +321,7 @@ public class FullDefenceTransitionBuilderTest {
             .caseAccessCategory(UNSPEC_CLAIM)
             .build();
 
-        assertFalse(demageMultiClaim.test(caseData));
+        assertFalse(ClaimPredicate.isMulti.and(ClaimPredicate.isUnspec).test(caseData));
     }
 
     @Test
@@ -336,7 +331,7 @@ public class FullDefenceTransitionBuilderTest {
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .build();
 
-        assertFalse(demageMultiClaim.test(caseData));
+        assertFalse(ClaimPredicate.isMulti.and(ClaimPredicate.isUnspec).test(caseData));
     }
 
     @Test
@@ -346,13 +341,13 @@ public class FullDefenceTransitionBuilderTest {
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .build();
 
-        assertFalse(demageMultiClaim.test(caseData));
+        assertFalse(ClaimPredicate.isMulti.and(ClaimPredicate.isUnspec).test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenUnspec_false() {
         CaseData caseData = CaseData.builder().build();
-        assertFalse(allAgreedToLrMediationSpec.test(caseData));
+        assertFalse(MediationPredicate.allAgreedToLrMediationSpec.test(caseData));
     }
 
     @Test
@@ -360,7 +355,7 @@ public class FullDefenceTransitionBuilderTest {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .build();
-        assertFalse(allAgreedToLrMediationSpec.test(caseData));
+        assertFalse(MediationPredicate.allAgreedToLrMediationSpec.test(caseData));
     }
 
     @Test
@@ -386,7 +381,7 @@ public class FullDefenceTransitionBuilderTest {
                                                           .hasAgreedFreeMediation(whoAgrees[1])
                                                           .build())
                 .build();
-            assertEquals(expected, allAgreedToLrMediationSpec.test(cd));
+            assertEquals(expected, MediationPredicate.allAgreedToLrMediationSpec.test(cd));
         });
     }
 
@@ -415,7 +410,7 @@ public class FullDefenceTransitionBuilderTest {
                                                           .hasAgreedFreeMediation(whoAgrees[1])
                                                           .build())
                 .build();
-            assertEquals(expected, allAgreedToLrMediationSpec.test(cd));
+            assertEquals(expected, MediationPredicate.allAgreedToLrMediationSpec.test(cd));
         });
     }
 
@@ -449,7 +444,7 @@ public class FullDefenceTransitionBuilderTest {
                                                           .hasAgreedFreeMediation(whoAgrees[2])
                                                           .build())
                 .build();
-            assertEquals(expected, allAgreedToLrMediationSpec.test(cd));
+            assertEquals(expected, MediationPredicate.allAgreedToLrMediationSpec.test(cd));
         });
     }
 
@@ -477,13 +472,13 @@ public class FullDefenceTransitionBuilderTest {
             CaseData cd = caseData.toBuilder()
                 .responseClaimMediationSpecRequired(whoAgrees[0])
                 .applicant1ClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
-                                                          .hasAgreedFreeMediation(whoAgrees[1])
-                                                          .build())
+                  .hasAgreedFreeMediation(whoAgrees[1])
+                  .build())
                 .applicantMPClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
-                                                           .hasAgreedFreeMediation(whoAgrees[2])
-                                                           .build())
+                   .hasAgreedFreeMediation(whoAgrees[2])
+                   .build())
                 .build();
-            assertEquals(expected, allAgreedToLrMediationSpec.test(cd));
+            assertEquals(expected, MediationPredicate.allAgreedToLrMediationSpec.test(cd));
         });
     }
 
@@ -493,12 +488,12 @@ public class FullDefenceTransitionBuilderTest {
             .caseAccessCategory(SPEC_CLAIM)
             .responseClaimTrack(SMALL_CLAIM.name())
             .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                                                          .hasAgreedFreeMediation(MediationDecision.Yes)
-                                                                          .build())
-                             .build())
+             .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
+              .hasAgreedFreeMediation(MediationDecision.Yes)
+              .build())
+             .build())
             .build();
-        boolean result = allAgreedToLrMediationSpec.test(caseData);
+        boolean result = MediationPredicate.allAgreedToLrMediationSpec.test(caseData);
         assertFalse(result);
     }
 
@@ -508,7 +503,7 @@ public class FullDefenceTransitionBuilderTest {
             .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
             .build();
 
-        assertFalse(declinedMediation.test(caseData));
+        assertFalse(MediationPredicate.declinedMediation.test(caseData));
     }
 
     @Test
@@ -517,7 +512,7 @@ public class FullDefenceTransitionBuilderTest {
             .atStateMediationUnsuccessfulCarm(MultiPartyScenario.ONE_V_ONE)
             .build();
 
-        assertFalse(declinedMediation.test(caseData));
+        assertFalse(MediationPredicate.declinedMediation.test(caseData));
     }
 
     @Test
@@ -526,7 +521,7 @@ public class FullDefenceTransitionBuilderTest {
             .atStateMediationSuccessful(MultiPartyScenario.ONE_V_ONE)
             .build();
 
-        assertFalse(declinedMediation.test(caseData));
+        assertFalse(MediationPredicate.declinedMediation.test(caseData));
     }
 
     @Test
@@ -535,7 +530,7 @@ public class FullDefenceTransitionBuilderTest {
             .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
             .build();
 
-        assertFalse(declinedMediation.test(caseData));
+        assertFalse(MediationPredicate.declinedMediation.test(caseData));
     }
 
     @Test
@@ -544,7 +539,7 @@ public class FullDefenceTransitionBuilderTest {
             .atStateMediationUnsuccessfulCarm(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
             .build();
 
-        assertFalse(declinedMediation.test(caseData));
+        assertFalse(MediationPredicate.declinedMediation.test(caseData));
     }
 
     @Test
@@ -553,7 +548,7 @@ public class FullDefenceTransitionBuilderTest {
             .atStateMediationSuccessful(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
             .build();
 
-        assertFalse(declinedMediation.test(caseData));
+        assertFalse(MediationPredicate.declinedMediation.test(caseData));
     }
 
     @Test
@@ -562,7 +557,7 @@ public class FullDefenceTransitionBuilderTest {
             .atStateMediationUnsuccessful(MultiPartyScenario.TWO_V_ONE)
             .build();
 
-        assertFalse(declinedMediation.test(caseData));
+        assertFalse(MediationPredicate.declinedMediation.test(caseData));
     }
 
     @Test
@@ -571,7 +566,7 @@ public class FullDefenceTransitionBuilderTest {
             .atStateMediationUnsuccessfulCarm(MultiPartyScenario.TWO_V_ONE)
             .build();
 
-        assertFalse(declinedMediation.test(caseData));
+        assertFalse(MediationPredicate.declinedMediation.test(caseData));
     }
 
     @Test
@@ -580,7 +575,7 @@ public class FullDefenceTransitionBuilderTest {
             .atStateMediationSuccessful(MultiPartyScenario.TWO_V_ONE)
             .build();
 
-        assertFalse(declinedMediation.test(caseData));
+        assertFalse(MediationPredicate.declinedMediation.test(caseData));
     }
 
     @Test
@@ -589,7 +584,7 @@ public class FullDefenceTransitionBuilderTest {
             .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
             .build();
 
-        assertFalse(declinedMediation.test(caseData));
+        assertFalse(MediationPredicate.declinedMediation.test(caseData));
     }
 
     @Test
@@ -598,7 +593,7 @@ public class FullDefenceTransitionBuilderTest {
             .atStateMediationUnsuccessfulCarm(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
             .build();
 
-        assertFalse(declinedMediation.test(caseData));
+        assertFalse(MediationPredicate.declinedMediation.test(caseData));
     }
 
     @Test
@@ -607,7 +602,7 @@ public class FullDefenceTransitionBuilderTest {
             .atStateMediationSuccessful(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
             .build();
 
-        assertFalse(declinedMediation.test(caseData));
+        assertFalse(MediationPredicate.declinedMediation.test(caseData));
     }
 
     @Test
@@ -616,7 +611,7 @@ public class FullDefenceTransitionBuilderTest {
             .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
             .build();
 
-        assertTrue(isClaimantNotSettleFullDefenceClaim.test(caseData));
+        assertTrue(ClaimantPredicate.isIntentionNotSettlePartAdmit.test(caseData));
     }
 
     @Test
@@ -625,7 +620,7 @@ public class FullDefenceTransitionBuilderTest {
             .applicant1PartAdmitIntentionToSettleClaimSpec(YES)
             .build();
 
-        assertFalse(isClaimantNotSettleFullDefenceClaim.test(caseData));
+        assertFalse(ClaimantPredicate.isIntentionNotSettlePartAdmit.test(caseData));
     }
 
     @Test
@@ -635,7 +630,7 @@ public class FullDefenceTransitionBuilderTest {
             .applicant1FullDefenceConfirmAmountPaidSpec(NO)
             .build();
 
-        assertTrue(isDefendantNotPaidFullDefenceClaim.test(caseData));
+        assertTrue(ClaimPredicate.isFullDefenceNotPaid.test(caseData));
     }
 
     @Test
@@ -645,7 +640,7 @@ public class FullDefenceTransitionBuilderTest {
             .applicant1FullDefenceConfirmAmountPaidSpec(YES)
             .build();
 
-        assertFalse(isDefendantNotPaidFullDefenceClaim.test(caseData));
+        assertFalse(ClaimPredicate.isFullDefenceNotPaid.test(caseData));
     }
 
     @Test
@@ -662,8 +657,8 @@ public class FullDefenceTransitionBuilderTest {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1SettleClaim(NO)
-                             .build())
+             .applicant1SettleClaim(NO)
+             .build())
             .build();
 
         assertTrue(LipPredicate.fullDefenceProceed.test(caseData));
@@ -674,8 +669,8 @@ public class FullDefenceTransitionBuilderTest {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1SettleClaim(YES)
-                             .build())
+             .applicant1SettleClaim(YES)
+             .build())
             .build();
 
         assertFalse(LipPredicate.fullDefenceProceed.test(caseData));
@@ -683,8 +678,8 @@ public class FullDefenceTransitionBuilderTest {
         caseData = CaseData.builder()
             .caseAccessCategory(UNSPEC_CLAIM)
             .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1SettleClaim(NO)
-                             .build())
+             .applicant1SettleClaim(NO)
+             .build())
             .build();
 
         assertFalse(LipPredicate.fullDefenceProceed.test(caseData));
@@ -697,7 +692,7 @@ public class FullDefenceTransitionBuilderTest {
             .responseClaimTrack(SMALL_CLAIM.name())
             .build();
 
-        assertTrue(FullDefenceTransitionBuilder.isSpecSmallClaim(caseData));
+        assertTrue(ClaimPredicate.isSpec.and(ClaimPredicate.isSmall).test(caseData));
     }
 
     @Test
@@ -707,64 +702,64 @@ public class FullDefenceTransitionBuilderTest {
             .responseClaimTrack(SMALL_CLAIM.name())
             .build();
 
-        assertFalse(FullDefenceTransitionBuilder.isSpecSmallClaim(caseData));
+        assertFalse(ClaimPredicate.isSpec.and(ClaimPredicate.isSmall).test(caseData));
     }
 
     @Test
     void shouldReturnTrue_whenGetCarmEnabledForLipCase() {
         CaseData caseData = CaseData.builder()
             .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponseCarm(MediationLiPCarm.builder()
-                                                            .isMediationContactNameCorrect(YES)
-                                                            .build())
-                             .build())
+             .applicant1LiPResponseCarm(MediationLiPCarm.builder()
+                .isMediationContactNameCorrect(YES)
+                .build())
+             .build())
             .build();
 
-        assertTrue(FullDefenceTransitionBuilder.getCarmEnabledForLipCase(caseData));
+        assertTrue(MediationPredicate.isCarmEnabledForCaseLiP.test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenGetCarmEnabledForLipCase() {
         CaseData caseData = CaseData.builder()
             .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().build())
-                             .build())
+             .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().build())
+             .build())
             .build();
 
-        assertFalse(FullDefenceTransitionBuilder.getCarmEnabledForLipCase(caseData));
+        assertFalse(MediationPredicate.isCarmEnabledForCaseLiP.test(caseData));
     }
 
     @Test
     void shouldReturnTrue_whenGetCarmEnabledForCase() {
         CaseData caseData = CaseData.builder()
             .app1MediationContactInfo(MediationContactInformation.builder()
-                                          .firstName("name")
-                                          .build())
+              .firstName("name")
+              .build())
             .build();
 
-        assertTrue(FullDefenceTransitionBuilder.getCarmEnabledForCase(caseData));
+        assertTrue(MediationPredicate.isCarmEnabledForCase.test(caseData));
     }
 
     @Test
     void shouldReturnTrue_whenGetCarmEnabledForCaseDefendant1() {
         CaseData caseData = CaseData.builder()
             .resp1MediationContactInfo(MediationContactInformation.builder()
-                                          .firstName("name")
-                                          .build())
+              .firstName("name")
+              .build())
             .build();
 
-        assertTrue(FullDefenceTransitionBuilder.getCarmEnabledForCase(caseData));
+        assertTrue(MediationPredicate.isCarmEnabledForCase.test(caseData));
     }
 
     @Test
     void shouldReturnTrue_whenGetCarmEnabledForCaseDefendant2() {
         CaseData caseData = CaseData.builder()
             .resp2MediationContactInfo(MediationContactInformation.builder()
-                                          .firstName("name")
-                                          .build())
+              .firstName("name")
+              .build())
             .build();
 
-        assertTrue(FullDefenceTransitionBuilder.getCarmEnabledForCase(caseData));
+        assertTrue(MediationPredicate.isCarmEnabledForCase.test(caseData));
     }
 
     @Test
@@ -772,7 +767,7 @@ public class FullDefenceTransitionBuilderTest {
         CaseData caseData = CaseData.builder()
             .build();
 
-        assertFalse(FullDefenceTransitionBuilder.getCarmEnabledForCase(caseData));
+        assertFalse(MediationPredicate.isCarmEnabledForCase.test(caseData));
     }
 
     @Test
@@ -843,7 +838,7 @@ public class FullDefenceTransitionBuilderTest {
             .responseClaimMediationSpecRequired(YesOrNo.YES)
             .build();
 
-        assertFalse(allAgreedToLrMediationSpec.test(caseData));
+        assertFalse(MediationPredicate.allAgreedToLrMediationSpec.test(caseData));
     }
 
     @Test
@@ -854,7 +849,7 @@ public class FullDefenceTransitionBuilderTest {
             .responseClaimMediationSpecRequired(YesOrNo.YES)
             .build();
 
-        assertFalse(allAgreedToLrMediationSpec.test(caseData));
+        assertFalse(MediationPredicate.allAgreedToLrMediationSpec.test(caseData));
     }
 
     @Test
@@ -865,7 +860,7 @@ public class FullDefenceTransitionBuilderTest {
             .responseClaimMediationSpecRequired(YesOrNo.NO)
             .build();
 
-        assertFalse(allAgreedToLrMediationSpec.test(caseData));
+        assertFalse(MediationPredicate.allAgreedToLrMediationSpec.test(caseData));
     }
 
     @Test
@@ -879,7 +874,7 @@ public class FullDefenceTransitionBuilderTest {
             .responseClaimMediationSpec2Required(YesOrNo.NO)
             .build();
 
-        assertFalse(allAgreedToLrMediationSpec.test(caseData));
+        assertFalse(MediationPredicate.allAgreedToLrMediationSpec.test(caseData));
     }
 
     @Test
@@ -889,11 +884,11 @@ public class FullDefenceTransitionBuilderTest {
             .responseClaimTrack(SMALL_CLAIM.name())
             .responseClaimMediationSpecRequired(YesOrNo.YES)
             .applicant1ClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
-                                                      .hasAgreedFreeMediation(YesOrNo.NO)
-                                                      .build())
+              .hasAgreedFreeMediation(YesOrNo.NO)
+              .build())
             .build();
 
-        assertFalse(allAgreedToLrMediationSpec.test(caseData));
+        assertFalse(MediationPredicate.allAgreedToLrMediationSpec.test(caseData));
     }
 
     @Test
@@ -903,11 +898,11 @@ public class FullDefenceTransitionBuilderTest {
             .responseClaimTrack(SMALL_CLAIM.name())
             .responseClaimMediationSpecRequired(YesOrNo.YES)
             .applicantMPClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
-                                                       .hasAgreedFreeMediation(YesOrNo.NO)
-                                                       .build())
+               .hasAgreedFreeMediation(YesOrNo.NO)
+               .build())
             .build();
 
-        assertFalse(allAgreedToLrMediationSpec.test(caseData));
+        assertFalse(MediationPredicate.allAgreedToLrMediationSpec.test(caseData));
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {
