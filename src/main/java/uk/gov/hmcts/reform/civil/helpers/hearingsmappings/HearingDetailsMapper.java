@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingLocationModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingWindowModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.JudiciaryModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.PanelRequirementsModel;
-import uk.gov.hmcts.reform.civil.service.refdata.CategoryService;
+import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsHearingsUtils;
 
 import java.util.ArrayList;

@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.enums.hearing.CategoryType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.CaseCategoryModel;
-import uk.gov.hmcts.reform.civil.service.refdata.CategoryService;
+import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.utils.HmctsServiceIDUtils;
 
 import java.util.Optional;

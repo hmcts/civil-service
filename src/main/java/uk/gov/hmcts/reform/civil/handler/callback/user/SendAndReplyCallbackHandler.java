@@ -86,10 +86,9 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
         }
 
         Element<Message> messageToReplyTo = getMessageToReplyTo(caseData);
+        caseData.setMessageHistory(messageService.renderMessageTableList(messageToReplyTo));
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toBuilder()
-                      .messageHistory(messageService.renderMessageTableList(messageToReplyTo))
-                      .build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
@@ -100,19 +99,19 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
 
     private CallbackResponse handleAboutToStart(CallbackParams params) {
         CaseData caseData = params.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
         if (nonNull(caseData.getMessages()) && !caseData.getMessages().isEmpty()) {
-            builder.messagesToReplyTo(messageService.createMessageSelectionList(caseData.getMessages()));
+            caseData.setMessagesToReplyTo(messageService.createMessageSelectionList(caseData.getMessages()));
         }
 
         if (featureToggleService.isWelshEnabledForMainCase()
             && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
-            builder.bilingualHint(YesOrNo.YES);
+            caseData.setBilingualHint(YesOrNo.YES);
         }
 
+        caseData.setSendAndReplyOption(null);
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.sendAndReplyOption(null).build().toMap(objectMapper)).build();
+            .data(caseData.toMap(objectMapper)).build();
     }
 
     private Element<Message> getMessageToReplyTo(CaseData caseData) {
@@ -122,7 +121,6 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
 
     private CallbackResponse handleAboutToSubmit(CallbackParams params) {
         CaseData caseData = params.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         String userAuth = params.getParams().get(BEARER_TOKEN).toString();
 
         List<Element<Message>> messagesNew;
@@ -135,9 +133,9 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
                 userAuth
             );
 
-            builder.messages(messagesNew)
-                .sendMessageMetadata(null)
-                .sendMessageContent(null);
+            caseData.setMessages(messagesNew);
+            caseData.setSendMessageMetadata(null);
+            caseData.setSendMessageContent(null);
         } else {
             messagesNew = messageService.addReplyToMessage(
                 caseData.getMessages(),
@@ -146,18 +144,18 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
                 userAuth, caseData
             );
 
-            builder.messages(messagesNew)
-                .messagesToReplyTo(null)
-                .messageReplyMetadata(null)
-                .messageHistory(null);
+            caseData.setMessages(messagesNew);
+            caseData.setMessagesToReplyTo(null);
+            caseData.setMessageReplyMetadata(null);
+            caseData.setMessageHistory(null);
         }
 
         Element<Message> lastMessageElement = messagesNew.stream()
                 .max(Comparator.comparing(message -> message.getValue().getUpdatedTime()))
-                .orElse(element(Message.builder().build()));
+                .orElse(element(new Message()));
         Message lastMessage = lastMessageElement.getValue();
 
-        builder.lastMessage(lastMessage);
+        caseData.setLastMessage(lastMessage);
 
         AllocatedTrack allocatedTrack;
         if (Objects.nonNull(caseData.getAssignedTrackType())) {
@@ -171,20 +169,20 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
                 caseData
             );
         }
-        builder.lastMessageAllocatedTrack(AllocatedTrack.toStringValueForMessage(allocatedTrack));
+        caseData.setLastMessageAllocatedTrack(AllocatedTrack.toStringValueForMessage(allocatedTrack));
 
         boolean isRecipientCircuitJudge = RolePool.JUDICIAL_CIRCUIT.equals(lastMessage.getRecipientRoleType());
         boolean isRecipientDistrictJudge = RolePool.JUDICIAL_DISTRICT.equals(lastMessage.getRecipientRoleType());
         boolean isJudge = RolePool.JUDICIAL.equals(lastMessage.getRecipientRoleType());
 
         if (isRecipientCircuitJudge || isRecipientDistrictJudge) {
-            builder.lastMessageJudgeLabel(isRecipientCircuitJudge ? "CJ" : "DJ");
+            caseData.setLastMessageJudgeLabel(isRecipientCircuitJudge ? "CJ" : "DJ");
         } else if (isJudge) {
-            builder.lastMessageJudgeLabel("Judge");
+            caseData.setLastMessageJudgeLabel("Judge");
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
@@ -224,12 +222,15 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
             if (taskToComplete.getTaskState().equals("unassigned")) {
                 UserDetails userDetails = userService.getUserDetails(userAuth);
                 taskManagementService.claimTask(userAuth, taskToComplete.getId());
-                taskToComplete.toBuilder().assignee(userDetails.getId()).build();
+                taskToComplete.setAssignee(userDetails.getId());
             }
 
-            return ClientContext.builder()
-                .userTask(UserTask.builder().taskData(taskToComplete).completeTask(true).build())
-                .build();
+            UserTask userTask = new UserTask();
+            userTask.setTaskData(taskToComplete);
+            userTask.setCompleteTask(true);
+            ClientContext clientContext = new ClientContext();
+            clientContext.setUserTask(userTask);
+            return clientContext;
         }
 
         return null;

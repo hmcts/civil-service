@@ -75,19 +75,39 @@ class AmendRestitchBundleCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     private List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> prepareCaseBundles() {
+        uk.gov.hmcts.reform.civil.model.Bundle bundle1 = new uk.gov.hmcts.reform.civil.model.Bundle(
+            "1",
+            "Trial Bundle - Static",
+            "Trial Bundle - Static",
+            null,
+            null,
+            Optional.of("NEW"),
+            Optional.empty(),
+            uk.gov.hmcts.reform.civil.enums.YesOrNo.NO,
+            uk.gov.hmcts.reform.civil.enums.YesOrNo.NO,
+            null
+        );
+        bundle1.setCreatedOn(Optional.of(LocalDateTime.now()));
+        bundle1.setBundleHearingDate(Optional.of(LocalDate.of(2023, 12, 12)));
         List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> caseBundles = new ArrayList<>();
-        caseBundles.add(new IdValue<>("1", uk.gov.hmcts.reform.civil.model.Bundle.builder().id("1")
-            .title("Trial Bundle - Static")
-            .stitchStatus(Optional.of("NEW")).description("Trial Bundle - Static")
-            .createdOn(Optional.of(LocalDateTime.now()))
-            .bundleHearingDate(Optional.of(LocalDate.of(2023, 12, 12)))
-            .build()));
-        caseBundles.add(new IdValue<>("2", uk.gov.hmcts.reform.civil.model.Bundle.builder().id("1")
-            .title("Trial Bundle - Old")
-            .stitchStatus(Optional.of("NEW")).description("Trial Bundle - Old")
-            .createdOn(Optional.of(LocalDateTime.now()))
-            .bundleHearingDate(Optional.of(LocalDate.now().plusWeeks(5).plusDays(5)))
-            .build()));
+        caseBundles.add(new IdValue<>("1", bundle1));
+
+        uk.gov.hmcts.reform.civil.model.Bundle bundle2 = new uk.gov.hmcts.reform.civil.model.Bundle(
+            "1",
+            "Trial Bundle - Old",
+            "Trial Bundle - Old",
+            null,
+            null,
+            Optional.of("NEW"),
+            Optional.empty(),
+            uk.gov.hmcts.reform.civil.enums.YesOrNo.NO,
+            uk.gov.hmcts.reform.civil.enums.YesOrNo.NO,
+            null
+        );
+        bundle2.setCreatedOn(Optional.of(LocalDateTime.now()));
+        bundle2.setBundleHearingDate(Optional.of(LocalDate.now().plusWeeks(5).plusDays(5)));
+        caseBundles.add(new IdValue<>("2", bundle2));
+
         return caseBundles;
     }
 
@@ -124,20 +144,28 @@ class AmendRestitchBundleCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnBundle_AndOverwriteExistingBundleForHearingDate() {
             when(featureToggleService.isAmendBundleEnabled()).thenReturn(true);
-            Bundle bundle = Bundle.builder().value(BundleDetails.builder().title("Trial Bundle - New").id("2")
-                                                       .stitchStatus("new")
-                                                       .fileName("Trial Bundle.pdf")
-                                                       .description("Trial Bundle - New")
-                                                       .bundleHearingDate(LocalDate.of(2023, 12, 12))
-                                                       .stitchedDocument(Document.builder()
-                                                                             .documentUrl(TEST_URL)
-                                                                             .documentFileName(TEST_FILE_NAME)
-                                                                             .build())
-                                                       .createdOn(LocalDateTime.of(2023, 11, 12, 1, 1, 1))
-                                                       .build()).build();
+
+            Document stitchedDocument = new Document();
+            stitchedDocument.setDocumentUrl(TEST_URL);
+            stitchedDocument.setDocumentFileName(TEST_FILE_NAME);
+
+            BundleDetails bundleDetails = new BundleDetails();
+            bundleDetails.setTitle("Trial Bundle - New");
+            bundleDetails.setId("2");
+            bundleDetails.setStitchStatus("new");
+            bundleDetails.setFileName("Trial Bundle.pdf");
+            bundleDetails.setDescription("Trial Bundle - New");
+            bundleDetails.setBundleHearingDate(LocalDate.of(2023, 12, 12));
+            bundleDetails.setStitchedDocument(stitchedDocument);
+            bundleDetails.setCreatedOn(LocalDateTime.of(2023, 11, 12, 1, 1, 1));
+
+            Bundle bundle = new Bundle(bundleDetails);
+
             IdValue<Bundle> packedBundle = new IdValue<>("2", bundle);
-            BundleCreateResponse bundleCreateResponse =
-                BundleCreateResponse.builder().data(BundleData.builder().caseBundles(List.of(bundle)).build()).build();
+
+            BundleData bundleData = new BundleData(List.of(bundle));
+
+            BundleCreateResponse bundleCreateResponse = new BundleCreateResponse(bundleData, null);
             CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome()
                 .caseBundles(prepareCaseBundles())
                 .build();

@@ -61,7 +61,6 @@ public class AmendRestitchBundleCallbackHandler extends CallbackHandler {
 
     private CallbackResponse amendRestitchBundle(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         BundleCreateResponse bundleCreateResponse = bundleCreationService.createBundle(caseData.getCcdCaseReference());
 
         List<IdValue<Bundle>> caseBundles = caseData.getCaseBundles();
@@ -72,11 +71,11 @@ public class AmendRestitchBundleCallbackHandler extends CallbackHandler {
         caseBundles.addAll(bundleCreateResponse.getData().getCaseBundles()
                                .stream().map(bundle -> bundleCreationEventHandler.prepareNewBundle(bundle, caseData)
             ).toList());
-        caseDataBuilder.caseBundles(caseBundles);
-        caseDataBuilder.bundleEvent(AMEND_RESTITCH_BUNDLE_EVENT);
+        caseData.setCaseBundles(caseBundles);
+        caseData.setBundleEvent(AMEND_RESTITCH_BUNDLE_EVENT);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(mapper))
+            .data(caseData.toMap(mapper))
             .build();
     }
 

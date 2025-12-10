@@ -7,7 +7,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.crd.model.Category;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
-import uk.gov.hmcts.reform.civil.service.refdata.CategoryService;
+import uk.gov.hmcts.reform.civil.service.CategoryService;
 
 import java.util.List;
 import java.util.Map;

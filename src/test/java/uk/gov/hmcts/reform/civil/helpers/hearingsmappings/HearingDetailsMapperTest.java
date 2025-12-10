@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.HearingLocationModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.JudiciaryModel;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.refdata.CategoryService;
+import uk.gov.hmcts.reform.civil.service.CategoryService;
 
 import java.util.List;
 import java.util.Optional;

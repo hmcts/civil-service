@@ -81,14 +81,11 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
 
     private CallbackResponse cleanObligationData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-
-        caseDataBuilder
-            .obligationDatePresent(null)
-            .courtStaffNextSteps(null);
+        caseData.setObligationDatePresent(null);
+        caseData.setCourtStaffNextSteps(null);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
@@ -127,12 +124,11 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
 
     private CallbackResponse confirmOrderReview(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
 
         if (YesOrNo.YES.equals(caseData.getObligationDatePresent())) {
-            updatedCaseData.businessProcess(BusinessProcess.ready(CONFIRM_ORDER_REVIEW));
+            caseData.setBusinessProcess(BusinessProcess.ready(CONFIRM_ORDER_REVIEW));
         } else if (YesOrNo.YES.equals(caseData.getIsFinalOrder())) {
-            updatedCaseData.businessProcess(BusinessProcess.ready(CONFIRM_ORDER_REVIEW_FINAL_ORDER));
+            caseData.setBusinessProcess(BusinessProcess.ready(CONFIRM_ORDER_REVIEW_FINAL_ORDER));
         }
 
         if (nonNull(caseData.getObligationData())) {
@@ -146,35 +142,34 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
             combinedData.addAll(storedObligationData);
 
             caseData.getObligationData().forEach(obligation -> {
-                StoredObligationData storedObligation = StoredObligationData.builder()
-                    .createdBy(officerName)
-                    .createdOn(time.now())
-                    .obligationDate(obligation.getValue().getObligationDate())
-                    .obligationReason(obligation.getValue().getObligationReason())
-                    .otherObligationReason(obligation.getValue().getOtherObligationReason())
-                    .reasonText(obligation.getValue().getObligationReason().equals(ObligationReason.OTHER)
+                StoredObligationData storedObligation = new StoredObligationData();
+                storedObligation.setCreatedBy(officerName);
+                storedObligation.setCreatedOn(time.now());
+                storedObligation.setObligationDate(obligation.getValue().getObligationDate());
+                storedObligation.setObligationReason(obligation.getValue().getObligationReason());
+                storedObligation.setOtherObligationReason(obligation.getValue().getOtherObligationReason());
+                storedObligation.setReasonText(obligation.getValue().getObligationReason().equals(ObligationReason.OTHER)
                                     ? ObligationReason.OTHER.getDisplayedValue() + ": " + obligation.getValue().getOtherObligationReason()
-                                    : obligation.getValue().getObligationReason().getDisplayedValue())
-                    .obligationAction(obligation.getValue().getObligationAction())
-                    .obligationWATaskRaised(YesOrNo.NO)
-                    .build();
+                                    : obligation.getValue().getObligationReason().getDisplayedValue());
+                storedObligation.setObligationAction(obligation.getValue().getObligationAction());
+                storedObligation.setObligationWATaskRaised(YesOrNo.NO);
 
                 combinedData.add(element(storedObligation));
             });
 
-            updatedCaseData.obligationData(null)
-                .storedObligationData(combinedData);
+            caseData.setObligationData(null);
+            caseData.setStoredObligationData(combinedData);
         }
 
         if (YesOrNo.YES.equals(caseData.getIsFinalOrder())) {
             return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedCaseData.build().toMap(objectMapper))
+                .data(caseData.toMap(objectMapper))
                 .state(CaseState.All_FINAL_ORDERS_ISSUED.toString())
                 .build();
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

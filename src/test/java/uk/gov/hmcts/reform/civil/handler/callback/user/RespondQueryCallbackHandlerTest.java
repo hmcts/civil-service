@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDateTime;
@@ -66,18 +67,17 @@ class RespondQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldMigrateAllQueries() {
-            CaseData caseData = CaseData.builder()
-                .ccdCaseReference(CASE_ID)
-                .qmApplicantSolicitorQueries(mockQueriesCollection("app-query-id", NOW))
-                .qmRespondentSolicitor1Queries(mockQueriesCollection(
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCcdCaseReference(CASE_ID);
+            caseData.setQmApplicantSolicitorQueries(mockQueriesCollection("app-query-id", NOW));
+            caseData.setQmRespondentSolicitor1Queries(mockQueriesCollection(
                     "res-1-query-id",
                     NOW.plusDays(1)
-                ))
-                .qmRespondentSolicitor2Queries(mockQueriesCollection(
+                ));
+            caseData.setQmRespondentSolicitor2Queries(mockQueriesCollection(
                     "res-2--query-id",
                     NOW.plusDays(2)
-                ))
-                .build();
+                ));
 
             List<Element<CaseMessage>> expectedMessages = Stream.of(
                     caseData.getQmApplicantSolicitorQueries(),
@@ -92,10 +92,10 @@ class RespondQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData actualData = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(actualData.getQueries()).isEqualTo(CaseQueriesCollection.builder()
-                                                              .partyName("All queries")
-                                                              .caseMessages(expectedMessages)
-                                                              .build());
+            CaseQueriesCollection caseQueriesCollection = new CaseQueriesCollection();
+            caseQueriesCollection.setPartyName("All queries");
+            caseQueriesCollection.setCaseMessages(expectedMessages);
+            assertThat(actualData.getQueries()).isEqualTo(caseQueriesCollection);
         }
     }
 
@@ -110,10 +110,9 @@ class RespondQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         public void shouldAssignClaimantQueryCategoryId_forCaseWorker() {
-            CaseData caseData = CaseData.builder()
-                .ccdCaseReference(CASE_ID)
-                .queries(mockQueriesCollection(QUERY_ID, NOW))
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCcdCaseReference(CASE_ID);
+            caseData.setQueries(mockQueriesCollection(QUERY_ID, NOW));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -132,38 +131,34 @@ class RespondQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     private CaseQueriesCollection mockQueriesCollection(String queryId, OffsetDateTime latestDate) {
-        return CaseQueriesCollection.builder()
-            .partyName("partyName")
-            .roleOnCase("roleOnCase")
-            .caseMessages(
-                List.of(
-                    Element.<CaseMessage>builder()
-                        .id(UUID.randomUUID())
-                        .value(
-                            CaseMessage.builder()
-                                .id(queryId)
-                                .parentId("parent-id")
-                                .isHearingRelated(NO)
-                                .createdOn(latestDate)
-                                .attachments(wrapElements(
-                                    Document.builder()
-                                        .documentFileName("file1")
-                                        .build(),
-                                    Document.builder()
-                                        .documentFileName("file2")
-                                        .build()
-                                ))
-                                .build()).build(),
-                    Element.<CaseMessage>builder()
-                        .id(UUID.randomUUID())
-                        .value(
-                            CaseMessage.builder()
-                                .id("parent-id")
-                                .isHearingRelated(NO)
-                                .createdOn(latestDate.minusMinutes(10))
-                                .build()).build()
-                ))
-            .build();
+        Document document1 = new Document();
+        document1.setDocumentFileName("file1");
+        Document document2 = new Document();
+        document2.setDocumentFileName("file2");
+
+        CaseMessage caseMessage1 = new CaseMessage();
+        caseMessage1.setId(queryId);
+        caseMessage1.setParentId("parent-id");
+        caseMessage1.setIsHearingRelated(NO);
+        caseMessage1.setCreatedOn(latestDate);
+        caseMessage1.setAttachments(wrapElements(document1, document2));
+        Element<CaseMessage> element1 = new Element<>();
+        element1.setId(UUID.randomUUID());
+        element1.setValue(caseMessage1);
+
+        CaseMessage caseMessage2 = new CaseMessage();
+        caseMessage2.setId("parent-id");
+        caseMessage2.setIsHearingRelated(NO);
+        caseMessage2.setCreatedOn(latestDate.minusMinutes(10));
+        Element<CaseMessage> element2 = new Element<>();
+        element2.setId(UUID.randomUUID());
+        element2.setValue(caseMessage2);
+
+        CaseQueriesCollection collection = new CaseQueriesCollection();
+        collection.setPartyName("partyName");
+        collection.setRoleOnCase("roleOnCase");
+        collection.setCaseMessages(List.of(element1, element2));
+        return collection;
     }
 
 }

@@ -72,7 +72,7 @@ import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
-import uk.gov.hmcts.reform.civil.model.referencedata.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.DocumentBuilder;

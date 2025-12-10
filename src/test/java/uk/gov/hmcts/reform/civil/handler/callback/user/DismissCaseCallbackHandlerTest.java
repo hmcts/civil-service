@@ -41,15 +41,16 @@ class DismissCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void aboutToSubmitShouldReadyCamundaProcess() {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimSubmitted2v1RespondentUnrepresented().build().toBuilder()
-            .typeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE)
-            .claimantWhoIsDiscontinuing(DynamicList.builder()
-                                            .value(DynamicListElement.builder()
-                                                       .label("Both")
-                                                       .build()).build())
-            .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO)
-            .hearingDate(LocalDate.now())
-            .hearingDueDate(LocalDate.now()).build();
+            .atStateClaimSubmitted2v1RespondentUnrepresented().build();
+        caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE);
+        DynamicListElement dynamicListElement = new DynamicListElement();
+        dynamicListElement.setLabel("Both");
+        DynamicList dynamicList = new DynamicList();
+        dynamicList.setValue(dynamicListElement);
+        caseData.setClaimantWhoIsDiscontinuing(dynamicList);
+        caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.NO);
+        caseData.setHearingDate(LocalDate.now());
+        caseData.setHearingDueDate(LocalDate.now());
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -62,9 +63,9 @@ class DismissCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void submittedShouldHaveConfirmationScreen() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
-            .isPermissionGranted(SettleDiscontinueYesOrNoList.YES)
-            .courtPermissionNeeded(SettleDiscontinueYesOrNoList.YES).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseData.setIsPermissionGranted(SettleDiscontinueYesOrNoList.YES);
+        caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.YES);
         CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
         SubmittedCallbackResponse response =

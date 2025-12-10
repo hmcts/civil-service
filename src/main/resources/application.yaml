@@ -22,6 +22,10 @@ spring:
     name: civil-service
   main:
     allow-bean-definition-overriding: true
+  cache:
+    cache-names: userInfoCache, accessTokenCache
+    caffeine:
+      spec: expireAfterWrite=3600s
   datasource:
     driverClassName: org.postgresql.Driver
     username: ${CMC_DB_USERNAME:-}

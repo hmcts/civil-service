@@ -41,12 +41,10 @@ public class UpdateCaseStateCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         String nextState = caseData.getNextState();
 
-        CaseData updatedCaseData = caseData.toBuilder()
-            .nextState(null)
-            .build();
+        caseData.setNextState(null);
 
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder = AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper));
+            .data(caseData.toMap(objectMapper));
 
         if (nextState != null) {
             responseBuilder.state(nextState);

@@ -38,9 +38,10 @@ public class ManageStayWATaskCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        caseData.setManageStayUpdateRequestDate(null);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toBuilder().manageStayUpdateRequestDate(null).build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

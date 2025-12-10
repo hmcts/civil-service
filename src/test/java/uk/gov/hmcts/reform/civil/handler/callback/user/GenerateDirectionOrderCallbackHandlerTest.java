@@ -56,7 +56,7 @@ import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrdersComplexityBand;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderAfterHearingDate;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderAfterHearingDateType;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
-import uk.gov.hmcts.reform.civil.model.referencedata.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -1911,7 +1911,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         }
 
         @Test
-        void shouldChangeStateToFinalOrder_onAboutToSubmitAndFreeFormOrder() {
+        void shouldNotChangeStateToFinalOrder_onAboutToSubmitAndFreeFormOrder() {
             when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                         .forename("Judge")
                                                                         .surname("Judy")
@@ -1919,16 +1919,16 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
             finalCaseDocuments.add(element(finalOrder));
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
-                .finalOrderDocumentCollection(finalCaseDocuments)
-                .finalOrderDocument(finalOrder)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setFinalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER);
+            caseData.setFinalOrderDocumentCollection(finalCaseDocuments);
+            caseData.setFinalOrderDocument(finalOrder);
+
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
-            assertThat(response.getState()).isEqualTo("All_FINAL_ORDERS_ISSUED");
+            assertThat(response.getState()).isEqualTo(null);
         }
 
         @Test
@@ -1940,17 +1940,17 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
             finalCaseDocuments.add(element(finalOrder));
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
-                .finalOrderFurtherHearingToggle(null)
-                .finalOrderDocumentCollection(finalCaseDocuments)
-                .finalOrderDocument(finalOrder)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setFinalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .setFinalOrderFurtherHearingToggle(null)
+                .setFinalOrderDocumentCollection(finalCaseDocuments)
+                .setFinalOrderDocument(finalOrder);
+
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
-            assertThat(response.getState()).isEqualTo("All_FINAL_ORDERS_ISSUED");
+            assertThat(response.getState()).isEqualTo(null);
         }
 
         @Test
@@ -2260,7 +2260,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
-            assertThat(response.getState()).isEqualTo("All_FINAL_ORDERS_ISSUED");
+            assertThat(response.getState()).isEqualTo(null);
         }
 
         @Test
@@ -2283,7 +2283,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
-            assertThat(response.getState()).isEqualTo("All_FINAL_ORDERS_ISSUED");
+            assertThat(response.getState()).isEqualTo(null);
         }
 
         @Test

@@ -31,7 +31,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2UploadOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2VariationOfDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
-import uk.gov.hmcts.reform.civil.model.referencedata.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import java.time.LocalDate;
 import java.util.List;
