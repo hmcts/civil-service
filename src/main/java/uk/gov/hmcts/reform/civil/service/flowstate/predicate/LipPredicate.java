@@ -92,6 +92,13 @@ public non-sealed interface LipPredicate extends CaseDataPredicate {
     Predicate<CaseData> caseContainsLiP = CaseDataPredicate.Lip.caseContainsLiP;
 
     @BusinessRule(
+        group = "",
+        summary = "",
+        description = ""
+    )
+    Predicate<CaseData> certificateOfServiceEnabled = CaseDataPredicate.Lip.isClaimIssued;
+
+    @BusinessRule(
         group = "Lip",
         summary = "PIN-in-post enabled",
         description = "PIN-in-post service is enabled for this case"
