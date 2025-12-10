@@ -1083,6 +1083,16 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
 
         @BusinessRule(
             group = "Lip",
+            summary = "Case is at claim issued (Either LiP defendants)",
+            description = "At least one defendant is at claim issued on the case"
+        )
+        Predicate<CaseData> isClaimIssued =
+            nullSafe(c -> YES.equals(c.getDefendant1LIPAtClaimIssued())
+            || YES.equals(c.getDefendant2LIPAtClaimIssued())
+            );
+
+        @BusinessRule(
+            group = "Lip",
             summary = "Applicant 1 has not settled claim (NO)",
             description = "Applicant 1 has not indicated they will settle the claim"
         )
