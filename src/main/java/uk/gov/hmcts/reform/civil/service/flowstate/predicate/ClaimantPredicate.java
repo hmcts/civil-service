@@ -7,6 +7,7 @@ import java.util.function.Predicate;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.service.flowstate.predicate.util.PredicateUtil.nullSafe;
 
 @SuppressWarnings("java:S1214")
 public non-sealed interface ClaimantPredicate extends CaseDataPredicate {
@@ -17,6 +18,22 @@ public non-sealed interface ClaimantPredicate extends CaseDataPredicate {
         description = "Applicant correspondence address not required (Spec)"
     )
     Predicate<CaseData> correspondenceAddressNotRequired = Applicant.isNotApplicantCorrespondenceAddressRequiredSpec;
+
+    @BusinessRule(
+        group = "Claimant",
+        summary = "Claimant intention settle (Part Admit)",
+        description = "Claimant intention settle"
+    )
+    Predicate<CaseData> isIntentionSettlePartAdmit =
+        nullSafe(CaseDataPredicate.Claimant.isIntentionSettlePartAdmit);
+
+    @BusinessRule(
+        group = "Claimant",
+        summary = "Claimant intention not settle (Part Admit)",
+        description = "Claimant intention not settle"
+    )
+    Predicate<CaseData> isIntentionNotSettlePartAdmit =
+        nullSafe(CaseDataPredicate.Claimant.isIntentionNotSettlePartAdmit);
 
     @BusinessRule(
         group = "Claimant",
