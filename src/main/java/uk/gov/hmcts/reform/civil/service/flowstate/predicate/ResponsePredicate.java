@@ -14,6 +14,20 @@ public non-sealed interface ResponsePredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Response",
+        summary = "Case has a second respondent",
+        description = "Checks if respondent 2 is present in the case data."
+    )
+    Predicate<CaseData> hasRespondent2 = CaseDataPredicate.Respondent.hasRespondent2;
+
+    @BusinessRule(
+        group = "Response",
+        summary = "Case has a second respondent",
+        description = "Checks if respondent 2 is present in the case data."
+    )
+    Predicate<CaseData> isNotSameLegalRepresentative = CaseDataPredicate.Respondent.isNotSameLegalRepresentative;
+
+    @BusinessRule(
+        group = "Response",
         summary = "Notification acknowledged",
         description = "At least one required defendant has acknowledged service " +
             "(matches State Flow 'NOTIFICATION_ACKNOWLEDGED')"

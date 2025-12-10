@@ -10,6 +10,10 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimantPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LanguagePredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.MediationPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.OutOfTimePredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.RepaymentPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 import uk.gov.hmcts.reform.civil.utils.JudgmentAdmissionUtils;
@@ -47,7 +51,7 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
     @Override
     void setUpTransitions(List<Transition> transitions) {
         this.moveTo(IN_MEDIATION, transitions)
-            .onlyWhen(LipPredicate.agreedToMediation
+            .onlyWhen(MediationPredicate.agreedToMediation
                 .and(not(TakenOfflinePredicate.byStaff))
                 .and(not(partAdmitPayImmediately))
                 .and(not(RepaymentPredicate.acceptRepaymentPlan))
@@ -57,7 +61,7 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
             .onlyWhen(carmMediation, transitions)
 
             .moveTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION, transitions)
-            .onlyWhen(isClaimantNotSettlePartAdmitClaim.and(not(LipPredicate.agreedToMediation)).and(not(isCarmApplicableCase))
+            .onlyWhen(isClaimantNotSettlePartAdmitClaim.and(not(MediationPredicate.agreedToMediation)).and(not(isCarmApplicableCase))
                 .and(not(isCarmApplicableLipCase))
                 .and(not(TakenOfflinePredicate.byStaff)), transitions)
             .set((c, flags) -> {
@@ -135,7 +139,7 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
     }
 
     public static final Predicate<CaseData> carmMediation = isClaimantNotSettlePartAdmitClaim
-        .and(LipPredicate.agreedToMediation.negate())
+        .and(MediationPredicate.agreedToMediation.negate())
         .and(isCarmApplicableCase.or(isCarmApplicableLipCase))
         .and(not(TakenOfflinePredicate.byStaff));
 
