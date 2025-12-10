@@ -5,6 +5,8 @@ import uk.gov.hmcts.reform.civil.service.flowstate.predicate.annotations.Busines
 
 import java.util.function.Predicate;
 
+import static uk.gov.hmcts.reform.civil.service.flowstate.predicate.util.PredicateUtil.nullSafe;
+
 @SuppressWarnings("java:S1214")
 public non-sealed interface ClaimPredicate extends CaseDataPredicate {
 
@@ -14,6 +16,42 @@ public non-sealed interface ClaimPredicate extends CaseDataPredicate {
         description = "Case is in the SPEC (damages) service based on case access category"
     )
     Predicate<CaseData> isSpec = CaseDataPredicate.Claim.isSpecClaim;
+
+    @BusinessRule(
+        group = "Claim",
+        summary = "UNSPEC claim",
+        description = "Case is in the UNSPEC service based on case access category"
+    )
+    Predicate<CaseData> isUnspec = CaseDataPredicate.Claim.isUnspecClaim;
+
+    @BusinessRule(
+        group = "Claim",
+        summary = "Small claim",
+        description = "Case is Small Claim track"
+    )
+    Predicate<CaseData> isSmall = CaseDataPredicate.Claim.isSmallClaim;
+
+    @BusinessRule(
+        group = "Claim",
+        summary = "Fast claim",
+        description = "Case is Fast Claim track"
+    )
+    Predicate<CaseData> isFast = CaseDataPredicate.Claim.isFastClaim;
+
+    @BusinessRule(
+        group = "Claim",
+        summary = "Multi claim",
+        description = "Case is Multi Claim track"
+    )
+    Predicate<CaseData> isMulti = CaseDataPredicate.Claim.isMultiClaim;
+
+    @BusinessRule(
+        group = "Claim",
+        summary = "Claim is full defence not paid",
+        description = "Claim is defendant not paid full defence"
+    )
+    Predicate<CaseData> isFullDefenceNotPaid =
+        nullSafe(CaseDataPredicate.Claim.isFullDefenceNotPaid);
 
     @BusinessRule(
         group = "Claim",

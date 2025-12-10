@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -15,6 +16,9 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -45,7 +49,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.predicate.util.Predica
  */
 @SuppressWarnings("java:S1214")
 sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, DismissedPredicate, DivergencePredicate,
-    HearingPredicate, LanguagePredicate, LipPredicate, NotificationPredicate, OutOfTimePredicate, PaymentPredicate,
+    HearingPredicate, LanguagePredicate, LipPredicate, MediationPredicate, NotificationPredicate, OutOfTimePredicate, PaymentPredicate,
     RepaymentPredicate, ResponsePredicate, TakenOfflinePredicate {
 
     interface Applicant {
@@ -57,6 +61,24 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         )
         Predicate<CaseData> isRepresented =
             nullSafe(c -> !c.isApplicantNotRepresented());
+
+        @BusinessRule(
+            group = "Respondent",
+            summary = "Applicant 1 is represented",
+            description = "Applicant 1 is represented"
+        )
+        Predicate<CaseData> isRepresentedApplicant1 =
+            nullSafe(c -> c.getApplicant1Represented() != null
+                && YES.equals(c.getApplicant1Represented()));
+
+        @BusinessRule(
+            group = "Respondent",
+            summary = "Applicant 1 is unrepresented",
+            description = "Applicant 1 is unrepresented"
+        )
+        Predicate<CaseData> isUnrepresentedApplicant1 =
+            nullSafe(c -> c.getApplicant1Represented() != null
+                && NO.equals(c.getApplicant1Represented()));
 
         @BusinessRule(
             group = "Applicant",
@@ -214,6 +236,38 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         )
         Predicate<CaseData> isUnspecClaim =
             nullSafe(c -> UNSPEC_CLAIM.equals(c.getCaseAccessCategory()));
+
+        @BusinessRule(
+            group = "Claim",
+            summary = "Case is Small Claim",
+            description = "Case is Small Claim track"
+        )
+        Predicate<CaseData> isSmallClaim =
+            nullSafe(c -> SMALL_CLAIM.name().equals(c.getResponseClaimTrack()));
+
+        @BusinessRule(
+            group = "Claim",
+            summary = "Case is Fast Claim",
+            description = "Case is Fast Claim track"
+        )
+        Predicate<CaseData> isFastClaim =
+            nullSafe(c -> FAST_CLAIM.name().equals(c.getResponseClaimTrack()));
+
+        @BusinessRule(
+            group = "Claim",
+            summary = "Case is Multi Claim",
+            description = "Case is Multi Claim track"
+        )
+        Predicate<CaseData> isMultiClaim =
+            nullSafe(c -> MULTI_CLAIM.equals(c.getAllocatedTrack()));
+
+        @BusinessRule(
+            group = "Claim",
+            summary = "Claim is full defence not paid",
+            description = "Claim is defendant not paid full defence"
+        )
+        Predicate<CaseData> isFullDefenceNotPaid =
+            nullSafe(CaseData::isFullDefenceNotPaid);
 
         @BusinessRule(
             group = "Claim",
@@ -412,6 +466,30 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         )
         Predicate<CaseData> agreedToMediation =
             nullSafe(CaseData::hasClaimantAgreedToFreeMediation);
+
+        @BusinessRule(
+            group = "Claimant",
+            summary = "Claimant declined mediation",
+            description = "Claimant has opted out of free mediation"
+        )
+        Predicate<CaseData> declinedMediation =
+            nullSafe(CaseData::hasClaimantNotAgreedToFreeMediation);
+
+        @BusinessRule(
+            group = "Claimant",
+            summary = "Claimant intention settle (Part Admit)",
+            description = "Claimant intention settle"
+        )
+        Predicate<CaseData> isIntentionSettlePartAdmit =
+            nullSafe(CaseData::isClaimantIntentionSettlePartAdmit);
+
+        @BusinessRule(
+            group = "Claimant",
+            summary = "Claimant intention not settle (Part Admit)",
+            description = "Claimant intention not settle"
+        )
+        Predicate<CaseData> isIntentionNotSettlePartAdmit =
+            nullSafe(CaseData::isClaimantIntentionNotSettlePartAdmit);
 
         @BusinessRule(
             group = "Claimant",
@@ -1109,4 +1187,116 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
 
     }
 
+    interface Mediation {
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "Applicant MP has agreed to free mediation",
+            description = "Applicant MP has agreed to free mediation"
+        )
+        Predicate<CaseData> isMediationRequiredApplicantMPSpec =
+            nullSafe(c -> c.getApplicantMPClaimMediationSpecRequired() != null
+                && YesOrNo.YES.equals(c.getApplicantMPClaimMediationSpecRequired().getHasAgreedFreeMediation()));
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "Applicant MP has not agreed to free mediation",
+            description = "Applicant MP has not agreed to free mediation"
+        )
+        Predicate<CaseData> isNotMediationRequiredApplicantMPSpec =
+            nullSafe(c -> c.getApplicantMPClaimMediationSpecRequired() != null
+                && YesOrNo.NO.equals(c.getApplicantMPClaimMediationSpecRequired().getHasAgreedFreeMediation()));
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "Applicant 1 has agreed to free mediation",
+            description = "Applicant 1 has agreed to free mediation"
+        )
+        Predicate<CaseData> isAgreedFreeMediationApplicant1Spec =
+            nullSafe(c -> c.getApplicant1ClaimMediationSpecRequired() != null
+                && YesOrNo.YES.equals(c.getApplicant1ClaimMediationSpecRequired().getHasAgreedFreeMediation()));
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "Applicant 1 has not agreed to free mediation",
+            description = "Applicant 1 has not agreed to free mediation"
+        )
+        Predicate<CaseData> isNotAgreedFreeMediationApplicant1Spec =
+            nullSafe(c -> c.getApplicant1ClaimMediationSpecRequired() != null
+                && YesOrNo.NO.equals(c.getApplicant1ClaimMediationSpecRequired().getHasAgreedFreeMediation()));
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "Respondent 1 claim mediation required (Spec)",
+            description = "Response claim mediation required (Spec)"
+        )
+        Predicate<CaseData> isMediationRequiredRespondent1Spec =
+            nullSafe(c -> YES.equals(c.getResponseClaimMediationSpecRequired()));
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "Respondent 1 claim mediation not required (Spec)",
+            description = "Response claim mediation not required (Spec)"
+        )
+        Predicate<CaseData> isMediationNotRequiredRespondent1Spec =
+            nullSafe(c -> NO.equals(c.getResponseClaimMediationSpecRequired()));
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "Respondent 2 claim mediation required (Spec)",
+            description = "Response claim mediation required (Spec)"
+        )
+        Predicate<CaseData> isMediationRequiredRespondent2Spec =
+            nullSafe(c -> YES.equals(c.getResponseClaimMediationSpec2Required()));
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "Respondent 2 claim mediation not required (Spec)",
+            description = "Response claim mediation not required (Spec)"
+        )
+        Predicate<CaseData> isMediationNotRequiredRespondent2Spec =
+            nullSafe(c -> NO.equals(c.getResponseClaimMediationSpec2Required()));
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "Applicant 1 has Mediation Contact Info",
+            description = "Applicant 1 has Mediation Contact Info"
+        )
+        Predicate<CaseData> hasMediationContactInfoApplicant1 =
+            nullSafe(c -> c.getApp1MediationContactInfo() != null);
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "Respondent 1 has Mediation Contact Info",
+            description = "Respondent 1 has Mediation Contact Info"
+        )
+        Predicate<CaseData> hasMediationContactInfoRespondent1 =
+            nullSafe(c -> c.getResp1MediationContactInfo() != null);
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "Respondent 2 has Mediation Contact Info",
+            description = "Respondent 2 has Mediation Contact Info"
+        )
+        Predicate<CaseData> hasMediationContactInfoRespondent2 =
+            nullSafe(c -> c.getResp2MediationContactInfo() != null);
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "Applicant 1 LiP has response Carm",
+            description = "Applicant 1 LiP has response Carm"
+        )
+        Predicate<CaseData> hasResponseCarmLiPApplicant1 =
+            nullSafe(c -> c.getCaseDataLiP() != null
+                     && c.getCaseDataLiP().getApplicant1LiPResponseCarm() != null);
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "Applicant 1 LiP has response Carm",
+            description = "Applicant 1 LiP has response Carm"
+        )
+        Predicate<CaseData> hasResponseCarmLiPRespondent1 =
+            nullSafe(c -> c.getCaseDataLiP() != null
+                && c.getCaseDataLiP().getRespondent1MediationLiPResponseCarm() != null);
+    }
 }
