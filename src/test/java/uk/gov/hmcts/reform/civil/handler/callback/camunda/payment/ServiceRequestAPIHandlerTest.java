@@ -185,10 +185,8 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotMakeAnyServiceRequest_whenServiceRequestHasBeenInvokedPreviously() {
             //GIVEN
-            caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDateWithHearingFeePBADetails()
-                .toBuilder()
-                .claimIssuedPBADetails(SRPbaDetails.builder().serviceReqReference("123456").build())
-                .build();
+            caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDateWithHearingFeePBADetails();
+            caseData.setClaimIssuedPBADetails(SRPbaDetails.builder().serviceReqReference("123456").build());
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API, ABOUT_TO_SUBMIT);
             //WHEN
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -205,10 +203,9 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             when(paymentsService.createServiceRequest(any(), any()))
                 .thenReturn(PaymentServiceResponse.builder()
                                 .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
-            caseData = caseData.toBuilder()
-                .hearingDueDate(LocalDate.now())
-                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.ONE).build())
-                .claimValue(ClaimValue.builder().statementOfValueInPennies(BigDecimal.TEN).build()).build();
+            caseData.setHearingDueDate(LocalDate.now());
+            caseData.setHearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.ONE).build());
+            caseData.setClaimValue(ClaimValue.builder().statementOfValueInPennies(BigDecimal.TEN).build());
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API, ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -248,9 +245,9 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotMakePaymentServiceRequestForClaimFee_whenInvoked() {
             //GIVEN
-            caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithoutServiceRequestReference()
-                .toBuilder().hearingDueDate(LocalDate.now().plusWeeks(1))
-                .hearingFeePBADetails(SRPbaDetails.builder().serviceReqReference("123").build()).build();
+            caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithoutServiceRequestReference();
+            caseData.setHearingDueDate(LocalDate.now().plusWeeks(1));
+            caseData.setHearingFeePBADetails(SRPbaDetails.builder().serviceReqReference("123").build());
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API, ABOUT_TO_SUBMIT);
             //WHEN
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -277,8 +274,8 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
                                 .hearingType("AAA7-TRI")
                                 .build());
 
-            caseData = CaseDataBuilder.builder().withHearingFeePBADetailsNoPaymentStatus()
-                .toBuilder().businessProcess(BusinessProcess.builder().processInstanceId("").build()).build();
+            caseData = CaseDataBuilder.builder().withHearingFeePBADetailsNoPaymentStatus();
+            caseData.setBusinessProcess(BusinessProcess.builder().processInstanceId("").build());
             when(paymentsService.createServiceRequest(any(), any()))
                 .thenReturn(PaymentServiceResponse.builder()
                                 .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
@@ -306,11 +303,10 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
                                 .hearingType("AAA7-TRI")
                                 .build());
 
-            caseData = CaseDataBuilder.builder().withHearingFeePBADetailsNoPaymentStatus()
-                .toBuilder()
-                .allocatedTrack(null)
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .businessProcess(BusinessProcess.builder().processInstanceId("").build()).build();
+            caseData = CaseDataBuilder.builder().withHearingFeePBADetailsNoPaymentStatus();
+            caseData.setAllocatedTrack(null);
+            caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
+            caseData.setBusinessProcess(BusinessProcess.builder().processInstanceId("").build());
             when(paymentsService.createServiceRequest(any(), any()))
                 .thenReturn(PaymentServiceResponse.builder()
                                 .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
@@ -335,8 +331,8 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             "AAA7-DRH"
         })
         void shouldNotCalculateFee_whenHearingTypeIs(String hearingType) {
-            caseData = CaseDataBuilder.builder().withHearingFeePBADetailsPaymentSuccess()
-                .toBuilder().businessProcess(BusinessProcess.builder().processInstanceId("").build()).build();
+            caseData = CaseDataBuilder.builder().withHearingFeePBADetailsPaymentSuccess();
+            caseData.setBusinessProcess(BusinessProcess.builder().processInstanceId("").build());
 
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API_HMC, ABOUT_TO_SUBMIT);
 
@@ -346,8 +342,8 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotCalculateFee_whenPaymentStatusIsSuccess() {
-            caseData = CaseDataBuilder.builder().withHearingFeePBADetailsPaymentSuccess()
-                .toBuilder().businessProcess(BusinessProcess.builder().processInstanceId("").build()).build();
+            caseData = CaseDataBuilder.builder().withHearingFeePBADetailsPaymentSuccess();
+            caseData.setBusinessProcess(BusinessProcess.builder().processInstanceId("").build());
 
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API_HMC, ABOUT_TO_SUBMIT);
 
@@ -357,8 +353,8 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotCalculateFee_whenPaymentStatusIsFailed() {
-            caseData = CaseDataBuilder.builder().withHearingFeePBADetailsPaymentFailed()
-                .toBuilder().businessProcess(BusinessProcess.builder().processInstanceId("").build()).build();
+            caseData = CaseDataBuilder.builder().withHearingFeePBADetailsPaymentFailed();
+            caseData.setBusinessProcess(BusinessProcess.builder().processInstanceId("").build());
 
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API_HMC, ABOUT_TO_SUBMIT);
 
@@ -373,8 +369,8 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
                                 .hearingType("AAA7-TRI")
                                 .build());
 
-            caseData = CaseDataBuilder.builder().withHearingFeePBADetailsNoPaymentStatus()
-                .toBuilder().businessProcess(BusinessProcess.builder().processInstanceId("").build()).build();
+            caseData = CaseDataBuilder.builder().withHearingFeePBADetailsNoPaymentStatus();
+            caseData.setBusinessProcess(BusinessProcess.builder().processInstanceId("").build());
 
             when(paymentsService.createServiceRequest(any(), any()))
                 .thenThrow(FeignException.class);

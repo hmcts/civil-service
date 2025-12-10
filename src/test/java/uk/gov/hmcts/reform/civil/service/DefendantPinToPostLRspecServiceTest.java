@@ -169,12 +169,11 @@ class DefendantPinToPostLRspecServiceTest {
 
         @Test
         void shouldReturnTrueIfDefendantIsLinked() {
+            IdamUserDetails idamUserDetails = new IdamUserDetails();
+            idamUserDetails.setId("1234");
+            idamUserDetails.setEmail("partyemail@gmail.com");
             CaseData caseData = new CaseDataBuilder()
-                .defendantUserDetails(
-                    IdamUserDetails.builder()
-                        .id("1234")
-                        .email("partyemail@gmail.com")
-                        .build())
+                .defendantUserDetails(idamUserDetails)
                 .build();
             CaseDetails caseDetails = createCaseDetails(caseData);
             when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
@@ -195,7 +194,9 @@ class DefendantPinToPostLRspecServiceTest {
 
         @Test
         void shouldReturnFalseIfUserDetailsEmailIsEmpty() {
-            CaseData caseData = new CaseDataBuilder().defendantUserDetails(IdamUserDetails.builder().id("1234").build()).build();
+            IdamUserDetails idamUserDetails = new IdamUserDetails();
+            idamUserDetails.setId("1234");
+            CaseData caseData = new CaseDataBuilder().defendantUserDetails(idamUserDetails).build();
             CaseDetails caseDetails = createCaseDetails(caseData);
             when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
             boolean status = defendantPinToPostLRspecService.isDefendantLinked(caseDetails);
@@ -205,9 +206,9 @@ class DefendantPinToPostLRspecServiceTest {
 
         @Test
         void shouldReturnFalseIfUserDetailsIdIsEmpty() {
-            CaseData caseData = new CaseDataBuilder().defendantUserDetails(
-                IdamUserDetails.builder().email("test@test.com").build()
-            ).build();
+            IdamUserDetails idamUserDetails = new IdamUserDetails();
+            idamUserDetails.setEmail("test@test.com");
+            CaseData caseData = new CaseDataBuilder().defendantUserDetails(idamUserDetails).build();
             CaseDetails caseDetails = createCaseDetails(caseData);
             when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
             boolean status = defendantPinToPostLRspecService.isDefendantLinked(caseDetails);
