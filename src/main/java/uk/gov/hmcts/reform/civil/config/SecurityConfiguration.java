@@ -36,9 +36,7 @@ public class SecurityConfiguration {
         "/loggers/**", "/assignment/**", "/service-request-update",
         "/service-request-update-claim-issued", "/case/document/downloadDocument/**",
         "/fees/claim/calculate-interest",
-        "/testing-support/flowstate",
-        "/testing-support/rpaJson",
-        "/testing-support/rpaJsonSpec"
+        "/testing-support/**"
     };
 
     private final RequestAuthorizer<User> userRequestAuthorizer;
