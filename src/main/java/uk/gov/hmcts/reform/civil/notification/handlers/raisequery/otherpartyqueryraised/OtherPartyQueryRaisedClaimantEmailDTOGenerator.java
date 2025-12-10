@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.raisequery.otherpartyqueryraised;
 
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.ClaimantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
+@Component
 public class OtherPartyQueryRaisedClaimantEmailDTOGenerator extends ClaimantEmailDTOGenerator {
 
     private final NotificationsProperties notificationsProperties;
