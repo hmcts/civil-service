@@ -458,8 +458,6 @@ class SendAndReplyCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_MessageIsSentToDistrictJudge_Intermediate_TotalClaimAmount() {
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-
             SendMessageMetadata messageMetaData = new SendMessageMetadata();
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setSendAndReplyOption(SEND);
@@ -496,8 +494,6 @@ class SendAndReplyCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_MessageIsSentToDistrictJudge_Multi_TotalClaimAmount() {
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-
             SendMessageMetadata messageMetaData = new SendMessageMetadata();
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setSendAndReplyOption(SEND);
