@@ -28,6 +28,7 @@ public class MockManageDocument {
                                   .documentUrl("http://localhost:9090/documents")
                                   .documentBinaryUrl("http://localhost:9090/documents/binary")
                                   .categoryID(docCategory.getCategoryId())
+                                  .uploadTimestamp("2025-12-10T12:39:50.823836740")
                                   .build())
                 .build()
         );

@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.civil.model.bundle.BundlingRequestDocument;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleUtils.buildBundlingRequestDoc;
@@ -19,7 +20,7 @@ public interface ManageDocMapper {
             bundlingRequestDocuments.add(
                 buildBundlingRequestDoc(
                     generateDocName(getDocumentNameBasedOfCategory(docCategory), md.getValue().getDocumentName(),
-                                    null, md.getValue().getCreatedDatetime().toLocalDate()),
+                                    null, LocalDateTime.parse(md.getValue().getDocumentLink().getUploadTimestamp()).toLocalDate()),
                      md.getValue().getDocumentLink(),
                      md.getValue().getDocumentType().name()
                  )
