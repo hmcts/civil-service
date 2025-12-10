@@ -21,7 +21,10 @@ public class CategoryService {
     private final ListOfValuesApi listOfValuesApi;
     private final AuthTokenGenerator authTokenGenerator;
 
-    @Cacheable(value = "civilCaseCategoryCache", key = "'allCaseCategories'")
+    @Cacheable(
+        value = "civilCaseCategoryCache",
+        key = "T(String).format('%s-%s', #categoryId, #serviceId)"
+    )
     public Optional<CategorySearchResult> findCategoryByCategoryIdAndServiceId(String authToken, String categoryId, String serviceId) {
         try {
             log.info("[CategoryService] Cache MISS → calling RD Common Data API to fetch all case categories");
