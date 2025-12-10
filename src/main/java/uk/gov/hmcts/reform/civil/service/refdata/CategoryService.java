@@ -30,15 +30,7 @@ public class CategoryService {
             log.info("[CategoryService] Cache MISS → calling RD Common Data API to fetch all case categories");
             var result = listOfValuesApi.findCategoryByCategoryIdAndServiceId(categoryId, serviceId, authToken,
                                                                                             authTokenGenerator.generate());
-            if (result != null) {
-                log.info("[CategoryService] Category received → id={}, serviceId={}, authToken={}, authTokenGeneratorgenerate={}",
-                         categoryId,
-                         serviceId,
-                         authToken,
-                         authTokenGenerator.generate()
-                );
-                log.info("[CategoryService] result {}", result);
-            } else {
+            if (result == null) {
                 log.warn("[CategoryService] API returned null for categoryId={}, serviceId={}", categoryId, serviceId);
             }
 
@@ -47,7 +39,7 @@ public class CategoryService {
             log.error("Category not found", ex);
             return Optional.empty();
         } catch (Exception ex) {
-            log.error("Access forbidden for this user", ex);
+            log.error("[CategoryService] Unexpected error occured", ex);
             return Optional.empty();
         }
     }
