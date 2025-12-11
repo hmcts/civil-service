@@ -21,6 +21,14 @@ public non-sealed interface ClaimantPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Claimant",
+        summary = "Claimant not settle (Part Admit)",
+        description = "Claimant not settle"
+    )
+    Predicate<CaseData> isNotSettlePartAdmit =
+        nullSafe(CaseDataPredicate.Claimant.isNotSettlePartAdmit);
+
+    @BusinessRule(
+        group = "Claimant",
         summary = "Claimant intention settle (Part Admit)",
         description = "Claimant intention settle"
     )
