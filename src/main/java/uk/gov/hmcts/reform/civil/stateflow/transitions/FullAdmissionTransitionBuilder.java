@@ -65,7 +65,7 @@ public class FullAdmissionTransitionBuilder extends MidTransitionBuilder {
             // For lip journeys
             .moveTo(FULL_ADMIT_JUDGMENT_ADMISSION, transitions)
             .onlyWhen(LipPredicate.ccjRequestJudgmentByAdmission
-                .and(PaymentPredicate.payImmediatelyPartAdmission).and(LipPredicate.isLiPvLiPCase), transitions)
+                .and(PaymentPredicate.payImmediatelyPartAdmit).and(LipPredicate.isLiPvLiPCase), transitions)
 
             .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions)
             .onlyWhen(TakenOfflinePredicate.byStaff
@@ -75,7 +75,7 @@ public class FullAdmissionTransitionBuilder extends MidTransitionBuilder {
             .onlyWhen(OutOfTimePredicate.notBeingTakenOffline, transitions)
 
             .moveTo(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA, transitions)
-            .onlyWhen(isDefendantNoCOnlineForCase.and(PaymentPredicate.payImmediatelyPartAdmission)
+            .onlyWhen(isDefendantNoCOnlineForCase.and(PaymentPredicate.payImmediatelyPartAdmit)
                 .and(TakenOfflinePredicate.isDefendantNoCOnlineForCaseAfterJBA), transitions);
     }
 

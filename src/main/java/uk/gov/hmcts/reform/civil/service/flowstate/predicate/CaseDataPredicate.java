@@ -280,6 +280,14 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
 
         @BusinessRule(
             group = "Claim",
+            summary = "Case is Part Admit Settled",
+            description = "Case is Part Admit Settled"
+        )
+        Predicate<CaseData> isPartAdmitSettled =
+            nullSafe(CaseData::isPartAdmitClaimSettled);
+
+        @BusinessRule(
+            group = "Claim",
             summary = "Claim submitted",
             description = "A claim has been submitted"
         )
@@ -474,6 +482,14 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         )
         Predicate<CaseData> declinedMediation =
             nullSafe(CaseData::hasClaimantNotAgreedToFreeMediation);
+
+        @BusinessRule(
+            group = "Claimant",
+            summary = "Claimant not settle (Part Admit)",
+            description = "Claimant not settle"
+        )
+        Predicate<CaseData> isNotSettlePartAdmit =
+            nullSafe(CaseData::isClaimantNotSettlePartAdmitClaim);
 
         @BusinessRule(
             group = "Claimant",
@@ -956,6 +972,14 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         )
         Predicate<CaseData> isPayImmediately =
             nullSafe(CaseData::isPayImmediately);
+
+        @BusinessRule(
+            group = "Payment",
+            summary = "Payment Pay Immediately Accepted",
+            description = "Part admission payment time (IMMEDIATELY) Accepted"
+        )
+        Predicate<CaseData> isPartAdmitPayImmediately =
+            nullSafe(CaseData::isPartAdmitPayImmediatelyAccepted);
 
         @BusinessRule(
             group = "Payment",

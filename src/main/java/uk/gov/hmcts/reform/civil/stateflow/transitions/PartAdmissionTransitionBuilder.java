@@ -3,16 +3,17 @@ package uk.gov.hmcts.reform.civil.stateflow.transitions;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimantPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LanguagePredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.MediationPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.OutOfTimePredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.PaymentPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.RepaymentPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
@@ -24,10 +25,6 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_AGREE_REPAYMENT;
@@ -53,16 +50,16 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
         this.moveTo(IN_MEDIATION, transitions)
             .onlyWhen(MediationPredicate.agreedToMediation
                 .and(not(TakenOfflinePredicate.byStaff))
-                .and(not(partAdmitPayImmediately))
+                .and(not(PaymentPredicate.payImmediatelyAcceptedPartAdmit))
                 .and(not(RepaymentPredicate.acceptRepaymentPlan))
                 .and(not(RepaymentPredicate.rejectRepaymentPlan)), transitions)
 
             .moveTo(IN_MEDIATION, transitions)
-            .onlyWhen(carmMediation, transitions)
+            .onlyWhen(MediationPredicate.isCarmMediation, transitions)
 
             .moveTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION, transitions)
-            .onlyWhen(isClaimantNotSettlePartAdmitClaim.and(not(MediationPredicate.agreedToMediation)).and(not(isCarmApplicableCase))
-                .and(not(isCarmApplicableLipCase))
+            .onlyWhen(ClaimantPredicate.isNotSettlePartAdmit.and(not(MediationPredicate.agreedToMediation)).and(not(MediationPredicate.isCarmApplicableCase))
+                .and(not(MediationPredicate.isCarmApplicableCaseLiP))
                 .and(not(TakenOfflinePredicate.byStaff)), transitions)
             .set((c, flags) -> {
                 flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), LanguagePredicate.respondentIsBilingual.test(c));
@@ -72,7 +69,7 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
             }, transitions)
 
             .moveTo(PART_ADMIT_PROCEED, transitions)
-            .onlyWhen(partAdmitProceed, transitions)
+            .onlyWhen(not(MediationPredicate.isCarmMediation).and(ClaimantPredicate.fullDefenceProceed).and(isNotPartAdmissionPaymentState), transitions)
             .set((c, flags) ->
                 flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), LanguagePredicate.respondentIsBilingual.test(c)), transitions)
 
@@ -80,10 +77,10 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
             .onlyWhen(ClaimantPredicate.fullDefenceNotProceed, transitions)
 
             .moveTo(PART_ADMIT_PAY_IMMEDIATELY, transitions)
-            .onlyWhen(partAdmitPayImmediately, transitions)
+            .onlyWhen(PaymentPredicate.payImmediatelyAcceptedPartAdmit, transitions)
 
             .moveTo(PART_ADMIT_AGREE_SETTLE, transitions)
-            .onlyWhen(agreePartAdmitSettle, transitions)
+            .onlyWhen(ClaimPredicate.isPartAdmitSettled, transitions)
 
             .moveTo(PART_ADMIT_AGREE_REPAYMENT, transitions)
             .onlyWhen(RepaymentPredicate.acceptRepaymentPlan, transitions)
@@ -100,49 +97,6 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
             .onlyWhen(OutOfTimePredicate.notBeingTakenOffline, transitions);
     }
 
-    public static final Predicate<CaseData> agreePartAdmitSettle = CaseData::isPartAdmitClaimSettled;
-
-    public static final Predicate<CaseData> partAdmitPayImmediately = CaseData::isPartAdmitPayImmediatelyAccepted;
-
-    public static final Predicate<CaseData> isClaimantNotSettlePartAdmitClaim = CaseData::isClaimantNotSettlePartAdmitClaim;
-
-    public static final Predicate<CaseData> isCarmApplicableCase = caseData ->
-        Optional.ofNullable(caseData)
-            .filter(PartAdmissionTransitionBuilder::getCarmEnabledForCase)
-            .filter(PartAdmissionTransitionBuilder::isSpecSmallClaim)
-            .filter(data -> YES.equals(data.getRespondent1Represented()) && !NO.equals(data.getApplicant1Represented()))
-            .isPresent();
-
-    public static final Predicate<CaseData> isCarmApplicableLipCase = caseData ->
-        Optional.ofNullable(caseData)
-            .filter(PartAdmissionTransitionBuilder::getCarmEnabledForLipCase)
-            .filter(PartAdmissionTransitionBuilder::isSpecSmallClaim)
-            .filter(data -> data.getRespondent2() == null)
-            .filter(data -> NO.equals(data.getApplicant1Represented()) || NO.equals(data.getRespondent1Represented()))
-            .isPresent();
-
-    public static boolean isSpecSmallClaim(CaseData caseData) {
-        return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack());
-    }
-
-    public static boolean getCarmEnabledForLipCase(CaseData caseData) {
-        return caseData.getCaseDataLiP() != null
-            && (caseData.getCaseDataLiP().getApplicant1LiPResponseCarm() != null
-            || caseData.getCaseDataLiP().getRespondent1MediationLiPResponseCarm() != null);
-    }
-
-    public static boolean getCarmEnabledForCase(CaseData caseData) {
-        return caseData.getApp1MediationContactInfo() != null
-            || caseData.getResp1MediationContactInfo() != null
-            || caseData.getResp2MediationContactInfo() != null;
-    }
-
-    public static final Predicate<CaseData> carmMediation = isClaimantNotSettlePartAdmitClaim
-        .and(MediationPredicate.agreedToMediation.negate())
-        .and(isCarmApplicableCase.or(isCarmApplicableLipCase))
-        .and(not(TakenOfflinePredicate.byStaff));
-
     public static final Predicate<CaseData> isNotPartAdmissionPaymentState = caseData ->
         Optional.ofNullable(caseData)
             .filter(data -> data.getShowResponseOneVOneFlag() != ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_INSTALMENT)
@@ -150,8 +104,4 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
             .filter(data -> data.getShowResponseOneVOneFlag() != ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
             .filter(data -> data.getShowResponseOneVOneFlag() != ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_HAS_PAID)
             .isPresent();
-
-    public static final Predicate<CaseData> partAdmitProceed =
-        not(carmMediation).and(ClaimantPredicate.fullDefenceProceed).and(isNotPartAdmissionPaymentState);
-
 }
