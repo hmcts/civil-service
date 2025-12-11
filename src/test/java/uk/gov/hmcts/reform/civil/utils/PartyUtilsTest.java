@@ -1204,9 +1204,10 @@ class PartyUtilsTest {
                 .respondent2Witnesses(wrapElements(PartyFlagStructure.builder().partyID("res2-witness-id").firstName(
                     "res2").lastName("witness").build()));
 
-            PartyUtils.populateWitnessAndExpertsPartyIds(builder);
+            CaseData caseData = builder.build();
+            PartyUtils.populateWitnessAndExpertsPartyIds(caseData);
 
-            CaseData actual = builder.build();
+            CaseData actual = caseData;
 
             assertNotNull(actual.getApplicantExperts().get(0).getValue().getPartyID());
             assertEquals("app1-expert-id", actual.getApplicantExperts().get(0).getValue().getPartyID());
@@ -1243,9 +1244,10 @@ class PartyUtilsTest {
                 .respondent2Witnesses(wrapElements(PartyFlagStructure.builder().partyID("existingRes2WitnessPartyId").firstName(
                     "res2").lastName("witness").build()));
 
-            PartyUtils.populateWitnessAndExpertsPartyIds(builder);
+            CaseData caseData = builder.build();
+            PartyUtils.populateWitnessAndExpertsPartyIds(caseData);
 
-            CaseData actual = builder.build();
+            CaseData actual = caseData;
 
             assertEquals("existingAppExpertPartyId", actual.getApplicantExperts().get(0).getValue().getPartyID());
             assertEquals("existingRes1ExpertPartyId", actual.getRespondent1Experts().get(0).getValue().getPartyID());
@@ -1257,10 +1259,10 @@ class PartyUtilsTest {
 
         @Test
         void shouldReturnNull_whenCaseDataBuilderHasNullWitnessAndExperts() {
-            CaseData.CaseDataBuilder builder = CaseData.builder();
+            CaseData caseData = CaseData.builder().build();
 
-            PartyUtils.populateWitnessAndExpertsPartyIds(builder);
-            CaseData actual = builder.build();
+            PartyUtils.populateWitnessAndExpertsPartyIds(caseData);
+            CaseData actual = caseData;
 
             assertNull(actual.getApplicantExperts());
             assertNull(actual.getRespondent1Experts());

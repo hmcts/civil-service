@@ -131,10 +131,10 @@ public class MediationJsonServiceTest {
             void shouldReturnTrue_whenOnlyApplicant1HasSupportAccessNeeds() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
-                    .build().toBuilder()
-                    .applicant1DQ(Applicant1DQ.builder()
+                    .build();
+                caseData.setApplicant1DQ(Applicant1DQ.builder()
                                       .applicant1DQHearingSupport(supportRequired(YES))
-                                      .build()).build();
+                                      .build());
 
                 MediationCase mediationCase = service.generateJsonContent(caseData);
 
@@ -145,10 +145,10 @@ public class MediationJsonServiceTest {
             void shouldReturnFalse_whenOnlyApplicant1HasNoSupportAccessNeeds() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
-                    .build().toBuilder()
-                    .applicant1DQ(Applicant1DQ.builder()
+                    .build();
+                caseData.setApplicant1DQ(Applicant1DQ.builder()
                                       .applicant1DQHearingSupport(supportRequired(NO))
-                                      .build()).build();
+                                      .build());
 
                 MediationCase mediationCase = service.generateJsonContent(caseData);
 
@@ -159,10 +159,10 @@ public class MediationJsonServiceTest {
             void shouldReturnTrue_whenOnlyApplicant2HasSupportAccessNeeds() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
-                    .build().toBuilder()
-                    .applicant2DQ(Applicant2DQ.builder()
+                    .build();
+                caseData.setApplicant2DQ(Applicant2DQ.builder()
                                       .applicant2DQHearingSupport(supportRequired(YES))
-                                      .build()).build();
+                                      .build());
 
                 MediationCase mediationCase = service.generateJsonContent(caseData);
 
@@ -173,10 +173,10 @@ public class MediationJsonServiceTest {
             void shouldReturnFalse_whenOnlyApplicant2HasNoSupportAccessNeeds() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
-                    .build().toBuilder()
-                    .applicant2DQ(Applicant2DQ.builder()
+                    .build();
+                caseData.setApplicant2DQ(Applicant2DQ.builder()
                                       .applicant2DQHearingSupport(supportRequired(NO))
-                                      .build()).build();
+                                      .build());
 
                 MediationCase mediationCase = service.generateJsonContent(caseData);
 
@@ -187,10 +187,10 @@ public class MediationJsonServiceTest {
             void shouldReturnTrue_whenOnlyRespondent1HasSupportAccessNeeds() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
-                    .build().toBuilder()
-                    .respondent1DQ(Respondent1DQ.builder()
-                                      .respondent1DQHearingSupport(supportRequired(YES))
-                                      .build()).build();
+                    .build();
+                caseData.setRespondent1DQ(Respondent1DQ.builder()
+                                       .respondent1DQHearingSupport(supportRequired(YES))
+                                       .build());
 
                 MediationCase mediationCase = service.generateJsonContent(caseData);
 
@@ -201,10 +201,10 @@ public class MediationJsonServiceTest {
             void shouldReturnFalse_whenOnlyRespondent1HasNoSupportAccessNeeds() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
-                    .build().toBuilder()
-                    .respondent1DQ(Respondent1DQ.builder()
+                    .build();
+                caseData.setRespondent1DQ(Respondent1DQ.builder()
                                        .respondent1DQHearingSupport(supportRequired(NO))
-                                       .build()).build();
+                                       .build());
 
                 MediationCase mediationCase = service.generateJsonContent(caseData);
 
@@ -215,10 +215,10 @@ public class MediationJsonServiceTest {
             void shouldReturnTrue_whenOnlyRespondent2HasSupportAccessNeeds() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
-                    .build().toBuilder()
-                    .respondent2DQ(Respondent2DQ.builder()
+                    .build();
+                caseData.setRespondent2DQ(Respondent2DQ.builder()
                                        .respondent2DQHearingSupport(supportRequired(YES))
-                                       .build()).build();
+                                       .build());
 
                 MediationCase mediationCase = service.generateJsonContent(caseData);
 
@@ -229,10 +229,10 @@ public class MediationJsonServiceTest {
             void shouldReturnFalse_whenOnlyRespondent2HasNoSupportAccessNeeds() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
-                    .build().toBuilder()
-                    .respondent2DQ(Respondent2DQ.builder()
+                    .build();
+                caseData.setRespondent2DQ(Respondent2DQ.builder()
                                        .respondent2DQHearingSupport(supportRequired(NO))
-                                       .build()).build();
+                                       .build());
 
                 MediationCase mediationCase = service.generateJsonContent(caseData);
 
@@ -247,10 +247,10 @@ public class MediationJsonServiceTest {
             void shouldReturnTrue_whenOnlyApplicant1HasVulnerability() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
-                    .build().toBuilder()
-                    .applicant1DQ(Applicant1DQ.builder()
+                    .build();
+                caseData.setApplicant1DQ(Applicant1DQ.builder()
                                       .applicant1DQVulnerabilityQuestions(vulnerabilityAdjustmentRequired(YES))
-                                      .build()).build();
+                                      .build());
 
                 MediationCase mediationCase = service.generateJsonContent(caseData);
 
@@ -275,10 +275,10 @@ public class MediationJsonServiceTest {
             void shouldReturnTrue_whenOnlyApplicant2HasVulnerability() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
-                    .build().toBuilder()
-                    .applicant2DQ(Applicant2DQ.builder()
+                    .build();
+                caseData.setApplicant2DQ(Applicant2DQ.builder()
                                       .applicant2DQVulnerabilityQuestions(vulnerabilityAdjustmentRequired(YES))
-                                      .build()).build();
+                                      .build());
 
                 MediationCase mediationCase = service.generateJsonContent(caseData);
 
@@ -303,10 +303,10 @@ public class MediationJsonServiceTest {
             void shouldReturnTrue_whenOnlyRespondent1HasVulnerability() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
-                    .build().toBuilder()
-                    .respondent1DQ(Respondent1DQ.builder()
+                    .build();
+                caseData.setRespondent1DQ(Respondent1DQ.builder()
                                        .respondent1DQVulnerabilityQuestions(vulnerabilityAdjustmentRequired(YES))
-                                       .build()).build();
+                                       .build());
 
                 MediationCase mediationCase = service.generateJsonContent(caseData);
 
@@ -331,10 +331,10 @@ public class MediationJsonServiceTest {
             void shouldReturnTrue_whenOnlyRespondent2HasVulnerability() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
-                    .build().toBuilder()
-                    .respondent2DQ(Respondent2DQ.builder()
+                    .build();
+                caseData.setRespondent2DQ(Respondent2DQ.builder()
                                        .respondent2DQVulnerabilityQuestions(vulnerabilityAdjustmentRequired(YES))
-                                       .build()).build();
+                                       .build());
 
                 MediationCase mediationCase = service.generateJsonContent(caseData);
 
