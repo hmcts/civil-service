@@ -21,6 +21,7 @@ public abstract class BaseNotifier {
     protected List<String> sendNotification(Set<EmailDTO> recipients) {
         List<String> errorMessages = new ArrayList<>();
         for (EmailDTO recipient : recipients) {
+            log.info("Sending notification for id {} and email {}", recipient.getReference(), recipient.getTargetEmail());
             if (NO_EMAIL_OPERATION.equals(recipient.getEmailTemplate())) {
                 log.info("Skipping notification for id {} due to no op request", recipient.getReference());
                 continue;
