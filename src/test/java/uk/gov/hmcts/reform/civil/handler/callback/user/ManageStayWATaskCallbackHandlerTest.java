@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
 
@@ -27,9 +28,8 @@ class ManageStayWATaskCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void aboutToSubmitShouldClearManageStayUpdateRequestDateField() {
-        CaseData caseData = CaseData.builder()
-            .manageStayUpdateRequestDate(LocalDate.now())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setManageStayUpdateRequestDate(LocalDate.now());
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
