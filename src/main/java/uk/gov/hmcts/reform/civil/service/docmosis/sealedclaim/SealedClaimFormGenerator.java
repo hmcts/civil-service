@@ -88,6 +88,8 @@ public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<S
                                               .orElse(""))
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .applicantRepresentativeOrganisationName(applicants.get(0).getRepresentative().getOrganisationName())
+            .declarationNarrative("test declaration narrative")
+            .humanRightActIssue("Yes")
             .courtFee(caseData.getClaimFee().formData());
 
         if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
