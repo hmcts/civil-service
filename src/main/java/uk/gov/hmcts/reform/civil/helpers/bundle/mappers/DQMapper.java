@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.bundle.BundlingRequestDocument;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -82,7 +83,7 @@ public class DQMapper {
                 buildBundlingRequestDoc(
                     generateDocName(BundleFileNameList.DIRECTIONS_QUESTIONNAIRE.getDisplayName(),
                                     partyType.getDisplayName(), null,
-                                    md.getValue().getCreatedDatetime().toLocalDate()
+                                    LocalDateTime.parse(md.getValue().getDocumentLink().getUploadTimestamp()).toLocalDate()
                     ),
                     md.getValue().getDocumentLink(),
                     md.getValue().getDocumentType().name()

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.helpers.bundle.mappers;
 
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory;
 import uk.gov.hmcts.reform.civil.model.bundle.BundlingRequestDocument;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
@@ -15,6 +16,21 @@ public interface ManageDocMapper {
 
     default void addDocumentByCategoryId(Element<ManageDocument> md,
                                          List<BundlingRequestDocument> bundlingRequestDocuments,
+                                         DocCategory docCategory) {
+        if (docCategory.getValue().equals(md.getValue().getDocumentLink().getCategoryID())) {
+            bundlingRequestDocuments.add(
+                buildBundlingRequestDoc(
+                    generateDocName(getDocumentNameBasedOfCategory(docCategory), md.getValue().getDocumentName(),
+                                    null, LocalDateTime.parse(md.getValue().getDocumentLink().getUploadTimestamp()).toLocalDate()),
+                    md.getValue().getDocumentLink(),
+                    md.getValue().getDocumentType().name()
+                )
+            );
+        }
+    }
+
+    default void addDocumentByCategoryId(Element<ManageDocument> md,
+                                         List<BundlingRequestDocument> bundlingRequestDocuments,
                                          DocumentCategory docCategory) {
         if (docCategory.getCategoryId().equals(md.getValue().getDocumentLink().getCategoryID())) {
             bundlingRequestDocuments.add(
@@ -26,6 +42,30 @@ public interface ManageDocMapper {
                  )
             );
         }
+    }
+
+    default String getDocumentNameBasedOfCategory(DocCategory docCategory) {
+        return switch (docCategory) {
+            case APP1_DQ -> "Applicant1 directions Questionnaire";
+            case APP1_REPLIES_TO_FURTHER_INFORMATION -> "Applicant1 Replies To FurtherInformation";
+            case APP1_REQUEST_FOR_FURTHER_INFORMATION -> "Applicant Requests For Further Information";
+            case APP1_REQUEST_SCHEDULE_OF_LOSS -> "Applicant1 Schedules Of Loss";
+            case APP1_REPLY -> "Applicant1 reply";
+            case CLAIMANT1_DETAILS_OF_CLAIM -> "Applicant1 details Of Claim";
+            case PARTICULARS_OF_CLAIM -> "Applicant1 particulars Of Claim";
+            case APP2_DQ -> "Applicant2 Directions Questionnaire";
+            case APP2_REPLIES_TO_FURTHER_INFORMATION -> "Applicant2 Replies To Further Information";
+            case APP2_REQUEST_FOR_FURTHER_INFORMATION -> "Applicant2 Requests For Further Information";
+            case APP2_REQUEST_SCHEDULE_OF_LOSS -> "Applicant2 Schedules Of Loss";
+            case APP2_REPLY -> "Applicant2 Reply";
+            case CLAIMANT2_DETAILS_OF_CLAIM -> "Applicant2 Details Of Claim";
+            case APP2_PARTICULARS_OF_CLAIM -> "Applicant2 Particulars Of Claim";
+            case DEF1_DEFENSE_DQ -> "Defendant1 Defense Directions Questionnaire";
+            case DEF2_DEFENSE_DQ -> "Defendant2 Defense Directions Questionnaire";
+            case DEF1_SCHEDULE_OF_LOSS -> "Defendant1 Schedules Of Loss";
+            case DEF2_SCHEDULE_OF_LOSS -> "Defendant2 Schedules Of Loss";
+            default -> throw new IllegalStateException("Unexpected value: " + docCategory);
+        };
     }
 
     default String getDocumentNameBasedOfCategory(DocumentCategory docCategory) {

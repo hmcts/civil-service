@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,7 +81,7 @@ public class OrdersMapper {
             bundlingRequestDocuments.add(
                 buildBundlingRequestDoc(
                     generateDocName(BundleFileNameList.ORDER.getDisplayName(), null, null,
-                                    md.getValue().getCreatedDatetime().toLocalDate()),
+                                    LocalDateTime.parse(md.getValue().getDocumentLink().getUploadTimestamp()).toLocalDate()),
                     md.getValue().getDocumentLink(),
                     md.getValue().getDocumentType().name()
                 )

@@ -25,13 +25,31 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.APP1_DQ;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.APP1_REPLIES_TO_FURTHER_INFORMATION;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.APP1_REPLY;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.APP1_REQUEST_FOR_FURTHER_INFORMATION;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.APP1_REQUEST_SCHEDULE_OF_LOSS;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.APP2_DQ;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.APP2_PARTICULARS_OF_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.APP2_REPLIES_TO_FURTHER_INFORMATION;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.APP2_REPLY;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.APP2_REQUEST_FOR_FURTHER_INFORMATION;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.APP2_REQUEST_SCHEDULE_OF_LOSS;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.CLAIMANT1_DETAILS_OF_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.CLAIMANT2_DETAILS_OF_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.DEF1_DEFENSE_DQ;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.DEF1_SCHEDULE_OF_LOSS;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.DEF2_DEFENSE_DQ;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.DEF2_SCHEDULE_OF_LOSS;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.PARTICULARS_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getEvidenceUploadDocsByPartyAndDocType;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleUtils.buildBundlingRequestDoc;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleUtils.generateDocName;
 
 @Service
 @RequiredArgsConstructor
-public class StatementsOfCaseMapper {
+public class StatementsOfCaseMapper implements ManageDocMapper {
 
     private final BundleDocumentsRetrieval bundleDocumentsRetrieval;
     private final ConversionToBundleRequestDocs conversionToBundleRequestDocs;
@@ -116,6 +134,12 @@ public class StatementsOfCaseMapper {
                 ))
         );
 
+        List<Element<ManageDocument>> manageDocuments = caseData.getManageDocumentsList();
+        if (!manageDocuments.isEmpty()) {
+            Arrays.stream(PartyType.values()).toList().forEach(partyType ->
+                addManageDocuments(manageDocuments, partyType, bundlingRequestDocuments)
+            );
+        }
         return ElementUtils.wrapElements(bundlingRequestDocuments);
     }
 
@@ -156,32 +180,49 @@ public class StatementsOfCaseMapper {
 
             List<Element<DocumentWithRegex>> other = caseData.getServedDocumentFiles().getOther();
             addParticularsOfClaimDocuments(other, bundlingRequestDocuments, caseData, BundleFileNameList.OTHER);
-
-            addManageDocuments(caseData, bundlingRequestDocuments);
         }
         return bundlingRequestDocuments;
     }
 
-    private void addManageDocuments(CaseData caseData, List<BundlingRequestDocument> bundlingRequestDocuments) {
-        List<Element<ManageDocument>> manageDocuments = caseData.getManageDocumentsList();
-        if (!manageDocuments.isEmpty()) {
-            manageDocuments.forEach(md -> {
-                if (DocCategory.PARTICULARS_OF_CLAIM.getValue().equals(md.getValue().getDocumentLink().getCategoryID())) {
-                    bundlingRequestDocuments.add(
-                        buildBundlingRequestDoc(
-                            generateDocName(
-                                BundleFileNameList.PARTICULARS_OF_CLAIM.getDisplayName(),
-                                md.getValue().getDocumentName(),
-                                null,
-                                md.getValue().getCreatedDatetime().toLocalDate()
-                            ),
-                            md.getValue().getDocumentLink(),
-                            md.getValue().getDocumentType().name()
-                        )
-                    );
-                }
-            });
-        }
+    private void addManageDocuments(List<Element<ManageDocument>> manageDocuments,
+                                    PartyType partyType,
+                                    List<BundlingRequestDocument> bundlingRequestDocuments) {
+        List<DocCategory> documentCategories = switch (partyType) {
+            case CLAIMANT1 -> List.of(
+                APP1_DQ,
+                APP1_REPLIES_TO_FURTHER_INFORMATION,
+                APP1_REQUEST_FOR_FURTHER_INFORMATION,
+                APP1_REQUEST_SCHEDULE_OF_LOSS,
+                APP1_REPLY,
+                CLAIMANT1_DETAILS_OF_CLAIM,
+                PARTICULARS_OF_CLAIM
+            );
+            case CLAIMANT2 -> List.of(
+                APP2_DQ,
+                APP2_REPLIES_TO_FURTHER_INFORMATION,
+                APP2_REQUEST_FOR_FURTHER_INFORMATION,
+                APP2_REQUEST_SCHEDULE_OF_LOSS,
+                APP2_REPLY,
+                CLAIMANT2_DETAILS_OF_CLAIM,
+                APP2_PARTICULARS_OF_CLAIM
+            );
+            case DEFENDANT1 -> List.of(
+                DEF1_DEFENSE_DQ,
+                DEF1_SCHEDULE_OF_LOSS
+            );
+            case DEFENDANT2 -> List.of(
+                DEF2_DEFENSE_DQ,
+                DEF2_SCHEDULE_OF_LOSS
+            );
+        };
+
+        documentCategories.forEach(category ->
+                                       manageDocuments.forEach(md -> addDocumentByCategoryId(
+                                           md,
+                                           bundlingRequestDocuments,
+                                           category
+                                       )));
+
     }
 
     private void addParticularsOfClaimDocuments(List<Element<DocumentWithRegex>> document,

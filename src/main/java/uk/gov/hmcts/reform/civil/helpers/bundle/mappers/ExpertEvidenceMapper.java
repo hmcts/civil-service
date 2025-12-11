@@ -84,18 +84,16 @@ public class ExpertEvidenceMapper implements ManageDocMapper {
         ));
 
         //ManageDocuments
-        addManageDocuments(caseData, partyType, bundlingRequestDocuments);
+        List<Element<ManageDocument>> manageDocuments = caseData.getManageDocumentsList();
+        if (!manageDocuments.isEmpty()) {
+            addManageDocuments(manageDocuments, partyType, bundlingRequestDocuments);
+        }
         return wrapElements(bundlingRequestDocuments);
     }
 
-    private void addManageDocuments(CaseData caseData,
+    private void addManageDocuments(List<Element<ManageDocument>> manageDocuments,
                                     PartyType partyType,
                                     List<BundlingRequestDocument> bundlingRequestDocuments) {
-        List<Element<ManageDocument>> manageDocuments = caseData.getManageDocumentsList();
-        if (manageDocuments == null || manageDocuments.isEmpty()) {
-            return;
-        }
-
         List<DocumentCategory> documentCategories = switch (partyType) {
             case CLAIMANT1 -> List.of(
                 APPLICANT_ONE_EXPERT_REPORT,
