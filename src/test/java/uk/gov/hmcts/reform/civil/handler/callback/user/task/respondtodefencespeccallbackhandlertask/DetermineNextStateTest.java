@@ -298,8 +298,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .responseClaimTrack(MULTI_CLAIM.name())
             .build();
 
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-
         String resultState;
         if (postTranslation) {
             resultState = determineNextState.determineNextStatePostTranslation(caseData, callbackParams(caseData));
@@ -325,8 +323,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .responseClaimTrack(INTERMEDIATE_CLAIM.name())
             .build();
-
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
         String resultState;
         if (postTranslation) {

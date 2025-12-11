@@ -79,7 +79,6 @@ class HearingFeeDueHandlerTest {
         Map<String, Object> data = Map.of("data", caseData);
         Set<CaseDetails> caseDetails = Set.of(new CaseDetailsBuilder().id(caseId).data(data).build());
 
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         when(searchService.getCases()).thenReturn(caseDetails);
         when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.iterator().next());
         when(caseDetailsConverter.toCaseData(caseDetails.iterator().next())).thenReturn(caseData);
@@ -98,7 +97,6 @@ class HearingFeeDueHandlerTest {
         Map<String, Object> data = Map.of("data", caseData);
         Set<CaseDetails> caseDetails = Set.of(new CaseDetailsBuilder().id(caseId).data(data).build());
 
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(toggle);
         when(searchService.getCases()).thenReturn(caseDetails);
         when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.iterator().next());
         when(caseDetailsConverter.toCaseData(caseDetails.iterator().next())).thenReturn(caseData);
@@ -123,7 +121,6 @@ class HearingFeeDueHandlerTest {
 
         Set<CaseDetails> caseDetails = Set.of(new CaseDetailsBuilder().id(caseId).data(caseData).build());
 
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(toggle);
         when(searchService.getCases()).thenReturn(caseDetails);
         when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.iterator().next());
         when(caseDetailsConverter.toCaseData(caseDetails.iterator().next())).thenReturn(caseData);
@@ -142,7 +139,6 @@ class HearingFeeDueHandlerTest {
         Map<String, Object> data = Map.of("data", caseData);
         Set<CaseDetails> caseDetails = Set.of(new CaseDetailsBuilder().id(caseId).data(data).build());
 
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(toggle);
         when(searchService.getCases()).thenReturn(caseDetails);
         when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.iterator().next());
         when(caseDetailsConverter.toCaseData(caseDetails.iterator().next())).thenReturn(caseData);

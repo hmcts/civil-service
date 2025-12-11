@@ -1289,7 +1289,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldNotCallUpdateWaCourtLocationsServiceWhenNotPresent_AndMintiEnabled() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
         handler = new CreateSDOCallbackHandler(objectMapper, locationRefDataService, workingDayIndicator,
                                                deadlinesCalculator, sdoGeneratorService, featureToggleService, locationHelper,
@@ -1308,7 +1307,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldCallUpdateWaCourtLocationsServiceWhenPresent_AndMintiEnabled() {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
         caseData.setCaseManagementLocation(createCaseLocation("123456", null));
@@ -2552,8 +2550,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setOrderType(OrderType.DISPOSAL);
             caseData.setCcdState(JUDICIAL_REFERRAL);
 
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
-
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2569,8 +2565,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setAllocatedTrack(AllocatedTrack.MULTI_CLAIM);
             caseData.setOrderType(OrderType.DISPOSAL);
             caseData.setCcdState(JUDICIAL_REFERRAL);
-
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -2589,8 +2583,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setOrderType(OrderType.DISPOSAL);
             caseData.setCcdState(JUDICIAL_REFERRAL);
 
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
-
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2607,8 +2599,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setResponseClaimTrack(AllocatedTrack.MULTI_CLAIM.name());
             caseData.setOrderType(OrderType.DISPOSAL);
             caseData.setCcdState(JUDICIAL_REFERRAL);
-
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 

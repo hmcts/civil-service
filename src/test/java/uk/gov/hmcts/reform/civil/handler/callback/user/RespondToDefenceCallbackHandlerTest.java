@@ -1231,7 +1231,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldAssignCategoryId_frc_whenInvoked() {
             // Given
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
             var caseData = CaseDataBuilder.builder()
                 .setIntermediateTrackClaim()
@@ -1380,7 +1379,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldCallUpdateWaCourtLocationsServiceWhenPresent_AndMintiEnabled() {
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             var caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("12345").region("3").build())
@@ -1400,7 +1398,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                           locationHelper, caseFlagsInitialiser, toggleConfiguration, assignCategoryId,
                                                           caseDetailsConverter, frcDocumentsUtils, Optional.empty(),
                                                           requestedCourtForClaimDetailsTab);
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             var caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("12345").region("3").build())

@@ -381,7 +381,7 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
 
         @Test
         void shouldNotifyRespondent_whenMultiTrack() {
-            when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn("offline-template-id");
+            when(notificationsProperties.getClaimantSolicitorConfirmsToProceed()).thenReturn("template-id");
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder()
@@ -397,7 +397,7 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
 
             verify(notificationService).sendMail(
                 caseData.getRespondentSolicitor1EmailAddress(),
-                "offline-template-id",
+                "template-id",
                 getNotificationDataMap(caseData),
                 "claimant-confirms-to-proceed-respondent-notification-000DC001"
             );
@@ -406,7 +406,6 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @Test
         void shouldNotifyRespondent_whenMultiTrack_mintiEligibleClaim() {
             when(notificationsProperties.getClaimantSolicitorConfirmsToProceed()).thenReturn("template-id");
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder()
@@ -430,7 +429,7 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
 
         @Test
         void shouldNotifyRespondent2_whenMultiTrack() {
-            when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn("offline-template-id");
+            when(notificationsProperties.getClaimantSolicitorConfirmsToProceed()).thenReturn("template-id");
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder()
@@ -451,7 +450,7 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
 
             verify(notificationService).sendMail(
                 caseData.getRespondentSolicitor2EmailAddress(),
-                "offline-template-id",
+                "template-id",
                 getNotificationDataMap(caseData),
                 "claimant-confirms-to-proceed-respondent-notification-000DC001"
             );

@@ -280,21 +280,16 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             caseData.getApplicant2DQ().setApplicant2DQDraftDirections(null);
         }
 
-        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-            updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
-                callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                caseData
-            ));
-        }
+        updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(
+            callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
+            caseData
+        ));
 
         requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicant(callbackParams, caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
-            .state((JudicialReferralUtils.shouldMoveToJudicialReferral(
-                caseData,
-                featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
-            )
+            .state((JudicialReferralUtils.shouldMoveToJudicialReferral(caseData)
                 ? CaseState.JUDICIAL_REFERRAL
                 : CaseState.PROCEEDS_IN_HERITAGE_SYSTEM).name())
             .build();

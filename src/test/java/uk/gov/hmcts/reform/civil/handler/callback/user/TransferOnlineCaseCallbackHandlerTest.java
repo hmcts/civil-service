@@ -389,7 +389,6 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldCallUpdateWaCourtLocationsServiceWhenPresent_AndMintiEnabled() {
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             given(courtLocationUtils.findPreferredLocationData(any(), any()))
                 .willReturn(LocationRefData.builder().siteName("")
                                 .epimmsId("222")
@@ -416,7 +415,6 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
             handler = new TransferOnlineCaseCallbackHandler(objectMapper, locationRefDataService, courtLocationUtils,
                                                             featureToggleService,
                                                             Optional.empty());
-            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
             given(courtLocationUtils.findPreferredLocationData(any(), any()))
                 .willReturn(LocationRefData.builder().siteName("")
                                 .epimmsId("222")

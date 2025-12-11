@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.model.docmosis.dq.LipExtraDQ;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.LipExtraDQEvidenceConfirmDetails;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.builders.DQGeneratorFormBuilder;
@@ -37,7 +36,6 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
 
     public DirectionsQuestionnaireLipGenerator(DocumentManagementService documentManagementService,
                                                DocumentGeneratorService documentGeneratorService,
-                                               FeatureToggleService featureToggleService,
                                                DQGeneratorFormBuilder dqGeneratorFormBuilder,
                                                RespondentTemplateForDQGenerator respondentTemplateForDQGenerator
     ) {
@@ -45,7 +43,6 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
         super(
             documentManagementService,
             documentGeneratorService,
-            featureToggleService,
             dqGeneratorFormBuilder,
             respondentTemplateForDQGenerator
         );

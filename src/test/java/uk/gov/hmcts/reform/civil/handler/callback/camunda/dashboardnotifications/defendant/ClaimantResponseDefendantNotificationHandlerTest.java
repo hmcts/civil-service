@@ -797,7 +797,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");
@@ -829,7 +828,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");

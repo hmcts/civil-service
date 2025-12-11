@@ -155,9 +155,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         caseData.setResponseClaimTrack(AllocatedTrack.getAllocatedTrack(
                 caseData.getTotalClaimAmount(),
                 null,
-                null,
-                featureToggleService,
-                caseData
+                null
             ).name());
         caseData.setApplicant1ResponseDeadline(applicantDeadline);
         caseData.setNextDeadline(applicantDeadline != null ? applicantDeadline.toLocalDate() : null);

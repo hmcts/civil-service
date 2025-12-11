@@ -9,24 +9,15 @@ import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import java.util.Optional;
-
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
 
 @Component
 @AllArgsConstructor
 public class FrcDocumentsUtils {
 
-    private final FeatureToggleService featureToggleService;
     private final AssignCategoryId assignCategoryId;
 
     public void assembleDefendantsFRCDocuments(CaseData caseData) {
-        if (!featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
-            && !INTERMEDIATE_CLAIM.equals(caseData.getAllocatedTrack())) {
-            return;
-        }
-
         if (Optional.ofNullable(caseData.getRespondent1DQ())
             .map(Respondent1DQ::getFixedRecoverableCostsIntermediate)
             .map(FixedRecoverableCosts::getFrcSupportingDocument).isPresent()) {
@@ -51,11 +42,6 @@ public class FrcDocumentsUtils {
     }
 
     public void assembleClaimantsFRCDocuments(CaseData caseData) {
-        if (!featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
-            && !INTERMEDIATE_CLAIM.equals(caseData.getAllocatedTrack())) {
-            return;
-        }
-
         if (Optional.ofNullable(caseData.getApplicant1DQ())
             .map(Applicant1DQ::getFixedRecoverableCostsIntermediate)
             .map(FixedRecoverableCosts::getFrcSupportingDocument).isPresent()) {
