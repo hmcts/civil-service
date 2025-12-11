@@ -5,6 +5,8 @@ import uk.gov.hmcts.reform.civil.service.flowstate.predicate.annotations.Busines
 
 import java.util.function.Predicate;
 
+import static uk.gov.hmcts.reform.civil.service.flowstate.predicate.util.PredicateUtil.nullSafe;
+
 @SuppressWarnings("java:S1214")
 public non-sealed interface MediationPredicate extends CaseDataPredicate {
 
@@ -26,45 +28,13 @@ public non-sealed interface MediationPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Mediation",
-        summary = "Applicant 1 has not agreed to free mediation",
-        description = "Applicant 1 has not agreed to free mediation"
-    )
-    Predicate<CaseData> isNotAgreedFreeMediationSpec =
-        CaseDataPredicate.Mediation.isNotAgreedFreeMediationApplicant1Spec;
-
-    @BusinessRule(
-        group = "Mediation",
-        summary = "Response claim mediation required (Spec)",
-        description = "Response claim mediation required (Spec)"
-    )
-    Predicate<CaseData> isResponseMediationRequiredSpec =
-        CaseDataPredicate.Mediation.isMediationRequiredRespondent1Spec;
-
-    @BusinessRule(
-        group = "Mediation",
-        summary = "Respondent 2 claim mediation not required (Spec)",
-        description = "Response claim mediation not required (Spec)"
-    )
-    Predicate<CaseData> isMediationNotRequiredRespondent2Spec =
-        CaseDataPredicate.Mediation.isMediationNotRequiredRespondent2Spec;
-
-    @BusinessRule(
-        group = "Mediation",
-        summary = "Applicant MP is not claim mediation required (Spec)",
-        description = "Applicant MP is not claim mediation required (Spec)"
-    )
-    Predicate<CaseData> isNotMediationRequiredApplicantMPSpec =
-        CaseDataPredicate.Mediation.isNotMediationRequiredApplicantMPSpec;
-
-    @BusinessRule(
-        group = "Mediation",
         summary = "Case is Carm enabled",
         description = "Case has applicant or respondent mediation contact information"
     )
     Predicate<CaseData> isCarmEnabledForCase =
-        CaseDataPredicate.Mediation.hasMediationContactInfoApplicant1
-        .or(CaseDataPredicate.Mediation.hasMediationContactInfoRespondent1)
-        .or(CaseDataPredicate.Mediation.hasMediationContactInfoRespondent2);
+        CaseDataPredicate.Mediation.hasContactInfoApplicant1
+        .or(CaseDataPredicate.Mediation.hasContactInfoRespondent1)
+        .or(CaseDataPredicate.Mediation.hasContactInfoRespondent2);
 
     @BusinessRule(
         group = "Mediation",
@@ -123,15 +93,36 @@ public non-sealed interface MediationPredicate extends CaseDataPredicate {
     Predicate<CaseData> allAgreedToLrMediationSpec =
         CaseDataPredicate.Claim.isSpecClaim
             .and(CaseDataPredicate.Claim.isSmallClaim)
-            .and(MediationPredicate.isResponseMediationRequiredSpec)
+            .and(CaseDataPredicate.Mediation.isRequiredRespondent1Spec)
             .and(
-                ResponsePredicate.hasRespondent2
-                    .and(ResponsePredicate.isNotSameLegalRepresentative)
-                    .and(MediationPredicate.isMediationNotRequiredRespondent2Spec)
+                CaseDataPredicate.Respondent.hasRespondent2
+                    .and(CaseDataPredicate.Respondent.isNotSameLegalRepresentative)
+                    .and(CaseDataPredicate.Mediation.isNotRequiredRespondent2Spec)
                     .negate()
             )
-            .and(MediationPredicate.isNotAgreedFreeMediationSpec.negate())
-            .and(MediationPredicate.isNotMediationRequiredApplicantMPSpec.negate())
-            .and(MediationPredicate.agreedToMediation.negate());
+            .and(CaseDataPredicate.Mediation.isNotAgreedFreeMediationApplicant1Spec.negate())
+            .and(CaseDataPredicate.Mediation.isNotRequiredApplicantMPSpec.negate())
+            .and(CaseDataPredicate.Claimant.agreedToMediation.negate());
+
+    @BusinessRule(
+        group = "Mediation",
+        summary = "todo",
+        description = "todo"
+    )
+    Predicate<CaseData> beforeUnsuccessful =
+        Mediation.hasReasonUnsuccessful.negate()
+            .and(Mediation.hasReasonUnsuccessfulMultiSelect.negate());
+
+    @BusinessRule(
+        group = "Mediation",
+        summary = "todo",
+        description = "todo"
+    )
+    Predicate<CaseData> unsuccessful =
+        Mediation.hasReasonUnsuccessful
+            .or(
+                Mediation.hasReasonUnsuccessfulMultiSelect
+                    .and(Mediation.hasReasonUnsuccessfulMultiSelectValue)
+            );
 
 }
