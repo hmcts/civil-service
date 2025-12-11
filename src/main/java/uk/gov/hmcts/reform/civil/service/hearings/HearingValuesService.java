@@ -82,52 +82,25 @@ public class HearingValuesService {
     private final FeatureToggleService featuretoggleService;
 
     public ServiceHearingValuesModel getValues(Long caseId, String authToken) throws Exception {
-        log.info("Getting hearing values for case id: " + caseId);
+        log.info("Getting hearing values for case id: {}", caseId);
         CaseData caseData = retrieveCaseData(caseId);
         populateMissingFields(caseId, caseData);
 
-        log.info("Checking LR v LR for case id: " + caseId);
+        log.info("Checking LR v LR for case id: {}", caseId);
         isLrVLr(caseData);
-        log.info("Completed LR v LR check for case id: " + caseId);
+        log.info("Completed LR v LR check for case id: {}", caseId);
 
-        String baseUrl = manageCaseBaseUrlConfiguration.getManageCaseBaseUrl();
-        String hmctsServiceID = getHmctsServiceID(caseData, paymentsConfiguration);
+        ServiceHearingValuesModel hearingValuesModel = buildHearingValues(caseData, authToken, caseId);
+        log.info("Returning hearing values for case id: {}", caseId);
+        return hearingValuesModel;
+    }
 
-        ServiceHearingValuesModel hearingValuesModel = ServiceHearingValuesModel.builder()
-            .hmctsServiceID(hmctsServiceID)
-            .hmctsInternalCaseName(getHmctsInternalCaseName(caseData))
-            .publicCaseName(getPublicCaseName(caseData))
-            .caseAdditionalSecurityFlag(getCaseAdditionalSecurityFlag(caseData))
-            .caseCategories(getCaseCategories(caseData, caseCategoriesService, authToken))
-            .caseDeepLink(getCaseDeepLink(caseId, baseUrl))
-            .caseRestrictedFlag(getCaseRestrictedFlag())
-            .externalCaseReference(getExternalCaseReference())
-            .caseManagementLocationCode(getCaseManagementLocationCode(caseData))
-            .caseSLAStartDate(getCaseSLAStartDate(caseData))
-            .autoListFlag(getAutoListFlag())
-            .hearingType(getHearingType())
-            .hearingWindow(getHearingWindow())
-            .duration(getDuration())
-            .hearingPriorityType(getHearingPriorityType())
-            .numberOfPhysicalAttendees(getNumberOfPhysicalAttendees())
-            .hearingInWelshFlag(getHearingInWelshFlag(caseData))
-            .hearingLocations(getHearingLocations(caseData))
-            .facilitiesRequired(getFacilitiesRequired(caseData))
-            .listingComments(getListingComments(caseData))
-            .hearingRequester(getHearingRequester())
-            .privateHearingRequiredFlag(getPrivateHearingRequiredFlag())
-            .caseInterpreterRequiredFlag(hasCaseInterpreterRequiredFlag(caseData))
-            .panelRequirements(getPanelRequirements())
-            .leadJudgeContractType(getLeadJudgeContractType())
-            .judiciary(getJudiciary())
-            .hearingIsLinkedFlag(getHearingIsLinkedFlag())
-            .parties(buildPartyObjectForHearingPayload(caseData, organisationService))
-            .screenFlow(getScreenFlow())
-            .vocabulary(getVocabulary())
-            .hearingChannels(getHearingChannels(authToken, hmctsServiceID, caseData, categoryService))
-            .caseFlags(getCaseFlags(caseData))
-            .build();
-        log.info("Returning hearing values for case id: " + caseId);
+    public ServiceHearingValuesModel getValues(CaseData caseData, String authToken) {
+        Long caseReference = caseData.getCcdCaseReference();
+        log.info("Building hearing values for supplied case data. case reference: {}", caseReference);
+        isLrVLr(caseData);
+        ServiceHearingValuesModel hearingValuesModel = buildHearingValues(caseData, authToken, caseReference);
+        log.info("Returning hearing values for supplied case data. case reference: {}", caseReference);
         return hearingValuesModel;
     }
 
@@ -233,5 +206,45 @@ public class HearingValuesService {
             return true;
         }
         return false;
+    }
+
+    private ServiceHearingValuesModel buildHearingValues(CaseData caseData, String authToken, Long caseIdForDeepLink) {
+        String baseUrl = manageCaseBaseUrlConfiguration.getManageCaseBaseUrl();
+        String hmctsServiceID = getHmctsServiceID(caseData, paymentsConfiguration);
+
+        return ServiceHearingValuesModel.builder()
+            .hmctsServiceID(hmctsServiceID)
+            .hmctsInternalCaseName(getHmctsInternalCaseName(caseData))
+            .publicCaseName(getPublicCaseName(caseData))
+            .caseAdditionalSecurityFlag(getCaseAdditionalSecurityFlag(caseData))
+            .caseCategories(getCaseCategories(caseData, caseCategoriesService, authToken))
+            .caseDeepLink(caseIdForDeepLink != null ? getCaseDeepLink(caseIdForDeepLink, baseUrl) : null)
+            .caseRestrictedFlag(getCaseRestrictedFlag())
+            .externalCaseReference(getExternalCaseReference())
+            .caseManagementLocationCode(getCaseManagementLocationCode(caseData))
+            .caseSLAStartDate(getCaseSLAStartDate(caseData))
+            .autoListFlag(getAutoListFlag())
+            .hearingType(getHearingType())
+            .hearingWindow(getHearingWindow())
+            .duration(getDuration())
+            .hearingPriorityType(getHearingPriorityType())
+            .numberOfPhysicalAttendees(getNumberOfPhysicalAttendees())
+            .hearingInWelshFlag(getHearingInWelshFlag(caseData))
+            .hearingLocations(getHearingLocations(caseData))
+            .facilitiesRequired(getFacilitiesRequired(caseData))
+            .listingComments(getListingComments(caseData))
+            .hearingRequester(getHearingRequester())
+            .privateHearingRequiredFlag(getPrivateHearingRequiredFlag())
+            .caseInterpreterRequiredFlag(hasCaseInterpreterRequiredFlag(caseData))
+            .panelRequirements(getPanelRequirements())
+            .leadJudgeContractType(getLeadJudgeContractType())
+            .judiciary(getJudiciary())
+            .hearingIsLinkedFlag(getHearingIsLinkedFlag())
+            .parties(buildPartyObjectForHearingPayload(caseData, organisationService))
+            .screenFlow(getScreenFlow())
+            .vocabulary(getVocabulary())
+            .hearingChannels(getHearingChannels(authToken, hmctsServiceID, caseData, categoryService))
+            .caseFlags(getCaseFlags(caseData))
+            .build();
     }
 }
