@@ -34,7 +34,7 @@ public class BundleUtils {
             log.warn("Truncating generated doc name to 255 chars: {}", formattedTitle);
             formattedTitle = formattedTitle.substring(0, MAX_DOC_TITLE_LENGTH);
         }
-
+        log.info("document filename {} formatted title: {}", fileName, formattedTitle);
         return formattedTitle;
     }
 
