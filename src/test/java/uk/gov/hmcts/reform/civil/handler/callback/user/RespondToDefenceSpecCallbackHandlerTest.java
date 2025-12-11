@@ -124,8 +124,8 @@ import java.util.stream.Stream;
 import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
@@ -251,7 +251,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private IStateFlowEngine stateFlowEngine;
     @MockBean
-    private  DirectionsQuestionnairePreparer directionsQuestionnairePreparer;
+    private DirectionsQuestionnairePreparer directionsQuestionnairePreparer;
     @Autowired
     private RoboticsAddressMapper addressMapper;
     @Autowired
@@ -260,6 +260,15 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private UpdateWaCourtLocationsService updateWaCourtLocationsService;
     @Autowired
     private InterestCalculator interestCalculator;
+
+    private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
+        return objectMapper.convertValue(response.getData(), CaseData.class);
+    }
+
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvents() {
+        assertThat(handler.handledEvents()).containsOnly(CLAIMANT_RESPONSE_SPEC);
+    }
 
     @Nested
     class AboutToStart {
@@ -314,12 +323,11 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateOnlyRespondent1Docs_whenInvokedAndSystemGeneratedContainsDQ() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setSystemGeneratedCaseDocuments(wrapElements(CaseDocument.builder()
                                                                .documentName("defendant_directions_questionnaire_form")
-                                                               .documentType(DIRECTIONS_QUESTIONNAIRE).build()))
-                .respondent1DocumentURL(null)
-                .build();
+                                                               .documentType(DIRECTIONS_QUESTIONNAIRE).build()));
+            caseData.setRespondent1DocumentURL(null);
             // When
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -331,12 +339,11 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotPopulateOnlyRespondent1Docs_whenInvokedAndSystemGeneratedDoesNotContainDQ() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setSystemGeneratedCaseDocuments(wrapElements(CaseDocument.builder()
                                                                .documentName("banana")
-                                                               .documentType(SEALED_CLAIM).build()))
-                .respondent1DocumentURL(null)
-                .build();
+                                                               .documentType(SEALED_CLAIM).build()));
+            caseData.setRespondent1DocumentURL(null);
             // When
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -370,11 +377,10 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             documentList.add(element(testDocument1));
             documentList.add(element(testDocument2));
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .systemGeneratedCaseDocuments(documentList)
-                .respondent1DocumentURL("test-respondent1Doc-url")
-                .respondent2DocumentURL("test-respondent2Doc-url")
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setSystemGeneratedCaseDocuments(documentList);
+            caseData.setRespondent1DocumentURL("test-respondent1Doc-url");
+            caseData.setRespondent2DocumentURL("test-respondent2Doc-url");
 
             // When
             var params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -397,9 +403,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                   .build()).build();
             List<Element<CaseDocument>> documentList = new ArrayList<>();
             documentList.add(element(testDocument1));
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .systemGeneratedCaseDocuments(documentList)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setSystemGeneratedCaseDocuments(documentList);
             // When
             var params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -414,14 +419,13 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldCheckDates_whenFastClaim() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
-                .build().toBuilder()
-                .ccdState(AWAITING_APPLICANT_INTENTION)
-                .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
-                .applicant1DQ(Applicant1DQ.builder()
+                .build();
+            caseData.setCcdState(AWAITING_APPLICANT_INTENTION);
+            caseData.setResponseClaimTrack(AllocatedTrack.FAST_CLAIM.name());
+            caseData.setApplicant1DQ(Applicant1DQ.builder()
                                   .applicant1DQHearingLRspec(Hearing.builder()
                                                                  .build())
-                                  .build())
-                .build();
+                                  .build());
 
             CallbackParams params = CallbackParamsBuilder.builder().of(MID, caseData)
                 .pageId("validate-unavailable-dates")
@@ -440,14 +444,13 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldCheckDates_whenSmallClaim() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
-                .build().toBuilder()
-                .ccdState(AWAITING_APPLICANT_INTENTION)
-                .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
-                .applicant1DQ(Applicant1DQ.builder()
+                .build();
+            caseData.setCcdState(AWAITING_APPLICANT_INTENTION);
+            caseData.setResponseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM);
+            caseData.setApplicant1DQ(Applicant1DQ.builder()
                                   .applicant1DQSmallClaimHearing(SmallClaimHearing.builder()
                                                                      .build())
-                                  .build())
-                .build();
+                                  .build());
 
             CallbackParams params = CallbackParamsBuilder.builder().of(MID, caseData)
                 .pageId("validate-unavailable-dates")
@@ -655,14 +658,16 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateRespondent1v1FullDefenceSpec()
                 .applicant1ProceedWithClaim(YES)
                 .build();
-            CallbackParams params = callbackParamsOf(CallbackVersion.V_2, caseData, MID,
-                                                     "set-applicant-route-flags");
+            CallbackParams params = callbackParamsOf(
+                CallbackVersion.V_2, caseData, MID,
+                "set-applicant-route-flags"
+            );
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isNull();
             assertThat(response.getData()).extracting("showConditionFlags").asList()
-                    .contains(DefendantResponseShowTag.VULNERABILITY.name());
+                .contains(DefendantResponseShowTag.VULNERABILITY.name());
         }
 
         @Test
@@ -672,8 +677,10 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
                 .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
                 .build();
-            CallbackParams params = callbackParamsOf(CallbackVersion.V_2, caseData, MID,
-                                                     "set-applicant-route-flags");
+            CallbackParams params = callbackParamsOf(
+                CallbackVersion.V_2, caseData, MID,
+                "set-applicant-route-flags"
+            );
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -881,8 +888,11 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = fullDefenceData.toBuilder()
                 .applicant1DQ(fullDefenceData.getApplicant1DQ().toBuilder()
                                   .applicant1DQDraftDirections(document)
-                    .build())
+                                  .build())
                 .build();
+            Applicant1DQ applicant1DQ = fullDefenceData.getApplicant1DQ();
+            applicant1DQ.setApplicant1DQDraftDirections(document);
+            caseData.setApplicant1DQ(applicant1DQ);
             var expectedResponseDocuments = List.of(
                 Element.<CaseDocument>builder()
                     .id(UUID.randomUUID())
@@ -893,7 +903,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                .createdDatetime(LocalDateTime.now())
                                .build())
                     .build());
-            when(dqResponseDocumentUtils.buildClaimantResponseDocuments(any(CaseData.class))).thenReturn(expectedResponseDocuments);
+            when(dqResponseDocumentUtils.buildClaimantResponseDocuments(any(CaseData.class))).thenReturn(
+                expectedResponseDocuments);
 
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -932,26 +943,25 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atState(FULL_DEFENCE_PROCEED)
                 .build();
-            var params = callbackParamsOf(
-                CallbackVersion.V_1,
-                caseData.toBuilder()
-                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                    .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                    .applicant2(Party.builder()
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+            caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+            caseData.setApplicant2(Party.builder()
                                     .companyName("company")
                                     .type(Party.Type.COMPANY)
-                                    .build())
-                    .applicant2DQ(Applicant2DQ.builder()
+                                    .build());
+            caseData.setApplicant2DQ(Applicant2DQ.builder()
                                       .applicant2DQFileDirectionsQuestionnaire(
                                           caseData.getApplicant1DQ()
                                               .getApplicant1DQFileDirectionsQuestionnaire())
                                       .applicant2RespondToClaimExperts(
                                           ExpertDetails.builder().build())
-                                      .build())
-                    .applicant1DQ(Applicant1DQ.builder().applicant1RespondToClaimExperts(
-                        ExpertDetails.builder().build()).build())
-                    .applicant2ResponseDate(LocalDateTime.now())
-                    .build(),
+                                      .build());
+            caseData.setApplicant1DQ(Applicant1DQ.builder().applicant1RespondToClaimExperts(
+                        ExpertDetails.builder().build()).build());
+            caseData.setApplicant2ResponseDate(LocalDateTime.now());
+            var params = callbackParamsOf(
+                CallbackVersion.V_1,
+                caseData,
                 ABOUT_TO_SUBMIT
             );
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -964,32 +974,31 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atState(FULL_DEFENCE_PROCEED)
                 .build();
-            var params = callbackParamsOf(
-                CallbackVersion.V_2,
-                caseData.toBuilder()
-                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                    .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                    .caseDataLiP(CaseDataLiP.builder()
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+            caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+            caseData.setCaseDataLiP(CaseDataLiP.builder()
                                      .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
                                                                                   .hasAgreedFreeMediation(
                                                                                       MediationDecision.Yes)
                                                                                   .build())
-                                     .build())
-                    .applicant2(Party.builder()
+                                     .build());
+            caseData.setApplicant2(Party.builder()
                                     .companyName("company")
                                     .type(Party.Type.COMPANY)
-                                    .build())
-                    .applicant2DQ(Applicant2DQ.builder()
+                                    .build());
+            caseData.setApplicant2DQ(Applicant2DQ.builder()
                                       .applicant2DQFileDirectionsQuestionnaire(
                                           caseData.getApplicant1DQ()
                                               .getApplicant1DQFileDirectionsQuestionnaire())
                                       .applicant2RespondToClaimExperts(
                                           ExpertDetails.builder().build())
-                                      .build())
-                    .applicant1DQ(Applicant1DQ.builder().applicant1RespondToClaimExperts(
-                        ExpertDetails.builder().build()).build())
-                    .applicant2ResponseDate(LocalDateTime.now())
-                    .build(),
+                                      .build());
+            caseData.setApplicant1DQ(Applicant1DQ.builder().applicant1RespondToClaimExperts(
+                        ExpertDetails.builder().build()).build());
+            caseData.setApplicant2ResponseDate(LocalDateTime.now());
+            var params = callbackParamsOf(
+                CallbackVersion.V_2,
+                caseData,
                 ABOUT_TO_SUBMIT
             );
 
@@ -1055,350 +1064,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).containsEntry("applicant1ResponseDate", localDateTime.format(ISO_DATE_TIME));
         }
 
-        @Nested
-        class ResetStatementOfTruth {
-
-            @Test
-            void shouldAddUiStatementOfTruthToApplicantStatementOfTruth_whenInvoked() {
-                String name = "John Smith";
-                String role = "Solicitor";
-
-                CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build()
-                    .toBuilder()
-                    .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
-                    .build();
-
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(
-                        caseData,
-                        ABOUT_TO_SUBMIT
-                    ));
-
-                assertThat(response.getData())
-                    .extracting("applicant1DQStatementOfTruth")
-                    .extracting("name", "role")
-                    .containsExactly("John Smith", "Solicitor");
-
-                assertThat(response.getData())
-                    .extracting("uiStatementOfTruth")
-                    .doesNotHaveToString("name")
-                    .doesNotHaveToString("role");
-            }
-        }
-
-        @Nested
-        class HandleCourtLocation {
-
-            @Test
-            void shouldHandleCourtLocationDataIfFastTrack() {
-                LocationRefData locationA = LocationRefData.builder()
-                    .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
-                    .courtAddress("Lane 1").postcode("123").build();
-                when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
-                    .thenReturn(locationA);
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateApplicantRespondToDefenceAndProceed()
-                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                    .applicant1DQ(
-                        Applicant1DQ.builder().applicant1DQRequestedCourt(
-                            RequestedCourt.builder()
-                                .responseCourtLocations(DynamicList.builder().build())
-                                .build()).build())
-                    .responseClaimTrack(FAST_CLAIM.name())
-                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.cnbcEpimsId).region("cnbc region").build())
-                    .build();
-
-                CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
-
-                assertThat(response.getData())
-                    .extracting("applicant1DQRequestedCourt")
-                    .extracting("responseCourtLocations").isNull();
-
-                assertThat(response.getData())
-                    .extracting("applicant1DQRequestedCourt")
-                    .extracting("caseLocation")
-                    .extracting("region", "baseLocation")
-                    .containsExactly("regionId1", "epimmsId1");
-
-                assertThat(response.getData())
-                    .extracting("applicant1DQRequestedCourt")
-                    .extracting("responseCourtCode").isEqualTo("312");
-            }
-
-            void shouldHandleCourtLocationDataIfSmallTrackAndNotFlightDelay() {
-                LocationRefData locationA = LocationRefData.builder()
-                    .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
-                    .courtAddress("Lane 1").postcode("123").build();
-                when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
-                    .thenReturn(locationA);
-
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateApplicantRespondToDefenceAndProceed()
-                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                    .applicant1DQ(
-                        Applicant1DQ.builder().applicant1DQRequestedCourt(
-                            RequestedCourt.builder()
-                                .responseCourtLocations(DynamicList.builder().build())
-                                .build()).build())
-                    .responseClaimTrack(SMALL_CLAIM.name())
-                    .build();
-
-                caseData.setIsFlightDelayClaim(NO);
-                CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
-
-                assertThat(response.getData())
-                    .extracting("applicant1DQRequestedCourt")
-                    .extracting("responseCourtLocations").isNull();
-
-                assertThat(response.getData())
-                    .extracting("applicant1DQRequestedCourt")
-                    .extracting("caseLocation")
-                    .extracting("region", "baseLocation")
-                    .containsExactly("regionId1", "epimmsId1");
-
-                assertThat(response.getData())
-                    .extracting("applicant1DQRequestedCourt")
-                    .extracting("responseCourtCode").isEqualTo("312");
-            }
-
-        }
-
-        @Nested
-        class ClaimTypeFlightDelay {
-
-            @Test
-            void shouldUpdateCaseManagmentLocationIfAirlineNotOther() {
-                LocationRefData locationA = LocationRefData.builder()
-                    .regionId("regionId1").epimmsId("111000").courtLocationCode("312").siteName("Site 1")
-                    .courtAddress("Lane 1").postcode("123").build();
-                when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
-                    .thenReturn(locationA);
-                CaseLocationCivil flightLocation = CaseLocationCivil.builder().baseLocation("111000").region("2").build();
-
-                List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>();
-                airlineEpimsIDList.add(AirlineEpimsId.builder().airline("BA/Cityflyer").epimsID("111000").build());
-
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateApplicantRespondToDefenceAndProceed()
-                    .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.cnbcEpimsId).region("cnbc region").build())
-                    .applicant1DQ(
-                        Applicant1DQ.builder().applicant1DQRequestedCourt(
-                            RequestedCourt.builder()
-                                .responseCourtLocations(DynamicList.builder().build())
-                                .build()).build())
-
-                    .flightDelay(FlightDelayDetails.builder()
-                                     .airlineList(fromList(airlineEpimsIDList.stream()
-                                                                    .map(AirlineEpimsId::getAirline).toList(),
-                                                           Object::toString, airlineEpimsIDList.stream()
-                                                                    .map(AirlineEpimsId::getAirline).toList().get(0), false))
-                                     .flightCourtLocation(flightLocation).build())
-                    .build();
-
-                caseData.setIsFlightDelayClaim(YES);
-
-                CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
-
-                assertThat(response.getData())
-                    .extracting("caseManagementLocation")
-                    .extracting("region", "baseLocation")
-                    .containsExactly("2", "111000");
-            }
-
-            @Test
-            void shouldUpdateCaseManagementLocatioToClaimantCourtIfAirlineOther() {
-                LocationRefData locationA = LocationRefData.builder()
-                    .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
-                    .courtAddress("Lane 1").postcode("123").build();
-                when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
-                    .thenReturn(locationA);
-
-                DynamicList airlineList = DynamicList.builder()
-                    .listItems(List.of(
-                                   DynamicListElement.builder().code("OTHER").label("OTHER").build()
-                               )
-                    )
-                    .value(DynamicListElement.builder().code("OTHER").label("OTHER").build())
-                    .build();
-                CaseLocationCivil requestCourt = CaseLocationCivil.builder().baseLocation("111000").region("2").build();
-
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateApplicantRespondToDefenceAndProceed()
-                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                    .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                    .applicant1DQ(
-                        Applicant1DQ.builder().applicant1DQRequestedCourt(
-                            RequestedCourt.builder()
-                                .responseCourtLocations(DynamicList.builder().build())
-                                .build()).build())
-                    .flightDelay(FlightDelayDetails.builder()
-                                     .airlineList(airlineList)
-                                     .flightCourtLocation(null)
-                                     .build())
-                    .build();
-
-                caseData.setIsFlightDelayClaim(YES);
-
-                CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
-
-                assertThat(response.getData())
-                    .extracting("caseManagementLocation").isNotNull();
-
-                assertThat(response.getData())
-                    .extracting("caseManagementLocation")
-                    .extracting("region", "baseLocation")
-                    .containsExactly("4", "00000");
-
-            }
-
-        }
-
-        @Nested
-        class UpdateExperts {
-            @Test
-            void updateApplicant1Experts() {
-                ExpertDetails experts = ExpertDetails.builder()
-                    .expertName("Mr Expert Defendant")
-                    .firstName("Expert")
-                    .lastName("Defendant")
-                    .phoneNumber("07123456789")
-                    .emailAddress("test@email.com")
-                    .fieldofExpertise("Roofing")
-                    .estimatedCost(new BigDecimal(434))
-                    .build();
-
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateApplicantRespondToDefenceAndProceed()
-                    .respondent1(PartyBuilder.builder().individual().build())
-                    .applicant1DQSmallClaimExperts(experts, YES)
-                    .build();
-
-                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-                // When
-                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                    .handle(params);
-
-                // Then
-                assertThat(response.getData())
-                    .extracting("applicant1ClaimExpertSpecRequired").isEqualTo("Yes");
-                assertThat(response.getData()).extracting("applicant1DQExperts").extracting("expertRequired").isEqualTo("Yes");
-            }
-
-            @Test
-            void updateApplicant1Experts_NoExperts() {
-                CaseData caseData = CaseDataBuilder.builder()
-                    .respondent1(PartyBuilder.builder().individual().build())
-                    .atStateApplicantRespondToDefenceAndProceed()
-                    .applicant1DQSmallClaimExperts(null, NO)
-                    .build();
-
-                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
-                    .thenReturn(LocalDateTime.now());
-
-                // When
-                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                    .handle(params);
-
-                // Then
-                assertThat(response.getData())
-                    .extracting("applicant1ClaimExpertSpecRequired").isEqualTo("No");
-                assertThat(response.getData()).extracting("applicant1DQExperts").extracting("expertRequired").isEqualTo("No");
-            }
-
-            @Test
-            void updateApplicant2Experts() {
-                ExpertDetails experts = ExpertDetails.builder()
-                    .expertName("Mr Expert Defendant")
-                    .firstName("Expert")
-                    .lastName("Defendant")
-                    .phoneNumber("07123456789")
-                    .emailAddress("test@email.com")
-                    .fieldofExpertise("Roofing")
-                    .estimatedCost(new BigDecimal(434))
-                    .build();
-
-                CaseData caseData = CaseDataBuilder.builder()
-                    .respondent2(PartyBuilder.builder().individual().build())
-                    .atStateApplicantRespondToDefenceAndProceed()
-                    .applicant2DQSmallClaimExperts(experts, YES)
-                    .applicant2ResponseDate(LocalDateTime.now())
-                    .build();
-
-                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-                // When
-                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                    .handle(params);
-
-                // Then
-                assertThat(response.getData())
-                    .extracting("applicantMPClaimExpertSpecRequired").isEqualTo("Yes");
-                assertThat(response.getData()).extracting("applicant2DQExperts").extracting("expertRequired").isEqualTo("Yes");
-            }
-
-            @Test
-            void updateAddress() {
-                CaseData caseDataBefore = CaseDataBuilder.builder()
-                    .respondent2(PartyBuilder.builder().individual().build())
-                    .respondent1(PartyBuilder.builder().individual().build())
-                    .applicant1(PartyBuilder.builder().individual().build())
-                    .applicant2(PartyBuilder.builder().individual().build())
-                    .build();
-                CaseData caseData = CaseDataBuilder.builder()
-                    .applicant1(Party.builder().type(INDIVIDUAL).build())
-                    .applicant2(Party.builder().type(INDIVIDUAL).build())
-                    .respondent1(Party.builder().type(INDIVIDUAL).build())
-                    .respondent2(Party.builder().type(INDIVIDUAL).build())
-                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
-                    .build();
-                given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
-                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-                // When
-                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                    .handle(params);
-
-                // Then
-                assertThat(response.getData())
-                    .extracting("applicant1").extracting("primaryAddress").isNotNull();
-                assertThat(response.getData())
-                    .extracting("applicant2").extracting("primaryAddress").isNotNull();
-                assertThat(response.getData())
-                    .extracting("respondent1").extracting("primaryAddress").isNotNull();
-                assertThat(response.getData())
-                    .extracting("respondent2").extracting("primaryAddress").isNotNull();
-            }
-
-            @Test
-            void updateApplicant2Experts_WhenNoExperts() {
-                CaseData caseData = CaseDataBuilder.builder()
-                    .respondent1(PartyBuilder.builder().individual().build())
-                    .atStateApplicantRespondToDefenceAndProceed()
-                    .noApplicant2DQSmallClaimExperts()
-                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
-                    .build();
-
-                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-                // When
-                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                    .handle(params);
-
-                // Then
-                assertThat(response.getData())
-                    .extracting("applicantMPClaimExpertSpecRequired").isEqualTo("No");
-                assertThat(response.getData()).extracting("applicant2DQExperts").extracting("expertRequired").isEqualTo("No");
-            }
-        }
-
         @Test
         void shouldChangeCaseState_WhenRespondentRepaymentPlanAndFlagV2WithJudgementLive() {
             given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
@@ -1462,7 +1127,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldChangeCaseState_WhenRespondentRepaymentPlanAndFlagV2WithJudgementLiveAndLrVLrAdmissionBulk() {
             given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
-            given(featureToggleService.isLrAdmissionBulkEnabled()).willReturn(true);
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeOption(YesOrNo.YES)
                 .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0))
@@ -1643,7 +1307,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                  .primaryAddress(Address.builder().build())
                                  .type(Party.Type.COMPANY)
                                  .companyName("company name").build())
-                .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentName("defendant_directions_questionnaire_form")
+                .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentName(
+                        "defendant_directions_questionnaire_form")
                                                                .documentType(DIRECTIONS_QUESTIONNAIRE)
                                                                .build()))
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
@@ -1675,7 +1340,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData updatedData = getCaseData(response);
             System.out.println(updatedData.getClaimantResponseDocuments());
             //Then
-            assertThat(updatedData.getApplicant1DQ().getApplicant1DQFixedRecoverableCostsIntermediate().getFrcSupportingDocument().getCategoryID()).isEqualTo("DQApplicant");
+            assertThat(updatedData.getApplicant1DQ().getApplicant1DQFixedRecoverableCostsIntermediate().getFrcSupportingDocument().getCategoryID()).isEqualTo(
+                "DQApplicant");
         }
 
         @Test
@@ -1685,7 +1351,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
                 .responseClaimMediationSpecRequired(NO)
                 .applicant1DQ(Applicant1DQ.builder().applicant1RespondToClaimExperts(
-                ExpertDetails.builder().build()).build())
+                    ExpertDetails.builder().build()).build())
                 .respondent1DetailsForClaimDetailsTab(Party.builder()
                                                           .type(Party.Type.COMPANY)
                                                           .primaryAddress(Address.builder().build())
@@ -2005,8 +1671,13 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var caseData = CaseDataBuilder.builder()
                 .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.cnbcEpimsId).region(
+                    "cnbcRegion").build())
+                .build().toBuilder()
+                .applicant1ProceedWithClaimSpec2v1(YES)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.cnbcEpimsId).region("cnbcRegion").build())
                 .build();
+            caseData.setApplicant1ProceedWithClaimSpec2v1(YES);
             //When
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2084,7 +1755,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                  .airlineList(airlineList)
                                  .flightCourtLocation(null)
                                  .build())
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.cnbcEpimsId).region("cnbcRegion").build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.cnbcEpimsId).region(
+                    "cnbcRegion").build())
                 .build();
 
             caseData.setIsFlightDelayClaim(YES);
@@ -2096,6 +1768,358 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("caseManagementLocation")
                 .extracting("region", "baseLocation")
                 .containsExactly("10", "214320");
+        }
+
+        @Nested
+        class ResetStatementOfTruth {
+
+            @Test
+            void shouldAddUiStatementOfTruthToApplicantStatementOfTruth_whenInvoked() {
+                String name = "John Smith";
+                String role = "Solicitor";
+
+                CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build()
+                    .toBuilder()
+                    .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
+                    .build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(
+                        caseData,
+                        ABOUT_TO_SUBMIT
+                    ));
+
+                assertThat(response.getData())
+                    .extracting("applicant1DQStatementOfTruth")
+                    .extracting("name", "role")
+                    .containsExactly("John Smith", "Solicitor");
+
+                assertThat(response.getData())
+                    .extracting("uiStatementOfTruth")
+                    .doesNotHaveToString("name")
+                    .doesNotHaveToString("role");
+            }
+        }
+
+        @Nested
+        class HandleCourtLocation {
+
+            @Test
+            void shouldHandleCourtLocationDataIfFastTrack() {
+                LocationRefData locationA = LocationRefData.builder()
+                    .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
+                    .courtAddress("Lane 1").postcode("123").build();
+                when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
+                    .thenReturn(locationA);
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                    .applicant1DQ(
+                        Applicant1DQ.builder().applicant1DQRequestedCourt(
+                            RequestedCourt.builder()
+                                .responseCourtLocations(DynamicList.builder().build())
+                                .build()).build())
+                    .responseClaimTrack(FAST_CLAIM.name())
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.cnbcEpimsId).region(
+                        "cnbc region").build())
+                    .build();
+
+                CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
+
+                assertThat(response.getData())
+                    .extracting("applicant1DQRequestedCourt")
+                    .extracting("responseCourtLocations").isNull();
+
+                assertThat(response.getData())
+                    .extracting("applicant1DQRequestedCourt")
+                    .extracting("caseLocation")
+                    .extracting("region", "baseLocation")
+                    .containsExactly("regionId1", "epimmsId1");
+
+                assertThat(response.getData())
+                    .extracting("applicant1DQRequestedCourt")
+                    .extracting("responseCourtCode").isEqualTo("312");
+            }
+
+            void shouldHandleCourtLocationDataIfSmallTrackAndNotFlightDelay() {
+                LocationRefData locationA = LocationRefData.builder()
+                    .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
+                    .courtAddress("Lane 1").postcode("123").build();
+                when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
+                    .thenReturn(locationA);
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                    .applicant1DQ(
+                        Applicant1DQ.builder().applicant1DQRequestedCourt(
+                            RequestedCourt.builder()
+                                .responseCourtLocations(DynamicList.builder().build())
+                                .build()).build())
+                    .responseClaimTrack(SMALL_CLAIM.name())
+                    .build();
+
+                caseData.setIsFlightDelayClaim(NO);
+                CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
+
+                assertThat(response.getData())
+                    .extracting("applicant1DQRequestedCourt")
+                    .extracting("responseCourtLocations").isNull();
+
+                assertThat(response.getData())
+                    .extracting("applicant1DQRequestedCourt")
+                    .extracting("caseLocation")
+                    .extracting("region", "baseLocation")
+                    .containsExactly("regionId1", "epimmsId1");
+
+                assertThat(response.getData())
+                    .extracting("applicant1DQRequestedCourt")
+                    .extracting("responseCourtCode").isEqualTo("312");
+            }
+
+        }
+
+        @Nested
+        class ClaimTypeFlightDelay {
+
+            @Test
+            void shouldUpdateCaseManagmentLocationIfAirlineNotOther() {
+                LocationRefData locationA = LocationRefData.builder()
+                    .regionId("regionId1").epimmsId("111000").courtLocationCode("312").siteName("Site 1")
+                    .courtAddress("Lane 1").postcode("123").build();
+                when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
+                    .thenReturn(locationA);
+                CaseLocationCivil flightLocation = CaseLocationCivil.builder().baseLocation("111000").region("2").build();
+
+                List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>();
+                airlineEpimsIDList.add(AirlineEpimsId.builder().airline("BA/Cityflyer").epimsID("111000").build());
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.cnbcEpimsId).region(
+                        "cnbc region").build())
+                    .applicant1DQ(
+                        Applicant1DQ.builder().applicant1DQRequestedCourt(
+                            RequestedCourt.builder()
+                                .responseCourtLocations(DynamicList.builder().build())
+                                .build()).build())
+
+                    .flightDelay(FlightDelayDetails.builder()
+                                     .airlineList(fromList(
+                                         airlineEpimsIDList.stream()
+                                             .map(AirlineEpimsId::getAirline).toList(),
+                                         Object::toString, airlineEpimsIDList.stream()
+                                             .map(AirlineEpimsId::getAirline).toList().get(0), false
+                                     ))
+                                     .flightCourtLocation(flightLocation).build())
+                    .build();
+
+                caseData.setIsFlightDelayClaim(YES);
+
+                CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
+
+                assertThat(response.getData())
+                    .extracting("caseManagementLocation")
+                    .extracting("region", "baseLocation")
+                    .containsExactly("2", "111000");
+            }
+
+            @Test
+            void shouldUpdateCaseManagementLocatioToClaimantCourtIfAirlineOther() {
+                LocationRefData locationA = LocationRefData.builder()
+                    .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
+                    .courtAddress("Lane 1").postcode("123").build();
+                when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
+                    .thenReturn(locationA);
+
+                DynamicList airlineList = DynamicList.builder()
+                    .listItems(List.of(
+                                   DynamicListElement.builder().code("OTHER").label("OTHER").build()
+                               )
+                    )
+                    .value(DynamicListElement.builder().code("OTHER").label("OTHER").build())
+                    .build();
+                CaseLocationCivil requestCourt = CaseLocationCivil.builder().baseLocation("111000").region("2").build();
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                    .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                    .applicant1DQ(
+                        Applicant1DQ.builder().applicant1DQRequestedCourt(
+                            RequestedCourt.builder()
+                                .responseCourtLocations(DynamicList.builder().build())
+                                .build()).build())
+                    .flightDelay(FlightDelayDetails.builder()
+                                     .airlineList(airlineList)
+                                     .flightCourtLocation(null)
+                                     .build())
+                    .build();
+
+                caseData.setIsFlightDelayClaim(YES);
+
+                CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
+
+                assertThat(response.getData())
+                    .extracting("caseManagementLocation").isNotNull();
+
+                assertThat(response.getData())
+                    .extracting("caseManagementLocation")
+                    .extracting("region", "baseLocation")
+                    .containsExactly("4", "00000");
+
+            }
+
+        }
+
+        @Nested
+        class UpdateExperts {
+            @Test
+            void updateApplicant1Experts() {
+                ExpertDetails experts = ExpertDetails.builder()
+                    .expertName("Mr Expert Defendant")
+                    .firstName("Expert")
+                    .lastName("Defendant")
+                    .phoneNumber("07123456789")
+                    .emailAddress("test@email.com")
+                    .fieldofExpertise("Roofing")
+                    .estimatedCost(new BigDecimal(434))
+                    .build();
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .respondent1(PartyBuilder.builder().individual().build())
+                    .applicant1DQSmallClaimExperts(experts, YES)
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                // When
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                // Then
+                assertThat(response.getData())
+                    .extracting("applicant1ClaimExpertSpecRequired").isEqualTo("Yes");
+                assertThat(response.getData()).extracting("applicant1DQExperts").extracting("expertRequired").isEqualTo(
+                    "Yes");
+            }
+
+            @Test
+            void updateApplicant1Experts_NoExperts() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .respondent1(PartyBuilder.builder().individual().build())
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .applicant1DQSmallClaimExperts(null, NO)
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
+                    .thenReturn(LocalDateTime.now());
+
+                // When
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                // Then
+                assertThat(response.getData())
+                    .extracting("applicant1ClaimExpertSpecRequired").isEqualTo("No");
+                assertThat(response.getData()).extracting("applicant1DQExperts").extracting("expertRequired").isEqualTo(
+                    "No");
+            }
+
+            @Test
+            void updateApplicant2Experts() {
+                ExpertDetails experts = ExpertDetails.builder()
+                    .expertName("Mr Expert Defendant")
+                    .firstName("Expert")
+                    .lastName("Defendant")
+                    .phoneNumber("07123456789")
+                    .emailAddress("test@email.com")
+                    .fieldofExpertise("Roofing")
+                    .estimatedCost(new BigDecimal(434))
+                    .build();
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .respondent2(PartyBuilder.builder().individual().build())
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .applicant2DQSmallClaimExperts(experts, YES)
+                    .applicant2ResponseDate(LocalDateTime.now())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                // When
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                // Then
+                assertThat(response.getData())
+                    .extracting("applicantMPClaimExpertSpecRequired").isEqualTo("Yes");
+                assertThat(response.getData()).extracting("applicant2DQExperts").extracting("expertRequired").isEqualTo(
+                    "Yes");
+            }
+
+            @Test
+            void updateAddress() {
+                CaseData caseDataBefore = CaseDataBuilder.builder()
+                    .respondent2(PartyBuilder.builder().individual().build())
+                    .respondent1(PartyBuilder.builder().individual().build())
+                    .applicant1(PartyBuilder.builder().individual().build())
+                    .applicant2(PartyBuilder.builder().individual().build())
+                    .build();
+                CaseData caseData = CaseDataBuilder.builder()
+                    .applicant1(Party.builder().type(INDIVIDUAL).build())
+                    .applicant2(Party.builder().type(INDIVIDUAL).build())
+                    .respondent1(Party.builder().type(INDIVIDUAL).build())
+                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
+                    .build();
+                given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                // When
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                // Then
+                assertThat(response.getData())
+                    .extracting("applicant1").extracting("primaryAddress").isNotNull();
+                assertThat(response.getData())
+                    .extracting("applicant2").extracting("primaryAddress").isNotNull();
+                assertThat(response.getData())
+                    .extracting("respondent1").extracting("primaryAddress").isNotNull();
+                assertThat(response.getData())
+                    .extracting("respondent2").extracting("primaryAddress").isNotNull();
+            }
+
+            @Test
+            void updateApplicant2Experts_WhenNoExperts() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .respondent1(PartyBuilder.builder().individual().build())
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .noApplicant2DQSmallClaimExperts()
+                    .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                // When
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                // Then
+                assertThat(response.getData())
+                    .extracting("applicantMPClaimExpertSpecRequired").isEqualTo("No");
+                assertThat(response.getData()).extracting("applicant2DQExperts").extracting("expertRequired").isEqualTo(
+                    "No");
+            }
         }
     }
 
@@ -2127,10 +2151,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void summary_WhenDoesNotProceed() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
-                .build().toBuilder()
-                .ccdState(AWAITING_APPLICANT_INTENTION)
-                .applicant1ProceedWithClaim(YesOrNo.NO)
                 .build();
+            caseData.setCcdState(AWAITING_APPLICANT_INTENTION);
+            caseData.setApplicant1ProceedWithClaim(YesOrNo.NO);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
 
@@ -2219,7 +2242,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void summary_when_all_finals_order_issued_on_LR_bulk_admission() {
-                given(featureToggleService.isLrAdmissionBulkEnabled()).willReturn(true);
                 CaseData caseData = CaseData.builder()
                     .respondent1Represented(YesOrNo.YES)
                     .applicant1Represented(YesOrNo.YES)
@@ -2227,7 +2249,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
                     .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                     .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
-                    .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(LocalDate.now().plusDays(1)).build())
+                    .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(
+                        LocalDate.now().plusDays(1)).build())
                     .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
                     .respondent1(Party.builder()
                                      .primaryAddress(Address.builder().build())
@@ -2244,7 +2267,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void summary_when_part_admit_pay_immediately_selected() {
-                given(featureToggleService.isLrAdmissionBulkEnabled()).willReturn(true);
                 CaseData caseData = CaseData.builder()
                     .respondent1Represented(YesOrNo.YES)
                     .applicant1Represented(YesOrNo.YES)
@@ -2252,7 +2274,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
                     .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                     .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
-                    .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(LocalDate.now().plusDays(1)).build())
+                    .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(
+                        LocalDate.now().plusDays(1)).build())
                     .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
                     .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
                     .respondForImmediateOption(YesOrNo.YES)
@@ -2387,7 +2410,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @EnumSource(value = RespondentResponsePartAdmissionPaymentTimeLRspec.class)
         void shouldGetOneVOneFullAdmitBySetDateFlagV2Parameterized(
             RespondentResponsePartAdmissionPaymentTimeLRspec type) {
-
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .defenceAdmitPartPaymentTimeRouteRequired(type)
@@ -2451,7 +2473,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetUpPaymentDateToString() {
             given(workingDayIndicator.isWorkingDay(any())).willReturn(true);
             LocalDate whenWillPay = LocalDate.now();
-            given(deadlineCalculatorService.calculateExtendedDeadline(any(LocalDateTime.class), anyInt())).willReturn(whenWillPay);
+            given(deadlineCalculatorService.calculateExtendedDeadline(any(LocalDateTime.class), anyInt())).willReturn(
+                whenWillPay);
 
             RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec =
                 RespondToClaimAdmitPartLRspec.builder()
@@ -2477,7 +2500,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetUpPaymentDateToStringForPartAdmitPaid() {
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
-            given(deadlineCalculatorService.calculateExtendedDeadline(any(LocalDateTime.class), anyInt())).willReturn(whenWillPay);
+            given(deadlineCalculatorService.calculateExtendedDeadline(any(LocalDateTime.class), anyInt())).willReturn(
+                whenWillPay);
 
             RespondToClaim respondToAdmittedClaim =
                 RespondToClaim.builder()
@@ -2505,7 +2529,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetUpPaymentDateForResponseDateToString() {
             given(workingDayIndicator.isWorkingDay(any())).willReturn(true);
             LocalDate whenWillPay = LocalDate.now();
-            given(deadlineCalculatorService.calculateExtendedDeadline(any(LocalDate.class), anyInt())).willReturn(whenWillPay);
+            given(deadlineCalculatorService.calculateExtendedDeadline(any(LocalDate.class), anyInt())).willReturn(
+                whenWillPay);
 
             CaseData caseData = CaseData.builder()
                 .respondent1ResponseDate(LocalDateTime.now())
@@ -2552,9 +2577,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             PaymentBySetDate paymentBySetDate = PaymentBySetDate.builder()
                 .paymentSetDate(LocalDate.now().plusDays(15)).build();
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .applicant1RequestedPaymentDateForDefendantSpec(paymentBySetDate)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setApplicant1RequestedPaymentDateForDefendantSpec(paymentBySetDate);
             CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isEmpty();
@@ -2607,7 +2631,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getErrors()).contains("This feature is currently not available, please see guidance below");
+            assertThat(response.getErrors()).contains(
+                "This feature is currently not available, please see guidance below");
         }
 
         @Test
@@ -2632,9 +2657,11 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldCheckValidateAmountPaid_withCcJPaymentDetailsWhenNoFixedCosts_BulkAdmissionsEnabled() {
 
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
-
-            Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
+            Fee fee = Fee.builder()
+                .version("1")
+                .code("CODE")
+                .calculatedAmountInPence(BigDecimal.valueOf(100))
+                .build();
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeOption(YesOrNo.NO)
                 .build();
@@ -2667,9 +2694,11 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldCheckValidateAmountPaid_withCcJPaymentDetailsWhenNoFixedCosts_BulkAdmissionsDisabled() {
 
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(false);
-
-            Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
+            Fee fee = Fee.builder()
+                .version("1")
+                .code("CODE")
+                .calculatedAmountInPence(BigDecimal.valueOf(100))
+                .build();
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeOption(YesOrNo.NO)
                 .build();
@@ -2687,19 +2716,21 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             BigDecimal claimFee = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentAmountClaimFee();
-            assertNull(claimFee);
+            assertNotNull(claimFee);
             BigDecimal subTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentSummarySubtotalAmount();
-            assertNull(subTotal);
+            assertNotNull(subTotal);
             BigDecimal finalTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentTotalStillOwed();
-            assertNull(finalTotal);
+            assertNotNull(finalTotal);
         }
 
         @Test
         void shouldSetCcjJudgmentAmountShowInterest_whenPayBySetDate_BulkAdmissionsEnabled() {
 
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
-
-            Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
+            Fee fee = Fee.builder()
+                .version("1")
+                .code("CODE")
+                .calculatedAmountInPence(BigDecimal.valueOf(100))
+                .build();
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeOption(YesOrNo.NO)
                 .build();
@@ -2722,9 +2753,11 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetCcjJudgmentAmountShowInterest_whenPayByInstallments_BulkAdmissionsEnabled() {
 
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
-
-            Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
+            Fee fee = Fee.builder()
+                .version("1")
+                .code("CODE")
+                .calculatedAmountInPence(BigDecimal.valueOf(100))
+                .build();
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeOption(YesOrNo.NO)
                 .build();
@@ -2746,8 +2779,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotSetCcjJudgmentAmountShowInterest_whenPayImmediately_BulkAdmissionsEnabled() {
-
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
 
             Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
@@ -2809,8 +2840,11 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetTheJudgmentSummaryDetailsToProceedOnJoFullAdmit() {
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
-            Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
+            Fee fee = Fee.builder()
+                .version("1")
+                .code("CODE")
+                .calculatedAmountInPence(BigDecimal.valueOf(100))
+                .build();
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
                 .ccjPaymentPaidSomeOption(YesOrNo.YES)
@@ -2847,27 +2881,29 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetTheJudgmentSummaryDetailsToProceedOnJo() {
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
-            Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
+            Fee fee = Fee.builder()
+                .version("1")
+                .code("CODE")
+                .calculatedAmountInPence(BigDecimal.valueOf(100))
+                .build();
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
                 .ccjPaymentPaidSomeOption(YesOrNo.YES)
                 .build();
 
             BigDecimal interestAmount = BigDecimal.valueOf(100);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .ccjPaymentDetails(ccjPaymentDetails)
-                .totalClaimAmount(BigDecimal.valueOf(1000))
-                .fixedCosts(FixedCosts.builder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setCcjPaymentDetails(ccjPaymentDetails);
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(1000));
+            caseData.setFixedCosts(FixedCosts.builder()
                                 .claimFixedCosts(YesOrNo.YES)
                                 .fixedCostAmount("10000")
-                                .build())
-                .claimFee(fee)
-                .totalInterest(interestAmount)
-                .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
-                .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
-                .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(500))
-                .build();
+                                .build());
+            caseData.setClaimFee(fee);
+            caseData.setTotalInterest(interestAmount);
+            caseData.setRespondent1ClaimResponseTypeForSpec(PART_ADMISSION);
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE);
+            caseData.setRespondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(500));
             CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2886,26 +2922,28 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetTheJudgmentSummaryDetailsToProceedOnJoOnPartAdmitClaim() {
-            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
-            Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
+            Fee fee = Fee.builder()
+                .version("1")
+                .code("CODE")
+                .calculatedAmountInPence(BigDecimal.valueOf(100))
+                .build();
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
                 .ccjPaymentPaidSomeOption(YesOrNo.YES)
                 .build();
 
             BigDecimal interestAmount = BigDecimal.valueOf(100);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .ccjPaymentDetails(ccjPaymentDetails)
-                .totalClaimAmount(BigDecimal.valueOf(1000))
-                .fixedCosts(FixedCosts.builder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setCcjPaymentDetails(ccjPaymentDetails);
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(1000));
+            caseData.setFixedCosts(FixedCosts.builder()
                                 .claimFixedCosts(YesOrNo.YES)
                                 .fixedCostAmount("10000")
-                                .build())
-                .claimFee(fee)
-                .totalInterest(interestAmount)
-                .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
-                .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(4000))
-                .build();
+                                .build());
+            caseData.setClaimFee(fee);
+            caseData.setTotalInterest(interestAmount);
+            caseData.setRespondent1ClaimResponseTypeForSpec(PART_ADMISSION);
+            caseData.setRespondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(4000));
             CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -3026,7 +3064,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnCorrectSummaryForAllFinalsOrderIssued() {
-            String expected = "The judgment request will be processed and a County"
+            final String expected = "The judgment request will be processed and a County"
                 + " Court Judgment (CCJ) will be issued, you will receive any further updates by email.";
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
@@ -3038,22 +3076,21 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             BigDecimal interestAmount = BigDecimal.valueOf(100);
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-                .respondent1Represented(NO)
-                .specRespondent1Represented(NO)
-                .applicant1Represented(YES)
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-                .defendantDetailsSpec(DynamicList.builder()
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setRespondent1Represented(NO);
+            caseData.setSpecRespondent1Represented(NO);
+            caseData.setApplicant1Represented(YES);
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+            caseData.setDefendantDetailsSpec(DynamicList.builder()
                                           .value(DynamicListElement.builder()
                                                      .label("John Doe")
                                                      .build())
-                                          .build())
-                .ccjPaymentDetails(ccjPaymentDetails)
-                .totalClaimAmount(BigDecimal.valueOf(1000))
-                .claimFee(fee)
-                .totalInterest(interestAmount)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
-                .build();
+                                          .build());
+            caseData.setCcjPaymentDetails(ccjPaymentDetails);
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(1000));
+            caseData.setClaimFee(fee);
+            caseData.setTotalInterest(interestAmount);
+            caseData.setCaseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build());
 
             CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
 
@@ -3132,15 +3169,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getState()).isEqualTo(CaseState.CASE_SETTLED.name());
         }
-    }
-
-    private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
-        return objectMapper.convertValue(response.getData(), CaseData.class);
-    }
-
-    @Test
-    void handleEventsReturnsTheExpectedCallbackEvents() {
-        assertThat(handler.handledEvents()).containsOnly(CLAIMANT_RESPONSE_SPEC);
     }
 
     @Nested
@@ -3255,8 +3283,11 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CaseData updatedCaseData = caseData.toBuilder()
                 .app1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
+                                               .unavailableDatesForMediation(unAvailableDates)
+                                               .build()).build();
+            updatedCaseData.setApp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
                                                 .unavailableDatesForMediation(unAvailableDates)
-                                                .build()).build();
+                                                .build());
             CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -3284,10 +3315,10 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .addApplicant2(YES)
                 .applicant2(PartyBuilder.builder().individual().build())
                 .build();
-            CaseData updatedCaseData = caseData.toBuilder()
-                .app1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
+            CaseData updatedCaseData = caseData;
+            updatedCaseData.setApp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
                                                 .unavailableDatesForMediation(unAvailableDates)
-                                                .build()).build();
+                                                .build());
             CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -3315,16 +3346,17 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .addApplicant2(YES)
                 .applicant2(PartyBuilder.builder().individual().build())
                 .build();
-            CaseData updatedCaseData = caseData.toBuilder()
-                .app1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
+            CaseData updatedCaseData = caseData;
+            updatedCaseData.setApp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
                                                 .unavailableDatesForMediation(unAvailableDates)
-                                                .build()).build();
+                                                .build());
             CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains("Unavailability Date must not be more than three months in the future.");
+            assertThat(response.getErrors()).contains(
+                "Unavailability Date must not be more than three months in the future.");
         }
 
         @Test
@@ -3346,16 +3378,17 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .addApplicant2(YES)
                 .applicant2(PartyBuilder.builder().individual().build())
                 .build();
-            CaseData updatedCaseData = caseData.toBuilder()
-                .app1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
+            CaseData updatedCaseData = caseData;
+            updatedCaseData.setApp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
                                                 .unavailableDatesForMediation(unAvailableDates)
-                                                .build()).build();
+                                                .build());
             CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains("Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.");
+            assertThat(response.getErrors()).contains(
+                "Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.");
         }
 
         @Test
@@ -3377,10 +3410,10 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .addApplicant2(YES)
                 .applicant2(PartyBuilder.builder().individual().build())
                 .build();
-            CaseData updatedCaseData = caseData.toBuilder()
-                .app1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
+            CaseData updatedCaseData = caseData;
+            updatedCaseData.setApp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
                                                 .unavailableDatesForMediation(unAvailableDates)
-                                                .build()).build();
+                                                .build());
             CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -3408,16 +3441,17 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .addApplicant2(YES)
                 .applicant2(PartyBuilder.builder().individual().build())
                 .build();
-            CaseData updatedCaseData = caseData.toBuilder()
-                .app1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
+            CaseData updatedCaseData = caseData;
+            updatedCaseData.setApp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
                                                 .unavailableDatesForMediation(unAvailableDates)
-                                                .build()).build();
+                                                .build());
             CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains("Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.");
+            assertThat(response.getErrors()).contains(
+                "Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.");
         }
 
         @Test
@@ -3439,16 +3473,17 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .addApplicant2(YES)
                 .applicant2(PartyBuilder.builder().individual().build())
                 .build();
-            CaseData updatedCaseData = caseData.toBuilder()
-                .app1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
+            CaseData updatedCaseData = caseData;
+            updatedCaseData.setApp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
                                                 .unavailableDatesForMediation(unAvailableDates)
-                                                .build()).build();
+                                                .build());
             CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains("Unavailability Date To must not be more than three months in the future.");
+            assertThat(response.getErrors()).contains(
+                "Unavailability Date To must not be more than three months in the future.");
         }
 
     }

@@ -43,7 +43,7 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantHandler extends BaseEx
                 log.error("Updating case with id: '{}' failed", caseId, e);
             }
         });
-        return ExternalTaskData.builder().build();
+        return new ExternalTaskData();
     }
 
     protected void setFullAdmitNoPaymentSchedulerProcessed(Long caseId) {

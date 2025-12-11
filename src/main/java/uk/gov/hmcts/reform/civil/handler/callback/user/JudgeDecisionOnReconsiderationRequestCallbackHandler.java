@@ -83,9 +83,9 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
     }
 
     private CallbackResponse getUpholdingPreviousOrderReason(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
+        CaseData caseData = callbackParams.getCaseData();
 
-        Optional<Element<CaseDocument>> sdoDocLatest = callbackParams.getCaseData().getSystemGeneratedCaseDocuments().stream().filter(
+        Optional<Element<CaseDocument>> sdoDocLatest = caseData.getSystemGeneratedCaseDocuments().stream().filter(
             caseDocumentElement -> caseDocumentElement.getValue().getDocumentType().equals(
                 DocumentType.SDO_ORDER)).sorted(Comparator.comparing(
                     caseDocumentElement -> caseDocumentElement.getValue().getCreatedDatetime(),
@@ -93,72 +93,71 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
         )).findFirst();
 
         if (featureToggleService.isWelshEnabledForMainCase()
-            && (callbackParams.getCaseData().isClaimantBilingual() || callbackParams.getCaseData().isRespondentResponseBilingual())) {
-            caseDataBuilder.bilingualHint(YesOrNo.YES);
+            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+            caseData.setBilingualHint(YesOrNo.YES);
         }
 
         if (sdoDocLatest.isPresent()) {
             String sdoDate = formatLocalDateTime(sdoDocLatest.get().getValue().getCreatedDatetime(), DATE);
-            caseDataBuilder.upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
-                                                             .reasonForReconsiderationTxtYes(String.format(
-                                                                 UPHOLDING_PREVIOUS_ORDER_REASON,
-                                                                 sdoDate
-                                                             )).build());
+            caseData.setUpholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
+                                                       .reasonForReconsiderationTxtYes(String.format(
+                                                           UPHOLDING_PREVIOUS_ORDER_REASON,
+                                                           sdoDate
+                                                       )).build());
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
     private CallbackResponse generateJudgeDecisionOrder(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
-        if (callbackParams.getCaseData().getDecisionOnRequestReconsiderationOptions().name().equals(DecisionOnRequestReconsiderationOptions.YES.name())) {
-            CaseDocument requestForReconsiderationDocument = createDecisionOnReconsiderationDocmosisDoc(callbackParams, caseDataBuilder);
+        CaseData caseData = callbackParams.getCaseData();
+        if (caseData.getDecisionOnRequestReconsiderationOptions().name().equals(DecisionOnRequestReconsiderationOptions.YES.name())) {
+            CaseDocument requestForReconsiderationDocument = createDecisionOnReconsiderationDocmosisDoc(callbackParams, caseData);
             assignCategoryId.assignCategoryIdToCaseDocument(requestForReconsiderationDocument, "ordersMadeOnApplications");
-            caseDataBuilder.decisionOnReconsiderationDocument(requestForReconsiderationDocument);
+            caseData.setDecisionOnReconsiderationDocument(requestForReconsiderationDocument);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
     private CallbackResponse saveRequestForReconsiderationReason(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
-        if (!callbackParams.getCaseData().getDecisionOnRequestReconsiderationOptions().name().equals(DecisionOnRequestReconsiderationOptions.YES.name())) {
-            caseDataBuilder.upholdingPreviousOrderReason(null);
+        CaseData caseData = callbackParams.getCaseData();
+        if (!caseData.getDecisionOnRequestReconsiderationOptions().name().equals(DecisionOnRequestReconsiderationOptions.YES.name())) {
+            caseData.setUpholdingPreviousOrderReason(null);
         }
 
-        if (callbackParams.getCaseData().getDecisionOnRequestReconsiderationOptions().name().equals(DecisionOnRequestReconsiderationOptions.YES.name())) {
-            if (callbackParams.getCaseData().getDecisionOnReconsiderationDocument() != null) {
-                CaseDocument requestForReconsiderationDocument =
-                    callbackParams.getCaseData().getDecisionOnReconsiderationDocument();
+        if (caseData.getDecisionOnRequestReconsiderationOptions().name().equals(DecisionOnRequestReconsiderationOptions.YES.name())) {
+            if (caseData.getDecisionOnReconsiderationDocument() != null) {
+                CaseDocument requestForReconsiderationDocument = caseData.getDecisionOnReconsiderationDocument();
                 List<Element<CaseDocument>> systemGeneratedCaseDocuments =
-                    callbackParams.getCaseData().getSystemGeneratedCaseDocuments();
-                if (featureToggleService.isWelshEnabledForMainCase() && (callbackParams.getCaseData().isClaimantBilingual()
-                    || callbackParams.getCaseData().isRespondentResponseBilingual())) {
-                    caseDataBuilder.preTranslationDocuments(List.of(ElementUtils.element(requestForReconsiderationDocument)));
-                    caseDataBuilder.bilingualHint(YesOrNo.YES);
-                    caseDataBuilder.preTranslationDocumentType(DECISION_MADE_ON_APPLICATIONS);
+                    caseData.getSystemGeneratedCaseDocuments();
+                if (featureToggleService.isWelshEnabledForMainCase() && (caseData.isClaimantBilingual()
+                    || caseData.isRespondentResponseBilingual())) {
+                    caseData.setPreTranslationDocuments(List.of(ElementUtils.element(requestForReconsiderationDocument)));
+                    caseData.setBilingualHint(YesOrNo.YES);
+                    caseData.setPreTranslationDocumentType(DECISION_MADE_ON_APPLICATIONS);
                 } else {
                     systemGeneratedCaseDocuments.add(element(requestForReconsiderationDocument));
-                    caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
-                    caseDataBuilder.businessProcess(BusinessProcess.ready(DECISION_ON_RECONSIDERATION_REQUEST));
+                    caseData.setSystemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
+                    caseData.setBusinessProcess(BusinessProcess.ready(DECISION_ON_RECONSIDERATION_REQUEST));
                 }
                 //delete temp so it will not show up twice in case file view
-                caseDataBuilder.decisionOnReconsiderationDocument(null);
+                caseData.setDecisionOnReconsiderationDocument(null);
             }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
     private CaseDocument createDecisionOnReconsiderationDocmosisDoc(CallbackParams callbackParams,
-                                                            CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+                                                            CaseData caseData) {
 
         return requestReconsiderationGeneratorService.generate(
-            caseDataBuilder.build(),
+            caseData,
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
     }
@@ -172,16 +171,11 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
     }
 
     private String getBody(DecisionOnRequestReconsiderationOptions decisionOnRequestReconsiderationOptions) {
-        switch (decisionOnRequestReconsiderationOptions) {
-            case YES:
-                return CONFIRMATION_BODY_YES;
-            case CREATE_SDO:
-                return CONFIRMATION_BODY_CREATE_SDO;
-            default:
-                return featureToggleService.isCaseProgressionEnabled()
-                    ? CONFIRMATION_BODY_CREATE_MAKE_AN_ORDER
-                    : CONFIRMATION_BODY_CREATE_GENERAL_ORDER;
-        }
+        return switch (decisionOnRequestReconsiderationOptions) {
+            case YES -> CONFIRMATION_BODY_YES;
+            case CREATE_SDO -> CONFIRMATION_BODY_CREATE_SDO;
+            default -> CONFIRMATION_BODY_CREATE_MAKE_AN_ORDER;
+        };
     }
 
     @Override

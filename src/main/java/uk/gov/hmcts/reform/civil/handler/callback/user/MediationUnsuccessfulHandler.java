@@ -47,21 +47,19 @@ public class MediationUnsuccessfulHandler extends CallbackHandler {
 
     private CallbackResponse populateShowConditionFlags(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         if (featureToggleService.isCarmEnabledForCase(caseData)) {
-            builder.showCarmFields(YES);
+            caseData.setShowCarmFields(YES);
         } else {
-            builder.showCarmFields(NO);
+            caseData.setShowCarmFields(NO);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
     private CallbackResponse submitUnsuccessfulMediation(CallbackParams callbackParams) {
-        CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
-            .businessProcess(BusinessProcess.ready(MEDIATION_UNSUCCESSFUL))
-            .build();
+        CaseData caseDataUpdated = callbackParams.getCaseData();
+        caseDataUpdated.setBusinessProcess(BusinessProcess.ready(MEDIATION_UNSUCCESSFUL));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.toMap(objectMapper))
             .state(CaseState.JUDICIAL_REFERRAL.name())

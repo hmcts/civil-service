@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataServ
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
+import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -139,16 +140,21 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldInitializePartyID_whenInvoked() {
+            Party party = new Party();
+            party.setType(Party.Type.INDIVIDUAL);
+            party.setPartyName(DEFENDANT_PARTY_NAME);
+            party.setPartyEmail(DEFENDANT_EMAIL_ADDRESS);
+            Party party1 = new Party();
+            party1.setType(Party.Type.ORGANISATION);
+            party1.setPartyName("Test Inc");
+            party1.setPartyEmail("claimant@email.com");
             caseData = CaseDataBuilder.builder()
-                .respondent1(Party.builder()
-                    .type(Party.Type.INDIVIDUAL)
-                    .partyName(DEFENDANT_PARTY_NAME)
-                    .partyEmail(DEFENDANT_EMAIL_ADDRESS).build())
-                .applicant1(Party.builder()
-                    .type(Party.Type.ORGANISATION)
-                    .partyName("Test Inc")
-                    .partyEmail("claimant@email.com").build())
+                .respondent1(party)
+                .applicant1(party1)
                 .build();
+
+            caseData.setRespondent1(PartyUtils.appendWithNewPartyId(caseData.getRespondent1()));
+            caseData.setApplicant1(PartyUtils.appendWithNewPartyId(caseData.getApplicant1()));
 
             CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
@@ -156,25 +162,27 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
             assertThat(updatedData.getRespondent1().getPartyID()).isNotNull();
             assertThat(updatedData.getApplicant1().getPartyID()).isNotNull();
         }
 
         @Test
         void shouldAddCaseReferenceSubmittedDateAndAllocatedTrack_whenInvoked() {
+            Party party = new Party();
+            party.setType(Party.Type.INDIVIDUAL);
+            party.setPartyName(CLAIMANT_PARTY_NAME);
+            party.setIndividualFirstName("Clay");
+            party.setIndividualLastName("Mint");
+            Party party1 = new Party();
+            party1.setType(Party.Type.INDIVIDUAL);
+            party1.setPartyName(DEFENDANT_PARTY_NAME);
+            party1.setIndividualFirstName("Dave");
+            party1.setIndividualLastName("Indent");
+            party1.setPartyEmail(DEFENDANT_EMAIL_ADDRESS);
             caseData = CaseDataBuilder.builder()
-                .applicant1(Party.builder()
-                                .type(Party.Type.INDIVIDUAL)
-                                .partyName(CLAIMANT_PARTY_NAME)
-                                .individualFirstName("Clay")
-                                .individualLastName("Mint")
-                                .build())
-                .respondent1(Party.builder()
-                    .type(Party.Type.INDIVIDUAL)
-                    .partyName(DEFENDANT_PARTY_NAME)
-                    .individualFirstName("Dave")
-                    .individualLastName("Indent")
-                    .partyEmail(DEFENDANT_EMAIL_ADDRESS).build())
+                .applicant1(party)
+                .respondent1(party1)
                 .build();
 
             CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -275,7 +283,7 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetLanguageDisplayToEnglishAndWelshIfSpecified() {
             when(toggleService.isWelshEnabledForMainCase()).thenReturn(true);
-            caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
+            caseData.setClaimantBilingualLanguagePreference("BOTH");
             CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
                 .build();

@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.model.ContactDetailsUpdatedEvent;
 import uk.gov.hmcts.reform.civil.model.StateFlowDTO;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -87,11 +88,11 @@ public class CoscApplicationAfterPaymentTaskHandlerTest {
         variables.putValue(JUDGMENT_MARK_PAID_FULL, false);
         variables.putValue(IS_CLAIMANT_LR, false);
 
-        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(StateFlowDTO.builder()
-                                                                    .flags(Map.of())
-                                                                    .stateHistory(List.of(State.from("MAIN.DRAFT")))
-                                                                    .state(State.from("MAIN.DRAFT"))
-                                                                    .build());
+        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(new StateFlowDTO()
+                                                                               .setFlags(Map.of())
+                                                                               .setStateHistory(
+                                                                                   List.of(State.from("MAIN.DRAFT")))
+                                                                               .setState(State.from("MAIN.DRAFT")));
     }
 
     @ParameterizedTest
@@ -101,20 +102,18 @@ public class CoscApplicationAfterPaymentTaskHandlerTest {
         "NO, false"
     }, nullValues = "NULL")
     void testStartTheEvent(YesOrNo applicant1Represented, boolean applicantRepresented) {
-        CaseData caseData = CaseData.builder()
-            .applicant1Represented(applicant1Represented)
-            .contactDetailsUpdatedEvent(
-                ContactDetailsUpdatedEvent.builder()
-                    .description("Best description")
-                    .summary("Even better summary")
-                    .submittedByCaseworker(YES).build())
-            .businessProcess(
-                BusinessProcess.builder()
-                    .status(BusinessProcessStatus.READY)
-                    .processInstanceId("process-id").build())
-            .build();
+        CaseData caseData = new CaseDataBuilder().applicant1Represented(applicant1Represented).build()
+            .setContactDetailsUpdatedEvent(
+                new ContactDetailsUpdatedEvent()
+                    .setDescription("Best description")
+                    .setSummary("Even better summary")
+                    .setSubmittedByCaseworker(YES))
+            .setBusinessProcess(
+                new BusinessProcess()
+                    .setStatus(BusinessProcessStatus.READY)
+                    .setProcessInstanceId("process-id"));
 
-        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
         when(mockExternalTask.getTopicName()).thenReturn("test");
         when(mockExternalTask.getAllVariables())
@@ -141,27 +140,29 @@ public class CoscApplicationAfterPaymentTaskHandlerTest {
 
     @Test
     void testStartTheEventWithActiveJudgment() {
-        CaseData caseData = CaseData.builder()
-            .applicant1Represented(NO)
-            .contactDetailsUpdatedEvent(
-                ContactDetailsUpdatedEvent.builder()
-                    .description("Best description")
-                    .summary("Even better summary")
-                    .submittedByCaseworker(YES).build())
+        CaseData caseData = new CaseDataBuilder()
             .businessProcess(
-                BusinessProcess.builder()
-                    .status(BusinessProcessStatus.READY)
-                    .processInstanceId("process-id").build())
-            .activeJudgment(JudgmentDetails.builder()
-                                .state(ISSUED)
-                                .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_BY_DATE).paymentDeadlineDate(
-                                    LocalDate.now()).build())
-                                .orderedAmount("150001")
-                                .fullyPaymentMadeDate(LocalDate.now())
-                                .build())
-            .build();
+                new BusinessProcess()
+                    .setStatus(BusinessProcessStatus.READY)
+                    .setProcessInstanceId("process-id"))
+            .build()
+            .setContactDetailsUpdatedEvent(
+                new ContactDetailsUpdatedEvent()
+                    .setDescription("Best description")
+                    .setSummary("Even better summary")
+                    .setSubmittedByCaseworker(YES));
 
-        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        caseData.setActiveJudgment(
+            new JudgmentDetails()
+                .setState(ISSUED)
+                .setPaymentPlan(new JudgmentPaymentPlan()
+                                    .setType(PAY_BY_DATE)
+                                    .setPaymentDeadlineDate(LocalDate.now()))
+                .setOrderedAmount("150001")
+                .setFullyPaymentMadeDate(LocalDate.now()));
+        caseData.setApplicant1Represented(NO);
+
+        CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
         when(mockExternalTask.getTopicName()).thenReturn("test");
         when(mockExternalTask.getAllVariables())
@@ -187,27 +188,29 @@ public class CoscApplicationAfterPaymentTaskHandlerTest {
 
     @Test
     void testStartTheEventWithActiveJudgmentClaimantLR() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = new CaseDataBuilder()
             .applicant1Represented(YES)
-            .contactDetailsUpdatedEvent(
-                ContactDetailsUpdatedEvent.builder()
-                    .description("Best description")
-                    .summary("Even better summary")
-                    .submittedByCaseworker(YES).build())
             .businessProcess(
-                BusinessProcess.builder()
-                    .status(BusinessProcessStatus.READY)
-                    .processInstanceId("process-id").build())
-            .activeJudgment(JudgmentDetails.builder()
-                                .state(ISSUED)
-                                .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_BY_DATE).paymentDeadlineDate(
-                                    LocalDate.now()).build())
-                                .orderedAmount("150001")
-                                .fullyPaymentMadeDate(LocalDate.now())
-                                .build())
-            .build();
+                new BusinessProcess()
+                    .setStatus(BusinessProcessStatus.READY)
+                    .setProcessInstanceId("process-id"))
+            .build()
+            .setContactDetailsUpdatedEvent(
+                new ContactDetailsUpdatedEvent()
+                    .setDescription("Best description")
+                    .setSummary("Even better summary")
+                    .setSubmittedByCaseworker(YES));
 
-        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        caseData.setActiveJudgment(
+            new JudgmentDetails()
+                .setState(ISSUED)
+                .setPaymentPlan(new JudgmentPaymentPlan()
+                                    .setType(PAY_BY_DATE)
+                                    .setPaymentDeadlineDate(LocalDate.now()))
+                .setOrderedAmount("150001")
+                .setFullyPaymentMadeDate(LocalDate.now()));
+
+        CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
         when(mockExternalTask.getTopicName()).thenReturn("test");
         when(mockExternalTask.getAllVariables())

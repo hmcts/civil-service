@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.service.citizenui.HelpWithFeesForTabService;
 
@@ -49,53 +49,54 @@ public class UpdateHelpWithFeeRefNumberHandler extends CallbackHandler {
     private CallbackResponse updateHwFReferenceNumber(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData updatedCaseData = setUpBusinessProcess(caseData);
-        updatedCaseData = updateHwFReference(updatedCaseData);
-
+        updateHwFReference(updatedCaseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedCaseData.toMap(objectMapper))
                 .build();
     }
 
     private CaseData setUpBusinessProcess(CaseData caseData) {
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
-            .businessProcess(BusinessProcess.ready(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME));
+        caseData.setBusinessProcess(BusinessProcess.ready(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME));
 
         if (caseData.isHWFTypeHearing()) {
-            HelpWithFeesDetails hearingFeeDetails = caseData.getHearingHwfDetails();
-            updatedData.hearingHwfDetails(hearingFeeDetails.toBuilder().hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER).build());
+            HelpWithFeesDetails hearingFeeDetails = ofNullable(caseData.getHearingHwfDetails())
+                .orElseGet(HelpWithFeesDetails::new);
+            hearingFeeDetails.setHwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER);
+            caseData.setHearingHwfDetails(hearingFeeDetails);
         }
         if (caseData.isHWFTypeClaimIssued()) {
-            HelpWithFeesDetails claimIssuedHwfDetails = caseData.getClaimIssuedHwfDetails();
-            updatedData.claimIssuedHwfDetails(claimIssuedHwfDetails.toBuilder().hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER).build());
+            HelpWithFeesDetails claimIssuedHwfDetails = ofNullable(caseData.getClaimIssuedHwfDetails())
+                .orElseGet(HelpWithFeesDetails::new);
+            claimIssuedHwfDetails.setHwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER);
+            caseData.setClaimIssuedHwfDetails(claimIssuedHwfDetails);
         }
-        return updatedData.build();
+        return caseData;
     }
 
     private CaseData updateHwFReference(CaseData caseData) {
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
         if (caseData.isHWFTypeClaimIssued()) {
             ofNullable(caseData.getCaseDataLiP())
-                    .map(CaseDataLiP::getHelpWithFees)
-                    .ifPresent(hwf -> {
-                        var caseDataLip = caseData.getCaseDataLiP();
-                        updatedData.caseDataLiP(caseDataLip.toBuilder().helpWithFees(
-                            hwf.toBuilder().helpWithFeesReferenceNumber(
-                                getHwFNewReferenceNumber(caseData.getClaimIssuedHwfDetails()))
-                                .build()).build());
-                    });
+                .ifPresent(caseDataLip -> {
+                    HelpWithFees helpWithFees = ofNullable(caseDataLip.getHelpWithFees())
+                        .orElseGet(HelpWithFees::new);
+                    helpWithFees.setHelpWithFeesReferenceNumber(
+                        getHwFNewReferenceNumber(caseData.getClaimIssuedHwfDetails()));
+                    caseDataLip.setHelpWithFees(helpWithFees);
+                    caseData.setCaseDataLiP(caseDataLip);
+                });
             if (caseData.getClaimIssuedHwfDetails() != null) {
-                updatedData.claimIssuedHwfDetails(caseData.getClaimIssuedHwfDetails().toBuilder().hwfReferenceNumber(null).build());
+                caseData.getClaimIssuedHwfDetails().setHwfReferenceNumber(null);
             }
-            helpWithFeesForTabService.setUpHelpWithFeeTab(updatedData);
-            return updatedData.build();
+            helpWithFeesForTabService.setUpHelpWithFeeTab(caseData);
+            return caseData;
         }
         if (caseData.isHWFTypeHearing()) {
-            updatedData.hearingHelpFeesReferenceNumber(getHwFNewReferenceNumber(caseData.getHearingHwfDetails()));
+            caseData.setHearingHelpFeesReferenceNumber(getHwFNewReferenceNumber(caseData.getHearingHwfDetails()));
             if (caseData.getHearingHwfDetails() != null) {
-                updatedData.hearingHwfDetails(caseData.getHearingHwfDetails().toBuilder().hwfReferenceNumber(null).build());
+                caseData.getHearingHwfDetails().setHwfReferenceNumber(null);
             }
-            helpWithFeesForTabService.setUpHelpWithFeeTab(updatedData);
-            return updatedData.build();
+            helpWithFeesForTabService.setUpHelpWithFeeTab(caseData);
+            return caseData;
         }
         return caseData;
     }

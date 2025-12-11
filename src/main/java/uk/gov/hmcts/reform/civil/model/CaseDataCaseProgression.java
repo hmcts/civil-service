@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -89,6 +90,7 @@ import java.util.List;
 
 import static java.util.Optional.ofNullable;
 
+@Accessors(chain = true)
 @SuperBuilder(toBuilder = true)
 @EqualsAndHashCode(callSuper = false)
 @Data
@@ -224,7 +226,7 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private  String freeFormHearingNotes;
     private CaseDocument finalOrderDocument;
     @Builder.Default
-    private final List<Element<CaseDocument>> finalOrderDocumentCollection = new ArrayList<>();
+    private List<Element<CaseDocument>> finalOrderDocumentCollection = new ArrayList<>();
 
     // Court officer order
     private FinalOrderFurtherHearing courtOfficerFurtherHearingComplex;

@@ -82,23 +82,23 @@ class AddCaseNoteCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseNote caseNote = caseNote(LocalDateTime.of(2021, 7, 5, 0, 0, 0),
                                          "John Doe", "Existing case note");
             CaseNote expectedCaseNote = caseNote(LocalDateTime.now(), "John Smith", "Example case note");
-            List<Element<CaseNote>> updatedCaseNotes = wrapElements(caseNote, expectedCaseNote);
 
-            CaseData caseData = CaseData.builder()
-                .caseNote("Example case note")
-                .caseNotes(wrapElements(caseNote))
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseNote("Example case note");
+            List<Element<CaseNote>> existingCaseNotes = wrapElements(caseNote);
+            caseData.setCaseNotes(existingCaseNotes);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            List<Element<CaseNote>> updatedCaseNotes = wrapElements(caseNote, expectedCaseNote);
 
             when(caseNoteService.buildCaseNote(params.getParams().get(BEARER_TOKEN).toString(), "Example case note"))
                 .thenReturn(expectedCaseNote);
-            when(caseNoteService.addNoteToListStart(expectedCaseNote, caseData.getCaseNotes())).thenReturn(updatedCaseNotes);
+            when(caseNoteService.addNoteToListStart(expectedCaseNote, existingCaseNotes)).thenReturn(updatedCaseNotes);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(caseNoteService).buildCaseNote(params.getParams().get(BEARER_TOKEN).toString(), "Example case note");
-            verify(caseNoteService).addNoteToListStart(expectedCaseNote, caseData.getCaseNotes());
+            verify(caseNoteService).addNoteToListStart(expectedCaseNote, existingCaseNotes);
 
             assertThat(response.getData())
                 .doesNotHaveToString("caseNote");
@@ -121,24 +121,23 @@ class AddCaseNoteCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseNote caseNote = caseNote(LocalDateTime.of(2021, 7, 5, 0, 0, 0),
                                          "John Doe", "Existing case note");
-            CaseNote expectedCaseNote = caseNote(LocalDateTime.now(), "John Smith", "Example case note");
-            List<Element<CaseNote>> updatedCaseNotes = wrapElements(caseNote, expectedCaseNote);
 
-            CaseData caseData = CaseData.builder()
-                .caseNote("Example case note")
-                .caseNotes(wrapElements(caseNote))
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseNote("Example case note");
+            List<Element<CaseNote>> existingCaseNotes = wrapElements(caseNote);
+            caseData.setCaseNotes(existingCaseNotes);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
+            CaseNote expectedCaseNote = caseNote(LocalDateTime.now(), "John Smith", "Example case note");
+            List<Element<CaseNote>> updatedCaseNotes = wrapElements(caseNote, expectedCaseNote);
             when(caseNoteService.buildCaseNote(params.getParams().get(BEARER_TOKEN).toString(), "Example case note"))
                 .thenReturn(expectedCaseNote);
-            when(caseNoteService.addNoteToListStart(expectedCaseNote, caseData.getCaseNotes())).thenReturn(updatedCaseNotes);
+            when(caseNoteService.addNoteToListStart(expectedCaseNote, existingCaseNotes)).thenReturn(updatedCaseNotes);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(caseNoteService).buildCaseNote(params.getParams().get(BEARER_TOKEN).toString(), "Example case note");
-            verify(caseNoteService).addNoteToListStart(expectedCaseNote, caseData.getCaseNotes());
+            verify(caseNoteService).addNoteToListStart(expectedCaseNote, existingCaseNotes);
 
             assertThat(response.getData())
                 .doesNotHaveToString("caseNote");

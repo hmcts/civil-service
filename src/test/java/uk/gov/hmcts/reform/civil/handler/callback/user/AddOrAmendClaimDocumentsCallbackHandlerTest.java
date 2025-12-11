@@ -32,17 +32,15 @@ class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
     private ExitSurveyContentService exitSurveyContentService;
 
     private static final String PAGE_ID = "particulars-of-claim";
-    private final CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseDataBuilder.builder()
+    private final CaseData caseData = CaseDataBuilder.builder()
         .atStateClaimDraft()
-        .build()
-        .toBuilder();
+        .build();
 
     @Nested
     class MidEventParticularsOfClaimCallback {
 
         @Test
         void shouldNotReturnErrors_whenNoDocuments() {
-            CaseData caseData = caseDataBuilder.build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -52,9 +50,7 @@ class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldNotReturnErrors_whenParticularsOfClaimFieldsAreEmpty() {
-            CaseData caseData = caseDataBuilder
-                .servedDocumentFiles(ServedDocumentFiles.builder().build())
-                .build();
+            caseData.setServedDocumentFiles(new ServedDocumentFiles());
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -64,11 +60,9 @@ class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldReturnNoErrors_whenParticularOfClaimsFieldsAreValid() {
-            CaseData caseData = caseDataBuilder
-                .servedDocumentFiles(ServedDocumentFiles.builder()
-                                         .particularsOfClaimText("Some string")
-                                         .build())
-                .build();
+            ServedDocumentFiles servedDocumentFiles = new ServedDocumentFiles();
+            servedDocumentFiles.setParticularsOfClaimText("Some string");
+            caseData.setServedDocumentFiles(servedDocumentFiles);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -78,12 +72,10 @@ class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldReturnError_whenParticularOfClaimsTextAndDocumentSubmitted() {
-            CaseData caseData = caseDataBuilder
-                .servedDocumentFiles(ServedDocumentFiles.builder()
-                                         .particularsOfClaimText("Some string")
-                                         .particularsOfClaimDocument(wrapElements(Document.builder().build()))
-                                         .build())
-                .build();
+            ServedDocumentFiles servedDocumentFiles = new ServedDocumentFiles();
+            servedDocumentFiles.setParticularsOfClaimText("Some string");
+            servedDocumentFiles.setParticularsOfClaimDocument(wrapElements(new Document()));
+            caseData.setServedDocumentFiles(servedDocumentFiles);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -96,11 +88,9 @@ class AddOrAmendClaimDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldReturnNoErrors_whenOnlyParticularOfClaimsTextSubmitted() {
-            CaseData caseData = caseDataBuilder
-                .servedDocumentFiles(ServedDocumentFiles.builder()
-                                         .particularsOfClaimText("Some string")
-                                         .build())
-                .build();
+            ServedDocumentFiles servedDocumentFiles = new ServedDocumentFiles();
+            servedDocumentFiles.setParticularsOfClaimText("Some string");
+            caseData.setServedDocumentFiles(servedDocumentFiles);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

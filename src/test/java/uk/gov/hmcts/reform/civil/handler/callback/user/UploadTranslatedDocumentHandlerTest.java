@@ -77,28 +77,26 @@ class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldUploadTranslatedDocumentSuccessfully() {
             //Given
-            TranslatedDocument translatedDocument1 = TranslatedDocument
-                .builder()
-                .documentType(DEFENDANT_RESPONSE)
-                .file(Document.builder().documentFileName(FILE_NAME_1).build())
-                .build();
+            Document document = new Document();
+            document.setDocumentFileName(FILE_NAME_1);
+            TranslatedDocument translatedDocument1 = new TranslatedDocument();
+            translatedDocument1.setDocumentType(DEFENDANT_RESPONSE);
+            translatedDocument1.setFile(document);
             List<Element<TranslatedDocument>> translatedDocument = List.of(
                 element(translatedDocument1)
             );
             when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any())).thenReturn(LocalDateTime.now()
                                                                                                    .plusDays(28));
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setTranslatedDocuments(translatedDocument);
             CaseData caseData = CaseDataBuilder
                 .builder()
                 .atStatePendingClaimIssued()
-                .build()
-                .builder()
-                .systemGeneratedCaseDocuments(new ArrayList<>())
-                .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
-                .caseDataLiP(CaseDataLiP
-                                 .builder()
-                                 .translatedDocuments(translatedDocument)
-                                 .build())
                 .build();
+            caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+            caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+            caseData.setCaseDataLiP(caseDataLiP);
+
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

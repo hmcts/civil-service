@@ -53,6 +53,7 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
         try {
+            log.info(externalTask.getActivityId());
             ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
             String caseId = ofNullable(variables.getCaseId())
                 .orElseThrow(() -> new InvalidCaseDataException("The caseId was not provided"));
@@ -73,7 +74,7 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
                 startEventData
             );
             var data = coreCaseDataService.submitUpdate(caseId, caseDataContent);
-            return ExternalTaskData.builder().caseData(data).build();
+            return new ExternalTaskData().setCaseData(data);
         } catch (ValueMapperException | IllegalArgumentException e) {
             throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
         }
@@ -153,6 +154,8 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
                     yield null;
                 }
             };
+        } else if (Objects.equals(eventId, CaseEvent.NOTIFY_EVENT.name())) {
+            return caseData.getBusinessProcess().getActivityId();
         }
         return null;
     }

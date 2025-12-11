@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -85,38 +86,38 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
 
     private CallbackResponse lipClaimInitialState(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.caseAccessCategory(SPEC_CLAIM);
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.submittedDate(time.now());
+        caseData.setSubmittedDate(time.now());
         // Add back Pip in post to temporary pass the email event
-        caseDataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
+        caseData.setRespondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
         if (Optional.ofNullable(callbackParams.getRequest()).map(CallbackRequest::getEventId).isPresent()) {
-            caseDataBuilder.legacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
-            caseDataBuilder.businessProcess(BusinessProcess.ready(CREATE_LIP_CLAIM));
-            caseDataBuilder.respondent1DetailsForClaimDetailsTab(caseDataBuilder.build().getRespondent1().toBuilder().flags(
-                null).build());
-            caseFlagsInitialiser.initialiseCaseFlags(CREATE_LIP_CLAIM, caseDataBuilder);
-        }
-        setUpHelpWithFees(caseDataBuilder);
-        addOrginsationPoliciesforClaimantLip(caseDataBuilder);
-        caseDataBuilder.caseNameHmctsInternal(buildCaseName(caseData));
-        caseDataBuilder.caseNamePublic(buildCaseName(caseData));
-        caseDataBuilder
-            .allPartyNames(getAllPartyNames(caseData));
-        populateWithPartyIds(caseDataBuilder);
+            caseData.setLegacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
+            caseData.setBusinessProcess(BusinessProcess.ready(CREATE_LIP_CLAIM));
+            Party party = caseData.getRespondent1();
+            party.setFlags(null);
+            caseData.setRespondent1DetailsForClaimDetailsTab(party);
 
-        caseDataBuilder.anyRepresented(NO);
+            caseFlagsInitialiser.initialiseCaseFlags(CREATE_LIP_CLAIM, caseData);
+            populateWithPartyIds(caseData);
+            OrgPolicyUtils.addMissingOrgPolicies(caseData);
+        }
+        setUpHelpWithFees(caseData);
+        addOrginsationPoliciesforClaimantLip(caseData);
+        caseData.setCaseNameHmctsInternal(buildCaseName(caseData));
+        caseData.setCaseNamePublic(buildCaseName(caseData));
+        caseData.setAllPartyNames(getAllPartyNames(caseData));
+
+        caseData.setAnyRepresented(NO);
 
         if (caseData.getIsFlightDelayClaim() == YesOrNo.YES) {
-            caseDataBuilder.claimType(ClaimType.FLIGHT_DELAY);
+            caseData.setClaimType(ClaimType.FLIGHT_DELAY);
         }
 
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
@@ -125,34 +126,32 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
 
         if (!locations.isEmpty()) {
             LocationRefData locationRefData = locations.get(0);
-            caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder()
-                                                       .region(locationRefData.getRegionId())
-                                                       .baseLocation(locationRefData.getEpimmsId())
-                                                       .build());
-            caseDataBuilder.locationName(locationRefData.getSiteName());
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setRegion(locationRefData.getRegionId());
+            caseLocationCivil.setBaseLocation(locationRefData.getEpimmsId());
+            caseData.setCaseManagementLocation(caseLocationCivil);
+            caseData.setLocationName(locationRefData.getSiteName());
         }
         if (featureToggleService.isWelshEnabledForMainCase()) {
-            caseDataBuilder.claimantLanguagePreferenceDisplay(PreferredLanguage.fromString(caseData.getClaimantBilingualLanguagePreference()));
+            caseData.setClaimantLanguagePreferenceDisplay(PreferredLanguage.fromString(caseData.getClaimantBilingualLanguagePreference()));
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
-    private void addOrginsationPoliciesforClaimantLip(CaseData.CaseDataBuilder caseDataBuilder) {
-        CaseData caseData = caseDataBuilder.build();
+    private void addOrginsationPoliciesforClaimantLip(CaseData caseData) {
         //         LiP are not represented or registered
         if (caseData.getApplicant1OrganisationPolicy() == null) {
-            caseDataBuilder
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+            caseData.setApplicant1OrganisationPolicy(OrganisationPolicy.builder()
                                                   .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
                                                   .build());
         }
 
-        OrgPolicyUtils.addMissingOrgPolicies(caseDataBuilder);
+        OrgPolicyUtils.addMissingOrgPolicies(caseData);
     }
 
-    private void setUpHelpWithFees(CaseData.CaseDataBuilder caseDataBuilder) {
-        helpWithFeesForTabService.setUpHelpWithFeeTab(caseDataBuilder);
+    private void setUpHelpWithFees(CaseData caseData) {
+        helpWithFeesForTabService.setUpHelpWithFeeTab(caseData);
     }
 }

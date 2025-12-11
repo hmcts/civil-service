@@ -55,11 +55,11 @@ public class LIPClaimSettledCallBackHandlerTest extends BaseCallbackHandlerTest 
         void shouldReturErrorForLipVsLRForProceedInHeritage_WhenAboutToStartIsInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             given(featureToggleService.isDefendantNoCOnlineForCase(any())).willReturn(true);
-            CaseData updatedCaseData =
-                caseData.toBuilder().respondent1Represented(YesOrNo.YES).specRespondent1Represented(YesOrNo.YES)
-                    .applicant1Represented(YesOrNo.NO).ccdState(
-                        CaseState.PROCEEDS_IN_HERITAGE_SYSTEM).build();
-            CallbackParams params = callbackParamsOf(updatedCaseData, ABOUT_TO_START);
+            caseData.setRespondent1Represented(YesOrNo.YES);
+            caseData.setSpecRespondent1Represented(YesOrNo.YES);
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 

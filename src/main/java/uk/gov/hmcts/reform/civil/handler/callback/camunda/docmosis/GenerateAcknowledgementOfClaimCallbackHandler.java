@@ -64,9 +64,8 @@ public class GenerateAcknowledgementOfClaimCallbackHandler extends CallbackHandl
         if (nonNull(caseData.getRespondent2DocumentGeneration()) && caseData.getRespondent2DocumentGeneration().equals("userRespondent2")) {
             assignCategoryId.assignCategoryIdToCaseDocument(acknowledgementOfClaim, DocCategory.DEF2_DEFENSE_DQ.getValue());
         }
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 }
