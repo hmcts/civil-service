@@ -29,7 +29,7 @@ public class FullAdmissionPayImmediatelyTransitionBuilder extends MidTransitionB
             .onlyWhen(TakenOfflinePredicate.byStaff.and(not(LipPredicate.ccjRequestJudgmentByAdmission)), transitions)
 
             .moveTo(FULL_ADMIT_JUDGMENT_ADMISSION, transitions)
-            .onlyWhen(LipPredicate.ccjRequestJudgmentByAdmission.and(PaymentPredicate.payImmediatelyPartAdmission), transitions);
+            .onlyWhen(LipPredicate.ccjRequestJudgmentByAdmission.and(PaymentPredicate.payImmediatelyPartAdmit), transitions);
     }
 
 }

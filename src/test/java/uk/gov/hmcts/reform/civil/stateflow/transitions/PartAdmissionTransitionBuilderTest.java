@@ -21,7 +21,10 @@ import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimantPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.MediationPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.PaymentPredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
@@ -87,7 +90,7 @@ class PartAdmissionTransitionBuilderTest {
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
             .build();
 
-        assertTrue(agreePartAdmitSettle.test(caseData));
+        assertTrue(ClaimPredicate.isPartAdmitSettled.test(caseData));
     }
 
     @Test
@@ -98,7 +101,7 @@ class PartAdmissionTransitionBuilderTest {
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
             .build();
 
-        assertFalse(agreePartAdmitSettle.test(caseData));
+        assertFalse(ClaimPredicate.isPartAdmitSettled.test(caseData));
     }
 
     @Test
@@ -109,7 +112,7 @@ class PartAdmissionTransitionBuilderTest {
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
             .build();
 
-        assertFalse(agreePartAdmitSettle.test(caseData));
+        assertFalse(ClaimPredicate.isPartAdmitSettled.test(caseData));
     }
 
     @Test
@@ -120,7 +123,7 @@ class PartAdmissionTransitionBuilderTest {
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
             .build();
 
-        assertFalse(agreePartAdmitSettle.test(caseData));
+        assertFalse(ClaimPredicate.isPartAdmitSettled.test(caseData));
     }
 
     @Test
@@ -131,7 +134,7 @@ class PartAdmissionTransitionBuilderTest {
             .showResponseOneVOneFlag(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
             .build();
 
-        assertTrue(partAdmitPayImmediately.test(caseData));
+        assertTrue(PaymentPredicate.payImmediatelyAcceptedPartAdmit.test(caseData));
     }
 
     @Test
@@ -142,7 +145,7 @@ class PartAdmissionTransitionBuilderTest {
             .showResponseOneVOneFlag(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
             .build();
 
-        assertTrue(isClaimantNotSettlePartAdmitClaim.test(caseData));
+        assertTrue(ClaimantPredicate.isNotSettlePartAdmit.test(caseData));
     }
 
     @Test
@@ -153,7 +156,7 @@ class PartAdmissionTransitionBuilderTest {
             .showResponseOneVOneFlag(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
             .build();
 
-        assertTrue(isClaimantNotSettlePartAdmitClaim.test(caseData));
+        assertTrue(ClaimantPredicate.isNotSettlePartAdmit.test(caseData));
     }
 
     @Test
@@ -164,14 +167,14 @@ class PartAdmissionTransitionBuilderTest {
             .showResponseOneVOneFlag(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
             .build();
 
-        assertTrue(isClaimantNotSettlePartAdmitClaim.test(caseData));
+        assertTrue(ClaimantPredicate.isNotSettlePartAdmit.test(caseData));
     }
 
     @Test
     void isPartAdmitPayImmediatelyAccepted_thenFalse() {
         CaseData caseData = CaseData.builder().build();
 
-        assertFalse(partAdmitPayImmediately.test(caseData));
+        assertFalse(PaymentPredicate.payImmediatelyAcceptedPartAdmit.test(caseData));
     }
 
     @Test
@@ -182,7 +185,7 @@ class PartAdmissionTransitionBuilderTest {
             .showResponseOneVOneFlag(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
             .build();
 
-        assertFalse(partAdmitPayImmediately.test(caseData));
+        assertFalse(PaymentPredicate.payImmediatelyAcceptedPartAdmit.test(caseData));
     }
 
     @Test
@@ -193,7 +196,7 @@ class PartAdmissionTransitionBuilderTest {
             .showResponseOneVOneFlag(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
             .build();
 
-        assertFalse(partAdmitPayImmediately.test(caseData));
+        assertFalse(PaymentPredicate.payImmediatelyAcceptedPartAdmit.test(caseData));
     }
 
     @Test
@@ -204,7 +207,7 @@ class PartAdmissionTransitionBuilderTest {
             .showResponseOneVOneFlag(null)
             .build();
 
-        assertFalse(partAdmitPayImmediately.test(caseData));
+        assertFalse(PaymentPredicate.payImmediatelyAcceptedPartAdmit.test(caseData));
     }
 
     @Test
@@ -215,7 +218,7 @@ class PartAdmissionTransitionBuilderTest {
             .showResponseOneVOneFlag(ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE)
             .build();
 
-        assertFalse(partAdmitPayImmediately.test(caseData));
+        assertFalse(PaymentPredicate.payImmediatelyAcceptedPartAdmit.test(caseData));
     }
 
     @Test
@@ -454,7 +457,7 @@ class PartAdmissionTransitionBuilderTest {
             .responseClaimTrack(FAST_CLAIM.name())
             .build();
 
-        assertFalse(isSpecSmallClaim(caseData));
+        assertFalse(ClaimPredicate.isSpec.and(ClaimPredicate.isSmall).test(caseData));
     }
 
     @Test
@@ -466,7 +469,7 @@ class PartAdmissionTransitionBuilderTest {
             .responseClaimTrack(SMALL_CLAIM.name())
             .build();
 
-        assertTrue(isSpecSmallClaim(caseData));
+        assertTrue(ClaimPredicate.isSpec.and(ClaimPredicate.isSmall).test(caseData));
     }
 
     @Test
@@ -479,7 +482,7 @@ class PartAdmissionTransitionBuilderTest {
                              .setApplicant1SettleClaim(YES))
             .build();
 
-        assertFalse(getCarmEnabledForLipCase(caseData));
+        assertFalse(MediationPredicate.isCarmEnabledForCaseLiP.test(caseData));
     }
 
     @Test
@@ -493,7 +496,7 @@ class PartAdmissionTransitionBuilderTest {
                                                             .setIsMediationContactNameCorrect(YES)))
             .build();
 
-        assertTrue(getCarmEnabledForLipCase(caseData));
+        assertTrue(MediationPredicate.isCarmEnabledForCaseLiP.test(caseData));
     }
 
     @Test
@@ -507,7 +510,7 @@ class PartAdmissionTransitionBuilderTest {
                                                                       .setIsMediationContactNameCorrect(YES)))
             .build();
 
-        assertTrue(getCarmEnabledForLipCase(caseData));
+        assertTrue(MediationPredicate.isCarmEnabledForCaseLiP.test(caseData));
     }
 
     @Test
@@ -518,7 +521,7 @@ class PartAdmissionTransitionBuilderTest {
             .build().toBuilder()
             .build();
 
-        assertFalse(getCarmEnabledForCase(caseData));
+        assertFalse(MediationPredicate.isCarmEnabledForCase.test(caseData));
     }
 
     @Test
@@ -531,7 +534,7 @@ class PartAdmissionTransitionBuilderTest {
                                           .build())
             .build();
 
-        assertTrue(getCarmEnabledForCase(caseData));
+        assertTrue(MediationPredicate.isCarmEnabledForCase.test(caseData));
     }
 
     @Test
@@ -544,7 +547,7 @@ class PartAdmissionTransitionBuilderTest {
                                            .build())
             .build();
 
-        assertTrue(getCarmEnabledForCase(caseData));
+        assertTrue(MediationPredicate.isCarmEnabledForCase.test(caseData));
     }
 
     @Test
@@ -557,7 +560,7 @@ class PartAdmissionTransitionBuilderTest {
                                            .build())
             .build();
 
-        assertTrue(getCarmEnabledForCase(caseData));
+        assertTrue(MediationPredicate.isCarmEnabledForCase.test(caseData));
     }
 
     @ParameterizedTest
