@@ -177,7 +177,6 @@ public class HearingValuesService {
      * that gets populated during claim creation. If no partyIds exist it's safe to assume there
      * are missing partyIds to populate.
      *
-     * @param builder case data builder
      * @param caseData given case data.
      * @throws MissingFieldsUpdatedException If party ids have been updated, to force the consumer to request
      *                                  the hearing values endpoint again.
