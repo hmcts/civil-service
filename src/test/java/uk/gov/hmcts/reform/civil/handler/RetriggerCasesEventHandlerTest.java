@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import java.util.HashMap;
@@ -210,8 +211,14 @@ class RetriggerCasesEventHandlerTest {
     @Test
     void testDocumentUpdateFinalOrders() {
         ExternalTask externalTask = mock(ExternalTask.class);
-        CaseDetails caseDetails = CaseDetails.builder().data(Map.of("finalOrderDocumentCollection", List.of(Element.<CaseDocument>builder().id(
-            UUID.randomUUID()).value(CaseDocument.builder().documentSize(123L).build()).build()))).build();
+        CaseDetails caseDetails = new CaseDetailsBuilder()
+            .data(Map.of(
+                "finalOrderDocumentCollection",
+                List.of(new Element<CaseDocument>()
+                            .setId(UUID.randomUUID())
+                            .setValue(new CaseDocument().setDocumentSize(123L)))
+            ))
+            .build();
 
         when(externalTask.getVariable("caseEvent")).thenReturn("UPDATE_CASE_DATA");
         when(externalTask.getVariable("caseIds")).thenReturn("1");
@@ -250,7 +257,7 @@ class RetriggerCasesEventHandlerTest {
     @Test
     void testDocumentUpdateFinalOrders_CurrentCollectionEmpty() {
         ExternalTask externalTask = mock(ExternalTask.class);
-        CaseDetails caseDetails = CaseDetails.builder().data(new HashMap<>()).build();
+        CaseDetails caseDetails = new CaseDetailsBuilder().data(new HashMap<>()).build();
 
         when(externalTask.getVariable("caseEvent")).thenReturn("UPDATE_CASE_DATA");
         when(externalTask.getVariable("caseIds")).thenReturn("1");
