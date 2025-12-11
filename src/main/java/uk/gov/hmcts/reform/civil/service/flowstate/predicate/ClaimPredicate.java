@@ -69,6 +69,13 @@ public non-sealed interface ClaimPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Claim",
+        summary = "Case is Part Admit Settled",
+        description = "Case is Part Admit Settled"
+    )
+    Predicate<CaseData> isPartAdmitSettled = CaseDataPredicate.Claim.isPartAdmitSettled;
+
+    @BusinessRule(
+        group = "Claim",
         summary = "Claim notified",
         description = "Acknowledgement deadline exists - claim notification has been sent (State Flow: claim notified)"
     )

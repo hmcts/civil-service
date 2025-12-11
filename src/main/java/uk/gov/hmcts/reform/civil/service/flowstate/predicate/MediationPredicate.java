@@ -13,14 +13,16 @@ public non-sealed interface MediationPredicate extends CaseDataPredicate {
         summary = "Claimant agreed to mediation",
         description = "Claimant has opted into free mediation"
     )
-    Predicate<CaseData> agreedToMediation = CaseDataPredicate.Claimant.agreedToMediation;
+    Predicate<CaseData> agreedToMediation =
+        CaseDataPredicate.Claimant.agreedToMediation;
 
     @BusinessRule(
         group = "Mediation",
         summary = "Claimant declined mediation",
         description = "Claimant has opted out of free mediation"
     )
-    Predicate<CaseData> declinedMediation = CaseDataPredicate.Claimant.declinedMediation;
+    Predicate<CaseData> declinedMediation =
+        CaseDataPredicate.Claimant.declinedMediation;
 
     @BusinessRule(
         group = "Mediation",
@@ -43,14 +45,16 @@ public non-sealed interface MediationPredicate extends CaseDataPredicate {
         summary = "Respondent 2 claim mediation not required (Spec)",
         description = "Response claim mediation not required (Spec)"
     )
-    Predicate<CaseData> isMediationNotRequiredRespondent2Spec = CaseDataPredicate.Mediation.isMediationNotRequiredRespondent2Spec;
+    Predicate<CaseData> isMediationNotRequiredRespondent2Spec =
+        CaseDataPredicate.Mediation.isMediationNotRequiredRespondent2Spec;
 
     @BusinessRule(
         group = "Mediation",
         summary = "Applicant MP is not claim mediation required (Spec)",
         description = "Applicant MP is not claim mediation required (Spec)"
     )
-    Predicate<CaseData> isNotMediationRequiredApplicantMPSpec = CaseDataPredicate.Mediation.isNotMediationRequiredApplicantMPSpec;
+    Predicate<CaseData> isNotMediationRequiredApplicantMPSpec =
+        CaseDataPredicate.Mediation.isNotMediationRequiredApplicantMPSpec;
 
     @BusinessRule(
         group = "Mediation",
@@ -100,6 +104,19 @@ public non-sealed interface MediationPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Mediation",
+        summary = "Case is Carm mediation",
+        description = "Case is Carm applicable"
+    )
+    Predicate<CaseData> isCarmMediation =
+        CaseDataPredicate.Claimant.isNotSettlePartAdmit
+            .and(CaseDataPredicate.Claimant.agreedToMediation.negate())
+            .and(
+                isCarmApplicableCase.or(isCarmApplicableCaseLiP)
+            )
+            .and(CaseDataPredicate.TakenOffline.byStaffDateExists.negate());
+
+    @BusinessRule(
+        group = "Mediation",
         summary = "All LR parties agreed to mediation (Spec small claim)",
         description = "In a SPEC small claim, all represented parties have agreed to legal representative mediation"
     )
@@ -116,4 +133,5 @@ public non-sealed interface MediationPredicate extends CaseDataPredicate {
             .and(MediationPredicate.isNotAgreedFreeMediationSpec.negate())
             .and(MediationPredicate.isNotMediationRequiredApplicantMPSpec.negate())
             .and(MediationPredicate.agreedToMediation.negate());
+
 }
