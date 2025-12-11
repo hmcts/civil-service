@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderFo
 import uk.gov.hmcts.reform.civil.model.finalorders.CaseHearingLengthElement;
 import uk.gov.hmcts.reform.civil.model.finalorders.DatesFinalOrders;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
-import uk.gov.hmcts.reform.civil.model.referencedata.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
