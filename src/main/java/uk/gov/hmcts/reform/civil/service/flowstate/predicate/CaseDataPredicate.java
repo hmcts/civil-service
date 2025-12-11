@@ -1218,7 +1218,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
             summary = "Applicant MP has agreed to free mediation",
             description = "Applicant MP has agreed to free mediation"
         )
-        Predicate<CaseData> isMediationRequiredApplicantMPSpec =
+        Predicate<CaseData> isRequiredApplicantMPSpec =
             nullSafe(c -> c.getApplicantMPClaimMediationSpecRequired() != null
                 && YesOrNo.YES.equals(c.getApplicantMPClaimMediationSpecRequired().getHasAgreedFreeMediation()));
 
@@ -1227,7 +1227,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
             summary = "Applicant MP has not agreed to free mediation",
             description = "Applicant MP has not agreed to free mediation"
         )
-        Predicate<CaseData> isNotMediationRequiredApplicantMPSpec =
+        Predicate<CaseData> isNotRequiredApplicantMPSpec =
             nullSafe(c -> c.getApplicantMPClaimMediationSpecRequired() != null
                 && YesOrNo.NO.equals(c.getApplicantMPClaimMediationSpecRequired().getHasAgreedFreeMediation()));
 
@@ -1254,7 +1254,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
             summary = "Respondent 1 claim mediation required (Spec)",
             description = "Response claim mediation required (Spec)"
         )
-        Predicate<CaseData> isMediationRequiredRespondent1Spec =
+        Predicate<CaseData> isRequiredRespondent1Spec =
             nullSafe(c -> YES.equals(c.getResponseClaimMediationSpecRequired()));
 
         @BusinessRule(
@@ -1262,7 +1262,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
             summary = "Respondent 1 claim mediation not required (Spec)",
             description = "Response claim mediation not required (Spec)"
         )
-        Predicate<CaseData> isMediationNotRequiredRespondent1Spec =
+        Predicate<CaseData> isNotRequiredRespondent1Spec =
             nullSafe(c -> NO.equals(c.getResponseClaimMediationSpecRequired()));
 
         @BusinessRule(
@@ -1270,7 +1270,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
             summary = "Respondent 2 claim mediation required (Spec)",
             description = "Response claim mediation required (Spec)"
         )
-        Predicate<CaseData> isMediationRequiredRespondent2Spec =
+        Predicate<CaseData> isRequiredRespondent2Spec =
             nullSafe(c -> YES.equals(c.getResponseClaimMediationSpec2Required()));
 
         @BusinessRule(
@@ -1278,7 +1278,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
             summary = "Respondent 2 claim mediation not required (Spec)",
             description = "Response claim mediation not required (Spec)"
         )
-        Predicate<CaseData> isMediationNotRequiredRespondent2Spec =
+        Predicate<CaseData> isNotRequiredRespondent2Spec =
             nullSafe(c -> NO.equals(c.getResponseClaimMediationSpec2Required()));
 
         @BusinessRule(
@@ -1286,7 +1286,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
             summary = "Applicant 1 has Mediation Contact Info",
             description = "Applicant 1 has Mediation Contact Info"
         )
-        Predicate<CaseData> hasMediationContactInfoApplicant1 =
+        Predicate<CaseData> hasContactInfoApplicant1 =
             nullSafe(c -> c.getApp1MediationContactInfo() != null);
 
         @BusinessRule(
@@ -1294,7 +1294,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
             summary = "Respondent 1 has Mediation Contact Info",
             description = "Respondent 1 has Mediation Contact Info"
         )
-        Predicate<CaseData> hasMediationContactInfoRespondent1 =
+        Predicate<CaseData> hasContactInfoRespondent1 =
             nullSafe(c -> c.getResp1MediationContactInfo() != null);
 
         @BusinessRule(
@@ -1302,7 +1302,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
             summary = "Respondent 2 has Mediation Contact Info",
             description = "Respondent 2 has Mediation Contact Info"
         )
-        Predicate<CaseData> hasMediationContactInfoRespondent2 =
+        Predicate<CaseData> hasContactInfoRespondent2 =
             nullSafe(c -> c.getResp2MediationContactInfo() != null);
 
         @BusinessRule(
@@ -1322,5 +1322,31 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         Predicate<CaseData> hasResponseCarmLiPRespondent1 =
             nullSafe(c -> c.getCaseDataLiP() != null
                 && c.getCaseDataLiP().getRespondent1MediationLiPResponseCarm() != null);
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "todo",
+            description = "todo"
+        )
+        Predicate<CaseData> hasReasonUnsuccessful =
+            nullSafe(c -> c.getMediation().getUnsuccessfulMediationReason() != null);
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "todo",
+            description = "todo"
+        )
+        Predicate<CaseData> hasReasonUnsuccessfulMultiSelect =
+            nullSafe(c -> c.getMediation().getMediationUnsuccessfulReasonsMultiSelect() != null);
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "todo",
+            description = "todo"
+        )
+        Predicate<CaseData> hasReasonUnsuccessfulMultiSelectValue =
+            nullSafe(c -> c.getMediation().getMediationUnsuccessfulReasonsMultiSelect() != null
+            && !c.getMediation().getMediationUnsuccessfulReasonsMultiSelect().isEmpty());
     }
+
 }
