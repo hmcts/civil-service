@@ -3833,9 +3833,9 @@ class SimpleStateFlowEngineTest {
             caseData.setRespondent1ResponseDate(LocalDateTime.now());
             caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
             caseData.setRespondentResponseIsSame(YES);
-            assertThat(FlowPredicate.fullAdmissionSpec.test(caseData))
+            assertThat(ResponsePredicate.isType(RespondentResponseTypeSpec.FULL_ADMISSION).test(caseData))
                 .isTrue();
-            assertThat(divergentRespondGoOfflineSpec.and(specClaim).test(caseData))
+            assertThat(DivergencePredicate.divergentRespondGoOfflineSpec.and(ClaimPredicate.isSpec).test(caseData))
                 .isFalse();
         }
 

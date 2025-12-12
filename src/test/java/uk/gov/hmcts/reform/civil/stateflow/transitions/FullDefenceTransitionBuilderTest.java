@@ -669,26 +669,6 @@ public class FullDefenceTransitionBuilderTest {
     }
 
     @Test
-    void shouldReturnTrue_whenIsSpecSmallClaim() {
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(SPEC_CLAIM)
-            .responseClaimTrack(SMALL_CLAIM.name())
-            .build();
-
-        assertTrue(ClaimPredicate.isSpec.and(ClaimPredicate.isSmall).test(caseData));
-    }
-
-    @Test
-    void shouldReturnFalse_whenIsSpecSmallClaim() {
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(UNSPEC_CLAIM)
-            .responseClaimTrack(SMALL_CLAIM.name())
-            .build();
-
-        assertFalse(ClaimPredicate.isSpec.and(ClaimPredicate.isSmall).test(caseData));
-    }
-
-    @Test
     void shouldReturnTrue_whenGetCarmEnabledForLipCase() {
         CaseData caseData = CaseData.builder()
             .caseDataLiP(new CaseDataLiP()

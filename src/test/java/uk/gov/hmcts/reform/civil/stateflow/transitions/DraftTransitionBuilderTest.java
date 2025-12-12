@@ -293,6 +293,26 @@ public class DraftTransitionBuilderTest {
     }
 
     @Test
+    void shouldSetFlags_whenOnlyRespondent2IsUnrepresented() {
+        // Covers the dedicated "Unrepresented defendant 2" path (transition index 4)
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimSubmittedTwoRespondentRepresentatives()
+            .respondent1Represented(YES) // respondent 1 is represented
+            .respondent2Represented(NO)  // respondent 2 is unrepresented
+            .build();
+
+        // Guards
+        assertFalse(ClaimPredicate.submittedRespondent1Unrepresented.test(caseData));
+        assertTrue(ClaimPredicate.submittedRespondent2Unrepresented.test(caseData));
+
+        Map<String, Boolean> flags = getCaseFlags(result.get(4), caseData);
+        assertThat(flags).contains(
+            entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false),
+            entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true)
+        );
+    }
+
+    @Test
     void shouldResolve_whenBothDefendantsUnrepresented() {
         CaseData caseData = CaseDataBuilder.builder()
             .defendant1LIPAtClaimIssued(YES)
