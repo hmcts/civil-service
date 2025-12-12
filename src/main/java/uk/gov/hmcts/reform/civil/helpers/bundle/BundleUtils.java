@@ -21,28 +21,20 @@ public class BundleUtils {
     }
 
     public static String generateDocName(String fileName, String strParam, String strParam2, LocalDate date) {
-        log.info("Local date - {}", date);
         String formatLocalDate = DateFormatHelper.formatLocalDate(date, DATE_FORMAT);
-        log.info("formatLocalDate - {}", formatLocalDate);
-        log.info("strParam - {}", strParam);
-        log.info("strParam2 - {}", strParam2);
         String formattedTitle;
         if (StringUtils.isBlank(strParam)) {
             formattedTitle = String.format(fileName, formatLocalDate);
-            log.info("formattedTitle 111- {} and date {}", formattedTitle, formatLocalDate);
         } else if (StringUtils.isBlank(strParam2)) {
             formattedTitle =  String.format(fileName, strParam, formatLocalDate);
-            log.info("fileName 222- {}, title {} and strParam {}", fileName, formattedTitle, strParam);
         } else {
             formattedTitle =  String.format(fileName, strParam, strParam2, formatLocalDate);
-            log.info("formattedTitle 333- {} and date {}", formattedTitle, formatLocalDate);
         }
 
         if (formattedTitle.length() > MAX_DOC_TITLE_LENGTH) {
             log.info("Truncating generated doc name to 255 chars: {}", formattedTitle);
             formattedTitle = formattedTitle.substring(0, MAX_DOC_TITLE_LENGTH);
         }
-        log.info("document filename {} formatted title: {}", fileName, formattedTitle);
         return formattedTitle;
     }
 
