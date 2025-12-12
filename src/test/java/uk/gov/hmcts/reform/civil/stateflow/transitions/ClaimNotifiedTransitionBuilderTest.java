@@ -16,8 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.hasNotifiedClaimDetailsToBoth;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimDetailsNotified;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimNotifiedTransitionBuilder.claimDetailsNotified;
 
 @ExtendWith(MockitoExtension.class)
 public class ClaimNotifiedTransitionBuilderTest {
@@ -48,13 +48,13 @@ public class ClaimNotifiedTransitionBuilderTest {
     @Test
     void shouldReturnTrue_whenCaseDataIsAtClaimDetailsNotifiedState() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-        assertTrue(claimDetailsNotified.test(caseData));
+        assertTrue(hasNotifiedClaimDetailsToBoth.test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenCaseDataIsAtClaimNotifiedState() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
-        assertFalse(claimDetailsNotified.test(caseData));
+        assertFalse(hasNotifiedClaimDetailsToBoth.test(caseData));
     }
 
     @Test
@@ -63,7 +63,7 @@ public class ClaimNotifiedTransitionBuilderTest {
             .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
             .build();
 
-        assertTrue(claimDetailsNotified.test(caseData));
+        assertTrue(hasNotifiedClaimDetailsToBoth.test(caseData));
     }
 
     @Test
@@ -73,7 +73,7 @@ public class ClaimNotifiedTransitionBuilderTest {
             .build();
 
         assertTrue(takenOfflineAfterClaimDetailsNotified.test(caseData));
-        assertFalse(claimDetailsNotified.test(caseData));
+        assertFalse(hasNotifiedClaimDetailsToBoth.test(caseData));
     }
 
     @Test
@@ -82,7 +82,7 @@ public class ClaimNotifiedTransitionBuilderTest {
             .atStateClaimDetailsNotified()
             .build();
 
-        assertTrue(claimDetailsNotified.test(caseData));
+        assertTrue(hasNotifiedClaimDetailsToBoth.test(caseData));
         assertFalse(takenOfflineAfterClaimDetailsNotified.test(caseData));
     }
 

@@ -30,6 +30,11 @@ Each image links to an SVG whose source (`docs/*.mmd`) is produced by `python3 s
 - Per-state allowed CCD events: [flowstate_allowed_events.md](docs/flowstate_allowed_events.md)
 - Spec-only allowed CCD events: [flowstate_allowed_spec_events.md](docs/flowstate_allowed_spec_events.md)
 
+#### Predicate Business Rules
+
+Generated business rules from flowstate predicates in
+- Composed & Atomic predicate rules: [business-rules.md](docs/business-rules.md)
+
 ## Building and deploying the application
 
 ### Dependencies
