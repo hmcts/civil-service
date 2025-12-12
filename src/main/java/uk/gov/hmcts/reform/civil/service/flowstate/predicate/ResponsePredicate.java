@@ -14,13 +14,6 @@ public non-sealed interface ResponsePredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Response",
-        summary = "Case has a second respondent",
-        description = "Checks if respondent 2 is present in the case data."
-    )
-    Predicate<CaseData> hasRespondent2 = CaseDataPredicate.Respondent.hasRespondent2;
-
-    @BusinessRule(
-        group = "Response",
         summary = "Notification acknowledged",
         description = "At least one required defendant has acknowledged service " +
             "(matches State Flow 'NOTIFICATION_ACKNOWLEDGED')"
@@ -147,13 +140,6 @@ public non-sealed interface ResponsePredicate extends CaseDataPredicate {
                              .and(CaseDataPredicate.Respondent.isTypeSpecRespondent2(RespondentResponseTypeSpec.FULL_ADMISSION).negate()
                                  .and(CaseDataPredicate.Respondent.hasResponseTypeSpecRespondent1.negate()))))
             );
-
-    @BusinessRule(
-        group = "Response",
-        summary = "One-v-one response flag (spec)",
-        description = "Flag indicating a one‑v‑one response was provided (used in SPEC response routing)"
-    )
-    Predicate<CaseData> isOneVOneResponseFlagSpec = CaseDataPredicate.Claim.hasOneVOneResponseFlag;
 
     @BusinessRule(
         group = "Response",

@@ -18,11 +18,4 @@ public non-sealed interface OutOfTimePredicate extends CaseDataPredicate {
             .and(CaseDataPredicate.Applicant.hasResponseDateApplicant1.negate())
             .and(CaseDataPredicate.TakenOffline.byStaffDateExists.negate());
 
-    @BusinessRule(
-        group = "OutOfTime",
-        summary = "Applicant out of time processed by Camunda",
-        description = "Case has been taken offline (takenOffline date present) indicating automated processing of out-of-time cases"
-    )
-    Predicate<CaseData> processedByCamunda = CaseDataPredicate.TakenOffline.dateExists;
-
 }

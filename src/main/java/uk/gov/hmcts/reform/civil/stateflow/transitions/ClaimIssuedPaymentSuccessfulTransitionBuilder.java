@@ -41,7 +41,7 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilder extends MidTransition
             .onlyWhen(ClaimPredicate.pendingIssuedUnrepresented, transitions)
 
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, transitions)
-            .onlyWhen(ClaimPredicate.isOneVOne.and(ClaimPredicate.issuedRespondent1Unrepresented).and(ClaimPredicate.isSpec), transitions)
+            .onlyWhen(ClaimPredicate.pendingIssuedUnrepresentedOneVOneSpec, transitions)
             .set(flags -> flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true), transitions)
 
             // Unregistered
@@ -49,27 +49,13 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilder extends MidTransition
             // 2. Def1 unregistered, Def2 registered
             // 3. Def1 registered, Def 2 unregistered
             .moveTo(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT, transitions)
-            .onlyWhen(
-                ((ClaimPredicate.issuedRespondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
-                    .and(ClaimPredicate.issuedRespondent2OrgNotRegistered.and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
-                    .or((ClaimPredicate.issuedRespondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
-                        .and(ClaimPredicate.issuedRespondent2OrgNotRegistered.negate().and(ClaimPredicate.issuedRespondent2Unrepresented.negate())))
-                    .or((ClaimPredicate.issuedRespondent1OrgNotRegistered.negate().and(ClaimPredicate.issuedRespondent1Unrepresented.negate()))
-                        .and(ClaimPredicate.issuedRespondent2OrgNotRegistered.and(ClaimPredicate.issuedRespondent2Unrepresented.negate()))
-                        .and(ClaimPredicate.sameRepresentationBoth.negate())
-                    ), transitions
-            )
+            .onlyWhen(ClaimPredicate.pendingIssuedUnregistered, transitions)
 
             // Unrepresented and Unregistered
             // 1. Def1 unrepresented, Def2 unregistered
             // 2. Def1 unregistered, Def 2 unrepresented
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT, transitions)
-            .onlyWhen(
-                (ClaimPredicate.issuedRespondent1Unrepresented
-                    .and(ClaimPredicate.issuedRespondent2OrgNotRegistered.and(ClaimPredicate.issuedRespondent2Unrepresented.negate()))
-                )
-                    .or(ClaimPredicate.issuedRespondent1OrgNotRegistered.and(ClaimPredicate.issuedRespondent1Unrepresented.negate())
-                        .and(ClaimPredicate.issuedRespondent2Unrepresented)), transitions);
+            .onlyWhen(ClaimPredicate.pendingIssuedUnrepresentedAndUnregistered, transitions);
     }
 
 }
