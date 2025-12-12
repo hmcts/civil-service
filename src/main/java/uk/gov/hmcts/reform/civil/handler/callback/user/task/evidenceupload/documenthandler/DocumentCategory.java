@@ -80,7 +80,7 @@ public enum DocumentCategory {
     RESPONDENT_ONE_ANY_PRECEDENT_H("respondentOneAnyPrecedentH"),
     RESPONDENT_TWO_UPLOADED_PRECEDENT_H("RespondentTwoUploadedPrecedentH"),
     RESPONDENT_TWO_PRECEDENT_AGREED("RespondentTwoPrecedentAgreed"),
-    RESPONDENT_TWO_ANY_PRECEDENT_H("RespondentTwoAnyPrecedentH"),
+    RESPONDENT_TWO_ANY_PRECEDENT_H("respondentTwoAnyPrecedentH"),
 
     APPLICANT_ONE_TRIAL_DOC_TIME_TABLE("ApplicantTrialDocTimetable"),
     RESPONDENT_ONE_TRIAL_DOC_TIME_TABLE("RespondentOneTrialDocTimetable"),
