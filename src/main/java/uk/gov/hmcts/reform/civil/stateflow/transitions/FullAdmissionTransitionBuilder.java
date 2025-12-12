@@ -58,12 +58,16 @@ public class FullAdmissionTransitionBuilder extends MidTransitionBuilder {
             .moveTo(FULL_ADMIT_REJECT_REPAYMENT, transitions).onlyWhen(rejectRepaymentPlan, transitions)
             .set((c, flags) -> flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)), transitions)
             // For lip journeys
-            .moveTo(FULL_ADMIT_JUDGMENT_ADMISSION, transitions).onlyWhen(ccjRequestJudgmentByAdmission.and(isPayImmediately).and(isLipCase), transitions)
+            .moveTo(FULL_ADMIT_JUDGMENT_ADMISSION, transitions).onlyWhen(fullAdmitJudgementAdmission(), transitions)
             .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaffAfterDefendantResponse.and(not(ccjRequestJudgmentByAdmission)), transitions)
             .moveTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA, transitions)
-            .onlyWhen(applicantOutOfTimeNotBeingTakenOffline, transitions)
+            .onlyWhen(applicantOutOfTimeNotBeingTakenOffline.and(not(fullAdmitJudgementAdmission())), transitions)
             .moveTo(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA, transitions)
             .onlyWhen(isDefendantNoCOnlineForCase.and(isPayImmediately).and(isDefendantNoCOnlineForCaseAfterJBA), transitions);
+    }
+
+    private static Predicate<CaseData> fullAdmitJudgementAdmission() {
+        return ccjRequestJudgmentByAdmission.and(isPayImmediately).and(isLipCase);
     }
 
     public static final Predicate<CaseData> fullAdmitPayImmediately = FullAdmissionTransitionBuilder::getPredicateForPayImmediately;
