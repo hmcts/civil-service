@@ -1,18 +1,22 @@
 package uk.gov.hmcts.reform.civil.model.taskmanagement;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.time.ZonedDateTime;
 import java.util.Map;
 
-@Getter
+@Data
 @EqualsAndHashCode
 @ToString
 @Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class Task {
 
     @JsonProperty("id")

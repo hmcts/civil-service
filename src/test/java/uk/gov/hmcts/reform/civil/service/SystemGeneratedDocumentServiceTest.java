@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
@@ -26,17 +27,18 @@ class SystemGeneratedDocumentServiceTest {
     @Test
     void shouldAddDocumentToSystemGeneratedDocuments() {
         //Given
-        TranslatedDocument translatedDocument1 = TranslatedDocument
-            .builder()
-            .documentType(DEFENDANT_RESPONSE)
-            .file(Document.builder().documentFileName(FILE_NAME_1).build())
-            .build();
+        Document document = new Document();
+        document.setDocumentFileName(FILE_NAME_1);
+
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(DEFENDANT_RESPONSE);
+        translatedDocument1.setFile(document);
 
         List<Element<TranslatedDocument>> translatedDocument = List.of(
             element(translatedDocument1)
         );
-        CaseData caseData = CaseData.builder().systemGeneratedCaseDocuments(new ArrayList<>())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
         //When
         List<Element<CaseDocument>> result = systemGeneratedDocumentService
@@ -50,9 +52,10 @@ class SystemGeneratedDocumentServiceTest {
     @Test
     void shouldAddCaseDocumentToSystemGeneratedDocuments() {
         //Given
-        CaseDocument caseDocument = CaseDocument.builder().documentName(FILE_NAME_1).build();
-        CaseData caseData = CaseData.builder().systemGeneratedCaseDocuments(new ArrayList<>())
-            .build();
+        CaseDocument caseDocument = new CaseDocument();
+        caseDocument.setDocumentName(FILE_NAME_1);
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
         //When
         List<Element<CaseDocument>> result = systemGeneratedDocumentService
             .getSystemGeneratedDocumentsWithAddedDocument(
@@ -67,17 +70,18 @@ class SystemGeneratedDocumentServiceTest {
     @Test
     void shouldGetHearingDocumentsDocumentToSystemGeneratedDocuments() {
         //Given
-        TranslatedDocument translatedDocument1 = TranslatedDocument
-            .builder()
-            .documentType(HEARING_NOTICE)
-            .file(Document.builder().documentFileName(FILE_NAME_1).build())
-            .build();
+        Document document = new Document();
+        document.setDocumentFileName(FILE_NAME_1);
+
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(HEARING_NOTICE);
+        translatedDocument1.setFile(document);
 
         List<Element<TranslatedDocument>> translatedDocument = List.of(
             element(translatedDocument1)
         );
-        CaseData caseData = CaseData.builder().systemGeneratedCaseDocuments(new ArrayList<>())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
         //When
         List<Element<CaseDocument>> result = systemGeneratedDocumentService
@@ -91,17 +95,18 @@ class SystemGeneratedDocumentServiceTest {
     @Test
     void shouldGetAddTranslatedCourtOfficersOrderToCollection() {
         //Given
-        TranslatedDocument translatedDocument1 = TranslatedDocument
-            .builder()
-            .documentType(COURT_OFFICER_ORDER)
-            .file(Document.builder().documentFileName(FILE_NAME_1).build())
-            .build();
+        Document document = new Document();
+        document.setDocumentFileName(FILE_NAME_1);
+
+        TranslatedDocument translatedDocument1 = new TranslatedDocument();
+        translatedDocument1.setDocumentType(COURT_OFFICER_ORDER);
+        translatedDocument1.setFile(document);
 
         List<Element<TranslatedDocument>> translatedDocument = List.of(
             element(translatedDocument1)
         );
-        CaseData caseData = CaseData.builder().courtOfficersOrders(new ArrayList<>())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCourtOfficersOrders(new ArrayList<>());
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
         //When
         List<Element<CaseDocument>> result = systemGeneratedDocumentService
