@@ -38,11 +38,10 @@ class ApplicantOneDisclosureDocumentHandlerTest extends BaseDocumentHandlerTest 
         CaseData caseData = CaseData.builder()
                 .documentForDisclosureRes(List.of(
                         Element.<UploadEvidenceDocumentType>builder()
-                                .value(UploadEvidenceDocumentType.builder()
-                                        .documentIssuedDate(LocalDate.of(2022, 2, 10))
-                                        .typeOfDocument("typeOfDocument")
-                                        .documentUpload(document)
-                                        .build())
+                                .value(new UploadEvidenceDocumentType()
+                                        .setDocumentIssuedDate(LocalDate.of(2022, 2, 10))
+                                        .setTypeOfDocument("typeOfDocument")
+                                        .setDocumentUpload(document))
                                 .build()))
                 .build();
 

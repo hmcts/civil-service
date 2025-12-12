@@ -145,11 +145,10 @@ class HearingNoticeSchedulerEventHandlerTest {
     @Test
     void shouldDispatchExpectedCamundaMessage_whenHearingIsInListedStatusAndPartiesNotifiedResponsesIsEmpty() {
         when(mapper.convertValue(any(), eq(HearingNoticeMessageVars.class))).thenReturn(
-            HearingNoticeMessageVars.builder()
-                .caseId(CASE_ID)
-                .hearingId(HEARING_ID)
-                .triggeredViaScheduler(true)
-                .build());
+            new HearingNoticeMessageVars()
+                .setCaseId(CASE_ID)
+                .setHearingId(HEARING_ID)
+                .setTriggeredViaScheduler(true));
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(
             createHearing(ListAssistCaseStatus.LISTED));
         when(hearingsService.getPartiesNotifiedResponses(anyString(), anyString())).thenReturn(
@@ -166,11 +165,10 @@ class HearingNoticeSchedulerEventHandlerTest {
 
         verify(runtimeService, times(1)).createMessageCorrelation(MESSAGE_ID);
         verify(messageCorrelationBuilder, times(1)).setVariables(
-            HearingNoticeMessageVars.builder()
-                .caseId(CASE_ID)
-                .hearingId(HEARING_ID)
-                .triggeredViaScheduler(true)
-                .build().toMap(mapper));
+            new HearingNoticeMessageVars()
+                .setCaseId(CASE_ID)
+                .setHearingId(HEARING_ID)
+                .setTriggeredViaScheduler(true).toMap(mapper));
         verify(messageCorrelationBuilder, times(1)).correlateStartMessage();
     }
 
@@ -210,11 +208,10 @@ class HearingNoticeSchedulerEventHandlerTest {
                 .dispatchedHearingIds(new ArrayList<>())
                 .build());
         when(mapper.convertValue(any(), eq(HearingNoticeMessageVars.class))).thenReturn(
-            HearingNoticeMessageVars.builder()
-                .caseId(CASE_ID)
-                .hearingId(HEARING_ID)
-                .triggeredViaScheduler(true)
-                .build());
+            new HearingNoticeMessageVars()
+                .setCaseId(CASE_ID)
+                .setHearingId(HEARING_ID)
+                .setTriggeredViaScheduler(true));
         when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
             createHearing(ListAssistCaseStatus.LISTED));
         when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID)).thenReturn(
@@ -241,8 +238,7 @@ class HearingNoticeSchedulerEventHandlerTest {
 
         verify(runtimeService, times(1)).createMessageCorrelation(MESSAGE_ID);
         verify(messageCorrelationBuilder, times(1)).setVariables(
-            HearingNoticeMessageVars.builder().caseId(CASE_ID).hearingId(HEARING_ID).triggeredViaScheduler(true)
-                .build().toMap(mapper));
+            new HearingNoticeMessageVars().setCaseId(CASE_ID).setHearingId(HEARING_ID).setTriggeredViaScheduler(true).toMap(mapper));
         verify(messageCorrelationBuilder, times(1)).correlateStartMessage();
     }
 
@@ -254,11 +250,10 @@ class HearingNoticeSchedulerEventHandlerTest {
                 .dispatchedHearingIds(new ArrayList<>())
                 .build());
         when(mapper.convertValue(any(), eq(HearingNoticeMessageVars.class))).thenReturn(
-            HearingNoticeMessageVars.builder()
-                .caseId(CASE_ID)
-                .hearingId(HEARING_ID)
-                .triggeredViaScheduler(true)
-                .build());
+            new HearingNoticeMessageVars()
+                .setCaseId(CASE_ID)
+                .setHearingId(HEARING_ID)
+                .setTriggeredViaScheduler(true));
         when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
             createHearing(ListAssistCaseStatus.LISTED));
         when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID)).thenReturn(
@@ -285,11 +280,10 @@ class HearingNoticeSchedulerEventHandlerTest {
 
         verify(runtimeService, times(1)).createMessageCorrelation(MESSAGE_ID);
         verify(messageCorrelationBuilder, times(1)).setVariables(
-            HearingNoticeMessageVars.builder()
-                .caseId(CASE_ID)
-                .hearingId(HEARING_ID)
-                .triggeredViaScheduler(true)
-                .build().toMap(mapper));
+            new HearingNoticeMessageVars()
+                .setCaseId(CASE_ID)
+                .setHearingId(HEARING_ID)
+                .setTriggeredViaScheduler(true).toMap(mapper));
         verify(messageCorrelationBuilder, times(1)).correlateStartMessage();
     }
 

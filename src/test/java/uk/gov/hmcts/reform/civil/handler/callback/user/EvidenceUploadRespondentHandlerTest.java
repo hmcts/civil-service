@@ -1480,14 +1480,12 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     void shouldBreakWhenThereIsAnyCaseBundlesWithoutCreatedDate() {
         // Given: No caseBundles exists with CreatedDate and new evidence is uploaded
         List<IdValue<Bundle>> caseBundles = new ArrayList<>();
-        caseBundles.add(new IdValue<>("1", Bundle.builder().id("1")
-            .title("Trial Bundle")
-            .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
-            .createdOn(Optional.of(LocalDateTime.of(2022, 05, 15, 12, 12, 12)))
-            .build()));
-        caseBundles.add(new IdValue<>("1", Bundle.builder().id("1")
-            .title("Trial Bundle")
-            .build()));
+        caseBundles.add(new IdValue<>("1", new Bundle().setId("1")
+            .setTitle("Trial Bundle")
+            .setStitchStatus(Optional.of("NEW")).setDescription("Trial Bundle")
+            .setCreatedOn(Optional.of(LocalDateTime.of(2022, 05, 15, 12, 12, 12)))));
+        caseBundles.add(new IdValue<>("1", new Bundle().setId("1")
+            .setTitle("Trial Bundle")));
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         caseData.setDocumentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"));
@@ -1510,11 +1508,10 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     void shouldBreakWhenThereIsAnyCaseBundlesWithNullCreatedDate() {
         // Given: No caseBundles exists with CreatedDate and new evidence is uploaded
         List<IdValue<Bundle>> caseBundles = new ArrayList<>();
-        caseBundles.add(new IdValue<>("1", Bundle.builder().id("1")
-            .title("Trial Bundle")
-            .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
-            .createdOn(Optional.ofNullable(null))
-            .build()));
+        caseBundles.add(new IdValue<>("1", new Bundle().setId("1")
+            .setTitle("Trial Bundle")
+            .setStitchStatus(Optional.of("NEW")).setDescription("Trial Bundle")
+            .setCreatedOn(Optional.ofNullable(null))));
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         caseData.setDocumentQuestionsRes(getExpertDocs(LocalDateTime.of(2022, 05, 10, 12, 13, 12), "url1"));
@@ -1871,11 +1868,10 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     private List<IdValue<Bundle>> prepareCaseBundles(LocalDateTime bundleCreatedDate) {
         List<IdValue<Bundle>> caseBundles = new ArrayList<>();
-        caseBundles.add(new IdValue<>("1", Bundle.builder().id("1")
-            .title("Trial Bundle")
-            .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
-            .createdOn(Optional.of(bundleCreatedDate))
-            .build()));
+        caseBundles.add(new IdValue<>("1", new Bundle().setId("1")
+            .setTitle("Trial Bundle")
+            .setStitchStatus(Optional.of("NEW")).setDescription("Trial Bundle")
+            .setCreatedOn(Optional.of(bundleCreatedDate))));
         return caseBundles;
     }
 

@@ -52,8 +52,8 @@ public class BundleUpdatedDefendantScenarioTest extends DashboardBaseIntegration
 
     private CaseData createCaseData(YesOrNo respondentRepresented, boolean isFastTrack) {
         List<IdValue<Bundle>> bundles = List.of(
-            new IdValue<>("1", Bundle.builder().createdOn(Optional.of(LocalDateTime.of(2024, 3, 1, 0, 0))).build()),
-            new IdValue<>("2", Bundle.builder().createdOn(Optional.of(LocalDateTime.of(2024, 4, 1, 0, 0))).build())
+              new IdValue<>("1", new Bundle().setCreatedOn(Optional.of(LocalDateTime.of(2024, 3, 1, 0, 0)))),
+              new IdValue<>("2", new Bundle().setCreatedOn(Optional.of(LocalDateTime.of(2024, 4, 1, 0, 0))))
         );
 
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()

@@ -119,16 +119,16 @@ public abstract class BaseDocumentHandlerTest {
     }
 
     protected UploadEvidenceDocumentType createDocumentType(String bundleName, String typeOfDocument) {
-        UploadEvidenceDocumentType.UploadEvidenceDocumentTypeBuilder documentBuilder = UploadEvidenceDocumentType.builder()
-                .documentIssuedDate(DomainConstants.ISSUE_DATE)
-                .bundleName(bundleName)
-                .documentUpload(document);
+        UploadEvidenceDocumentType documentType = new UploadEvidenceDocumentType()
+                .setDocumentIssuedDate(DomainConstants.ISSUE_DATE)
+                .setBundleName(bundleName)
+                .setDocumentUpload(document);
 
         if (typeOfDocument != null) {
-            documentBuilder.typeOfDocument(typeOfDocument);
+            documentType.setTypeOfDocument(typeOfDocument);
         }
 
-        return documentBuilder.build();
+        return documentType;
     }
 
     protected UploadEvidenceExpert createExpert(String name) {
@@ -347,12 +347,11 @@ public abstract class BaseDocumentHandlerTest {
     }
 
     protected void setUpDocumentReferredInStatement() {
-        uploadEvidenceDocumentType = UploadEvidenceDocumentType.builder()
-                .witnessOptionName(DomainConstants.WITNESS_NAME)
-                .typeOfDocument(DomainConstants.TYPE_OF_DOCUMENT)
-                .documentIssuedDate(DomainConstants.ISSUE_DATE)
-                .documentUpload(document)
-                .build();
+        uploadEvidenceDocumentType = new UploadEvidenceDocumentType()
+                .setWitnessOptionName(DomainConstants.WITNESS_NAME)
+                .setTypeOfDocument(DomainConstants.TYPE_OF_DOCUMENT)
+                .setDocumentIssuedDate(DomainConstants.ISSUE_DATE)
+                .setDocumentUpload(document);
 
         caseData = CaseData.builder()
                 .documentReferredInStatement(toElementArrayList(uploadEvidenceDocumentType))

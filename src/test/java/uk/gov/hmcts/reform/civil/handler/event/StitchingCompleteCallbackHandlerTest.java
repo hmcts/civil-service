@@ -64,14 +64,13 @@ public class StitchingCompleteCallbackHandlerTest extends BaseCallbackHandlerTes
     @Test
     void shouldSetCategoryId() {
         List<IdValue<Bundle>> caseBundles = new ArrayList<>();
-        caseBundles.add(new IdValue<>("1", Bundle.builder().id("1")
-            .title("Trial Bundle")
-            .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
-            .stitchedDocument(Optional.of(Document.builder()
+        caseBundles.add(new IdValue<>("1", new Bundle().setId("1")
+            .setTitle("Trial Bundle")
+            .setStitchStatus(Optional.of("NEW")).setDescription("Trial Bundle")
+            .setStitchedDocument(Optional.of(Document.builder()
                                               .documentUrl("url")
                                               .documentFileName("name")
-                                              .build()))
-            .build()));
+                                              .build()))));
         CaseData caseData = CaseData.builder().caseBundles(caseBundles).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -84,14 +83,13 @@ public class StitchingCompleteCallbackHandlerTest extends BaseCallbackHandlerTes
     @Test
     void shouldSetBundleCreationBusinessProcessWhenBundleEventIsNotNull() {
         List<IdValue<Bundle>> caseBundles = new ArrayList<>();
-        caseBundles.add(new IdValue<>("1", Bundle.builder().id("1")
-            .title("Trial Bundle")
-            .stitchStatus(Optional.of("SUCCESS")).description("Trial Bundle")
-            .stitchedDocument(Optional.of(Document.builder()
+        caseBundles.add(new IdValue<>("1", new Bundle().setId("1")
+            .setTitle("Trial Bundle")
+            .setStitchStatus(Optional.of("SUCCESS")).setDescription("Trial Bundle")
+            .setStitchedDocument(Optional.of(Document.builder()
                                               .documentUrl("url")
                                               .documentFileName("name")
-                                              .build()))
-            .build()));
+                                              .build()))));
         CaseData caseData = CaseData.builder().caseBundles(caseBundles)
             .bundleEvent("BUNDLE_CREATED_NOTIFICATION").build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -112,9 +110,9 @@ public class StitchingCompleteCallbackHandlerTest extends BaseCallbackHandlerTes
     }
 
     private static Stream<Arguments> provideBundlesForLatestBundleTest() {
-        Bundle bundle1 = Bundle.builder().id("1").createdOn(Optional.of(LocalDateTime.of(2023, 1, 1, 0, 0))).build();
-        Bundle bundle2 = Bundle.builder().id("2").createdOn(Optional.of(LocalDateTime.of(2023, 2, 1, 0, 0))).build();
-        Bundle bundle3 = Bundle.builder().id("3").createdOn(Optional.of(LocalDateTime.of(2023, 3, 1, 0, 0))).build();
+        Bundle bundle1 = new Bundle().setId("1").setCreatedOn(Optional.of(LocalDateTime.of(2023, 1, 1, 0, 0)));
+        Bundle bundle2 = new Bundle().setId("2").setCreatedOn(Optional.of(LocalDateTime.of(2023, 2, 1, 0, 0)));
+        Bundle bundle3 = new Bundle().setId("3").setCreatedOn(Optional.of(LocalDateTime.of(2023, 3, 1, 0, 0)));
 
         return Stream.of(
             Arguments.of(List.of(), Optional.empty()),
@@ -148,11 +146,11 @@ public class StitchingCompleteCallbackHandlerTest extends BaseCallbackHandlerTes
     }
 
     private static Stream<Arguments> provideCaseDataForTriggerUpdateBundleCategoryIdTest() {
-        Bundle bundleSuccess = Bundle.builder().id("1").stitchStatus(Optional.of("SUCCESS")).build();
-        Bundle bundleFailed = Bundle.builder().id("2").stitchStatus(Optional.of("FAILED")).build();
+        Bundle bundleSuccess = new Bundle().setId("1").setStitchStatus(Optional.of("SUCCESS"));
+        Bundle bundleFailed = new Bundle().setId("2").setStitchStatus(Optional.of("FAILED"));
         List<Element<UploadEvidenceDocumentType>> docsUploadedAfterBundle = Stream.generate(() ->
                                                                                                 ElementUtils.element(
-                                                                                                    UploadEvidenceDocumentType.builder().build())
+                                                                                                    new UploadEvidenceDocumentType())
         ).limit(3).collect(Collectors.toList());
 
         return Stream.of(

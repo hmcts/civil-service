@@ -90,24 +90,16 @@ class AmendRestitchBundleCallbackHandlerTest extends BaseCallbackHandlerTest {
         bundle1.setCreatedOn(Optional.of(LocalDateTime.now()));
         bundle1.setBundleHearingDate(Optional.of(LocalDate.of(2023, 12, 12)));
         List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> caseBundles = new ArrayList<>();
-        caseBundles.add(new IdValue<>("1", bundle1));
-
-        uk.gov.hmcts.reform.civil.model.Bundle bundle2 = new uk.gov.hmcts.reform.civil.model.Bundle(
-            "1",
-            "Trial Bundle - Old",
-            "Trial Bundle - Old",
-            null,
-            null,
-            Optional.of("NEW"),
-            Optional.empty(),
-            uk.gov.hmcts.reform.civil.enums.YesOrNo.NO,
-            uk.gov.hmcts.reform.civil.enums.YesOrNo.NO,
-            null
-        );
-        bundle2.setCreatedOn(Optional.of(LocalDateTime.now()));
-        bundle2.setBundleHearingDate(Optional.of(LocalDate.now().plusWeeks(5).plusDays(5)));
-        caseBundles.add(new IdValue<>("2", bundle2));
-
+        caseBundles.add(new IdValue<>("1", new uk.gov.hmcts.reform.civil.model.Bundle().setId("1")
+            .setTitle("Trial Bundle - Static")
+            .setStitchStatus(Optional.of("NEW")).setDescription("Trial Bundle - Static")
+            .setCreatedOn(Optional.of(LocalDateTime.now()))
+            .setBundleHearingDate(Optional.of(LocalDate.of(2023, 12, 12)))));
+        caseBundles.add(new IdValue<>("2", new uk.gov.hmcts.reform.civil.model.Bundle().setId("1")
+            .setTitle("Trial Bundle - Old")
+            .setStitchStatus(Optional.of("NEW")).setDescription("Trial Bundle - Old")
+            .setCreatedOn(Optional.of(LocalDateTime.now()))
+            .setBundleHearingDate(Optional.of(LocalDate.now().plusWeeks(5).plusDays(5)))));
         return caseBundles;
     }
 

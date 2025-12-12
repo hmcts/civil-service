@@ -144,13 +144,11 @@ class BundleRequestDocsOrganizerTest {
     @Test
     void shouldSortEvidenceUploadByDate() {
 
-        UploadEvidenceDocumentType doc1 = UploadEvidenceDocumentType.builder()
-            .documentIssuedDate(LocalDate.of(2023, 2, 5))
-            .build();
+        UploadEvidenceDocumentType doc1 = new UploadEvidenceDocumentType()
+            .setDocumentIssuedDate(LocalDate.of(2023, 2, 5));
 
-        UploadEvidenceDocumentType doc2 = UploadEvidenceDocumentType.builder()
-            .documentIssuedDate(LocalDate.of(2023, 3, 10))
-            .build();
+        UploadEvidenceDocumentType doc2 = new UploadEvidenceDocumentType()
+            .setDocumentIssuedDate(LocalDate.of(2023, 3, 10));
 
         List<Element<UploadEvidenceDocumentType>> documentList = new ArrayList<>();
         documentList.add(Element.<UploadEvidenceDocumentType>builder().value(doc1).build());
@@ -173,21 +171,17 @@ class BundleRequestDocsOrganizerTest {
     private List<Element<UploadEvidenceDocumentType>> getDocumentEvidenceForTrial() {
         List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = new ArrayList<>();
         Arrays.stream(TypeOfDocDocumentaryEvidenceOfTrial.values()).toList().forEach(type -> {
-            otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
-                                                           .builder()
-                                                           .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
+            otherEvidenceDocs.add(ElementUtils.element(new UploadEvidenceDocumentType()
+                                                           .setDocumentUpload(Document.builder().documentBinaryUrl(TEST_URL)
                                                                                .documentFileName(TEST_FILE_NAME).categoryID("").build())
-                                                           .typeOfDocument(type.getDisplayNames().get(0))
-                                                           .documentIssuedDate(LocalDate.of(2023, 1, 12))
-                                                           .build()));
+                                                           .setTypeOfDocument(type.getDisplayNames().get(0))
+                                                           .setDocumentIssuedDate(LocalDate.of(2023, 1, 12))));
         });
-        otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
-                                                       .builder()
-                                                       .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
+        otherEvidenceDocs.add(ElementUtils.element(new UploadEvidenceDocumentType()
+                                                       .setDocumentUpload(Document.builder().documentBinaryUrl(TEST_URL)
                                                                            .documentFileName(TEST_FILE_NAME).categoryID("").build())
-                                                       .typeOfDocument("Other")
-                                                       .documentIssuedDate(LocalDate.of(2023, 1, 12))
-                                                       .build()));
+                                                       .setTypeOfDocument("Other")
+                                                       .setDocumentIssuedDate(LocalDate.of(2023, 1, 12))));
         return otherEvidenceDocs;
     }
 }

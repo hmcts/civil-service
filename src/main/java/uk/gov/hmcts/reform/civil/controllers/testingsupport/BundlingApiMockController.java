@@ -53,7 +53,7 @@ public class BundlingApiMockController {
                           SEALED_CLAIM);
         var document = documentManagementService.uploadDocument(authorisation, pdf).getDocumentLink();
 
-        var bundle = new IdValue<>("", Bundle.builder().stitchedDocument(Optional.of(document)).build());
+        var bundle = new IdValue<>("", new Bundle().setStitchedDocument(Optional.of(document)));
         List<IdValue<Bundle>> caseBundles = List.of(bundle);
         data.put("caseBundles", caseBundles);
 
