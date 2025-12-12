@@ -36,7 +36,6 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
-    @SuppressWarnings("unchecked")
     public ExternalTaskData handleTask(ExternalTask externalTask) {
 
         HearingNoticeSchedulerVars schedulerVars = mapper.convertValue(externalTask.getAllVariables(), HearingNoticeSchedulerVars.class);
@@ -55,12 +54,13 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
 
         runtimeService.setVariables(
             externalTask.getProcessInstanceId(),
-            HearingNoticeSchedulerVars.builder()
-                .dispatchedHearingIds(dispatchedHearingIds)
-                .totalNumberOfUnnotifiedHearings(unnotifiedHearings.getTotalFound().intValue())
-                .build().toMap(mapper)
+            new HearingNoticeSchedulerVars()
+                .setDispatchedHearingIds(dispatchedHearingIds)
+                .setTotalNumberOfUnnotifiedHearings(unnotifiedHearings.getTotalFound().intValue())
+                .toMap(mapper)
         );
-        return ExternalTaskData.builder().build();
+
+        return new ExternalTaskData();
     }
 
     @Override

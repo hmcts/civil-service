@@ -7,8 +7,8 @@ import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 
 @Accessors(chain = true)
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
 public class HearingNoticeMessageVars implements MappableObject {
 
