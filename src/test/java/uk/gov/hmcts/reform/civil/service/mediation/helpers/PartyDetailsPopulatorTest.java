@@ -20,13 +20,13 @@ public class PartyDetailsPopulatorTest {
     @Test
     void shouldPopulateLitigantWithCorrectInfo_whenAllFieldsProvided() {
         PartyFlags flags = PartyFlags.builder().roleOnCase("Defendant").build();
-        Party party = Party.builder()
-            .partyID("P1")
-            .type(Type.INDIVIDUAL)
-            .individualFirstName("John")
-            .individualLastName("Doe")
-            .flags(flags)
-            .build();
+
+        Party party = new Party();
+        party.setPartyID("P1");
+        party.setType(Type.INDIVIDUAL);
+        party.setIndividualFirstName("John");
+        party.setIndividualLastName("Doe");
+        party.setFlags(flags);
 
         MediationLitigant.MediationLitigantBuilder builder = MediationLitigant.builder();
         MediationLitigant litigant = partyDetailsPopulator.populator(builder, party).build();
@@ -45,7 +45,6 @@ public class PartyDetailsPopulatorTest {
             .type(Type.COMPANY)
             .individualFirstName("John")
             .individualLastName("Doe")
-            .flags(null)
             .build();
 
         MediationLitigant.MediationLitigantBuilder builder = MediationLitigant.builder();

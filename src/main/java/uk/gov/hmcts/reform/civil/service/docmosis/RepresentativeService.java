@@ -43,20 +43,17 @@ public class RepresentativeService {
             var representative = fromOrganisation(organisationService.findOrganisationById(organisationId)
                                                       .orElseThrow(RuntimeException::new));
 
-            var representativeBuilder = representative.toBuilder();
-
             Optional.ofNullable(caseData.getRespondentSolicitor1ServiceAddress())
-                .ifPresent(representativeBuilder::serviceAddress);
-            representativeBuilder.legalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
+                .ifPresent(representative::setServiceAddress);
+            representative.setLegalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
                                                       ? "Name" : ORGANISATION_NAME);
             if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                 && caseData.getSpecRespondentCorrespondenceAddressdetails() != null) {
-                representativeBuilder.serviceAddress(caseData.getSpecRespondentCorrespondenceAddressdetails());
+                representative.setServiceAddress(caseData.getSpecRespondentCorrespondenceAddressdetails());
             }
 
-            return representativeBuilder
-                .emailAddress(caseData.getRespondentSolicitor1EmailAddress())
-                .build();
+            representative.setEmailAddress(caseData.getRespondentSolicitor1EmailAddress());
+            return representative;
         }
         return ofNullable(caseData.getRespondentSolicitor1OrganisationDetails())
             .map(Representative::fromSolicitorOrganisationDetails)
@@ -75,22 +72,19 @@ public class RepresentativeService {
             var representative = fromOrganisation(organisationService.findOrganisationById(organisationId)
                                                       .orElseThrow(RuntimeException::new));
 
-            var representativeBuilder = representative.toBuilder();
-
-            representativeBuilder.legalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
+            representative.setLegalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
                                                       ? "Name" : ORGANISATION_NAME);
 
             Optional.ofNullable(caseData.getRespondentSolicitor2ServiceAddress())
-                .ifPresent(representativeBuilder::serviceAddress);
+                .ifPresent(representative::setServiceAddress);
 
             if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                 && caseData.getSpecRespondent2CorrespondenceAddressdetails() != null) {
-                representativeBuilder.serviceAddress(caseData.getSpecRespondent2CorrespondenceAddressdetails());
+                representative.setServiceAddress(caseData.getSpecRespondent2CorrespondenceAddressdetails());
             }
 
-            return representativeBuilder
-                .emailAddress(caseData.getRespondentSolicitor2EmailAddress())
-                .build();
+            representative.setEmailAddress(caseData.getRespondentSolicitor2EmailAddress());
+            return representative;
         }
         return ofNullable(caseData.getRespondentSolicitor2OrganisationDetails())
             .map(Representative::fromSolicitorOrganisationDetails)
@@ -106,18 +100,16 @@ public class RepresentativeService {
         var representative = fromOrganisation(organisationService.findOrganisationById(organisationId)
                                                   .orElseThrow(RuntimeException::new));
 
-        var representativeBuilder = representative.toBuilder();
         Optional.ofNullable(caseData.getApplicantSolicitor1ServiceAddress())
-            .ifPresent(representativeBuilder::serviceAddress);
-        representativeBuilder.legalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
+            .ifPresent(representative::setServiceAddress);
+        representative.setLegalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
                                                   ? "Name" : ORGANISATION_NAME);
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && caseData.getSpecApplicantCorrespondenceAddressdetails() != null) {
-            representativeBuilder.serviceAddress(caseData.getSpecApplicantCorrespondenceAddressdetails());
+            representative.setServiceAddress(caseData.getSpecApplicantCorrespondenceAddressdetails());
         }
 
-        return representativeBuilder
-            .emailAddress(caseData.getApplicantSolicitor1UserDetails().getEmail())
-            .build();
+        representative.setEmailAddress(caseData.getApplicantSolicitor1UserDetails().getEmail());
+        return representative;
     }
 }

@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimResponseF
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDateTime;
@@ -34,12 +35,12 @@ public class StatementOfTruthPopulatorTest {
 
     @Test
     void shouldPopulateDetailsForRespondent1() {
-        StatementOfTruth respondent1StatementOfTruth = StatementOfTruth.builder().name("Respondent 1").build();
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder()
-            .respondent1DQStatementOfTruth(respondent1StatementOfTruth)
-            .build();
+        StatementOfTruth respondent1StatementOfTruth = new StatementOfTruth();
+        respondent1StatementOfTruth.setName("Respondent 1");
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQStatementOfTruth(respondent1StatementOfTruth);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .respondent1DQ(respondent1DQ)
             .respondent1ResponseDate(LocalDateTime.now())
             .build();
@@ -58,16 +59,17 @@ public class StatementOfTruthPopulatorTest {
 
     @Test
     void shouldPopulateDetailsForRespondent2() {
-        StatementOfTruth respondent2StatementOfTruth = StatementOfTruth.builder().name("Respondent 2").build();
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder()
-            .respondent1DQRequestedCourt(RequestedCourt.builder().build())
-            .build();
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder()
-            .respondent2DQRequestedCourt(RequestedCourt.builder().build())
-            .respondent2DQStatementOfTruth(respondent2StatementOfTruth)
-            .build();
+        StatementOfTruth respondent2StatementOfTruth = new StatementOfTruth();
+        respondent2StatementOfTruth.setName("Respondent 2");
+        RequestedCourt requestedCourt1 = new RequestedCourt();
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt1);
+        RequestedCourt requestedCourt2 = new RequestedCourt();
+        Respondent2DQ respondent2DQ = new Respondent2DQ();
+        respondent2DQ.setRespondent2DQRequestedCourt(requestedCourt2);
+        respondent2DQ.setRespondent2DQStatementOfTruth(respondent2StatementOfTruth);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .respondent1DQ(respondent1DQ)
             .respondent2DQ(respondent2DQ)
             .respondent2ResponseDate(LocalDateTime.now())
@@ -88,10 +90,14 @@ public class StatementOfTruthPopulatorTest {
 
     @Test
     void shouldHandleNoStatementOfTruthForRespondent1AndRespondent2() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder().build()).build();
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQRequestedCourt(RequestedCourt.builder().build()).build();
+        RequestedCourt requestedCourt1 = new RequestedCourt();
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt1);
+        RequestedCourt requestedCourt2 = new RequestedCourt();
+        Respondent2DQ respondent2DQ = new Respondent2DQ();
+        respondent2DQ.setRespondent2DQRequestedCourt(requestedCourt2);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .respondent1DQ(respondent1DQ)
             .respondent2DQ(respondent2DQ)
             .respondent1ResponseDate(LocalDateTime.now())
@@ -112,8 +118,10 @@ public class StatementOfTruthPopulatorTest {
 
     @Test
     void shouldHandleCarmFeatureToggleEnabled() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder().build()).build();
-        CaseData caseData = CaseData.builder()
+        RequestedCourt requestedCourt = new RequestedCourt();
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt);
+        CaseData caseData = CaseDataBuilder.builder()
             .respondent1DQ(respondent1DQ)
             .build();
 

@@ -45,7 +45,7 @@ class GetRespondentsForDQGeneratorTest {
             .respondent2SameLegalRepresentative(NO)
             .respondent2AcknowledgeNotificationDate(LocalDateTime.now())
             .respondent2ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
-            .businessProcess(BusinessProcess.builder().camundaEvent("CLAIMANT_RESPONSE").build())
+            .businessProcess(new BusinessProcess().setCamundaEvent("CLAIMANT_RESPONSE"))
             .build();
 
         List<Party> respondents = getRespondentsForDQGenerator.getRespondents(caseData, "ONE");

@@ -66,7 +66,8 @@ public class TrialReadyFormGenerator {
             default:
         }
 
-        return trialReadyDocument.toBuilder().ownedBy(userRole).build();
+        trialReadyDocument.setOwnedBy(userRole);
+        return trialReadyDocument;
     }
 
     private TrialReadyForm getTemplateData(CaseData caseData, String camundaActivity) {

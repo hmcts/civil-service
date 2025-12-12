@@ -342,12 +342,13 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
     }
 
     private SpecifiedParty getApplicant(Party applicant, CaseData caseData) {
+        var representative = representativeService.getApplicantRepresentative(caseData);
+        representative.setContactName(caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName());
+
         return SpecifiedParty.builder()
             .name(applicant.getPartyName())
             .primaryAddress(applicant.getPrimaryAddress())
-            .representative(representativeService.getApplicantRepresentative(caseData).toBuilder()
-                .contactName(caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName())
-                .build())
+            .representative(representative)
             .individualDateOfBirth(applicant.getIndividualDateOfBirth() != null
                 ? applicant.getIndividualDateOfBirth() : null)
             .build();

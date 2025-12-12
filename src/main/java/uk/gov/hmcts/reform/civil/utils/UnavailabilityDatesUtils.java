@@ -45,15 +45,11 @@ public class UnavailabilityDatesUtils {
                 respondent1DQUnavailableDates
             );
 
-            Party.PartyBuilder resp1 = caseData.getRespondent1().toBuilder()
-                .unavailableDates(updatedUnavailableDates);
-            caseData.setRespondent1(resp1.build());
+            caseData.getRespondent1().setUnavailableDates(updatedUnavailableDates);
             caseData.setRespondent1UnavailableDatesForTab(updatedUnavailableDates);
 
             if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
-                Party.PartyBuilder resp2 = caseData.getRespondent2().toBuilder()
-                    .unavailableDates(updatedUnavailableDates);
-                caseData.setRespondent2(resp2.build());
+                caseData.getRespondent2().setUnavailableDates(updatedUnavailableDates);
                 caseData.setRespondent2UnavailableDatesForTab(updatedUnavailableDates);
             }
         }
@@ -69,9 +65,7 @@ public class UnavailabilityDatesUtils {
                 respondent2DQUnavailableDates
             );
 
-            Party.PartyBuilder resp2 = caseData.getRespondent2().toBuilder()
-                .unavailableDates(updatedUnavailableDates);
-            caseData.setRespondent2(resp2.build());
+            caseData.getRespondent2().setUnavailableDates(updatedUnavailableDates);
             caseData.setRespondent2UnavailableDatesForTab(updatedUnavailableDates);
         }
     }
@@ -90,15 +84,11 @@ public class UnavailabilityDatesUtils {
                 applicant1DQUnavailableDates
             );
 
-            Party.PartyBuilder applicant1 = caseData.getApplicant1().toBuilder()
-                .unavailableDates(updatedUnavailableDates);
-            caseData.setApplicant1(applicant1.build());
+            caseData.getApplicant1().setUnavailableDates(updatedUnavailableDates);
             caseData.setApplicant1UnavailableDatesForTab(updatedUnavailableDates);
 
             if (caseData.getApplicant2() != null) {
-                Party.PartyBuilder applicant2 = caseData.getApplicant2().toBuilder()
-                    .unavailableDates(updatedUnavailableDates);
-                caseData.setApplicant2(applicant2.build());
+                caseData.getApplicant2().setUnavailableDates(updatedUnavailableDates);
                 caseData.setApplicant2UnavailableDatesForTab(updatedUnavailableDates);
             }
         }
@@ -154,9 +144,14 @@ public class UnavailabilityDatesUtils {
                                                                   List<Element<UnavailableDate>> unavailableDates) {
         List<Element<UnavailableDate>> updatedUnavailableDates = new ArrayList<>();
         for (Element<UnavailableDate> date : unavailableDates) {
-            updatedUnavailableDates.addAll(wrapElements(date.getValue().toBuilder()
-                                                            .dateAdded(dateAdded)
-                                                            .eventAdded(eventAdded).build()));
+            UnavailableDate updated = new UnavailableDate();
+            updated.setDate(date.getValue().getDate());
+            updated.setDateAdded(dateAdded);
+            updated.setEventAdded(eventAdded);
+            updated.setUnavailableDateType(date.getValue().getUnavailableDateType());
+            updated.setFromDate(date.getValue().getFromDate());
+            updated.setToDate(date.getValue().getToDate());
+            updatedUnavailableDates.addAll(wrapElements(updated));
         }
         return updatedUnavailableDates;
     }

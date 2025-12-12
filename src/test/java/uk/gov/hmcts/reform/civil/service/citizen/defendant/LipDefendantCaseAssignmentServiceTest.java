@@ -106,9 +106,8 @@ class LipDefendantCaseAssignmentServiceTest {
     @Test
     void shouldRemovePinPostDetails_whenLipVLipFlagIsEnabled() {
         //Given
-        DefendantPinToPostLRspec pinInPostData = DefendantPinToPostLRspec.builder()
-            .expiryDate(LocalDate.now().plusDays(180))
-            .build();
+        DefendantPinToPostLRspec pinInPostData = new DefendantPinToPostLRspec();
+        pinInPostData.setExpiryDate(LocalDate.now().plusDays(180));
         Map<String, Object> data = new HashMap<>();
         data.put("respondent1PinToPostLRspec", pinInPostData);
         given(featureToggleService.isLipVLipEnabled()).willReturn(true);
@@ -117,10 +116,7 @@ class LipDefendantCaseAssignmentServiceTest {
         given(defendantPinToPostLRspecService.removePinInPostData(any())).willReturn(data);
 
         CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
-            .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
-                                               .accessCode("TEST1234")
-                                               .expiryDate(LocalDate.now().plusDays(180))
-                                               .build())
+            .addRespondent1PinToPostLRspec(buildPin("TEST1234", LocalDate.now().plusDays(180)))
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
             .respondent1(Party.builder()
                              .flags(Flags.builder()
@@ -156,5 +152,12 @@ class LipDefendantCaseAssignmentServiceTest {
         //Then
         verify(userService).getUserDetails(AUTHORIZATION);
         verify(caseEventService).submitEventForClaim(refEq(params));
+    }
+
+    private DefendantPinToPostLRspec buildPin(String accessCode, LocalDate expiryDate) {
+        DefendantPinToPostLRspec pin = new DefendantPinToPostLRspec();
+        pin.setAccessCode(accessCode);
+        pin.setExpiryDate(expiryDate);
+        return pin;
     }
 }

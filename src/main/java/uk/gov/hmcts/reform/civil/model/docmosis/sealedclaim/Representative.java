@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.prd.model.DxAddress;
@@ -15,6 +18,8 @@ import static uk.gov.hmcts.reform.civil.model.Address.fromContactInformation;
 
 @Data
 @Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class Representative {
 
     private String contactName;

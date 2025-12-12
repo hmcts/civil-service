@@ -59,8 +59,7 @@ class RespondentTemplateForDQGeneratorTest {
             .atStateApplicantRespondToDefenceAndProceed()
             .build()
             .toBuilder()
-            .businessProcess(BusinessProcess.builder()
-                                 .camundaEvent("CLAIMANT_RESPONSE").build())
+            .businessProcess(new BusinessProcess().setCamundaEvent("CLAIMANT_RESPONSE"))
             .build();
 
         DirectionsQuestionnaireForm result =
@@ -83,8 +82,7 @@ class RespondentTemplateForDQGeneratorTest {
             .respondent2SameLegalRepresentative(YES)
             .build()
             .toBuilder()
-            .businessProcess(BusinessProcess.builder()
-                                 .camundaEvent("CLAIMANT_RESPONSE").build())
+            .businessProcess(new BusinessProcess().setCamundaEvent("CLAIMANT_RESPONSE"))
             .build();
 
         DirectionsQuestionnaireForm result =
@@ -107,8 +105,7 @@ class RespondentTemplateForDQGeneratorTest {
             .responseClaimTrack(FAST_CLAIM.name())
             .build()
             .toBuilder()
-            .businessProcess(BusinessProcess.builder()
-                                 .camundaEvent("CLAIMANT_RESPONSE").build())
+            .businessProcess(new BusinessProcess().setCamundaEvent("CLAIMANT_RESPONSE"))
             .build();
 
         DirectionsQuestionnaireForm result =

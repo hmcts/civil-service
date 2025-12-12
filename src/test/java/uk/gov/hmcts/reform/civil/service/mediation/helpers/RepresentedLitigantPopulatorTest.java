@@ -79,7 +79,7 @@ public class RepresentedLitigantPopulatorTest {
 
     @Test
     void shouldHandleNullableContactInformation() {
-        Organisation organisation = new Organisation();
+        Organisation organisation = Organisation.builder().build();
         OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
             .organisation(organisation)
             .build();
@@ -111,7 +111,7 @@ public class RepresentedLitigantPopulatorTest {
             .emailAddress("john.doe@example.com")
             .build();
 
-        Organisation organisation = new Organisation();
+        Organisation organisation = Organisation.builder().build();
         OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
             .organisation(organisation)
             .build();

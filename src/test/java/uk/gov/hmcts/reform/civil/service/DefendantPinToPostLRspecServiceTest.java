@@ -219,20 +219,20 @@ class DefendantPinToPostLRspecServiceTest {
         private CaseData createCaseDataWithPin(String accessCode, int daysToExpiry) {
             return new CaseDataBuilder().atStateClaimSubmitted()
                 .addRespondent1PinToPostLRspec(createPinToPost(accessCode, LocalDate.now().plusDays(daysToExpiry)))
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                 .build();
         }
 
         private CaseData createCaseDataWithExpiry(int daysToExpiry) {
             return new CaseDataBuilder().atStateClaimSubmitted()
-                .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().expiryDate(LocalDate.now().plusDays(daysToExpiry)).build())
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .addRespondent1PinToPostLRspec(createPinWithExpiry(LocalDate.now().plusDays(daysToExpiry)))
+                .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                 .build();
         }
 
         private CaseData createCaseData() {
             return new CaseDataBuilder().atStateClaimSubmitted()
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                 .build();
         }
 
@@ -241,11 +241,20 @@ class DefendantPinToPostLRspecServiceTest {
         }
 
         private DefendantPinToPostLRspec createPinInPostData(int daysToExpiry) {
-            return DefendantPinToPostLRspec.builder().expiryDate(LocalDate.now().plusDays(daysToExpiry)).build();
+            return createPinWithExpiry(LocalDate.now().plusDays(daysToExpiry));
         }
 
         private DefendantPinToPostLRspec createPinToPost(String accessCode, LocalDate expiryDate) {
-            return DefendantPinToPostLRspec.builder().accessCode(accessCode).expiryDate(expiryDate).build();
+            DefendantPinToPostLRspec pin = new DefendantPinToPostLRspec();
+            pin.setAccessCode(accessCode);
+            pin.setExpiryDate(expiryDate);
+            return pin;
+        }
+
+        private DefendantPinToPostLRspec createPinWithExpiry(LocalDate expiryDate) {
+            DefendantPinToPostLRspec pin = new DefendantPinToPostLRspec();
+            pin.setExpiryDate(expiryDate);
+            return pin;
         }
 
         private Response createResponse(int status) {
