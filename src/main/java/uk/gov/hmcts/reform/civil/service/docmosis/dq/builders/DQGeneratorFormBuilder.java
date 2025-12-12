@@ -379,12 +379,12 @@ public class DQGeneratorFormBuilder {
                 .map(FurtherInformation::getOtherInformationForJudge)
         ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(null);
 
-        return FurtherInformation.builder()
-            .futureApplications(wantMore)
-            .intentionToMakeFutureApplications(wantMore)
-            .reasonForFutureApplications(whatMoreFor)
-            .otherInformationForJudge(furtherJudgeInfo)
-            .build();
+        FurtherInformation furtherInformation = new FurtherInformation();
+        furtherInformation.setFutureApplications(wantMore);
+        furtherInformation.setIntentionToMakeFutureApplications(wantMore);
+        furtherInformation.setReasonForFutureApplications(whatMoreFor);
+        furtherInformation.setOtherInformationForJudge(furtherJudgeInfo);
+        return furtherInformation;
     }
 
     private Hearing getHearing(DQ dq) {

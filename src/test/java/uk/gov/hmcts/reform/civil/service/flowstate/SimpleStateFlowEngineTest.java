@@ -3824,16 +3824,15 @@ class SimpleStateFlowEngineTest {
 
         @Test
         void claimIssue_fullAdmitAndDivergentRespondGoOffline() {
-            CaseData caseData = CaseData.builder()
-                .caseAccessCategory(SPEC_CLAIM)
-                .applicant1(Party.builder().build())
-                .respondent1(Party.builder().build())
-                .respondent2(Party.builder().build())
-                .respondent2SameLegalRepresentative(YES)
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .respondentResponseIsSame(YES)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setApplicant1(new Party());
+            caseData.setRespondent1(new Party());
+            caseData.setRespondent2(new Party());
+            caseData.setRespondent2SameLegalRepresentative(YES);
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+            caseData.setRespondentResponseIsSame(YES);
             assertThat(FlowPredicate.fullAdmissionSpec.test(caseData))
                 .isTrue();
             assertThat(divergentRespondGoOfflineSpec.and(specClaim).test(caseData))
@@ -3842,105 +3841,104 @@ class SimpleStateFlowEngineTest {
 
         @Test
         void claim1v1_reachFullAdmitProceed() {
-            CaseData.CaseDataBuilder<?, ?> builder = claim1v1Submitted();
+            CaseData caseData = claim1v1Submitted();
 
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+            assertThat(stateFlowEngine.evaluate(caseData).getState().getName())
                 .isEqualTo(CLAIM_SUBMITTED.fullName());
 
-            payPBA(builder);
+            payPBA(caseData);
 
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+            assertThat(stateFlowEngine.evaluate(caseData).getState().getName())
                 .isEqualTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName());
 
-            issuedAndRepresented(builder);
+            issuedAndRepresented(caseData);
 
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+            assertThat(stateFlowEngine.evaluate(caseData).getState().getName())
                 .isEqualTo(PENDING_CLAIM_ISSUED.fullName());
 
-            issued(builder);
+            issued(caseData);
 
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+            assertThat(stateFlowEngine.evaluate(caseData).getState().getName())
                 .isEqualTo(CLAIM_ISSUED.fullName());
 
-            fullAdmit1v1(builder);
+            fullAdmit1v1(caseData);
 
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+            assertThat(stateFlowEngine.evaluate(caseData).getState().getName())
                 .isEqualTo(FULL_ADMISSION.fullName());
 
-            applicantProceeds1v1(builder);
+            applicantProceeds1v1(caseData);
 
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+            assertThat(stateFlowEngine.evaluate(caseData).getState().getName())
                 .isEqualTo(FULL_ADMIT_PROCEED.fullName());
         }
 
         @Test
         void claim1v1_reachFullAdmitNoProceed() {
-            CaseData.CaseDataBuilder<?, ?> builder = claim1v1Submitted();
+            CaseData caseData = claim1v1Submitted();
 
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+            assertThat(stateFlowEngine.evaluate(caseData).getState().getName())
                 .isEqualTo(CLAIM_SUBMITTED.fullName());
 
-            payPBA(builder);
+            payPBA(caseData);
 
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+            assertThat(stateFlowEngine.evaluate(caseData).getState().getName())
                 .isEqualTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName());
 
-            issuedAndRepresented(builder);
+            issuedAndRepresented(caseData);
 
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+            assertThat(stateFlowEngine.evaluate(caseData).getState().getName())
                 .isEqualTo(PENDING_CLAIM_ISSUED.fullName());
 
-            issued(builder);
+            issued(caseData);
 
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+            assertThat(stateFlowEngine.evaluate(caseData).getState().getName())
                 .isEqualTo(CLAIM_ISSUED.fullName());
 
-            fullAdmit1v1(builder);
+            fullAdmit1v1(caseData);
 
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+            assertThat(stateFlowEngine.evaluate(caseData).getState().getName())
                 .isEqualTo(FULL_ADMISSION.fullName());
 
-            applicantDoesntProceed1v1(builder);
+            applicantDoesntProceed1v1(caseData);
 
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
+            assertThat(stateFlowEngine.evaluate(caseData).getState().getName())
                 .isEqualTo(FULL_ADMIT_NOT_PROCEED.fullName());
         }
 
-        private CaseData.CaseDataBuilder<?, ?> claim1v1Submitted() {
-            return CaseData.builder()
-                .caseAccessCategory(SPEC_CLAIM)
-                .applicant1(Party.builder().build())
-                .respondent1(Party.builder().build())
-                .submittedDate(LocalDateTime.now());
+        private CaseData claim1v1Submitted() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setApplicant1(new Party());
+            caseData.setRespondent1(new Party());
+            caseData.setSubmittedDate(LocalDateTime.now());
+            return caseData;
         }
 
-        private void payPBA(CaseData.CaseDataBuilder<?, ?> builder) {
-            builder.paymentSuccessfulDate(LocalDateTime.now());
+        private void payPBA(CaseData caseData) {
+            caseData.setPaymentSuccessfulDate(LocalDateTime.now());
         }
 
-        private void issuedAndRepresented(CaseData.CaseDataBuilder<?, ?> builder) {
-            builder
-                .issueDate(LocalDate.now())
-                .respondent1Represented(YesOrNo.YES)
-                .respondent1OrgRegistered(YesOrNo.YES);
+        private void issuedAndRepresented(CaseData caseData) {
+            caseData.setIssueDate(LocalDate.now());
+            caseData.setRespondent1Represented(YesOrNo.YES);
+            caseData.setRespondent1OrgRegistered(YesOrNo.YES);
         }
 
-        private void issued(CaseData.CaseDataBuilder<?, ?> builder) {
-            builder
-                .claimNotificationDeadline(LocalDateTime.now().plusDays(14));
+        private void issued(CaseData caseData) {
+            caseData.setClaimNotificationDeadline(LocalDateTime.now().plusDays(14));
         }
 
-        private void fullAdmit1v1(CaseData.CaseDataBuilder<?, ?> builder) {
-            builder.respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        private void fullAdmit1v1(CaseData caseData) {
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
         }
 
-        private void applicantProceeds1v1(CaseData.CaseDataBuilder<?, ?> builder) {
-            builder.applicant1ProceedWithClaim(YES);
+        private void applicantProceeds1v1(CaseData caseData) {
+            caseData.setApplicant1ProceedWithClaim(YES);
         }
 
-        private void applicantDoesntProceed1v1(CaseData.CaseDataBuilder<?, ?> builder) {
-            builder.applicant1ProceedWithClaim(NO);
+        private void applicantDoesntProceed1v1(CaseData caseData) {
+            caseData.setApplicant1ProceedWithClaim(NO);
         }
     }
 
@@ -3950,24 +3948,17 @@ class SimpleStateFlowEngineTest {
         @Test
         void fullDefenceNoMediationSpec() {
             // Given
-            CaseData caseData = CaseData.builder()
-                // spec claim
-                .caseAccessCategory(SPEC_CLAIM)
-                // claim submitted
-                .submittedDate(LocalDateTime.now())
-                .respondent1Represented(YES)
-                // payment successful
-                .paymentSuccessfulDate(LocalDateTime.now())
-                // pending claim issued
-                .issueDate(LocalDate.now())
-                .respondent1OrgRegistered(YES)
-                // claim issued
-                .claimNotificationDeadline(LocalDateTime.now())
-                // full defence
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .claimNotificationDate(LocalDateTime.now())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setSubmittedDate(LocalDateTime.now());
+            caseData.setRespondent1Represented(YES);
+            caseData.setPaymentSuccessfulDate(LocalDateTime.now());
+            caseData.setIssueDate(LocalDate.now());
+            caseData.setRespondent1OrgRegistered(YES);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now());
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+            caseData.setClaimNotificationDate(LocalDateTime.now());
 
             // When
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
@@ -3985,27 +3976,19 @@ class SimpleStateFlowEngineTest {
         @Test
         void fullDefencePartialMediationSpec() {
             // Given
-            CaseData caseData = CaseData.builder()
-                // spec claim
-                .caseAccessCategory(SPEC_CLAIM)
-                // claim submitted
-                .submittedDate(LocalDateTime.now())
-                .respondent1Represented(YES)
-                // payment successful
-                .paymentSuccessfulDate(LocalDateTime.now())
-                // pending claim issued
-                .issueDate(LocalDate.now())
-                .respondent1OrgRegistered(YES)
-                // claim issued
-                .claimNotificationDeadline(LocalDateTime.now())
-                // full defence
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .claimNotificationDate(LocalDateTime.now())
-                // defendant agrees to mediation
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .responseClaimMediationSpecRequired(YES)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setSubmittedDate(LocalDateTime.now());
+            caseData.setRespondent1Represented(YES);
+            caseData.setPaymentSuccessfulDate(LocalDateTime.now());
+            caseData.setIssueDate(LocalDate.now());
+            caseData.setRespondent1OrgRegistered(YES);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now());
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+            caseData.setClaimNotificationDate(LocalDateTime.now());
+            caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
+            caseData.setResponseClaimMediationSpecRequired(YES);
 
             // When
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
@@ -4014,9 +3997,7 @@ class SimpleStateFlowEngineTest {
             assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
 
             caseData.setApplicant1ProceedWithClaim(YES);
-            SmallClaimMedicalLRspec smallClaimMedicalLRspec = SmallClaimMedicalLRspec.builder()
-                .hasAgreedFreeMediation(NO)
-                .build();
+            SmallClaimMedicalLRspec smallClaimMedicalLRspec = new SmallClaimMedicalLRspec(NO);
             caseData.setApplicant1ClaimMediationSpecRequired(smallClaimMedicalLRspec);
             StateFlow newState = stateFlowEngine.evaluate(caseData);
 
@@ -4027,29 +4008,21 @@ class SimpleStateFlowEngineTest {
         @Test
         void fullDefenceAllMediationSpec() {
             // Given
-            CaseData caseData = CaseData.builder()
-                // spec claim
-                .caseAccessCategory(SPEC_CLAIM)
-                // claim submitted
-                .submittedDate(LocalDateTime.now())
-                .respondent1Represented(YES)
-                // payment successful
-                .paymentSuccessfulDate(LocalDateTime.now())
-                // pending claim issued
-                .issueDate(LocalDate.now())
-                .respondent1OrgRegistered(YES)
-                // claim issued
-                .claimNotificationDeadline(LocalDateTime.now())
-                // full defence
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .claimNotificationDate(LocalDateTime.now())
-                // defendant agrees to mediation
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .responseClaimMediationSpecRequired(YES)
-                .applicant1ClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
-                                                          .hasAgreedFreeMediation(YES).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setSubmittedDate(LocalDateTime.now());
+            caseData.setRespondent1Represented(YES);
+            caseData.setPaymentSuccessfulDate(LocalDateTime.now());
+            caseData.setIssueDate(LocalDate.now());
+            caseData.setRespondent1OrgRegistered(YES);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now());
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+            caseData.setClaimNotificationDate(LocalDateTime.now());
+            caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
+            caseData.setResponseClaimMediationSpecRequired(YES);
+            SmallClaimMedicalLRspec mediationSpec = new SmallClaimMedicalLRspec(YES);
+            caseData.setApplicant1ClaimMediationSpecRequired(mediationSpec);
 
             // When
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
@@ -4058,9 +4031,7 @@ class SimpleStateFlowEngineTest {
             assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
 
             caseData.setApplicant1ProceedWithClaim(YES);
-            SmallClaimMedicalLRspec smallClaimMedicalLRspec = SmallClaimMedicalLRspec.builder()
-                .hasAgreedFreeMediation(YES)
-                .build();
+            SmallClaimMedicalLRspec smallClaimMedicalLRspec = new SmallClaimMedicalLRspec(YES);
             caseData.setApplicant1ClaimMediationSpecRequired(smallClaimMedicalLRspec);
             StateFlow newState = stateFlowEngine.evaluate(caseData);
 
@@ -4112,32 +4083,25 @@ class SimpleStateFlowEngineTest {
         @Test
         void partAdmitInMediationSpec() {
             // Given
-            CaseData caseData = CaseData.builder()
-                // spec claim
-                .caseAccessCategory(SPEC_CLAIM)
-                // claim submitted
-                .submittedDate(LocalDateTime.now())
-                .respondent1Represented(YES)
-                // payment successful
-                .paymentSuccessfulDate(LocalDateTime.now())
-                // pending claim issued
-                .issueDate(LocalDate.now())
-                .respondent1OrgRegistered(YES)
-                // claim issued
-                .claimNotificationDeadline(LocalDateTime.now())
-                // part admit
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .claimNotificationDate(LocalDateTime.now())
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .responseClaimMediationSpecRequired(YES)
-                .applicant1PartAdmitConfirmAmountPaidSpec(NO)
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .applicant1ClaimMediationSpecRequiredLip(
-                                     ClaimantMediationLip.builder()
-                                         .hasAgreedFreeMediation(MediationDecision.Yes)
-                                         .build()).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setSubmittedDate(LocalDateTime.now());
+            caseData.setRespondent1Represented(YES);
+            caseData.setPaymentSuccessfulDate(LocalDateTime.now());
+            caseData.setIssueDate(LocalDate.now());
+            caseData.setRespondent1OrgRegistered(YES);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now());
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+            caseData.setClaimNotificationDate(LocalDateTime.now());
+            caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
+            caseData.setResponseClaimMediationSpecRequired(YES);
+            caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(NO);
+            ClaimantMediationLip claimantMediationLip = new ClaimantMediationLip();
+            claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.Yes);
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip);
+            caseData.setCaseDataLiP(caseDataLiP);
 
             // When
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
@@ -4149,32 +4113,25 @@ class SimpleStateFlowEngineTest {
         @Test
         void partAdmitPartMediationSpec() {
             // Given
-            CaseData caseData = CaseData.builder()
-                // spec claim
-                .caseAccessCategory(SPEC_CLAIM)
-                // claim submitted
-                .submittedDate(LocalDateTime.now())
-                .respondent1Represented(YES)
-                // payment successful
-                .paymentSuccessfulDate(LocalDateTime.now())
-                // pending claim issued
-                .issueDate(LocalDate.now())
-                .respondent1OrgRegistered(YES)
-                // claim issued
-                .claimNotificationDeadline(LocalDateTime.now())
-                // part admit
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .claimNotificationDate(LocalDateTime.now())
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .responseClaimMediationSpecRequired(YES)
-                .applicant1PartAdmitConfirmAmountPaidSpec(NO)
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .applicant1ClaimMediationSpecRequiredLip(
-                                     ClaimantMediationLip.builder()
-                                         .hasAgreedFreeMediation(MediationDecision.No)
-                                         .build()).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setSubmittedDate(LocalDateTime.now());
+            caseData.setRespondent1Represented(YES);
+            caseData.setPaymentSuccessfulDate(LocalDateTime.now());
+            caseData.setIssueDate(LocalDate.now());
+            caseData.setRespondent1OrgRegistered(YES);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now());
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+            caseData.setClaimNotificationDate(LocalDateTime.now());
+            caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
+            caseData.setResponseClaimMediationSpecRequired(YES);
+            caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(NO);
+            ClaimantMediationLip claimantMediationLip = new ClaimantMediationLip();
+            claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.No);
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip);
+            caseData.setCaseDataLiP(caseDataLiP);
 
             // When
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
@@ -4185,27 +4142,20 @@ class SimpleStateFlowEngineTest {
 
         @Test
         void partAdmitNoMediationSpec() {
-            CaseData caseData = CaseData.builder()
-                // spec claim
-                .caseAccessCategory(SPEC_CLAIM)
-                // claim submitted
-                .submittedDate(LocalDateTime.now())
-                .respondent1Represented(YES)
-                // payment successful
-                .paymentSuccessfulDate(LocalDateTime.now())
-                // pending claim issued
-                .issueDate(LocalDate.now())
-                .respondent1OrgRegistered(YES)
-                // claim issued
-                .claimNotificationDeadline(LocalDateTime.now())
-                // part admit
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .claimNotificationDate(LocalDateTime.now())
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .responseClaimMediationSpecRequired(NO)
-                .applicant1PartAdmitConfirmAmountPaidSpec(NO)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setSubmittedDate(LocalDateTime.now());
+            caseData.setRespondent1Represented(YES);
+            caseData.setPaymentSuccessfulDate(LocalDateTime.now());
+            caseData.setIssueDate(LocalDate.now());
+            caseData.setRespondent1OrgRegistered(YES);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now());
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+            caseData.setClaimNotificationDate(LocalDateTime.now());
+            caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
+            caseData.setResponseClaimMediationSpecRequired(NO);
+            caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(NO);
 
             // When
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
@@ -4219,30 +4169,23 @@ class SimpleStateFlowEngineTest {
     class FromPartAdmitNotSettledNoMediation {
         @Test
         void partAdmitNoMediationSpec() {
-            CaseData caseData = CaseData.builder()
-                // spec claim
-                .caseAccessCategory(SPEC_CLAIM)
-                // claim submitted
-                .submittedDate(LocalDateTime.now())
-                .respondent1Represented(YES)
-                // payment successful
-                .paymentSuccessfulDate(LocalDateTime.now())
-                // pending claim issued
-                .issueDate(LocalDate.now())
-                .respondent1OrgRegistered(YES)
-                // claim issued
-                .claimNotificationDeadline(LocalDateTime.now())
-                // part admit
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .claimNotificationDate(LocalDateTime.now())
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .responseClaimMediationSpecRequired(NO)
-                .applicant1PartAdmitConfirmAmountPaidSpec(NO)
-                .reasonNotSuitableSDO(new ReasonNotSuitableSDO("test"))
-                .takenOfflineDate(LocalDateTime.now())
-                .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setSubmittedDate(LocalDateTime.now());
+            caseData.setRespondent1Represented(YES);
+            caseData.setPaymentSuccessfulDate(LocalDateTime.now());
+            caseData.setIssueDate(LocalDate.now());
+            caseData.setRespondent1OrgRegistered(YES);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now());
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+            caseData.setClaimNotificationDate(LocalDateTime.now());
+            caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
+            caseData.setResponseClaimMediationSpecRequired(NO);
+            caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(NO);
+            caseData.setReasonNotSuitableSDO(new ReasonNotSuitableSDO("test"));
+            caseData.setTakenOfflineDate(LocalDateTime.now());
+            caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
 
             // When
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
@@ -4290,27 +4233,24 @@ class SimpleStateFlowEngineTest {
         @Test
         void shouldReturnInHearingReadiness_whenTransitionedFromFullDefenseProceed() {
             // Given
-            CaseData caseData = CaseData.builder()
-                .caseAccessCategory(SPEC_CLAIM)
-                .submittedDate(LocalDateTime.now())
-                .respondent1Represented(YES)
-                .paymentSuccessfulDate(LocalDateTime.now())
-                .issueDate(LocalDate.now())
-                .respondent1OrgRegistered(YES)
-                .claimNotificationDeadline(LocalDateTime.now())
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .claimNotificationDate(LocalDateTime.now())
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .responseClaimMediationSpecRequired(YES)
-                .applicant1ProceedWithClaim(YES)
-                .applicant1ClaimMediationSpecRequired(
-                    SmallClaimMedicalLRspec.builder()
-                        .hasAgreedFreeMediation(NO)
-                        .build())
-                .hearingReferenceNumber("10101010")
-                .listingOrRelisting(ListingOrRelisting.LISTING)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setSubmittedDate(LocalDateTime.now());
+            caseData.setRespondent1Represented(YES);
+            caseData.setPaymentSuccessfulDate(LocalDateTime.now());
+            caseData.setIssueDate(LocalDate.now());
+            caseData.setRespondent1OrgRegistered(YES);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now());
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+            caseData.setClaimNotificationDate(LocalDateTime.now());
+            caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
+            caseData.setResponseClaimMediationSpecRequired(YES);
+            caseData.setApplicant1ProceedWithClaim(YES);
+            SmallClaimMedicalLRspec mediationSpec = new SmallClaimMedicalLRspec(NO);
+            caseData.setApplicant1ClaimMediationSpecRequired(mediationSpec);
+            caseData.setHearingReferenceNumber("10101010");
+            caseData.setListingOrRelisting(ListingOrRelisting.LISTING);
 
             // When
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -4332,29 +4272,22 @@ class SimpleStateFlowEngineTest {
 
         @Test
         void shouldReturnInHearingReadiness_whenTransitionedFromPartAdmitNotSettledNoMediation() {
-            CaseData caseData = CaseData.builder()
-                // spec claim
-                .caseAccessCategory(SPEC_CLAIM)
-                // claim submitted
-                .submittedDate(LocalDateTime.now())
-                .respondent1Represented(YES)
-                // payment successful
-                .paymentSuccessfulDate(LocalDateTime.now())
-                // pending claim issued
-                .issueDate(LocalDate.now())
-                .respondent1OrgRegistered(YES)
-                // claim issued
-                .claimNotificationDeadline(LocalDateTime.now())
-                // part admit
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .claimNotificationDate(LocalDateTime.now())
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .responseClaimMediationSpecRequired(NO)
-                .applicant1PartAdmitConfirmAmountPaidSpec(NO)
-                .hearingReferenceNumber("10101010")
-                .listingOrRelisting(ListingOrRelisting.LISTING)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setSubmittedDate(LocalDateTime.now());
+            caseData.setRespondent1Represented(YES);
+            caseData.setPaymentSuccessfulDate(LocalDateTime.now());
+            caseData.setIssueDate(LocalDate.now());
+            caseData.setRespondent1OrgRegistered(YES);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now());
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+            caseData.setClaimNotificationDate(LocalDateTime.now());
+            caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
+            caseData.setResponseClaimMediationSpecRequired(NO);
+            caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(NO);
+            caseData.setHearingReferenceNumber("10101010");
+            caseData.setListingOrRelisting(ListingOrRelisting.LISTING);
 
             // When
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
@@ -4722,9 +4655,8 @@ class SimpleStateFlowEngineTest {
         @Test
         void shouldReturnProceedsInHeritageSystem_whenFullDefenceDefendantNotPaid() {
             // Given
-            DefendantPinToPostLRspec respondent1PinToPostLRspec = DefendantPinToPostLRspec.builder()
-                .accessCode("TEST")
-                .build();
+            DefendantPinToPostLRspec respondent1PinToPostLRspec = new DefendantPinToPostLRspec();
+            respondent1PinToPostLRspec.setAccessCode("TEST");
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued1v1UnrepresentedDefendant()
                 .applicant1Represented(NO)
@@ -4761,31 +4693,27 @@ class SimpleStateFlowEngineTest {
     class FromPartAdmitRepaymentAgreed {
         @Test
         void partAdmitRepaymentAgreedSpec() {
-            CaseData caseData = CaseData.builder()
-                // spec claim
-                .caseAccessCategory(SPEC_CLAIM)
-                // claim submitted
-                .submittedDate(LocalDateTime.now())
-                .respondent1Represented(YES)
-                // payment successful
-                .paymentSuccessfulDate(LocalDateTime.now())
-                // pending claim issued
-                .issueDate(LocalDate.now())
-                .respondent1OrgRegistered(YES)
-                // claim issued
-                .claimNotificationDeadline(LocalDateTime.now())
-                // part admit
-                .respondent1ResponseDate(LocalDateTime.now())
-                .caseDataLiP(CaseDataLiP.builder().respondentSignSettlementAgreement(YES)
-                    .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.No).build())
-                    .build())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .claimNotificationDate(LocalDateTime.now())
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .applicant1PartAdmitConfirmAmountPaidSpec(YES)
-                .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
-                .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setSubmittedDate(LocalDateTime.now());
+            caseData.setRespondent1Represented(YES);
+            caseData.setPaymentSuccessfulDate(LocalDateTime.now());
+            caseData.setIssueDate(LocalDate.now());
+            caseData.setRespondent1OrgRegistered(YES);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now());
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            ClaimantMediationLip claimantMediationLip = new ClaimantMediationLip();
+            claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.No);
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setRespondentSignSettlementAgreement(YES);
+            caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip);
+            caseData.setCaseDataLiP(caseDataLiP);
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+            caseData.setClaimNotificationDate(LocalDateTime.now());
+            caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
+            caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(YES);
+            caseData.setCcdState(CaseState.All_FINAL_ORDERS_ISSUED);
+            caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YES);
 
             // When
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
@@ -4797,12 +4725,10 @@ class SimpleStateFlowEngineTest {
         @Test
         void shouldReturnProceedsInHeritageSystem_whenPartAdmitRepaymentAcceptedWithCCJ() {
             // Given
-            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-                .ccjPaymentPaidSomeOption(YES)
-                .build();
-            DefendantPinToPostLRspec respondent1PinToPostLRspec = DefendantPinToPostLRspec.builder()
-                .accessCode("TEST")
-                .build();
+            CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
+            ccjPaymentDetails.setCcjPaymentPaidSomeOption(YES);
+            DefendantPinToPostLRspec respondent1PinToPostLRspec = new DefendantPinToPostLRspec();
+            respondent1PinToPostLRspec.setAccessCode("TEST");
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued1v1UnrepresentedDefendant()
                 .applicant1Represented(NO)
@@ -4840,29 +4766,26 @@ class SimpleStateFlowEngineTest {
     class FromFullAdmitRepaymentAgreed {
         @Test
         void fullAdmitRepaymentAgreedSpec() {
-            CaseData caseData = CaseData.builder()
-                // spec claim
-                .caseAccessCategory(SPEC_CLAIM)
-                .submittedDate(LocalDateTime.now())
-                .respondent1Represented(YES)
-                // payment successful
-                .paymentSuccessfulDate(LocalDateTime.now())
-                // pending claim issued
-                .issueDate(LocalDate.now())
-                .respondent1OrgRegistered(YES)
-                // claim issued
-                .claimNotificationDeadline(LocalDateTime.now())
-                // part admit
-                .respondent1ResponseDate(LocalDateTime.now())
-                .caseDataLiP(CaseDataLiP.builder().respondentSignSettlementAgreement(YES)
-                    .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.No).build())
-                    .build())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .claimNotificationDate(LocalDateTime.now())
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-                .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
-                .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            caseData.setSubmittedDate(LocalDateTime.now());
+            caseData.setRespondent1Represented(YES);
+            caseData.setPaymentSuccessfulDate(LocalDateTime.now());
+            caseData.setIssueDate(LocalDate.now());
+            caseData.setRespondent1OrgRegistered(YES);
+            caseData.setClaimNotificationDeadline(LocalDateTime.now());
+            caseData.setRespondent1ResponseDate(LocalDateTime.now());
+            ClaimantMediationLip claimantMediationLip = new ClaimantMediationLip();
+            claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.No);
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setRespondentSignSettlementAgreement(YES);
+            caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip);
+            caseData.setCaseDataLiP(caseDataLiP);
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+            caseData.setClaimNotificationDate(LocalDateTime.now());
+            caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
+            caseData.setCcdState(CaseState.All_FINAL_ORDERS_ISSUED);
+            caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YES);
 
             // When
             StateFlow fullState = stateFlowEngine.evaluate(caseData);
@@ -4874,15 +4797,13 @@ class SimpleStateFlowEngineTest {
         @Test
         void shouldReturnProceedsInHeritageSystemState_whenFullAdmitRepaymentAcceptedWithCCJ() {
             // Given
-            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-                .ccjPaymentPaidSomeOption(YES)
-                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(600.0))
-                .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
-                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
-                .build();
-            DefendantPinToPostLRspec respondent1PinToPostLRspec = DefendantPinToPostLRspec.builder()
-                .accessCode("TEST")
-                .build();
+            CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
+            ccjPaymentDetails.setCcjPaymentPaidSomeOption(YES);
+            ccjPaymentDetails.setCcjPaymentPaidSomeAmount(BigDecimal.valueOf(600.0));
+            ccjPaymentDetails.setCcjJudgmentLipInterest(BigDecimal.valueOf(300));
+            ccjPaymentDetails.setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(0));
+            DefendantPinToPostLRspec respondent1PinToPostLRspec = new DefendantPinToPostLRspec();
+            respondent1PinToPostLRspec.setAccessCode("TEST");
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued1v1UnrepresentedDefendant()
                 .applicant1Represented(NO)
@@ -4928,14 +4849,15 @@ class SimpleStateFlowEngineTest {
                 .applicant1Represented(NO)
                 .respondent1Represented(YES)
                 .build();
-            caseData.setRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode("Temp").build());
+            DefendantPinToPostLRspec tempPin = new DefendantPinToPostLRspec();
+            tempPin.setAccessCode("Temp");
+            caseData.setRespondent1PinToPostLRspec(tempPin);
             caseData.setPaymentSuccessfulDate(null);
             caseData.setClaimIssuedPaymentDetails(null);
-            ChangeOfRepresentation changeOfRepresentation = ChangeOfRepresentation.builder()
-                .caseRole("RESPONDENTSOLICITORONE")
-                .timestamp(LocalDateTime.now())
-                .organisationToAddID("HA160")
-                .build();
+            ChangeOfRepresentation changeOfRepresentation = new ChangeOfRepresentation();
+            changeOfRepresentation.setCaseRole("RESPONDENTSOLICITORONE");
+            changeOfRepresentation.setTimestamp(LocalDateTime.now());
+            changeOfRepresentation.setOrganisationToAddID("HA160");
             caseData.setChangeOfRepresentation(changeOfRepresentation);
             HelpWithFees helpWithFees = new HelpWithFees();
             helpWithFees.setHelpWithFeesReferenceNumber("Test");
@@ -4973,15 +4895,16 @@ class SimpleStateFlowEngineTest {
                 .applicant1Represented(NO)
                 .respondent1Represented(YES)
                 .build();
-            caseData.setRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode("Temp").build());
+            DefendantPinToPostLRspec tempPin = new DefendantPinToPostLRspec();
+            tempPin.setAccessCode("Temp");
+            caseData.setRespondent1PinToPostLRspec(tempPin);
             caseData.setTakenOfflineDate(LocalDateTime.now());
             caseData.setPaymentSuccessfulDate(null);
             caseData.setClaimIssuedPaymentDetails(null);
-            ChangeOfRepresentation changeOfRepresentation = ChangeOfRepresentation.builder()
-                .caseRole("RESPONDENTSOLICITORONE")
-                .timestamp(LocalDateTime.now())
-                .organisationToAddID("HA160")
-                .build();
+            ChangeOfRepresentation changeOfRepresentation = new ChangeOfRepresentation();
+            changeOfRepresentation.setCaseRole("RESPONDENTSOLICITORONE");
+            changeOfRepresentation.setTimestamp(LocalDateTime.now());
+            changeOfRepresentation.setOrganisationToAddID("HA160");
             caseData.setChangeOfRepresentation(changeOfRepresentation);
             HelpWithFees helpWithFees = new HelpWithFees();
             helpWithFees.setHelpWithFeesReferenceNumber("Test");
@@ -5014,14 +4937,15 @@ class SimpleStateFlowEngineTest {
                 .applicant1Represented(NO)
                 .respondent1Represented(YES)
                 .build();
-            caseData.setRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode("Temp").build());
+            DefendantPinToPostLRspec tempPin = new DefendantPinToPostLRspec();
+            tempPin.setAccessCode("Temp");
+            caseData.setRespondent1PinToPostLRspec(tempPin);
             caseData.setPaymentSuccessfulDate(null);
             caseData.setClaimIssuedPaymentDetails(null);
-            ChangeOfRepresentation changeOfRepresentation = ChangeOfRepresentation.builder()
-                .caseRole("RESPONDENTSOLICITORONE")
-                .timestamp(LocalDateTime.now())
-                .organisationToAddID("HA160")
-                .build();
+            ChangeOfRepresentation changeOfRepresentation = new ChangeOfRepresentation();
+            changeOfRepresentation.setCaseRole("RESPONDENTSOLICITORONE");
+            changeOfRepresentation.setTimestamp(LocalDateTime.now());
+            changeOfRepresentation.setOrganisationToAddID("HA160");
             caseData.setChangeOfRepresentation(changeOfRepresentation);
             HelpWithFees helpWithFees = new HelpWithFees();
             helpWithFees.setHelpWithFeesReferenceNumber("Test");
@@ -5054,7 +4978,9 @@ class SimpleStateFlowEngineTest {
                 .applicant1Represented(NO)
                 .respondent1Represented(YES)
                 .build();
-            caseData.setRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode("Temp").build());
+            DefendantPinToPostLRspec tempPin = new DefendantPinToPostLRspec();
+            tempPin.setAccessCode("Temp");
+            caseData.setRespondent1PinToPostLRspec(tempPin);
             caseData.setPaymentSuccessfulDate(null);
             caseData.setClaimIssuedPaymentDetails(null);
             HelpWithFees helpWithFees = new HelpWithFees();
@@ -5102,7 +5028,9 @@ class SimpleStateFlowEngineTest {
                 .applicant1Represented(NO)
                 .respondent1Represented(YES)
                 .build();
-            caseData.setRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode("Temp").build());
+            DefendantPinToPostLRspec tempPin = new DefendantPinToPostLRspec();
+            tempPin.setAccessCode("Temp");
+            caseData.setRespondent1PinToPostLRspec(tempPin);
             caseData.setPaymentSuccessfulDate(null);
             caseData.setClaimIssuedPaymentDetails(null);
             HelpWithFees helpWithFees = new HelpWithFees();
@@ -5133,7 +5061,9 @@ class SimpleStateFlowEngineTest {
                 .applicant1Represented(NO)
                 .respondent1Represented(YES)
                 .build();
-            caseData.setRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode("Temp").build());
+            DefendantPinToPostLRspec tempPin = new DefendantPinToPostLRspec();
+            tempPin.setAccessCode("Temp");
+            caseData.setRespondent1PinToPostLRspec(tempPin);
             caseData.setPaymentSuccessfulDate(null);
             caseData.setClaimIssuedPaymentDetails(null);
             HelpWithFees helpWithFees = new HelpWithFees();
@@ -5164,7 +5094,9 @@ class SimpleStateFlowEngineTest {
                 .applicant1Represented(NO)
                 .respondent1Represented(YES)
                 .build();
-            caseData.setRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode("Temp").build());
+            DefendantPinToPostLRspec tempPin = new DefendantPinToPostLRspec();
+            tempPin.setAccessCode("Temp");
+            caseData.setRespondent1PinToPostLRspec(tempPin);
             caseData.setPaymentSuccessfulDate(null);
             caseData.setClaimIssuedPaymentDetails(null);
             HelpWithFees helpWithFees = new HelpWithFees();

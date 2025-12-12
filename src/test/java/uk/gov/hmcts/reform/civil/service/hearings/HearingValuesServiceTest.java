@@ -131,11 +131,16 @@ public class HearingValuesServiceTest {
 
     @Test
     void shouldReturnExpectedHearingValuesWhenCaseDataIsReturned() throws Exception {
+        WelshLanguageRequirements applicant1WelshLang = new WelshLanguageRequirements();
+        applicant1WelshLang.setCourt(Language.ENGLISH);
+        Applicant1DQ applicant1DQ = new Applicant1DQ();
+        applicant1DQ.setApplicant1DQLanguage(applicant1WelshLang);
+        WelshLanguageRequirements respondent1WelshLang = new WelshLanguageRequirements();
+        respondent1WelshLang.setCourt(Language.WELSH);
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQLanguage(respondent1WelshLang);
+
         Long caseId = 1L;
-        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .caseReference(caseId)
@@ -349,23 +354,28 @@ public class HearingValuesServiceTest {
 
     @Test
     void shouldNotTriggerEventIfPartyIdCaseFlagsUnavailableDatesExistsForApplicant1() throws Exception {
+        WelshLanguageRequirements applicant1WelshLang = new WelshLanguageRequirements();
+        applicant1WelshLang.setCourt(Language.ENGLISH);
+        UnavailableDate unavailableDate1 = new UnavailableDate();
+        unavailableDate1.setUnavailableDateType(SINGLE_DATE);
+        unavailableDate1.setDate(LocalDate.of(2023, 10, 20));
+        Hearing applicant1Hearing = new Hearing();
+        applicant1Hearing.setUnavailableDates(wrapElements(List.of(unavailableDate1)));
+        Applicant1DQ applicant1DQ = new Applicant1DQ();
+        applicant1DQ.setApplicant1DQLanguage(applicant1WelshLang);
+        applicant1DQ.setApplicant1DQHearing(applicant1Hearing);
+        WelshLanguageRequirements respondent1WelshLang = new WelshLanguageRequirements();
+        respondent1WelshLang.setCourt(Language.WELSH);
+        UnavailableDate unavailableDate2 = new UnavailableDate();
+        unavailableDate2.setUnavailableDateType(SINGLE_DATE);
+        unavailableDate2.setDate(LocalDate.of(2023, 10, 20));
+        Hearing respondent1Hearing = new Hearing();
+        respondent1Hearing.setUnavailableDates(wrapElements(List.of(unavailableDate2)));
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQLanguage(respondent1WelshLang);
+        respondent1DQ.setRespondent1DQHearing(respondent1Hearing);
+
         Long caseId = 1L;
-        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build())
-            .applicant1DQHearing(Hearing.builder()
-                                     .unavailableDates(wrapElements(List.of(UnavailableDate.builder()
-                                                                                .unavailableDateType(SINGLE_DATE)
-                                                                                .date(LocalDate.of(2023, 10, 20))
-                                                                                .build()))).build())
-            .build();
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.WELSH).build())
-            .respondent1DQHearing(Hearing.builder()
-                                     .unavailableDates(wrapElements(List.of(UnavailableDate.builder()
-                                                                                .unavailableDateType(SINGLE_DATE)
-                                                                                .date(LocalDate.of(2023, 10, 20))
-                                                                                .build()))).build())
-            .build();
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .caseReference(caseId)
@@ -401,10 +411,14 @@ public class HearingValuesServiceTest {
     @SneakyThrows
     @Test
     void shouldThrowFeinExceptionIfCaseDataServiceThrowsException() {
-        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
+        WelshLanguageRequirements applicant1WelshLang = new WelshLanguageRequirements();
+        applicant1WelshLang.setCourt(Language.ENGLISH);
+        Applicant1DQ applicant1DQ = new Applicant1DQ();
+        applicant1DQ.setApplicant1DQLanguage(applicant1WelshLang);
+        WelshLanguageRequirements respondent1WelshLang = new WelshLanguageRequirements();
+        respondent1WelshLang.setCourt(Language.WELSH);
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQLanguage(respondent1WelshLang);
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .applicant1(PartyBuilder.builder().individual().build())
@@ -469,13 +483,19 @@ public class HearingValuesServiceTest {
 
     @Nested
     class EarlyAdopter {
-        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
+        Applicant1DQ applicant1DQ;
+        Respondent1DQ respondent1DQ;
 
         @BeforeEach
         void setup() {
+            WelshLanguageRequirements applicant1WelshLang = new WelshLanguageRequirements();
+            applicant1WelshLang.setCourt(Language.ENGLISH);
+            applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQLanguage(applicant1WelshLang);
+            WelshLanguageRequirements respondent1WelshLang = new WelshLanguageRequirements();
+            respondent1WelshLang.setCourt(Language.WELSH);
+            respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQLanguage(respondent1WelshLang);
             when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
                 .thenReturn(Optional.of(Organisation.builder()
                                             .name(APPLICANT_LR_ORG_NAME)

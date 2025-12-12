@@ -179,28 +179,32 @@ class FlowPredicateTest {
 
         @Test
         void shouldReturnTrue_whenCaseDataAtStateClaimAcknowledgedRespondent1Extension1v2() {
-            CaseData caseData =
-                CaseDataBuilder.builder().atStateNotificationAcknowledgedRespondent1TimeExtension()
-                    .respondent2(Party.builder().partyName("Respondent2").build())
-                    .respondent2SameLegalRepresentative(NO)
-                    .build();
+            Party respondent2 = new Party();
+            respondent2.setPartyName("Respondent2");
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedRespondent1TimeExtension()
+                .respondent2(respondent2)
+                .respondent2SameLegalRepresentative(NO)
+                .build();
             assertTrue(notificationAcknowledged.and(respondentTimeExtension).test(caseData));
         }
 
         @Test
         void shouldReturnTrue_whenCaseDataAtStateClaimAcknowledgedRespondent2Extension1v2() {
-            CaseData caseData =
-                CaseDataBuilder.builder().atStateNotificationAcknowledgedRespondent2TimeExtension()
-                    .respondent2(Party.builder().partyName("Respondent2").build())
-                    .respondent2SameLegalRepresentative(NO)
-                    .build();
+            Party respondent2 = new Party();
+            respondent2.setPartyName("Respondent2");
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedRespondent2TimeExtension()
+                .respondent2(respondent2)
+                .respondent2SameLegalRepresentative(NO)
+                .build();
             assertTrue(notificationAcknowledged.and(respondentTimeExtension).test(caseData));
         }
 
         @Test
         void shouldReturnFalse_whenCaseDataAtStateClaimDetailsNotified1v2() {
+            Party respondent2 = new Party();
+            respondent2.setPartyName("Respondent2");
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .respondent2(Party.builder().partyName("Respondent2").build())
+                .respondent2(respondent2)
                 .respondent2SameLegalRepresentative(NO)
                 .build();
             assertFalse(notificationAcknowledged.and(respondentTimeExtension).test(caseData));
@@ -337,7 +341,9 @@ class FlowPredicateTest {
                         .atStateRespondentFullDefenceAfterNotifyClaimDetails().build();
                     caseData.setRespondent1ClaimResponseType(FULL_DEFENCE);
                     caseData.setRespondent2ClaimResponseType(FULL_DEFENCE);
-                    caseData.setRespondent2(Party.builder().partyName("Respondent2").build());
+                    Party respondent2 = new Party();
+                    respondent2.setPartyName("Respondent2");
+                    caseData.setRespondent2(respondent2);
                     caseData.setRespondent2SameLegalRepresentative(YES);
                     caseData.setAddApplicant2(null);
 
@@ -350,7 +356,9 @@ class FlowPredicateTest {
                         .atStateRespondentFullDefenceAfterNotifyClaimDetails().build();
                     caseData.setRespondent1ClaimResponseType(COUNTER_CLAIM);
                     caseData.setRespondent2ClaimResponseType(PART_ADMISSION);
-                    caseData.setRespondent2(Party.builder().partyName("Respondent2").build());
+                    Party respondent2 = new Party();
+                    respondent2.setPartyName("Respondent2");
+                    caseData.setRespondent2(respondent2);
                     caseData.setRespondent2SameLegalRepresentative(YES);
                     caseData.setAddApplicant2(null);
 
@@ -363,7 +371,9 @@ class FlowPredicateTest {
                         .atStateRespondentFullDefenceAfterNotifyClaimDetails().build();
                     caseData.setRespondent1ClaimResponseType(FULL_DEFENCE);
                     caseData.setRespondent2ClaimResponseType(FULL_ADMISSION);
-                    caseData.setRespondent2(Party.builder().partyName("Respondent2").build());
+                    Party respondent2 = new Party();
+                    respondent2.setPartyName("Respondent2");
+                    caseData.setRespondent2(respondent2);
                     caseData.setRespondent2SameLegalRepresentative(YES);
                     caseData.setAddApplicant2(null);
 
@@ -376,7 +386,9 @@ class FlowPredicateTest {
                         .atStateRespondentFullDefenceAfterNotifyClaimDetails().build();
                     caseData.setRespondent1ClaimResponseType(FULL_DEFENCE);
                     caseData.setRespondent2ClaimResponseType(FULL_DEFENCE);
-                    caseData.setRespondent2(Party.builder().partyName("Respondent2").build());
+                    Party respondent2 = new Party();
+                    respondent2.setPartyName("Respondent2");
+                    caseData.setRespondent2(respondent2);
                     caseData.setRespondent2SameLegalRepresentative(NO);
                     caseData.setAddApplicant2(null);
 
@@ -389,7 +401,9 @@ class FlowPredicateTest {
                         .atStateRespondentFullDefenceAfterNotifyClaimDetails().build();
                     caseData.setRespondent1ClaimResponseType(COUNTER_CLAIM);
                     caseData.setRespondent2ClaimResponseType(PART_ADMISSION);
-                    caseData.setRespondent2(Party.builder().partyName("Respondent2").build());
+                    Party respondent2 = new Party();
+                    respondent2.setPartyName("Respondent2");
+                    caseData.setRespondent2(respondent2);
                     caseData.setRespondent2SameLegalRepresentative(NO);
                     caseData.setAddApplicant2(null);
 
@@ -402,7 +416,9 @@ class FlowPredicateTest {
                         .atStateRespondentFullDefenceAfterNotifyClaimDetails().build();
                     caseData.setRespondent1ClaimResponseType(FULL_DEFENCE);
                     caseData.setRespondent2ClaimResponseType(FULL_ADMISSION);
-                    caseData.setRespondent2(Party.builder().partyName("Respondent2").build());
+                    Party respondent2 = new Party();
+                    respondent2.setPartyName("Respondent2");
+                    caseData.setRespondent2(respondent2);
                     caseData.setRespondent2SameLegalRepresentative(NO);
                     caseData.setRespondent2ResponseDate(LocalDateTime.now().minusDays(1));
                     caseData.setAddApplicant2(null);
@@ -531,7 +547,7 @@ class FlowPredicateTest {
 
                 @Test
                 void shouldReturnFalse_whenPredicateDivergentRespondWithDQAndGoOffline_default() {
-                    CaseData caseData = CaseData.builder().build();
+                    CaseData caseData = CaseDataBuilder.builder().build();
                     assertFalse(divergentRespondWithDQAndGoOfflineSpec.test(caseData));
                 }
 
@@ -543,16 +559,15 @@ class FlowPredicateTest {
 
             @Test
             void shouldReturnTrue_whenDefendantResponse() {
-                CaseData caseData = CaseData.builder()
-                    .respondent1ClaimResponseType(RespondentResponseType.COUNTER_CLAIM)
-                    .respondent1ResponseDate(LocalDateTime.now())
-                    .build();
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setRespondent1ClaimResponseType(RespondentResponseType.COUNTER_CLAIM);
+                caseData.setRespondent1ResponseDate(LocalDateTime.now());
                 assertTrue(counterClaim.test(caseData));
             }
 
             @Test
             void shouldReturnFalse_whenNoDefendantResponse() {
-                CaseData caseData = CaseData.builder().build();
+                CaseData caseData = CaseDataBuilder.builder().build();
                 assertFalse(counterClaim.test(caseData));
             }
 
@@ -759,8 +774,10 @@ class FlowPredicateTest {
 
             @Test
             void shouldReturnTrue_whenCaseDataAtStateTakenOfflineAfterClaimDetailsNotified1v2SameSolicitor() {
+                Party respondent2 = new Party();
+                respondent2.setPartyName("Respondent 2");
                 CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaffAfterClaimDetailsNotified()
-                    .respondent2(Party.builder().partyName("Respondent 2").build())
+                    .respondent2(respondent2)
                     .respondent2SameLegalRepresentative(YES)
                     .build();
                 assertTrue(takenOfflineByStaffAfterClaimDetailsNotified.test(caseData));
@@ -1203,7 +1220,7 @@ class FlowPredicateTest {
 
                     @Test
                     void shouldReturnFalse_whenPredicateDivergentRespondGoOffline_default() {
-                        CaseData caseData = CaseData.builder().build();
+                        CaseData caseData = CaseDataBuilder.builder().build();
                         assertFalse(divergentRespondGoOfflineSpec.test(caseData));
                     }
 
@@ -1229,7 +1246,7 @@ class FlowPredicateTest {
 
                     @Test
                     void shouldReturnFalse_whenPredicateDivergentRespondWithDQAndGoOffline_default() {
-                        CaseData caseData = CaseData.builder().build();
+                        CaseData caseData = CaseDataBuilder.builder().build();
                         assertFalse(divergentRespondWithDQAndGoOfflineSpec.test(caseData));
                     }
 
@@ -1468,15 +1485,15 @@ class FlowPredicateTest {
 
             @Test
             void shouldReturnFalse_whenShowOneVOneResponseFlagExist() {
-                CaseData caseData = CaseData.builder().build();
+                CaseData caseData = CaseDataBuilder.builder().build();
 
                 assertFalse(isOneVOneResponseFlagSpec.test(caseData));
             }
 
             @Test
             void shouldReturnTrue_whenShowOneVOneResponseFlagNotExist() {
-                CaseData caseData = CaseData.builder()
-                    .showResponseOneVOneFlag(ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE).build();
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setShowResponseOneVOneFlag(ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE);
 
                 assertTrue(isOneVOneResponseFlagSpec.test(caseData));
             }
@@ -1484,20 +1501,18 @@ class FlowPredicateTest {
 
         @Test
         public void isInHearingReadiness_whenHearingNoticeSubmitted() {
-            CaseData caseData = CaseData.builder()
-                .hearingReferenceNumber("11111")
-                .listingOrRelisting(ListingOrRelisting.LISTING)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setHearingReferenceNumber("11111");
+            caseData.setListingOrRelisting(ListingOrRelisting.LISTING);
 
             assertTrue(isInHearingReadiness.test(caseData));
         }
 
         @Test
         public void isNotInHearingReadiness_whenHearingNoticeSubmitted() {
-            CaseData caseData = CaseData.builder()
-                .hearingReferenceNumber("11111")
-                .listingOrRelisting(ListingOrRelisting.RELISTING)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setHearingReferenceNumber("11111");
+            caseData.setListingOrRelisting(ListingOrRelisting.RELISTING);
 
             assertFalse(isInHearingReadiness.test(caseData));
         }
@@ -1511,29 +1526,28 @@ class FlowPredicateTest {
 
         @Test
         void onlyInitialRespondentResponseLangIsBilingual() {
-            CaseData caseData = CaseData.builder()
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                             .respondent1ResponseLanguage(Language.WELSH.toString())
-                                                             .build())
-                                 .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            RespondentLiPResponse response = new RespondentLiPResponse();
+            response.setRespondent1ResponseLanguage(Language.WELSH.toString());
+            caseDataLiP.setRespondent1LiPResponse(response);
+            caseData.setCaseDataLiP(caseDataLiP);
 
             assertTrue(onlyInitialRespondentResponseLangIsBilingual.test(caseData));
         }
 
         @Test
         void onlyInitialRespondentResponseLangIsBilingual_false() {
-            CaseData caseData = CaseData.builder()
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                             .respondent1ResponseLanguage(Language.WELSH.toString())
-                                                             .build())
-                                 .build())
-                .changeLanguagePreference(ChangeLanguagePreference.builder()
-                                              .userType(DEFENDANT)
-                                              .preferredLanguage(ENGLISH_AND_WELSH).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            RespondentLiPResponse response = new RespondentLiPResponse();
+            response.setRespondent1ResponseLanguage(Language.WELSH.toString());
+            caseDataLiP.setRespondent1LiPResponse(response);
+            caseData.setCaseDataLiP(caseDataLiP);
+            ChangeLanguagePreference clp = new ChangeLanguagePreference();
+            clp.setUserType(DEFENDANT);
+            clp.setPreferredLanguage(ENGLISH_AND_WELSH);
+            caseData.setChangeLanguagePreference(clp);
 
             assertFalse(onlyInitialRespondentResponseLangIsBilingual.test(caseData));
         }
