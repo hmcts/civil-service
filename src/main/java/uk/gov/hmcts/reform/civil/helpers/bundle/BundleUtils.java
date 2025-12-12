@@ -27,14 +27,17 @@ public class BundleUtils {
         String formattedTitle;
         if (StringUtils.isBlank(strParam)) {
             formattedTitle = String.format(fileName, formatLocalDate);
+            log.info("formatLocalDate 111- {} and date {}", formattedTitle, formatLocalDate);
         } else if (StringUtils.isBlank(strParam2)) {
             formattedTitle =  String.format(fileName, strParam, formatLocalDate);
+            log.info("formatLocalDate 222- {} and date {}", formattedTitle, formatLocalDate);
         } else {
             formattedTitle =  String.format(fileName, strParam, strParam2, formatLocalDate);
+            log.info("formatLocalDate 333- {} and date {}", formattedTitle, formatLocalDate);
         }
 
         if (formattedTitle.length() > MAX_DOC_TITLE_LENGTH) {
-            log.warn("Truncating generated doc name to 255 chars: {}", formattedTitle);
+            log.info("Truncating generated doc name to 255 chars: {}", formattedTitle);
             formattedTitle = formattedTitle.substring(0, MAX_DOC_TITLE_LENGTH);
         }
         log.info("document filename {} formatted title: {}", fileName, formattedTitle);
