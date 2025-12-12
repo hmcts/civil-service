@@ -10,23 +10,6 @@ public non-sealed interface NotificationPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Notification",
-        summary = "Time extension granted before acknowledgement",
-        description = "A defendant has obtained a time extension to respond and has not acknowledged service (claim details)"
-    )
-    Predicate<CaseData> notifiedTimeExtension =
-        CaseDataPredicate.Respondent.hasTimeExtensionRespondent1
-            .and(CaseDataPredicate.Respondent.hasAcknowledgedNotificationRespondent1.negate());
-
-    @BusinessRule(
-        group = "Notification",
-        summary = "Claim details notify option is 'Both'",
-        description = "Claim details notification option was set to 'Both' in the defendant notification options"
-    )
-    Predicate<CaseData> hasNotifyOptionsBoth =
-        CaseDataPredicate.ClaimDetails.isNotifyOptionsBoth;
-
-    @BusinessRule(
-        group = "Notification",
         summary = "Claim notification completed - options both/unspecified",
         description = "Claim notification date exists and defendant notify options are either not set or set to 'Both'"
     )

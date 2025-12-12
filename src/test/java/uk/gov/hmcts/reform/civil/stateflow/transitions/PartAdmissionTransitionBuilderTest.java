@@ -454,29 +454,6 @@ class PartAdmissionTransitionBuilderTest {
     }
 
     @Test
-    void shouldReturnFalse_UnspecFastClaim() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atState2v1Applicant1NotProceedApplicant2Proceeds()
-            .build().toBuilder()
-            .responseClaimTrack(FAST_CLAIM.name())
-            .build();
-
-        assertFalse(ClaimPredicate.isSpec.and(ClaimPredicate.isSmall).test(caseData));
-    }
-
-    @Test
-    void shouldReturnTrue_SpecSmallClaim() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atState2v1Applicant1NotProceedApplicant2Proceeds()
-            .setClaimTypeToSpecClaim()
-            .build().toBuilder()
-            .responseClaimTrack(SMALL_CLAIM.name())
-            .build();
-
-        assertTrue(ClaimPredicate.isSpec.and(ClaimPredicate.isSmall).test(caseData));
-    }
-
-    @Test
     void shouldReturnFalse_whenCarmNotEnabledOnLipClaim() {
         CaseData caseData = CaseDataBuilder.builder()
             .atState2v1Applicant1NotProceedApplicant2Proceeds()
