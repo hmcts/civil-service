@@ -33,6 +33,6 @@ public class CvpJoinLinkSchedulerHandler extends BaseExternalTaskHandler {
                 log.error("Publishing 'CvpJoinLinkEvent' event for case id: '{}' failed", caseDetails.getId(), e);
             }
         });
-        return ExternalTaskData.builder().build();
+        return new ExternalTaskData();
     }
 }

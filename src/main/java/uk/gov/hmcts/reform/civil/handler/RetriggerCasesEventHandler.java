@@ -66,7 +66,7 @@ public class RetriggerCasesEventHandler extends BaseExternalTaskHandler {
                 log.error("ERROR Retrigger CaseId: {}. Case data: {},  {}", caseId, caseData, e.getMessage(), e);
             }
         }
-        return ExternalTaskData.builder().build();
+        return new ExternalTaskData();
     }
 
     private Map<String, Object> getCaseData(ExternalTask externalTask) {
@@ -108,7 +108,7 @@ public class RetriggerCasesEventHandler extends BaseExternalTaskHandler {
             ? mapper.convertValue(data.get("finalOrderDocumentCollection"), listType)
             : new ArrayList<>();
 
-        finalOrderDocumentCollection.add(Element.<CaseDocument>builder().id(UUID.randomUUID()).value(document).build());
+        finalOrderDocumentCollection.add(new Element<CaseDocument>().setId(UUID.randomUUID()).setValue(document));
 
         Map<String, Object> updatedData = new HashMap<>();
 

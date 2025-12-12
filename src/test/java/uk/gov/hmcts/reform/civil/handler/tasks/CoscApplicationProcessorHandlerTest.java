@@ -14,6 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.CoscApplicationProcessorEvent;
 import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.search.CoscApplicationSearchService;
 
 import java.util.Map;
@@ -59,7 +60,7 @@ class CoscApplicationProcessorHandlerTest {
     void shouldInteractWithSearchServiceAndPublishEvent_whenCasesFound() {
         long caseId = 1L;
         Map<String, Object> data = Map.of("data", "some data");
-        Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
+        Set<CaseDetails> caseDetails = Set.of(new CaseDetailsBuilder().id(caseId).data(data).build());
 
         when(searchService.getCases()).thenReturn(caseDetails);
 

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 @Builder(toBuilder = true)
 @lombok.NoArgsConstructor
 @lombok.AllArgsConstructor
+@Accessors(chain = true)
 public class BusinessProcess {
 
     private String processInstanceId;

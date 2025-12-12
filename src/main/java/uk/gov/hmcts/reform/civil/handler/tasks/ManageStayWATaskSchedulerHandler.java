@@ -39,6 +39,6 @@ public class ManageStayWATaskSchedulerHandler extends BaseExternalTaskHandler {
                 );
             }
         });
-        return ExternalTaskData.builder().build();
+        return new ExternalTaskData();
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.event.FullAdmitPayImmediatelyNoPaymentFromDefendantEvent;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.search.FullAdmitPayImmediatelyNoPaymentFromDefendantSearchService;
 
@@ -64,7 +65,7 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantHandlerTest {
     @Test
     void shouldMarkCaseAsProcessedAndPublishEventForEachResult() {
         long caseId = 1234567890123456L;
-        Set<CaseDetails> cases = Set.of(CaseDetails.builder().id(caseId).build());
+        Set<CaseDetails> cases = Set.of(new CaseDetailsBuilder().id(caseId).build());
         when(caseSearchService.getCases()).thenReturn(cases);
 
         handler.handleTask(externalTask);
@@ -87,8 +88,8 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantHandlerTest {
         long successfulCaseId = 2222222222222222L;
 
         LinkedHashSet<CaseDetails> cases = new LinkedHashSet<>();
-        cases.add(CaseDetails.builder().id(failingCaseId).build());
-        cases.add(CaseDetails.builder().id(successfulCaseId).build());
+        cases.add(new CaseDetailsBuilder().id(failingCaseId).build());
+        cases.add(new CaseDetailsBuilder().id(successfulCaseId).build());
         when(caseSearchService.getCases()).thenReturn(cases);
 
         doAnswer(invocation -> {

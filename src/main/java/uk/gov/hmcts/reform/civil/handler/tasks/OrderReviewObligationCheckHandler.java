@@ -50,6 +50,6 @@ public class OrderReviewObligationCheckHandler extends BaseExternalTaskHandler {
                 log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
             }
         });
-        return ExternalTaskData.builder().build();
+        return new ExternalTaskData();
     }
 }

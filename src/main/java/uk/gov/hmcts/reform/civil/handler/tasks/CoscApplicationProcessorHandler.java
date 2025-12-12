@@ -32,6 +32,6 @@ public class CoscApplicationProcessorHandler extends BaseExternalTaskHandler {
                 log.error("COSC Application Processor Job failed to process case with id: '{}'", caseDetails.getId(), e);
             }
         });
-        return ExternalTaskData.builder().build();
+        return new ExternalTaskData();
     }
 }

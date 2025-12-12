@@ -15,6 +15,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.EventEmitterService;
 import uk.gov.hmcts.reform.civil.service.search.CaseReadyBusinessProcessSearchService;
 
@@ -60,11 +61,11 @@ class PollingEventEmitterHandlerTest {
 
     @BeforeEach
     void init() {
-        caseDetails1 = CaseDetails.builder().id(1L).data(
+        caseDetails1 = new CaseDetailsBuilder().id(1L).data(
             Map.of("businessProcess", businessProcessWithCamundaEvent("TEST_EVENT1"))).build();
-        caseDetails2 = CaseDetails.builder().id(2L).data(
+        caseDetails2 = new CaseDetailsBuilder().id(2L).data(
             Map.of("businessProcess", businessProcessWithCamundaEvent("TEST_EVENT2"))).build();
-        caseDetails3 = CaseDetails.builder().id(3L).data(
+        caseDetails3 = new CaseDetailsBuilder().id(3L).data(
             Map.of("businessProcess", businessProcessWithCamundaEvent("TEST_EVENT3"))).build();
         when(searchService.getCases()).thenReturn(Set.of(caseDetails1, caseDetails2, caseDetails3));
         ReflectionTestUtils.setField(pollingEventEmitterHandler, "multiCasesExecutionDelayInSeconds", 1L);
@@ -128,11 +129,10 @@ class PollingEventEmitterHandlerTest {
     }
 
     private BusinessProcess businessProcessWithCamundaEvent(String camundaEvent) {
-        return BusinessProcess.builder()
-            .activityId("testActivityId")
-            .processInstanceId("testInstanceId")
-            .camundaEvent(camundaEvent)
-            .status(READY)
-            .build();
+        return new BusinessProcess()
+            .setActivityId("testActivityId")
+            .setProcessInstanceId("testInstanceId")
+            .setCamundaEvent(camundaEvent)
+            .setStatus(READY);
     }
 }

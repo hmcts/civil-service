@@ -54,6 +54,6 @@ public class RetriggerUpdateLocationDataHandler extends BaseExternalTaskHandler 
                           caseId, epimsId, e.getMessage(), e);
             }
         }
-        return ExternalTaskData.builder().build();
+        return new ExternalTaskData();
     }
 }
