@@ -21,9 +21,9 @@ public class BundleUtils {
     }
 
     public static String generateDocName(String fileName, String strParam, String strParam2, LocalDate date) {
-        log.info("Local date - {}" , date);
+        log.info("Local date - {}", date);
         String formatLocalDate = DateFormatHelper.formatLocalDate(date, DATE_FORMAT);
-        log.info("formatLocalDate - {}" , formatLocalDate);
+        log.info("formatLocalDate - {}", formatLocalDate);
         String formattedTitle;
         if (StringUtils.isBlank(strParam)) {
             formattedTitle = String.format(fileName, formatLocalDate);
