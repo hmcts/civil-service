@@ -21,13 +21,16 @@ public class BundleUtils {
     }
 
     public static String generateDocName(String fileName, String strParam, String strParam2, LocalDate date) {
+        log.info("Local date - {}" , date);
+        String formatLocalDate = DateFormatHelper.formatLocalDate(date, DATE_FORMAT);
+        log.info("formatLocalDate - {}" , formatLocalDate);
         String formattedTitle;
         if (StringUtils.isBlank(strParam)) {
-            formattedTitle = String.format(fileName, DateFormatHelper.formatLocalDate(date, DATE_FORMAT));
+            formattedTitle = String.format(fileName, formatLocalDate);
         } else if (StringUtils.isBlank(strParam2)) {
-            formattedTitle =  String.format(fileName, strParam, DateFormatHelper.formatLocalDate(date, DATE_FORMAT));
+            formattedTitle =  String.format(fileName, strParam, formatLocalDate);
         } else {
-            formattedTitle =  String.format(fileName, strParam, strParam2, DateFormatHelper.formatLocalDate(date, DATE_FORMAT));
+            formattedTitle =  String.format(fileName, strParam, strParam2, formatLocalDate);
         }
 
         if (formattedTitle.length() > MAX_DOC_TITLE_LENGTH) {
