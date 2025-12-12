@@ -33,7 +33,8 @@ public class NotificationAcknowledgedTransitionBuilder extends MidTransitionBuil
     @Override
     void setUpTransitions(List<Transition> transitions) {
         this.moveTo(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION, transitions)
-            .onlyWhen(ResponsePredicate.notificationAcknowledged.and(ResponsePredicate.respondentTimeExtension), transitions)
+            .onlyWhen(ResponsePredicate.notificationAcknowledged
+                .and(ResponsePredicate.respondentTimeExtension), transitions)
 
             .moveTo(ALL_RESPONSES_RECEIVED, transitions)
             .onlyWhen(ResponsePredicate.notificationAcknowledged.and(not(ResponsePredicate.respondentTimeExtension))

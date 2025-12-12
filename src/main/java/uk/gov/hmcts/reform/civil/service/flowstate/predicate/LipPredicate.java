@@ -87,7 +87,8 @@ public non-sealed interface LipPredicate extends CaseDataPredicate {
     @BusinessRule(
         group = "Lip",
         summary = "Certificate of service enabled",
-        description = "True when at least one litigant-in-person (LiP) defendant is flagged as 'at claim issued' (either `defendant1LIPAtClaimIssued` or `defendant2LIPAtClaimIssued` = Yes)."
+        description = "True when at least one litigant-in-person (LiP) defendant is flagged as 'at claim issued' (either " +
+            "`defendant1LIPAtClaimIssued` or `defendant2LIPAtClaimIssued` = Yes)."
     )
     Predicate<CaseData> certificateOfServiceEnabled = CaseDataPredicate.Lip.isClaimIssued;
 

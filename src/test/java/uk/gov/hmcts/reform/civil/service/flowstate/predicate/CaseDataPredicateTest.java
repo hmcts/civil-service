@@ -10,9 +10,9 @@ import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
+import uk.gov.hmcts.reform.civil.model.Mediation;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -21,8 +21,14 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
+import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.MediationLiPCarm;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
+import uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,6 +37,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
@@ -487,38 +494,6 @@ class CaseDataPredicateTest {
         }
 
         @Test
-        void should_return_true_for_hasOneVOneResponseFlag_when_present() {
-            when(caseData.getShowResponseOneVOneFlag()).thenReturn(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY);
-            assertTrue(CaseDataPredicate.Claim.hasOneVOneResponseFlag.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_hasOneVOneResponseFlag_when_absent() {
-            when(caseData.getShowResponseOneVOneFlag()).thenReturn(null);
-            assertFalse(CaseDataPredicate.Claim.hasOneVOneResponseFlag.test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_isType_factory_when_matches() {
-            when(caseData.getShowResponseOneVOneFlag()).thenReturn(ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE);
-            assertTrue(CaseDataPredicate.Claim.isType(ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE).test(caseData));
-        }
-
-        @Test
-        void should_return_true_for_isType_factory_when_matches_part_admit_pay_immediately() {
-            when(caseData.getShowResponseOneVOneFlag()).thenReturn(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY);
-            assertTrue(CaseDataPredicate.Claim
-                .isType(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
-                .test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isType_factory_when_different() {
-            when(caseData.getShowResponseOneVOneFlag()).thenReturn(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY);
-            assertFalse(CaseDataPredicate.Claim.isType(ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE).test(caseData));
-        }
-
-        @Test
         void should_return_true_for_hasNotifyOptions_when_present() {
             DynamicList list = new DynamicList(DynamicListElement.EMPTY, List.of());
             when(caseData.getDefendantSolicitorNotifyClaimOptions()).thenReturn(list);
@@ -794,16 +769,16 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_isByAdmission_when_active_judgment_by_admission() {
-            uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails jd = new JudgmentDetails();
-            jd.setType(uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType.JUDGMENT_BY_ADMISSION);
+            JudgmentDetails jd = new JudgmentDetails();
+            jd.setType(JudgmentType.JUDGMENT_BY_ADMISSION);
             when(caseData.getActiveJudgment()).thenReturn(jd);
             assertTrue(CaseDataPredicate.Judgment.isByAdmission.test(caseData));
         }
 
         @Test
         void should_return_false_for_isByAdmission_when_no_active_judgment() {
-            uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails jd = new JudgmentDetails();
-            jd.setType(uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType.DEFAULT_JUDGMENT);
+            JudgmentDetails jd = new JudgmentDetails();
+            jd.setType(JudgmentType.DEFAULT_JUDGMENT);
             when(caseData.getActiveJudgment()).thenReturn(jd);
             assertFalse(CaseDataPredicate.Judgment.isByAdmission.test(caseData));
         }
@@ -852,17 +827,6 @@ class CaseDataPredicateTest {
             assertFalse(CaseDataPredicate.MultiParty.isOneVTwoTwoLegalRep.test(caseData));
         }
 
-        @Test
-        void should_return_true_for_isTwoVOne_when_AddApplicant2_yes() {
-            when(caseData.getAddApplicant2()).thenReturn(YesOrNo.YES);
-            assertTrue(CaseDataPredicate.MultiParty.isTwoVOne.test(caseData));
-        }
-
-        @Test
-        void should_return_false_for_isTwoVOne_when_AddApplicant2_no() {
-            when(caseData.getAddApplicant2()).thenReturn(YesOrNo.NO);
-            assertFalse(CaseDataPredicate.MultiParty.isTwoVOne.test(caseData));
-        }
     }
 
     @Nested
@@ -1076,7 +1040,7 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_hasRespondent2_when_present() {
-            when(caseData.getRespondent2()).thenReturn(uk.gov.hmcts.reform.civil.model.Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
             assertTrue(CaseDataPredicate.Respondent.hasRespondent2.test(caseData));
         }
 
@@ -1513,7 +1477,7 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_claimIssuedPaymentSucceeded_when_status_success() {
-            uk.gov.hmcts.reform.civil.model.PaymentDetails pd = uk.gov.hmcts.reform.civil.model.PaymentDetails.builder()
+            PaymentDetails pd = PaymentDetails.builder()
                 .status(PaymentStatus.SUCCESS)
                 .build();
             when(caseData.getClaimIssuedPaymentDetails()).thenReturn(pd);
@@ -1528,7 +1492,7 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_false_for_claimIssuedPaymentSucceeded_when_payment_status_not_success() {
-            uk.gov.hmcts.reform.civil.model.PaymentDetails pd = PaymentDetails.builder()
+            PaymentDetails pd = PaymentDetails.builder()
                 .status(PaymentStatus.FAILED)
                 .build();
             when(caseData.getClaimIssuedPaymentDetails()).thenReturn(pd);
@@ -1561,7 +1525,7 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_paymentDetailsFailed_when_status_failed() {
-            uk.gov.hmcts.reform.civil.model.PaymentDetails pd = PaymentDetails.builder()
+            PaymentDetails pd = PaymentDetails.builder()
                 .status(PaymentStatus.FAILED)
                 .build();
             when(caseData.getPaymentDetails()).thenReturn(pd);
@@ -1570,7 +1534,7 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_claimIssuedPaymentFailed_when_status_failed() {
-            uk.gov.hmcts.reform.civil.model.PaymentDetails pd = PaymentDetails.builder()
+            PaymentDetails pd = PaymentDetails.builder()
                 .status(PaymentStatus.FAILED)
                 .build();
             when(caseData.getClaimIssuedPaymentDetails()).thenReturn(pd);
@@ -1579,7 +1543,7 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_false_for_paymentDetailsFailed_when_status_success() {
-            uk.gov.hmcts.reform.civil.model.PaymentDetails pd = PaymentDetails.builder()
+            PaymentDetails pd = PaymentDetails.builder()
                 .status(PaymentStatus.SUCCESS)
                 .build();
             when(caseData.getPaymentDetails()).thenReturn(pd);
@@ -1594,7 +1558,7 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_false_for_claimIssuedPaymentFailed_when_status_success() {
-            uk.gov.hmcts.reform.civil.model.PaymentDetails pd = PaymentDetails.builder()
+            PaymentDetails pd = PaymentDetails.builder()
                 .status(PaymentStatus.SUCCESS)
                 .build();
             when(caseData.getClaimIssuedPaymentDetails()).thenReturn(pd);
@@ -1605,6 +1569,203 @@ class CaseDataPredicateTest {
         void should_return_false_for_claimIssuedPaymentFailed_when_details_null() {
             when(caseData.getClaimIssuedPaymentDetails()).thenReturn(null);
             assertFalse(CaseDataPredicate.Payment.claimIssuedPaymentFailed.test(caseData));
+        }
+    }
+
+    @Nested
+    class MediationCases {
+
+        @Test
+        void should_return_true_for_isNotRequiredApplicantMPSpec_when_hasAgreedFreeMediation_is_no() {
+            when(caseData.getApplicantMPClaimMediationSpecRequired())
+                .thenReturn(SmallClaimMedicalLRspec.builder().hasAgreedFreeMediation(YesOrNo.NO).build());
+            assertTrue(CaseDataPredicate.Mediation.isNotRequiredApplicantMPSpec.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_isNotRequiredApplicantMPSpec_when_null_or_yes() {
+            when(caseData.getApplicantMPClaimMediationSpecRequired()).thenReturn(null);
+            assertFalse(CaseDataPredicate.Mediation.isNotRequiredApplicantMPSpec.test(caseData));
+
+            when(caseData.getApplicantMPClaimMediationSpecRequired())
+                .thenReturn(SmallClaimMedicalLRspec.builder().hasAgreedFreeMediation(YesOrNo.YES).build());
+            assertFalse(CaseDataPredicate.Mediation.isNotRequiredApplicantMPSpec.test(caseData));
+        }
+
+        @Test
+        void should_return_true_for_isNotAgreedFreeMediationApplicant1Spec_when_hasAgreedFreeMediation_is_no() {
+            when(caseData.getApplicant1ClaimMediationSpecRequired())
+                .thenReturn(SmallClaimMedicalLRspec.builder().hasAgreedFreeMediation(YesOrNo.NO).build());
+            assertTrue(CaseDataPredicate.Mediation.isNotAgreedFreeMediationApplicant1Spec.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_isNotAgreedFreeMediationApplicant1Spec_when_null_or_yes() {
+            when(caseData.getApplicant1ClaimMediationSpecRequired()).thenReturn(null);
+            assertFalse(CaseDataPredicate.Mediation.isNotAgreedFreeMediationApplicant1Spec.test(caseData));
+
+            when(caseData.getApplicant1ClaimMediationSpecRequired())
+                .thenReturn(SmallClaimMedicalLRspec.builder().hasAgreedFreeMediation(YesOrNo.YES).build());
+            assertFalse(CaseDataPredicate.Mediation.isNotAgreedFreeMediationApplicant1Spec.test(caseData));
+        }
+
+        @Test
+        void should_return_true_for_isRequiredRespondent1Spec_when_yes() {
+            when(caseData.getResponseClaimMediationSpecRequired()).thenReturn(YES);
+            assertTrue(CaseDataPredicate.Mediation.isRequiredRespondent1Spec.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_isRequiredRespondent1Spec_when_no_or_null() {
+            when(caseData.getResponseClaimMediationSpecRequired()).thenReturn(YesOrNo.NO);
+            assertFalse(CaseDataPredicate.Mediation.isRequiredRespondent1Spec.test(caseData));
+
+            when(caseData.getResponseClaimMediationSpecRequired()).thenReturn(null);
+            assertFalse(CaseDataPredicate.Mediation.isRequiredRespondent1Spec.test(caseData));
+        }
+
+        @Test
+        void should_return_true_for_isNotRequiredRespondent2Spec_when_no() {
+            when(caseData.getResponseClaimMediationSpec2Required()).thenReturn(YesOrNo.NO);
+            assertTrue(CaseDataPredicate.Mediation.isNotRequiredRespondent2Spec.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_isNotRequiredRespondent2Spec_when_yes_or_null() {
+            when(caseData.getResponseClaimMediationSpec2Required()).thenReturn(YES);
+            assertFalse(CaseDataPredicate.Mediation.isNotRequiredRespondent2Spec.test(caseData));
+
+            when(caseData.getResponseClaimMediationSpec2Required()).thenReturn(null);
+            assertFalse(CaseDataPredicate.Mediation.isNotRequiredRespondent2Spec.test(caseData));
+        }
+
+        @Test
+        void should_return_true_for_hasContactInfoApplicant1_when_present() {
+            when(caseData.getApp1MediationContactInfo()).thenReturn(MediationContactInformation.builder().build());
+            assertTrue(CaseDataPredicate.Mediation.hasContactInfoApplicant1.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_hasContactInfoApplicant1_when_absent() {
+            when(caseData.getApp1MediationContactInfo()).thenReturn(null);
+            assertFalse(CaseDataPredicate.Mediation.hasContactInfoApplicant1.test(caseData));
+        }
+
+        @Test
+        void should_return_true_for_hasContactInfoRespondent1_when_present() {
+            when(caseData.getResp1MediationContactInfo()).thenReturn(MediationContactInformation.builder().build());
+            assertTrue(CaseDataPredicate.Mediation.hasContactInfoRespondent1.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_hasContactInfoRespondent1_when_absent() {
+            when(caseData.getResp1MediationContactInfo()).thenReturn(null);
+            assertFalse(CaseDataPredicate.Mediation.hasContactInfoRespondent1.test(caseData));
+        }
+
+        @Test
+        void should_return_true_for_hasContactInfoRespondent2_when_present() {
+            when(caseData.getResp2MediationContactInfo()).thenReturn(MediationContactInformation.builder().build());
+            assertTrue(CaseDataPredicate.Mediation.hasContactInfoRespondent2.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_hasContactInfoRespondent2_when_absent() {
+            when(caseData.getResp2MediationContactInfo()).thenReturn(null);
+            assertFalse(CaseDataPredicate.Mediation.hasContactInfoRespondent2.test(caseData));
+        }
+
+        @Test
+        void should_return_true_for_hasResponseCarmLiPApplicant1_when_present() {
+            CaseDataLiP lip = CaseDataLiP.builder()
+                .applicant1LiPResponseCarm(MediationLiPCarm.builder().build())
+                .build();
+            when(caseData.getCaseDataLiP()).thenReturn(lip);
+            assertTrue(CaseDataPredicate.Mediation.hasResponseCarmLiPApplicant1.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_hasResponseCarmLiPApplicant1_when_absent() {
+            when(caseData.getCaseDataLiP()).thenReturn(null);
+            assertFalse(CaseDataPredicate.Mediation.hasResponseCarmLiPApplicant1.test(caseData));
+
+            CaseDataLiP lip = CaseDataLiP.builder().build();
+            when(caseData.getCaseDataLiP()).thenReturn(lip);
+            assertFalse(CaseDataPredicate.Mediation.hasResponseCarmLiPApplicant1.test(caseData));
+        }
+
+        @Test
+        void should_return_true_for_hasResponseCarmLiPRespondent1_when_present() {
+            CaseDataLiP lip = CaseDataLiP.builder()
+                .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder().build())
+                .build();
+            when(caseData.getCaseDataLiP()).thenReturn(lip);
+            assertTrue(CaseDataPredicate.Mediation.hasResponseCarmLiPRespondent1.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_hasResponseCarmLiPRespondent1_when_absent() {
+            when(caseData.getCaseDataLiP()).thenReturn(null);
+            assertFalse(CaseDataPredicate.Mediation.hasResponseCarmLiPRespondent1.test(caseData));
+
+            CaseDataLiP lip = CaseDataLiP.builder().build();
+            when(caseData.getCaseDataLiP()).thenReturn(lip);
+            assertFalse(CaseDataPredicate.Mediation.hasResponseCarmLiPRespondent1.test(caseData));
+        }
+
+        @Test
+        void should_return_true_for_hasReasonUnsuccessful_when_value_present() {
+            Mediation mediation = mock(Mediation.class);
+            when(mediation.getUnsuccessfulMediationReason()).thenReturn("No show");
+            when(caseData.getMediation()).thenReturn(mediation);
+            assertTrue(CaseDataPredicate.Mediation.hasReasonUnsuccessful.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_hasReasonUnsuccessful_when_absent() {
+            Mediation mediation = mock(Mediation.class);
+            when(mediation.getUnsuccessfulMediationReason()).thenReturn(null);
+            when(caseData.getMediation()).thenReturn(mediation);
+            assertFalse(CaseDataPredicate.Mediation.hasReasonUnsuccessful.test(caseData));
+        }
+
+        @Test
+        void should_return_true_for_hasReasonUnsuccessfulMultiSelect_when_list_present() {
+            Mediation mediation = mock(Mediation.class);
+            when(mediation.getMediationUnsuccessfulReasonsMultiSelect())
+                .thenReturn(List.of(MediationUnsuccessfulReason.PARTY_WITHDRAWS));
+            when(caseData.getMediation()).thenReturn(mediation);
+            assertTrue(CaseDataPredicate.Mediation.hasReasonUnsuccessfulMultiSelect.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_hasReasonUnsuccessfulMultiSelect_when_list_absent() {
+            Mediation mediation = mock(Mediation.class);
+            when(mediation.getMediationUnsuccessfulReasonsMultiSelect()).thenReturn(null);
+            when(caseData.getMediation()).thenReturn(mediation);
+            assertFalse(CaseDataPredicate.Mediation.hasReasonUnsuccessfulMultiSelect.test(caseData));
+        }
+
+        @Test
+        void should_return_true_for_hasReasonUnsuccessfulMultiSelectValue_when_values_exist() {
+            Mediation mediation = mock(Mediation.class);
+            when(mediation.getMediationUnsuccessfulReasonsMultiSelect())
+                .thenReturn(List.of(MediationUnsuccessfulReason.PARTY_WITHDRAWS));
+            when(caseData.getMediation()).thenReturn(mediation);
+            assertTrue(CaseDataPredicate.Mediation.hasReasonUnsuccessfulMultiSelectValue.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_hasReasonUnsuccessfulMultiSelectValue_when_empty_or_null() {
+            Mediation mediationWithEmpty = mock(Mediation.class);
+            when(mediationWithEmpty.getMediationUnsuccessfulReasonsMultiSelect()).thenReturn(List.of());
+            when(caseData.getMediation()).thenReturn(mediationWithEmpty);
+            assertFalse(CaseDataPredicate.Mediation.hasReasonUnsuccessfulMultiSelectValue.test(caseData));
+
+            Mediation mediationWithNull = mock(Mediation.class);
+            when(mediationWithNull.getMediationUnsuccessfulReasonsMultiSelect()).thenReturn(null);
+            when(caseData.getMediation()).thenReturn(mediationWithNull);
+            assertFalse(CaseDataPredicate.Mediation.hasReasonUnsuccessfulMultiSelectValue.test(caseData));
         }
     }
 
@@ -1829,7 +1990,6 @@ class CaseDataPredicateTest {
             when(caseData.isApplicantNotRepresented()).thenReturn(false);
             assertFalse(CaseDataPredicate.Lip.caseContainsLiP.test(caseData));
         }
-
     }
 
 }
