@@ -80,12 +80,14 @@ public class MoreInformationHwfCallbackHandler extends CallbackHandler {
         if (caseData.isHWFTypeHearing()) {
             HelpWithFeesDetails hearingFeeDetails =
                 Optional.ofNullable(caseData.getHearingHwfDetails()).orElse(new HelpWithFeesDetails());
-            caseData.setHearingHwfDetails(hearingFeeDetails.toBuilder().hwfCaseEvent(MORE_INFORMATION_HWF).build());
+            hearingFeeDetails.setHwfCaseEvent(MORE_INFORMATION_HWF);
+            caseData.setHearingHwfDetails(hearingFeeDetails);
         }
         if (caseData.isHWFTypeClaimIssued()) {
             HelpWithFeesDetails claimIssuedHwfDetails =
                 Optional.ofNullable(caseData.getClaimIssuedHwfDetails()).orElse(new HelpWithFeesDetails());
-            caseData.setClaimIssuedHwfDetails(claimIssuedHwfDetails.toBuilder().hwfCaseEvent(MORE_INFORMATION_HWF).build());
+            claimIssuedHwfDetails.setHwfCaseEvent(MORE_INFORMATION_HWF);
+            caseData.setClaimIssuedHwfDetails(claimIssuedHwfDetails);
 
         }
 

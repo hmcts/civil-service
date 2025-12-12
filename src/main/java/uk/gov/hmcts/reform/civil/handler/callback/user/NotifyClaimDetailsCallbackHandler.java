@@ -235,7 +235,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         if (Objects.nonNull(cosNotifyClaimDetails)) {
             cosNotifyClaimDetails.setCosDocSaved(YES);
             if (Objects.isNull(caseData.getServedDocumentFiles())) {
-                caseData.setServedDocumentFiles(ServedDocumentFiles.builder().build());
+                caseData.setServedDocumentFiles(new ServedDocumentFiles());
             }
             if (Objects.isNull(caseData.getServedDocumentFiles().getOther())) {
                 caseData.getServedDocumentFiles().setOther(new ArrayList<>());
@@ -371,8 +371,6 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                 && isMandatoryDocMissing(caseData.getCosNotifyClaimDetails1())) {
             errors.add(DOC_SERVED_MANDATORY);
         }
-        CertificateOfService certificateOfService = caseData.getCosNotifyClaimDetails1();
-        caseData.setCosNotifyClaimDetails1(certificateOfService.toBuilder().build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
@@ -397,8 +395,6 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             && isMandatoryDocMissing(caseData.getCosNotifyClaimDetails2())) {
             errors.add(DOC_SERVED_MANDATORY);
         }
-        CertificateOfService certificateOfServiceDef2 = caseData.getCosNotifyClaimDetails2();
-        caseData.setCosNotifyClaimDetails2(certificateOfServiceDef2.toBuilder().build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
@@ -429,9 +425,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     private CertificateOfService updateStatementOfTruthForLip(CertificateOfService certificateOfService) {
         List<String> cosUISenderStatementOfTruthLabel = new ArrayList<>();
         cosUISenderStatementOfTruthLabel.add("CERTIFIED");
-        return certificateOfService.toBuilder()
-            .cosSenderStatementOfTruthLabel(cosUISenderStatementOfTruthLabel)
-            .build();
+        certificateOfService.setCosSenderStatementOfTruthLabel(cosUISenderStatementOfTruthLabel);
+        return certificateOfService;
     }
 
     private boolean areAnyRespondentsLitigantInPerson(CaseData caseData) {

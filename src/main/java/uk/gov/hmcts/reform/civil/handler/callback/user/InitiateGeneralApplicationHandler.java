@@ -128,7 +128,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             errors.add(RESP_NOT_ASSIGNED_ERROR);
         }
         log.info("initiating general application allowed for caseId {}", caseData.getCcdCaseReference());
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
 
         if (initiateGeneralApplicationService.caseContainsLiP(caseData)) {
@@ -280,8 +279,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
 
         if (caseData.getGeneralAppTypeLR() != null && isCoscEnabledAndUserNotLip(callbackParams)) {
-            caseData.setGeneralAppType(GAApplicationType.builder().types(GATypeHelper.getGATypes(
-                caseData.getGeneralAppTypeLR().getTypes())).build());
+            GAApplicationType gaApplicationType = new GAApplicationType();
+            gaApplicationType.setTypes(GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes()));
+            caseData.setGeneralAppType(gaApplicationType);
         }
         caseData = setWithNoticeByType(caseData);
         Fee feeForGA = feesService.getFeeForGA(caseData);
@@ -339,7 +339,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         }
         if (caseData.getGeneralAppTypeLR() != null && isCoscEnabledAndUserNotLip(callbackParams)) {
             var generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
-            caseData.setGeneralAppType(GAApplicationType.builder().types(generalAppTypes).build());
+            GAApplicationType gaApplicationType = new GAApplicationType();
+            gaApplicationType.setTypes(generalAppTypes);
+            caseData.setGeneralAppType(gaApplicationType);
         }
 
         Map<String, Object> data = initiateGeneralApplicationService

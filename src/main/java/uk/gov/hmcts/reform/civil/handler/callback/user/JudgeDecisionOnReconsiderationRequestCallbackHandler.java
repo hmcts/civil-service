@@ -99,11 +99,12 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
 
         if (sdoDocLatest.isPresent()) {
             String sdoDate = formatLocalDateTime(sdoDocLatest.get().getValue().getCreatedDatetime(), DATE);
-            caseData.setUpholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
-                                                       .reasonForReconsiderationTxtYes(String.format(
-                                                           UPHOLDING_PREVIOUS_ORDER_REASON,
-                                                           sdoDate
-                                                       )).build());
+            UpholdingPreviousOrderReason upholdingPreviousOrderReason = new UpholdingPreviousOrderReason();
+            upholdingPreviousOrderReason.setReasonForReconsiderationTxtYes(String.format(
+                UPHOLDING_PREVIOUS_ORDER_REASON,
+                sdoDate
+            ));
+            caseData.setUpholdingPreviousOrderReason(upholdingPreviousOrderReason);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
