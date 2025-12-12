@@ -5,31 +5,29 @@ import uk.gov.hmcts.reform.civil.service.flowstate.predicate.annotations.Busines
 
 import java.util.function.Predicate;
 
-import static uk.gov.hmcts.reform.civil.service.flowstate.predicate.util.PredicateUtil.nullSafe;
-
 @SuppressWarnings("java:S1214")
 public non-sealed interface MediationPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Mediation",
-        summary = "Claimant agreed to mediation",
-        description = "Claimant has opted into free mediation"
+        summary = "Claimant agreed to free mediation",
+        description = "Claimant has opted into free mediation (delegates to Claimant.agreedToMediation)."
     )
     Predicate<CaseData> agreedToMediation =
         CaseDataPredicate.Claimant.agreedToMediation;
 
     @BusinessRule(
         group = "Mediation",
-        summary = "Claimant declined mediation",
-        description = "Claimant has opted out of free mediation"
+        summary = "Claimant declined free mediation",
+        description = "Claimant has opted out of free mediation (delegates to Claimant.declinedMediation)."
     )
     Predicate<CaseData> declinedMediation =
         CaseDataPredicate.Claimant.declinedMediation;
 
     @BusinessRule(
         group = "Mediation",
-        summary = "Case is Carm enabled",
-        description = "Case has applicant or respondent mediation contact information"
+        summary = "Case is CARM-enabled (LR)",
+        description = "Mediation contact information is present for any party: applicant 1, respondent 1, or respondent 2."
     )
     Predicate<CaseData> isCarmEnabledForCase =
         CaseDataPredicate.Mediation.hasContactInfoApplicant1
@@ -38,8 +36,8 @@ public non-sealed interface MediationPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Mediation",
-        summary = "Case is Carm enabled (LiP)",
-        description = "Case is LiP and has applicant or respondent response Carm"
+        summary = "Case is CARM-enabled (LiP)",
+        description = "A LiP CARM response is present for applicant 1 or respondent 1."
     )
     Predicate<CaseData> isCarmEnabledForCaseLiP =
         CaseDataPredicate.Mediation.hasResponseCarmLiPApplicant1
@@ -47,8 +45,8 @@ public non-sealed interface MediationPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Mediation",
-        summary = "Case is Carm applicable",
-        description = "Case is LiP and has applicant or respondent response Carm"
+        summary = "CARM applicable (LR • SPEC small claims)",
+        description = "Case is SPEC and small claims track; CARM is enabled via mediation contact info; respondent 1 is represented; applicant 1 is not marked as unrepresented."
     )
     Predicate<CaseData> isCarmApplicableCase =
         isCarmEnabledForCase
@@ -59,8 +57,8 @@ public non-sealed interface MediationPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Mediation",
-        summary = "Case is Carm applicable (LiP)",
-        description = "Case is LiP and has applicant or respondent response Carm"
+        summary = "CARM applicable (LiP • 1v1 • SPEC small claims)",
+        description = "Case is SPEC and small claims track; CARM is LiP-enabled (applicant 1 or respondent 1 LiP CARM response present); there is no respondent 2; at least one of applicant 1 or respondent 1 is unrepresented."
     )
     Predicate<CaseData> isCarmApplicableCaseLiP =
         isCarmEnabledForCaseLiP
@@ -74,8 +72,8 @@ public non-sealed interface MediationPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Mediation",
-        summary = "Case is Carm mediation",
-        description = "Case is Carm applicable"
+        summary = "Route to CARM mediation",
+        description = "The claimant indicates they will not settle (part admission); the claimant has not agreed to free mediation; the case is CARM applicable (LR or LiP criteria met); and the case has not been taken offline by staff."
     )
     Predicate<CaseData> isCarmMediation =
         CaseDataPredicate.Claimant.isNotSettlePartAdmit
@@ -87,8 +85,8 @@ public non-sealed interface MediationPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Mediation",
-        summary = "All LR parties agreed to mediation (Spec small claim)",
-        description = "In a SPEC small claim, all represented parties have agreed to legal representative mediation"
+        summary = "All LR parties agreed to mediation (SPEC small claims)",
+        description = "SPEC small claims when: respondent 1 has agreed to free mediation (SPEC); if respondent 2 is present with a different legal rep, they have not declined (SPEC); applicant 1 has agreed to free mediation (SPEC); any MP applicant (if present) has agreed (SPEC); and the general claimant 'agreed to mediation' flag is not set."
     )
     Predicate<CaseData> allAgreedToLrMediationSpec =
         CaseDataPredicate.Claim.isSpecClaim
@@ -106,8 +104,8 @@ public non-sealed interface MediationPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Mediation",
-        summary = "todo",
-        description = "todo"
+        summary = "Before unsuccessful mediation recorded",
+        description = "No unsuccessful mediation reason has been recorded: neither the single reason nor the multi-select list is present."
     )
     Predicate<CaseData> beforeUnsuccessful =
         Mediation.hasReasonUnsuccessful.negate()
@@ -115,8 +113,8 @@ public non-sealed interface MediationPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Mediation",
-        summary = "todo",
-        description = "todo"
+        summary = "Unsuccessful mediation recorded",
+        description = "An unsuccessful mediation reason is recorded: either the single reason is present, or the multi-select list exists and contains at least one value."
     )
     Predicate<CaseData> unsuccessful =
         Mediation.hasReasonUnsuccessful
