@@ -80,7 +80,7 @@ public class OrdersMapper {
         if (docCategory.getValue().equals(md.getValue().getDocumentLink().getCategoryID())) {
             bundlingRequestDocuments.add(
                 buildBundlingRequestDoc(
-                    generateDocName(BundleFileNameList.ORDER.getDisplayName(), null, null,
+                    generateDocName(BundleFileNameList.ORDER.getDisplayName(), md.getValue().getDocumentName(), null,
                                     LocalDateTime.parse(md.getValue().getDocumentLink().getUploadTimestamp()).toLocalDate()),
                     md.getValue().getDocumentLink(),
                     md.getValue().getDocumentType().name()
