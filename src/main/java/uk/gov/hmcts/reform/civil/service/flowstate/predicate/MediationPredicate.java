@@ -46,7 +46,8 @@ public non-sealed interface MediationPredicate extends CaseDataPredicate {
     @BusinessRule(
         group = "Mediation",
         summary = "CARM applicable (LR • SPEC small claims)",
-        description = "Case is SPEC and small claims track; CARM is enabled via mediation contact info; respondent 1 is represented; applicant 1 is not marked as unrepresented."
+        description = "Case is SPEC and small claims track; CARM is enabled via mediation contact info; respondent 1 is " +
+            "represented; applicant 1 is not marked as unrepresented."
     )
     Predicate<CaseData> isCarmApplicableCase =
         isCarmEnabledForCase
@@ -58,7 +59,8 @@ public non-sealed interface MediationPredicate extends CaseDataPredicate {
     @BusinessRule(
         group = "Mediation",
         summary = "CARM applicable (LiP • 1v1 • SPEC small claims)",
-        description = "Case is SPEC and small claims track; CARM is LiP-enabled (applicant 1 or respondent 1 LiP CARM response present); there is no respondent 2; at least one of applicant 1 or respondent 1 is unrepresented."
+        description = "Case is SPEC and small claims track; CARM is LiP-enabled (applicant 1 or respondent 1 LiP CARM " +
+            "response present); there is no respondent 2; at least one of applicant 1 or respondent 1 is unrepresented."
     )
     Predicate<CaseData> isCarmApplicableCaseLiP =
         isCarmEnabledForCaseLiP
@@ -73,7 +75,8 @@ public non-sealed interface MediationPredicate extends CaseDataPredicate {
     @BusinessRule(
         group = "Mediation",
         summary = "Route to CARM mediation",
-        description = "The claimant indicates they will not settle (part admission); the claimant has not agreed to free mediation; the case is CARM applicable (LR or LiP criteria met); and the case has not been taken offline by staff."
+        description = "The claimant indicates they will not settle (part admission); the claimant has not agreed to free " +
+            "mediation; the case is CARM applicable (LR or LiP criteria met); and the case has not been taken offline by staff."
     )
     Predicate<CaseData> isCarmMediation =
         CaseDataPredicate.Claimant.isNotSettlePartAdmit
@@ -86,7 +89,9 @@ public non-sealed interface MediationPredicate extends CaseDataPredicate {
     @BusinessRule(
         group = "Mediation",
         summary = "All LR parties agreed to mediation (SPEC small claims)",
-        description = "SPEC small claims when: respondent 1 has agreed to free mediation (SPEC); if respondent 2 is present with a different legal rep, they have not declined (SPEC); applicant 1 has agreed to free mediation (SPEC); any MP applicant (if present) has agreed (SPEC); and the general claimant 'agreed to mediation' flag is not set."
+        description = "SPEC small claims when: respondent 1 has agreed to free mediation (SPEC); if respondent 2 is " +
+            "present with a different legal rep, they have not declined (SPEC); applicant 1 has agreed to free mediation " +
+            "(SPEC); any MP applicant (if present) has agreed (SPEC); and the general claimant 'agreed to mediation' flag is not set."
     )
     Predicate<CaseData> allAgreedToLrMediationSpec =
         CaseDataPredicate.Claim.isSpecClaim
@@ -105,7 +110,8 @@ public non-sealed interface MediationPredicate extends CaseDataPredicate {
     @BusinessRule(
         group = "Mediation",
         summary = "Before unsuccessful mediation recorded",
-        description = "No unsuccessful mediation reason has been recorded: neither the single reason nor the multi-select list is present."
+        description = "No unsuccessful mediation reason has been recorded: neither the single reason nor the " +
+            "multi-select list is present."
     )
     Predicate<CaseData> beforeUnsuccessful =
         Mediation.hasReasonUnsuccessful.negate()
@@ -114,7 +120,8 @@ public non-sealed interface MediationPredicate extends CaseDataPredicate {
     @BusinessRule(
         group = "Mediation",
         summary = "Unsuccessful mediation recorded",
-        description = "An unsuccessful mediation reason is recorded: either the single reason is present, or the multi-select list exists and contains at least one value."
+        description = "An unsuccessful mediation reason is recorded: either the single reason is present, or the " +
+            "multi-select list exists and contains at least one value."
     )
     Predicate<CaseData> unsuccessful =
         Mediation.hasReasonUnsuccessful

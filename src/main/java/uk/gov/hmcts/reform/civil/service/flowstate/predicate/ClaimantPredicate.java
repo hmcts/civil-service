@@ -14,10 +14,10 @@ public non-sealed interface ClaimantPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Claimant",
-        summary = "todo",
-        description = "Applicant correspondence address not required (Spec)"
+        summary = "Applicant correspondence address not required (Spec)",
+        description = "Applicant correspondence address is not required (Spec) — field `specAoSApplicantCorrespondenceAddressRequired` = No."
     )
-    Predicate<CaseData> correspondenceAddressNotRequired = Applicant.isNotApplicantCorrespondenceAddressRequiredSpec;
+    Predicate<CaseData> correspondenceAddressNotRequired = Applicant.isNotCorrespondenceAddressRequiredSpec;
 
     @BusinessRule(
         group = "Claimant",
