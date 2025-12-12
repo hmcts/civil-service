@@ -80,7 +80,7 @@ public class DQGeneratorFormBuilder {
     private final RespondentTemplateForDQGenerator respondentTemplateForDQGenerator;
     static final String DEFENDANT = "defendant";
     static final String SMALL_CLAIM = "SMALL_CLAIM";
-    static final String organisationName = "Organisation name";
+    static final String ORGANISATION_NAME = "Organisation name";
 
     @NotNull
     public DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder getDirectionsQuestionnaireFormBuilder(CaseData caseData, String authorisation) {
@@ -167,7 +167,7 @@ public class DQGeneratorFormBuilder {
     }
 
     protected List<Party> getApplicants(CaseData caseData) {
-        var legalRepHeading = caseData.getCaseAccessCategory().equals(SPEC_CLAIM) ? "Name" : organisationName;
+        var legalRepHeading = caseData.getCaseAccessCategory().equals(SPEC_CLAIM) ? "Name" : ORGANISATION_NAME;
         var applicant = caseData.getApplicant1();
         var applicant2 = caseData.getApplicant2();
         var respondentRepresentative = representativeService.getApplicantRepresentative(caseData);
