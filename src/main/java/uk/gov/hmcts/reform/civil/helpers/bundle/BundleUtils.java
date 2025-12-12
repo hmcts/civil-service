@@ -24,16 +24,18 @@ public class BundleUtils {
         log.info("Local date - {}", date);
         String formatLocalDate = DateFormatHelper.formatLocalDate(date, DATE_FORMAT);
         log.info("formatLocalDate - {}", formatLocalDate);
+        log.info("strParam - {}", strParam);
+        log.info("strParam2 - {}", strParam2);
         String formattedTitle;
         if (StringUtils.isBlank(strParam)) {
             formattedTitle = String.format(fileName, formatLocalDate);
-            log.info("formatLocalDate 111- {} and date {}", formattedTitle, formatLocalDate);
+            log.info("formattedTitle 111- {} and date {}", formattedTitle, formatLocalDate);
         } else if (StringUtils.isBlank(strParam2)) {
             formattedTitle =  String.format(fileName, strParam, formatLocalDate);
-            log.info("formatLocalDate 222- {} and date {}", formattedTitle, formatLocalDate);
+            log.info("fileName 222- {}, title {} and strParam {}", fileName, formattedTitle, strParam);
         } else {
             formattedTitle =  String.format(fileName, strParam, strParam2, formatLocalDate);
-            log.info("formatLocalDate 333- {} and date {}", formattedTitle, formatLocalDate);
+            log.info("formattedTitle 333- {} and date {}", formattedTitle, formatLocalDate);
         }
 
         if (formattedTitle.length() > MAX_DOC_TITLE_LENGTH) {
