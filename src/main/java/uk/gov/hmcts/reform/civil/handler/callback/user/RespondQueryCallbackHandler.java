@@ -51,25 +51,22 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToStart(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        migrateAllQueries(caseDataBuilder);
+        migrateAllQueries(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(mapper)).build();
+            .data(caseData.toMap(mapper)).build();
     }
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         CaseMessage latestCaseMessage = caseData.getQueries().latest();
 
         assignCategoryIdToCaseworkerAttachments(latestCaseMessage, assignCategoryId);
-        clearOldQueryCollections(caseDataBuilder);
+        clearOldQueryCollections(caseData);
 
+        caseData.setBusinessProcess(BusinessProcess.ready(queryManagementRespondQuery));
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder
-                      .businessProcess(BusinessProcess.ready(queryManagementRespondQuery))
-                      .build().toMap(mapper))
+            .data(caseData.toMap(mapper))
             .build();
     }
 

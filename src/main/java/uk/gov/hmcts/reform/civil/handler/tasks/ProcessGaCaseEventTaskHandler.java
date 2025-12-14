@@ -11,6 +11,6 @@ public class ProcessGaCaseEventTaskHandler extends BaseExternalTaskHandler {
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        return ExternalTaskData.builder().build();
+        return new ExternalTaskData();
     }
 }

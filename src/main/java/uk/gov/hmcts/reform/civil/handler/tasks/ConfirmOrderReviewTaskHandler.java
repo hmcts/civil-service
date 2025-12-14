@@ -49,7 +49,7 @@ public class ConfirmOrderReviewTaskHandler extends BaseExternalTaskHandler {
 
             coreCaseDataService.submitUpdate(caseIdentifier, caseDataContent(startEvent, externalTask));
 
-            return ExternalTaskData.builder().build();
+            return new ExternalTaskData();
         } catch (ValueMapperException | IllegalArgumentException ex) {
             throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", ex);
         }
@@ -83,9 +83,7 @@ public class ConfirmOrderReviewTaskHandler extends BaseExternalTaskHandler {
                        .description(obligationActions)
                        .summary(obligationReasons)
                        .build())
-            .data(caseData.toBuilder()
-                      .businessProcess(businessProcess)
-                      .build().toMap(mapper))
+            .data(caseData.setBusinessProcess(businessProcess).toMap(mapper))
             .build();
     }
 
