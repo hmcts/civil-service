@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.BundleFileNameList;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.TypeOfDocDocumentaryEvidenceOfTrial;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory;
 import uk.gov.hmcts.reform.civil.helpers.bundle.BundleDocumentsRetrieval;
 import uk.gov.hmcts.reform.civil.helpers.bundle.BundleRequestDocsOrganizer;
 import uk.gov.hmcts.reform.civil.helpers.bundle.ConversionToBundleRequestDocs;
@@ -22,26 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_ONE_WITNESS_HEARSAY;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_ONE_WITNESS_OTHER_STATEMENT;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_ONE_WITNESS_REFERRED;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_ONE_WITNESS_STATEMENT;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_ONE_WITNESS_SUMMARY;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_TWO_WITNESS_HEARSAY;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_TWO_WITNESS_OTHER_STATEMENT;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_TWO_WITNESS_REFERRED;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_TWO_WITNESS_STATEMENT;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_TWO_WITNESS_SUMMARY;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_ONE_WITNESS_HEARSAY;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_ONE_WITNESS_OTHER_STATEMENT;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_ONE_WITNESS_REFERRED;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_ONE_WITNESS_STATEMENT;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_ONE_WITNESS_SUMMARY;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_TWO_WITNESS_HEARSAY;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_TWO_WITNESS_OTHER_STATEMENT;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_TWO_WITNESS_REFERRED;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_TWO_WITNESS_STATEMENT;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_TWO_WITNESS_SUMMARY;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getEvidenceUploadDocsByPartyAndDocType;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getWitnessDocsByPartyAndDocType;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -125,47 +104,5 @@ public class WitnessStatementsMapper implements ManageDocMapper {
             addManageDocuments(manageDocuments, partyType, bundlingRequestDocuments);
         }
         return wrapElements(bundlingRequestDocuments);
-    }
-
-    private void addManageDocuments(List<Element<ManageDocument>> manageDocuments,
-                                    PartyType partyType,
-                                    List<BundlingRequestDocument> bundlingRequestDocuments) {
-        List<DocumentCategory> documentCategories = switch (partyType) {
-            case CLAIMANT1 -> List.of(
-                APPLICANT_ONE_WITNESS_STATEMENT,
-                APPLICANT_ONE_WITNESS_OTHER_STATEMENT,
-                APPLICANT_ONE_WITNESS_HEARSAY,
-                APPLICANT_ONE_WITNESS_SUMMARY,
-                APPLICANT_ONE_WITNESS_REFERRED
-            );
-            case CLAIMANT2 -> List.of(
-                APPLICANT_TWO_WITNESS_STATEMENT,
-                APPLICANT_TWO_WITNESS_OTHER_STATEMENT,
-                APPLICANT_TWO_WITNESS_HEARSAY,
-                APPLICANT_TWO_WITNESS_SUMMARY,
-                APPLICANT_TWO_WITNESS_REFERRED
-            );
-            case DEFENDANT1 -> List.of(
-                RESPONDENT_ONE_WITNESS_STATEMENT,
-                RESPONDENT_ONE_WITNESS_OTHER_STATEMENT,
-                RESPONDENT_ONE_WITNESS_HEARSAY,
-                RESPONDENT_ONE_WITNESS_SUMMARY,
-                RESPONDENT_ONE_WITNESS_REFERRED
-            );
-            case DEFENDANT2 -> List.of(
-                RESPONDENT_TWO_WITNESS_STATEMENT,
-                RESPONDENT_TWO_WITNESS_OTHER_STATEMENT,
-                RESPONDENT_TWO_WITNESS_HEARSAY,
-                RESPONDENT_TWO_WITNESS_SUMMARY,
-                RESPONDENT_TWO_WITNESS_REFERRED
-            );
-        };
-
-        documentCategories.forEach(category ->
-                                       manageDocuments.forEach(md -> addDocumentByCategoryId(
-                                           md,
-                                           bundlingRequestDocuments,
-                                           category
-                                       )));
     }
 }

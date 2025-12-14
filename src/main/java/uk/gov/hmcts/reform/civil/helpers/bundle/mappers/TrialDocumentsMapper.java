@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.TypeOfDocDocumentaryEvidenceOfTrial;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory;
 import uk.gov.hmcts.reform.civil.helpers.bundle.BundleDocumentsRetrieval;
 import uk.gov.hmcts.reform.civil.helpers.bundle.ConversionToBundleRequestDocs;
 import uk.gov.hmcts.reform.civil.helpers.bundle.PartyType;
@@ -21,18 +20,6 @@ import static uk.gov.hmcts.reform.civil.enums.caseprogression.BundleFileNameList
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.BundleFileNameList.CHRONOLOGY_FILE_DISPLAY_NAME;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.BundleFileNameList.SKELETON_ARGUMENT;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.BundleFileNameList.TRIAL_TIMETABLE_FILE_DISPLAY_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_ONE_TRIAL_DOC_CORRESPONDENCE;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_ONE_TRIAL_DOC_TIME_TABLE;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_ONE_TRIAL_SKELETON;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_TWO_TRIAL_DOC_CORRESPONDENCE;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_TWO_TRIAL_DOC_TIME_TABLE;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_TWO_TRIAL_SKELETON;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_ONE_TRIAL_DOC_CORRESPONDENCE;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_ONE_TRIAL_DOC_TIME_TABLE;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_ONE_TRIAL_SKELETON;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_TWO_TRIAL_DOC_CORRESPONDENCE;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_TWO_TRIAL_DOC_TIME_TABLE;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_TWO_TRIAL_SKELETON;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getEvidenceUploadDocsByPartyAndDocType;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -97,39 +84,5 @@ public class TrialDocumentsMapper implements ManageDocMapper {
             );
         }
         return wrapElements(bundlingRequestDocuments);
-    }
-
-    private void addManageDocuments(List<Element<ManageDocument>> manageDocuments,
-                                    PartyType partyType,
-                                    List<BundlingRequestDocument> bundlingRequestDocuments) {
-        List<DocumentCategory> documentCategories = switch (partyType) {
-            case CLAIMANT1 -> List.of(
-                APPLICANT_ONE_TRIAL_SKELETON,
-                APPLICANT_ONE_TRIAL_DOC_CORRESPONDENCE,
-                APPLICANT_ONE_TRIAL_DOC_TIME_TABLE
-            );
-            case CLAIMANT2 -> List.of(
-                APPLICANT_TWO_TRIAL_SKELETON,
-                APPLICANT_TWO_TRIAL_DOC_CORRESPONDENCE,
-                APPLICANT_TWO_TRIAL_DOC_TIME_TABLE
-            );
-            case DEFENDANT1 -> List.of(
-                RESPONDENT_ONE_TRIAL_SKELETON,
-                RESPONDENT_ONE_TRIAL_DOC_CORRESPONDENCE,
-                RESPONDENT_ONE_TRIAL_DOC_TIME_TABLE
-            );
-            case DEFENDANT2 -> List.of(
-                RESPONDENT_TWO_TRIAL_SKELETON,
-                RESPONDENT_TWO_TRIAL_DOC_CORRESPONDENCE,
-                RESPONDENT_TWO_TRIAL_DOC_TIME_TABLE
-            );
-        };
-
-        documentCategories.forEach(category ->
-                                       manageDocuments.forEach(md -> addDocumentByCategoryId(
-                                           md,
-                                           bundlingRequestDocuments,
-                                           category
-                                       )));
     }
 }

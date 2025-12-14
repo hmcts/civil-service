@@ -67,7 +67,7 @@ class TrialDocumentsMapperTest {
         CaseData caseData = getCaseData();
         caseData.setManageDocuments(getTestDocuments());
         List<Element<BundlingRequestDocument>> result = mapper.map(caseData);
-        assertEquals(27, result.size());
+        assertEquals(28, result.size());
     }
 
     private List<Element<ManageDocument>> getTestDocuments() {
