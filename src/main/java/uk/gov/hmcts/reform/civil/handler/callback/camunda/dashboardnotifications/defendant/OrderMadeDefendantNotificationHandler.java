@@ -82,14 +82,13 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
     public CallbackResponse configureDashboardScenario(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (isNull(caseData.getRequestForReconsiderationDeadline())
             && isSDOEvent(callbackParams)
             && isEligibleForReconsideration(caseData)) {
-            caseDataBuilder.requestForReconsiderationDeadline(getDateWithoutBankHolidays());
+            caseData.setRequestForReconsiderationDeadline(getDateWithoutBankHolidays());
         }
-        HashMap<String, Object> paramsMap = (HashMap<String, Object>) mapper.mapCaseDataToParams(caseDataBuilder.build(), caseEvent);
+        HashMap<String, Object> paramsMap = (HashMap<String, Object>) mapper.mapCaseDataToParams(caseData, caseEvent);
 
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         String scenario = getScenario(caseData, callbackParams);
@@ -103,7 +102,7 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper)).build();
+            .data(caseData.toMap(objectMapper)).build();
     }
 
     @Override

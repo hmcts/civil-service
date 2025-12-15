@@ -46,7 +46,7 @@ public class PaymentTaskHandler extends BaseExternalTaskHandler {
             BusinessProcess businessProcess = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails())
                 .getBusinessProcess().updateActivityId(externalTask.getActivityId());
             var data = coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
-            return ExternalTaskData.builder().caseData(data).build();
+            return new ExternalTaskData().setCaseData(data);
         } catch (ValueMapperException | IllegalArgumentException e) {
             throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
         }

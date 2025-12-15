@@ -117,12 +117,11 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
 
         @Test
         void shouldRecordScenario_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .finalOrderDocumentCollection(List.of(ElementUtils.element(CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl(
-                    "url").build()).build())))
-                .respondent1Represented(YesOrNo.NO)
-                .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_SDO)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setFinalOrderDocumentCollection(List.of(ElementUtils.element(
+                new CaseDocument().setDocumentLink(new Document().setDocumentBinaryUrl("url")))));
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setDecisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_SDO);
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "url");
@@ -146,11 +145,11 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
 
         @Test
         void shouldRecordScenarioInSdoDj_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .orderSDODocumentDJCollection(List.of(
-                    ElementUtils.element(CaseDocument.builder().documentLink(
-                        Document.builder().documentBinaryUrl("urlDirectionsOrder").build()).build())))
-                .respondent1Represented(YesOrNo.NO).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setOrderSDODocumentDJCollection(List.of(
+                ElementUtils.element(new CaseDocument().setDocumentLink(
+                    new Document().setDocumentBinaryUrl("urlDirectionsOrder")))));
+            caseData.setRespondent1Represented(YesOrNo.NO);
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
@@ -173,11 +172,11 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
 
         @Test
         void shouldRecordScenarioInSDO_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .orderSDODocumentDJCollection(List.of(
-                    ElementUtils.element(CaseDocument.builder().documentLink(
-                        Document.builder().documentBinaryUrl("urlDirectionsOrder").build()).build())))
-                .respondent1Represented(YesOrNo.NO).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setOrderSDODocumentDJCollection(List.of(
+                ElementUtils.element(new CaseDocument().setDocumentLink(
+                    new Document().setDocumentBinaryUrl("urlDirectionsOrder")))));
+            caseData.setRespondent1Represented(YesOrNo.NO);
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
@@ -200,20 +199,18 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
 
         @Test
         void shouldRecordScenarioInSDO_whenInvokedMediationUnsuccessfulCarmWithoutUploadDocuments() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .orderSDODocumentDJCollection(List.of(
-                    ElementUtils.element(CaseDocument.builder().documentLink(
-                        Document.builder().documentBinaryUrl("urlDirectionsOrder").build()).build())))
-                .respondent1Represented(YesOrNo.NO)
-                .responseClaimTrack(FAST_CLAIM.name())
-                .totalClaimAmount(BigDecimal.valueOf(999))
-                .mediation(Mediation.builder()
-                               .mediationUnsuccessfulReasonsMultiSelect(List.of(
-                                   NOT_CONTACTABLE_CLAIMANT_ONE,
-                                   NOT_CONTACTABLE_DEFENDANT_ONE
-                               ))
-                               .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setOrderSDODocumentDJCollection(List.of(
+                ElementUtils.element(new CaseDocument().setDocumentLink(
+                    new Document().setDocumentBinaryUrl("urlDirectionsOrder")))));
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setResponseClaimTrack(FAST_CLAIM.name());
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(999));
+            caseData.setMediation(new Mediation()
+                .setMediationUnsuccessfulReasonsMultiSelect(List.of(
+                    NOT_CONTACTABLE_CLAIMANT_ONE,
+                    NOT_CONTACTABLE_DEFENDANT_ONE
+                )));
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
@@ -238,20 +235,18 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
         void shouldRecordScenarioInSDO_whenInvokedMediationUnsuccessfulCarmWithUploadDocuments() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck()
                 .uploadMediationByDocumentTypes(MEDIATION_NON_ATTENDANCE_OPTION)
-                .build().toBuilder()
-                .orderSDODocumentDJCollection(List.of(
-                    ElementUtils.element(CaseDocument.builder().documentLink(
-                        Document.builder().documentBinaryUrl("urlDirectionsOrder").build()).build())))
-                .respondent1Represented(YesOrNo.NO)
-                .responseClaimTrack(FAST_CLAIM.name())
-                .totalClaimAmount(BigDecimal.valueOf(999))
-                .mediation(Mediation.builder()
-                               .mediationUnsuccessfulReasonsMultiSelect(List.of(
-                                   NOT_CONTACTABLE_CLAIMANT_ONE,
-                                   NOT_CONTACTABLE_DEFENDANT_ONE
-                               ))
-                               .build())
                 .build();
+            caseData.setOrderSDODocumentDJCollection(List.of(
+                ElementUtils.element(new CaseDocument().setDocumentLink(
+                    new Document().setDocumentBinaryUrl("urlDirectionsOrder")))));
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setResponseClaimTrack(FAST_CLAIM.name());
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(999));
+            caseData.setMediation(new Mediation()
+                .setMediationUnsuccessfulReasonsMultiSelect(List.of(
+                    NOT_CONTACTABLE_CLAIMANT_ONE,
+                    NOT_CONTACTABLE_DEFENDANT_ONE
+                )));
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
@@ -274,20 +269,18 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
 
         @Test
         void shouldNotRecordScenarioInDJSdo_whenInvokedMediationUnsuccessfulCarmWithoutUploadDocuments() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .orderSDODocumentDJCollection(List.of(
-                    ElementUtils.element(CaseDocument.builder().documentLink(
-                        Document.builder().documentBinaryUrl("urlDirectionsOrder").build()).build())))
-                .respondent1Represented(YesOrNo.NO)
-                .responseClaimTrack(FAST_CLAIM.name())
-                .totalClaimAmount(BigDecimal.valueOf(999))
-                .mediation(Mediation.builder()
-                               .mediationUnsuccessfulReasonsMultiSelect(List.of(
-                                   NOT_CONTACTABLE_CLAIMANT_ONE,
-                                   NOT_CONTACTABLE_DEFENDANT_ONE
-                               ))
-                               .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setOrderSDODocumentDJCollection(List.of(
+                ElementUtils.element(new CaseDocument().setDocumentLink(
+                    new Document().setDocumentBinaryUrl("urlDirectionsOrder")))));
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setResponseClaimTrack(FAST_CLAIM.name());
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(999));
+            caseData.setMediation(new Mediation()
+                .setMediationUnsuccessfulReasonsMultiSelect(List.of(
+                    NOT_CONTACTABLE_CLAIMANT_ONE,
+                    NOT_CONTACTABLE_DEFENDANT_ONE
+                )));
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
@@ -312,20 +305,18 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
         void shouldNotRecordScenarioInDJSdo_whenInvokedMediationUnsuccessfulCarmWithUploadDocuments() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck()
                 .uploadMediationByDocumentTypes(MEDIATION_NON_ATTENDANCE_OPTION)
-                .build().toBuilder()
-                .orderSDODocumentDJCollection(List.of(
-                    ElementUtils.element(CaseDocument.builder().documentLink(
-                        Document.builder().documentBinaryUrl("urlDirectionsOrder").build()).build())))
-                .respondent1Represented(YesOrNo.NO)
-                .responseClaimTrack(FAST_CLAIM.name())
-                .totalClaimAmount(BigDecimal.valueOf(999))
-                .mediation(Mediation.builder()
-                               .mediationUnsuccessfulReasonsMultiSelect(List.of(
-                                   NOT_CONTACTABLE_CLAIMANT_ONE,
-                                   NOT_CONTACTABLE_DEFENDANT_ONE
-                               ))
-                               .build())
                 .build();
+            caseData.setOrderSDODocumentDJCollection(List.of(
+                ElementUtils.element(new CaseDocument().setDocumentLink(
+                    new Document().setDocumentBinaryUrl("urlDirectionsOrder")))));
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setResponseClaimTrack(FAST_CLAIM.name());
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(999));
+            caseData.setMediation(new Mediation()
+                .setMediationUnsuccessfulReasonsMultiSelect(List.of(
+                    NOT_CONTACTABLE_CLAIMANT_ONE,
+                    NOT_CONTACTABLE_DEFENDANT_ONE
+                )));
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
@@ -349,20 +340,18 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
 
         @Test
         void shouldNotRecordScenarioInSDO_whenInvokedMediationUnsuccessfulCarmFastClaim() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .orderSDODocumentDJCollection(List.of(
-                    ElementUtils.element(CaseDocument.builder().documentLink(
-                        Document.builder().documentBinaryUrl("urlDirectionsOrder").build()).build())))
-                .respondent1Represented(YesOrNo.NO)
-                .responseClaimTrack(FAST_CLAIM.name())
-                .totalClaimAmount(BigDecimal.valueOf(11111111))
-                .mediation(Mediation.builder()
-                               .mediationUnsuccessfulReasonsMultiSelect(List.of(
-                                   NOT_CONTACTABLE_CLAIMANT_ONE,
-                                   NOT_CONTACTABLE_DEFENDANT_ONE
-                               ))
-                               .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setOrderSDODocumentDJCollection(List.of(
+                ElementUtils.element(new CaseDocument().setDocumentLink(
+                    new Document().setDocumentBinaryUrl("urlDirectionsOrder")))));
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setResponseClaimTrack(FAST_CLAIM.name());
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(11111111));
+            caseData.setMediation(new Mediation()
+                .setMediationUnsuccessfulReasonsMultiSelect(List.of(
+                    NOT_CONTACTABLE_CLAIMANT_ONE,
+                    NOT_CONTACTABLE_DEFENDANT_ONE
+                )));
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
@@ -385,11 +374,11 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
 
         @Test
         void shouldRecordScenarioInSDOPreCPRelease_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .orderSDODocumentDJCollection(List.of(
-                    ElementUtils.element(CaseDocument.builder().documentLink(
-                        Document.builder().documentBinaryUrl("urlDirectionsOrder").build()).build())))
-                .respondent1Represented(YesOrNo.NO).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setOrderSDODocumentDJCollection(List.of(
+                ElementUtils.element(new CaseDocument().setDocumentLink(
+                    new Document().setDocumentBinaryUrl("urlDirectionsOrder")))));
+            caseData.setRespondent1Represented(YesOrNo.NO);
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
@@ -413,12 +402,11 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
         void shouldRecordScenarioInSdoLegalAdviser_whenInvoked() {
             when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .orderSDODocumentDJCollection(List.of(
-                    ElementUtils.element(CaseDocument.builder().documentLink(
-                        Document.builder().documentBinaryUrl("urlDirectionsOrder").build()).build())))
-                .respondent1Represented(YesOrNo.NO)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setOrderSDODocumentDJCollection(List.of(
+                ElementUtils.element(new CaseDocument().setDocumentLink(
+                    new Document().setDocumentBinaryUrl("urlDirectionsOrder")))));
+            caseData.setRespondent1Represented(YesOrNo.NO);
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
@@ -449,11 +437,10 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
             when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .responseClaimTrack("SMALL_CLAIM")
-                .totalClaimAmount(BigDecimal.valueOf(500))
-                .respondent1Represented(YesOrNo.NO)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setResponseClaimTrack("SMALL_CLAIM");
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(500));
+            caseData.setRespondent1Represented(YesOrNo.NO);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.name()).build()
@@ -481,12 +468,11 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
             when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
-                .responseClaimTrack("SMALL_CLAIM")
-                .totalClaimAmount(totalClaimAmount)
-                .respondent1Represented(YesOrNo.NO)
-                .decisionOnRequestReconsiderationOptions(decisionOnRequestReconsiderationOptions)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
+            caseData.setResponseClaimTrack("SMALL_CLAIM");
+            caseData.setTotalClaimAmount(totalClaimAmount);
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setDecisionOnRequestReconsiderationOptions(decisionOnRequestReconsiderationOptions);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.name())
@@ -519,9 +505,8 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
 
         @Test
         void shouldRecordScenarioDefendantFinalOrder_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
             when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
             when(toggleService.isLocationWhiteListed(any())).thenReturn(true);
@@ -544,11 +529,10 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
 
         @Test
         void shouldRecordScenarioDefendantFinalOrderFastTrackNotReadyTrial_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .drawDirectionsOrderRequired(YesOrNo.NO)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
             when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
             when(toggleService.isLocationWhiteListed(any())).thenReturn(true);
@@ -571,11 +555,10 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
 
         @Test
         void shouldRecordScenarioDefendantFinalOrderFastTrackNotReadyTrial_whenInvokedForNro() {
-            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .drawDirectionsOrderRequired(YesOrNo.NO)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
             when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
             when(toggleService.isCuiGaNroEnabled()).thenReturn(true);
@@ -600,12 +583,11 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
 
         @Test
         void shouldRecordScenarioDefendantFinalOrderFastTrackTrialReady_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .drawDirectionsOrderRequired(YesOrNo.NO)
-                .trialReadyRespondent1(YesOrNo.YES)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
+            caseData.setTrialReadyRespondent1(YesOrNo.YES);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name())

@@ -100,28 +100,24 @@ class TrialArrangementsDefendantNotificationHandlerTest extends BaseCallbackHand
     }
 
     private static Stream<Arguments> provideCaseData() {
+        CaseData caseData1 = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseData1.setRespondent1Represented(YesOrNo.NO);
+        caseData1.setDrawDirectionsOrderRequired(YES);
+        caseData1.setDrawDirectionsOrderSmallClaims(NO);
+        caseData1.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData1.setOrderType(OrderType.DECIDE_DAMAGES);
+
+        CaseData caseData2 = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseData2.setRespondent1Represented(YesOrNo.NO);
+        caseData2.setDrawDirectionsOrderRequired(YES);
+        caseData2.setDrawDirectionsOrderSmallClaims(NO);
+        caseData2.setClaimsTrack(ClaimsTrack.fastTrack);
+        caseData2.setOrderType(OrderType.DECIDE_DAMAGES);
+        caseData2.setTrialReadyRespondent1(YES);
+
         return Stream.of(
-            Arguments.of(
-                CaseDataBuilder.builder().atStateClaimIssued().build()
-                    .toBuilder().respondent1Represented(YesOrNo.NO)
-                    .drawDirectionsOrderRequired(YES)
-                    .drawDirectionsOrderSmallClaims(NO)
-                    .claimsTrack(ClaimsTrack.fastTrack)
-                    .orderType(OrderType.DECIDE_DAMAGES)
-                    .build(),
-                true
-            ),
-            Arguments.of(
-                CaseDataBuilder.builder().atStateClaimIssued().build()
-                    .toBuilder().respondent1Represented(YesOrNo.NO)
-                    .drawDirectionsOrderRequired(YES)
-                    .drawDirectionsOrderSmallClaims(NO)
-                    .claimsTrack(ClaimsTrack.fastTrack)
-                    .orderType(OrderType.DECIDE_DAMAGES)
-                    .trialReadyRespondent1(YES)
-                    .build(),
-                false
-            )
+            Arguments.of(caseData1, true),
+            Arguments.of(caseData2, false)
         );
     }
 

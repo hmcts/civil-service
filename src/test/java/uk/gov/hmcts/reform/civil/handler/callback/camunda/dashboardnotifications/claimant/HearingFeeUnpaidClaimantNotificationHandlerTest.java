@@ -80,13 +80,12 @@ class HearingFeeUnpaidClaimantNotificationHandlerTest {
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateHearingFeeDueUnpaid().build().toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .drawDirectionsOrderRequired(YesOrNo.YES)
-                .drawDirectionsOrderSmallClaims(NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .orderType(OrderType.DECIDE_DAMAGES)
-                .build();
+                .atStateHearingFeeDueUnpaid().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
+            caseData.setDrawDirectionsOrderSmallClaims(NO);
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setOrderType(OrderType.DECIDE_DAMAGES);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_HEARING_FEE_UNPAID_FOR_CLAIMANT1.name()).build()
             ).build();
@@ -135,13 +134,12 @@ class HearingFeeUnpaidClaimantNotificationHandlerTest {
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateTrialReadyApplicant().build().toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .drawDirectionsOrderRequired(YesOrNo.YES)
-                .drawDirectionsOrderSmallClaims(NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .orderType(OrderType.DECIDE_DAMAGES)
-                .build();
+                .atStateTrialReadyApplicant().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
+            caseData.setDrawDirectionsOrderSmallClaims(NO);
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setOrderType(OrderType.DECIDE_DAMAGES);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_HEARING_FEE_UNPAID_FOR_CLAIMANT1.name()).build()
             ).build();
