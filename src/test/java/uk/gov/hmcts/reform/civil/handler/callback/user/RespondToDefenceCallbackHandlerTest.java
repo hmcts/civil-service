@@ -579,8 +579,11 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             String name = "John Smith";
             String role = "Solicitor";
 
+            StatementOfTruth statementOfTruth = new StatementOfTruth();
+            statementOfTruth.setName(name);
+            statementOfTruth.setRole(role);
             CaseData caseData = CaseDataBuilder.builder()
-                .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
+                .uiStatementOfTruth(statementOfTruth)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, "statement-of-truth");
@@ -1303,7 +1306,10 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 String role = "Solicitor";
 
                 CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
-                caseData.setUiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build());
+                StatementOfTruth statementOfTruth = new StatementOfTruth();
+                statementOfTruth.setName(name);
+                statementOfTruth.setRole(role);
+                caseData.setUiStatementOfTruth(statementOfTruth);
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                     callbackParamsOf(
