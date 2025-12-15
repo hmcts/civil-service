@@ -23,6 +23,12 @@ public class ClaimTypeHelper {
                 return ClaimType.CONSUMER;
             case CONSUMER_CREDIT:
                 return ClaimType.CONSUMER_CREDIT;
+            case PPI:
+                return ClaimType.PPI;
+            case HOUSING_DISREPAIR:
+                return ClaimType.HOUSING_DISREPAIR;
+            case MOTOR_FINANCE:
+                return ClaimType.MOTOR_FINANCE;
             case OTHER:
                 return ClaimType.OTHER;
             default:
