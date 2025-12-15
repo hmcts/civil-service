@@ -1311,12 +1311,12 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         }
 
         private CaseData getMockServiceData(CaseData caseData) {
-            GAPbaDetails originalPbaDetails = caseData.getGeneralAppPBADetails();
-            GAPbaDetails pbaDetails = originalPbaDetails != null
-                ? originalPbaDetails.toBuilder().build()
-                : GAPbaDetails.builder().build();
+            GAPbaDetails pbaDetails = caseData.getGeneralAppPBADetails();
+            if (pbaDetails == null) {
+                pbaDetails = new GAPbaDetails();
+                caseData.setGeneralAppPBADetails(pbaDetails);
+            }
             pbaDetails.setFee(feeFromFeeService);
-            caseData.setGeneralAppPBADetails(pbaDetails);
             return caseData;
         }
 

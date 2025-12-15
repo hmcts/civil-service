@@ -198,23 +198,25 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
 
     private void setOrganisationPolicy(CaseData caseData) {
         if (caseData.getRespondent1OrganisationIDCopy() != null) {
-            caseData.setRespondent1OrganisationPolicy(
-                caseData.getRespondent1OrganisationPolicy().toBuilder()
-                    .organisation(Organisation.builder()
-                                      .organisationID(caseData.getRespondent1OrganisationIDCopy())
-                                      .build())
-                    .build()
-            );
+            var existingPolicy = caseData.getRespondent1OrganisationPolicy();
+            var newPolicy = new uk.gov.hmcts.reform.ccd.model.OrganisationPolicy();
+            newPolicy.setOrgPolicyReference(existingPolicy.getOrgPolicyReference());
+            newPolicy.setOrgPolicyCaseAssignedRole(existingPolicy.getOrgPolicyCaseAssignedRole());
+            Organisation organisation = new Organisation();
+            organisation.setOrganisationID(caseData.getRespondent1OrganisationIDCopy());
+            newPolicy.setOrganisation(organisation);
+            caseData.setRespondent1OrganisationPolicy(newPolicy);
         }
 
         if (caseData.getRespondent2OrganisationIDCopy() != null) {
-            caseData.setRespondent2OrganisationPolicy(
-                caseData.getRespondent2OrganisationPolicy().toBuilder()
-                    .organisation(Organisation.builder()
-                                      .organisationID(caseData.getRespondent2OrganisationIDCopy())
-                                      .build())
-                    .build()
-            );
+            var existingPolicy = caseData.getRespondent2OrganisationPolicy();
+            var newPolicy = new uk.gov.hmcts.reform.ccd.model.OrganisationPolicy();
+            newPolicy.setOrgPolicyReference(existingPolicy.getOrgPolicyReference());
+            newPolicy.setOrgPolicyCaseAssignedRole(existingPolicy.getOrgPolicyCaseAssignedRole());
+            Organisation organisation = new Organisation();
+            organisation.setOrganisationID(caseData.getRespondent2OrganisationIDCopy());
+            newPolicy.setOrganisation(organisation);
+            caseData.setRespondent2OrganisationPolicy(newPolicy);
         }
     }
 

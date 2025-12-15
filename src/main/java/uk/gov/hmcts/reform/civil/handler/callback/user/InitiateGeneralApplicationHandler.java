@@ -295,19 +295,10 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 .build();
     }
 
-    private CaseData.CaseDataBuilder<?, ?> getSharedData(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        return caseData.toBuilder();
-    }
-
     private CallbackResponse submitApplication(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         caseData = setWithNoticeByType(caseData);
         final UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
-
-        // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        final CaseData.CaseDataBuilder<?, ?> dataBuilder = getSharedData(callbackParams);
 
         if (caseData.getGeneralAppPBADetails() == null) {
             GAPbaDetails generalAppPBADetails = new GAPbaDetails();
