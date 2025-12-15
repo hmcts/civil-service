@@ -47,6 +47,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -119,16 +120,12 @@ public class SubmitClaimTask {
         caseData.setRespondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build());
         caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
 
-        if (featureToggleService.isWelshEnabledForMainCase()) {
-            //    added this to show location name  on location column in my tasks tab
-            List<LocationRefData> locations = (locationRefDataService
-                .getCourtLocationsByEpimmsIdAndCourtType(authorisationToken, epimmsId));
-            if (!locations.isEmpty()) {
-                LocationRefData locationRefData = locations.get(0);
-                caseData.setLocationName(locationRefData.getSiteName());
-            }
+        List<LocationRefData> locations = (locationRefDataService
+            .getCourtLocationsByEpimmsId(authorisationToken, epimmsId));
 
-        }
+        Optional.ofNullable(locations)
+            .orElseGet(Collections::emptyList).stream().findFirst()
+            .ifPresent(locationRefData -> caseData.setLocationName(locationRefData.getSiteName()));
 
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             caseData.setRespondent2DetailsForClaimDetailsTab(caseData.getRespondent2().toBuilder().flags(null).build());
