@@ -62,7 +62,7 @@ public class DashboardClaimInfoService {
         List<DashboardClaimInfo> currentPageItems = currentPage <= totalPages
             ? getDashboardItemsForCurrentPage(ocmcClaims, currentPage, ccdData, false) :
             Collections.emptyList();
-        return DashboardResponse.builder().totalPages(totalPages).claims(currentPageItems).build();
+        return new DashboardResponse().setTotalPages(totalPages).setClaims(currentPageItems);
     }
 
     public DashboardResponse getDashboardClaimantResponse(String authorisation, String claimantId, int currentPage) {
@@ -79,7 +79,7 @@ public class DashboardClaimInfoService {
         List<DashboardClaimInfo> currentPageItems = currentPage <= totalPages
             ? getDashboardItemsForCurrentPage(ocmcClaims, currentPage, ccdData, true) :
             Collections.emptyList();
-        return DashboardResponse.builder().totalPages(totalPages).claims(currentPageItems).build();
+        return new DashboardResponse().setTotalPages(totalPages).setClaims(currentPageItems);
     }
 
     private List<DashboardClaimInfo> getClaimsForClaimant(String authorisation, String claimantId) {
@@ -134,16 +134,16 @@ public class DashboardClaimInfoService {
 
     private DashboardClaimInfo translateCaseDataToDashboardClaimInfo(CaseDetails caseDetails, boolean isClaimant) {
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
-        DashboardClaimInfo item = DashboardClaimInfo.builder().claimId(String.valueOf(caseData.getCcdCaseReference()))
-            .createdDate(submittedDateToCreatedDate(caseData))
-            .claimNumber(caseData.getLegacyCaseReference())
-            .claimantName(nonNull(caseData.getApplicant1()) ? caseData.getApplicant1().getPartyName() : null)
-            .defendantName(nonNull(caseData.getRespondent1()) ? caseData.getRespondent1().getPartyName() : null)
-            .claimAmount(nonNull(caseData.getTotalClaimAmount()) ? caseData.getTotalClaimAmount() : null)
-            .admittedAmount(caseData.getPartAdmitPaidValuePounds())
-            .responseDeadlineTime(caseData.getRespondent1ResponseDeadline())
-            .status(getStatus(isClaimant, caseData))
-            .build();
+        DashboardClaimInfo item = new DashboardClaimInfo()
+            .setClaimId(String.valueOf(caseData.getCcdCaseReference()))
+            .setCreatedDate(submittedDateToCreatedDate(caseData))
+            .setClaimNumber(caseData.getLegacyCaseReference())
+            .setClaimantName(nonNull(caseData.getApplicant1()) ? caseData.getApplicant1().getPartyName() : null)
+            .setDefendantName(nonNull(caseData.getRespondent1()) ? caseData.getRespondent1().getPartyName() : null)
+            .setClaimAmount(nonNull(caseData.getTotalClaimAmount()) ? caseData.getTotalClaimAmount() : null)
+            .setAdmittedAmount(caseData.getPartAdmitPaidValuePounds())
+            .setResponseDeadlineTime(caseData.getRespondent1ResponseDeadline())
+            .setStatus(getStatus(isClaimant, caseData));
         if (caseData.getRespondent1ResponseDeadline() != null) {
             item.setResponseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate());
         }

@@ -43,9 +43,8 @@ public class UpdateWaCourtLocationsService {
             LocationRefData caseManagementLocationName = courtLocationDetails(locationRefDataList,
                                                                               caseData.getCaseManagementLocation().getBaseLocation(),
                                                                               "CML location");
-            caseData.setCaseManagementLocationTab(TaskManagementLocationTab.builder()
-                                                          .caseManagementLocation(caseManagementLocationName.getSiteName())
-                                                          .build());
+            caseData.setCaseManagementLocationTab(new TaskManagementLocationTab()
+                                                          .setCaseManagementLocation(caseManagementLocationName.getSiteName()));
             caseData.setTaskManagementLocations(null);
             return;
         }
@@ -64,32 +63,27 @@ public class UpdateWaCourtLocationsService {
             LocationRefData trialListing = courtLocationDetails(locationRefDataList,
                                                                 dmnListingLocations.getTrialListingLocation().getValue(), "Trial Listing");
 
-            caseData.setTaskManagementLocations(TaskManagementLocationTypes.builder()
-                                                        .cmcListingLocation(TaskManagementLocationsModel.builder()
-                                                                                .region(cmcListing.getRegionId())
-                                                                                .regionName(cmcListing.getRegion())
-                                                                                .location(cmcListing.getEpimmsId())
-                                                                                .locationName(cmcListing.getSiteName())
-                                                                                .build())
-                                                        .ccmcListingLocation(TaskManagementLocationsModel.builder()
-                                                                                 .region(ccmcListing.getRegionId())
-                                                                                 .regionName(ccmcListing.getRegion())
-                                                                                 .location(ccmcListing.getEpimmsId())
-                                                                                 .locationName(ccmcListing.getSiteName())
-                                                                                 .build())
-                                                        .ptrListingLocation(TaskManagementLocationsModel.builder()
-                                                                                .region(preTrialListing.getRegionId())
-                                                                                .regionName(preTrialListing.getRegion())
-                                                                                .location(preTrialListing.getEpimmsId())
-                                                                                .locationName(preTrialListing.getSiteName())
-                                                                                .build())
-                                                        .trialListingLocation(TaskManagementLocationsModel.builder()
-                                                                                  .region(trialListing.getRegionId())
-                                                                                  .regionName(trialListing.getRegion())
-                                                                                  .location(trialListing.getEpimmsId())
-                                                                                  .locationName(trialListing.getSiteName())
-                                                                                  .build())
-                                                        .build());
+            caseData.setTaskManagementLocations(new TaskManagementLocationTypes()
+                                                        .setCmcListingLocation(new TaskManagementLocationsModel()
+                                                                                .setRegion(cmcListing.getRegionId())
+                                                                                .setRegionName(cmcListing.getRegion())
+                                                                                .setLocation(cmcListing.getEpimmsId())
+                                                                                .setLocationName(cmcListing.getSiteName()))
+                                                        .setCcmcListingLocation(new TaskManagementLocationsModel()
+                                                                                 .setRegion(ccmcListing.getRegionId())
+                                                                                 .setRegionName(ccmcListing.getRegion())
+                                                                                 .setLocation(ccmcListing.getEpimmsId())
+                                                                                 .setLocationName(ccmcListing.getSiteName()))
+                                                        .setPtrListingLocation(new TaskManagementLocationsModel()
+                                                                                .setRegion(preTrialListing.getRegionId())
+                                                                                .setRegionName(preTrialListing.getRegion())
+                                                                                .setLocation(preTrialListing.getEpimmsId())
+                                                                                .setLocationName(preTrialListing.getSiteName()))
+                                                        .setTrialListingLocation(new TaskManagementLocationsModel()
+                                                                                  .setRegion(trialListing.getRegionId())
+                                                                                  .setRegionName(trialListing.getRegion())
+                                                                                  .setLocation(trialListing.getEpimmsId())
+                                                                                  .setLocationName(trialListing.getSiteName())));
 
             populateSummaryTab(caseData, locationRefDataList);
 
@@ -100,11 +94,10 @@ public class UpdateWaCourtLocationsService {
 
     private void populateSummaryTab(CaseData caseData, List<LocationRefData> locationRefDataList) {
 
-        TaskManagementLocationTab tabContent = TaskManagementLocationTab.builder()
-            .cmcListingLocation(caseData.getTaskManagementLocations().getCmcListingLocation().getLocationName())
-            .ptrListingLocation(caseData.getTaskManagementLocations().getPtrListingLocation().getLocationName())
-            .trialListingLocation(caseData.getTaskManagementLocations().getTrialListingLocation().getLocationName())
-            .build();
+        TaskManagementLocationTab tabContent = new TaskManagementLocationTab()
+            .setCmcListingLocation(caseData.getTaskManagementLocations().getCmcListingLocation().getLocationName())
+            .setPtrListingLocation(caseData.getTaskManagementLocations().getPtrListingLocation().getLocationName())
+            .setTrialListingLocation(caseData.getTaskManagementLocations().getTrialListingLocation().getLocationName());
 
         String claimTrack = getClaimTrack(caseData);
         if ("MULTI_CLAIM".equals(claimTrack)) {
@@ -115,9 +108,8 @@ public class UpdateWaCourtLocationsService {
                                                                           caseData.getCaseManagementLocation().getBaseLocation(),
                                                                           "CML location");
 
-        caseData.setCaseManagementLocationTab(TaskManagementLocationTab.builder()
-                                                      .caseManagementLocation(caseManagementLocationName.getSiteName())
-                                                      .build());
+        caseData.setCaseManagementLocationTab(new TaskManagementLocationTab()
+                                                      .setCaseManagementLocation(caseManagementLocationName.getSiteName()));
 
         caseData.setTaskManagementLocationsTab(tabContent);
     }

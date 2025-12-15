@@ -469,9 +469,7 @@ public class UnavailabilityDatesUtilsTest {
                 .respondent1DQ(respondent1DQ)
                 .build();
 
-            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-
-            UnavailabilityDatesUtils.copyDatesIntoListingTabFields(caseData, builder);
+            UnavailabilityDatesUtils.copyDatesIntoListingTabFields(caseData);
 
             UnavailableDate expectedDate = new UnavailableDate();
             expectedDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
@@ -480,8 +478,8 @@ public class UnavailabilityDatesUtilsTest {
             expectedDate.setEventAdded(DEFENDANT_RESPONSE_EVENT);
             List<UnavailableDate> expectedDates = Stream.of(expectedDate).toList();
 
-            assertThat(unwrapElements(builder.build().getRespondent1().getUnavailableDates())).isEqualTo(expectedDates);
-            assertThat(unwrapElements(builder.build().getRespondent1UnavailableDatesForTab())).isEqualTo(expectedDates);
+            assertThat(unwrapElements(caseData.getRespondent1().getUnavailableDates())).isEqualTo(expectedDates);
+            assertThat(unwrapElements(caseData.getRespondent1UnavailableDatesForTab())).isEqualTo(expectedDates);
         }
 
         @Test
@@ -502,9 +500,7 @@ public class UnavailabilityDatesUtilsTest {
                 .respondent2DQ(respondent2DQ)
                 .build();
 
-            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-
-            UnavailabilityDatesUtils.copyDatesIntoListingTabFields(caseData, builder);
+            UnavailabilityDatesUtils.copyDatesIntoListingTabFields(caseData);
 
             UnavailableDate expectedDate = new UnavailableDate();
             expectedDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
@@ -513,8 +509,8 @@ public class UnavailabilityDatesUtilsTest {
             expectedDate.setEventAdded(DEFENDANT_RESPONSE_EVENT);
             List<UnavailableDate> expectedDates = Stream.of(expectedDate).toList();
 
-            assertThat(unwrapElements(builder.build().getRespondent2().getUnavailableDates())).isEqualTo(expectedDates);
-            assertThat(unwrapElements(builder.build().getRespondent2UnavailableDatesForTab())).isEqualTo(expectedDates);
+            assertThat(unwrapElements(caseData.getRespondent2().getUnavailableDates())).isEqualTo(expectedDates);
+            assertThat(unwrapElements(caseData.getRespondent2UnavailableDatesForTab())).isEqualTo(expectedDates);
         }
 
         @Test
@@ -535,9 +531,7 @@ public class UnavailabilityDatesUtilsTest {
                 .applicant1DQ(applicant1DQ)
                 .build();
 
-            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-
-            UnavailabilityDatesUtils.copyDatesIntoListingTabFields(caseData, builder);
+            UnavailabilityDatesUtils.copyDatesIntoListingTabFields(caseData);
 
             UnavailableDate expectedDate = new UnavailableDate();
             expectedDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
@@ -546,8 +540,8 @@ public class UnavailabilityDatesUtilsTest {
             expectedDate.setEventAdded(CLAIMANT_INTENTION_EVENT);
             List<UnavailableDate> expectedDates = Stream.of(expectedDate).toList();
 
-            assertThat(unwrapElements(builder.build().getApplicant1().getUnavailableDates())).isEqualTo(expectedDates);
-            assertThat(unwrapElements(builder.build().getApplicant1UnavailableDatesForTab())).isEqualTo(expectedDates);
+            assertThat(unwrapElements(caseData.getApplicant1().getUnavailableDates())).isEqualTo(expectedDates);
+            assertThat(unwrapElements(caseData.getApplicant1UnavailableDatesForTab())).isEqualTo(expectedDates);
         }
 
         @Test
@@ -574,9 +568,7 @@ public class UnavailabilityDatesUtilsTest {
                 .applicant1DQ(applicant1DQ)
                 .build();
 
-            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-
-            UnavailabilityDatesUtils.copyDatesIntoListingTabFields(caseData, builder);
+            UnavailabilityDatesUtils.copyDatesIntoListingTabFields(caseData);
 
             UnavailableDate expectedDate = new UnavailableDate();
             expectedDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
@@ -585,10 +577,10 @@ public class UnavailabilityDatesUtilsTest {
             expectedDate.setEventAdded(CLAIMANT_INTENTION_EVENT);
             List<UnavailableDate> expectedDates = Stream.of(expectedDate).toList();
 
-            assertThat(unwrapElements(builder.build().getApplicant1().getUnavailableDates())).isEqualTo(expectedDates);
-            assertThat(unwrapElements(builder.build().getApplicant1UnavailableDatesForTab())).isEqualTo(expectedDates);
-            assertThat(unwrapElements(builder.build().getApplicant2().getUnavailableDates())).isEqualTo(expectedDates);
-            assertThat(unwrapElements(builder.build().getApplicant2UnavailableDatesForTab())).isEqualTo(expectedDates);
+            assertThat(unwrapElements(caseData.getApplicant1().getUnavailableDates())).isEqualTo(expectedDates);
+            assertThat(unwrapElements(caseData.getApplicant1UnavailableDatesForTab())).isEqualTo(expectedDates);
+            assertThat(unwrapElements(caseData.getApplicant2().getUnavailableDates())).isEqualTo(expectedDates);
+            assertThat(unwrapElements(caseData.getApplicant2UnavailableDatesForTab())).isEqualTo(expectedDates);
         }
 
         @Test
@@ -610,12 +602,10 @@ public class UnavailabilityDatesUtilsTest {
                                 .build())
                 .build();
 
-            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+            UnavailabilityDatesUtils.copyDatesIntoListingTabFields(caseData);
 
-            UnavailabilityDatesUtils.copyDatesIntoListingTabFields(caseData, builder);
-
-            assertThat(unwrapElements(builder.build().getApplicant1().getUnavailableDates())).isEqualTo(expectedDates);
-            assertThat(unwrapElements(builder.build().getApplicant1UnavailableDatesForTab())).isEqualTo(expectedDates);
+            assertThat(unwrapElements(caseData.getApplicant1().getUnavailableDates())).isEqualTo(expectedDates);
+            assertThat(unwrapElements(caseData.getApplicant1UnavailableDatesForTab())).isEqualTo(expectedDates);
         }
 
         @Test
@@ -654,9 +644,7 @@ public class UnavailabilityDatesUtilsTest {
                 .applicant1DQ(applicant1DQ)
                 .build();
 
-            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-
-            UnavailabilityDatesUtils.copyDatesIntoListingTabFields(caseData, builder);
+            UnavailabilityDatesUtils.copyDatesIntoListingTabFields(caseData);
 
             UnavailableDate expectedDateDefendant = new UnavailableDate();
             expectedDateDefendant.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
@@ -672,12 +660,12 @@ public class UnavailabilityDatesUtilsTest {
             List<UnavailableDate> expectedDatesApplicant = Stream.of(expectedDateApplicant).toList();
             List<UnavailableDate> expectedDatesDefendant = Stream.of(expectedDateDefendant).toList();
 
-            assertThat(unwrapElements(builder.build().getApplicant1().getUnavailableDates())).isEqualTo(expectedDatesApplicant);
-            assertThat(unwrapElements(builder.build().getApplicant1UnavailableDatesForTab())).isEqualTo(expectedDatesApplicant);
-            assertThat(unwrapElements(builder.build().getRespondent1().getUnavailableDates())).isEqualTo(expectedDatesDefendant);
-            assertThat(unwrapElements(builder.build().getRespondent1UnavailableDatesForTab())).isEqualTo(expectedDatesDefendant);
-            assertThat(unwrapElements(builder.build().getRespondent2().getUnavailableDates())).isEqualTo(expectedDatesDefendant);
-            assertThat(unwrapElements(builder.build().getRespondent2UnavailableDatesForTab())).isEqualTo(expectedDatesDefendant);
+            assertThat(unwrapElements(caseData.getApplicant1().getUnavailableDates())).isEqualTo(expectedDatesApplicant);
+            assertThat(unwrapElements(caseData.getApplicant1UnavailableDatesForTab())).isEqualTo(expectedDatesApplicant);
+            assertThat(unwrapElements(caseData.getRespondent1().getUnavailableDates())).isEqualTo(expectedDatesDefendant);
+            assertThat(unwrapElements(caseData.getRespondent1UnavailableDatesForTab())).isEqualTo(expectedDatesDefendant);
+            assertThat(unwrapElements(caseData.getRespondent2().getUnavailableDates())).isEqualTo(expectedDatesDefendant);
+            assertThat(unwrapElements(caseData.getRespondent2UnavailableDatesForTab())).isEqualTo(expectedDatesDefendant);
         }
     }
 }

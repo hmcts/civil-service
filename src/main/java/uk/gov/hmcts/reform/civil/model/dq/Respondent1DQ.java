@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.DeterWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
@@ -20,6 +21,7 @@ import java.util.stream.Stream;
 @Setter
 @Data
 @Builder(toBuilder = true)
+@Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Respondent1DQ implements DQ {

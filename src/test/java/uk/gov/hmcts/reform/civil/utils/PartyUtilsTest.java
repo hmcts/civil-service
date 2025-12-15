@@ -1190,7 +1190,7 @@ class PartyUtilsTest {
 
         @Test
         void shouldPopulateWitnessAndExpertsPartyIds_withinGivenCaseDataBuilder() {
-            CaseData.CaseDataBuilder builder = CaseData.builder()
+            CaseData caseData = CaseData.builder()
                 .applicantExperts(wrapElements(PartyFlagStructure.builder().partyID("app1-expert-id").firstName("app1").lastName(
                     "expert").build()))
                 .respondent1Experts(wrapElements(PartyFlagStructure.builder().partyID("res1-expert-id").firstName("res1").lastName(
@@ -1202,11 +1202,12 @@ class PartyUtilsTest {
                 .respondent1Witnesses(wrapElements(PartyFlagStructure.builder().partyID("res1-witness-id").firstName(
                     "res1").lastName("witness").build()))
                 .respondent2Witnesses(wrapElements(PartyFlagStructure.builder().partyID("res2-witness-id").firstName(
-                    "res2").lastName("witness").build()));
+                    "res2").lastName("witness").build()))
+                .build();
 
-            PartyUtils.populateWitnessAndExpertsPartyIds(builder);
+            PartyUtils.populateWitnessAndExpertsPartyIds(caseData);
 
-            CaseData actual = builder.build();
+            CaseData actual = caseData;
 
             assertNotNull(actual.getApplicantExperts().get(0).getValue().getPartyID());
             assertEquals("app1-expert-id", actual.getApplicantExperts().get(0).getValue().getPartyID());
@@ -1229,7 +1230,7 @@ class PartyUtilsTest {
 
         @Test
         void shouldNotOverWriteExistingWitnessAndExpertsPartyIds() {
-            CaseData.CaseDataBuilder builder = CaseData.builder()
+            CaseData caseData = CaseData.builder()
                 .applicantExperts(wrapElements(PartyFlagStructure.builder().partyID("existingAppExpertPartyId").firstName(
                     "app1").lastName("expert").build()))
                 .respondent1Experts(wrapElements(PartyFlagStructure.builder().partyID("existingRes1ExpertPartyId").firstName(
@@ -1241,11 +1242,12 @@ class PartyUtilsTest {
                 .respondent1Witnesses(wrapElements(PartyFlagStructure.builder().partyID("existingRes1WitnessPartyId").firstName(
                     "res1").lastName("witness").build()))
                 .respondent2Witnesses(wrapElements(PartyFlagStructure.builder().partyID("existingRes2WitnessPartyId").firstName(
-                    "res2").lastName("witness").build()));
+                    "res2").lastName("witness").build()))
+                .build();
 
-            PartyUtils.populateWitnessAndExpertsPartyIds(builder);
+            PartyUtils.populateWitnessAndExpertsPartyIds(caseData);
 
-            CaseData actual = builder.build();
+            CaseData actual = caseData;
 
             assertEquals("existingAppExpertPartyId", actual.getApplicantExperts().get(0).getValue().getPartyID());
             assertEquals("existingRes1ExpertPartyId", actual.getRespondent1Experts().get(0).getValue().getPartyID());
@@ -1257,10 +1259,10 @@ class PartyUtilsTest {
 
         @Test
         void shouldReturnNull_whenCaseDataBuilderHasNullWitnessAndExperts() {
-            CaseData.CaseDataBuilder builder = CaseData.builder();
+            CaseData caseData = CaseData.builder().build();
 
-            PartyUtils.populateWitnessAndExpertsPartyIds(builder);
-            CaseData actual = builder.build();
+            PartyUtils.populateWitnessAndExpertsPartyIds(caseData);
+            CaseData actual = caseData;
 
             assertNull(actual.getApplicantExperts());
             assertNull(actual.getRespondent1Experts());

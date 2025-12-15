@@ -57,12 +57,14 @@ public class UpdateCaseManagementDetailsService {
 
         caseData.setCaseNameHmctsInternal(caseParticipants(caseData).toString());
 
-        CaseManagementCategoryElement civil =
-            CaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
+        CaseManagementCategoryElement civil = new CaseManagementCategoryElement()
+            .setCode("Civil")
+            .setLabel("Civil");
         List<Element<CaseManagementCategoryElement>> itemList = new ArrayList<>();
         itemList.add(element(civil));
-        caseData.setCaseManagementCategory(
-            CaseManagementCategory.builder().value(civil).list_items(itemList).build());
+        caseData.setCaseManagementCategory(new CaseManagementCategory()
+            .setValue(civil)
+            .setList_items(itemList));
     }
 
     private void updateFlightDelayCaseManagementLocation(
@@ -88,16 +90,15 @@ public class UpdateCaseManagementDetailsService {
         return Optional.ofNullable(airlineEpimsService.getEpimsIdForAirlineIgnoreCase(airlineName))
             .map(locationEpimmsId -> availableLocations.stream().filter(loc -> loc.getEpimmsId().equals(locationEpimmsId)).toList())
             .filter(matchedLocations -> !matchedLocations.isEmpty())
-            .map(matchedLocations -> CaseLocationCivil.builder()
-                .region(matchedLocations.get(0).getRegionId())
-                .baseLocation(matchedLocations.get(0).getEpimmsId()).build())
+            .map(matchedLocations -> new CaseLocationCivil()
+                .setRegion(matchedLocations.get(0).getRegionId())
+                .setBaseLocation(matchedLocations.get(0).getEpimmsId()))
             .orElse(availableLocations.stream()
                         .filter(locationRefData -> LIVERPOOL_SITE_NAME.equals(locationRefData.getSiteName()))
                         .findFirst()
-                        .map(locationRefData -> CaseLocationCivil.builder()
-                            .region(locationRefData.getRegionId())
-                            .baseLocation(locationRefData.getEpimmsId())
-                            .build())
+                        .map(locationRefData -> new CaseLocationCivil()
+                            .setRegion(locationRefData.getRegionId())
+                            .setBaseLocation(locationRefData.getEpimmsId()))
                         .orElse(null));
     }
 
@@ -105,8 +106,7 @@ public class UpdateCaseManagementDetailsService {
         Optional.ofNullable(caseData.getApplicant1DQ())
             .ifPresent(dq -> Optional.ofNullable(dq.getApplicant1DQRequestedCourt())
                 .ifPresent(requestedCourt -> caseData.setApplicant1DQ(
-                    dq.toBuilder().applicant1DQRequestedCourt(correctCaseLocation(requestedCourt, availableLocations))
-                        .build())));
+                    dq.setApplicant1DQRequestedCourt(correctCaseLocation(requestedCourt, availableLocations)))));
     }
 
     public void updateRespondent1RequestedCourtDetails(CaseData caseData, List<LocationRefData> availableLocations) {
@@ -114,8 +114,7 @@ public class UpdateCaseManagementDetailsService {
             Optional.ofNullable(caseData.getRespondent1DQ())
                 .ifPresent(dq -> Optional.ofNullable(dq.getRespondent1DQRequestedCourt())
                     .ifPresent(requestedCourt -> caseData.setRespondent1DQ(
-                        dq.toBuilder().respondent1DQRequestedCourt(correctCaseLocation(requestedCourt, availableLocations))
-                            .build())));
+                        dq.setRespondent1DQRequestedCourt(correctCaseLocation(requestedCourt, availableLocations)))));
         }
     }
 
@@ -127,10 +126,9 @@ public class UpdateCaseManagementDetailsService {
         LocationRefData preferredLocation = locations.stream()
             .filter(locationRefData -> courtLocationUtils.checkLocation(locationRefData, locationLabel))
             .findFirst().orElseThrow(RuntimeException::new);
-        return requestedCourt.toBuilder()
-            .responseCourtCode(preferredLocation.getCourtLocationCode())
-            .caseLocation(LocationHelper.buildCaseLocation(preferredLocation))
-            .build();
+        return requestedCourt
+            .setResponseCourtCode(preferredLocation.getCourtLocationCode())
+            .setCaseLocation(LocationHelper.buildCaseLocation(preferredLocation));
     }
 
     public List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {

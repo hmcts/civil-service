@@ -49,16 +49,15 @@ public class LipDefendantCaseAssignmentService {
                                                           Optional<CaseRole> caseRole,
                                                           Optional<CaseDetails> caseDetails) {
         UserDetails defendantIdamUserDetails = userService.getUserDetails(authorisation);
-        IdamUserDetails defendantUserDetails = IdamUserDetails.builder()
-                .id(defendantIdamUserDetails.getId())
-                .email(defendantIdamUserDetails.getEmail())
-                .build();
+        IdamUserDetails defendantUserDetails = new IdamUserDetails()
+                .setId(defendantIdamUserDetails.getId())
+                .setEmail(defendantIdamUserDetails.getEmail());
         Map<String, Object> data = new HashMap<>();
         data.put("defendantUserDetails", defendantUserDetails);
         if (caseDetails.isPresent()) {
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails.get());
             Party respondent1 = caseData.getRespondent1();
-            respondent1 = respondent1.toBuilder().partyEmail(defendantIdamUserDetails.getEmail()).build();
+            respondent1 = respondent1.setPartyEmail(defendantIdamUserDetails.getEmail());
             data.put("respondent1", respondent1);
             if (caseFlagsLoggingEnabled) {
                 log.info(
@@ -72,13 +71,11 @@ public class LipDefendantCaseAssignmentService {
             Map<String, Object> pinPostData = defendantPinToPostLRspecService.removePinInPostData(caseDetails.get());
             data.putAll(pinPostData);
         }
-        caseEventService.submitEventForClaim(EventSubmissionParams
-                                                 .builder()
-                                                 .userId(defendantIdamUserDetails.getId())
-                                                 .authorisation(authorisation)
-                                                 .caseId(caseId)
-                                                 .updates(data)
-                                                 .event(ASSIGN_LIP_DEFENDANT)
-                                                 .build());
+        caseEventService.submitEventForClaim(new EventSubmissionParams()
+                                                 .setUserId(defendantIdamUserDetails.getId())
+                                                 .setAuthorisation(authorisation)
+                                                 .setCaseId(caseId)
+                                                 .setUpdates(data)
+                                                 .setEvent(ASSIGN_LIP_DEFENDANT));
     }
 }

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.DeterWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -13,6 +14,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 @Setter
 @Data
 @Builder(toBuilder = true)
+@Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Applicant1DQ implements DQ {

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.NoRemissionDetailsSummary;
 
@@ -12,6 +13,7 @@ import java.math.BigDecimal;
 
 @Data
 @Builder(toBuilder = true)
+@Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class HelpWithFeesDetails {

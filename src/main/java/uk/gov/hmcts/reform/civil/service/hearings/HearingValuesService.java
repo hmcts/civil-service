@@ -155,15 +155,14 @@ public class HearingValuesService {
     }
 
     private void populateMissingFields(Long caseId, CaseData caseData) throws Exception {
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-        boolean partyIdsUpdated = populateMissingPartyIds(builder, caseData);
-        boolean unavailableDatesUpdated = populateMissingUnavailableDatesFields(builder);
-        boolean caseFlagsUpdated = initialiseMissingCaseFlags(builder);
+        boolean partyIdsUpdated = populateMissingPartyIds(caseData);
+        boolean unavailableDatesUpdated = populateMissingUnavailableDatesFields(caseData);
+        boolean caseFlagsUpdated = initialiseMissingCaseFlags(caseData);
 
         if (partyIdsUpdated || unavailableDatesUpdated || caseFlagsUpdated) {
             try {
                 caseDataService.triggerEvent(
-                    caseId, UPDATE_MISSING_FIELDS, builder.build().toMap(mapper));
+                    caseId, UPDATE_MISSING_FIELDS, caseData.toMap(mapper));
             } catch (FeignException e) {
                 log.error("Updating missing fields failed: {}", e);
                 throw e;
@@ -178,13 +177,12 @@ public class HearingValuesService {
      * that gets populated during claim creation. If no partyIds exist it's safe to assume there
      * are missing partyIds to populate.
      *
-     * @param builder case data builder
      * @param caseData given case data.
      * @throws MissingFieldsUpdatedException If party ids have been updated, to force the consumer to request
      *                                  the hearing values endpoint again.
      * @throws FeignException If an error is returned from case data service when triggering the event.
      */
-    private boolean populateMissingPartyIds(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData) {
+    private boolean populateMissingPartyIds(CaseData caseData) {
         if (caseData.getApplicant1().getPartyID() == null) {
             // Even if party ids creation is released and cases are
             // in an inconsistent state where app/res fields have no party ids
@@ -192,7 +190,7 @@ public class HearingValuesService {
             // as it was created to not overwrite partyId fields if they exist.
             populateWithPartyIds(caseData);
             populateDQPartyIds(caseData);
-            populateWitnessAndExpertsPartyIds(builder);
+            populateWitnessAndExpertsPartyIds(caseData);
             return true;
         }
         return false;
@@ -207,15 +205,14 @@ public class HearingValuesService {
      *                                  the hearing values endpoint again.
      * @throws FeignException If an error is returned from case data service when triggering the event.
      */
-    private boolean populateMissingUnavailableDatesFields(CaseData.CaseDataBuilder<?, ?> builder) {
-        CaseData caseData = builder.build();
+    private boolean populateMissingUnavailableDatesFields(CaseData caseData) {
         if (shouldUpdateApplicant1UnavailableDates(caseData)
             || shouldUpdateApplicant2UnavailableDates(caseData)
             || shouldUpdateRespondent1UnavailableDates(caseData)
             || shouldUpdateRespondent2UnavailableDates(caseData)) {
             updateMissingUnavailableDatesForApplicants(caseData);
             rollUpUnavailabilityDatesForRespondent(caseData);
-            copyDatesIntoListingTabFields(builder.build(), builder);
+            copyDatesIntoListingTabFields(caseData);
             return true;
         }
         return false;
@@ -230,8 +227,7 @@ public class HearingValuesService {
      *                                  the hearing values endpoint again.
      * @throws FeignException If an error is returned from case data service when triggering the event.
      */
-    private boolean initialiseMissingCaseFlags(CaseData.CaseDataBuilder<?, ?> builder) {
-        CaseData caseData = builder.build();
+    private boolean initialiseMissingCaseFlags(CaseData caseData) {
         if (caseData.getApplicant1().getFlags() == null) {
             caseFlagInitialiser.initialiseMissingCaseFlags(caseData);
             return true;

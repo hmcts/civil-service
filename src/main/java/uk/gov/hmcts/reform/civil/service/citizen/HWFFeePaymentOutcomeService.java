@@ -27,11 +27,10 @@ public class HWFFeePaymentOutcomeService {
             && caseData.getFeePaymentOutcomeDetails().getHwfNumberAvailable() == YesOrNo.YES) {
             if (caseData.isHWFTypeClaimIssued()) {
                 var caseDataLip = caseData.getCaseDataLiP();
-                HelpWithFees helpWithFees = HelpWithFees.builder()
-                    .helpWithFee(YesOrNo.YES)
-                    .helpWithFeesReferenceNumber(caseData.getFeePaymentOutcomeDetails().getHwfNumberForFeePaymentOutcome())
-                    .build();
-                caseData.setCaseDataLiP(caseDataLip.toBuilder().helpWithFees(helpWithFees).build());
+                HelpWithFees helpWithFees = new HelpWithFees()
+                    .setHelpWithFee(YesOrNo.YES)
+                    .setHelpWithFeesReferenceNumber(caseData.getFeePaymentOutcomeDetails().getHwfNumberForFeePaymentOutcome());
+                caseData.setCaseDataLiP(caseDataLip.setHelpWithFees(helpWithFees));
                 helpWithFeesForTabService.setUpHelpWithFeeTab(caseData);
             }
             if (caseData.isHWFTypeHearing()) {
@@ -43,9 +42,9 @@ public class HWFFeePaymentOutcomeService {
     }
 
     private void clearHwfReferenceProperties(CaseData caseData) {
-        caseData.setFeePaymentOutcomeDetails(caseData.getFeePaymentOutcomeDetails().toBuilder()
-                                                     .hwfNumberAvailable(null)
-                                                     .hwfNumberForFeePaymentOutcome(null).build());
+        caseData.setFeePaymentOutcomeDetails(caseData.getFeePaymentOutcomeDetails()
+                                                     .setHwfNumberAvailable(null)
+                                                     .setHwfNumberForFeePaymentOutcome(null));
     }
 
     public CaseData updateOutstandingFee(CaseData caseData, String caseEventId) {
@@ -62,19 +61,17 @@ public class HWFFeePaymentOutcomeService {
         if (caseData.isHWFTypeClaimIssued() && BigDecimal.ZERO.compareTo(claimFeeAmount) != 0) {
             outstandingFeeAmount = claimFeeAmount.subtract(claimIssuedRemissionAmount);
             caseData.setClaimIssuedHwfDetails(
-                caseData.getClaimIssuedHwfDetails().toBuilder()
-                    .remissionAmount(claimIssuedRemissionAmount)
-                    .outstandingFeeInPounds(MonetaryConversions.penniesToPounds(outstandingFeeAmount))
-                    .build()
+                caseData.getClaimIssuedHwfDetails()
+                    .setRemissionAmount(claimIssuedRemissionAmount)
+                    .setOutstandingFeeInPounds(MonetaryConversions.penniesToPounds(outstandingFeeAmount))
             );
             helpWithFeesForTabService.setUpHelpWithFeeTab(caseData);
         } else if (caseData.isHWFTypeHearing() && BigDecimal.ZERO.compareTo(hearingFeeAmount) != 0) {
             outstandingFeeAmount = hearingFeeAmount.subtract(hearingRemissionAmount);
             caseData.setHearingHwfDetails(
-                caseData.getHearingHwfDetails().toBuilder()
-                    .remissionAmount(hearingRemissionAmount)
-                    .outstandingFeeInPounds(MonetaryConversions.penniesToPounds(outstandingFeeAmount))
-                    .build()
+                caseData.getHearingHwfDetails()
+                    .setRemissionAmount(hearingRemissionAmount)
+                    .setOutstandingFeeInPounds(MonetaryConversions.penniesToPounds(outstandingFeeAmount))
             );
             helpWithFeesForTabService.setUpHelpWithFeeTab(caseData);
         }
