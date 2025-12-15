@@ -28,6 +28,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1_MULTIPARTY_SAME_SOL;
 import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.formatCcdCaseReference;
@@ -88,8 +89,8 @@ public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<S
                                               .orElse(""))
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .applicantRepresentativeOrganisationName(applicants.get(0).getRepresentative().getOrganisationName())
-            .declarationNarrative("test declaration narrative")
-            .humanRightActIssue("Yes")
+            .declarationNarrative(caseData.getDeclarationNarrative())
+            .humanRightActIssue(caseData.getHumanRightActIssue())
             .courtFee(caseData.getClaimFee().formData());
 
         if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
