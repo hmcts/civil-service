@@ -56,11 +56,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static java.lang.String.format;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -73,7 +73,6 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument.to
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
@@ -87,6 +86,7 @@ import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderDownload
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderDownloadTemplateOptions.FIX_DATE_CCMC;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderDownloadTemplateOptions.FIX_DATE_CMC;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.ASSISTED_ORDER;
+import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.FREE_FORM_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.CLAIMANT;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.STANDARD_BASIS;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.SUBJECT_DETAILED_ASSESSMENT;
@@ -350,7 +350,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             && caseData.getFinalOrderFurtherHearingToggle().get(0).equals(SHOW)
             && caseData.getFinalOrderFurtherHearingComplex().getLengthList()
                 .equals(HearingLengthFinalOrderList.OTHER)
-            && Objects.isNull(caseData.getFinalOrderFurtherHearingComplex()
+            && isNull(caseData.getFinalOrderFurtherHearingComplex()
                 .getLengthListOther())) {
             errors.add(FURTHER_HEARING_OTHER_EMPTY);
         }
@@ -690,20 +690,23 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         FinalOrderSelection savedFinalOrderSelection = caseData.getFinalOrderSelection();
         List<FinalOrderToggle> savedFinalOrderFurtherHearingToggle = caseData.getFinalOrderFurtherHearingToggle();
 
-        nullPreviousSelections(caseData);
-
         // Early return check uses the cleared selection to preserve original behavior
         // where ASSISTED_ORDER and FREE_FORM_ORDER checks would always be false after nullPreviousSelections
         if (!JUDICIAL_REFERRAL.toString().equals(callbackParams.getRequest().getCaseDetails().getState())
-            && isMultiOrIntTrack(caseData)) {
+            && ((ASSISTED_ORDER.equals(caseData.getFinalOrderSelection())
+            && isNull(caseData.getFinalOrderFurtherHearingToggle()))
+            || FREE_FORM_ORDER.equals(caseData.getFinalOrderSelection())
+            || isMultiOrIntTrack(caseData))) {
 
             caseData.setFinalOrderFurtherHearingToggle(null);
 
+            nullPreviousSelections(caseData);
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseData.toMap(objectMapper))
                 .build();
         }
-        CaseState state = All_FINAL_ORDERS_ISSUED;
+
+        CaseState state = null;
         if ((ASSISTED_ORDER.equals(savedFinalOrderSelection)
             && savedFinalOrderFurtherHearingToggle != null)
             || isJudicialReferral(callbackParams)) {
@@ -713,10 +716,17 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             caseData.setFinalOrderFurtherHearingToggle(null);
         }
 
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(objectMapper))
-            .state(state.name())
-            .build();
+        nullPreviousSelections(caseData);
+
+        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
+            AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseData.toMap(objectMapper));
+
+        if (state != null) {
+            responseBuilder.state(state.name());
+        }
+
+        return responseBuilder.build();
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {

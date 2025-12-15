@@ -91,7 +91,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         String stuckCasesFromPastDays = externalTask.getVariable("stuckCasesFromPastDays");
         casesStuckCheckSearchService.getCases(stuckCasesFromPastDays != null ? stuckCasesFromPastDays : "7");
 
-        return ExternalTaskData.builder().build();
+        return new ExternalTaskData();
     }
 
     private void processAllIncidents(

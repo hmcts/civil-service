@@ -14,6 +14,7 @@ import java.util.List;
 @Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 public class FeePaymentOutcomeDetails {
 
     private YesOrNo hwfNumberAvailable;

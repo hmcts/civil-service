@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -26,9 +27,8 @@ class UpdateCaseStateCallbackHandlerTest {
     void shouldReturnResponseWithState_whenNextStateIsPresent() {
         // Given
         String nextState = "AWAITING_APPLICANT_INTENTION";
-        CaseData caseData = CaseData.builder()
-            .nextState(nextState)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setNextState(nextState);
 
         CallbackParams params = mock(CallbackParams.class);
         when(params.getCaseData()).thenReturn(caseData);
@@ -47,9 +47,8 @@ class UpdateCaseStateCallbackHandlerTest {
     @Test
     void shouldReturnResponseWithoutState_whenNextStateIsNull() {
         // Given
-        CaseData caseData = CaseData.builder()
-            .nextState(null)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setNextState(null);
 
         CallbackParams params = mock(CallbackParams.class);
         when(params.getCaseData()).thenReturn(caseData);

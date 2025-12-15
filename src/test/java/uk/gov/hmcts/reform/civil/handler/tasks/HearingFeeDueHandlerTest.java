@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.HearingFeeDueSearchService;
@@ -74,9 +75,9 @@ class HearingFeeDueHandlerTest {
     @Test
     void shouldEmitNoHearingFeeDueEvent_whenCasesFoundNoFeeDue() {
         long caseId = 1L;
-        CaseData caseData = CaseDataBuilder.builder().atStateNoHearingFeeDue().build();
+        CaseData caseData = new CaseDataBuilder().atStateNoHearingFeeDue().build();
         Map<String, Object> data = Map.of("data", caseData);
-        Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
+        Set<CaseDetails> caseDetails = Set.of(new CaseDetailsBuilder().id(caseId).data(data).build());
 
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         when(searchService.getCases()).thenReturn(caseDetails);
@@ -93,9 +94,9 @@ class HearingFeeDueHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldEmitHearingFeePaidEvent_whenCasesFoundPaid(boolean toggle) {
         long caseId = 1L;
-        CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDuePaid().build();
+        CaseData caseData = new CaseDataBuilder().atStateHearingFeeDuePaid().build();
         Map<String, Object> data = Map.of("data", caseData);
-        Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
+        Set<CaseDetails> caseDetails = Set.of(new CaseDetailsBuilder().id(caseId).data(data).build());
 
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(toggle);
         when(searchService.getCases()).thenReturn(caseDetails);
@@ -112,16 +113,15 @@ class HearingFeeDueHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldEmitHearingFeePaidEvent_whenCasesFoundPaidWithHWF(boolean toggle) {
         long caseId = 1L;
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateHearingFeeDuePaidWithHwf()
+        CaseData caseData = new CaseDataBuilder().atStateHearingFeeDuePaidWithHwf()
             .respondent1Represented(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)
-            .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
-                                          .hwfFullRemissionGrantedForHearingFee(YesOrNo.YES).build())
+            .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
+                                          .setHwfFullRemissionGrantedForHearingFee(YesOrNo.YES))
             .build();
-        caseData = caseData.toBuilder().hearingHelpFeesReferenceNumber("HWF-111-111").build();
-        Map<String, Object> data = Map.of("data", caseData);
-        Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
+        caseData.setHearingHelpFeesReferenceNumber("HWF-111-111");
+
+        Set<CaseDetails> caseDetails = Set.of(new CaseDetailsBuilder().id(caseId).data(caseData).build());
 
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(toggle);
         when(searchService.getCases()).thenReturn(caseDetails);
@@ -138,9 +138,9 @@ class HearingFeeDueHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldEmitHearingFeeUnpaidEvent_whenCasesFoundUnpaid(boolean toggle) {
         long caseId = 1L;
-        CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDueUnpaid().build();
+        CaseData caseData = new CaseDataBuilder().atStateHearingFeeDueUnpaid().build();
         Map<String, Object> data = Map.of("data", caseData);
-        Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
+        Set<CaseDetails> caseDetails = Set.of(new CaseDetailsBuilder().id(caseId).data(data).build());
 
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(toggle);
         when(searchService.getCases()).thenReturn(caseDetails);
@@ -202,8 +202,8 @@ class HearingFeeDueHandlerTest {
         long otherId = 2L;
         Map<String, Object> data = Map.of("data", "some data");
         Set<CaseDetails> caseDetails = Set.of(
-            CaseDetails.builder().id(caseId).data(data).build(),
-            CaseDetails.builder().id(otherId).data(data).build());
+            new CaseDetailsBuilder().id(caseId).data(data).build(),
+            new CaseDetailsBuilder().id(otherId).data(data).build());
 
         when(searchService.getCases()).thenReturn(caseDetails);
 
