@@ -410,10 +410,9 @@ class DashboardClaimStatusFactoryTest {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = previous.toBuilder()
             .caseBundles(List.of(new IdValue<>(
                 "bundle1",
-                Bundle.builder()
-                    .bundleHearingDate(Optional.of(previous.getHearingDate()))
-                    .createdOn(Optional.of(LocalDateTime.now()))
-                    .build()
+                new Bundle()
+                    .setBundleHearingDate(Optional.of(previous.getHearingDate()))
+                    .setCreatedOn(Optional.of(LocalDateTime.now()))
             )));
 
         DashboardClaimStatus expectedStatus = DashboardClaimStatus.BUNDLE_CREATED;
