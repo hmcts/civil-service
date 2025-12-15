@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -41,14 +43,19 @@ public class SdoHearingPreparationService {
     @Value("${court-location.unspecified-claim.epimms-id}")
     String ccmccEpimsId;
 
-    public Optional<RequestedCourt> updateCaseManagementLocationIfLegalAdvisorSdo(
-        CaseData caseData
-    ) {
+    public Optional<RequestedCourt> updateCaseManagementLocationIfLegalAdvisorSdo(CaseData caseData, String authToken) {
         Optional<RequestedCourt> preferredCourt;
         if (isSpecClaim1000OrLessAndCcmcc(ccmccAmount).test(caseData)) {
             preferredCourt = locationHelper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData);
             preferredCourt.map(RequestedCourt::getCaseLocation)
                 .ifPresent(caseData::setCaseManagementLocation);
+            preferredCourt
+                .map(RequestedCourt::getCaseLocation)
+                .map(CaseLocationCivil::getBaseLocation)
+                .map(epimmsId -> sdoLocationService.fetchCourtLocationsByEpimmsId(authToken, epimmsId))
+                .map(list -> Optional.of(list).orElse(Collections.emptyList()))
+                .flatMap(locations -> locations.stream().findFirst())
+                .ifPresent(locationRefData -> caseData.setLocationName(locationRefData.getSiteName()));
             return preferredCourt;
         } else {
             return locationHelper.getCaseManagementLocation(caseData);

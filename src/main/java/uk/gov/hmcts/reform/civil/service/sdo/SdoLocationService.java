@@ -97,6 +97,10 @@ public class SdoLocationService {
         updateWaCourtLocationsService.ifPresent(service -> service.updateCourtListingWALocations(authToken, caseData));
     }
 
+    public List<LocationRefData> fetchCourtLocationsByEpimmsId(String authToken, String epimmsId) {
+        return locationReferenceDataService.getCourtLocationsByEpimmsId(authToken, epimmsId);
+    }
+
     public void clearWaLocationMetadata(CaseData caseData) {
         log.info("Clearing WA location metadata");
         caseData.setTaskManagementLocations(null);

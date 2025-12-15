@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 
@@ -119,6 +120,7 @@ class SdoPrePopulateServiceTest {
         when(deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(any(LocalDateTime.class)))
             .thenAnswer(invocation -> invocation.getArgument(0, LocalDateTime.class).toLocalDate());
         lenient().when(locationService.fetchHearingLocations(anyString())).thenReturn(Collections.emptyList());
+        lenient().when(locationService.fetchCourtLocationsByEpimmsId(anyString(), anyString())).thenReturn(Collections.emptyList());
         lenient().when(locationService.buildLocationList(ArgumentMatchers.nullable(RequestedCourt.class), anyBoolean(), ArgumentMatchers.anyList()))
             .thenAnswer(invocation -> dynamicList("loc", "Location"));
         lenient().when(locationService.buildCourtLocationForSdoR2(ArgumentMatchers.nullable(RequestedCourt.class), ArgumentMatchers.anyList()))
@@ -183,6 +185,23 @@ class SdoPrePopulateServiceTest {
         CaseData result = service.prePopulate(context);
 
         assertThat(result.getSmallClaimsMediationSectionStatement()).isNotNull();
+    }
+
+    @Test
+    void shouldPopulateLocationNameWhenLegalAdvisorRoute() {
+        CaseData caseData = baseCaseData();
+        RequestedCourt requestedCourt = RequestedCourt.builder()
+            .caseLocation(CaseLocationCivil.builder().baseLocation("EPIMS999").build())
+            .build();
+        when(locationHelper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData)).thenReturn(Optional.of(requestedCourt));
+        when(locationService.fetchCourtLocationsByEpimmsId(AUTH_TOKEN, "EPIMS999"))
+            .thenReturn(List.of(LocationRefData.builder().siteName("Preferred Court").build()));
+
+        DirectionsOrderTaskContext context = buildContext(caseData);
+
+        CaseData result = service.prePopulate(context);
+
+        assertThat(result.getLocationName()).isEqualTo("Preferred Court");
     }
 
     private DirectionsOrderTaskContext buildContext(CaseData caseData) {

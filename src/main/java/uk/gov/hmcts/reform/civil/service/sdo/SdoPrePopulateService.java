@@ -34,7 +34,7 @@ public class SdoPrePopulateService {
         sdoTrackDefaultsService.applyBaseTrackDefaults(caseData);
 
         Optional<RequestedCourt> preferredCourt = sdoHearingPreparationService
-            .updateCaseManagementLocationIfLegalAdvisorSdo(caseData);
+            .updateCaseManagementLocationIfLegalAdvisorSdo(caseData, authToken);
 
         DynamicList hearingMethodList = sdoHearingPreparationService.getDynamicHearingMethodList(callbackParams, caseData);
         sdoHearingPreparationService.applyVersionSpecificHearingDefaults(callbackParams, hearingMethodList);

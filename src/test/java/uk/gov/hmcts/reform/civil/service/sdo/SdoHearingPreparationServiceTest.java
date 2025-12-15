@@ -67,11 +67,35 @@ class SdoHearingPreparationServiceTest {
             .build();
         when(locationHelper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData))
             .thenReturn(Optional.of(requestedCourt));
+        when(sdoLocationService.fetchCourtLocationsByEpimmsId(AUTH, "NEW"))
+            .thenReturn(List.of(LocationRefData.builder().siteName("New Court").build()));
 
-        Optional<RequestedCourt> result = service.updateCaseManagementLocationIfLegalAdvisorSdo(caseData);
+        Optional<RequestedCourt> result = service.updateCaseManagementLocationIfLegalAdvisorSdo(caseData, AUTH);
 
         assertThat(result).contains(requestedCourt);
         assertThat(caseData.getCaseManagementLocation()).isEqualTo(requestedCourt.getCaseLocation());
+        assertThat(caseData.getLocationName()).isEqualTo("New Court");
+    }
+
+    @Test
+    void shouldNotFailWhenEpimmsLookupReturnsNull() {
+        CaseData caseData = CaseData.builder()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .totalClaimAmount(BigDecimal.valueOf(500))
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("EPIMS123").build())
+            .build();
+        RequestedCourt requestedCourt = RequestedCourt.builder()
+            .caseLocation(CaseLocationCivil.builder().baseLocation("NEW").build())
+            .build();
+        when(locationHelper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData))
+            .thenReturn(Optional.of(requestedCourt));
+        when(sdoLocationService.fetchCourtLocationsByEpimmsId(AUTH, "NEW"))
+            .thenReturn(null);
+
+        Optional<RequestedCourt> result = service.updateCaseManagementLocationIfLegalAdvisorSdo(caseData, AUTH);
+
+        assertThat(result).contains(requestedCourt);
+        assertThat(caseData.getLocationName()).isNull();
     }
 
     @Test
@@ -83,7 +107,7 @@ class SdoHearingPreparationServiceTest {
             .build();
         when(locationHelper.getCaseManagementLocation(caseData)).thenReturn(Optional.empty());
 
-        Optional<RequestedCourt> result = service.updateCaseManagementLocationIfLegalAdvisorSdo(caseData);
+        Optional<RequestedCourt> result = service.updateCaseManagementLocationIfLegalAdvisorSdo(caseData, AUTH);
 
         assertThat(result).isEmpty();
         verify(locationHelper).getCaseManagementLocation(caseData);

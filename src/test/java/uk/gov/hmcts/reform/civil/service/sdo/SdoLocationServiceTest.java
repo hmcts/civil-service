@@ -76,6 +76,17 @@ class SdoLocationServiceTest {
     }
 
     @Test
+    void shouldFetchCourtLocationsByEpimmsId() {
+        List<LocationRefData> locations = List.of(LocationRefData.builder().epimmsId("789").build());
+        when(locationReferenceDataService.getCourtLocationsByEpimmsId(AUTH_TOKEN, "789")).thenReturn(locations);
+
+        List<LocationRefData> result = service.fetchCourtLocationsByEpimmsId(AUTH_TOKEN, "789");
+
+        assertThat(result).isEqualTo(locations);
+        verify(locationReferenceDataService).getCourtLocationsByEpimmsId(AUTH_TOKEN, "789");
+    }
+
+    @Test
     void shouldBuildLocationListWithMatchingSelection() {
         LocationRefData location = LocationRefData.builder()
             .epimmsId("123")
