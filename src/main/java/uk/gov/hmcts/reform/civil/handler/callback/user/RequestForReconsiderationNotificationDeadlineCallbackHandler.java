@@ -52,11 +52,12 @@ public class RequestForReconsiderationNotificationDeadlineCallbackHandler extend
 
         HashMap<String, Object> paramsMap = mapper.mapCaseDataToParams(caseData);
 
+        ScenarioRequestParams scenarioRequestParams = ScenarioRequestParams.builder().params(paramsMap).build();
         dashboardScenariosService.recordScenarios(
             authToken,
             DashboardScenarios.SCENARIO_AAA6_CP_SDO_MADE_BY_LA_DELETE.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(paramsMap).build()
+            scenarioRequestParams
         );
 
         return AboutToStartOrSubmitCallbackResponse.builder()
