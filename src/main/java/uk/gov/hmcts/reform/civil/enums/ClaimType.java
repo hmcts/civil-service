@@ -14,7 +14,6 @@ public enum ClaimType {
     CONSUMER_CREDIT(FeeType.HIGHER),
     OTHER(FeeType.HIGHER),
     FLIGHT_DELAY(null),
-    //Todo: Need to verify FeeType for PPI, HOUSING_DISREPAIR and MOTOR_FINANCE
     PPI(FeeType.HIGHER),
     HOUSING_DISREPAIR(FeeType.HIGHER),
     MOTOR_FINANCE(FeeType.HIGHER);
