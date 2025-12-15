@@ -94,7 +94,7 @@ class ExpertEvidenceMapperTest {
         caseData.setManageDocuments(getTestDocuments());
 
         List<Element<BundlingRequestDocument>> resultApp1 = mapper.map(caseData, PartyType.CLAIMANT1);
-        assertEquals(10, resultApp1.size());
+        assertEquals(9, resultApp1.size());
         List<Element<BundlingRequestDocument>> resultApp2 = mapper.map(caseData, PartyType.CLAIMANT2);
         assertEquals(4, resultApp2.size());
         List<Element<BundlingRequestDocument>> resultResp1 = mapper.map(caseData, PartyType.DEFENDANT1);
