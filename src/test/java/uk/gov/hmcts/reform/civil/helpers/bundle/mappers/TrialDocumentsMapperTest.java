@@ -27,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceuploa
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_TWO_TRIAL_DOC_TIME_TABLE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.APPLICANT_TWO_TRIAL_SKELETON;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_ONE_TRIAL_DOC_CORRESPONDENCE;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_ONE_TRIAL_DOC_TIME_TABLE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_ONE_TRIAL_SKELETON;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_TWO_DISCLOSURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory.RESPONDENT_TWO_TRIAL_DOC_CORRESPONDENCE;
@@ -67,7 +68,7 @@ class TrialDocumentsMapperTest {
         CaseData caseData = getCaseData();
         caseData.setManageDocuments(getTestDocuments());
         List<Element<BundlingRequestDocument>> result = mapper.map(caseData);
-        assertEquals(28, result.size());
+        assertEquals(29, result.size());
     }
 
     private List<Element<ManageDocument>> getTestDocuments() {
@@ -126,8 +127,12 @@ class TrialDocumentsMapperTest {
             N9B_PAPER_DEFENCE_OR_COUNTERCLAIM,
             RESPONDENT_TWO_TRIAL_DOC_TIME_TABLE
         );
+        Element<ManageDocument> documentA84 = getManageDocumentElement(
+            N9B_PAPER_DEFENCE_OR_COUNTERCLAIM,
+            RESPONDENT_ONE_TRIAL_DOC_TIME_TABLE
+        );
         return List.of(documentA1, documentA2, documentA3, documentA4, documentA5,
                        documentA6, documentA7, documentA8, documentA9, documentA10,
-                       documentA82, documentA83);
+                       documentA82, documentA83, documentA84);
     }
 }
