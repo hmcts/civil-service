@@ -14,10 +14,10 @@ import uk.gov.hmcts.reform.civil.event.RequestForReconsiderationNotificationDead
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.search.RequestForReconsiderationNotificationDeadlineSearchService;
 
-import java.util.Map;
 import java.util.Set;
 
 import static org.mockito.Mockito.verify;
@@ -57,9 +57,8 @@ class RequestForReconsiderationNotificationDeadlineHandlerTest {
     @Test
     void shouldEmitRequestForReconsiderationDeadlineEvent_whenDeadlineIsDue() {
         long caseId = 1L;
-        CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDuePaid().build();
-        Map<String, Object> data = Map.of("data", caseData);
-        Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
+        CaseData caseData = new CaseDataBuilder().atStateHearingFeeDuePaid().build();
+        Set<CaseDetails> caseDetails = Set.of(new CaseDetailsBuilder().id(caseId).data(caseData).build());
 
         when(searchService.getCases()).thenReturn(caseDetails);
         when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.iterator().next());
