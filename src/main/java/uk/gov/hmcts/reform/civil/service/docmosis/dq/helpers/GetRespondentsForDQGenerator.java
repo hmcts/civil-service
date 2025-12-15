@@ -339,31 +339,31 @@ public class GetRespondentsForDQGenerator {
         return YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
     }
 
-    private Party.PartyBuilder getRespondent1PartyBuilder(CaseData caseData, String legalRepHeading) {
-        return Party.builder()
-            .name(caseData.getRespondent1().getPartyName())
-            .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
-            .emailAddress(caseData.getRespondent1().getPartyEmail())
-            .phoneNumber(caseData.getRespondent1().getPartyPhone())
-            .representative(representativeService.getRespondent1Representative(caseData))
-            .litigationFriendName(
+    private Party getRespondent1PartyBuilder(CaseData caseData, String legalRepHeading) {
+        return new Party()
+            .setName(caseData.getRespondent1().getPartyName())
+            .setPrimaryAddress(caseData.getRespondent1().getPrimaryAddress())
+            .setEmailAddress(caseData.getRespondent1().getPartyEmail())
+            .setPhoneNumber(caseData.getRespondent1().getPartyPhone())
+            .setRepresentative(representativeService.getRespondent1Representative(caseData))
+            .setLitigationFriendName(
                 ofNullable(caseData.getRespondent1LitigationFriend())
                     .map(LitigationFriend::getFullName)
                     .orElse(""))
-            .litigationFriendFirstName(
+            .setLitigationFriendFirstName(
                 ofNullable(caseData.getRespondent1LitigationFriend())
                     .map(LitigationFriend::getFirstName)
                     .orElse(""))
-            .litigationFriendLastName(
+            .setLitigationFriendLastName(
                 ofNullable(caseData.getRespondent1LitigationFriend())
                     .map(LitigationFriend::getLastName)
                     .orElse(""))
-            .litigationFriendPhoneNumber(ofNullable(caseData.getRespondent1LitigationFriend())
+            .setLitigationFriendPhoneNumber(ofNullable(caseData.getRespondent1LitigationFriend())
                                              .map(LitigationFriend::getPhoneNumber)
                                              .orElse(""))
-            .litigationFriendEmailAddress(ofNullable(caseData.getRespondent1LitigationFriend())
+            .setLitigationFriendEmailAddress(ofNullable(caseData.getRespondent1LitigationFriend())
                                               .map(LitigationFriend::getEmailAddress)
                                               .orElse(""))
-            .legalRepHeading(legalRepHeading);
+            .setLegalRepHeading(legalRepHeading);
     }
 }

@@ -24,7 +24,7 @@ public class UnrepresentedLitigantPopulator {
 
     private static final String DATE_FORMAT = "yyyy-MM-dd";
 
-    public MediationLitigant.MediationLitigantBuilder populator(MediationLitigant.MediationLitigantBuilder builder,
+    public MediationLitigant populator(MediationLitigant builder,
                                                                 Party party,
                                                                 String originalMediationContactPerson,
                                                                 MediationLiPCarm mediationLiPCarm) {
@@ -38,14 +38,14 @@ public class UnrepresentedLitigantPopulator {
 
         String mediationPhone = getMediationPhone(party, mediationLiPCarm);
 
-        return builder.represented(false)
-            .solicitorOrgName(null)
-            .litigantEmail(party.getPartyEmail())
-            .litigantTelephone(party.getPartyPhone())
-            .mediationContactName(mediationContactName)
-            .mediationContactNumber(mediationPhone)
-            .mediationContactEmail(mediationEmail)
-            .dateRangeToAvoid(dateRangeToAvoid);
+        return builder.setRepresented(false)
+            .setSolicitorOrgName(null)
+            .setLitigantEmail(party.getPartyEmail())
+            .setLitigantTelephone(party.getPartyPhone())
+            .setMediationContactName(mediationContactName)
+            .setMediationContactNumber(mediationPhone)
+            .setMediationContactEmail(mediationEmail)
+            .setDateRangeToAvoid(dateRangeToAvoid);
     }
 
     private static String getMediationPhone(Party party, MediationLiPCarm mediationLiPCarm) {

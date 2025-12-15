@@ -28,13 +28,13 @@ public record LipFormPartyDefence(String name, boolean isIndividual,
         if (party == null) {
             return null;
         }
-        LipFormPartyDefenceBuilder builder = getLipDefenceFormPartyBuilderWithPartyData(party);
+        LipFormPartyDefence.LipFormPartyDefenceBuilder builder = getLipDefenceFormPartyBuilderWithPartyData(party);
         builder.correspondenceAddress(correspondenceAddress);
         return builder.build();
     }
 
-    private static LipFormPartyDefenceBuilder getLipDefenceFormPartyBuilderWithPartyData(Party party) {
-        LipFormPartyDefenceBuilder builder = LipFormPartyDefence.builder()
+    private static LipFormPartyDefence.LipFormPartyDefenceBuilder getLipDefenceFormPartyBuilderWithPartyData(Party party) {
+        LipFormPartyDefence.LipFormPartyDefenceBuilder builder = LipFormPartyDefence.builder()
             .name(party.getPartyName())
             .phone(party.getPartyPhone())
             .email(party.getPartyEmail())

@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.dq.VulnerabilityQuestions;
 import java.time.LocalDate;
 import java.util.List;
 
+@Accessors(chain = true)
 @Getter
 @Builder(toBuilder = true)
 @AllArgsConstructor

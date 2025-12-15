@@ -122,7 +122,7 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
         return caseData.getTotalClaimAmountPlusInterest() != null ? caseData.getTotalClaimAmountPlusInterest() : caseData.getTotalClaimAmount();
     }
 
-    private static void addRepaymentMethodLip(CaseData caseData, ResponseRepaymentDetailsFormBuilder builder,
+    private static void addRepaymentMethodLip(CaseData caseData, ResponseRepaymentDetailsForm.ResponseRepaymentDetailsFormBuilder builder,
                                               BigDecimal totalAmount,
                                               BigDecimal admittedAmount) {
         if (caseData.isPayImmediately()) {
@@ -137,7 +137,7 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
         }
     }
 
-    private static void addRepaymentMethod(CaseData caseData, ResponseRepaymentDetailsFormBuilder builder, BigDecimal totalAmount) {
+    private static void addRepaymentMethod(CaseData caseData, ResponseRepaymentDetailsForm.ResponseRepaymentDetailsFormBuilder builder, BigDecimal totalAmount) {
         if (caseData.isPayImmediately()) {
             addPayByDatePayImmediately(builder, totalAmount, caseData);
         } else if (caseData.isPayByInstallment()) {
@@ -147,7 +147,7 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
         }
     }
 
-    private static void addPayBySetDate(CaseData caseData, ResponseRepaymentDetailsFormBuilder builder, BigDecimal totalClaimAmount) {
+    private static void addPayBySetDate(CaseData caseData, ResponseRepaymentDetailsForm.ResponseRepaymentDetailsFormBuilder builder, BigDecimal totalClaimAmount) {
         if (caseData.getRespondToClaimAdmitPartLRspec() != null && caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() != null) {
             builder.payBy(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())
                 .amountToPay(totalClaimAmount + "")
@@ -158,7 +158,7 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
         }
     }
 
-    private static void addPayByDatePayImmediately(ResponseRepaymentDetailsFormBuilder builder, BigDecimal totalClaimAmount, CaseData caseData) {
+    private static void addPayByDatePayImmediately(ResponseRepaymentDetailsForm.ResponseRepaymentDetailsFormBuilder builder, BigDecimal totalClaimAmount, CaseData caseData) {
         LocalDate whenWillThisAmountBePaid = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec()).map(
             RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(null);
         if (whenWillThisAmountBePaid == null) {
@@ -167,7 +167,7 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
         builder.payBy(whenWillThisAmountBePaid).amountToPay(totalClaimAmount + "");
     }
 
-    private static void addRepaymentPlan(CaseData caseData, ResponseRepaymentDetailsFormBuilder builder, BigDecimal totalClaimAmount) {
+    private static void addRepaymentPlan(CaseData caseData, ResponseRepaymentDetailsForm.ResponseRepaymentDetailsFormBuilder builder, BigDecimal totalClaimAmount) {
         RepaymentPlanLRspec repaymentPlan = caseData.getRespondent1RepaymentPlan();
         if (repaymentPlan != null) {
             builder.repaymentPlan(RepaymentPlanTemplateData.builder()
@@ -191,7 +191,7 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
         }
     }
 
-    private static void alreadyPaid(CaseData caseData, ResponseRepaymentDetailsFormBuilder builder) {
+    private static void alreadyPaid(CaseData caseData, ResponseRepaymentDetailsForm.ResponseRepaymentDetailsFormBuilder builder) {
         RespondToClaim respondToClaim = caseData.getResponseToClaim();
         String howMuchWasPaidAsString = MonetaryConversions.penniesToPounds(respondToClaim.getHowMuchWasPaid()) + "";
         builder.whyReject("ALREADY_PAID")
@@ -200,7 +200,7 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
             .paymentHow(respondToClaim.getExplanationOnHowTheAmountWasPaid());
     }
 
-    private static void addDetailsOnWhyClaimIsRejected(CaseData caseData, ResponseRepaymentDetailsFormBuilder builder) {
+    private static void addDetailsOnWhyClaimIsRejected(CaseData caseData, ResponseRepaymentDetailsForm.ResponseRepaymentDetailsFormBuilder builder) {
         Optional<CaseDataLiP> caseDataLiPOptional = Optional.ofNullable(caseData.getCaseDataLiP());
         builder.freeTextWhyReject(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
             .timelineComments(caseDataLiPOptional.map(CaseDataLiP::getTimeLineComment).orElse(
@@ -211,7 +211,7 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
             .evidenceList(EvidenceTemplateData.toEvidenceTemplateDataList(caseData.getSpecResponselistYourEvidenceList()));
     }
 
-    private static void fullDefenceData(CaseData caseData, ResponseRepaymentDetailsFormBuilder builder) {
+    private static void fullDefenceData(CaseData caseData, ResponseRepaymentDetailsForm.ResponseRepaymentDetailsFormBuilder builder) {
         addDetailsOnWhyClaimIsRejected(caseData, builder);
         if (caseData.hasDefendantPaidTheAmountClaimed()) {
             alreadyPaid(caseData, builder);
@@ -220,7 +220,7 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
         }
     }
 
-    private static void partAdmissionData(CaseData caseData, ResponseRepaymentDetailsFormBuilder builder) {
+    private static void partAdmissionData(CaseData caseData, ResponseRepaymentDetailsForm.ResponseRepaymentDetailsFormBuilder builder) {
         addDetailsOnWhyClaimIsRejected(caseData, builder);
         if (caseData.getSpecDefenceAdmittedRequired() == YesOrNo.YES) {
             alreadyPaid(caseData, builder);

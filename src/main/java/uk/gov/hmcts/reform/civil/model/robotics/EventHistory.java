@@ -4,12 +4,14 @@ import com.google.common.collect.Lists;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
+import lombok.experimental.Accessors;
 import net.minidev.json.annotate.JsonIgnore;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
+@Accessors(chain = true)
 @Data
 @Builder
 public class EventHistory {

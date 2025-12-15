@@ -25,14 +25,14 @@ public abstract class BaseRoboticsDataMapper {
     protected final RoboticsAddressMapper addressMapper;
 
     protected Consumer<Organisation> buildOrganisation(
-        Solicitor.SolicitorBuilder<?, ?> solicitorBuilder, Address providedServiceAddress
+        Solicitor solicitor, Address providedServiceAddress
     ) {
         return organisation -> {
             List<ContactInformation> contactInformation = organisation.getContactInformation();
-            solicitorBuilder
-                .name(organisation.getName())
-                .addresses(fromProvidedAddress(contactInformation, providedServiceAddress))
-                .contactDX(getContactDX(contactInformation));
+            solicitor
+                .setName(organisation.getName())
+                .setAddresses(fromProvidedAddress(contactInformation, providedServiceAddress))
+                .setContactDX(getContactDX(contactInformation));
         };
     }
 
@@ -57,11 +57,11 @@ public abstract class BaseRoboticsDataMapper {
     }
 
     protected Consumer<SolicitorOrganisationDetails> buildOrganisationDetails(
-        Solicitor.SolicitorBuilder solicitorBuilder
+        Solicitor solicitor
     ) {
         return organisationDetails ->
-            solicitorBuilder
-                .name(organisationDetails.getOrganisationName())
+            solicitor
+                .setName(organisationDetails.getOrganisationName())
                 .contactTelephoneNumber(organisationDetails.getPhoneNumber())
                 .contactFaxNumber(organisationDetails.getFax())
                 .contactDX(organisationDetails.getDx())

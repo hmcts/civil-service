@@ -17,7 +17,7 @@ public class StatementOfTruthPopulator {
         this.featureToggleService = featureToggleService;
     }
 
-    public void populateStatementOfTruthDetails(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
+    public void populateStatementOfTruthDetails(SealedClaimResponseFormForSpec builder, CaseData caseData) {
 
         StatementOfTruth statementOfTruth = null;
 
@@ -33,11 +33,11 @@ public class StatementOfTruthPopulator {
             }
         }
 
-        builder.statementOfTruth(statementOfTruth)
-            .allocatedTrack(caseData.getResponseClaimTrack())
-            .responseType(caseData.getRespondentClaimResponseTypeForSpecGeneric())
-            .checkCarmToggle(featureToggleService.isCarmEnabledForCase(caseData))
-            .mediation(caseData.getResponseClaimMediationSpecRequired());
+        builder.setStatementOfTruth(statementOfTruth)
+            .setAllocatedTrack(caseData.getResponseClaimTrack())
+            .setResponseType(caseData.getRespondentClaimResponseTypeForSpecGeneric())
+            .setCheckCarmToggle(featureToggleService.isCarmEnabledForCase(caseData))
+            .setMediation(caseData.getResponseClaimMediationSpecRequired());
     }
 
     private boolean isRespondent2(CaseData caseData) {

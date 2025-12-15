@@ -35,7 +35,7 @@ public class RepresentedLitigantPopulator {
         this.organisationService = organisationService;
     }
 
-    public MediationLitigant.MediationLitigantBuilder populator(MediationLitigant.MediationLitigantBuilder builder,
+    public MediationLitigant populator(MediationLitigant builder,
                                                                 MediationContactInformation mediationContactInformation,
                                                                 MediationAvailability mediationAvailability,
                                                                 OrganisationPolicy organisationPolicy, String solicitorEmail) {
@@ -49,14 +49,14 @@ public class RepresentedLitigantPopulator {
 
         List<MediationUnavailability> dateRangeToAvoid = getDateRangeToAvoid(mediationAvailability);
 
-        return builder.represented(true)
-            .solicitorOrgName(solicitorOrgName)
-            .litigantEmail(solicitorEmail)
-            .litigantTelephone(null)
-            .mediationContactName(mediationContactName)
-            .mediationContactNumber(mediationContactNumber)
-            .mediationContactEmail(mediationEmail)
-            .dateRangeToAvoid(dateRangeToAvoid);
+        return builder.setRepresented(true)
+            .setSolicitorOrgName(solicitorOrgName)
+            .setLitigantEmail(solicitorEmail)
+            .setLitigantTelephone(null)
+            .setMediationContactName(mediationContactName)
+            .setMediationContactNumber(mediationContactNumber)
+            .setMediationContactEmail(mediationEmail)
+            .setDateRangeToAvoid(dateRangeToAvoid);
     }
 
     @Nullable

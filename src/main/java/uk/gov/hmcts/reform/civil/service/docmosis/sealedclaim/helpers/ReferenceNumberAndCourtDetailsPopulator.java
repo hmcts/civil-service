@@ -21,7 +21,7 @@ public class ReferenceNumberAndCourtDetailsPopulator {
         this.locationRefDataService = locationRefDataService;
     }
 
-    public void populateReferenceNumberDetails(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData,
+    public void populateReferenceNumberDetails(SealedClaimResponseFormForSpec builder, CaseData caseData,
                                                String authorisation) {
 
         String requestedCourt = null;
@@ -45,11 +45,11 @@ public class ReferenceNumberAndCourtDetailsPopulator {
             .map(LocationRefData::getCourtName)
             .orElse(null);
 
-        builder.referenceNumber(caseData.getLegacyCaseReference())
-            .ccdCaseReference(Optional.ofNullable(caseData.getCcdCaseReference()).map(String::valueOf).orElse(""))
-            .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
-            .whyDisputeTheClaim(isRespondent2(caseData) ? caseData.getDetailsOfWhyDoesYouDisputeTheClaim2() : caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
-            .hearingCourtLocation(hearingCourtLocation);
+        builder.setReferenceNumber(caseData.getLegacyCaseReference())
+            .setCcdCaseReference(Optional.ofNullable(caseData.getCcdCaseReference()).map(String::valueOf).orElse(""))
+            .setCaseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
+            .setWhyDisputeTheClaim(isRespondent2(caseData) ? caseData.getDetailsOfWhyDoesYouDisputeTheClaim2() : caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
+            .setHearingCourtLocation(hearingCourtLocation);
     }
 
     private boolean isRespondent2(CaseData caseData) {

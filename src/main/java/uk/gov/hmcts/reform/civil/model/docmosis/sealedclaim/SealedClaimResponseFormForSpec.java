@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.common.SpecifiedParty;
 import java.time.LocalDate;
 import java.util.List;
 
+@Accessors(chain = true)
 @Getter
 @Builder
 @AllArgsConstructor

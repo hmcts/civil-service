@@ -6,9 +6,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.util.Optional;
 
+@Accessors(chain = true)
 @Setter
 @Data
 @NoArgsConstructor

@@ -21,18 +21,18 @@ public class SetApplicantsForDQGenerator {
     private final RepresentativeService representativeService;
     static final String organisationName = "Organisation name";
 
-    public void setApplicants(DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder,
+    public void setApplicants(DirectionsQuestionnaireForm builder,
                                CaseData caseData) {
         if (TWO_V_ONE.equals(MultiPartyScenario
                                  .getMultiPartyScenario(caseData))) {
             if (onlyApplicant2IsProceeding(caseData)) {
-                builder.applicant(getApplicant2DQParty(caseData));
+                builder.setApplicant(getApplicant2DQParty(caseData));
             } else {
-                builder.applicant(getApplicant1DQParty(caseData));
-                builder.applicant2(getApplicant2DQParty(caseData));
+                builder.setApplicant(getApplicant1DQParty(caseData));
+                builder.setApplicant2(getApplicant2DQParty(caseData));
             }
         } else {
-            builder.applicant(getApplicant1DQParty(caseData));
+            builder.setApplicant(getApplicant1DQParty(caseData));
         }
     }
 

@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.experimental.Accessors;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.EmployerDetailsLRspec;
@@ -44,6 +45,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_AD
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.formatCcdCaseReference;
 
+@Accessors(chain = true)
 @Getter
 @Builder(toBuilder = true)
 @AllArgsConstructor
@@ -84,27 +86,27 @@ public class SealedClaimLipResponseForm implements MappableObject {
 
     @JsonIgnore
     public static SealedClaimLipResponseForm toTemplate(CaseData caseData, BigDecimal admittedAmount) {
-        SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder = SealedClaimLipResponseForm.builder()
-            .generationDate(LocalDate.now())
-            .ccdCaseReference(formatCcdCaseReference(caseData))
-            .claimReferenceNumber(caseData.getLegacyCaseReference())
-            .claimant1(LipFormPartyDefence.toLipDefenceParty(caseData.getApplicant1()))
-            .defendant1(LipFormPartyDefence.toLipDefenceParty(
+        SealedClaimLipResponseForm builder = new SealedClaimLipResponseForm()
+            .setGenerationDate(LocalDate.now())
+            .setCcdCaseReference(formatCcdCaseReference(caseData))
+            .setClaimReferenceNumber(caseData.getLegacyCaseReference())
+            .setClaimant1(LipFormPartyDefence.toLipDefenceParty(caseData.getApplicant1()))
+            .setDefendant1(LipFormPartyDefence.toLipDefenceParty(
                 caseData.getRespondent1(),
                 caseData.getRespondent1CorrespondanceAddress()
             ))
-            .defendant2(LipFormPartyDefence.toLipDefenceParty(caseData.getRespondent2()))
-            .partnerAndDependent(caseData.getRespondent1PartnerAndDependent())
-            .debtList(mapToDebtList(caseData.getSpecDefendant1Debts()))
-            .commonDetails(ResponseRepaymentDetailsForm.toSealedClaimResponseCommonContent(caseData, admittedAmount))
-            .faContent(getAdditionContent(caseData))
-            .uiStatementOfTruth(caseData.getRespondent1LiPStatementOfTruth());
+            .setDefendant2(LipFormPartyDefence.toLipDefenceParty(caseData.getRespondent2()))
+            .setPartnerAndDependent(caseData.getRespondent1PartnerAndDependent())
+            .setDebtList(mapToDebtList(caseData.getSpecDefendant1Debts()))
+            .setCommonDetails(ResponseRepaymentDetailsForm.toSealedClaimResponseCommonContent(caseData, admittedAmount))
+            .setFaContent(getAdditionContent(caseData))
+            .setUiStatementOfTruth(caseData.getRespondent1LiPStatementOfTruth());
         addSolicitorDetails(caseData, builder);
         addEmployeeDetails(caseData, builder);
         addFinancialDetails(caseData, builder);
         addSelfEmploymentDetails(caseData, builder);
         addCourtOrderDetails(caseData, builder);
-        return builder.build();
+        return builder;
 
     }
 
@@ -130,25 +132,25 @@ public class SealedClaimLipResponseForm implements MappableObject {
         return "";
     }
 
-    private static void addSolicitorDetails(CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
+    private static void addSolicitorDetails(CaseData caseData, SealedClaimLipResponseForm builder) {
         Optional.ofNullable(caseData.getSolicitorReferences())
             .ifPresent(references ->
-                           builder.claimantReferenceNumber(references.getApplicantSolicitor1Reference())
-                               .defendantReferenceNumber(references.getRespondentSolicitor1Reference()));
+                           builder.setClaimantReferenceNumber(references.getApplicantSolicitor1Reference())
+                               .setDefendantReferenceNumber(references.getRespondentSolicitor1Reference()));
     }
 
-    private static void addEmployeeDetails(CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
+    private static void addEmployeeDetails(CaseData caseData, SealedClaimLipResponseForm builder) {
         Optional.ofNullable(caseData.getResponseClaimAdmitPartEmployer())
             .map(Respondent1EmployerDetailsLRspec::getEmployerDetails)
             .map(ElementUtils::unwrapElements)
-            .ifPresent(builder::employerDetails);
+            .ifPresent(builder::setEmployerDetails);
 
     }
 
-    private static void addSelfEmploymentDetails(CaseData caseData, SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder) {
+    private static void addSelfEmploymentDetails(CaseData caseData, SealedClaimLipResponseForm builder) {
         Optional.ofNullable(caseData.getSpecDefendant1SelfEmploymentDetails())
             .ifPresent(selfEmployDetails ->
-                           builder.selfEmployment(Respondent1SelfEmploymentLRspec.builder()
+                           builder.setSelfEmployment(Respondent1SelfEmploymentLRspec.builder()
                                                       .amountOwed(selfEmployDetails.getAmountOwed() != null
                                                                       ? (MonetaryConversions.penniesToPounds(
                                                           selfEmployDetails.getAmountOwed())).setScale(2, RoundingMode.CEILING)
@@ -184,31 +186,31 @@ public class SealedClaimLipResponseForm implements MappableObject {
     }
 
     @JsonIgnore
-    private static void addFinancialDetails(CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
+    private static void addFinancialDetails(CaseData caseData, SealedClaimLipResponseForm builder) {
         if (caseData.getRespondent1DQ() != null) {
-            builder.whereTheyLive(new AccommodationTemplate(caseData.getRespondent1DQ().getRespondent1DQHomeDetails()));
+            builder.setWhereTheyLive(new AccommodationTemplate(caseData.getRespondent1DQ().getRespondent1DQHomeDetails()));
             Optional.ofNullable(caseData.getRespondent1DQ().getRespondent1BankAccountList())
                 .map(ElementUtils::unwrapElements)
                 .map(list -> IntStream.range(0, list.size()).mapToObj(i -> new AccountSimpleTemplateData(
                     list.get(i),
                     i + 1
                 )).toList())
-                .ifPresent(builder::bankAccountList);
+                .ifPresent(builder::setBankAccountList);
             Optional.ofNullable(caseData.getRecurringIncomeForRespondent1())
                 .map(ElementUtils::unwrapElements)
                 .map(list -> list.stream()
                     .map(ReasonMoneyTemplateData::toReasonMoneyTemplateData).collect(Collectors.toList()))
-                .ifPresent(builder::incomeList);
+                .ifPresent(builder::setIncomeList);
             Optional.ofNullable(caseData.getRecurringExpensesForRespondent1())
                 .map(ElementUtils::unwrapElements)
                 .map(list -> list.stream()
                     .map(ReasonMoneyTemplateData::toReasonMoneyTemplateData).toList())
-                .ifPresent(builder::expenseList);
+                .ifPresent(builder::setExpenseList);
         }
     }
 
-    private static void addCourtOrderDetails(CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
-        builder.courtOrderDetails(
+    private static void addCourtOrderDetails(CaseData caseData, SealedClaimLipResponseForm builder) {
+        builder.setCourtOrderDetails(
             Optional.ofNullable(caseData.getRespondent1CourtOrderDetails()).map(Collection::stream)
                 .orElseGet(Stream::empty)
                 .map(courtOrderDetails -> Respondent1CourtOrderDetails.builder()

@@ -70,25 +70,25 @@ public class TrialReadyFormGenerator {
     }
 
     private TrialReadyForm getTemplateData(CaseData caseData, String camundaActivity) {
-        var trialReadyForm = TrialReadyForm.builder()
-            .caseNumber(caseData.getLegacyCaseReference())
-            .date(formatLocalDate(LocalDate.now(), DATE))
-            .claimant1(caseData.getApplicant1().getPartyName())
-            .isClaimant2(nonNull(caseData.getApplicant2()))
-            .claimant2(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
-            .defendant1(caseData.getRespondent1().getPartyName())
-            .isDefendant2(nonNull(caseData.getRespondent2()))
-            .defendant2(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
-            .claimantReferenceNumber(checkReference(caseData)
+        var trialReadyForm = new TrialReadyForm()
+            .setCaseNumber(caseData.getLegacyCaseReference())
+            .setDate(formatLocalDate(LocalDate.now(), DATE))
+            .setClaimant1(caseData.getApplicant1().getPartyName())
+            .setIsClaimant2(nonNull(caseData.getApplicant2()))
+            .setClaimant2(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
+            .setDefendant1(caseData.getRespondent1().getPartyName())
+            .setIsDefendant2(nonNull(caseData.getRespondent2()))
+            .setDefendant2(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
+            .setClaimantReferenceNumber(checkReference(caseData)
                                          ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
-            .defendantRefNumber(checkReference(caseData)
+            .setDefendantRefNumber(checkReference(caseData)
                                     ? caseData.getSolicitorReferences().getRespondentSolicitor1Reference() : null)
-            .isDefendant2RefDiff(checkReference(caseData)
+            .setIsDefendant2RefDiff(checkReference(caseData)
                                      && nonNull(caseData.getSolicitorReferences().getRespondentSolicitor2Reference()))
-            .defendant2RefNumber(checkReference(caseData)
+            .setDefendant2RefNumber(checkReference(caseData)
                                      ? caseData.getSolicitorReferences().getRespondentSolicitor2Reference() : null);
 
-        return completeTrialReadyFormWithOptionalFields(caseData, trialReadyForm, camundaActivity).build();
+        return completeTrialReadyFormWithOptionalFields(caseData, trialReadyForm, camundaActivity);
     }
 
     private String getFileName(CaseData caseData, DocmosisTemplates template, String camundaActivity) {
@@ -120,8 +120,8 @@ public class TrialReadyFormGenerator {
         };
     }
 
-    private TrialReadyForm.TrialReadyFormBuilder completeTrialReadyFormWithOptionalFields(
-        CaseData caseData, TrialReadyForm.TrialReadyFormBuilder trialReadyForm, String camundaActivity) {
+    private TrialReadyForm completeTrialReadyFormWithOptionalFields(
+        CaseData caseData, TrialReadyForm trialReadyForm, String camundaActivity) {
         if (TASK_ID_APPLICANT.equals(camundaActivity)) {
             return addUserFields(caseData.getTrialReadyApplicant(),
                                  caseData.getApplicantRevisedHearingRequirements(),
@@ -137,18 +137,18 @@ public class TrialReadyFormGenerator {
         }
     }
 
-    private TrialReadyForm.TrialReadyFormBuilder addUserFields(YesOrNo trialReadyCheck,
+    private TrialReadyForm addUserFields(YesOrNo trialReadyCheck,
                                                                RevisedHearingRequirements hearingRequirements,
                                                                HearingOtherComments hearingOtherComments,
-                                                               TrialReadyForm.TrialReadyFormBuilder trialReadyForm) {
-        return trialReadyForm.trialReadyAccepted(trialReadyCheck.equals(YesOrNo.YES))
-            .trialReadyDeclined(trialReadyCheck.equals(YesOrNo.NO))
-            .hearingRequirementsCheck(YesOrNo.YES.equals(
+                                                               TrialReadyForm trialReadyForm) {
+        return trialReadyForm.setTrialReadyAccepted(trialReadyCheck.equals(YesOrNo.YES))
+            .setTrialReadyDeclined(trialReadyCheck.equals(YesOrNo.NO))
+            .setHearingRequirementsCheck(YesOrNo.YES.equals(
                 hearingRequirements.getRevisedHearingRequirements()) ? "Yes" : "No")
-            .hearingRequirementsText(YesOrNo.YES.equals(
+            .setHearingRequirementsText(YesOrNo.YES.equals(
                 hearingRequirements
                     .getRevisedHearingRequirements()) ? hearingRequirements.getRevisedHearingComments() : null)
-            .additionalInfo(nonNull(hearingOtherComments) ? hearingOtherComments.getHearingOtherComments() : null);
+            .setAdditionalInfo(nonNull(hearingOtherComments) ? hearingOtherComments.getHearingOtherComments() : null);
 
     }
 

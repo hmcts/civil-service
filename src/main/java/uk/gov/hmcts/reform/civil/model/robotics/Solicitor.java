@@ -3,8 +3,10 @@ package uk.gov.hmcts.reform.civil.model.robotics;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
+@Accessors(chain = true)
 @Data
 @SuperBuilder
 @AllArgsConstructor
