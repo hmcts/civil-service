@@ -46,7 +46,7 @@ import java.util.List;
 public class SdoDocumentFormFastNihl implements MappableObject {
 
     private String caseNumber;
-    private LocalDate currentDate;
+private LocalDate currentDate;
     private String judgeName;
     private ClaimsTrack claimsTrack;
     private List<FastTrack> fastClaims;

@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import uk.gov.hmcts.reform.civil.validation.groups.PaymentDateGroup;
 
 import java.math.BigDecimal;
@@ -13,6 +14,7 @@ import java.time.LocalDate;
 import javax.validation.constraints.PastOrPresent;
 
 @Data
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

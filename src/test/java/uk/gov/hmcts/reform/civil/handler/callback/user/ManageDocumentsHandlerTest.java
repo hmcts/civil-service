@@ -47,13 +47,14 @@ public class ManageDocumentsHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldUploadManageDocumentsSuccessfully() {
             //Given
+            Document documentLink = new Document();
+            ManageDocument manageDocument = new ManageDocument();
+            manageDocument.setDocumentType(ManageDocumentType.N9A_PAPER_ADMISSION_FULL_OR_PART);
+            manageDocument.setDocumentName("defendant");
+            manageDocument.setDocumentLink(documentLink);
             Element<ManageDocument> document = new Element<>(
                 UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
-                ManageDocument.builder()
-                    .documentType(ManageDocumentType.N9A_PAPER_ADMISSION_FULL_OR_PART)
-                    .documentName("defendant")
-                    .documentLink(Document.builder().build())
-                    .build()
+                manageDocument
             );
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setManageDocuments(List.of(document));

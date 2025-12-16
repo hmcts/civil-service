@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.jackson.Jacksonized;
 
 import java.util.UUID;
@@ -14,6 +15,7 @@ import java.util.UUID;
  * <p>There are two properties which map to the relevant items of an option html tag.
  */
 @Data
+@Setter
 @Jacksonized
 @Builder
 @AllArgsConstructor

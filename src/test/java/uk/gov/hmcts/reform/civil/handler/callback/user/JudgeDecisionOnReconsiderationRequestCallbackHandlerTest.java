@@ -82,18 +82,22 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         "is dismissed.";
 
     private List<Element<CaseDocument>> sdoDocList;
-    private static final CaseDocument document = CaseDocument.builder()
-        .createdBy("John")
-        .documentName("document name")
-        .documentSize(0L)
-        .documentType(DECISION_MADE_ON_APPLICATIONS)
-        .createdDatetime(LocalDateTime.now())
-        .documentLink(Document.builder()
-                          .documentUrl("fake-url")
-                          .documentFileName("file-name")
-                          .documentBinaryUrl("binary-url")
-                          .build())
-        .build();
+    private static final CaseDocument document;
+
+    static {
+        Document documentLink = new Document();
+        documentLink.setDocumentUrl("fake-url");
+        documentLink.setDocumentFileName("file-name");
+        documentLink.setDocumentBinaryUrl("binary-url");
+
+        document = new CaseDocument();
+        document.setCreatedBy("John");
+        document.setDocumentName("document name");
+        document.setDocumentSize(0L);
+        document.setDocumentType(DECISION_MADE_ON_APPLICATIONS);
+        document.setCreatedDatetime(LocalDateTime.now());
+        document.setDocumentLink(documentLink);
+    }
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvents() {
@@ -109,12 +113,20 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
                                                                            assignCategoryId, featureToggleService
         );
         sdoDocList = new ArrayList<>();
-        CaseDocument sdoDoc =
-            CaseDocument.builder().documentType(DocumentType.SDO_ORDER).documentLink(Document.builder().documentUrl(
-                "test").build()).createdDatetime(LocalDateTime.now().minusDays(10)).build();
-        CaseDocument sdoDoc2 =
-            CaseDocument.builder().documentType(DocumentType.SDO_ORDER).documentLink(Document.builder().documentUrl(
-                "test").build()).createdDatetime(LocalDateTime.now()).build();
+        Document doc1Link = new Document();
+        doc1Link.setDocumentUrl("test");
+        CaseDocument sdoDoc = new CaseDocument();
+        sdoDoc.setDocumentType(DocumentType.SDO_ORDER);
+        sdoDoc.setDocumentLink(doc1Link);
+        sdoDoc.setCreatedDatetime(LocalDateTime.now().minusDays(10));
+
+        Document doc2Link = new Document();
+        doc2Link.setDocumentUrl("test");
+        CaseDocument sdoDoc2 = new CaseDocument();
+        sdoDoc2.setDocumentType(DocumentType.SDO_ORDER);
+        sdoDoc2.setDocumentLink(doc2Link);
+        sdoDoc2.setCreatedDatetime(LocalDateTime.now());
+
         sdoDocList.add(ElementUtils.element(sdoDoc));
         sdoDocList.add(ElementUtils.element(sdoDoc2));
     }

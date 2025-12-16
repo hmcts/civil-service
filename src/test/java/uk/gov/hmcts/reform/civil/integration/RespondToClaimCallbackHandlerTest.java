@@ -839,12 +839,13 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Given
             when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORONE)))
                 .thenReturn(true);
+            Experts resp1Experts = new Experts();
+            resp1Experts.setExpertRequired(NO);
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimTwoDefendantSolicitors()
                 .respondent1DQ(Respondent1DQ
-                                   .builder().respondent1DQExperts(Experts.builder()
-                                                                       .expertRequired(NO)
-                                                                       .build()).build())
+                                   .builder().respondent1DQExperts(resp1Experts)
+                                   .build())
                 .build();
             caseData.setCcdCaseReference(1234L);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -859,10 +860,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Given
             when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
                 .thenReturn(false, true);
+            Experts resp2Experts = new Experts();
+            resp2Experts.setExpertRequired(NO);
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimTwoDefendantSolicitors()
                 .respondent2DQ(Respondent2DQ
-                                   .builder().respondent2DQExperts(Experts.builder().expertRequired(NO).build())
+                                   .builder().respondent2DQExperts(resp2Experts)
                                    .build())
                 .build();
             caseData.setCcdCaseReference(1234L);
@@ -878,10 +881,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             given(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
                 .willReturn(false, false);
+            Experts resp2ExpertsSameLRDiffResp = new Experts();
+            resp2ExpertsSameLRDiffResp.setExpertRequired(NO);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .multiPartyClaimOneDefendantSolicitor()
                 .respondent2DQ(Respondent2DQ
-                                   .builder().respondent2DQExperts(Experts.builder().expertRequired(NO).build())
+                                   .builder().respondent2DQExperts(resp2ExpertsSameLRDiffResp)
                                    .build())
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(NO)
@@ -900,10 +905,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             given(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
                 .willReturn(false, false);
+            Experts resp1ExpertsDiffLR = new Experts();
+            resp1ExpertsDiffLR.setExpertRequired(NO);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .multiPartyClaimOneDefendantSolicitor()
                 .respondent1DQ(Respondent1DQ
-                                   .builder().respondent1DQExperts(Experts.builder().expertRequired(NO).build())
+                                   .builder().respondent1DQExperts(resp1ExpertsDiffLR)
                                    .build())
                 .respondent2SameLegalRepresentative(NO)
                 .build();
@@ -921,10 +928,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             given(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
                 .willReturn(false, false);
+            Experts resp1ExpertsResponseNull = new Experts();
+            resp1ExpertsResponseNull.setExpertRequired(NO);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .multiPartyClaimOneDefendantSolicitor()
                 .respondent1DQ(Respondent1DQ
-                                   .builder().respondent1DQExperts(Experts.builder().expertRequired(NO).build())
+                                   .builder().respondent1DQExperts(resp1ExpertsResponseNull)
                                    .build())
                 .respondent2SameLegalRepresentative(YES)
                 .build();
@@ -942,10 +951,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             given(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
                 .willReturn(false, false);
+            Experts resp1ExpertsResponseSame = new Experts();
+            resp1ExpertsResponseSame.setExpertRequired(NO);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .multiPartyClaimOneDefendantSolicitor()
                 .respondent1DQ(Respondent1DQ
-                                   .builder().respondent1DQExperts(Experts.builder().expertRequired(NO).build())
+                                   .builder().respondent1DQExperts(resp1ExpertsResponseSame)
                                    .build())
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(YES)
@@ -964,10 +975,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             given(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
                 .willReturn(false, false);
+            Experts resp1ExpertsDiffResponse = new Experts();
+            resp1ExpertsDiffResponse.setExpertRequired(NO);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .multiPartyClaimOneDefendantSolicitor()
                 .respondent1DQ(Respondent1DQ
-                                   .builder().respondent1DQExperts(Experts.builder().expertRequired(NO).build())
+                                   .builder().respondent1DQExperts(resp1ExpertsDiffResponse)
                                    .build())
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(NO)
@@ -986,12 +999,14 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             given(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
                 .willReturn(false, false);
+            Experts resp1ExpertsR2Null = new Experts();
+            resp1ExpertsR2Null.setExpertRequired(NO);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .multiPartyClaimOneDefendantSolicitor()
                 .respondent2DQ(Respondent2DQ
                                    .builder().build())
                 .respondent1DQ(Respondent1DQ
-                                   .builder().respondent1DQExperts(Experts.builder().expertRequired(NO).build())
+                                   .builder().respondent1DQExperts(resp1ExpertsR2Null)
                                    .build())
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(NO)
@@ -1008,11 +1023,11 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_whenExpertRequiredAndNullDetails() {
             //Given
+            Experts resp1ExpertsRequired = new Experts();
+            resp1ExpertsRequired.setExpertRequired(YES);
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(Respondent1DQ.builder()
-                                   .respondent1DQExperts(Experts.builder()
-                                                             .expertRequired(YES)
-                                                             .build())
+                                   .respondent1DQExperts(resp1ExpertsRequired)
                                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -1026,13 +1041,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoError_whenExpertRequiredAndDetailsProvided() {
             //Given
+            Experts resp1ExpertsWithDetails = new Experts();
+            resp1ExpertsWithDetails.setExpertRequired(YES);
+            resp1ExpertsWithDetails.setDetails(wrapElements(Expert.builder().name("test expert").build()));
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(Respondent1DQ.builder()
-                                   .respondent1DQExperts(Experts.builder()
-                                                             .expertRequired(YES)
-                                                             .details(wrapElements(Expert.builder()
-                                                                                       .name("test expert").build()))
-                                                             .build())
+                                   .respondent1DQExperts(resp1ExpertsWithDetails)
                                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -1045,11 +1059,11 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoError_whenExpertNotRequired() {
             //Given
+            Experts resp1ExpertsNotRequired = new Experts();
+            resp1ExpertsNotRequired.setExpertRequired(NO);
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(Respondent1DQ.builder()
-                                   .respondent1DQExperts(Experts.builder()
-                                                             .expertRequired(NO)
-                                                             .build())
+                                   .respondent1DQExperts(resp1ExpertsNotRequired)
                                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -1274,8 +1288,11 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             String name = "John Smith";
             String role = "Solicitor";
             //Given
+            StatementOfTruth uiStatement = new StatementOfTruth();
+            uiStatement.setName(name);
+            uiStatement.setRole(role);
             CaseData caseData = CaseDataBuilder.builder()
-                .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
+                .uiStatementOfTruth(uiStatement)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, "statement-of-truth");
@@ -1929,7 +1946,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimDetailsNotified()
                 .multiPartyClaimTwoDefendantSolicitors()
                 .respondent1DQ(Respondent1DQ.builder()
-                                   .respondent1DQStatementOfTruth(StatementOfTruth.builder().build())
+                                   .respondent1DQStatementOfTruth(new StatementOfTruth())
                                    .build())
                 .build();
 
@@ -2215,10 +2232,13 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 String name = "John Smith";
                 String role = "Solicitor";
                 //Given
+                StatementOfTruth uiStatement1v1 = new StatementOfTruth();
+                uiStatement1v1.setName(name);
+                uiStatement1v1.setRole(role);
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                     .respondent1Copy(PartyBuilder.builder().individual().build())
-                    .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
+                    .uiStatementOfTruth(uiStatement1v1)
                     .build();
                 CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                 //When
@@ -2245,7 +2265,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                     .build();
                 caseData.setRespondent1Copy(PartyBuilder.builder().individual().build());
-                caseData.setUiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build());
+                StatementOfTruth uiStatement2v1 = new StatementOfTruth();
+                uiStatement2v1.setName(name);
+                uiStatement2v1.setRole(role);
+                caseData.setUiStatementOfTruth(uiStatement2v1);
                 CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                 //When
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.jackson.Jacksonized;
 
 import java.util.Comparator;
@@ -17,6 +18,7 @@ import static java.util.stream.Collectors.toList;
  * Representation of a CCD Dynamic List which is then converted to a select dropdown list.
  */
 @Data
+@Setter
 @Jacksonized
 @Builder(toBuilder = true)
 @AllArgsConstructor

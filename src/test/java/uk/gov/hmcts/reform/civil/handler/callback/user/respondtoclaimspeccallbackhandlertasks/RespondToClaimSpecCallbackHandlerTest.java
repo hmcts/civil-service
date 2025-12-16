@@ -1013,10 +1013,9 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .atStateRespondentFullDefenceFastTrack()
                     .build();
 
-            RespondToClaim respondToClaim = RespondToClaim.builder()
-                    // how much was paid is pence, total claim amount is pounds
-                    .howMuchWasPaid(caseData.getTotalClaimAmount().multiply(BigDecimal.valueOf(100)))
-                    .build();
+            RespondToClaim respondToClaim = new RespondToClaim();
+            // how much was paid is pence, total claim amount is pounds
+            respondToClaim.setHowMuchWasPaid(caseData.getTotalClaimAmount().multiply(BigDecimal.valueOf(100)));
 
             caseData.setDefenceRouteRequired(SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED);
             caseData.setRespondToClaim(respondToClaim);
@@ -1043,11 +1042,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .atStateRespondentFullDefenceFastTrack()
                     .build();
 
-            RespondToClaim respondToClaim = RespondToClaim.builder()
-                    // how much was paid is pence, total claim amount is pounds
-                    // multiply by less than 100 so defendant paid less than claimed
-                    .howMuchWasPaid(caseData.getTotalClaimAmount().multiply(BigDecimal.valueOf(50)))
-                    .build();
+            RespondToClaim respondToClaim = new RespondToClaim();
+            // how much was paid is pence, total claim amount is pounds
+            // multiply by less than 100 so defendant paid less than claimed
+            respondToClaim.setHowMuchWasPaid(caseData.getTotalClaimAmount().multiply(BigDecimal.valueOf(50)));
 
             caseData.setDefenceRouteRequired(SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED);
             caseData.setRespondToClaim(respondToClaim);
@@ -2697,7 +2695,9 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
             caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
             caseData.setSpecDefenceAdmittedRequired(YesOrNo.YES);
-            caseData.setRespondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(howMuchWasPaid).build());
+            RespondToClaim respondToAdmittedClaim = new RespondToClaim();
+            respondToAdmittedClaim.setHowMuchWasPaid(howMuchWasPaid);
+            caseData.setRespondToAdmittedClaim(respondToAdmittedClaim);
             caseData.setTotalClaimAmount(totalClaimAmount);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
@@ -2917,13 +2917,15 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void specificSummary_whenPartialAdmitPaidLess() {
             // Given
             BigDecimal howMuchWasPaid = BigDecimal.valueOf(1000);
-            BigDecimal totalClaimAmount = BigDecimal.valueOf(10000);
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .build();
             caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
             caseData.setSpecDefenceAdmittedRequired(YesOrNo.YES);
-            caseData.setRespondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(howMuchWasPaid).build());
+            RespondToClaim respondToAdmittedClaim = new RespondToClaim();
+            respondToAdmittedClaim.setHowMuchWasPaid(howMuchWasPaid);
+            caseData.setRespondToAdmittedClaim(respondToAdmittedClaim);
+            BigDecimal totalClaimAmount = BigDecimal.valueOf(10000);
             caseData.setTotalClaimAmount(totalClaimAmount);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
@@ -3284,7 +3286,9 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent2SameLegalRepresentative(NO)
                     .respondent1DQ()
                     .build();
-            caseData.setResp2MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(NO).build());
+            MediationAvailability resp2MediationAvailability = new MediationAvailability();
+            resp2MediationAvailability.setIsMediationUnavailablityExists(NO);
+            caseData.setResp2MediationAvailability(resp2MediationAvailability);
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-mediation-unavailable-dates");
             // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -3318,9 +3322,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent1DQ()
                     .build();
             CaseData updatedCaseData = caseData;
-            updatedCaseData.setResp2MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
-                            .unavailableDatesForMediation(unAvailableDates)
-                            .build());
+            MediationAvailability resp2MediationAvailability3 = new MediationAvailability();
+            resp2MediationAvailability3.setIsMediationUnavailablityExists(YES);
+            resp2MediationAvailability3.setUnavailableDatesForMediation(unAvailableDates);
+            updatedCaseData.setResp2MediationAvailability(resp2MediationAvailability3);
             CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
@@ -3339,7 +3344,9 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent1DQ()
                     .build();
             CaseData updatedCaseData = caseData;
-            updatedCaseData.setResp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(NO).build());
+            MediationAvailability resp1MediationAvailability = new MediationAvailability();
+            resp1MediationAvailability.setIsMediationUnavailablityExists(NO);
+            updatedCaseData.setResp1MediationAvailability(resp1MediationAvailability);
             CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
             // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -3373,9 +3380,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent1DQ()
                     .build();
             CaseData updatedCaseData = caseData;
-            updatedCaseData.setResp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
-                            .unavailableDatesForMediation(unAvailableDates)
-                            .build());
+            MediationAvailability resp1MediationAvailability3 = new MediationAvailability();
+            resp1MediationAvailability3.setIsMediationUnavailablityExists(YES);
+            resp1MediationAvailability3.setUnavailableDatesForMediation(unAvailableDates);
+            updatedCaseData.setResp1MediationAvailability(resp1MediationAvailability3);
             CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
@@ -3407,9 +3415,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent1DQ()
                     .build();
             CaseData updatedCaseData = caseData;
-            updatedCaseData.setResp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
-                            .unavailableDatesForMediation(unAvailableDates)
-                            .build());
+            MediationAvailability resp1MediationAvailability3 = new MediationAvailability();
+            resp1MediationAvailability3.setIsMediationUnavailablityExists(YES);
+            resp1MediationAvailability3.setUnavailableDatesForMediation(unAvailableDates);
+            updatedCaseData.setResp1MediationAvailability(resp1MediationAvailability3);
             CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
@@ -3441,9 +3450,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent1DQ()
                     .build();
             CaseData updatedCaseData = caseData;
-            updatedCaseData.setResp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
-                            .unavailableDatesForMediation(unAvailableDates)
-                            .build());
+            MediationAvailability resp1MediationAvailability3 = new MediationAvailability();
+            resp1MediationAvailability3.setIsMediationUnavailablityExists(YES);
+            resp1MediationAvailability3.setUnavailableDatesForMediation(unAvailableDates);
+            updatedCaseData.setResp1MediationAvailability(resp1MediationAvailability3);
             CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
@@ -3476,9 +3486,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent1DQ()
                     .build();
             CaseData updatedCaseData = caseData;
-            updatedCaseData.setResp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
-                            .unavailableDatesForMediation(unAvailableDates)
-                            .build());
+            MediationAvailability resp1MediationAvailability3 = new MediationAvailability();
+            resp1MediationAvailability3.setIsMediationUnavailablityExists(YES);
+            resp1MediationAvailability3.setUnavailableDatesForMediation(unAvailableDates);
+            updatedCaseData.setResp1MediationAvailability(resp1MediationAvailability3);
             CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
@@ -3511,9 +3522,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent1DQ()
                     .build();
             CaseData updatedCaseData = caseData;
-            updatedCaseData.setResp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
-                            .unavailableDatesForMediation(unAvailableDates)
-                            .build());
+            MediationAvailability resp1MediationAvailability3 = new MediationAvailability();
+            resp1MediationAvailability3.setIsMediationUnavailablityExists(YES);
+            resp1MediationAvailability3.setUnavailableDatesForMediation(unAvailableDates);
+            updatedCaseData.setResp1MediationAvailability(resp1MediationAvailability3);
             CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
@@ -3545,9 +3557,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent1DQ()
                     .build();
             CaseData updatedCaseData = caseData;
-            updatedCaseData.setResp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
-                            .unavailableDatesForMediation(unAvailableDates)
-                            .build());
+            MediationAvailability resp1MediationAvailability3 = new MediationAvailability();
+            resp1MediationAvailability3.setIsMediationUnavailablityExists(YES);
+            resp1MediationAvailability3.setUnavailableDatesForMediation(unAvailableDates);
+            updatedCaseData.setResp1MediationAvailability(resp1MediationAvailability3);
             CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
@@ -3580,9 +3593,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent1DQ()
                     .build();
             CaseData updatedCaseData = caseData;
-            updatedCaseData.setResp1MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(YES)
-                            .unavailableDatesForMediation(unAvailableDates)
-                            .build());
+            MediationAvailability resp1MediationAvailability3 = new MediationAvailability();
+            resp1MediationAvailability3.setIsMediationUnavailablityExists(YES);
+            resp1MediationAvailability3.setUnavailableDatesForMediation(unAvailableDates);
+            updatedCaseData.setResp1MediationAvailability(resp1MediationAvailability3);
             CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
