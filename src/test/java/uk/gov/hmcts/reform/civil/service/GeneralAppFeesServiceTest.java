@@ -659,6 +659,25 @@ class GeneralAppFeesServiceTest {
         return caseData;
     }
 
+    private GeneralApplicationCaseData getFeeCaseGeneralApplication(List<GeneralApplicationTypes> types, YesOrNo hasAgreed,
+                                                                    YesOrNo isWithNotice, LocalDate hearingScheduledDate) {
+        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder = GeneralApplicationCaseData.builder();
+        builder.generalAppType(GAApplicationType.builder().types(types).build());
+        if (Objects.nonNull(hasAgreed)) {
+            builder.generalAppRespondentAgreement(GARespondentOrderAgreement
+                                                      .builder().hasAgreed(hasAgreed).build());
+        }
+        if (Objects.nonNull(isWithNotice)) {
+            builder.generalAppInformOtherParty(
+                GAInformOtherParty.builder().isWithNotice(isWithNotice).build());
+        }
+        if (Objects.nonNull(hearingScheduledDate)) {
+            builder.generalAppHearingDate(GAHearingDateGAspec.builder()
+                                              .hearingScheduledDate(hearingScheduledDate).build());
+        }
+        return builder.build();
+    }
+
     private List<GeneralApplicationTypes> getGADefaultTypes() {
         List<GeneralApplicationTypes> allTypes =
             Stream.of(GeneralApplicationTypes.values()).collect(Collectors.toList());

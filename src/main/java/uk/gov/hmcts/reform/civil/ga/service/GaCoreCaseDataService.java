@@ -266,7 +266,7 @@ public class GaCoreCaseDataService {
         }
         String userToken = userService.getAccessToken(userName, userConfig.getPassword());
         String userId = userService.getUserInfo(userToken).getUid();
-        return UserAuthContent.builder().userToken(userToken).userId(userId).build();
+        return new UserAuthContent().setUserToken(userToken).setUserId(userId);
     }
 
     private UserAuthContent refreshSystemUpdateUser() {
@@ -276,7 +276,7 @@ public class GaCoreCaseDataService {
         }
         String userToken = userService.getAccessToken(userName, userConfig.getPassword());
         String userId = userService.getUserInfo(userToken).getUid();
-        return UserAuthContent.builder().userToken(userToken).userId(userId).build();
+        return new UserAuthContent().setUserToken(userToken).setUserId(userId);
     }
 
     public CaseDataContent caseDataContentFromStartEventResponse(
