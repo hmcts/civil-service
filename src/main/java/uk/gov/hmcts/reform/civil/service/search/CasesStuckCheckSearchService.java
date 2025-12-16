@@ -17,8 +17,8 @@ import java.util.Set;
 
 import static java.math.RoundingMode.UP;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
+import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 
 @Service
 @Slf4j
@@ -54,7 +54,7 @@ public class CasesStuckCheckSearchService {
         return new Query(
             boolQuery()
                 .must(rangeQuery("last_modified").gt(pastDaysExpression).lt(timeNow))
-                .mustNot(matchQuery("data.businessProcess.status", "FINISHED")),
+                .mustNot(termQuery("data.businessProcess.status.keyword", "finished")),
             List.of("reference"),
             startIndex
         );
