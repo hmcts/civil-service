@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.List;
 
@@ -28,27 +29,24 @@ class Respondent1WitnessesCaseDataUpdaterTest {
 
     @BeforeEach
     void setUp() {
+        Witness witness = new Witness();
+        witness.setFirstName("test witness");
+        List<Element<Witness>> testWitness = wrapElements(witness);
 
-        List<Element<Witness>> testWitness = wrapElements(Witness.builder().firstName("test witness").build());
-
-        caseData = CaseData.builder()
-                .respondent1DQ(Respondent1DQ.builder()
-                        .respondent1DQWitnesses(Witnesses.builder()
-                                .witnessesToAppear(YES)
-                                .details(testWitness)
-                                .build())
-                        .build())
-                .build();
+        caseData = CaseDataBuilder.builder().build();
+        Witnesses witnesses = new Witnesses();
+        witnesses.setWitnessesToAppear(YES);
+        witnesses.setDetails(testWitness);
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQWitnesses(witnesses);
+        caseData.setRespondent1DQ(respondent1DQ);
     }
 
     @Test
     void shouldUpdateCaseDataWithWitnesses() {
-        CaseData.CaseDataBuilder<?, ?> updatedData = CaseData.builder()
-                .respondent1DQ(caseData.getRespondent1DQ());
-
         updater.update(caseData);
 
-        Respondent1DQ updatedRespondent1DQ = updatedData.build().getRespondent1DQ();
+        Respondent1DQ updatedRespondent1DQ = caseData.getRespondent1DQ();
         assertThat(updatedRespondent1DQ).isNotNull();
         Witnesses updatedWitnesses = updatedRespondent1DQ.getRespondent1DQWitnesses();
         assertThat(updatedWitnesses).isNotNull();
@@ -57,16 +55,12 @@ class Respondent1WitnessesCaseDataUpdaterTest {
 
     @Test
     void shouldHandleNullWitnesses() {
-        caseData = caseData.toBuilder()
-                .respondent1DQ(Respondent1DQ.builder().build())
-                .build();
-
-        CaseData.CaseDataBuilder<?, ?> updatedData = CaseData.builder()
-                .respondent1DQ(caseData.getRespondent1DQ());
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        caseData.setRespondent1DQ(respondent1DQ);
 
         updater.update(caseData);
 
-        Respondent1DQ updatedRespondent1DQ = updatedData.build().getRespondent1DQ();
+        Respondent1DQ updatedRespondent1DQ = caseData.getRespondent1DQ();
         assertThat(updatedRespondent1DQ).isNotNull();
         assertThat(updatedRespondent1DQ.getRespondent1DQWitnesses()).isNull();
     }

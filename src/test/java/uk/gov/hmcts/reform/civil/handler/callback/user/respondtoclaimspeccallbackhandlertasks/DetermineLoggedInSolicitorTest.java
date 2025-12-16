@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -42,7 +43,7 @@ class DetermineLoggedInSolicitorTest {
     void setUp() {
         ObjectMapper objectMapper = new ObjectMapper();
         determineLoggedInSolicitor = new DetermineLoggedInSolicitor(userService, coreCaseUserService, objectMapper);
-        CaseData caseData = CaseData.builder().ccdCaseReference(1234L).build();
+        CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(1234L).build();
         UserInfo userInfo = UserInfo.builder().uid("userId").build();
         callbackParams = CallbackParams.builder()
                 .caseData(caseData)
@@ -136,11 +137,13 @@ class DetermineLoggedInSolicitorTest {
     }
 
     private CaseData buildCaseData(Party.Type partyType) {
-        return CaseData.builder()
-                .isRespondent2(YesOrNo.YES)
-                .respondent2DetailsForClaimDetailsTab(Party.builder().type(partyType).build())
-                .ccdCaseReference(1234L)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setIsRespondent2(YesOrNo.YES);
+        Party party = new Party();
+        party.setType(partyType);
+        caseData.setRespondent2DetailsForClaimDetailsTab(party);
+        caseData.setCcdCaseReference(1234L);
+        return caseData;
     }
 
     private CallbackParams buildCallbackParams(CaseData caseData) {
