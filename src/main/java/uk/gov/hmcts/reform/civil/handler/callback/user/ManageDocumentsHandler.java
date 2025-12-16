@@ -61,7 +61,7 @@ public class ManageDocumentsHandler extends CallbackHandler {
                 manageDocumentNew.setDocumentType(manageDocument.getDocumentType());
                 manageDocumentNew.setDocumentTypeOther(manageDocument.getDocumentTypeOther());
                 manageDocumentNew.setCreatedDatetime(manageDocument.getCreatedDatetime());
-                manageDocumentsNewList.add(element(manageDocument));
+                manageDocumentsNewList.add(element(manageDocumentNew));
             }
             caseData.setManageDocuments(manageDocumentsNewList);
         }
@@ -84,7 +84,7 @@ public class ManageDocumentsHandler extends CallbackHandler {
                         document.setUploadTimestamp(documentLink.getUploadTimestamp());
                         document.setDocumentUrl(documentLink.getDocumentUrl());
                         document.setDocumentBinaryUrl(documentLink.getDocumentBinaryUrl());
-                        document.setCategoryID(documentLink.getCategoryID());
+                        document.setCategoryID(manageDocument.getDocumentLink().getCategoryID());
                         return document;
                     }
                 }
