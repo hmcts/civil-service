@@ -90,6 +90,6 @@ public class ManageDocumentsHandler extends CallbackHandler {
                 }
             }
         }
-        return  documentLink;
+        return documentLink;
     }
 }
