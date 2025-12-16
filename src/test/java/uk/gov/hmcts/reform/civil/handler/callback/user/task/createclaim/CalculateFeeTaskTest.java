@@ -111,8 +111,10 @@ class CalculateFeeTaskTest extends BaseCallbackHandlerTest {
         organisation.setPaymentAccount(pbaAccounts);
         given(organisationService.findOrganisation(any())).willReturn(Optional.of(organisation));
 
+        ClaimValue claimValue = new ClaimValue();
+        claimValue.setStatementOfValueInPennies(BigDecimal.valueOf(10000L));
         CaseData caseData = CaseDataBuilder.builder()
-            .claimValue(ClaimValue.builder().statementOfValueInPennies(BigDecimal.valueOf(10000L)).build())
+            .claimValue(claimValue)
             .build();
         CallbackResponse response = calculateFeeTask.calculateFees(caseData, "authToken");
 
