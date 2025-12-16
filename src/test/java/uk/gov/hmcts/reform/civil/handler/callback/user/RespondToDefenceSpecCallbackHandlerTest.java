@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
@@ -53,6 +54,7 @@ import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.FixedCosts;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
+import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
@@ -1768,6 +1770,41 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("caseManagementLocation")
                 .extracting("region", "baseLocation")
                 .containsExactly("10", "214320");
+        }
+
+        @Test
+        void shouldAssignCategoryId_whenApplicant1DefenceResponseDocumentIsPresent() {
+            // Given
+            Document document = Document.builder()
+                .documentUrl("http://dm-store/documents/123")
+                .documentBinaryUrl("http://dm-store/documents/123/binary")
+                .documentFileName("defence-response.pdf")
+                .build();
+
+            ResponseDocument responseDocument = ResponseDocument.builder()
+                .file(document)
+                .build();
+
+            CaseData caseData = CaseData.builder()
+                .applicant1DefenceResponseDocumentSpec(responseDocument)
+                .build();
+
+            // When
+            CallbackParams params = CallbackParams.builder()
+                .type(CallbackType.MID)
+                .pageId("set-applicant1-defence-response-doc-category")
+                .caseData(caseData)
+                .build();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            // Then
+            assertThat(updatedCaseData.getApplicant1DefenceResponseDocumentSpec()
+                           .getFile()
+                           .getCategoryID())
+                .isEqualTo("directionsQuestionnaire");
         }
 
         @Nested
