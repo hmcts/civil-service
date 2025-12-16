@@ -139,8 +139,6 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         List<String> dateValidationErrorMessages = serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(certificateOfService);
         errors.addAll(dateValidationErrorMessages);
 
-        caseData.setCosNotifyClaimDefendant1(certificateOfService.toBuilder().build());
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .errors(errors)
@@ -153,8 +151,6 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         ArrayList<String> errors = new ArrayList<>();
         List<String> dateValidationErrorMessages = serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(certificateOfServiceDef2);
         errors.addAll(dateValidationErrorMessages);
-
-        caseData.setCosNotifyClaimDefendant2(certificateOfServiceDef2.toBuilder().build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
@@ -202,23 +198,25 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
 
     private void setOrganisationPolicy(CaseData caseData) {
         if (caseData.getRespondent1OrganisationIDCopy() != null) {
-            caseData.setRespondent1OrganisationPolicy(
-                caseData.getRespondent1OrganisationPolicy().toBuilder()
-                    .organisation(Organisation.builder()
-                                      .organisationID(caseData.getRespondent1OrganisationIDCopy())
-                                      .build())
-                    .build()
-            );
+            var existingPolicy = caseData.getRespondent1OrganisationPolicy();
+            var newPolicy = new uk.gov.hmcts.reform.ccd.model.OrganisationPolicy();
+            newPolicy.setOrgPolicyReference(existingPolicy.getOrgPolicyReference());
+            newPolicy.setOrgPolicyCaseAssignedRole(existingPolicy.getOrgPolicyCaseAssignedRole());
+            Organisation organisation = new Organisation();
+            organisation.setOrganisationID(caseData.getRespondent1OrganisationIDCopy());
+            newPolicy.setOrganisation(organisation);
+            caseData.setRespondent1OrganisationPolicy(newPolicy);
         }
 
         if (caseData.getRespondent2OrganisationIDCopy() != null) {
-            caseData.setRespondent2OrganisationPolicy(
-                caseData.getRespondent2OrganisationPolicy().toBuilder()
-                    .organisation(Organisation.builder()
-                                      .organisationID(caseData.getRespondent2OrganisationIDCopy())
-                                      .build())
-                    .build()
-            );
+            var existingPolicy = caseData.getRespondent2OrganisationPolicy();
+            var newPolicy = new uk.gov.hmcts.reform.ccd.model.OrganisationPolicy();
+            newPolicy.setOrgPolicyReference(existingPolicy.getOrgPolicyReference());
+            newPolicy.setOrgPolicyCaseAssignedRole(existingPolicy.getOrgPolicyCaseAssignedRole());
+            Organisation organisation = new Organisation();
+            organisation.setOrganisationID(caseData.getRespondent2OrganisationIDCopy());
+            newPolicy.setOrganisation(organisation);
+            caseData.setRespondent2OrganisationPolicy(newPolicy);
         }
     }
 
@@ -323,8 +321,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     private CertificateOfService updateStatementOfTruthForLip(CertificateOfService certificateOfService) {
         List<String> cosUISenderStatementOfTruthLabel = new ArrayList<>();
         cosUISenderStatementOfTruthLabel.add("CERTIFIED");
-        return certificateOfService.toBuilder()
-            .cosSenderStatementOfTruthLabel(cosUISenderStatementOfTruthLabel)
-            .build();
+        certificateOfService.setCosSenderStatementOfTruthLabel(cosUISenderStatementOfTruthLabel);
+        return certificateOfService;
     }
 }

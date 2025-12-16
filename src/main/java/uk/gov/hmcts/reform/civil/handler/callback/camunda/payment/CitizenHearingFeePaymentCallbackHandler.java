@@ -45,12 +45,11 @@ public class CitizenHearingFeePaymentCallbackHandler extends CallbackHandler {
     private CallbackResponse citizenHearingFeePayment(CallbackParams callbackParams) {
 
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
 
-        dataBuilder.businessProcess(BusinessProcess.ready(CITIZEN_HEARING_FEE_PAYMENT));
+        caseData.setBusinessProcess(BusinessProcess.ready(CITIZEN_HEARING_FEE_PAYMENT));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(dataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

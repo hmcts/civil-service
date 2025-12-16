@@ -46,6 +46,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BaseCaseData;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -54,6 +55,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.hearings.HearingValuesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.judgments.CjesMapper;
@@ -83,6 +85,7 @@ public class TestingSupportController {
     private final RoboticsDataMapperForUnspec roboticsDataMapper;
     private final RoboticsDataMapperForSpec roboticsSpecDataMapper;
     private final CjesMapper cjesMapper;
+    private final HearingValuesService hearingValuesService;
     private final SystemUpdateUserConfiguration systemUserConfig;
     private final UserService userService;
 
@@ -192,6 +195,14 @@ public class TestingSupportController {
     public String getRPAJsonInformationForSpecCaseData(
         @RequestBody CaseData caseData) throws JsonProcessingException {
         return roboticsSpecDataMapper.toRoboticsCaseData(caseData, getSystemUserToken()).toJsonString();
+    }
+
+    @PostMapping(
+        value = "/testing-support/hearingValues",
+        produces = "application/json")
+    public ServiceHearingValuesModel getHearingValues(
+        @RequestBody CaseData caseData) {
+        return hearingValuesService.getValues(caseData, getSystemUserToken());
     }
 
     @PostMapping(

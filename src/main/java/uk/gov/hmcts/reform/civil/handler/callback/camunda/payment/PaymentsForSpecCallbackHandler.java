@@ -62,12 +62,11 @@ public class PaymentsForSpecCallbackHandler extends CallbackHandler {
     }
 
     private CaseData updateWithDuplicatePaymentError(CaseData caseData, FeignException e) {
-        return caseData.toBuilder()
-            .paymentDetails(PaymentDetails.builder()
-                                .status(FAILED)
-                                .errorMessage(e.contentUTF8())
-                                .build())
-            .build();
+        PaymentDetails paymentDetails = new PaymentDetails();
+        paymentDetails.setStatus(FAILED);
+        paymentDetails.setErrorMessage(e.contentUTF8());
+        caseData.setPaymentDetails(paymentDetails);
+        return caseData;
     }
 
     private CallbackResponse makePbaPayment(CallbackParams callbackParams) {
@@ -78,28 +77,24 @@ public class PaymentsForSpecCallbackHandler extends CallbackHandler {
             var paymentReference = paymentsService.createCreditAccountPayment(caseData, authToken)
                 .getPaymentReference();
             PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
-                .map(PaymentDetails::toBuilder)
-                .orElse(PaymentDetails.builder())
-                .status(SUCCESS)
-                .reference(paymentReference)
-                .errorCode(null)
-                .errorMessage(null)
-                .build();
+                .orElse(new PaymentDetails());
+            paymentDetails.setStatus(SUCCESS);
+            paymentDetails.setReference(paymentReference);
+            paymentDetails.setErrorCode(null);
+            paymentDetails.setErrorMessage(null);
 
-            caseData = caseData.toBuilder()
-                .claimIssuedPaymentDetails(paymentDetails)
-                .paymentSuccessfulDate(time.now())
-                .build();
+            caseData.setClaimIssuedPaymentDetails(paymentDetails);
+            caseData.setPaymentSuccessfulDate(time.now());
 
         } catch (FeignException e) {
             log.info(String.format("Http Status %s ", e.status()), e);
             if (e.status() == 403) {
-                caseData = updateWithBusinessError(caseData, e);
+                updateWithBusinessError(caseData, e);
             } else if (e.status() == 400) {
                 log.error(String.format("Payment error status code 400 for case: %s, response body: %s",
                                         caseData.getCcdCaseReference(), e.contentUTF8()
                 ));
-                caseData = updateWithDuplicatePaymentError(caseData, e);
+                updateWithDuplicatePaymentError(caseData, e);
             } else {
                 errors.add(ERROR_MESSAGE);
             }
@@ -112,20 +107,17 @@ public class PaymentsForSpecCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private CaseData updateWithBusinessError(CaseData caseData, FeignException e) {
+    private void updateWithBusinessError(CaseData caseData, FeignException e) {
         try {
             var paymentDto = objectMapper.readValue(e.contentUTF8(), PaymentDto.class);
             var statusHistory = paymentDto.getStatusHistories()[0];
             PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
-                .map(PaymentDetails::toBuilder).orElse(PaymentDetails.builder())
-                .status(FAILED)
-                .errorCode(statusHistory.getErrorCode())
-                .errorMessage(statusHistory.getErrorMessage())
-                .build();
+                .orElse(new PaymentDetails());
+            paymentDetails.setStatus(FAILED);
+            paymentDetails.setErrorCode(statusHistory.getErrorCode());
+            paymentDetails.setErrorMessage(statusHistory.getErrorMessage());
 
-            return caseData.toBuilder()
-                .claimIssuedPaymentDetails(paymentDetails)
-                .build();
+            caseData.setClaimIssuedPaymentDetails(paymentDetails);
         } catch (JsonProcessingException jsonException) {
             log.error(String.format("Unknown payment error for case: %s, response body: %s",
                                     caseData.getCcdCaseReference(), e.contentUTF8()

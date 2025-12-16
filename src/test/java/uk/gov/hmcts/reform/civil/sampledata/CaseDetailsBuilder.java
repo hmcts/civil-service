@@ -51,6 +51,11 @@ public class CaseDetailsBuilder {
         return this;
     }
 
+    public CaseDetailsBuilder data(Map<String, Object> data) {
+        this.data = data;
+        return this;
+    }
+
     public CaseDetailsBuilder id(Long id) {
         this.id = id;
         return this;

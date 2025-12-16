@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import org.camunda.bpm.engine.variable.VariableMap;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 
@@ -13,6 +14,7 @@ import java.util.Optional;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 public class ExternalTaskData {
 
     private CaseData caseData;

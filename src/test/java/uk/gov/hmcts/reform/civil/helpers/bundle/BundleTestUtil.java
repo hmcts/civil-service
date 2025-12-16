@@ -294,33 +294,28 @@ public class BundleTestUtil {
 
     private static List<Element<UploadEvidenceDocumentType>> getDocumentEvidenceForTrial() {
         List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = new ArrayList<>();
-        Arrays.stream(TypeOfDocDocumentaryEvidenceOfTrial.values()).toList().forEach(type -> otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
-                                                       .builder()
-                                                       .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
+        Arrays.stream(TypeOfDocDocumentaryEvidenceOfTrial.values()).toList().forEach(type -> otherEvidenceDocs.add(ElementUtils.element(new UploadEvidenceDocumentType()
+                                                       .setDocumentUpload(Document.builder().documentBinaryUrl(TEST_URL)
                                                                            .documentFileName(TEST_FILE_NAME).categoryID("").build())
-                                                       .typeOfDocument(type.getDisplayNames().get(0))
-                                                       .documentIssuedDate(LocalDate.of(2023, 1, 12))
-                                                       .build())));
-        otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
-                                                       .builder()
-                                                       .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
+                                                       .setTypeOfDocument(type.getDisplayNames().get(0))
+                                                       .setDocumentIssuedDate(LocalDate.of(2023, 1, 12)))));
+        otherEvidenceDocs.add(ElementUtils.element(new UploadEvidenceDocumentType()
+                                                       .setDocumentUpload(Document.builder().documentBinaryUrl(TEST_URL)
                                                                            .documentFileName(TEST_FILE_NAME).categoryID("").build())
-                                                       .typeOfDocument("Other")
-                                                       .documentIssuedDate(LocalDate.of(2023, 1, 12))
-                                                       .build()));
+                                                       .setTypeOfDocument("Other")
+                                                       .setDocumentIssuedDate(LocalDate.of(2023, 1, 12))));
         return otherEvidenceDocs;
     }
 
     private static List<Element<UploadEvidenceDocumentType>> setupOtherEvidenceDocs(String witnessOptionName) {
         List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = new ArrayList<>();
-        otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
-                                                       .builder()
-                                                       .witnessOptionName(witnessOptionName)
-                                                       .typeOfDocument(TEST_FILE_TYPE)
-                                                       .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
+        otherEvidenceDocs.add(ElementUtils.element(new UploadEvidenceDocumentType()
+                                                       .setWitnessOptionName(witnessOptionName)
+                                                       .setTypeOfDocument(TEST_FILE_TYPE)
+                                                       .setDocumentUpload(Document.builder().documentBinaryUrl(TEST_URL)
                                                                            .documentFileName(TEST_FILE_NAME).categoryID("").build())
-                                                       .documentIssuedDate(LocalDate.of(2022, 12, 12))
-                                                       .createdDatetime(LocalDateTime.of(2023, 12, 12, 8, 8, 5)).build()));
+                                                       .setDocumentIssuedDate(LocalDate.of(2022, 12, 12))
+                                                       .setCreatedDatetime(LocalDateTime.of(2023, 12, 12, 8, 8, 5))));
         return otherEvidenceDocs;
     }
 

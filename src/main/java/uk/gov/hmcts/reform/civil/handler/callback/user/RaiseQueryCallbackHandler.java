@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
+import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -88,11 +89,10 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
                 .errors(errors).build();
         }
 
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        migrateAllQueries(caseDataBuilder);
+        migrateAllQueries(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper)).build();
+            .data(caseData.toMap(objectMapper)).build();
     }
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
@@ -109,20 +109,20 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
         }
 
         assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, roles);
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
-        caseDataBuilder
-            .queries(caseData.getQueries().toBuilder().partyName(PUBLIC_QUERIES_PARTY_NAME).build())
-            .qmLatestQuery(buildLatestQuery(latestCaseMessage, caseData, roles));
-        clearOldQueryCollections(caseDataBuilder);
+        CaseQueriesCollection caseQueriesCollection = caseData.getQueries();
+        caseQueriesCollection.setPartyName(PUBLIC_QUERIES_PARTY_NAME);
+        caseData.setQueries(caseQueriesCollection);
+        caseData.setQmLatestQuery(buildLatestQuery(latestCaseMessage, caseData, roles));
+        clearOldQueryCollections(caseData);
+        caseData.setBusinessProcess(BusinessProcess.ready(queryManagementRaiseQuery));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.businessProcess(BusinessProcess.ready(queryManagementRaiseQuery)).build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
     private CallbackResponse submitted(CallbackParams callbackParams) {
-        CaseData caseDataBefore = callbackParams.getCaseDataBefore();
         logMigrationSuccess(callbackParams.getCaseDataBefore());
         return emptySubmittedCallbackResponse(callbackParams);
     }

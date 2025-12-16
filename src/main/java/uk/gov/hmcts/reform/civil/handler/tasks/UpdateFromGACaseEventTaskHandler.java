@@ -93,7 +93,7 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
                     getUpdatedCaseData(caseData, generalAppCaseData)
                 )
             );
-            return ExternalTaskData.builder().caseData(caseData).generalApplicationData(generalAppCaseData).build();
+            return new ExternalTaskData().setCaseData(caseData).setGeneralApplicationData(generalAppCaseData);
         } catch (NumberFormatException ne) {
             throw new InvalidCaseDataException(
                 "Conversion to long datatype failed for general application for a case ", ne
@@ -141,7 +141,7 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
                 newGaAddlDoc = new ArrayList<>();
             }
             newGaAddlDoc.addAll(generalAppCaseData.getGaAddlDocBundle());
-            return generalAppCaseData.toBuilder().gaAddlDoc(newGaAddlDoc).build();
+            return generalAppCaseData.setGaAddlDoc(newGaAddlDoc);
         }
         return generalAppCaseData;
     }
