@@ -15,14 +15,12 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_DOCUMENTS;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Slf4j
 @Service
@@ -50,20 +48,16 @@ public class ManageDocumentsHandler extends CallbackHandler {
     private CallbackResponse uploadManageDocuments(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<Element<ManageDocument>> manageDocumentsList = caseData.getManageDocumentsList();
-        List<Element<ManageDocument>> manageDocumentsNewList = new ArrayList<>();
         if (!manageDocumentsList.isEmpty()) {
             log.info("submit data callback called {}", caseData.getCcdCaseReference());
             for (Element<ManageDocument> element : manageDocumentsList) {
                 ManageDocument manageDocument = element.getValue();
-                ManageDocument manageDocumentNew = new ManageDocument();
-                manageDocumentNew.setDocumentLink(preserveCategoryId(callbackParams, manageDocument.getDocumentLink()));
-                manageDocumentNew.setDocumentName(manageDocument.getDocumentName());
-                manageDocumentNew.setDocumentType(manageDocument.getDocumentType());
-                manageDocumentNew.setDocumentTypeOther(manageDocument.getDocumentTypeOther());
-                manageDocumentNew.setCreatedDatetime(manageDocument.getCreatedDatetime());
-                manageDocumentsNewList.add(element(manageDocumentNew));
+                Document documentLink = manageDocument.getDocumentLink();
+                if (documentLink != null) {
+                    manageDocument.setDocumentLink(preserveCategoryId(callbackParams, documentLink));
+                }
             }
-            caseData.setManageDocuments(manageDocumentsNewList);
+            caseData.setManageDocuments(manageDocumentsList);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -78,14 +72,12 @@ public class ManageDocumentsHandler extends CallbackHandler {
             if (!manageDocumentsListBefore.isEmpty()) {
                 for (Element<ManageDocument> element : manageDocumentsListBefore) {
                     ManageDocument manageDocument = element.getValue();
-                    if (manageDocument.getDocumentLink().getDocumentBinaryUrl().equals(documentLink.getDocumentBinaryUrl())) {
-                        Document document = new Document();
-                        document.setDocumentFileName(documentLink.getDocumentFileName());
-                        document.setUploadTimestamp(documentLink.getUploadTimestamp());
-                        document.setDocumentUrl(documentLink.getDocumentUrl());
-                        document.setDocumentBinaryUrl(documentLink.getDocumentBinaryUrl());
-                        document.setCategoryID(manageDocument.getDocumentLink().getCategoryID());
-                        return document;
+                    Document previousDocumentLink = manageDocument.getDocumentLink();
+                    if (previousDocumentLink != null
+                        && documentLink.getDocumentBinaryUrl().equals(previousDocumentLink.getDocumentBinaryUrl())) {
+                        return documentLink.toBuilder()
+                            .categoryID(previousDocumentLink.getCategoryID())
+                            .build();
                     }
                 }
             }
