@@ -71,11 +71,10 @@ public class MediationSuccessfulCallbackHandler extends CallbackHandler {
             .map(MediationSuccessful::getMediationAgreement);
 
         mediationAgreementDocument.ifPresent(document -> {
-            ManageDocument manageDocument = ManageDocument.builder()
-                .documentLink(document.getDocument())
-                .documentName(document.getName())
-                .documentType(DocumentTypeMapper.mapDocumentTypeToManageDocumentType(document.getDocumentType()))
-                .build();
+            ManageDocument manageDocument = new ManageDocument();
+            manageDocument.setDocumentLink(document.getDocument());
+            manageDocument.setDocumentName(document.getName());
+            manageDocument.setDocumentType(DocumentTypeMapper.mapDocumentTypeToManageDocumentType(document.getDocumentType()));
             manageDocumentsList.add(element(manageDocument));
         });
         return manageDocumentsList;
