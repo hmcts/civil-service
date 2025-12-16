@@ -250,7 +250,8 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                 .totalClaimAmount(new BigDecimal(1200))
                 .eaCourtLocation(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.NO)
-                .build().toBuilder().isReferToJudgeClaim(YesOrNo.YES).build();
+                .build();
+            caseData.setIsReferToJudgeClaim(YesOrNo.YES);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             //When: handler is called with ABOUT_TO_START event

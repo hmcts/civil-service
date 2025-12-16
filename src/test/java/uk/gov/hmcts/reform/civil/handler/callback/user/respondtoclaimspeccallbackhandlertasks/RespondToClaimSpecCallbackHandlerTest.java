@@ -922,9 +922,9 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent2SameLegalRepresentative(NO)
                     .isRespondent2(YES)
                     .build();
-            caseData = caseData.toBuilder().showConditionFlags(EnumSet.of(
+            caseData.setShowConditionFlags(EnumSet.of(
                     DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1
-            )).build();
+            ));
             CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
 
             // When
@@ -1381,17 +1381,15 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void testValidateSpecDefendantResponseAdmitClaimOwingAmountIsNull() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-                    .toBuilder()
-                    .respondent1(PartyBuilder.builder().individual().build())
-                    .isRespondent1(YES)
-                    .respondent2(PartyBuilder.builder().individual().build())
-                    .isRespondent2(YES)
-                    .specDefenceAdmitted2Required(YES)
-                    .specDefenceAdmittedRequired(YES)
-                    .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                    .totalClaimAmount(new BigDecimal(7000))
-                    .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build();
+            caseData.setRespondent1(PartyBuilder.builder().individual().build());
+            caseData.setIsRespondent1(YES);
+            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setIsRespondent2(YES);
+            caseData.setSpecDefenceAdmitted2Required(YES);
+            caseData.setSpecDefenceAdmittedRequired(YES);
+            caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+            caseData.setTotalClaimAmount(new BigDecimal(7000));
             when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal("0.05"));
             CallbackParams params = callbackParamsOf(
                     caseData, MID, "specHandleAdmitPartClaim", "DEFENDANT_RESPONSE_SPEC");
@@ -1493,10 +1491,9 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent2Copy(PartyBuilder.builder().individual().build())
                     .atSpecAoSRespondent2HomeAddressRequired(NO)
                     .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
-                    .build().toBuilder()
-                    .build().toBuilder()
-                    .respondent2ResponseDate(dateTime)
-                    .respondent1ResponseDate(null).build();
+                    .build();
+            caseData.setRespondent2ResponseDate(dateTime);
+            caseData.setRespondent1ResponseDate(null);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
@@ -2697,12 +2694,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             BigDecimal howMuchWasPaid = new BigDecimal(MonetaryConversions.poundsToPennies(totalClaimAmount));
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .build().toBuilder()
-                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                    .specDefenceAdmittedRequired(YesOrNo.YES)
-                    .respondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(howMuchWasPaid).build())
-                    .totalClaimAmount(totalClaimAmount)
                     .build();
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+            caseData.setSpecDefenceAdmittedRequired(YesOrNo.YES);
+            caseData.setRespondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(howMuchWasPaid).build());
+            caseData.setTotalClaimAmount(totalClaimAmount);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
             // When
@@ -2924,12 +2920,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             BigDecimal totalClaimAmount = BigDecimal.valueOf(10000);
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .build().toBuilder()
-                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                    .specDefenceAdmittedRequired(YesOrNo.YES)
-                    .respondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(howMuchWasPaid).build())
-                    .totalClaimAmount(totalClaimAmount)
                     .build();
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+            caseData.setSpecDefenceAdmittedRequired(YesOrNo.YES);
+            caseData.setRespondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(howMuchWasPaid).build());
+            caseData.setTotalClaimAmount(totalClaimAmount);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
             // When
@@ -2949,9 +2944,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .build().toBuilder()
-                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
                     .build();
+            caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
             // When
@@ -3290,9 +3284,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent2SameLegalRepresentative(NO)
                     .respondent1DQ()
                     .build();
-            CaseData updatedCaseData = caseData.toBuilder()
-                    .resp2MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(NO).build()).build();
-            CallbackParams params = callbackParamsOf(updatedCaseData, MID, "validate-mediation-unavailable-dates");
+            caseData.setResp2MediationAvailability(MediationAvailability.builder().isMediationUnavailablityExists(NO).build());
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-mediation-unavailable-dates");
             // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);

@@ -368,11 +368,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
-                    .build().toBuilder()
-                    .courtLocation(uk.gov.hmcts.reform.civil.model.CourtLocation.builder()
-                                       .applicantPreferredCourt("123")
-                                       .build())
                     .build();
+                caseData.setCourtLocation(uk.gov.hmcts.reform.civil.model.CourtLocation.builder()
+                                       .applicantPreferredCourt("123")
+                                       .build());
 
                 CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_START);
                 //When
@@ -517,8 +516,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
                 .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
-                .build().toBuilder().ccdCaseReference(1234L)
                 .build();
+            caseData.setCcdCaseReference(1234L);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             // When
@@ -543,8 +542,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .multiPartyClaimOneDefendantSolicitor()
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
                 .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
-                .build().toBuilder().ccdCaseReference(1234L)
                 .build();
+            caseData.setCcdCaseReference(1234L);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             // When
@@ -571,8 +570,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(NO)
-                .build().toBuilder().ccdCaseReference(1234L)
                 .build();
+            caseData.setCcdCaseReference(1234L);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             // When
@@ -598,8 +597,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
                 .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
                 .respondent2SameLegalRepresentative(NO)
-                .build().toBuilder().ccdCaseReference(1234L)
                 .build();
+            caseData.setCcdCaseReference(1234L);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -624,8 +623,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(YES)
-                .build().toBuilder().ccdCaseReference(1234L)
                 .build();
+            caseData.setCcdCaseReference(1234L);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -649,8 +648,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
                 .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
                 .respondent2SameLegalRepresentative(YES)
-                .build().toBuilder().ccdCaseReference(1234L)
                 .build();
+            caseData.setCcdCaseReference(1234L);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -675,8 +674,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2DQ(Respondent2DQ.builder().build())
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(NO)
-                .build().toBuilder().ccdCaseReference(1234L)
                 .build();
+            caseData.setCcdCaseReference(1234L);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -700,8 +699,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(NO)
-                .build().toBuilder().ccdCaseReference(1234L)
                 .build();
+            caseData.setCcdCaseReference(1234L);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -723,10 +722,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
                 .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
-                .build().toBuilder().ccdCaseReference(1234L)
-                .respondent2SameLegalRepresentative(YES)
-                .respondentResponseIsSame(NO)
                 .build();
+            caseData.setCcdCaseReference(1234L);
+            caseData.setRespondent2SameLegalRepresentative(YES);
+            caseData.setRespondentResponseIsSame(NO);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -846,8 +845,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                    .builder().respondent1DQExperts(Experts.builder()
                                                                        .expertRequired(NO)
                                                                        .build()).build())
-                .build().toBuilder().ccdCaseReference(1234L)
                 .build();
+            caseData.setCcdCaseReference(1234L);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -865,8 +864,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2DQ(Respondent2DQ
                                    .builder().respondent2DQExperts(Experts.builder().expertRequired(NO).build())
                                    .build())
-                .build().toBuilder().ccdCaseReference(1234L)
                 .build();
+            caseData.setCcdCaseReference(1234L);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1888,7 +1887,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .respondent1Copy(PartyBuilder.builder().individual().build())
                 .respondent2Copy(PartyBuilder.builder().individual().build())
-                .build().toBuilder()
                 .build();
             var beforeCaseData = Map.of(
                 "solicitorReferences",
@@ -1998,10 +1996,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             String address = "test address";
             var expectedAddress = AddressBuilder.defaults().addressLine1(address).build();
-            caseData = caseData.toBuilder()
-                .respondent1Copy(caseData.getRespondent1().toBuilder().primaryAddress(expectedAddress).build())
-                .respondent2Copy(caseData.getRespondent2().toBuilder().primaryAddress(expectedAddress).build())
-                .build();
+            var respondent1 = caseData.getRespondent1();
+            respondent1.setPrimaryAddress(expectedAddress);
+            caseData.setRespondent1Copy(respondent1);
+            var respondent2 = caseData.getRespondent2();
+            respondent2.setPrimaryAddress(expectedAddress);
+            caseData.setRespondent2Copy(respondent2);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2243,11 +2243,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimTwoApplicants()
                     .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
-                    .build()
-                    .toBuilder()
-                    .respondent1Copy(PartyBuilder.builder().individual().build())
-                    .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
                     .build();
+                caseData.setRespondent1Copy(PartyBuilder.builder().individual().build());
+                caseData.setUiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build());
                 CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                 //When
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
@@ -2848,10 +2846,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetMultiPartyResponseTypeFlags_2v1Only1FullDefence() {
             //Given
-            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
-                .respondent1ClaimResponseType(COUNTER_CLAIM)
-                .respondent1ClaimResponseTypeToApplicant2(FULL_DEFENCE)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build();
+            caseData.setRespondent1ClaimResponseType(COUNTER_CLAIM);
+            caseData.setRespondent1ClaimResponseTypeToApplicant2(FULL_DEFENCE);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
@@ -2863,10 +2860,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetMultiPartyResponseTypeFlags_2v1BothFullDefence() {
             //Given
-            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
-                .respondent1ClaimResponseType(FULL_DEFENCE)
-                .respondent1ClaimResponseTypeToApplicant2(FULL_DEFENCE)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build();
+            caseData.setRespondent1ClaimResponseType(FULL_DEFENCE);
+            caseData.setRespondent1ClaimResponseTypeToApplicant2(FULL_DEFENCE);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
@@ -2878,10 +2874,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetMultiPartyResponseTypeFlags_2v1PartAdmission() {
             //Given
-            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
-                .respondent1ClaimResponseType(COUNTER_CLAIM)
-                .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build();
+            caseData.setRespondent1ClaimResponseType(COUNTER_CLAIM);
+            caseData.setRespondent1ClaimResponseTypeToApplicant2(PART_ADMISSION);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
@@ -2897,13 +2892,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
-                .respondent1ClaimResponseType(COUNTER_CLAIM)
-                .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
-                .respondent2ClaimResponseType(FULL_DEFENCE)
-                .respondent2SameLegalRepresentative(YES)
-                .build().toBuilder().ccdCaseReference(1234L)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build();
+            caseData.setRespondent1ClaimResponseType(COUNTER_CLAIM);
+            caseData.setRespondent1ClaimResponseTypeToApplicant2(PART_ADMISSION);
+            caseData.setRespondent2ClaimResponseType(FULL_DEFENCE);
+            caseData.setRespondent2SameLegalRepresentative(YES);
+            caseData.setCcdCaseReference(1234L);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
@@ -2919,13 +2913,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
-                .respondent1ClaimResponseType(FULL_DEFENCE)
-                .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
-                .respondent2ClaimResponseType(COUNTER_CLAIM)
-                .respondent2SameLegalRepresentative(YES)
-                .build().toBuilder().ccdCaseReference(1234L)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build();
+            caseData.setRespondent1ClaimResponseType(FULL_DEFENCE);
+            caseData.setRespondent1ClaimResponseTypeToApplicant2(PART_ADMISSION);
+            caseData.setRespondent2ClaimResponseType(COUNTER_CLAIM);
+            caseData.setRespondent2SameLegalRepresentative(YES);
+            caseData.setCcdCaseReference(1234L);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
@@ -2941,13 +2934,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
-                .respondent1ClaimResponseType(COUNTER_CLAIM)
-                .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
-                .respondent2ClaimResponseType(FULL_DEFENCE)
-                .respondent2SameLegalRepresentative(YES)
-                .build().toBuilder().ccdCaseReference(1234L)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build();
+            caseData.setRespondent1ClaimResponseType(COUNTER_CLAIM);
+            caseData.setRespondent1ClaimResponseTypeToApplicant2(PART_ADMISSION);
+            caseData.setRespondent2ClaimResponseType(FULL_DEFENCE);
+            caseData.setRespondent2SameLegalRepresentative(YES);
+            caseData.setCcdCaseReference(1234L);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
@@ -2963,13 +2955,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
-                .respondent1ClaimResponseType(COUNTER_CLAIM)
-                .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
-                .respondent2ClaimResponseType(COUNTER_CLAIM)
-                .respondent2SameLegalRepresentative(YES)
-                .build().toBuilder().ccdCaseReference(1234L)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build();
+            caseData.setRespondent1ClaimResponseType(COUNTER_CLAIM);
+            caseData.setRespondent1ClaimResponseTypeToApplicant2(PART_ADMISSION);
+            caseData.setRespondent2ClaimResponseType(COUNTER_CLAIM);
+            caseData.setRespondent2SameLegalRepresentative(YES);
+            caseData.setCcdCaseReference(1234L);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
@@ -2985,13 +2976,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
-                .respondent1ClaimResponseType(FULL_DEFENCE)
-                .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
-                .respondent2ClaimResponseType(FULL_DEFENCE)
-                .respondent2SameLegalRepresentative(YES)
-                .build().toBuilder().ccdCaseReference(1234L)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build();
+            caseData.setRespondent1ClaimResponseType(FULL_DEFENCE);
+            caseData.setRespondent1ClaimResponseTypeToApplicant2(PART_ADMISSION);
+            caseData.setRespondent2ClaimResponseType(FULL_DEFENCE);
+            caseData.setRespondent2SameLegalRepresentative(YES);
+            caseData.setCcdCaseReference(1234L);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
@@ -3007,13 +2997,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
-                .respondent1ClaimResponseType(FULL_DEFENCE)
-                .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
-                .respondent2ClaimResponseType(FULL_DEFENCE)
-                .respondent2SameLegalRepresentative(NO)
-                .build().toBuilder().ccdCaseReference(1234L)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build();
+            caseData.setRespondent1ClaimResponseType(FULL_DEFENCE);
+            caseData.setRespondent1ClaimResponseTypeToApplicant2(PART_ADMISSION);
+            caseData.setRespondent2ClaimResponseType(FULL_DEFENCE);
+            caseData.setRespondent2SameLegalRepresentative(NO);
+            caseData.setCcdCaseReference(1234L);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
@@ -3029,13 +3018,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
-                .respondent1ClaimResponseType(FULL_DEFENCE)
-                .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
-                .respondent2ClaimResponseType(COUNTER_CLAIM)
-                .respondent2SameLegalRepresentative(NO)
-                .build().toBuilder().ccdCaseReference(1234L)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build();
+            caseData.setRespondent1ClaimResponseType(FULL_DEFENCE);
+            caseData.setRespondent1ClaimResponseTypeToApplicant2(PART_ADMISSION);
+            caseData.setRespondent2ClaimResponseType(COUNTER_CLAIM);
+            caseData.setRespondent2SameLegalRepresentative(NO);
+            caseData.setCcdCaseReference(1234L);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
@@ -3051,14 +3039,13 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
-                .respondent1ClaimResponseType(FULL_DEFENCE)
-                .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
-                .respondent2ClaimResponseType(COUNTER_CLAIM)
-                .respondent2SameLegalRepresentative(NO)
-                .addApplicant2(NO)
-                .build().toBuilder().ccdCaseReference(1234L)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build();
+            caseData.setRespondent1ClaimResponseType(FULL_DEFENCE);
+            caseData.setRespondent1ClaimResponseTypeToApplicant2(PART_ADMISSION);
+            caseData.setRespondent2ClaimResponseType(COUNTER_CLAIM);
+            caseData.setRespondent2SameLegalRepresentative(NO);
+            caseData.setAddApplicant2(NO);
+            caseData.setCcdCaseReference(1234L);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
@@ -3074,14 +3061,13 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
-                .respondent1ClaimResponseType(FULL_DEFENCE)
-                .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
-                .respondent2ClaimResponseType(COUNTER_CLAIM)
-                .respondent2SameLegalRepresentative(NO)
-                .addApplicant2(YES)
-                .build().toBuilder().ccdCaseReference(1234L)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build();
+            caseData.setRespondent1ClaimResponseType(FULL_DEFENCE);
+            caseData.setRespondent1ClaimResponseTypeToApplicant2(PART_ADMISSION);
+            caseData.setRespondent2ClaimResponseType(COUNTER_CLAIM);
+            caseData.setRespondent2SameLegalRepresentative(NO);
+            caseData.setAddApplicant2(YES);
+            caseData.setCcdCaseReference(1234L);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
@@ -3093,10 +3079,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetMultiPartyResponseTypeFlags_2v1NonFullDefence() {
             //Given
-            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
-                .respondent1ClaimResponseType(COUNTER_CLAIM)
-                .respondent1ClaimResponseTypeToApplicant2(COUNTER_CLAIM)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build();
+            caseData.setRespondent1ClaimResponseType(COUNTER_CLAIM);
+            caseData.setRespondent1ClaimResponseTypeToApplicant2(COUNTER_CLAIM);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
@@ -3108,10 +3093,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_WhenBothFullDefenceAndSameRespondent() {
             //Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
-                .respondent2ClaimResponseType(FULL_DEFENCE)
-                .respondent2SameLegalRepresentative(YES)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
+            caseData.setRespondent2ClaimResponseType(FULL_DEFENCE);
+            caseData.setRespondent2SameLegalRepresentative(YES);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
@@ -3125,9 +3109,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotReturnError_WhenNotBothFullDefence() {
             //Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
-                .respondent2ClaimResponseType(PART_ADMISSION)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
+            caseData.setRespondent2ClaimResponseType(PART_ADMISSION);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When

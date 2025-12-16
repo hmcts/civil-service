@@ -173,32 +173,31 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldNotReturnReturnErrors_WhenAboutToStartIsInvokedByAdminUserWhileCaseInAwaitingApplicantIntentionState() {
             when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-                .applicant1(Party.builder()
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setApplicant1(Party.builder()
                                 .type(COMPANY)
                                 .companyName("Test Inc")
-                                .build())
-                .respondent1(Party.builder()
+                                .build());
+            caseData.setRespondent1(Party.builder()
                         .type(COMPANY)
                         .companyName("Test Inc")
-                        .build())
-                    .applicant1OrgIndividuals(wrapElements(List.of(PartyFlagStructure.builder()
+                        .build());
+            caseData.setApplicant1OrgIndividuals(wrapElements(List.of(PartyFlagStructure.builder()
                             .firstName("Claimant")
                             .lastName("OrgIndividual")
                             .email("claiamnt-orgindividual@example.com")
                             .phone("07867654543")
                             .partyID("party-id")
-                            .build())))
-                    .respondent1OrgIndividuals(wrapElements(List.of(PartyFlagStructure.builder()
+                            .build())));
+            caseData.setRespondent1OrgIndividuals(wrapElements(List.of(PartyFlagStructure.builder()
                             .firstName("Defendant")
                             .lastName("OrgIndividual")
                             .email("defendant-orgindividual@example.com")
                             .phone("07867654543")
                             .partyID("party-id")
-                            .build())))
-                    .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
-                    .ccdCaseReference(123L)
-                .build();
+                            .build())));
+            caseData.setCcdState(CaseState.AWAITING_APPLICANT_INTENTION);
+            caseData.setCcdCaseReference(123L);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -211,10 +210,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @EnumSource(value = CaseState.class, names = {"AWAITING_RESPONDENT_ACKNOWLEDGEMENT", "AWAITING_APPLICANT_INTENTION"})
         void shouldReturnErrors_WhenAboutToStartIsInvokedByNonAdminUserWhileCaseInAwaitingRespondentAcknowledgementState(CaseState states) {
             when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-                .ccdState(states)
-                .ccdCaseReference(123L)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCcdState(states);
+            caseData.setCcdCaseReference(123L);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -229,10 +227,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldNotReturnErrors_WhenAboutToStartIsInvokedByNonAdminUserWhileCaseInANonAwaitingApplicantIntentionState() {
             when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-                .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
-                .ccdCaseReference(123L)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCcdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION);
+            caseData.setCcdCaseReference(123L);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -255,10 +252,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .type(COMPANY)
                                  .companyName("Test Inc")
                                  .build())
-                .build()
-                .toBuilder()
-                .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
-                .ccdCaseReference(123L).build();
+                .build();
+            caseData.setCcdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION);
+            caseData.setCcdCaseReference(123L);
 
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
 
@@ -298,10 +294,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                             .type(COMPANY)
                             .companyName("Test Inc")
                             .build())
-                    .build()
-                    .toBuilder()
-                    .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
-                    .ccdCaseReference(123L).build();
+                    .build();
+            caseData.setCcdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION);
+            caseData.setCcdCaseReference(123L);
 
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
 
@@ -341,10 +336,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .type(COMPANY)
                                  .companyName("Test Inc")
                                  .build())
-                .build()
-                .toBuilder()
-                .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
-                .ccdCaseReference(123L).build();
+                .build();
+            caseData.setCcdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION);
+            caseData.setCcdCaseReference(123L);
 
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
 
@@ -380,10 +374,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .type(COMPANY)
                                  .companyName("Test Inc")
                                  .build())
-                .build()
-                .toBuilder()
-                .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
-                .ccdCaseReference(123L).build();
+                .build();
+            caseData.setCcdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION);
+            caseData.setCcdCaseReference(123L);
 
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
 
@@ -418,10 +411,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .type(COMPANY)
                                  .companyName("Test Inc")
                                  .build())
-                .build()
-                .toBuilder()
-                .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
-                .ccdCaseReference(123L).build();
+                .build();
+            caseData.setCcdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION);
+            caseData.setCcdCaseReference(123L);
 
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
 
@@ -464,10 +456,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .type(COMPANY)
                                  .companyName("Test Inc")
                                  .build())
-                .build()
-                .toBuilder()
-                .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
-                .ccdCaseReference(123L).build();
+                .build();
+            caseData.setCcdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION);
+            caseData.setCcdCaseReference(123L);
 
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
 
@@ -506,10 +497,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .type(COMPANY)
                                  .companyName("Test Inc")
                                  .build())
-                .build()
-                .toBuilder()
-                .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
-                .ccdCaseReference(123L).build();
+                .build();
+            caseData.setCcdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION);
+            caseData.setCcdCaseReference(123L);
 
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
 
@@ -545,10 +535,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .type(COMPANY)
                                  .companyName("Test Inc")
                                  .build())
-                .build()
-                .toBuilder()
-                .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
-                .ccdCaseReference(123L).build();
+                .build();
+            caseData.setCcdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION);
+            caseData.setCcdCaseReference(123L);
 
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
 
@@ -594,10 +583,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .type(COMPANY)
                                  .companyName("Test Inc")
                                  .build())
-                .build()
-                .toBuilder()
-                .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
-                .ccdCaseReference(123L).build();
+                .build();
+            caseData.setCcdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION);
+            caseData.setCcdCaseReference(123L);
 
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
 
@@ -637,10 +625,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .type(COMPANY)
                                  .companyName("Test Inc")
                                  .build())
-                .build()
-                .toBuilder()
-                .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
-                .ccdCaseReference(123L).build();
+                .build();
+            caseData.setCcdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION);
+            caseData.setCcdCaseReference(123L);
 
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
 
@@ -682,10 +669,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .companyName("Test Inc")
                                  .build())
                 .applicant1Represented(YES)
-                .build()
-                .toBuilder()
-                .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
-                .ccdCaseReference(123L).build();
+                .build();
+            caseData.setCcdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION);
+            caseData.setCcdCaseReference(123L);
 
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
 
@@ -738,10 +724,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .type(COMPANY)
                                  .companyName("Test Inc")
                                  .build())
-                .build()
-                .toBuilder()
-                .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
-                .ccdCaseReference(123L).build();
+                .build();
+            caseData.setCcdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION);
+            caseData.setCcdCaseReference(123L);
 
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
 
@@ -783,10 +768,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .type(COMPANY)
                                  .companyName("Test Inc")
                                  .build())
-                .build()
-                .toBuilder()
-                .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
-                .ccdCaseReference(123L).build();
+                .build();
+            caseData.setCcdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION);
+            caseData.setCcdCaseReference(123L);
 
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
 
@@ -828,10 +812,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .type(COMPANY)
                                  .companyName("Test Inc")
                                  .build())
-                .build()
-                .toBuilder()
-                .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
-                .ccdCaseReference(123L).build();
+                .build();
+            caseData.setCcdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION);
+            caseData.setCcdCaseReference(123L);
 
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
 
@@ -958,8 +941,12 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             assertEquals(updated.getApplicant1(), responseData.getApplicant1());
             assertEquals(MANAGE_CONTACT_INFORMATION.name(), responseData.getBusinessProcess().getCamundaEvent());
             assertEquals(READY, responseData.getBusinessProcess().getStatus());
-            assertEquals(
-                EVENT.toBuilder().submittedByCaseworker(YES).build(), responseData.getContactDetailsUpdatedEvent());
+            ContactDetailsUpdatedEvent expectedEvent = ContactDetailsUpdatedEvent.builder()
+                .summary(EVENT.getSummary())
+                .description(EVENT.getDescription())
+                .build();
+            expectedEvent.setSubmittedByCaseworker(YES);
+            assertEquals(expectedEvent, responseData.getContactDetailsUpdatedEvent());
         }
 
         @Test
@@ -1007,7 +994,12 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             assertEquals(updated.getApplicant1(), responseData.getApplicant1());
             assertEquals(MANAGE_CONTACT_INFORMATION.name(), responseData.getBusinessProcess().getCamundaEvent());
             assertEquals(READY, responseData.getBusinessProcess().getStatus());
-            assertEquals(EVENT.toBuilder().submittedByCaseworker(YES).build(), responseData.getContactDetailsUpdatedEvent());
+            ContactDetailsUpdatedEvent expectedEvent = ContactDetailsUpdatedEvent.builder()
+                .summary(EVENT.getSummary())
+                .description(EVENT.getDescription())
+                .build();
+            expectedEvent.setSubmittedByCaseworker(YES);
+            assertEquals(expectedEvent, responseData.getContactDetailsUpdatedEvent());
             verify(coreCaseDataService).triggerGeneralApplicationEvent(eq(1234L), eq(CaseEvent.UPDATE_GA_CASE_DATA), anyMap());
         }
 
@@ -1392,8 +1384,12 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             assertEquals(updated.getApplicant1(), responseData.getApplicant1());
             assertEquals(MANAGE_CONTACT_INFORMATION.name(), responseData.getBusinessProcess().getCamundaEvent());
             assertEquals(READY, responseData.getBusinessProcess().getStatus());
-            assertEquals(
-                EVENT.toBuilder().submittedByCaseworker(NO).build(), responseData.getContactDetailsUpdatedEvent());
+            ContactDetailsUpdatedEvent expectedEvent = ContactDetailsUpdatedEvent.builder()
+                .summary(EVENT.getSummary())
+                .description(EVENT.getDescription())
+                .build();
+            expectedEvent.setSubmittedByCaseworker(NO);
+            assertEquals(expectedEvent, responseData.getContactDetailsUpdatedEvent());
         }
 
         @Test
@@ -1406,23 +1402,31 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
             CaseData caseDataBefore = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
-                .respondent1(respondent).build()
-                .toBuilder()
-                .respondent1DetailsForClaimDetailsTab(respondent.toBuilder().flags(respondent1Flags).build())
-                .caseNameHmctsInternal("Mr. John Rambo v Dis Guy")
-                .caseNamePublic("John Rambo v Dis Guy")
+                .respondent1(respondent).build();
+            Party respondentWithFlags = Party.builder()
+                .individualFirstName(respondent.getIndividualFirstName())
+                .individualLastName(respondent.getIndividualLastName())
+                .type(respondent.getType())
+                .flags(respondent1Flags)
                 .build();
+            caseDataBefore.setRespondent1DetailsForClaimDetailsTab(respondentWithFlags);
+            caseDataBefore.setCaseNameHmctsInternal("Mr. John Rambo v Dis Guy");
+            caseDataBefore.setCaseNamePublic("John Rambo v Dis Guy");
 
-            CaseData updated = caseDataBefore.toBuilder()
-                .updateDetailsForm(UpdateDetailsForm.builder()
+            CaseData updated = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .respondent1(respondent).build();
+            updated.setRespondent1DetailsForClaimDetailsTab(respondentWithFlags);
+            updated.setCaseNameHmctsInternal("Mr. John Rambo v Dis Guy");
+            updated.setCaseNamePublic("John Rambo v Dis Guy");
+            updated.setUpdateDetailsForm(UpdateDetailsForm.builder()
                                        .partyChosen(DynamicList.builder()
                                                         .value(DynamicListElement.builder()
                                                                    .code(DEFENDANT_ONE_ID)
                                                                    .build())
                                                         .build())
                                        .partyChosenId(DEFENDANT_ONE_ID)
-                                       .build())
-                .build();
+                                       .build());
 
             when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseDataBefore);
             when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
@@ -2253,20 +2257,26 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .addApplicant1LitigationFriend()
                     .addRespondent1LitigationFriend()
                     .addRespondent2LitigationFriend()
-                    .buildClaimIssuedPaymentCaseData().toBuilder()
-                    .respondent2SameLegalRepresentative(YES)
-                    .build();
+                    .buildClaimIssuedPaymentCaseData();
+                caseDataBefore.setRespondent2SameLegalRepresentative(YES);
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
-                CaseData caseData = caseDataBefore.toBuilder()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
+                CaseData caseData = CaseDataBuilder.builder()
+                    .applicant1(Party.builder().type(INDIVIDUAL).build())
+                    .respondent1(Party.builder().type(INDIVIDUAL).build())
+                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .addApplicant1LitigationFriend()
+                    .addRespondent1LitigationFriend()
+                    .addRespondent2LitigationFriend()
+                    .buildClaimIssuedPaymentCaseData();
+                caseData.setRespondent2SameLegalRepresentative(YES);
+                caseData.setUpdateDetailsForm(UpdateDetailsForm.builder()
                                            .partyChosen(DynamicList.builder()
                                                             .value(DynamicListElement.builder()
                                                                        .code(partyChosenId)
                                                                        .build())
                                                             .build())
-                                           .build())
-                    .build();
+                                           .build());
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
 
@@ -2286,20 +2296,26 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .addApplicant1LitigationFriend()
                     .addRespondent1LitigationFriend()
                     .addRespondent2LitigationFriend()
-                    .buildClaimIssuedPaymentCaseData().toBuilder()
-                    .respondent2SameLegalRepresentative(null)
-                    .build();;
+                    .buildClaimIssuedPaymentCaseData();
+                caseDataBefore.setRespondent2SameLegalRepresentative(null);
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
-                CaseData caseData = caseDataBefore.toBuilder()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
+                CaseData caseData = CaseDataBuilder.builder()
+                    .applicant1(Party.builder().type(INDIVIDUAL).build())
+                    .respondent1(Party.builder().type(INDIVIDUAL).build())
+                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .addApplicant1LitigationFriend()
+                    .addRespondent1LitigationFriend()
+                    .addRespondent2LitigationFriend()
+                    .buildClaimIssuedPaymentCaseData();
+                caseData.setRespondent2SameLegalRepresentative(null);
+                caseData.setUpdateDetailsForm(UpdateDetailsForm.builder()
                                            .partyChosen(DynamicList.builder()
                                                             .value(DynamicListElement.builder()
                                                                        .code(partyChosenId)
                                                                        .build())
                                                             .build())
-                                           .build())
-                    .build();
+                                           .build());
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
 
@@ -2320,15 +2336,21 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .buildClaimIssuedPaymentCaseData();
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
-                CaseData caseData = caseDataBefore.toBuilder()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
+                CaseData caseData = CaseDataBuilder.builder()
+                    .applicant1(Party.builder().type(INDIVIDUAL).build())
+                    .applicant2(Party.builder().type(INDIVIDUAL).build())
+                    .respondent1(Party.builder().type(INDIVIDUAL).build())
+                    .addApplicant1LitigationFriend()
+                    .addApplicant2LitigationFriend()
+                    .addRespondent1LitigationFriend()
+                    .buildClaimIssuedPaymentCaseData();
+                caseData.setUpdateDetailsForm(UpdateDetailsForm.builder()
                                            .partyChosen(DynamicList.builder()
                                                             .value(DynamicListElement.builder()
                                                                        .code(partyChosenId)
                                                                        .build())
                                                             .build())
-                                           .build())
-                    .build();
+                                           .build());
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
 
@@ -2347,20 +2369,25 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .respondent2(Party.builder().type(INDIVIDUAL).build())
                     .addApplicant1LitigationFriend()
                     .addRespondent1LitigationFriend()
-                    .buildClaimIssuedPaymentCaseData().toBuilder()
-                    .respondent2SameLegalRepresentative(YES)
-                    .build();
+                    .buildClaimIssuedPaymentCaseData();
+                caseDataBefore.setRespondent2SameLegalRepresentative(YES);
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
-                CaseData caseData = caseDataBefore.toBuilder()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
+                CaseData caseData = CaseDataBuilder.builder()
+                    .applicant1(Party.builder().type(INDIVIDUAL).build())
+                    .respondent1(Party.builder().type(INDIVIDUAL).build())
+                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .addApplicant1LitigationFriend()
+                    .addRespondent1LitigationFriend()
+                    .buildClaimIssuedPaymentCaseData();
+                caseData.setRespondent2SameLegalRepresentative(YES);
+                caseData.setUpdateDetailsForm(UpdateDetailsForm.builder()
                                            .partyChosen(DynamicList.builder()
                                                             .value(DynamicListElement.builder()
                                                                        .code(partyChosenId)
                                                                        .build())
                                                             .build())
-                                           .build())
-                    .build();
+                                           .build());
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
 
@@ -2380,15 +2407,20 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .buildClaimIssuedPaymentCaseData();
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
-                CaseData caseData = caseDataBefore.toBuilder()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
+                CaseData caseData = CaseDataBuilder.builder()
+                    .applicant1(Party.builder().type(INDIVIDUAL).build())
+                    .respondent1(Party.builder().type(INDIVIDUAL).build())
+                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .addApplicant1LitigationFriend()
+                    .addRespondent1LitigationFriend()
+                    .buildClaimIssuedPaymentCaseData();
+                caseData.setUpdateDetailsForm(UpdateDetailsForm.builder()
                                            .partyChosen(DynamicList.builder()
                                                             .value(DynamicListElement.builder()
                                                                        .code(partyChosenId)
                                                                        .build())
                                                             .build())
-                                           .build())
-                    .build();
+                                           .build());
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
 
@@ -2409,15 +2441,20 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
-                CaseData caseData = caseDataBefore.toBuilder()
-                    .updateDetailsForm(UpdateDetailsForm.builder()
+                CaseData caseData = CaseDataBuilder.builder()
+                    .applicant1(Party.builder().type(INDIVIDUAL).build())
+                    .applicant2(Party.builder().type(INDIVIDUAL).build())
+                    .respondent1(Party.builder().type(INDIVIDUAL).build())
+                    .addApplicant1LitigationFriend()
+                    .addRespondent1LitigationFriend()
+                    .buildClaimIssuedPaymentCaseData();
+                caseData.setUpdateDetailsForm(UpdateDetailsForm.builder()
                                            .partyChosen(DynamicList.builder()
                                                             .value(DynamicListElement.builder()
                                                                        .code(partyChosenId)
                                                                        .build())
                                                             .build())
-                                           .build())
-                    .build();
+                                           .build());
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
 

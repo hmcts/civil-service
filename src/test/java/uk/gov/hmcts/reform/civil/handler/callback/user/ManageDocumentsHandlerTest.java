@@ -55,9 +55,8 @@ public class ManageDocumentsHandlerTest extends BaseCallbackHandlerTest {
                     .documentLink(Document.builder().build())
                     .build()
             );
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-                .manageDocuments(List.of(document))
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setManageDocuments(List.of(document));
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

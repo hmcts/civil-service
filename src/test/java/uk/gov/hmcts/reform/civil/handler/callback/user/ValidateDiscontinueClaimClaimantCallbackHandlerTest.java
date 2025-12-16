@@ -267,14 +267,14 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
             CaseDataLiP caseDataLiP  = new CaseDataLiP();
             caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-            caseData.setRespondent1(PartyBuilder.builder().individual().build().toBuilder()
-                                 .individualFirstName("John")
-                                 .individualLastName("Doe")
-                                 .build());
-            caseData.setApplicant1(PartyBuilder.builder().individual().build().toBuilder()
-                                .individualFirstName("Doe")
-                                .individualLastName("John")
-                                .build());
+            Party respondent1 = PartyBuilder.builder().individual().build();
+            respondent1.setIndividualFirstName("John");
+            respondent1.setIndividualLastName("Doe");
+            caseData.setRespondent1(respondent1);
+            Party applicant1 = PartyBuilder.builder().individual().build();
+            applicant1.setIndividualFirstName("Doe");
+            applicant1.setIndividualLastName("John");
+            caseData.setApplicant1(applicant1);
             caseData.setRespondent1Represented(YesOrNo.NO);
             caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE);
             caseData.setRespondent1NoticeOfDiscontinueCWViewDoc(caseDocument);
