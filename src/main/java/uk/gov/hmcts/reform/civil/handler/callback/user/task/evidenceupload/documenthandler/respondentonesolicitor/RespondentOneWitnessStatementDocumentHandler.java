@@ -30,8 +30,8 @@ public class RespondentOneWitnessStatementDocumentHandler extends
     }
 
     @Override
-    protected void addDocumentsToCopyToCaseData(CaseData.CaseDataBuilder<?, ?> builder, List<Element<UploadEvidenceWitness>> evidenceDocsToAdd) {
-        builder.documentWitnessStatementRes2(evidenceDocsToAdd);
+    protected void addDocumentsToCopyToCaseData(CaseData caseData, List<Element<UploadEvidenceWitness>> evidenceDocsToAdd) {
+        caseData.setDocumentWitnessStatementRes2(evidenceDocsToAdd);
     }
 
     @Override

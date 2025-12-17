@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -73,7 +74,7 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetGenericResponseTypeFlagForOneVOneScenario() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                 .build();
 
@@ -85,7 +86,7 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetGenericResponseTypeFlagForTwoVOneScenario() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .build();
@@ -98,7 +99,7 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetGenericResponseTypeFlagForOneVTwoTwoLegalRepScenario() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
                 .isRespondent1(YES)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .isRespondent2(YES)
@@ -117,10 +118,9 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetCounterAdmitOrAdmitPartFlagWhenBothClaimantsHaveAdmissionOrCounterClaim() {
-        CaseData caseData = CaseData.builder()
-                .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .claimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setClaimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData.setClaimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
 
         CallbackParams callbackParams = buildCallbackParams(caseData);
 
@@ -132,10 +132,9 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetCounterAdmitOrAdmitPartFlagWhenBothClaimantsHaveFullAdmission() {
-        CaseData caseData = CaseData.builder()
-                .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .claimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setClaimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData.setClaimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
 
         CallbackParams callbackParams = buildCallbackParams(caseData);
 
@@ -147,10 +146,9 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetCounterAdmitOrAdmitPartFlagWhenBothClaimantsHavePartAdmission() {
-        CaseData caseData = CaseData.builder()
-                .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .claimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setClaimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+        caseData.setClaimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
 
         CallbackParams callbackParams = buildCallbackParams(caseData);
 
@@ -162,10 +160,9 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetCounterAdmitOrAdmitPartFlagWhenBothClaimantsHaveCounterClaim() {
-        CaseData caseData = CaseData.builder()
-                .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
-                .claimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setClaimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM);
+        caseData.setClaimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM);
 
         CallbackParams callbackParams = buildCallbackParams(caseData);
 
@@ -177,7 +174,7 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetFullDefenceFlagWhenResponseTypeIsFullDefence() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                 .build();
 
@@ -191,7 +188,7 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetCounterClaimFlagWhenResponseTypeIsCounterClaim() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
                 .build();
 
@@ -205,7 +202,7 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetFullAdmissionFlagWhenResponseTypeIsFullAdmission() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .build();
 
@@ -219,7 +216,7 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetSpecFullAdmissionOrPartAdmissionWhenTwoVOneAndBothRespondentsHaveAdmission() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .build();
@@ -231,7 +228,7 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetFullDefenceFlagWhenRespondent1HasFullDefence() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                 .build();
 
@@ -247,7 +244,7 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetFullDefenceFlagWhenRespondent1HasCounterClaim() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
                 .build();
 
@@ -264,10 +261,9 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldNotSetCounterAdmitOrAdmitPartFlagWhenOnlyOneClaimantHasCounterClaim() {
-        CaseData caseData = CaseData.builder()
-                .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
-                .claimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setClaimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM);
+        caseData.setClaimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
 
         CallbackParams callbackParams = buildCallbackParams(caseData);
 
@@ -279,7 +275,7 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldNotSetFullAdmissionFlagWhenRespondent2DoesNotHaveFullAdmission() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .build();
@@ -295,7 +291,7 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldNotSetFullAdmissionFlagWhenRespondent2ResponseTypeIsNull() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .respondent2ClaimResponseTypeForSpec(null)
                 .build();
@@ -311,7 +307,7 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldNotSetFullAdmissionFlagWhenRespondent2ClaimResponseTypeIsNull() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
                 .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .build();
 
@@ -326,7 +322,7 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldNotSetSpecFullAdmissionOrPartAdmissionWhenRespondent2DoesNotHaveAdmission() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                 .build();
@@ -339,7 +335,7 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetGenericResponseTypeFlagWhenBothRespondentsHavePartAdmissionInOneVTwoTwoLegalRepScenario() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
                 .isRespondent1(YES)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .isRespondent2(YES)
@@ -354,7 +350,7 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetGenericResponseTypeFlagWhenUserHasRespondentSolicitorTwoRoleInOneVTwoTwoLegalRepScenario() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
                 .isRespondent1(YES)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                 .isRespondent2(YES)
@@ -372,7 +368,7 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetGenericResponseTypeFlagWhenRespondent2HasPartAdmissionInOneVTwoTwoLegalRepScenario() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
                 .isRespondent2(YES)
                 .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .ccdCaseReference(1234L)
@@ -386,7 +382,7 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetGenericResponseTypeFlagWhenRespondent1HasFullAdmissionAndRespondent2HasPartAdmissionInOneVTwoTwoLegalRepScenario() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
                 .isRespondent1(YES)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .isRespondent2(YES)
@@ -402,9 +398,8 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldNotSetCounterAdmitOrAdmitPartFlagWhenClaimant1HasFullDefence() {
-        CaseData caseData = CaseData.builder()
-                .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setClaimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
 
         CallbackParams callbackParams = buildCallbackParams(caseData);
 
@@ -416,7 +411,7 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetGenericResponseTypeFlagWhenBothRespondentsHaveFullDefenceInOneVTwoTwoLegalRepScenario() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
                 .isRespondent1(YES)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                 .isRespondent2(YES)
@@ -431,7 +426,7 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetGenericResponseTypeFlagWhenRespondent1HasFullDefenceAndRespondent2HasFullAdmissionInOneVTwoTwoLegalRepScenario() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
                 .isRespondent1(YES)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                 .isRespondent2(YES)
@@ -446,7 +441,7 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetGenericResponseTypeFlagWhenRespondent1HasFullDefenceAndImmediatePaymentRouteInOneVTwoTwoLegalRepScenario() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
                 .isRespondent1(YES)
                 .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
@@ -463,14 +458,13 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetGenericResponseTypeFlagWhenRespondent2HasFullAdmissionAndImmediatePaymentRouteInOneVTwoTwoLegalRepScenario() {
-        CaseData caseData = CaseData.builder()
-                .isRespondent2(YES)
-                .defenceAdmitPartPaymentTimeRouteRequired2(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .isRespondent1(YES)
-                .ccdCaseReference(1234L)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder()
+                .isRespondent2(YES).build();
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired2(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+        caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData.setIsRespondent1(YES);
+        caseData.setCcdCaseReference(1234L);
 
         AboutToStartOrSubmitCallbackResponse response = executeWithMockedScenario(caseData, ONE_V_TWO_TWO_LEGAL_REP);
 
@@ -480,11 +474,10 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetGenericResponseTypeFlagWhenRespondent1HasFullAdmissionAndSameResponseInOneVTwoOneLegalRepScenario() {
-        CaseData caseData = CaseData.builder()
-                .showConditionFlags(EnumSet.of(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1))
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .respondentResponseIsSame(YES)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setShowConditionFlags(EnumSet.of(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1));
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData.setRespondentResponseIsSame(YES);
 
         AboutToStartOrSubmitCallbackResponse response = executeWithMockedScenario(caseData, ONE_V_TWO_ONE_LEGAL_REP);
 
@@ -494,12 +487,11 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetGenericResponseTypeFlagWhenRespondent1HasDifferentResponseInOneVTwoOneLegalRepScenario() {
-        CaseData caseData = CaseData.builder()
-                .showConditionFlags(EnumSet.of(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1))
-                .respondentResponseIsSame(NO)
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setShowConditionFlags(EnumSet.of(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1));
+        caseData.setRespondentResponseIsSame(NO);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
 
         AboutToStartOrSubmitCallbackResponse response = executeWithMockedScenario(caseData, ONE_V_TWO_ONE_LEGAL_REP);
 
@@ -511,11 +503,10 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetGenericResponseTypeFlagWhenRespondent2HasFullAdmissionAndSameResponseInOneVTwoOneLegalRepScenario() {
-        CaseData caseData = CaseData.builder()
-                .showConditionFlags(EnumSet.of(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2))
-                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .respondentResponseIsSame(YES)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setShowConditionFlags(EnumSet.of(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2));
+        caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData.setRespondentResponseIsSame(YES);
 
         AboutToStartOrSubmitCallbackResponse response = executeWithMockedScenario(caseData, ONE_V_TWO_ONE_LEGAL_REP);
 
@@ -524,7 +515,7 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldNotSetSpecFullAdmissionOrPartAdmissionWhenRespondent2HasNoAdmission() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
                 .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                 .build();
 
@@ -536,7 +527,7 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetGenericResponseTypeFlagForOneVTwoTwoLegalRepScenarioWithRespondent2NotResponding() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
                 .isRespondent1(YES)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .isRespondent2(NO)
@@ -555,11 +546,10 @@ class SetGenericResponseTypeFlagTest {
 
     @Test
     void shouldSetGenericResponseTypeFlagWhenRespondent1HasFullAdmissionAndResponsesAreSameInOneVTwoOneLegalRepScenario() {
-        CaseData caseData = CaseData.builder()
-                .showConditionFlags(EnumSet.of(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1))
-                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .respondentResponseIsSame(YES)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setShowConditionFlags(EnumSet.of(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1));
+        caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData.setRespondentResponseIsSame(YES);
 
         AboutToStartOrSubmitCallbackResponse response = executeWithMockedScenario(caseData, ONE_V_TWO_ONE_LEGAL_REP);
 

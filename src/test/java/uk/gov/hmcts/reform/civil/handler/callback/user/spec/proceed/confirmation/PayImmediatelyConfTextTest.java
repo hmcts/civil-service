@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 
@@ -48,16 +49,14 @@ class PayImmediatelyConfTextTest {
 
     @BeforeEach
     void setUp() {
-        caseData = CaseData.builder()
+        caseData = CaseDataBuilder.builder()
             .ccdCaseReference(1234567890123456L)
             .build();
     }
 
     @Test
     void shouldReturnEmpty_WhenDefenceAdmitPartPaymentTimeRouteRequiredIsNull() {
-        caseData = caseData.toBuilder()
-            .defenceAdmitPartPaymentTimeRouteRequired(null)
-            .build();
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(null);
 
         Optional<String> result = payImmediatelyConfText.generateTextFor(caseData, featureToggleService);
 
@@ -67,9 +66,7 @@ class PayImmediatelyConfTextTest {
 
     @Test
     void shouldReturnEmpty_WhenDefenceAdmitPartPaymentTimeRouteRequiredIsNotImmediately() {
-        caseData = caseData.toBuilder()
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-            .build();
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
 
         Optional<String> result = payImmediatelyConfText.generateTextFor(caseData, featureToggleService);
 
@@ -79,11 +76,9 @@ class PayImmediatelyConfTextTest {
 
     @Test
     void shouldReturnEmpty_WhenNotFullAdmissionAndNotPartAdmitImmediatePayment() {
-        caseData = caseData.toBuilder()
-            .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .applicant1ProceedWithClaim(YesOrNo.YES)
-            .build();
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+        caseData.setApplicant1ProceedWithClaim(YesOrNo.YES);
 
         Optional<String> result = payImmediatelyConfText.generateTextFor(caseData, featureToggleService);
 
@@ -93,11 +88,9 @@ class PayImmediatelyConfTextTest {
 
     @Test
     void shouldReturnEmpty_WhenFullAdmissionButApplicant1ProceedWithClaimIsNotNull() {
-        caseData = caseData.toBuilder()
-            .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .applicant1ProceedWithClaim(YesOrNo.YES)
-            .build();
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData.setApplicant1ProceedWithClaim(YesOrNo.YES);
 
         Optional<String> result = payImmediatelyConfText.generateTextFor(caseData, featureToggleService);
 
@@ -107,10 +100,8 @@ class PayImmediatelyConfTextTest {
 
     @Test
     void shouldReturnEmpty_WhenPartAdmitButRespondForImmediateOptionIsNotYes() {
-        caseData = caseData.toBuilder()
-            .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
-            .respondForImmediateOption(YesOrNo.NO)
-            .build();
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY);
+        caseData.setRespondForImmediateOption(YesOrNo.NO);
 
         Optional<String> result = payImmediatelyConfText.generateTextFor(caseData, featureToggleService);
 
@@ -120,11 +111,9 @@ class PayImmediatelyConfTextTest {
 
     @Test
     void shouldThrowException_WhenFormattedPaymentDateIsNull() {
-        caseData = caseData.toBuilder()
-            .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .applicant1ProceedWithClaim(null)
-            .build();
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData.setApplicant1ProceedWithClaim(null);
 
         when(paymentDateService.getFormattedPaymentDate(any(CaseData.class))).thenReturn(null);
 
@@ -137,11 +126,11 @@ class PayImmediatelyConfTextTest {
 
     @Test
     void shouldGenerateTextForFullAdmission_WithLrPayImmediatelyPlan() {
-        CaseData spyData = spy(caseData.toBuilder()
-                                   .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
-                                   .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                                   .applicant1ProceedWithClaim(null)
-                                   .build());
+        CaseData caseData1 = caseData;
+        caseData1.setDefenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY);
+        caseData1.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData1.setApplicant1ProceedWithClaim(null);
+        CaseData spyData = spy(caseData1);
 
         when(paymentDateService.getFormattedPaymentDate(any(CaseData.class))).thenReturn("1 January 2025");
 
@@ -166,11 +155,11 @@ class PayImmediatelyConfTextTest {
 
     @Test
     void shouldGenerateTextForFullAdmission_WithoutLrPayImmediatelyPlan() {
-        CaseData spyData = spy(caseData.toBuilder()
-                                   .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
-                                   .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                                   .applicant1ProceedWithClaim(null)
-                                   .build());
+        CaseData caseData1 = caseData;
+        caseData1.setDefenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY);
+        caseData1.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData1.setApplicant1ProceedWithClaim(null);
+        CaseData spyData = spy(caseData1);
 
         when(paymentDateService.getFormattedPaymentDate(any(CaseData.class))).thenReturn("1 January 2025");
         when(claimUrlsConfiguration.getN225Link()).thenReturn("http://example.com/n225");
@@ -194,10 +183,10 @@ class PayImmediatelyConfTextTest {
 
     @Test
     void shouldGenerateTextForPartAdmit_WithLrPayImmediatelyPlan_WithFiveDaysMessage() {
-        CaseData spyData = spy(caseData.toBuilder()
-                                   .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
-                                   .respondForImmediateOption(YesOrNo.YES)
-                                   .build());
+        CaseData caseData1 = caseData;
+        caseData1.setDefenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY);
+        caseData1.setRespondForImmediateOption(YesOrNo.YES);
+        CaseData spyData = spy(caseData1);
 
         when(paymentDateService.getFormattedPaymentDate(any(CaseData.class))).thenReturn("1 January 2025");
 
@@ -220,10 +209,10 @@ class PayImmediatelyConfTextTest {
 
     @Test
     void shouldGenerateTextForPartAdmit_WithoutLrPayImmediatelyPlan() {
-        CaseData spyData = spy(caseData.toBuilder()
-                                   .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
-                                   .respondForImmediateOption(YesOrNo.YES)
-                                   .build());
+        CaseData caseData1 = caseData;
+        caseData1.setDefenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY);
+        caseData1.setRespondForImmediateOption(YesOrNo.YES);
+        CaseData spyData = spy(caseData1);
 
         when(paymentDateService.getFormattedPaymentDate(any(CaseData.class))).thenReturn("1 January 2025");
         when(claimUrlsConfiguration.getN225Link()).thenReturn("http://example.com/n225");
@@ -247,10 +236,10 @@ class PayImmediatelyConfTextTest {
 
     @Test
     void shouldGenerateTextForPartAdmit_NotPartAdmitSpec_WithoutLrPayImmediatelyPlan() {
-        CaseData spyData = spy(caseData.toBuilder()
-                                   .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
-                                   .respondForImmediateOption(YesOrNo.YES)
-                                   .build());
+        CaseData caseData1 = caseData;
+        caseData1.setDefenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY);
+        caseData1.setRespondForImmediateOption(YesOrNo.YES);
+        CaseData spyData = spy(caseData1);
 
         when(paymentDateService.getFormattedPaymentDate(any(CaseData.class))).thenReturn("1 January 2025");
         when(claimUrlsConfiguration.getN225Link()).thenReturn("http://example.com/n225");
@@ -272,11 +261,11 @@ class PayImmediatelyConfTextTest {
 
     @Test
     void shouldGenerateText_WhenPayImmediatelyFalseButOneVOneTrue() {
-        CaseData spyData = spy(caseData.toBuilder()
-                                   .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
-                                   .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                                   .applicant1ProceedWithClaim(null)
-                                   .build());
+        CaseData caseData1 = caseData;
+        caseData1.setDefenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY);
+        caseData1.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData1.setApplicant1ProceedWithClaim(null);
+        CaseData spyData = spy(caseData1);
 
         when(paymentDateService.getFormattedPaymentDate(any(CaseData.class))).thenReturn("1 January 2025");
         when(claimUrlsConfiguration.getN225Link()).thenReturn("http://example.com/n225");
@@ -296,11 +285,11 @@ class PayImmediatelyConfTextTest {
 
     @Test
     void shouldGenerateText_WhenPayImmediatelyTrueButOneVOneFalse() {
-        CaseData spyData = spy(caseData.toBuilder()
-                                   .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
-                                   .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                                   .applicant1ProceedWithClaim(null)
-                                   .build());
+        CaseData caseData1 = caseData;
+        caseData1.setDefenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY);
+        caseData1.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData1.setApplicant1ProceedWithClaim(null);
+        CaseData spyData = spy(caseData1);
 
         when(paymentDateService.getFormattedPaymentDate(any(CaseData.class))).thenReturn("1 January 2025");
         when(claimUrlsConfiguration.getN225Link()).thenReturn("http://example.com/n225");

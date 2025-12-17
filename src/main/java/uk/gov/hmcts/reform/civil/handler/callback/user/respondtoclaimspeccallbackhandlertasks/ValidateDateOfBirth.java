@@ -48,12 +48,11 @@ public class ValidateDateOfBirth implements CaseTask {
         errors.addAll(correspondenceAddressCorrect(caseData));
         log.info("CaseId {}: Correspondence address validation errors: {}", caseData.getCcdCaseReference(), errors);
 
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
-        updateSolicitorResponse(callbackParams, caseData, updatedData);
+        updateSolicitorResponse(callbackParams, caseData);
         log.info("CaseId {}: Solicitor response updated", caseData.getCcdCaseReference());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedData.build().toMap(objectMapper))
+                .data(caseData.toMap(objectMapper))
                 .errors(errors)
                 .build();
     }
@@ -71,16 +70,16 @@ public class ValidateDateOfBirth implements CaseTask {
         return respondent;
     }
 
-    private void updateSolicitorResponse(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+    private void updateSolicitorResponse(CallbackParams callbackParams, CaseData caseData) {
         if (isTwoLegalRepsScenario(caseData) && YES.equals(caseData.getAddRespondent2())) {
-            updatedData.sameSolicitorSameResponse(
+            caseData.setSameSolicitorSameResponse(
                     respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
                             && respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE) ? YES : NO
-            ).build();
+            );
         } else if (isOneLegalRepScenario(caseData) && YES.equals(caseData.getAddRespondent2())) {
-            updatedData.sameSolicitorSameResponse(
+            caseData.setSameSolicitorSameResponse(
                     NO.equals(caseData.getRespondentResponseIsSame()) ? NO : YES
-            ).build();
+            );
         }
     }
 

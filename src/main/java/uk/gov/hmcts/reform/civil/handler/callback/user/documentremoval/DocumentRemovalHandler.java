@@ -61,11 +61,10 @@ public class DocumentRemovalHandler extends CallbackHandler {
         log.info("Retrieved {} case documents to remove from Case ID {}", docsToRemoveCollection.size(),
             caseData.getCcdCaseReference());
 
-        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
-        updatedCaseData.documentToKeepCollection(docsToRemoveCollection);
+        caseData.setDocumentToKeepCollection(docsToRemoveCollection);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.build().toMap(mapper))
+            .data(caseData.toMap(mapper))
             .build();
     }
 
