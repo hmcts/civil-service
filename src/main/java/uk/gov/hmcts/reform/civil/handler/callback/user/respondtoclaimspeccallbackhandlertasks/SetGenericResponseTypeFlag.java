@@ -64,17 +64,16 @@ public class SetGenericResponseTypeFlag implements CaseTask {
 
     public CallbackResponse execute(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
-                .multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.NOT_FULL_DEFENCE);
+        caseData.setMultiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.NOT_FULL_DEFENCE);
 
-        handleClaimantResponseTypeForSpec(caseData, updatedData);
+        handleClaimantResponseTypeForSpec(caseData);
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-        handleOneVOneScenario(caseData, updatedData, multiPartyScenario);
-        handleTwoVOneScenario(caseData, updatedData, multiPartyScenario);
-        handleOneVTwoOneLegalRepScenario(caseData, updatedData, multiPartyScenario);
-        handleOneVTwoTwoLegalRepScenario(callbackParams, caseData, updatedData, multiPartyScenario);
-        handleRespondentResponseTypeForSpec(caseData, updatedData);
-        handleDefenceAdmitPartPaymentTimeRoute(caseData, updatedData);
+        handleOneVOneScenario(caseData, multiPartyScenario);
+        handleTwoVOneScenario(caseData, multiPartyScenario);
+        handleOneVTwoOneLegalRepScenario(caseData, multiPartyScenario);
+        handleOneVTwoTwoLegalRepScenario(callbackParams, caseData, multiPartyScenario);
+        handleRespondentResponseTypeForSpec(caseData);
+        handleDefenceAdmitPartPaymentTimeRoute(caseData);
 
         Set<DefendantResponseShowTag> updatedShowConditions = whoDisputesPartAdmission(caseData);
         updateShowConditions(caseData, updatedShowConditions);
@@ -82,11 +81,11 @@ public class SetGenericResponseTypeFlag implements CaseTask {
         if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
                 && YES.equals(caseData.getIsRespondent1())
                 && featureToggleService.isDefendantNoCOnlineForCase(caseData)) {
-            updatedData.specDefenceFullAdmittedRequired(NO);
-            updatedData.fullAdmissionAndFullAmountPaid(NO);
-            updatedData.specPaidLessAmountOrDisputesOrPartAdmission(NO);
-            updatedData.specDisputesOrPartAdmission(NO);
-            updatedData.specFullAdmitPaid(NO);
+            caseData.setSpecDefenceFullAdmittedRequired(NO);
+            caseData.setFullAdmissionAndFullAmountPaid(NO);
+            caseData.setSpecPaidLessAmountOrDisputesOrPartAdmission(NO);
+            caseData.setSpecDisputesOrPartAdmission(NO);
+            caseData.setSpecFullAdmitPaid(NO);
             updatedShowConditions.removeAll(EnumSet.of(
                     NEED_FINANCIAL_DETAILS_1,
                     NEED_FINANCIAL_DETAILS_2,
@@ -95,14 +94,14 @@ public class SetGenericResponseTypeFlag implements CaseTask {
                     WHEN_WILL_CLAIM_BE_PAID,
                     SHOW_ADMITTED_AMOUNT_SCREEN
             ));
-            if (mustWhenWillClaimBePaidBeShown(updatedData.build())) {
+            if (mustWhenWillClaimBePaidBeShown(caseData)) {
                 updatedShowConditions.add(WHEN_WILL_CLAIM_BE_PAID);
             }
         } else if (
                 RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
                         && YES.equals(caseData.getIsRespondent2())
                         && featureToggleService.isDefendantNoCOnlineForCase(caseData)) {
-            updatedData.specDefenceFullAdmitted2Required(NO);
+            caseData.setSpecDefenceFullAdmitted2Required(NO);
             updatedShowConditions.removeAll(EnumSet.of(
                     NEED_FINANCIAL_DETAILS_1,
                     NEED_FINANCIAL_DETAILS_2,
@@ -111,21 +110,21 @@ public class SetGenericResponseTypeFlag implements CaseTask {
                     WHEN_WILL_CLAIM_BE_PAID,
                     SHOW_ADMITTED_AMOUNT_SCREEN
             ));
-            if (mustWhenWillClaimBePaidBeShown(updatedData.build())) {
+            if (mustWhenWillClaimBePaidBeShown(caseData)) {
                 updatedShowConditions.add(WHEN_WILL_CLAIM_BE_PAID);
             }
         } else {
             updatedShowConditions.add(SHOW_ADMITTED_AMOUNT_SCREEN);
         }
 
-        updatedData.showConditionFlags(updatedShowConditions);
+        caseData.setShowConditionFlags(updatedShowConditions);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedData.build().toMap(objectMapper))
+                .data(caseData.toMap(objectMapper))
                 .build();
     }
 
-    private void handleClaimantResponseTypeForSpec(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+    private void handleClaimantResponseTypeForSpec(CaseData caseData) {
         log.info("Handling claimant response type for caseId: {}", caseData.getCcdCaseReference());
 
         if ((RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getClaimant1ClaimResponseTypeForSpec())
@@ -135,29 +134,29 @@ public class SetGenericResponseTypeFlag implements CaseTask {
                 (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getClaimant2ClaimResponseTypeForSpec())
                         || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getClaimant2ClaimResponseTypeForSpec())
                         || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getClaimant2ClaimResponseTypeForSpec()))) {
-            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
+            caseData.setMultiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
             log.debug("CaseId {}: Updated multi-party response type flags to COUNTER_ADMIT_OR_ADMIT_PART", caseData.getCcdCaseReference());
         }
 
         log.info("CaseId {}: Completed handling claimant response type", caseData.getCcdCaseReference());
     }
 
-    private void handleOneVOneScenario(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData, MultiPartyScenario multiPartyScenario) {
+    private void handleOneVOneScenario(CaseData caseData, MultiPartyScenario multiPartyScenario) {
         log.info("Handling One V One scenario for caseId: {}", caseData.getCcdCaseReference());
 
         if (ONE_V_ONE.equals(multiPartyScenario)) {
-            updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
+            caseData.setRespondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
             log.debug("CaseId {}: Set respondent claim response type for spec generic", caseData.getCcdCaseReference());
 
             if (caseData.getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE) {
-                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
+                caseData.setMultiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
                 log.debug("CaseId {}: Updated multi-party response type flags to FULL_DEFENCE", caseData.getCcdCaseReference());
             } else if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.COUNTER_CLAIM) {
-                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
+                caseData.setMultiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
                 log.debug("CaseId {}: Updated multi-party response type flags to COUNTER_ADMIT_OR_ADMIT_PART", caseData.getCcdCaseReference());
             } else if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION
                     || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION) {
-                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_ADMISSION);
+                caseData.setMultiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_ADMISSION);
                 log.debug("CaseId {}: Updated multi-party response type flags to FULL_ADMISSION", caseData.getCcdCaseReference());
             }
         }
@@ -165,68 +164,68 @@ public class SetGenericResponseTypeFlag implements CaseTask {
         log.info("CaseId {}: Completed handling One V One scenario", caseData.getCcdCaseReference());
     }
 
-    private void handleTwoVOneScenario(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData, MultiPartyScenario multiPartyScenario) {
+    private void handleTwoVOneScenario(CaseData caseData, MultiPartyScenario multiPartyScenario) {
         log.info("Handling Two V One scenario for caseId: {}", caseData.getCcdCaseReference());
 
         Set<RespondentResponseTypeSpec> someAdmission = EnumSet.of(PART_ADMISSION, FULL_ADMISSION);
         if (TWO_V_ONE.equals(multiPartyScenario)
                 && someAdmission.contains(caseData.getRespondent1ClaimResponseTypeForSpec())
                 && someAdmission.contains(caseData.getRespondent2ClaimResponseTypeForSpec())) {
-            updatedData.specFullAdmissionOrPartAdmission(YES);
+            caseData.setSpecFullAdmissionOrPartAdmission(YES);
             log.debug("CaseId {}: Updated specFullAdmissionOrPartAdmission to YES", caseData.getCcdCaseReference());
         } else {
-            updatedData.specFullAdmissionOrPartAdmission(NO);
+            caseData.setSpecFullAdmissionOrPartAdmission(NO);
             log.debug("CaseId {}: Updated specFullAdmissionOrPartAdmission to NO", caseData.getCcdCaseReference());
         }
 
         log.info("CaseId {}: Completed handling Two V One scenario", caseData.getCcdCaseReference());
     }
 
-    private void handleOneVTwoOneLegalRepScenario(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData, MultiPartyScenario multiPartyScenario) {
+    private void handleOneVTwoOneLegalRepScenario(CaseData caseData, MultiPartyScenario multiPartyScenario) {
         log.info("Handling One V Two One Legal Rep scenario for caseId: {}", caseData.getCcdCaseReference());
 
         if (ONE_V_TWO_ONE_LEGAL_REP.equals(multiPartyScenario)
                 && Objects.equals(caseData.getRespondent1ClaimResponseTypeForSpec(), caseData.getRespondent2ClaimResponseTypeForSpec())) {
-            updatedData.respondentResponseIsSame(YES);
-            caseData = caseData.toBuilder().respondentResponseIsSame(YES).build();
+            caseData.setRespondentResponseIsSame(YES);
+            caseData.setRespondentResponseIsSame(YES);
             log.debug("CaseId {}: Respondent responses are the same", caseData.getCcdCaseReference());
         }
         if (ONE_V_TWO_ONE_LEGAL_REP.equals(multiPartyScenario) && caseData.getRespondentResponseIsSame().equals(NO)) {
-            updatedData.sameSolicitorSameResponse(NO);
+            caseData.setSameSolicitorSameResponse(NO);
             log.debug("CaseId {}: Same solicitor same response set to NO", caseData.getCcdCaseReference());
             if (FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
                     || FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
-                updatedData.respondentClaimResponseTypeForSpecGeneric(FULL_DEFENCE);
+                caseData.setRespondentClaimResponseTypeForSpecGeneric(FULL_DEFENCE);
                 log.debug("CaseId {}: Respondent claim response type set to FULL_DEFENCE", caseData.getCcdCaseReference());
             }
         } else if (ONE_V_TWO_ONE_LEGAL_REP.equals(multiPartyScenario) && caseData.getRespondentResponseIsSame().equals(YES)) {
-            updatedData.sameSolicitorSameResponse(YES);
-            updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
+            caseData.setSameSolicitorSameResponse(YES);
+            caseData.setRespondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
             log.debug("CaseId {}: Same solicitor same response set to YES", caseData.getCcdCaseReference());
             if (FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
                     || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
-                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
+                caseData.setMultiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
                 log.debug("CaseId {}: Multi-party response type flags set to FULL_DEFENCE", caseData.getCcdCaseReference());
             }
         } else {
-            updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
+            caseData.setRespondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
             log.debug("CaseId {}: Respondent claim response type set to generic", caseData.getCcdCaseReference());
         }
 
         log.info("CaseId {}: Completed handling One V Two One Legal Rep scenario", caseData.getCcdCaseReference());
     }
 
-    private void handleOneVTwoTwoLegalRepScenario(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData,
+    private void handleOneVTwoTwoLegalRepScenario(CallbackParams callbackParams, CaseData caseData,
                                                   MultiPartyScenario multiPartyScenario) {
         log.info("Handling One V Two Two Legal Rep scenario for caseId: {}", caseData.getCcdCaseReference());
 
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         if (ONE_V_TWO_TWO_LEGAL_REP.equals(multiPartyScenario)) {
             if (coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
-                updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent2ClaimResponseTypeForSpec());
+                caseData.setRespondentClaimResponseTypeForSpecGeneric(caseData.getRespondent2ClaimResponseTypeForSpec());
                 log.debug("CaseId {}: Set respondent claim response type for spec generic to Respondent 2", caseData.getCcdCaseReference());
             } else {
-                updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
+                caseData.setRespondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
                 log.debug("CaseId {}: Set respondent claim response type for spec generic to Respondent 1", caseData.getCcdCaseReference());
             }
         }
@@ -236,59 +235,59 @@ public class SetGenericResponseTypeFlag implements CaseTask {
                 && RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
                 || (YES.equals(caseData.getIsRespondent2())
                 && RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())))) {
-            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.PART_ADMISSION);
+            caseData.setMultiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.PART_ADMISSION);
             log.debug("CaseId {}: Updated multi-party response type flags to PART_ADMISSION", caseData.getCcdCaseReference());
         }
 
         log.info("CaseId {}: Completed handling One V Two Two Legal Rep scenario", caseData.getCcdCaseReference());
     }
 
-    private void handleRespondentResponseTypeForSpec(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+    private void handleRespondentResponseTypeForSpec(CaseData caseData) {
         log.info("Handling respondent response type for caseId: {}", caseData.getCcdCaseReference());
 
-        setRespondentClaimResponseTypeForSpecGeneric(caseData, updatedData);
+        setRespondentClaimResponseTypeForSpecGeneric(caseData);
         log.debug("CaseId {}: Set respondent claim response type for spec generic", caseData.getCcdCaseReference());
 
-        setMultiPartyResponseTypeFlags(caseData, updatedData);
+        setMultiPartyResponseTypeFlags(caseData);
         log.debug("CaseId {}: Set multi-party response type flags", caseData.getCcdCaseReference());
 
-        setSpecFullAdmissionOrPartAdmission(caseData, updatedData);
+        setSpecFullAdmissionOrPartAdmission(caseData);
         log.debug("CaseId {}: Set spec full admission or part admission", caseData.getCcdCaseReference());
 
-        setSpecFullDefenceOrPartAdmission(caseData, updatedData);
+        setSpecFullDefenceOrPartAdmission(caseData);
         log.debug("CaseId {}: Set spec full defence or part admission", caseData.getCcdCaseReference());
 
-        setSpecDefenceFullAdmittedRequired(caseData, updatedData);
+        setSpecDefenceFullAdmittedRequired(caseData);
         log.debug("CaseId {}: Set spec defence full admitted required", caseData.getCcdCaseReference());
 
-        setShowHowToAddTimeLinePage(caseData, updatedData);
+        setShowHowToAddTimeLinePage(caseData);
         log.debug("CaseId {}: Set show how to add timeline page", caseData.getCcdCaseReference());
 
-        setPartAdmittedByEitherRespondents(caseData, updatedData);
+        setPartAdmittedByEitherRespondents(caseData);
         log.debug("CaseId {}: Set part admitted by either respondents", caseData.getCcdCaseReference());
 
-        setFullAdmissionAndFullAmountPaid(caseData, updatedData);
+        setFullAdmissionAndFullAmountPaid(caseData);
         log.debug("CaseId {}: Set full admission and full amount paid", caseData.getCcdCaseReference());
 
         log.info("CaseId {}: Completed handling respondent response type", caseData.getCcdCaseReference());
     }
 
-    private void setRespondentClaimResponseTypeForSpecGeneric(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+    private void setRespondentClaimResponseTypeForSpecGeneric(CaseData caseData) {
         if (YES.equals(caseData.getIsRespondent2())) {
-            updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent2ClaimResponseTypeForSpec());
+            caseData.setRespondentClaimResponseTypeForSpecGeneric(caseData.getRespondent2ClaimResponseTypeForSpec());
             log.debug("CaseId {}: Respondent claim response type for spec generic set to Respondent 2", caseData.getCcdCaseReference());
         }
 
     }
 
-    private void setMultiPartyResponseTypeFlags(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+    private void setMultiPartyResponseTypeFlags(CaseData caseData) {
         if (isAnyRespondentOrClaimantFullDefence(caseData)) {
-            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
+            caseData.setMultiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
             log.debug("CaseId {}: Multi-party response type flags set to FULL_DEFENCE", caseData.getCcdCaseReference());
         }
 
         if (isRespondent2AdmitOrCounterClaim(caseData)) {
-            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
+            caseData.setMultiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
             log.debug("CaseId {}: Multi-party response type flags set to COUNTER_ADMIT_OR_ADMIT_PART", caseData.getCcdCaseReference());
         }
     }
@@ -308,11 +307,11 @@ public class SetGenericResponseTypeFlag implements CaseTask {
                 || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent2ClaimResponseTypeForSpec());
     }
 
-    private void setSpecFullAdmissionOrPartAdmission(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+    private void setSpecFullAdmissionOrPartAdmission(CaseData caseData) {
         log.info("Setting spec full admission or part admission for caseId: {}", caseData.getCcdCaseReference());
 
         if (isRespondent1Admitting(caseData) || isRespondent2Admitting(caseData)) {
-            updatedData.specFullAdmissionOrPartAdmission(YES);
+            caseData.setSpecFullAdmissionOrPartAdmission(YES);
             log.debug("CaseId {}: Spec full admission or part admission set to YES", caseData.getCcdCaseReference());
         }
 
@@ -333,16 +332,16 @@ public class SetGenericResponseTypeFlag implements CaseTask {
                 || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION);
     }
 
-    private void setSpecFullDefenceOrPartAdmission(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+    private void setSpecFullDefenceOrPartAdmission(CaseData caseData) {
         if (isRespondent1DefendingOrAdmitting(caseData)) {
-            updatedData.specFullDefenceOrPartAdmission1V1(YES);
+            caseData.setSpecFullDefenceOrPartAdmission1V1(YES);
             log.debug("CaseId {}: Spec full defence or part admission 1V1 set to YES", caseData.getCcdCaseReference());
         }
         if (isAnyRespondentDefendingOrAdmitting(caseData)) {
-            updatedData.specFullDefenceOrPartAdmission(YES);
+            caseData.setSpecFullDefenceOrPartAdmission(YES);
             log.debug("CaseId {}: Spec full defence or part admission set to YES", caseData.getCcdCaseReference());
         } else {
-            updatedData.specFullDefenceOrPartAdmission(NO);
+            caseData.setSpecFullDefenceOrPartAdmission(NO);
             log.debug("CaseId {}: Spec full defence or part admission set to NO", caseData.getCcdCaseReference());
         }
     }
@@ -360,66 +359,66 @@ public class SetGenericResponseTypeFlag implements CaseTask {
                 || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE;
     }
 
-    private void setSpecDefenceFullAdmittedRequired(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+    private void setSpecDefenceFullAdmittedRequired(CaseData caseData) {
         if (caseData.getRespondent1ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION
                 || caseData.getRespondent2ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION) {
-            updatedData.specDefenceFullAdmittedRequired(NO);
+            caseData.setSpecDefenceFullAdmittedRequired(NO);
             log.debug("CaseId {}: Spec defence full admitted required set to NO", caseData.getCcdCaseReference());
         }
     }
 
-    private void setShowHowToAddTimeLinePage(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+    private void setShowHowToAddTimeLinePage(CaseData caseData) {
         if (YES.equals(caseData.getSpecPaidLessAmountOrDisputesOrPartAdmission())
                 && !MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART.equals(caseData.getMultiPartyResponseTypeFlags())
                 && (!RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT.equals(caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()))) {
-            updatedData.showHowToAddTimeLinePage(YES);
+            caseData.setShowHowToAddTimeLinePage(YES);
             log.debug("CaseId {}: Show how to add timeline page set to YES", caseData.getCcdCaseReference());
         }
     }
 
-    private void setPartAdmittedByEitherRespondents(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+    private void setPartAdmittedByEitherRespondents(CaseData caseData) {
         log.info("Setting part admitted by either respondents for caseId: {}", caseData.getCcdCaseReference());
 
         if (YES.equals(caseData.getIsRespondent2()) && YES.equals(caseData.getSpecDefenceAdmittedRequired())) {
-            updatedData.partAdmittedByEitherRespondents(YES);
+            caseData.setPartAdmittedByEitherRespondents(YES);
             log.debug("CaseId {}: Part admitted by either respondents set to YES", caseData.getCcdCaseReference());
         } else if (YES.equals(caseData.getIsRespondent1()) && YES.equals(caseData.getSpecDefenceAdmitted2Required())) {
-            updatedData.partAdmittedByEitherRespondents(YES);
+            caseData.setPartAdmittedByEitherRespondents(YES);
             log.debug("CaseId {}: Part admitted by either respondents set to YES", caseData.getCcdCaseReference());
         } else {
-            updatedData.partAdmittedByEitherRespondents(NO);
+            caseData.setPartAdmittedByEitherRespondents(NO);
             log.debug("CaseId {}: Part admitted by either respondents set to NO", caseData.getCcdCaseReference());
         }
 
         log.info("CaseId {}: Completed setting part admitted by either respondents", caseData.getCcdCaseReference());
     }
 
-    private void setFullAdmissionAndFullAmountPaid(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+    private void setFullAdmissionAndFullAmountPaid(CaseData caseData) {
         log.info("Setting full admission and full amount paid for caseId: {}", caseData.getCcdCaseReference());
 
         if (YES.equals(caseData.getIsRespondent2()) && YES.equals(caseData.getSpecDefenceFullAdmitted2Required())) {
-            updatedData.fullAdmissionAndFullAmountPaid(YES);
+            caseData.setFullAdmissionAndFullAmountPaid(YES);
             log.debug("CaseId {}: Full admission and full amount paid set to YES", caseData.getCcdCaseReference());
         } else if (YES.equals(caseData.getIsRespondent1()) && YES.equals(caseData.getSpecDefenceFullAdmittedRequired())) {
-            updatedData.fullAdmissionAndFullAmountPaid(YES);
+            caseData.setFullAdmissionAndFullAmountPaid(YES);
             log.debug("CaseId {}: Full admission and full amount paid set to YES", caseData.getCcdCaseReference());
         } else {
-            updatedData.fullAdmissionAndFullAmountPaid(NO);
+            caseData.setFullAdmissionAndFullAmountPaid(NO);
             log.debug("CaseId {}: Full admission and full amount paid set to NO", caseData.getCcdCaseReference());
         }
 
         log.info("CaseId {}: Completed setting full admission and full amount paid", caseData.getCcdCaseReference());
     }
 
-    private void handleDefenceAdmitPartPaymentTimeRoute(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+    private void handleDefenceAdmitPartPaymentTimeRoute(CaseData caseData) {
         if (YES.equals(caseData.getIsRespondent1()) && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null) {
-            updatedData.defenceAdmitPartPaymentTimeRouteGeneric(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
+            caseData.setDefenceAdmitPartPaymentTimeRouteGeneric(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
             log.debug("CaseId {}: Defence admit part payment time route generic set to Respondent 1", caseData.getCcdCaseReference());
         } else if (YES.equals(caseData.getIsRespondent2()) && caseData.getDefenceAdmitPartPaymentTimeRouteRequired2() != null) {
-            updatedData.defenceAdmitPartPaymentTimeRouteGeneric(caseData.getDefenceAdmitPartPaymentTimeRouteRequired2());
+            caseData.setDefenceAdmitPartPaymentTimeRouteGeneric(caseData.getDefenceAdmitPartPaymentTimeRouteRequired2());
             log.debug("CaseId {}: Defence admit part payment time route generic set to Respondent 2", caseData.getCcdCaseReference());
         } else {
-            updatedData.defenceAdmitPartPaymentTimeRouteGeneric(IMMEDIATELY);
+            caseData.setDefenceAdmitPartPaymentTimeRouteGeneric(IMMEDIATELY);
             log.debug("CaseId {}: Defence admit part payment time route generic set to IMMEDIATELY", caseData.getCcdCaseReference());
         }
     }
