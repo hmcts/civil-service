@@ -164,9 +164,7 @@ class RoboticsNotificationServiceTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
         if (caseData.getRespondent2OrgRegistered() != null
             && caseData.getRespondent2Represented() == null) {
-            caseData = caseData.toBuilder()
-                .respondent2Represented(YES)
-                .build();
+            caseData.setRespondent2Represented(YES);
         }
 
         when(roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN))
@@ -197,13 +195,12 @@ class RoboticsNotificationServiceTest {
     @SneakyThrows
     void shouldSendNotificationEmailLRSpec_whenCaseDataIsProvided() {
         // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder().respondent1Represented(YES).caseAccessCategory(SPEC_CLAIM).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        caseData.setRespondent1Represented(YES);
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
         if (caseData.getRespondent2OrgRegistered() != null
             && caseData.getRespondent2Represented() == null) {
-            caseData = caseData.toBuilder()
-                .respondent2Represented(YES)
-                .build();
+            caseData.setRespondent2Represented(YES);
         }
 
         String latestEventText = "Claim details notified.";
@@ -252,16 +249,13 @@ class RoboticsNotificationServiceTest {
     @SneakyThrows
     void shouldSendNotificationEmailForMultiParty_whenCaseDataIsProvided() {
         // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .respondent2(PartyBuilder.builder().individual().build())
-            .addRespondent2(YES)
-            .respondent2SameLegalRepresentative(NO)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setAddRespondent2(YES);
+        caseData.setRespondent2SameLegalRepresentative(NO);
         if (caseData.getRespondent2OrgRegistered() != null
             && caseData.getRespondent2Represented() == null) {
-            caseData = caseData.toBuilder()
-                .respondent2Represented(YES)
-                .build();
+            caseData.setRespondent2Represented(YES);
         }
 
         String latestEventText = "[1 of 2 - 2020-08-01] Defendant: Mr. John Rambo has responded: "
@@ -297,12 +291,11 @@ class RoboticsNotificationServiceTest {
     @SneakyThrows
     void shouldSendNotificationEmailForMultiPartySpec_whenCaseDataIsProvided() {
         // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .caseAccessCategory(SPEC_CLAIM)
-            .respondent2(PartyBuilder.builder().individual().build())
-            .addRespondent2(YES)
-            .respondent2SameLegalRepresentative(NO)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
+        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setAddRespondent2(YES);
+        caseData.setRespondent2SameLegalRepresentative(NO);
 
         String lastEventText = "event text";
         RoboticsCaseDataSpec roboticsCaseData = RoboticsCaseDataSpec.builder()
@@ -343,14 +336,12 @@ class RoboticsNotificationServiceTest {
             .atState(FlowState.Main.FULL_DEFENCE)
             .respondent2Responds1v2SameSol(FULL_DEFENCE)
             .respondentResponseIsSame(YES)
-            .respondent1DQ(Respondent1DQ.builder().build())
+            .respondent1DQ(new Respondent1DQ())
             .respondent2ClaimResponseIntentionType(ResponseIntention.FULL_DEFENCE)
             .build();
         if (caseData.getRespondent2OrgRegistered() != null
             && caseData.getRespondent2Represented() == null) {
-            caseData = caseData.toBuilder()
-                .respondent2Represented(YES)
-                .build();
+            caseData.setRespondent2Represented(YES);
         }
 
         String latestEventText = "[1 of 2 - 2020-08-01] Defendant: Mr. John Rambo has responded: "
@@ -385,8 +376,9 @@ class RoboticsNotificationServiceTest {
     @Test
     void shouldSendNotificationEmailForLRvsLiP_whenCaseDataIsProvided() {
         //Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder().respondent1Represented(NO).caseAccessCategory(SPEC_CLAIM).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        caseData.setRespondent1Represented(NO);
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
 
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
@@ -423,8 +415,9 @@ class RoboticsNotificationServiceTest {
     @Test
     void shouldNotifyJudgementLiP_whenLipDefendant() {
         //Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder().respondent1Represented(NO).caseAccessCategory(SPEC_CLAIM).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        caseData.setRespondent1Represented(NO);
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder()
@@ -455,9 +448,10 @@ class RoboticsNotificationServiceTest {
     @Test
     void shouldNotifyDefaultJudgementLiP_whenLipDefendant() {
         //Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder().respondent1Represented(NO).caseAccessCategory(SPEC_CLAIM).paymentTypeSelection(
-                DJPaymentTypeSelection.SET_DATE).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        caseData.setRespondent1Represented(NO);
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
+        caseData.setPaymentTypeSelection(DJPaymentTypeSelection.SET_DATE);
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder()
@@ -488,9 +482,10 @@ class RoboticsNotificationServiceTest {
     @Test
     void shouldNotifyJudgementByAdmissionLiP_whenLipDefendant() {
         //Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder().respondent1Represented(NO).caseAccessCategory(SPEC_CLAIM)
-            .ccjPaymentDetails(CCJPaymentDetails.builder().ccjPaymentPaidSomeOption(YES).build()).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        caseData.setRespondent1Represented(NO);
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
+        caseData.setCcjPaymentDetails(CCJPaymentDetails.builder().ccjPaymentPaidSomeOption(YES).build());
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder()
@@ -521,8 +516,10 @@ class RoboticsNotificationServiceTest {
     @Test
     void shouldNotifyJudgementLiP_whenLipvsLiPEnabled() {
         //Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder().respondent1Represented(NO).applicant1Represented(NO).caseAccessCategory(SPEC_CLAIM).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        caseData.setRespondent1Represented(NO);
+        caseData.setApplicant1Represented(NO);
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
@@ -555,16 +552,14 @@ class RoboticsNotificationServiceTest {
     @CsvSource({"DEFAULT_JUDGEMENT_SPEC", "DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC"})
     void shouldNotifyDefaultJudgementLiP_whenLipvsLiPEnabled(String camundaEvent) {
         //Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder()
-            .respondent1Represented(NO)
-            .applicant1Represented(NO)
-            .caseAccessCategory(SPEC_CLAIM).paymentTypeSelection(
-                DJPaymentTypeSelection.SET_DATE)
-            .businessProcess(BusinessProcess.builder()
-                .camundaEvent(camundaEvent)
-                .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        caseData.setRespondent1Represented(NO);
+        caseData.setApplicant1Represented(NO);
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
+        caseData.setPaymentTypeSelection(DJPaymentTypeSelection.SET_DATE);
+        caseData.setBusinessProcess(BusinessProcess.builder()
+            .camundaEvent(camundaEvent)
+            .build());
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
@@ -598,9 +593,11 @@ class RoboticsNotificationServiceTest {
     @Test
     void shouldNotifyJudgementByAdmissionLiP_whenLipvsLiPEnabled() {
         //Given
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder().respondent1Represented(NO).applicant1Represented(NO).caseAccessCategory(SPEC_CLAIM)
-            .ccjPaymentDetails(CCJPaymentDetails.builder().ccjPaymentPaidSomeOption(YES).build()).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        caseData.setRespondent1Represented(NO);
+        caseData.setApplicant1Represented(NO);
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
+        caseData.setCcjPaymentDetails(CCJPaymentDetails.builder().ccjPaymentPaidSomeOption(YES).build());
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
@@ -635,11 +632,9 @@ class RoboticsNotificationServiceTest {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
 
-        caseData = caseData.toBuilder()
-                .applicant1Represented(NO)
-                .respondent1Represented(YES)
-                .caseAccessCategory(SPEC_CLAIM)
-                .build();
+        caseData.setApplicant1Represented(NO);
+        caseData.setRespondent1Represented(YES);
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder()
@@ -678,12 +673,10 @@ class RoboticsNotificationServiceTest {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
 
-        caseData = caseData.toBuilder()
-            .applicant1Represented(NO)
-            .respondent1Represented(YES)
-            .caseAccessCategory(SPEC_CLAIM)
-            .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
-            .build();
+        caseData.setApplicant1Represented(NO);
+        caseData.setRespondent1Represented(YES);
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
+        caseData.setPaymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY);
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder()

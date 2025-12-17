@@ -136,7 +136,7 @@ class CaseEventTaskHandlerTest {
             variables.putValue(FLOW_STATE, "MAIN.DRAFT");
             variables.putValue(FLOW_FLAGS, Map.of());
 
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
             when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE))
                 .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
@@ -262,7 +262,7 @@ class CaseEventTaskHandlerTest {
 
             CaseData caseData = getCaseData(state);
             caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
             when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
                 .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
@@ -322,7 +322,7 @@ class CaseEventTaskHandlerTest {
             CaseData caseData = getCaseData(TAKEN_OFFLINE_BY_STAFF);
             caseData.getClaimProceedsInCaseman().setReason(reason);
             caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
             when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
                 .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
@@ -366,7 +366,7 @@ class CaseEventTaskHandlerTest {
 
             CaseData caseData = getCaseData(state);
             caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
             when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
                 .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
@@ -409,7 +409,7 @@ class CaseEventTaskHandlerTest {
 
             CaseData caseData = getCaseData(state);
             caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
             when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
                 .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
@@ -452,7 +452,7 @@ class CaseEventTaskHandlerTest {
 
             CaseData caseData = getCaseData(state);
             caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
             when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
                 .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
@@ -505,7 +505,7 @@ class CaseEventTaskHandlerTest {
                 void shouldHaveExpectedDescription() {
                     CaseData caseData = getCaseData(state);
                     caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
-                    CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+                    CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
                     when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
                         .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
@@ -533,7 +533,7 @@ class CaseEventTaskHandlerTest {
             class OneVTwo {
                 @Test
                 void shouldHaveExpectedDescription_WhenClaimantProceedsAgainstBothDefendants() {
-                    CaseData caseData = CaseDataBuilder.builder()
+                    CaseData caseData = new CaseDataBuilder()
                         .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                         .atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2()
                         .businessProcess(businessProcess)
@@ -564,7 +564,7 @@ class CaseEventTaskHandlerTest {
 
                 @Test
                 void shouldHaveExpectedDescription_WhenClaimantProceedsAgainstFirstDefendantOnly() {
-                    CaseData caseData = CaseDataBuilder.builder()
+                    CaseData caseData = new CaseDataBuilder()
                         .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                         .atStateApplicantRespondToDefenceAndProceedVsDefendant1Only_1v2()
                         .businessProcess(businessProcess)
@@ -595,7 +595,7 @@ class CaseEventTaskHandlerTest {
 
                 @Test
                 void shouldHaveExpectedDescription_WhenClaimantProceedsAgainstSecondDefendantOnly() {
-                    CaseData caseData = CaseDataBuilder.builder()
+                    CaseData caseData = new CaseDataBuilder()
                         .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                         .atStateApplicantRespondToDefenceAndProceedVsDefendant2Only_1v2()
                         .businessProcess(businessProcess)
@@ -629,7 +629,7 @@ class CaseEventTaskHandlerTest {
             class TwoVOne {
                 @Test
                 void shouldHaveExpectedDescription_WhenBothClaimaintsProceed() {
-                    CaseData caseData = CaseDataBuilder.builder()
+                    CaseData caseData = new CaseDataBuilder()
                         .multiPartyClaimTwoApplicants()
                         .atStateBothApplicantsRespondToDefenceAndProceed_2v1()
                         .businessProcess(businessProcess)
@@ -660,12 +660,12 @@ class CaseEventTaskHandlerTest {
 
                 @Test
                 void shouldHaveExpectedDescription_WhenOnlyFirstClaimantProceeds() {
-                    CaseData caseData = CaseDataBuilder.builder()
+                    CaseData caseData = new CaseDataBuilder()
                         .multiPartyClaimTwoApplicants()
                         .atStateApplicant1RespondToDefenceAndProceed_2v1()
                         .businessProcess(businessProcess)
                         .build();
-                    CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+                    CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
                     when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
                         .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
@@ -691,7 +691,7 @@ class CaseEventTaskHandlerTest {
 
                 @Test
                 void shouldHaveExpectedDescription_WhenOnlySecondClaimantProceeds() {
-                    CaseData caseData = CaseDataBuilder.builder()
+                    CaseData caseData = new CaseDataBuilder()
                         .multiPartyClaimTwoApplicants()
                         .atStateApplicant2RespondToDefenceAndProceed_2v1()
                         .businessProcess(businessProcess)

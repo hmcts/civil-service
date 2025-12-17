@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantRespon
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.Party.Type;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -66,31 +67,35 @@ class PopulateRespondent1CopyTest {
 
     private CaseData caseData;
     private UserInfo userInfo;
+    private StateFlow baseFlow;
 
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
         populateRespondent1Copy = new PopulateRespondent1Copy(
-                userService,
-                coreCaseUserService,
-                toggleService,
-                courtLocationUtils,
-                objectMapper,
-                stateFlowEngine,
-                respondToClaimSpecUtils,
-                interestCalculator
+            userService,
+            coreCaseUserService,
+            toggleService,
+            courtLocationUtils,
+            objectMapper,
+            stateFlowEngine,
+            respondToClaimSpecUtils,
+            interestCalculator
         );
-        caseData = CaseData.builder()
-                .respondent1(Party.builder().type(Type.INDIVIDUAL).build())
-                .respondent2(Party.builder().type(Type.INDIVIDUAL).build())
-                .ccdCaseReference(1234L)
-                .build();
+        Party party = new Party();
+        party.setType(Type.INDIVIDUAL);
+        caseData = CaseDataBuilder.builder()
+            .respondent1(party)
+            .respondent2(party)
+            .ccdCaseReference(1234L)
+            .build();
 
         userInfo = UserInfo.builder()
-                .uid("testUserId")
-                .build();
+            .uid("testUserId")
+            .build();
 
-        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mock(StateFlow.class));
+        baseFlow = mock(StateFlow.class);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(baseFlow);
     }
 
     @Test
@@ -104,17 +109,73 @@ class PopulateRespondent1CopyTest {
         params.put(BEARER_TOKEN, "testBearerToken");
 
         CallbackParams callbackParams = CallbackParams.builder()
-                .caseData(caseData)
-                .params(params)
-                .build();
+            .caseData(caseData)
+            .params(params)
+            .build();
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) populateRespondent1Copy.execute(
-                callbackParams);
+            callbackParams);
 
         Map<String, Object> responseData = response.getData();
         CaseData updatedCaseData = objectMapper.convertValue(responseData, CaseData.class);
         assertEquals(caseData.getRespondent1(), updatedCaseData.getRespondent1Copy());
         assertEquals(YES, updatedCaseData.getShowCarmFields());
+    }
+
+    @Test
+    void shouldReturnErrorWhenDefendantResponseAlreadySubmittedForSolicitorOne() {
+        when(userService.getUserInfo(any())).thenReturn(userInfo);
+        // TWO_RESPONDENT_REPRESENTATIVES flag true and solicitor one has case role
+        when(baseFlow.isFlagSet(any())).thenReturn(true);
+        when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(true);
+
+        // respondent1 has already submitted
+        caseData.setRespondent1ResponseDate(java.time.LocalDateTime.now());
+
+        Map<CallbackParams.Params, Object> params = new EnumMap<>(CallbackParams.Params.class);
+        params.put(BEARER_TOKEN, "testBearerToken");
+
+        CallbackParams callbackParams = CallbackParams.builder()
+            .caseData(caseData)
+            .params(params)
+            .build();
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) populateRespondent1Copy
+            .execute(callbackParams);
+
+        assertTrue(response.getErrors().contains(PopulateRespondent1Copy.ERROR_DEFENDANT_RESPONSE_SPEC_SUBMITTED));
+    }
+
+    @Test
+    void shouldPopulateInterestAndTotalsInUpdateCarmFields() {
+        when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
+        when(courtLocationUtils.getLocationsFromList(any())).thenReturn(null);
+        when(userService.getUserInfo(any())).thenReturn(userInfo);
+        when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORONE"));
+
+        // interest calculation mocked
+        when(interestCalculator.calculateInterest(any())).thenReturn(new java.math.BigDecimal("12.34"));
+
+        caseData.setTotalClaimAmount(new java.math.BigDecimal("200"));
+
+        Map<CallbackParams.Params, Object> params = new EnumMap<>(CallbackParams.Params.class);
+        params.put(BEARER_TOKEN, "testBearerToken");
+
+        CallbackParams callbackParams = CallbackParams.builder()
+            .caseData(caseData)
+            .params(params)
+            .build();
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) populateRespondent1Copy
+            .execute(callbackParams);
+
+        CaseData updated = objectMapper.convertValue(response.getData(), CaseData.class);
+        // claimAmountInPounds with scale(2)
+        assertEquals(new java.math.BigDecimal("200.00"), updated.getTotalClaimAmountPlusInterest());
+        assertEquals("200.00", updated.getTotalClaimAmountPlusInterestString());
+        // totalClaimAmount + interest (both scaled)
+        assertEquals(new java.math.BigDecimal("212.34"), updated.getTotalClaimAmountPlusInterestAdmitPart());
+        assertEquals("212.34", updated.getTotalClaimAmountPlusInterestAdmitPartString());
     }
 
     @Test
@@ -128,12 +189,12 @@ class PopulateRespondent1CopyTest {
         params.put(BEARER_TOKEN, "testBearerToken");
 
         CallbackParams callbackParams = CallbackParams.builder()
-                .caseData(caseData)
-                .params(params)
-                .build();
+            .caseData(caseData)
+            .params(params)
+            .build();
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) populateRespondent1Copy.execute(
-                callbackParams);
+            callbackParams);
 
         Map<String, Object> responseData = response.getData();
         CaseData updatedCaseData = objectMapper.convertValue(responseData, CaseData.class);
@@ -146,20 +207,20 @@ class PopulateRespondent1CopyTest {
         when(courtLocationUtils.getLocationsFromList(any())).thenReturn(null);
         when(userService.getUserInfo(any())).thenReturn(userInfo);
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(
-                "RESPONDENTSOLICITORONE",
-                "RESPONDENTSOLICITORTWO"
+            "RESPONDENTSOLICITORONE",
+            "RESPONDENTSOLICITORTWO"
         ));
 
         Map<CallbackParams.Params, Object> params =  new EnumMap<>(CallbackParams.Params.class);
         params.put(BEARER_TOKEN, "testBearerToken");
 
         CallbackParams callbackParams = CallbackParams.builder()
-                .caseData(caseData)
-                .params(params)
-                .build();
+            .caseData(caseData)
+            .params(params)
+            .build();
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) populateRespondent1Copy.execute(
-                callbackParams);
+            callbackParams);
 
         Map<String, Object> responseData = response.getData();
         CaseData updatedCaseData = objectMapper.convertValue(responseData, CaseData.class);
@@ -173,18 +234,18 @@ class PopulateRespondent1CopyTest {
         when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
         when(courtLocationUtils.getLocationsFromList(any())).thenReturn(null);
 
-        caseData = CaseData.builder()
-                .respondent1(Party.builder().type(Type.INDIVIDUAL).build())
-                .respondent2(null)
-                .build();
+        Party party = new Party();
+        party.setType(Type.INDIVIDUAL);
+        caseData.setRespondent1(party);
+        caseData.setRespondent2(null);
 
         Map<CallbackParams.Params, Object> params =  new EnumMap<>(CallbackParams.Params.class);
         params.put(BEARER_TOKEN, "testBearerToken");
 
         CallbackParams callbackParams = CallbackParams.builder()
-                .caseData(caseData)
-                .params(params)
-                .build();
+            .caseData(caseData)
+            .params(params)
+            .build();
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) populateRespondent1Copy.execute(callbackParams);
 
@@ -200,20 +261,22 @@ class PopulateRespondent1CopyTest {
         when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
         when(courtLocationUtils.getLocationsFromList(any())).thenReturn(null);
 
-        caseData = CaseData.builder()
-                .respondent1(Party.builder().type(Type.INDIVIDUAL).build())
-                .respondent2(Party.builder().type(Type.INDIVIDUAL).build())
-                .respondent2SameLegalRepresentative(YES)
-                .ccdCaseReference(1234L)
-                .build();
+        Party party = new Party();
+        party.setType(Type.INDIVIDUAL);
+        caseData = CaseDataBuilder.builder()
+            .respondent1(party)
+            .respondent2(party)
+            .respondent2SameLegalRepresentative(YES)
+            .ccdCaseReference(1234L)
+            .build();
 
         Map<CallbackParams.Params, Object> params =  new EnumMap<>(CallbackParams.Params.class);
         params.put(BEARER_TOKEN, "testBearerToken");
 
         CallbackParams callbackParams = CallbackParams.builder()
-                .caseData(caseData)
-                .params(params)
-                .build();
+            .caseData(caseData)
+            .params(params)
+            .build();
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) populateRespondent1Copy.execute(callbackParams);
 
@@ -231,19 +294,21 @@ class PopulateRespondent1CopyTest {
         when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
         when(courtLocationUtils.getLocationsFromList(any())).thenReturn(null);
 
-        caseData = CaseData.builder()
-                .respondent1(Party.builder().type(Type.INDIVIDUAL).build())
-                .respondent2(null)
-                .ccdCaseReference(1234L)
-                .build();
+        Party party = new Party();
+        party.setType(Type.INDIVIDUAL);
+        caseData = CaseDataBuilder.builder()
+            .respondent1(party)
+            .respondent2(null)
+            .ccdCaseReference(1234L)
+            .build();
 
         Map<CallbackParams.Params, Object> params =  new EnumMap<>(CallbackParams.Params.class);
         params.put(BEARER_TOKEN, "testBearerToken");
 
         CallbackParams callbackParams = CallbackParams.builder()
-                .caseData(caseData)
-                .params(params)
-                .build();
+            .caseData(caseData)
+            .params(params)
+            .build();
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) populateRespondent1Copy.execute(callbackParams);
 

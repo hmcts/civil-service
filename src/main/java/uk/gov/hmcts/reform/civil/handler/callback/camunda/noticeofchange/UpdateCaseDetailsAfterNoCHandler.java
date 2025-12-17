@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
@@ -81,10 +82,8 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
     private CallbackResponse updateCaseDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-
-        // nullify this field since it was persisted to auto approve noc
-        caseDataBuilder.changeOrganisationRequestField(null);
+        // Store original multiPartyScenario before any modifications
+        final var originalMultiPartyScenario = getMultiPartyScenario(caseData);
 
         if (caseData.getChangeOfRepresentation() == null) {
             return AboutToStartOrSubmitCallbackResponse.builder()
@@ -104,69 +103,69 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             .email(caseData.getChangeOrganisationRequestField().getCreatedBy())
             .build();
 
+        // nullify this field since it was persisted to auto approve noc
+        caseData.setChangeOrganisationRequestField(null);
+
         String replacedSolicitorCaseRole = caseData.getChangeOfRepresentation().getCaseRole();
 
         boolean isApplicantSolicitorRole = isApplicantOrRespondent(replacedSolicitorCaseRole);
 
         if (isApplicantSolicitorRole) {
-            unAssignCaseFromClaimantLip(caseDataBuilder);
-            updateApplicantSolicitorDetails(caseDataBuilder, addedSolicitorDetails);
+            unAssignCaseFromClaimantLip(caseData);
+            updateApplicantSolicitorDetails(caseData, addedSolicitorDetails);
         } else {
             unassignCaseFromDefendantLip(caseData);
             if (replacedSolicitorCaseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
-                updateRespondentSolicitor1Details(caseDataBuilder, addedOrganisation, addedSolicitorDetails);
+                updateRespondentSolicitor1Details(caseData, addedOrganisation, addedSolicitorDetails);
             } else {
                 if (replacedSolicitorCaseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
-                    updateRespondentSolicitor2Details(caseDataBuilder, addedOrganisation, addedSolicitorDetails);
+                    updateRespondentSolicitor2Details(caseData, addedOrganisation, addedSolicitorDetails);
                 }
             }
         }
 
-        updateSolicitorReferences(caseData, caseDataBuilder, replacedSolicitorCaseRole);
+        updateSolicitorReferences(caseData, replacedSolicitorCaseRole);
 
-        updateOrgPolicyReferences(caseData, caseDataBuilder, replacedSolicitorCaseRole);
+        updateOrgPolicyReferences(caseData, replacedSolicitorCaseRole);
 
-        CaseData tempUpdatedCaseData = caseDataBuilder.build();
-
-        if (!is1v1(tempUpdatedCaseData)) {
-            if (isSameSolicitorScenario(tempUpdatedCaseData)) {
-                caseDataBuilder.respondent2SameLegalRepresentative(YES);
+        if (!is1v1(caseData)) {
+            if (isSameSolicitorScenario(caseData)) {
+                caseData.setRespondent2SameLegalRepresentative(YES);
             } else {
-                caseDataBuilder.respondent2SameLegalRepresentative(NO);
+                caseData.setRespondent2SameLegalRepresentative(NO);
             }
         }
 
-        if (featureToggleService.isLrAdmissionBulkEnabled() && featureToggleService.isJudgmentOnlineLive()) {
-            caseDataBuilder.previousCCDState(callbackParams.getCaseData().getCcdState());
+        if (featureToggleService.isJudgmentOnlineLive()) {
+            caseData.setPreviousCCDState(callbackParams.getCaseData().getCcdState());
         }
 
-        updateDefendantQueryCollectionPartyName(caseDataBuilder);
-        clearLRIndividuals(replacedSolicitorCaseRole, caseDataBuilder.build(), caseDataBuilder, caseData);
+        updateDefendantQueryCollectionPartyName(caseData);
+        clearLRIndividuals(replacedSolicitorCaseRole, caseData, originalMultiPartyScenario);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
-    private void updateDefendantQueryCollectionPartyName(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
-        CaseData caseData = caseDataBuilder.build();
+    private void updateDefendantQueryCollectionPartyName(CaseData caseData) {
         if (nonNull(caseData.getQmRespondentSolicitor1Queries())
             && getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)) {
             updateQueryCollectionPartyName(
                 List.of(RESPONDENTSOLICITORONE.getFormattedName()),
                 ONE_V_TWO_TWO_LEGAL_REP,
-                caseDataBuilder
+                caseData
             );
         }
     }
 
-    private Consumer<Organisation> setRespondentSolicitorDetails(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+    private Consumer<Organisation> setRespondentSolicitorDetails(CaseData caseData) {
         return organisation -> {
             List<ContactInformation> contactInformation = organisation.getContactInformation();
-            caseDataBuilder.respondentSolicitorDetails(RespondentSolicitorDetails.builder()
-                                                           .orgName(organisation.getName())
-                                                           .address(Address.fromContactInformation(
-                                                               contactInformation.get(0))).build());
+            RespondentSolicitorDetails respondentSolicitorDetails = new RespondentSolicitorDetails();
+            respondentSolicitorDetails.setOrgName(organisation.getName());
+            respondentSolicitorDetails.setAddress(Address.fromContactInformation(contactInformation.get(0)));
+            caseData.setRespondentSolicitorDetails(respondentSolicitorDetails);
         };
     }
 
@@ -176,8 +175,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         }
     }
 
-    private void unAssignCaseFromClaimantLip(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
-        CaseData caseData = caseDataBuilder.build();
+    private void unAssignCaseFromClaimantLip(CaseData caseData) {
         if (caseData.isApplicantLiP() && caseData.getClaimantUserDetails() != null) {
             coreCaseUserService.unassignCase(
                 caseData.getCcdCaseReference().toString(),
@@ -185,117 +183,106 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
                 null,
                 CaseRole.CLAIMANT
             );
-            caseDataBuilder.applicant1Represented(YES);
+            caseData.setApplicant1Represented(YES);
         }
     }
 
-    private void clearLRIndividuals(String replacedSolicitorCaseRole, CaseData caseData,
-                                    CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseData oldCaseData) {
+    private void clearLRIndividuals(String replacedSolicitorCaseRole, CaseData caseData, MultiPartyScenario originalMultiPartyScenario) {
         if (CaseRole.APPLICANTSOLICITORONE.getFormattedName().equals(replacedSolicitorCaseRole)) {
-            caseDataBuilder.applicant1LRIndividuals(null);
+            caseData.setApplicant1LRIndividuals(null);
         } else if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(replacedSolicitorCaseRole)) {
             if (ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))) {
                 // if it's diff to same sol after noc, copy from defendant 2
-                caseDataBuilder.respondent1LRIndividuals(caseData.getRespondent2LRIndividuals());
-                caseDataBuilder.respondent2LRIndividuals(null);
+                caseData.setRespondent1LRIndividuals(caseData.getRespondent2LRIndividuals());
+                caseData.setRespondent2LRIndividuals(null);
             } else {
                 // if it's same to diff sol after noc, copy into def 2 and clear def 1
                 if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))
-                    && ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(oldCaseData))) {
-                    caseDataBuilder.respondent2LRIndividuals(caseData.getRespondent1LRIndividuals());
+                    && ONE_V_TWO_ONE_LEGAL_REP.equals(originalMultiPartyScenario)) {
+                    caseData.setRespondent2LRIndividuals(caseData.getRespondent1LRIndividuals());
                 }
-                caseDataBuilder.respondent1LRIndividuals(null);
+                caseData.setRespondent1LRIndividuals(null);
             }
         } else if (CaseRole.RESPONDENTSOLICITORTWO.getFormattedName().equals(replacedSolicitorCaseRole)) {
             // always clear for defendant 2 because even if it goes from DS to SS,
             // LR individuals are always stored against defendant 1
-            caseDataBuilder.respondent2LRIndividuals(null);
+            caseData.setRespondent2LRIndividuals(null);
         }
     }
 
     private void updateOrgPolicyReferences(CaseData caseData,
-                                           CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                            String replacedSolicitorCaseRole) {
         if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(replacedSolicitorCaseRole)) {
             OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
-            OrganisationPolicy updatedOrgPolicy =
-                respondent1OrganisationPolicy.toBuilder().orgPolicyReference(null).build();
-            caseDataBuilder.respondent1OrganisationPolicy(updatedOrgPolicy);
+            respondent1OrganisationPolicy.setOrgPolicyReference(null);
         } else if (CaseRole.RESPONDENTSOLICITORTWO.getFormattedName().equals(replacedSolicitorCaseRole)) {
             OrganisationPolicy respondent2OrganisationPolicy = caseData.getRespondent2OrganisationPolicy();
-            OrganisationPolicy updatedOrgPolicy =
-                respondent2OrganisationPolicy.toBuilder().orgPolicyReference(null).build();
-            caseDataBuilder.respondent2OrganisationPolicy(updatedOrgPolicy);
+            respondent2OrganisationPolicy.setOrgPolicyReference(null);
         } else {
             OrganisationPolicy applicant1OrganisationPolicy = caseData.getApplicant1OrganisationPolicy();
-            OrganisationPolicy updatedOrgPolicy =
-                applicant1OrganisationPolicy.toBuilder().orgPolicyReference(null).build();
-            caseDataBuilder.applicant1OrganisationPolicy(updatedOrgPolicy);
+            applicant1OrganisationPolicy.setOrgPolicyReference(null);
         }
         if (caseData.getUnassignedCaseListDisplayOrganisationReferences() != null) {
-            caseDataBuilder.unassignedCaseListDisplayOrganisationReferences(
-                getAllOrganisationPolicyReferences(caseDataBuilder.build()));
+            caseData.setUnassignedCaseListDisplayOrganisationReferences(
+                getAllOrganisationPolicyReferences(caseData));
         }
     }
 
     private void updateRespondentSolicitor2Details(
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
+        CaseData caseData,
         String addedOrganisation,
         UserDetails addedSolicitorDetails) {
-        CaseData caseData = caseDataBuilder.build();
 
-        caseDataBuilder.respondent2OrgRegistered(YES)
-            .respondentSolicitor2OrganisationDetails(null)
-            .respondent2Represented(YES)
-            .defendant2LIPAtClaimIssued(NO);
+        caseData.setRespondent2OrgRegistered(YES);
+        caseData.setRespondentSolicitor2OrganisationDetails(null);
+        caseData.setRespondent2Represented(YES);
+        caseData.setDefendant2LIPAtClaimIssued(NO);
 
-        caseDataBuilder.anyRepresented(YES);
+        caseData.setAnyRepresented(YES);
 
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            caseDataBuilder.respondentSolicitor2ServiceAddress(null)
-                .respondentSolicitor2ServiceAddressRequired(NO)
-                .respondentSolicitor2ServiceAddress(null)
-                .respondent2OrganisationIDCopy(addedOrganisation);
+            caseData.setRespondentSolicitor2ServiceAddress(null);
+            caseData.setRespondentSolicitor2ServiceAddressRequired(NO);
+            caseData.setRespondent2OrganisationIDCopy(addedOrganisation);
         } else {
-            caseDataBuilder.specRespondent2Represented(YES)
-                .specRespondent2CorrespondenceAddressRequired(null)
-                .specRespondent2CorrespondenceAddressdetails(Address.builder().build())
-                .specAoSRespondentCorrespondenceAddressdetails(null);
+            caseData.setSpecRespondent2Represented(YES);
+            caseData.setSpecRespondent2CorrespondenceAddressRequired(null);
+            caseData.setSpecRespondent2CorrespondenceAddressdetails(Address.builder().build());
+            caseData.setSpecAoSRespondentCorrespondenceAddressdetails(null);
         }
 
         if (addedSolicitorDetails != null) {
-            caseDataBuilder.respondentSolicitor2EmailAddress(addedSolicitorDetails.getEmail());
+            caseData.setRespondentSolicitor2EmailAddress(addedSolicitorDetails.getEmail());
         } else {
-            caseDataBuilder.respondentSolicitor2EmailAddress(null);
+            caseData.setRespondentSolicitor2EmailAddress(null);
         }
     }
 
-    private void updateRespondentSolicitor1Details(CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
+    private void updateRespondentSolicitor1Details(CaseData caseData,
                                                    String addedOrganisation, UserDetails addedSolicitorDetails) {
-        CaseData caseData = caseDataBuilder.build();
 
-        caseDataBuilder.respondent1OrgRegistered(YES)
-            .respondentSolicitor1OrganisationDetails(null)
-            .respondent1Represented(YES)
-            .defendant1LIPAtClaimIssued(NO);
+        caseData.setRespondent1OrgRegistered(YES);
+        caseData.setRespondentSolicitor1OrganisationDetails(null);
+        caseData.setRespondent1Represented(YES);
+        caseData.setDefendant1LIPAtClaimIssued(NO);
 
-        caseDataBuilder.anyRepresented(YES);
+        caseData.setAnyRepresented(YES);
 
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            caseDataBuilder.respondentSolicitor1ServiceAddress(null)
-                .respondentSolicitor1ServiceAddressRequired(NO)
-                .respondent1OrganisationIDCopy(addedOrganisation);
+            caseData.setRespondentSolicitor1ServiceAddress(null);
+            caseData.setRespondentSolicitor1ServiceAddressRequired(NO);
+            caseData.setRespondent1OrganisationIDCopy(addedOrganisation);
         } else {
-            caseDataBuilder.specRespondentCorrespondenceAddressdetails(null)
-                .specAoSRespondentCorrespondenceAddressdetails(null)
-                .specAoSRespondentCorrespondenceAddressRequired(null)
-                .specRespondent1Represented(YES);
+            caseData.setSpecRespondentCorrespondenceAddressdetails(null);
+            caseData.setSpecAoSRespondentCorrespondenceAddressdetails(null);
+            caseData.setSpecAoSRespondentCorrespondenceAddressRequired(null);
+            caseData.setSpecRespondent1Represented(YES);
         }
 
         if (addedSolicitorDetails != null) {
-            caseDataBuilder.respondentSolicitor1EmailAddress(addedSolicitorDetails.getEmail());
+            caseData.setRespondentSolicitor1EmailAddress(addedSolicitorDetails.getEmail());
         } else {
-            caseDataBuilder.respondentSolicitor1EmailAddress(null);
+            caseData.setRespondentSolicitor1EmailAddress(null);
         }
 
         String organisationId = OrgPolicyUtils.getRespondent1SolicitorOrgId(caseData);
@@ -304,7 +291,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             && isOneVOne(caseData)) {
             try {
                 organisationService.findOrganisationById(organisationId)
-                    .ifPresent(setRespondentSolicitorDetails(caseDataBuilder));
+                    .ifPresent(setRespondentSolicitorDetails(caseData));
                 caseData.getSystemGeneratedCaseDocuments().removeIf(e -> e.getValue().getDocumentType().equals(
                     DocumentType.CLAIMANT_CLAIM_FORM));
             } catch (FeignException e) {
@@ -314,39 +301,33 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         }
     }
 
-    private void updateApplicantSolicitorDetails(CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
+    private void updateApplicantSolicitorDetails(CaseData caseData,
                                                  UserDetails addedSolicitorDetails) {
-        CaseData caseData = caseDataBuilder.build();
 
-        caseDataBuilder.applicantSolicitor1PbaAccounts(null)
-            .applicantSolicitor1PbaAccountsIsEmpty(YES);
+        caseData.setApplicantSolicitor1PbaAccounts(null);
+        caseData.setApplicantSolicitor1PbaAccountsIsEmpty(YES);
 
-        caseDataBuilder.anyRepresented(YES);
+        caseData.setAnyRepresented(YES);
 
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            caseDataBuilder
-                .applicantSolicitor1ServiceAddressRequired(NO)
-                .applicantSolicitor1ServiceAddress(null);
+            caseData.setApplicantSolicitor1ServiceAddressRequired(NO);
+            caseData.setApplicantSolicitor1ServiceAddress(null);
         } else {
-            caseDataBuilder
-                .specApplicantCorrespondenceAddressdetails(null)
-                .specApplicantCorrespondenceAddressRequired(NO);
+            caseData.setSpecApplicantCorrespondenceAddressdetails(null);
+            caseData.setSpecApplicantCorrespondenceAddressRequired(NO);
         }
 
         if (addedSolicitorDetails != null) {
-            caseDataBuilder.applicantSolicitor1UserDetails(
-                IdamUserDetails.builder()
-                    .id(addedSolicitorDetails.getId())
-                    .email(addedSolicitorDetails.getEmail())
-                    .build()
-            );
+            IdamUserDetails idamUserDetails = new IdamUserDetails();
+            idamUserDetails.setId(addedSolicitorDetails.getId());
+            idamUserDetails.setEmail(addedSolicitorDetails.getEmail());
+            caseData.setApplicantSolicitor1UserDetails(idamUserDetails);
         } else {
-            caseDataBuilder.applicantSolicitor1UserDetails(null);
+            caseData.setApplicantSolicitor1UserDetails(null);
         }
     }
 
-    private void updateSolicitorReferences(CaseData caseData,
-                                           CaseData.CaseDataBuilder<?, ?> caseDataBuilder, String replacedCaseRole) {
+    private void updateSolicitorReferences(CaseData caseData, String replacedCaseRole) {
         if (caseData.getSolicitorReferences() != null) {
             SolicitorReferences solicitorReferences = caseData.getSolicitorReferences();
             String applicantReference = replacedCaseRole.equals(CaseRole.APPLICANTSOLICITORONE.getFormattedName())
@@ -358,27 +339,26 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             String respondent2Reference = replacedCaseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
                 ? null : solicitorReferences.getRespondentSolicitor2Reference();
 
-            SolicitorReferences updatedSolicitorReferences = SolicitorReferences.builder()
-                .applicantSolicitor1Reference(applicantReference)
-                .respondentSolicitor1Reference(respondent1Reference)
-                .respondentSolicitor2Reference(respondent2Reference)
-                .build();
+            SolicitorReferences updatedSolicitorReferences = new SolicitorReferences();
+            updatedSolicitorReferences.setApplicantSolicitor1Reference(applicantReference);
+            updatedSolicitorReferences.setRespondentSolicitor1Reference(respondent1Reference);
+            updatedSolicitorReferences.setRespondentSolicitor2Reference(respondent2Reference);
 
-            caseDataBuilder.solicitorReferences(updatedSolicitorReferences);
+            caseData.setSolicitorReferences(updatedSolicitorReferences);
 
             // only update if it's been created during acknowledge claim
             if (caseData.getSolicitorReferencesCopy() != null) {
-                caseDataBuilder.solicitorReferencesCopy(updatedSolicitorReferences);
+                caseData.setSolicitorReferencesCopy(updatedSolicitorReferences);
             }
 
             // also update this field because it exists
             if (replacedCaseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
-                caseDataBuilder.respondentSolicitor2Reference(null);
+                caseData.setRespondentSolicitor2Reference(null);
             }
 
             if (caseData.getCaseListDisplayDefendantSolicitorReferences() != null) {
-                caseDataBuilder.caseListDisplayDefendantSolicitorReferences(
-                    getAllDefendantSolicitorReferences(caseDataBuilder.build()));
+                caseData.setCaseListDisplayDefendantSolicitorReferences(
+                    getAllDefendantSolicitorReferences(caseData));
             }
         }
     }

@@ -126,20 +126,20 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         caseData.getDefendantResponseDocuments().forEach(document -> {
             if (document.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)
                 && document.getValue().getCreatedBy().equals("Defendant")) {
-                caseData.setRespondent1ClaimResponseDocument(ResponseDocument.builder()
-                                                                 .file(document.getValue().getDocumentLink())
-                                                                 .build());
+                ResponseDocument responseDocument = new ResponseDocument();
+                responseDocument.setFile(document.getValue().getDocumentLink());
+                caseData.setRespondent1ClaimResponseDocument(responseDocument);
             }
             if (document.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)
                 && document.getValue().getCreatedBy().equals("Defendant 2")) {
-                caseData.setRespondent2ClaimResponseDocument(ResponseDocument.builder()
-                                                                 .file(document.getValue().getDocumentLink())
-                                                                 .build());
+                ResponseDocument responseDocument = new ResponseDocument();
+                responseDocument.setFile(document.getValue().getDocumentLink());
+                caseData.setRespondent2ClaimResponseDocument(responseDocument);
             }
             if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
-                caseData.setRespondentSharedClaimResponseDocument(ResponseDocument.builder()
-                                                                      .file(document.getValue().getDocumentLink())
-                                                                      .build());
+                ResponseDocument responseDocument = new ResponseDocument();
+                responseDocument.setFile(document.getValue().getDocumentLink());
+                caseData.setRespondentSharedClaimResponseDocument(responseDocument);
             }
         });
 
@@ -246,7 +246,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             updateApplicants(caseData, statementOfTruth, callbackParams);
 
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
-            caseData.setUiStatementOfTruth(StatementOfTruth.builder().build());
+            caseData.setUiStatementOfTruth(new StatementOfTruth());
         }
 
         assembleResponseDocuments(caseData);
@@ -273,11 +273,11 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         caseData.setRespondentSharedClaimResponseDocument(null);
         if (caseData.getApplicant1DQ() != null
             && caseData.getApplicant1DQ() != null) {
-            caseData.setApplicant1DQ(caseData.getApplicant1DQ().toBuilder().applicant1DQDraftDirections(null).build());
+            caseData.getApplicant1DQ().setApplicant1DQDraftDirections(null);
         }
         if (caseData.getApplicant2DQ() != null
             && caseData.getApplicant2DQ() != null) {
-            caseData.setApplicant2DQ(caseData.getApplicant2DQ().toBuilder().applicant2DQDraftDirections(null).build());
+            caseData.getApplicant2DQ().setApplicant2DQDraftDirections(null);
         }
 
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
@@ -304,29 +304,23 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                                   CallbackParams callbackParams) {
         if (caseData.getApplicant1DQ() != null
             && caseData.getApplicant1DQ().getApplicant1DQFileDirectionsQuestionnaire() != null) {
-            Applicant1DQ.Applicant1DQBuilder applicant1DQBuilder = caseData.getApplicant1DQ().toBuilder();
-            applicant1DQBuilder.applicant1DQStatementOfTruth(statementOfTruth);
+            Applicant1DQ applicant1DQ = caseData.getApplicant1DQ();
+            applicant1DQ.setApplicant1DQStatementOfTruth(statementOfTruth);
 
             String responseCourtCode = locationRefDataUtil.getPreferredCourtData(
                 caseData,
                 callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(), true
             );
-            applicant1DQBuilder.applicant1DQRequestedCourt(
-                RequestedCourt.builder()
-                    .caseLocation(caseData.getCourtLocation().getCaseLocation())
-                    .responseCourtCode(responseCourtCode)
-                    .build());
-
-            caseData.setApplicant1DQ(applicant1DQBuilder.build());
+            RequestedCourt requestedCourt = new RequestedCourt();
+            requestedCourt.setCaseLocation(caseData.getCourtLocation().getCaseLocation());
+            requestedCourt.setResponseCourtCode(responseCourtCode);
+            applicant1DQ.setApplicant1DQRequestedCourt(requestedCourt);
         }
 
         if (caseData.getApplicant2DQ() != null
             && caseData.getApplicant2DQ().getApplicant2DQFileDirectionsQuestionnaire() != null) {
-            Applicant2DQ dq = caseData.getApplicant2DQ().toBuilder()
-                .applicant2DQStatementOfTruth(statementOfTruth)
-                .build();
-
-            caseData.setApplicant2DQ(dq);
+            Applicant2DQ applicant2DQ = caseData.getApplicant2DQ();
+            applicant2DQ.setApplicant2DQStatementOfTruth(statementOfTruth);
         }
     }
 

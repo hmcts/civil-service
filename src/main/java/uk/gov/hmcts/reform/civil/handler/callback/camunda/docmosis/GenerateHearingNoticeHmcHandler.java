@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.hearing.HearingNoticeHmcGenerator;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
+import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.HearingFeeUtils;
@@ -81,7 +82,6 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
 
     private CallbackResponse generateHearingNotice(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String processInstanceId = caseData.getBusinessProcess().getProcessInstanceId();
         String bearerToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
@@ -92,49 +92,51 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
         );
 
         var hearingStartDay = HmcDataUtils.getHearingStartDay(hearing);
-        var hearingStartDate = convertFromUTC(hearingStartDay.getHearingStartDateTime());
         String hearingLocation = getHearingLocation(camundaVars.getHearingId(), hearing,
                                                     bearerToken, locationRefDataService, false);
 
-        buildDocument(callbackParams, caseDataBuilder, hearing, hearingLocation, camundaVars.getHearingId(), HEARING_NOTICE_HMC);
+        buildDocument(callbackParams, hearing, hearingLocation, camundaVars.getHearingId(), HEARING_NOTICE_HMC);
 
         // Check DQ document language if Welsh not enabled, only check main language flag if enabled
         if ((!featureToggleService.isWelshEnabledForMainCase() && isWelshHearingTemplate(caseData))
                 || (featureToggleService.isWelshEnabledForMainCase() && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()))) {
             String hearingLocationWelsh = getHearingLocation(camundaVars.getHearingId(), hearing,
                                                         bearerToken, locationRefDataService, true);
-            buildDocument(callbackParams, caseDataBuilder, hearing, hearingLocationWelsh, camundaVars.getHearingId(), HEARING_NOTICE_HMC_WELSH);
+            buildDocument(callbackParams, hearing, hearingLocationWelsh, camundaVars.getHearingId(), HEARING_NOTICE_HMC_WELSH);
         }
 
-        camundaService.setProcessVariables(
-            processInstanceId,
-            camundaVars.toBuilder()
-                .hearingStartDateTime(hearingStartDate)
-                .hearingLocationEpims(hearingStartDay.getHearingVenueId())
-                .days(getHearingDays(hearing))
-                .requestVersion(hearing.getRequestDetails().getVersionNumber())
-                .caseState(caseData.getCcdState().name())
-                .responseDateTime(hearing.getHearingResponse().getReceivedDateTime())
-                .hearingType(hearing.getHearingDetails().getHearingType())
-                .build()
-        );
+        var hearingStartDate = convertFromUTC(hearingStartDay.getHearingStartDateTime());
+        HearingNoticeVariables updatedVars = new HearingNoticeVariables();
+        updatedVars.setHearingId(camundaVars.getHearingId());
+        updatedVars.setCaseId(camundaVars.getCaseId());
+        updatedVars.setHearingStartDateTime(hearingStartDate);
+        updatedVars.setHearingLocationEpims(hearingStartDay.getHearingVenueId());
+        updatedVars.setDays(getHearingDays(hearing));
+        updatedVars.setRequestVersion(hearing.getRequestDetails().getVersionNumber());
+        updatedVars.setCaseState(caseData.getCcdState().name());
+        updatedVars.setResponseDateTime(hearing.getHearingResponse().getReceivedDateTime());
+        updatedVars.setHearingType(hearing.getHearingDetails().getHearingType());
 
-        String claimTrack = determineClaimTrack(caseData);
+        camundaService.setProcessVariables(processInstanceId, updatedVars);
+
         Integer totalDurationInMinutes = getTotalHearingDurationInMinutes(hearing);
-        caseDataBuilder.hearingDurationInMinutesAHN(totalDurationInMinutes.toString()).trialReadyNotified(null);
+        caseData.setHearingDurationInMinutesAHN(totalDurationInMinutes.toString());
+        caseData.setTrialReadyNotified(null);
+        caseData.setHearingDate(hearingStartDate.toLocalDate());
+        caseData.setHearingDueDate(HearingFeeUtils.calculateHearingDueDate(LocalDate.now(), hearingStartDate.toLocalDate()));
+        DynamicListElement dynamicListElement = new DynamicListElement();
+        dynamicListElement.setLabel(hearingLocation);
+        DynamicList dynamicList = new DynamicList();
+        dynamicList.setValue(dynamicListElement);
+        caseData.setHearingLocation(dynamicList);
+        String claimTrack = determineClaimTrack(caseData);
+        caseData.setHearingFee(calculateAndApplyFee(hearingFeesService, caseData, claimTrack));
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseDataBuilder
-                        .hearingDate(hearingStartDate.toLocalDate())
-                        .hearingDueDate(HearingFeeUtils.calculateHearingDueDate(LocalDate.now(), hearingStartDate.toLocalDate()))
-                        .hearingLocation(DynamicList.builder().value(DynamicListElement.builder()
-                                .label(hearingLocation)
-                                .build()).build())
-                        .hearingFee(calculateAndApplyFee(hearingFeesService, caseData, claimTrack))
-                        .build().toMap(objectMapper))
+                .data(caseData.toMap(objectMapper))
                 .build();
     }
 
-    private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder, HearingGetResponse hearing,
+    private void buildDocument(CallbackParams callbackParams, HearingGetResponse hearing,
                                String hearingLocation, String hearingId, DocmosisTemplates template) {
         CaseData caseData = callbackParams.getCaseData();
         List<CaseDocument> caseDocuments = hearingNoticeHmcGenerator.generate(
@@ -151,12 +153,12 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
             if (!isEmpty(caseData.getHearingDocumentsWelsh())) {
                 systemGeneratedCaseDocuments.addAll(caseData.getHearingDocumentsWelsh());
             }
-            caseDataBuilder.hearingDocumentsWelsh(systemGeneratedCaseDocuments);
+            caseData.setHearingDocumentsWelsh(systemGeneratedCaseDocuments);
         } else {
             if (!isEmpty(caseData.getHearingDocuments())) {
                 systemGeneratedCaseDocuments.addAll(caseData.getHearingDocuments());
             }
-            caseDataBuilder.hearingDocuments(systemGeneratedCaseDocuments);
+            caseData.setHearingDocuments(systemGeneratedCaseDocuments);
         }
     }
 

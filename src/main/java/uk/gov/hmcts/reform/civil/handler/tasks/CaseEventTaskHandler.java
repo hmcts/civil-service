@@ -76,7 +76,7 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
                 startEventData
             );
             var data = coreCaseDataService.submitUpdate(caseId, caseDataContent);
-            return ExternalTaskData.builder().caseData(data).build();
+            return new ExternalTaskData().setCaseData(data);
         } catch (ValueMapperException | IllegalArgumentException e) {
             throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
         }

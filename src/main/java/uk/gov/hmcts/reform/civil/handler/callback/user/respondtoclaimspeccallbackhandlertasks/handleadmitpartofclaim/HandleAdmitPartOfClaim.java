@@ -42,9 +42,7 @@ public class HandleAdmitPartOfClaim implements CaseTask {
 
         List<String> errors = validatePaymentDate(caseData);
 
-        if (featureToggleService.isLrAdmissionBulkEnabled()) {
-            validateAdmittedClaimOwingAmount(errors, caseData);
-        }
+        validateAdmittedClaimOwingAmount(errors, caseData);
 
         if (!errors.isEmpty()) {
             return buildErrorResponse(errors);
@@ -53,27 +51,25 @@ public class HandleAdmitPartOfClaim implements CaseTask {
         if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
                 && featureToggleService.isDefendantNoCOnlineForCase(caseData) && YES.equals(caseData.getIsRespondent1())
                 && caseData.getSpecDefenceFullAdmittedRequired() == null) {
-            caseData = caseData.toBuilder().specDefenceFullAdmittedRequired(NO).build();
+            caseData.setSpecDefenceFullAdmittedRequired(NO);
         }
 
         if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
                 && featureToggleService.isDefendantNoCOnlineForCase(caseData) && YES.equals(caseData.getIsRespondent2())
                 && caseData.getSpecDefenceFullAdmitted2Required() == null) {
-            caseData = caseData.toBuilder().specDefenceFullAdmitted2Required(NO).build();
+            caseData.setSpecDefenceFullAdmitted2Required(NO);
         }
 
-        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
-        CaseData finalCaseData = caseData;
-        handleAdmitPartOfClaimCaseUpdaters.forEach(updater -> updater.update(finalCaseData, updatedCaseData));
-        updateResponseClaimTrack(callbackParams, caseData, updatedCaseData);
+        handleAdmitPartOfClaimCaseUpdaters.forEach(updater -> updater.update(caseData));
+        updateResponseClaimTrack(callbackParams, caseData);
 
-        return buildSuccessResponse(updatedCaseData);
+        return buildSuccessResponse(caseData);
     }
 
     private List<String> validatePaymentDate(CaseData caseData) {
         log.info("Validating payment date for caseId: {}", caseData.getCcdCaseReference());
         return paymentDateValidator.validate(Optional.ofNullable(caseData.getRespondToAdmittedClaim())
-                .orElseGet(() -> RespondToClaim.builder().build()));
+                .orElseGet(() -> new RespondToClaim()));
     }
 
     private CallbackResponse buildErrorResponse(List<String> errors) {
@@ -82,18 +78,18 @@ public class HandleAdmitPartOfClaim implements CaseTask {
                 .build();
     }
 
-    private void updateResponseClaimTrack(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+    private void updateResponseClaimTrack(CallbackParams callbackParams, CaseData caseData) {
         log.info("Updating response claim track for caseId: {}", caseData.getCcdCaseReference());
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
             AllocatedTrack allocatedTrack = getAllocatedTrack(caseData);
-            updatedCaseData.responseClaimTrack(allocatedTrack.name());
+            caseData.setResponseClaimTrack(allocatedTrack.name());
         }
     }
 
-    private CallbackResponse buildSuccessResponse(CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+    private CallbackResponse buildSuccessResponse(CaseData updatedCaseData) {
         log.info("Successfully updated case data for HandleAdmitPartOfClaim");
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedCaseData.build().toMap(objectMapper))
+                .data(updatedCaseData.toMap(objectMapper))
                 .build();
     }
 

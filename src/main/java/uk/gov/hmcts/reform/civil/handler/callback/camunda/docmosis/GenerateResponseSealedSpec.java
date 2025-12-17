@@ -86,7 +86,6 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
             assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, DocCategory.DEF2_DEFENSE_DQ.getValue());
             assignCategoryId.assignCategoryIdToCaseDocument(copy, DocCategory.DQ_DEF2.getValue());
         }
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         if (stitchEnabled) {
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
             log.info("Calling civil stitch service for generate response sealed form for caseId {}", caseId);
@@ -104,17 +103,17 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
                 assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.DEF2_DEFENSE_DQ.getValue());
                 assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocumentCopy, DocCategory.DQ_DEF2.getValue());
             }
-            isLipWelshApplicant(caseData, builder, stitchedDocument, stitchedDocumentCopy);
+            isLipWelshApplicant(caseData, stitchedDocument, stitchedDocumentCopy);
         } else {
-            isLipWelshApplicant(caseData, builder, sealedForm, copy);
+            isLipWelshApplicant(caseData, sealedForm, copy);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
-    private void isLipWelshApplicant(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder,
+    private void isLipWelshApplicant(CaseData caseData,
                                      CaseDocument sealedForm,
                                      CaseDocument copy) {
         if (featureToggleService.isWelshEnabledForMainCase() && caseData.isLipvLROneVOne()
@@ -123,9 +122,9 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
             List<Element<CaseDocument>> preTranslationDocs =
                 Optional.ofNullable(caseData.getPreTranslationDocuments()).orElseGet(ArrayList::new);
             preTranslationDocs.add(ElementUtils.element(sealedForm));
-            builder.preTranslationDocuments(preTranslationDocs);
-            builder.bilingualHint(YesOrNo.YES);
-            builder.preTranslationDocumentType(PreTranslationDocumentType.DEFENDANT_SEALED_CLAIM_FORM_FOR_LIP_VS_LR);
+            caseData.setPreTranslationDocuments(preTranslationDocs);
+            caseData.setBilingualHint(YesOrNo.YES);
+            caseData.setPreTranslationDocumentType(PreTranslationDocumentType.DEFENDANT_SEALED_CLAIM_FORM_FOR_LIP_VS_LR);
         } else {
             caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(sealedForm));
             if (Objects.nonNull(copy)) {

@@ -58,8 +58,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     private GenAppStateHelperService helperService;
     @Mock
     private FeatureToggleService featureToggleService;
-    private static final String authToken = "Bearer TestAuthToken";
-
     private ObjectMapper mapper;
 
     @Nested
@@ -77,7 +75,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
         @Test
         void shouldTriggerGeneralApplicationEvent_whenCaseHasGeneralApplication() {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseData.builder().build(),
+                .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),
                                             true,
                                             true,
                                             true, true,
@@ -103,7 +101,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
         @Test
         void shouldTriggerGeneralApplicationEvent_whenCaseHasGeneralApplicationNotRepresented() {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithLocationDetailsLip(CaseData.builder().build(),
+                .getTestCaseDataWithLocationDetailsLip(CaseDataBuilder.builder().build(),
                                             true,
                                             true,
                                             true, true,
@@ -129,7 +127,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
         @Test
         void shouldTriggerGeneralApplicationEvent_whenCaseHasGeneralApplicationNotRepresentedAndNotInEa() {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithLocationDetailsLip(CaseData.builder().build(),
+                .getTestCaseDataWithLocationDetailsLip(CaseDataBuilder.builder().build(),
                                                        true,
                                                        true,
                                                        true, true,
@@ -155,7 +153,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
         @Test
         void shouldTriggerGeneralApplicationEvent_whenCaseHasGeneralApplicationRepresentedAndNotInEa() {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseData.builder().build(),
+                .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),
                                                        true,
                                                        true,
                                                        true, true,
@@ -186,12 +184,10 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
                     .generalAppType(GAApplicationType.builder().types(singletonList(SUMMARY_JUDGEMENT)).build())
                     .build());
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
-                .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES).build())
-                .respondent1Represented(YesOrNo.NO).build().toBuilder()
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("000000")
-                                                                   .region("2").build())
-                .generalApplications(gaApplications)
-                .build();
+                .caseDataLip(new CaseDataLiP().setApplicant1SettleClaim(YesOrNo.YES))
+                .respondent1Represented(YesOrNo.NO).build();
+            caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("000000").setRegion("2"))
+                .setGeneralApplications(gaApplications);
             when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
             when(featureToggleService.isCuiGaNroEnabled()).thenReturn(false);
             when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
@@ -220,12 +216,10 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
                     .generalAppType(GAApplicationType.builder().types(singletonList(SUMMARY_JUDGEMENT)).build())
                     .build());
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
-                .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES).build())
-                .respondent1Represented(YesOrNo.NO).build().toBuilder()
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("000000")
-                                            .region("2").build())
-                .generalApplications(gaApplications)
-                .build();
+                .caseDataLip(new CaseDataLiP().setApplicant1SettleClaim(YesOrNo.YES))
+                .respondent1Represented(YesOrNo.NO).build();
+            caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("000000").setRegion("2"))
+                .setGeneralApplications(gaApplications);
             when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
             when(featureToggleService.isCuiGaNroEnabled()).thenReturn(true);
             when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
@@ -287,8 +281,10 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
         @Test
         void triggerGeneralApplicationEventThrowsException_HandleFailure() {
+            CaseData baseCaseData = CaseDataBuilder.builder().build();
+            baseCaseData.setCcdCaseReference(1234L);
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseData.builder().ccdCaseReference(1234L).build(),
+                .getTestCaseDataWithDetails(baseCaseData,
                                             true,
                                             true,
                                             true, true,
@@ -308,7 +304,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
         @Test
         void shouldTriggerReconfigureWhenCallbackEventIsReconfigGA() {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseData.builder().build(),
+                .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),
                                             true,
                                             true,
                                             true, true,

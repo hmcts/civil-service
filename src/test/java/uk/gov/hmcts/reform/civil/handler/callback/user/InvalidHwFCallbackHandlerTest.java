@@ -38,10 +38,10 @@ public class InvalidHwFCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldHandleInvalidRefNumberSuccessfully_FeeType_ClaimIssued() {
             //Given
-            CaseData caseData = CaseData.builder()
-                .claimIssuedHwfDetails(HelpWithFeesDetails.builder().build())
-                .hwfFeeType(FeeType.CLAIMISSUED)
-                .build();
+            HelpWithFeesDetails claimIssuedHwfDetails = new HelpWithFeesDetails();
+            CaseData caseData = CaseData.builder().build();
+            caseData.setClaimIssuedHwfDetails(claimIssuedHwfDetails);
+            caseData.setHwfFeeType(FeeType.CLAIMISSUED);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
@@ -55,9 +55,8 @@ public class InvalidHwFCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldHandleInvalidRefNumberSuccessfully_FeeType_Hearing() {
             //Given
-            CaseData caseData = CaseData.builder()
-                .hwfFeeType(FeeType.HEARING)
-                .build();
+            CaseData caseData = CaseData.builder().build();
+            caseData.setHwfFeeType(FeeType.HEARING);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
