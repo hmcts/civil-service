@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -92,6 +93,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Accessors(chain = true)
 @SuperBuilder(toBuilder = true)
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Data
 public class CaseDataParent extends CaseDataCaseProgression implements MappableObject {

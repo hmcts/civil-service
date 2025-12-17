@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.model;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -107,6 +108,7 @@ import java.util.List;
 
 @Accessors(chain = true)
 @SuperBuilder(toBuilder = true)
+@NoArgsConstructor
 @Data
 public class CaseDataCaseSdo implements MappableObject {
 
