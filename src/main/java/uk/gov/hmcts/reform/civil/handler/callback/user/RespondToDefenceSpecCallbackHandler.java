@@ -90,8 +90,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates)
             .put(callbackKey(MID, "set-applicant1-proceed-flag"), this::setApplicant1ProceedFlag)
             .put(callbackKey(MID, "validate-mediation-unavailable-dates"), this::validateMediationUnavailableDates)
-            .put(callbackKey(MID, "set-applicant1-defence-response-doc-category"),
-                 this::setApplicant1DefenceResponseDocumentSpecCategoryId)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit)
             .put(callbackKey(ABOUT_TO_START), this::populateCaseData)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
@@ -344,22 +342,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
 
         caseData.setCcjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(objectMapper))
-            .build();
-    }
-
-    private CallbackResponse setApplicant1DefenceResponseDocumentSpecCategoryId(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-
-        if (caseData.getApplicant1DefenceResponseDocumentSpec() != null
-            && caseData.getApplicant1DefenceResponseDocumentSpec().getFile() != null) {
-
-            caseData.getApplicant1DefenceResponseDocumentSpec()
-                .getFile()
-                .setCategoryID("directionsQuestionnaire");
-        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))

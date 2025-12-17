@@ -124,6 +124,8 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         caseData.setClaimantResponseDocuments(
             dqResponseDocumentUtils.buildClaimantResponseDocuments(caseData));
 
+        setApplicant1DefenceResponseDocumentCategory(caseData);
+
         clearTempDocuments(caseData);
 
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
@@ -389,4 +391,13 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             || AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack());
     }
 
+    private void setApplicant1DefenceResponseDocumentCategory(CaseData caseData) {
+        if (caseData.getApplicant1DefenceResponseDocumentSpec() != null
+            && caseData.getApplicant1DefenceResponseDocumentSpec().getFile() != null) {
+
+            caseData.getApplicant1DefenceResponseDocumentSpec()
+                .getFile()
+                .setCategoryID("directionsQuestionnaire");
+        }
+    }
 }
