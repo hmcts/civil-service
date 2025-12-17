@@ -61,7 +61,8 @@ public class NoRemissionHWFCallbackHandler extends CallbackHandler {
         if (caseData.isHWFTypeClaimIssued()) {
             HelpWithFeesDetails claimIssuedHwfDetails =
                 Optional.ofNullable(caseData.getClaimIssuedHwfDetails()).orElse(new HelpWithFeesDetails());
-            caseData.setClaimIssuedHwfDetails(claimIssuedHwfDetails.toBuilder().hwfCaseEvent(NO_REMISSION_HWF).build());
+            claimIssuedHwfDetails.setHwfCaseEvent(NO_REMISSION_HWF);
+            caseData.setClaimIssuedHwfDetails(claimIssuedHwfDetails);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
