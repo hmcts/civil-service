@@ -136,9 +136,9 @@ public class DashboardNotificationsParamsMapperTest {
 
         LocalDateTime now = LocalDateTime.now();
         List<IdValue<Bundle>> bundles = List.of(
-            new IdValue<>("1", Bundle.builder().createdOn(Optional.of(now.minusDays(1))).build()),
-            new IdValue<>("2", Bundle.builder().createdOn(Optional.of(now)).build()),
-            new IdValue<>("3", Bundle.builder().createdOn(Optional.of(now.minusDays(2))).build())
+            new IdValue<>("1", new Bundle().setCreatedOn(Optional.of(now.minusDays(1)))),
+            new IdValue<>("2", new Bundle().setCreatedOn(Optional.of(now))),
+            new IdValue<>("3", new Bundle().setCreatedOn(Optional.of(now.minusDays(2))))
         );
         caseData.setCaseBundles(bundles);
 

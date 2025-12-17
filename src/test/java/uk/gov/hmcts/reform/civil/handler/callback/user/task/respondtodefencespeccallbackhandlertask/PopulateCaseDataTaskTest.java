@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
@@ -77,16 +78,15 @@ class PopulateCaseDataTaskTest {
     @Test
     void shouldUpdateCaseData() {
 
-        CaseData caseData = CaseData.builder()
+        Party party = new Party();
+        party.setType(Party.Type.COMPANY);
+        party.setCompanyName("company name");
+        CaseData caseData = CaseDataBuilder.builder()
             .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .respondent1(Party.builder()
-                             .type(Party.Type.COMPANY)
-                             .companyName("company name")
-                             .build())
-            .respondent2DocumentURL("test-respondent2Doc-url")
-            .totalClaimAmount(BigDecimal.valueOf(1000))
-            .build();
+            .respondent1(party).build();
+        caseData.setRespondent2DocumentURL("test-respondent2Doc-url");
+        caseData.setTotalClaimAmount(BigDecimal.valueOf(1000));
 
         when(featureToggleService.isCarmEnabledForCase(any(CaseData.class))).thenReturn(true);
         when(paymentDateService.getFormattedPaymentDate(any())).thenReturn(LocalDate.EPOCH.toString());
@@ -107,15 +107,14 @@ class PopulateCaseDataTaskTest {
 
     @Test
     void shouldUpdatedCaseDataPartiallyWhenFeatureTogglesAreFalse() {
-        CaseData caseData = CaseData.builder()
+        Party party = new Party();
+        party.setType(Party.Type.COMPANY);
+        party.setCompanyName("company name");
+        CaseData caseData = CaseDataBuilder.builder()
             .applicant1DQ(null)
             .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
-            .respondent1(Party.builder()
-                             .type(Party.Type.COMPANY)
-                             .companyName("company name")
-                             .build())
-            .respondent2DocumentURL("test-respondent2Doc-url")
-            .build();
+            .respondent1(party).build();
+        caseData.setRespondent2DocumentURL("test-respondent2Doc-url");
 
         when(featureToggleService.isCarmEnabledForCase(any(CaseData.class))).thenReturn(false);
 

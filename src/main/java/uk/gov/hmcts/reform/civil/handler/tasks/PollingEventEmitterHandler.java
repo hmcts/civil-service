@@ -50,7 +50,7 @@ public class PollingEventEmitterHandler extends BaseExternalTaskHandler {
                 eventEmitterService.emitBusinessProcessCamundaEvent(mappedCase, true);
                 delayNextExecution(multiCasesExecutionDelayInSeconds);
             });
-        return ExternalTaskData.builder().build();
+        return new ExternalTaskData();
     }
 
     private void delayNextExecution(Long multiCasesExecutionDelayInSeconds) {

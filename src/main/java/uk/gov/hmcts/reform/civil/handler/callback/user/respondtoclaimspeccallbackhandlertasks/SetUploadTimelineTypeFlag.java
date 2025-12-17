@@ -31,7 +31,6 @@ public class SetUploadTimelineTypeFlag implements CaseTask {
         log.info("Executing callback task for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
 
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
         Set<DefendantResponseShowTag> updatedShowConditions = new HashSet<>(caseData.getShowConditionFlags());
 
         removeExistingTimelineFlags(updatedShowConditions);
@@ -44,10 +43,10 @@ public class SetUploadTimelineTypeFlag implements CaseTask {
             log.info("CaseId {}: Timeline manual flag added", caseData.getCcdCaseReference());
         }
 
-        updatedData.showConditionFlags(updatedShowConditions);
+        caseData.setShowConditionFlags(updatedShowConditions);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedData.build().toMap(objectMapper))
+                .data(caseData.toMap(objectMapper))
                 .build();
     }
 

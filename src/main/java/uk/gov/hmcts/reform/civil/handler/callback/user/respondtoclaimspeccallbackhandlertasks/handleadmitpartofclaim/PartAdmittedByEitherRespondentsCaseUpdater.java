@@ -12,14 +12,14 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 public class PartAdmittedByEitherRespondentsCaseUpdater implements HandleAdmitPartOfClaimCaseUpdater {
 
     @Override
-    public void update(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+    public void update(CaseData caseData) {
         log.info("Updating Part Admitted By Either Respondents for caseId: {}", caseData.getCcdCaseReference());
         if (YES.equals(caseData.getIsRespondent2()) && YES.equals(caseData.getSpecDefenceAdmitted2Required())) {
-            updatedCaseData.partAdmittedByEitherRespondents(YES);
+            caseData.setPartAdmittedByEitherRespondents(YES);
         } else if (YES.equals(caseData.getIsRespondent1()) && YES.equals(caseData.getSpecDefenceAdmittedRequired())) {
-            updatedCaseData.partAdmittedByEitherRespondents(YES);
+            caseData.setPartAdmittedByEitherRespondents(YES);
         } else {
-            updatedCaseData.partAdmittedByEitherRespondents(NO);
+            caseData.setPartAdmittedByEitherRespondents(NO);
         }
     }
 }

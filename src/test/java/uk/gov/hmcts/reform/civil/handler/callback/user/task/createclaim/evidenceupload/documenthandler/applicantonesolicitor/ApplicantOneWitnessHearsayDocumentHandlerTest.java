@@ -24,9 +24,9 @@ class ApplicantOneWitnessHearsayDocumentHandlerTest extends BaseDocumentHandlerT
 
     @Test
     void shouldCopyWitnessHearsayDocumentsToLegalRep2() {
-        handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore, builder);
+        handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore);
 
-        assertEquals(2, builder.build().getDocumentHearsayNoticeApp2().size());
+        assertEquals(2, caseData.getDocumentHearsayNoticeApp2().size());
     }
 
     @Test
