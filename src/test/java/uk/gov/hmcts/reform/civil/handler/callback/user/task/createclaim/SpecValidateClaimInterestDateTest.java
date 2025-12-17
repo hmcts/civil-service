@@ -6,8 +6,8 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.SpecValidateClaimInterestDateTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
 
@@ -22,7 +22,7 @@ class SpecValidateClaimInterestDateTest extends BaseCallbackHandlerTest {
     @Test
     void shouldReturnErrorForFutureInterestDate() {
         LocalDate futureDate = LocalDate.now().plusDays(1);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .interestFromSpecificDate(futureDate)
             .build();
 
@@ -35,7 +35,7 @@ class SpecValidateClaimInterestDateTest extends BaseCallbackHandlerTest {
     @Test
     void shouldNotReturnErrorForPastOrTodayInterestDate() {
         LocalDate pastDate = LocalDate.now().minusDays(1);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .interestFromSpecificDate(pastDate)
             .build();
 

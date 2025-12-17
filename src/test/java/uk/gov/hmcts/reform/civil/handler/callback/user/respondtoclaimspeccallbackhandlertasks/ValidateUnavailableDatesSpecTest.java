@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
 import java.util.List;
@@ -39,33 +40,39 @@ class ValidateUnavailableDatesSpecTest {
 
     @BeforeEach
     void setUp() {
-        caseData = CaseData.builder()
-                .respondent1DQ(Respondent1DQ.builder().build())
+        caseData = CaseDataBuilder.builder()
+                .respondent1DQ(new Respondent1DQ())
                 .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
     }
 
     private void setupCaseDataForSmallClaim(SmallClaimHearing smallClaimHearing, boolean isRespondent2) {
-        caseData = CaseData.builder()
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQHearingSmallClaim(isRespondent2 ? null : smallClaimHearing);
+        Respondent2DQ respondent2DQ = new Respondent2DQ();
+        respondent2DQ.setRespondent2DQHearingSmallClaim(smallClaimHearing);
+        caseData = CaseDataBuilder.builder()
                 .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
                 .isRespondent2(isRespondent2 ? YES : NO)
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQHearingSmallClaim(isRespondent2 ? null : smallClaimHearing).build())
-                .respondent2DQ(isRespondent2 ? Respondent2DQ.builder().respondent2DQHearingSmallClaim(smallClaimHearing).build() : null)
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(isRespondent2 ? respondent2DQ : null)
                 .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
     }
 
     private void setupCaseDataForFastClaim(Hearing hearing) {
-        caseData = CaseData.builder()
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQHearingFastClaim(hearing);
+        caseData = CaseDataBuilder.builder()
                 .responseClaimTrack("FAST_CLAIM")
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQHearingFastClaim(hearing).build())
+                .respondent1DQ(respondent1DQ)
                 .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
     }
 
     @Test
     void shouldReturnErrorsForRespondent2SmallClaimHearing() {
-        SmallClaimHearing smallClaimHearing = SmallClaimHearing.builder().build();
+        SmallClaimHearing smallClaimHearing = new SmallClaimHearing();
         setupCaseDataForSmallClaim(smallClaimHearing, true);
         when(unavailableDateValidator.validateSmallClaimsHearing(smallClaimHearing)).thenReturn(List.of("Error"));
 
@@ -76,7 +83,7 @@ class ValidateUnavailableDatesSpecTest {
 
     @Test
     void shouldReturnNoErrorsForRespondent1SmallClaimHearing() {
-        SmallClaimHearing smallClaimHearing = SmallClaimHearing.builder().build();
+        SmallClaimHearing smallClaimHearing = new SmallClaimHearing();
         setupCaseDataForSmallClaim(smallClaimHearing, false);
         when(unavailableDateValidator.validateSmallClaimsHearing(smallClaimHearing)).thenReturn(List.of());
 
@@ -87,7 +94,7 @@ class ValidateUnavailableDatesSpecTest {
 
     @Test
     void shouldReturnErrorsForFastClaimHearing() {
-        Hearing hearing = Hearing.builder().build();
+        Hearing hearing = new Hearing();
         setupCaseDataForFastClaim(hearing);
         when(unavailableDateValidator.validateFastClaimHearing(hearing)).thenReturn(List.of("Error"));
 

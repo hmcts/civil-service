@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -61,34 +62,47 @@ public class ValidateExpertsTaskTest {
         mapper = new ObjectMapper();
         handler = new ValidateExpertsTask(mapper, userService);
         mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
-        party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name").build();
-        dqExpert = Expert.builder().partyID("id").firstName("dq").lastName("dq").build();
-        expectedExpert1 = dqExpert.builder().firstName("First").lastName("Name")
-            .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now())
-            .partyID(PARTY_ID)
-            .build();
-        expectedExpertFlags = PartyFlagStructure.builder()
-            .partyID(PARTY_ID)
-            .firstName("First")
-            .lastName("Name")
-            .build();
-        dqWitness = Witness.builder().firstName("dq").lastName("dq").partyID("id").build();
-        expectedWitness1 = Witness.builder().firstName("First").lastName("Name")
-            .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now())
-            .partyID(PARTY_ID).build();
-        expectedWitnessFlags = PartyFlagStructure.builder()
-            .partyID(PARTY_ID)
-            .firstName("First")
-            .lastName("Name")
-            .build();
+        party = new UpdatePartyDetailsForm();
+        party.setFirstName("First");
+        party.setLastName("Name");
+        dqExpert = new Expert();
+        dqExpert.setPartyID("id");
+        dqExpert.setFirstName("dq");
+        dqExpert.setLastName("dq");
+        expectedExpert1 = new Expert();
+        expectedExpert1.setFirstName("First");
+        expectedExpert1.setLastName("Name");
+        expectedExpert1.setEventAdded("Manage Contact Information Event");
+        expectedExpert1.setDateAdded(LocalDate.now());
+        expectedExpert1.setPartyID(PARTY_ID);
+        expectedExpertFlags = new PartyFlagStructure();
+        expectedExpertFlags.setPartyID(PARTY_ID);
+        expectedExpertFlags.setFirstName("First");
+        expectedExpertFlags.setLastName("Name");
+        dqWitness = new Witness();
+        dqWitness.setFirstName("dq");
+        dqWitness.setLastName("dq");
+        dqWitness.setPartyID("id");
+        expectedWitness1 = new Witness();
+        expectedWitness1.setFirstName("First");
+        expectedWitness1.setLastName("Name");
+        expectedWitness1.setEventAdded("Manage Contact Information Event");
+        expectedWitness1.setDateAdded(LocalDate.now());
+        expectedWitness1.setPartyID(PARTY_ID);
+        expectedWitnessFlags = new PartyFlagStructure();
+        expectedWitnessFlags.setPartyID(PARTY_ID);
+        expectedWitnessFlags.setFirstName("First");
+        expectedWitnessFlags.setLastName("Name");
     }
 
     @Test
     void shouldNotReturnErrorWhenAdminAddsExperts() {
-        CaseData caseData = CaseData.builder()
-            .updateDetailsForm(UpdateDetailsForm.builder()
-                                   .updateExpertsDetailsForm(wrapElements(UpdatePartyDetailsForm.builder().partyId(null).build()))
-                                   .build())
+        UpdatePartyDetailsForm updatePartyDetailsForm = new UpdatePartyDetailsForm();
+        updatePartyDetailsForm.setPartyId(null);
+        UpdateDetailsForm updateDetailsForm = new UpdateDetailsForm();
+        updateDetailsForm.setUpdateExpertsDetailsForm(wrapElements(updatePartyDetailsForm));
+        CaseData caseData = CaseDataBuilder.builder()
+            .updateDetailsForm(updateDetailsForm)
             .build();
         when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
 
@@ -99,10 +113,12 @@ public class ValidateExpertsTaskTest {
 
     @Test
     void shouldNotReturnErrorWhenNonAdminHasValidExperts() {
-        CaseData caseData = CaseData.builder()
-            .updateDetailsForm(UpdateDetailsForm.builder()
-                                   .updateExpertsDetailsForm(wrapElements(UpdatePartyDetailsForm.builder().partyId("123").build()))
-                                   .build())
+        UpdatePartyDetailsForm updatePartyDetailsForm = new UpdatePartyDetailsForm();
+        updatePartyDetailsForm.setPartyId("123");
+        UpdateDetailsForm updateDetailsForm = new UpdateDetailsForm();
+        updateDetailsForm.setUpdateExpertsDetailsForm(wrapElements(updatePartyDetailsForm));
+        CaseData caseData = CaseDataBuilder.builder()
+            .updateDetailsForm(updateDetailsForm)
             .build();
         when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
 
@@ -113,10 +129,12 @@ public class ValidateExpertsTaskTest {
 
     @Test
     void shouldReturnErrorWhenNonAdminAddsExpertsWithoutPartyId() {
-        CaseData caseData = CaseData.builder()
-            .updateDetailsForm(UpdateDetailsForm.builder()
-                                   .updateExpertsDetailsForm(wrapElements(UpdatePartyDetailsForm.builder().partyId(null).build()))
-                                   .build())
+        UpdatePartyDetailsForm updatePartyDetailsForm = new UpdatePartyDetailsForm();
+        updatePartyDetailsForm.setPartyId(null);
+        UpdateDetailsForm updateDetailsForm = new UpdateDetailsForm();
+        updateDetailsForm.setUpdateExpertsDetailsForm(wrapElements(updatePartyDetailsForm));
+        CaseData caseData = CaseDataBuilder.builder()
+            .updateDetailsForm(updateDetailsForm)
             .build();
         when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
 
@@ -127,10 +145,10 @@ public class ValidateExpertsTaskTest {
 
     @Test
     void shouldNotReturnErrorWhenNoExpertsInUpdateDetailsForm() {
-        CaseData caseData = CaseData.builder()
-            .updateDetailsForm(UpdateDetailsForm.builder()
-                                   .updateExpertsDetailsForm(null) // No experts form
-                                   .build())
+        UpdateDetailsForm updateDetailsForm = new UpdateDetailsForm();
+        updateDetailsForm.setUpdateExpertsDetailsForm(null); // No experts form
+        CaseData caseData = CaseDataBuilder.builder()
+            .updateDetailsForm(updateDetailsForm)
             .build();
         when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
 
