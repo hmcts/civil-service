@@ -6,13 +6,13 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LipPredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
 import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.nocSubmittedForLiPDefendant;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SPEC_DEFENDANT_NOC;
 
 @Component
@@ -25,8 +25,10 @@ public class SpecDefendantNocTransitionBuilder extends MidTransitionBuilder {
 
     @Override
     void setUpTransitions(List<Transition> transitions) {
-        this.moveTo(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC, transitions)
-            .onlyWhen(not(isDefendantNoCOnlineForCase).and(LipPredicate.nocSubmittedForLiPDefendant), transitions);
+        this.moveTo(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC, transitions).onlyWhen(
+            not(isDefendantNoCOnlineForCase).and(nocSubmittedForLiPDefendant),
+            transitions
+        );
     }
 
     public final Predicate<CaseData> isDefendantNoCOnlineForCase = featureToggleService::isDefendantNoCOnlineForCase;

@@ -9,12 +9,6 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimPredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimantPredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.DismissedPredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.NotificationPredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ResponsePredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
@@ -25,6 +19,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.awaitingResponsesFullAdmitReceivedSpec;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.awaitingResponsesFullDefenceReceivedSpec;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.claimNotified;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.contactDetailsChange;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.pastClaimNotificationDeadline;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.takenOfflineAfterClaimNotified;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.takenOfflineByStaffAfterClaimIssue;
 
 @ExtendWith(MockitoExtension.class)
 public class ClaimIssuedTransitionBuilderTest {
@@ -66,79 +68,79 @@ public class ClaimIssuedTransitionBuilderTest {
     @Test
     void shouldReturnTrueWhenCaseDataIsAtClaimNotifiedState() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
-        assertTrue(ClaimPredicate.isSpec.negate().and(NotificationPredicate.hasClaimNotifiedToBoth).test(caseData));
+        assertTrue(claimNotified.test(caseData));
     }
 
     @Test
     void shouldReturnFalseWhenCaseDataIsAtDraftState() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-        assertFalse(ClaimPredicate.isSpec.negate().and(NotificationPredicate.hasClaimNotifiedToBoth).test(caseData));
+        assertFalse(claimNotified.test(caseData));
     }
 
     @Test
     void shouldReturnTrueWhenSolicitorOptionsAreNullIn1v1Case() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
-        assertTrue(ClaimPredicate.isSpec.negate().and(NotificationPredicate.hasClaimNotifiedToBoth).test(caseData));
+        assertTrue(claimNotified.test(caseData));
     }
 
     @Test
     void shouldReturnTrueWhenNotifyBothSolicitorsIn1v2Case() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors().build();
-        assertTrue(ClaimPredicate.isSpec.negate().and(NotificationPredicate.hasClaimNotifiedToBoth).test(caseData));
-        assertFalse(TakenOfflinePredicate.afterClaimNotified.test(caseData));
+        assertTrue(claimNotified.test(caseData));
+        assertFalse(takenOfflineAfterClaimNotified.test(caseData));
     }
 
     @Test
     void shouldReturnTrueWhenNotifyOneSolicitorIn1v2Case() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor().build();
-        assertFalse(ClaimPredicate.isSpec.negate().and(NotificationPredicate.hasClaimNotifiedToBoth).test(caseData));
-        assertTrue(TakenOfflinePredicate.afterClaimNotified.test(caseData));
+        assertFalse(claimNotified.test(caseData));
+        assertTrue(takenOfflineAfterClaimNotified.test(caseData));
     }
 
     @Test
     void shouldHandleOfflineWhenNotifyOneSolicitorIn1v2Case() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor().build();
-        assertFalse(ClaimPredicate.isSpec.negate().and(NotificationPredicate.hasClaimNotifiedToBoth).test(caseData));
-        assertTrue(TakenOfflinePredicate.afterClaimNotified.test(caseData));
+        assertFalse(claimNotified.test(caseData));
+        assertTrue(takenOfflineAfterClaimNotified.test(caseData));
     }
 
     @Test
     void shouldReturnTrueWhenCaseDataIsAtStateTakenOfflineAfterClaimIssue() {
         CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaff().build();
-        assertTrue(TakenOfflinePredicate.byStaff.and(ClaimPredicate.afterIssued).test(caseData));
+        assertTrue(takenOfflineByStaffAfterClaimIssue.test(caseData));
     }
 
     @Test
     void shouldReturnTrueWhenCaseDataIsAtStateTakenOfflineAfterClaimIssueSpec() {
         CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaff()
             .setClaimNotificationDate().setClaimTypeToSpecClaim().build();
-        assertTrue(TakenOfflinePredicate.byStaff.and(ClaimPredicate.afterIssued).test(caseData));
+        assertTrue(takenOfflineByStaffAfterClaimIssue.test(caseData));
     }
 
     @Test
     void shouldReturnTrueWhenCaseDataIsAtStateClaimDismissedPastClaimNotificationDeadline() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissedPastClaimNotificationDeadline().build();
-        assertTrue(DismissedPredicate.pastClaimNotificationDeadline.test(caseData));
+        assertTrue(pastClaimNotificationDeadline.test(caseData));
     }
 
     @Test
     void shouldReturnFalseWhenCaseDataIsAtStateAwaitingCaseNotification() {
         CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
-        assertFalse(DismissedPredicate.pastClaimNotificationDeadline.test(caseData));
+        assertFalse(pastClaimNotificationDeadline.test(caseData));
     }
 
     @Test
     void shouldReturnTrueWhenAwaitingResponsesFullDefenceReceivedForRespondent1() {
         CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoDefendantSolicitors()
             .setClaimTypeToSpecClaim().respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE).build();
-        assertTrue(ResponsePredicate.awaitingResponsesFullDefenceReceivedSpec.test(caseData));
+        assertTrue(awaitingResponsesFullDefenceReceivedSpec.test(caseData));
     }
 
     @Test
     void shouldReturnTrueWhenAwaitingResponsesFullDefenceReceivedForRespondent2() {
         CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoDefendantSolicitors()
             .setClaimTypeToSpecClaim().respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE).build();
-        assertTrue(ResponsePredicate.awaitingResponsesFullDefenceReceivedSpec.test(caseData));
+        assertTrue(awaitingResponsesFullDefenceReceivedSpec.test(caseData));
     }
 
     @Test
@@ -146,28 +148,28 @@ public class ClaimIssuedTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoDefendantSolicitors()
             .setClaimTypeToSpecClaim().respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE).build();
-        assertFalse(ResponsePredicate.awaitingResponsesFullDefenceReceivedSpec.test(caseData));
+        assertFalse(awaitingResponsesFullDefenceReceivedSpec.test(caseData));
     }
 
     @Test
     void shouldReturnFalseWhenSingleDefendantFullDefenceReceived() {
         CaseData caseData = CaseDataBuilder.builder().multiPartyClaimOneDefendantSolicitor()
             .setClaimTypeToSpecClaim().build();
-        assertFalse(ResponsePredicate.awaitingResponsesFullDefenceReceivedSpec.test(caseData));
+        assertFalse(awaitingResponsesFullDefenceReceivedSpec.test(caseData));
     }
 
     @Test
     void shouldReturnTrueWhenAwaitingResponsesFullAdmitReceivedForRespondent1() {
         CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoDefendantSolicitors()
             .setClaimTypeToSpecClaim().respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION).build();
-        assertTrue(ResponsePredicate.awaitingResponsesFullAdmitReceivedSpec.test(caseData));
+        assertTrue(awaitingResponsesFullAdmitReceivedSpec.test(caseData));
     }
 
     @Test
     void shouldReturnTrueWhenAwaitingResponsesFullAdmitReceivedForRespondent2() {
         CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoDefendantSolicitors()
             .setClaimTypeToSpecClaim().respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION).build();
-        assertTrue(ResponsePredicate.awaitingResponsesFullAdmitReceivedSpec.test(caseData));
+        assertTrue(awaitingResponsesFullAdmitReceivedSpec.test(caseData));
     }
 
     @Test
@@ -175,42 +177,42 @@ public class ClaimIssuedTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoDefendantSolicitors()
             .setClaimTypeToSpecClaim().respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION).build();
-        assertFalse(ResponsePredicate.awaitingResponsesFullAdmitReceivedSpec.test(caseData));
+        assertFalse(awaitingResponsesFullAdmitReceivedSpec.test(caseData));
     }
 
     @Test
     void shouldReturnFalseWhenSingleDefendantFullAdmitReceived() {
         CaseData caseData = CaseDataBuilder.builder().multiPartyClaimOneDefendantSolicitor()
             .setClaimTypeToSpecClaim().build();
-        assertFalse(ResponsePredicate.awaitingResponsesFullAdmitReceivedSpec.test(caseData));
+        assertFalse(awaitingResponsesFullAdmitReceivedSpec.test(caseData));
     }
 
     @Test
     void shouldReturnTrueWhenAwaitingFirstDefendantNonFullDefenceReceived() {
         CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoDefendantSolicitors()
             .setClaimTypeToSpecClaim().respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION).build();
-        assertTrue(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.test(caseData));
+        assertTrue(awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.test(caseData));
     }
 
     @Test
     void shouldReturnTrueWhenAwaitingSecondDefendantNonFullDefenceReceived() {
         CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoDefendantSolicitors()
             .setClaimTypeToSpecClaim().respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION).build();
-        assertTrue(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.test(caseData));
+        assertTrue(awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.test(caseData));
     }
 
     @Test
     void shouldReturnFalseWhenNoDefendantNonFullDefenceReceived() {
         CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoDefendantSolicitors()
             .setClaimTypeToSpecClaim().build();
-        assertFalse(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.test(caseData));
+        assertFalse(awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.test(caseData));
     }
 
     @Test
     void shouldReturnFalseWhenSingleDefendantNonFullDefenceReceived() {
         CaseData caseData = CaseDataBuilder.builder().multiPartyClaimOneDefendantSolicitor()
             .setClaimTypeToSpecClaim().build();
-        assertFalse(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.test(caseData));
+        assertFalse(awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.test(caseData));
     }
 
     @Test
@@ -219,7 +221,7 @@ public class ClaimIssuedTransitionBuilderTest {
             .atStateClaimIssued()
             .atSpecAoSApplicantCorrespondenceAddressRequired(NO).build();
 
-        assertTrue(ClaimantPredicate.correspondenceAddressNotRequired.test(caseData));
+        assertTrue(contactDetailsChange.test(caseData));
     }
 
     @Test
@@ -227,7 +229,7 @@ public class ClaimIssuedTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued().atSpecAoSApplicantCorrespondenceAddressRequired(YES).build();
 
-        assertFalse(ClaimantPredicate.correspondenceAddressNotRequired.test(caseData));
+        assertFalse(contactDetailsChange.test(caseData));
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {

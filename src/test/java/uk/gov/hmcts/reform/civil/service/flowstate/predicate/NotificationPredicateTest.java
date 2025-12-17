@@ -22,7 +22,55 @@ class NotificationPredicateTest {
     private CaseData caseData;
 
     @Nested
+    class NotifiedTimeExtension {
+
+        @Test
+        void should_return_true_for_notifiedTimeExtension_when_time_extension_granted_and_not_acknowledged() {
+            when(caseData.getRespondent1TimeExtensionDate()).thenReturn(LocalDateTime.now());
+            when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(null);
+            assertTrue(NotificationPredicate.notifiedTimeExtension.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_notifiedTimeExtension_when_no_time_extension_and_not_acknowledged() {
+            when(caseData.getRespondent1TimeExtensionDate()).thenReturn(null);
+            assertFalse(NotificationPredicate.notifiedTimeExtension.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_notifiedTimeExtension_when_time_extension_granted_and_acknowledged() {
+            when(caseData.getRespondent1TimeExtensionDate()).thenReturn(LocalDateTime.now());
+            when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
+            assertFalse(NotificationPredicate.notifiedTimeExtension.test(caseData));
+        }
+    }
+
+    @Nested
     class HasNotifyOptionsBoth {
+
+        @Test
+        void should_return_true_for_notifiedOptionsToBoth_when_notify_options_is_both() {
+            DynamicList dynamicList = DynamicList.builder()
+                .value(DynamicListElement.builder().label("Both").build())
+                .build();
+            when(caseData.getDefendantSolicitorNotifyClaimDetailsOptions()).thenReturn(dynamicList);
+            assertTrue(NotificationPredicate.hasNotifyOptionsBoth.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_notifiedOptionsToBoth_when_notify_options_is_not_both() {
+            DynamicList dynamicList = DynamicList.builder()
+                .value(DynamicListElement.builder().label("Solicitor 1").build())
+                .build();
+            when(caseData.getDefendantSolicitorNotifyClaimDetailsOptions()).thenReturn(dynamicList);
+            assertFalse(NotificationPredicate.hasNotifyOptionsBoth.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_notifiedOptionsToBoth_when_notify_options_is_null() {
+            when(caseData.getDefendantSolicitorNotifyClaimDetailsOptions()).thenReturn(null);
+            assertFalse(NotificationPredicate.hasNotifyOptionsBoth.test(caseData));
+        }
 
         @Test
         void should_return_true_for_hasClaimNotifiedToBoth_when_date_present_and_no_notify_options() {

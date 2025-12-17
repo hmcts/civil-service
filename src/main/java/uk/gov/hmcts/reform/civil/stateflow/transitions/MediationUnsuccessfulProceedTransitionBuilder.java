@@ -5,14 +5,16 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.DismissedPredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.HearingPredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
 
 import static java.util.function.Predicate.not;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedPastHearingFeeDue;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isInHearingReadiness;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterSDO;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaff;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineSDONotDrawn;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_SDO;
@@ -29,21 +31,10 @@ public class MediationUnsuccessfulProceedTransitionBuilder extends MidTransition
 
     @Override
     void setUpTransitions(List<Transition> transitions) {
-        this.moveTo(IN_HEARING_READINESS, transitions)
-            .onlyWhen(HearingPredicate.isInReadiness, transitions)
-
-            .moveTo(CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE, transitions)
-            .onlyWhen(DismissedPredicate.pastHearingFeeDue.and(not(TakenOfflinePredicate.byStaff)), transitions)
-
-            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions)
-            .onlyWhen(TakenOfflinePredicate.byStaff, transitions)
-
-            .moveTo(TAKEN_OFFLINE_AFTER_SDO, transitions)
-            .onlyWhen(TakenOfflinePredicate.byStaff.negate()
-                .and(TakenOfflinePredicate.afterSdo.and(TakenOfflinePredicate.bySystem)), transitions)
-
-            .moveTo(TAKEN_OFFLINE_SDO_NOT_DRAWN, transitions)
-            .onlyWhen(TakenOfflinePredicate.byStaff.negate().and(TakenOfflinePredicate.sdoNotDrawn), transitions);
+        this.moveTo(IN_HEARING_READINESS, transitions).onlyWhen(isInHearingReadiness, transitions)
+            .moveTo(CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE, transitions).onlyWhen(caseDismissedPastHearingFeeDue.and(not(takenOfflineByStaff)), transitions)
+            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaff, transitions)
+            .moveTo(TAKEN_OFFLINE_AFTER_SDO, transitions).onlyWhen(takenOfflineAfterSDO, transitions)
+            .moveTo(TAKEN_OFFLINE_SDO_NOT_DRAWN, transitions).onlyWhen(takenOfflineSDONotDrawn, transitions);
     }
-
 }

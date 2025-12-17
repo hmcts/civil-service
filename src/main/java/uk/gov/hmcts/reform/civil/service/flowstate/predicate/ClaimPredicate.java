@@ -5,8 +5,6 @@ import uk.gov.hmcts.reform.civil.service.flowstate.predicate.annotations.Busines
 
 import java.util.function.Predicate;
 
-import static uk.gov.hmcts.reform.civil.service.flowstate.predicate.util.PredicateUtil.nullSafe;
-
 @SuppressWarnings("java:S1214")
 public non-sealed interface ClaimPredicate extends CaseDataPredicate {
 
@@ -19,42 +17,6 @@ public non-sealed interface ClaimPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Claim",
-        summary = "UNSPEC claim",
-        description = "Case is in the UNSPEC service based on case access category"
-    )
-    Predicate<CaseData> isUnspec = CaseDataPredicate.Claim.isUnspecClaim;
-
-    @BusinessRule(
-        group = "Claim",
-        summary = "Multi claim",
-        description = "Case is Multi Claim track"
-    )
-    Predicate<CaseData> isMulti = CaseDataPredicate.Claim.isMultiClaim;
-
-    @BusinessRule(
-        group = "Claim",
-        summary = "Claim is full defence not paid",
-        description = "Claim is defendant not paid full defence"
-    )
-    Predicate<CaseData> isFullDefenceNotPaid =
-        nullSafe(CaseDataPredicate.Claim.isFullDefenceNotPaid);
-
-    @BusinessRule(
-        group = "Claim",
-        summary = "One V One claim",
-        description = "Case is One V One based on case party scenario"
-    )
-    Predicate<CaseData> isOneVOne = CaseDataPredicate.MultiParty.isOneVOne;
-
-    @BusinessRule(
-        group = "Claim",
-        summary = "Case is Part Admit Settled",
-        description = "Case is Part Admit Settled"
-    )
-    Predicate<CaseData> isPartAdmitSettled = CaseDataPredicate.Claim.isPartAdmitSettled;
-
-    @BusinessRule(
-        group = "Claim",
         summary = "Claim notified",
         description = "Acknowledgement deadline exists - claim notification has been sent (State Flow: claim notified)"
     )
@@ -62,53 +24,17 @@ public non-sealed interface ClaimPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Claim",
+        summary = "Claim submitted",
+        description = "Claim has a submitted date (claim has been submitted)"
+    )
+    Predicate<CaseData> submitted = CaseDataPredicate.Claim.hasSubmittedDate;
+
+    @BusinessRule(
+        group = "Claim",
         summary = "Case change of representation",
         description = "A change of legal representation has been recorded on the case"
     )
     Predicate<CaseData> changeOfRepresentation = CaseDataPredicate.Claim.hasChangeOfRepresentation;
-
-    @BusinessRule(
-        group = "Claim",
-        summary = "Respondent have same legal representative",
-        description = "Same legal representation for both defendants"
-    )
-    Predicate<CaseData> sameRepresentationBoth = CaseDataPredicate.Respondent.isSameLegalRepresentative;
-
-    @BusinessRule(
-        group = "Claim",
-        summary = "Issued - respondent 1 unrepresented",
-        description = "Issue date exists and respondent 1 is marked unrepresented (respondent1Represented = No)"
-    )
-    Predicate<CaseData> issuedRespondent1Unrepresented =
-        CaseDataPredicate.Claim.hasIssueDate.and(CaseDataPredicate.Respondent.isUnrepresentedRespondent1);
-
-    @BusinessRule(
-        group = "Claim",
-        summary = "Issued - respondent 2 unrepresented",
-        description = "Issue date exists and respondent 2 is marked unrepresented (respondent2Represented = No)"
-    )
-    Predicate<CaseData> issuedRespondent2Unrepresented =
-        CaseDataPredicate.Claim.hasIssueDate.and(CaseDataPredicate.Respondent.isUnrepresentedRespondent2);
-
-    @BusinessRule(
-        group = "Claim",
-        summary = "Issued - respondent 1 is represented with unregistered org",
-        description = "Issue date is set where defendant is represented but their organisation is not registered"
-    )
-    Predicate<CaseData> issuedRespondent1OrgNotRegistered =
-        CaseDataPredicate.Claim.hasIssueDate
-            .and(CaseDataPredicate.Respondent.isRepresentedRespondent1)
-            .and(CaseDataPredicate.Respondent.isNotOrgRegisteredRespondent1);
-
-    @BusinessRule(
-        group = "Claim",
-        summary = "Issued - respondent 2 is represented with unregistered org",
-        description = "Issue date is set where defendant is represented but their organisation is not registered"
-    )
-    Predicate<CaseData> issuedRespondent2OrgNotRegistered =
-        CaseDataPredicate.Claim.hasIssueDate
-            .and(CaseDataPredicate.Respondent.isRepresentedRespondent2)
-            .and(CaseDataPredicate.Respondent.isNotOrgRegisteredRespondent2);
 
     @BusinessRule(
         group = "Claim",
@@ -258,47 +184,6 @@ public non-sealed interface ClaimPredicate extends CaseDataPredicate {
                             .and(CaseDataPredicate.Respondent.isUnrepresentedRespondent2)))
                 .and(CaseDataPredicate.Claim.isSpecClaim)
             );
-
-    @BusinessRule(
-        group = "Claim",
-        summary = "Pending claim issue - unregistered defendant(s), none unrepresented",
-        description = "Issue date set; at least one represented defendant has an unregistered org; no defendants are " +
-            "unrepresented; if only defendant 2 is unregistered, defendants must not share the same representative"
-    )
-    Predicate<CaseData> pendingIssuedUnregistered =
-        // - Non-SPEC: issue date set and any unrepresented defendant qualifies.
-        // - SPEC: must be multiparty AND the same unrepresented conditions apply.
-        (issuedRespondent1OrgNotRegistered.and(issuedRespondent1Unrepresented.negate())
-            .and(issuedRespondent2OrgNotRegistered.and(issuedRespondent2Unrepresented.negate())))
-            .or(issuedRespondent1OrgNotRegistered.and(issuedRespondent1Unrepresented.negate())
-                .and(issuedRespondent2OrgNotRegistered.negate().and(issuedRespondent2Unrepresented.negate())))
-            .or(issuedRespondent1OrgNotRegistered.negate().and(issuedRespondent1Unrepresented.negate())
-                .and(issuedRespondent2OrgNotRegistered.and(issuedRespondent2Unrepresented.negate()))
-                .and(sameRepresentationBoth.negate()));
-
-    @BusinessRule(
-        group = "Claim",
-        summary = "Pending claim issue - one unrepresented and the other unregistered",
-        description = "Issue date set; exactly one defendant unrepresented; the other is represented with unregistered organisation"
-    )
-    Predicate<CaseData> pendingIssuedUnrepresentedAndUnregistered =
-        // 1) R1 unregistered & represented AND R2 unregistered & represented
-        // 2) R1 unregistered & represented AND R2 registered & represented
-        // 3) R1 registered & represented AND R2 unregistered & represented AND not same representative
-        issuedRespondent1Unrepresented
-            .and(issuedRespondent2OrgNotRegistered.and(issuedRespondent2Unrepresented.negate()))
-            .or(issuedRespondent1OrgNotRegistered.and(issuedRespondent1Unrepresented.negate())
-                .and(issuedRespondent2Unrepresented));
-
-    @BusinessRule(
-        group = "Claim",
-        summary = "Pending claim issue - 1v1 SPEC, respondent 1 unrepresented",
-        description = "One-vs-one SPEC case where respondent 1 is unrepresented and the case is issued"
-    )
-    Predicate<CaseData> pendingIssuedUnrepresentedOneVOneSpec =
-        // - R1 unrepresented AND R2 represented with unregistered org
-        // - OR R1 represented with unregistered org AND R2 unrepresented
-        isOneVOne.and(issuedRespondent1Unrepresented).and(isSpec);
 
     @BusinessRule(
         group = "Claim",

@@ -52,4 +52,19 @@ class OutOfTimePredicateTest {
         }
     }
 
+    @Nested
+    class ProcessedByCamunda {
+
+        @Test
+        void should_return_true_for_processedByCamunda_when_taken_offline_date_exists() {
+            when(caseData.getTakenOfflineDate()).thenReturn(LocalDateTime.now());
+            assertTrue(OutOfTimePredicate.processedByCamunda.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_processedByCamunda_when_taken_offline_date_does_not_exist() {
+            when(caseData.getTakenOfflineDate()).thenReturn(null);
+            assertFalse(OutOfTimePredicate.processedByCamunda.test(caseData));
+        }
+    }
 }

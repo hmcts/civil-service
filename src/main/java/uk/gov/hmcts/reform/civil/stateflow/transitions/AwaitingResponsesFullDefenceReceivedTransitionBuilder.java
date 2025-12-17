@@ -5,13 +5,14 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.DismissedPredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ResponsePredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
 
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allResponsesReceived;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pastClaimDetailsNotificationDeadline;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimDetailsNotified;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED;
@@ -27,17 +28,11 @@ public class AwaitingResponsesFullDefenceReceivedTransitionBuilder extends MidTr
 
     @Override
     void setUpTransitions(List<Transition> transitions) {
-        this.moveTo(ALL_RESPONSES_RECEIVED, transitions)
-            .onlyWhen(ResponsePredicate.allResponsesReceived, transitions)
-
-            .moveTo(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED, transitions)
-            .onlyWhen(TakenOfflinePredicate.afterClaimDetailsNotified, transitions)
-
-            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions)
-            .onlyWhen(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.afterClaimNotifiedFutureDeadline), transitions)
-
+        this.moveTo(ALL_RESPONSES_RECEIVED, transitions).onlyWhen(allResponsesReceived, transitions)
+            .moveTo(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED, transitions).onlyWhen(takenOfflineAfterClaimDetailsNotified, transitions)
+            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaffAfterClaimNotified, transitions)
             .moveTo(PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA, transitions)
-            .onlyWhen(DismissedPredicate.pastClaimDetailsNotificationDeadline, transitions);
+            .onlyWhen(pastClaimDetailsNotificationDeadline, transitions);
     }
 
 }

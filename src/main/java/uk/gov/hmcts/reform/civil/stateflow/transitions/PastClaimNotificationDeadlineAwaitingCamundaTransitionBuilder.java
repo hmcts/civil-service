@@ -5,11 +5,11 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.DismissedPredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
 
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDismissedByCamunda;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE;
 
 @Component
@@ -22,7 +22,6 @@ public class PastClaimNotificationDeadlineAwaitingCamundaTransitionBuilder exten
 
     @Override
     void setUpTransitions(List<Transition> transitions) {
-        this.moveTo(CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE, transitions)
-            .onlyWhen(DismissedPredicate.byCamunda, transitions);
+        this.moveTo(CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE, transitions).onlyWhen(claimDismissedByCamunda, transitions);
     }
 }

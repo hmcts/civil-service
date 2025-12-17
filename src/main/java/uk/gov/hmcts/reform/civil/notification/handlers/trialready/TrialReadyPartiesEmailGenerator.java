@@ -4,10 +4,10 @@ import lombok.AllArgsConstructor;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
 import uk.gov.hmcts.reform.civil.notification.handlers.PartiesEmailGenerator;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimPredicate;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.DraftTransitionBuilder.claimSubmittedRespondent2Unrepresented;
 
 @AllArgsConstructor
 public abstract class TrialReadyPartiesEmailGenerator implements PartiesEmailGenerator {
@@ -38,7 +38,7 @@ public abstract class TrialReadyPartiesEmailGenerator implements PartiesEmailGen
     }
 
     protected EmailDTO getRespondentTwo(CaseData caseData, String taskId) {
-        boolean isTwoLipDefendants = ClaimPredicate.submittedRespondent2Unrepresented.test(caseData);
+        boolean isTwoLipDefendants = claimSubmittedRespondent2Unrepresented.test(caseData);
         if (caseData.getTrialReadyRespondent2() != null || !(isOneVTwoTwoLegalRep(caseData) || isTwoLipDefendants)) {
             return null;
         }

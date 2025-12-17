@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimPredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.time.LocalDate;
@@ -21,6 +20,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedPaymentSuccessfulTransitionBuilder.multipartyCase;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedPaymentSuccessfulTransitionBuilder.oneVsOneCase;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedPaymentSuccessfulTransitionBuilder.pendingClaimIssued;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedPaymentSuccessfulTransitionBuilder.respondent1NotRepresented;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedPaymentSuccessfulTransitionBuilder.respondent1OrgNotRegistered;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedPaymentSuccessfulTransitionBuilder.respondent2NotRepresented;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedPaymentSuccessfulTransitionBuilder.respondent2OrgNotRegistered;
 
 @ExtendWith(MockitoExtension.class)
 public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
@@ -52,56 +58,80 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
     @Test
     void shouldReturnTrue_whenRespondent1IsNotRepresented() {
         CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnrepresentedDefendant().build();
-        assertTrue(ClaimPredicate.issuedRespondent1Unrepresented.test(caseData));
+        assertTrue(respondent1NotRepresented.test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenRespondent1IsRepresentedAndAtPendingClaimIssuedState() {
         CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
-        assertFalse(ClaimPredicate.issuedRespondent1Unrepresented.test(caseData));
+        assertFalse(respondent1NotRepresented.test(caseData));
     }
 
     @Test
     void shouldReturnTrue_whenRespondent1IsNotRegistered() {
         CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnregisteredDefendant().build();
-        assertTrue(ClaimPredicate.issuedRespondent1OrgNotRegistered.test(caseData));
+        assertTrue(respondent1OrgNotRegistered.test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenRespondent1IsRegisteredAndAtPendingClaimIssuedState() {
         CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
-        assertFalse(ClaimPredicate.issuedRespondent1OrgNotRegistered.test(caseData));
+        assertFalse(respondent1OrgNotRegistered.test(caseData));
     }
 
     @Test
     void shouldReturnTrue_whenRespondent2IsNotRepresented() {
         CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnrepresentedDefendant().build();
-        assertTrue(ClaimPredicate.issuedRespondent2Unrepresented.test(caseData));
+        assertTrue(respondent2NotRepresented.test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenRespondent2IsRepresentedAndAtPendingClaimIssuedState() {
         CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
-        assertFalse(ClaimPredicate.issuedRespondent2Unrepresented.test(caseData));
+        assertFalse(respondent2NotRepresented.test(caseData));
     }
 
     @Test
     void shouldReturnTrue_whenRespondent2IsNotRegistered() {
         CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnregisteredDefendant().build();
-        assertTrue(ClaimPredicate.issuedRespondent1OrgNotRegistered.test(caseData));
+        assertTrue(respondent1OrgNotRegistered.test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenRespondent2IsRegisteredAndAtPendingClaimIssuedState() {
         CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
-        assertFalse(ClaimPredicate.issuedRespondent2OrgNotRegistered.test(caseData));
+        assertFalse(respondent2OrgNotRegistered.test(caseData));
     }
 
     @Test
     void shouldReturnTrue_forOneVsOneCase() {
         CaseData caseData = CaseDataBuilder.builder()
             .setClaimTypeToSpecClaim().build().toBuilder().build();
-        assertTrue(ClaimPredicate.isOneVOne.test(caseData));
+        assertTrue(oneVsOneCase.test(caseData));
+    }
+
+    @Test
+    void shouldReturnTrue_forMultipartyCaseOneVTwoWithTwoReps() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .multiPartyClaimTwoDefendantSolicitors()
+            .setClaimTypeToSpecClaim().build().toBuilder().build();
+        assertTrue(multipartyCase.test(caseData));
+    }
+
+    @Test
+    void shouldReturnTrue_forMultipartyCaseOneVTwoWithOneRep() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .multiPartyClaimOneDefendantSolicitor()
+            .setClaimTypeToSpecClaim().build().toBuilder().build();
+        assertTrue(multipartyCase.test(caseData));
+    }
+
+    @Test
+    void shouldReturnTrue_forMultipartyCaseWithTwoApplicants() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .multiPartyClaimTwoApplicants()
+            .setClaimTypeToSpecClaim().build().toBuilder().build();
+        assertTrue(multipartyCase.test(caseData));
     }
 
     @Test
@@ -115,8 +145,17 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
             .respondent2SameLegalRepresentative(YES)
             .build();
 
-        assertTrue(ClaimPredicate.pendingIssued.test(caseData));
-        assertFalse(ClaimPredicate.pendingIssuedUnregistered.test(caseData));
+        assertTrue(pendingClaimIssued.test(caseData));
+        assertFalse(
+            ((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
+                .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
+                .or((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
+                        .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate())))
+                .or((respondent1OrgNotRegistered.negate()
+                    .and(respondent1NotRepresented.negate()))
+                        .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
+                .and(ClaimIssuedPaymentSuccessfulTransitionBuilder
+                         .bothDefSameLegalRep.negate()).test(caseData));
     }
 
     @Test
@@ -131,8 +170,16 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
             .respondent2OrgRegistered(YES)
             .build();
 
-        assertTrue(ClaimPredicate.pendingIssued.test(caseData));
-        assertFalse(ClaimPredicate.pendingIssuedUnregistered.test(caseData));
+        assertTrue(pendingClaimIssued.test(caseData));
+        assertFalse(
+            ((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
+                .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
+                .or((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
+                        .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate())))
+                .or((respondent1OrgNotRegistered.negate().and(respondent1NotRepresented.negate()))
+                        .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
+                .and(ClaimIssuedPaymentSuccessfulTransitionBuilder
+                         .bothDefSameLegalRep.negate()).test(caseData));
     }
 
     @Test
@@ -143,20 +190,29 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
             .respondent1OrgRegistered(YES)
             .build();
 
-        assertTrue(ClaimPredicate.pendingIssued.test(caseData));
-        assertFalse(ClaimPredicate.pendingIssuedUnregistered.test(caseData));
+        assertTrue(pendingClaimIssued.test(caseData));
+        assertFalse(
+            ((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
+                .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
+                .or((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
+                        .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate())))
+                .or((respondent1OrgNotRegistered.negate().and(respondent1NotRepresented.negate()))
+                        .and(respondent2OrgNotRegistered.and(
+                            respondent2NotRepresented.negate())))
+                .and(ClaimIssuedPaymentSuccessfulTransitionBuilder
+                         .bothDefSameLegalRep.negate()).test(caseData));
     }
 
     @Test
     void shouldReturnTrue_whenCaseDataIsAtPendingClaimIssuedState() {
         CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
-        assertTrue(ClaimPredicate.pendingIssued.test(caseData));
+        assertTrue(pendingClaimIssued.test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenCaseDataAtDraftState() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
-        assertFalse(ClaimPredicate.pendingIssued.test(caseData));
+        assertFalse(pendingClaimIssued.test(caseData));
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {

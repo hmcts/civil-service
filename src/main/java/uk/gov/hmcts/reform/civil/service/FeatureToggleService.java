@@ -5,12 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LipPredicate;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseContainsLiP;
 import static uk.gov.hmcts.reform.civil.utils.JudgeReallocatedClaimTrack.judgeReallocatedTrackOrAlreadyMinti;
 
 @Slf4j
@@ -130,7 +130,7 @@ public class FeatureToggleService {
 
     // if deleting this, also handle isQMPdfGeneratorEnabled() below
     public boolean isPublicQueryManagementEnabled(CaseData caseData) {
-        if (LipPredicate.caseContainsLiP.test(caseData)) {
+        if (caseContainsLiP.test(caseData)) {
             return isLipQueryManagementEnabled(caseData);
         }
         return true;

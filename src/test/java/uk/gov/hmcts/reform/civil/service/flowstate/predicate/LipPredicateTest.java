@@ -46,13 +46,13 @@ class LipPredicateTest {
         @Test
         void should_return_true_for_agreedToMediation_when_claimant_has_agreed_to_free_mediation() {
             when(caseData.hasClaimantAgreedToFreeMediation()).thenReturn(true);
-            assertTrue(MediationPredicate.agreedToMediation.test(caseData));
+            assertTrue(LipPredicate.agreedToMediation.test(caseData));
         }
 
         @Test
         void should_return_false_for_agreedToMediation_when_claimant_has_not_agreed_to_free_mediation() {
             when(caseData.hasClaimantAgreedToFreeMediation()).thenReturn(false);
-            assertFalse(MediationPredicate.agreedToMediation.test(caseData));
+            assertFalse(LipPredicate.agreedToMediation.test(caseData));
         }
     }
 

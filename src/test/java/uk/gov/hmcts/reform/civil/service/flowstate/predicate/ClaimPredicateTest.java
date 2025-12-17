@@ -40,6 +40,22 @@ class ClaimPredicateTest {
     }
 
     @Nested
+    class SubmittedPredicate {
+
+        @Test
+        void should_return_true_for_submitted_when_claim_has_submitted_date() {
+            when(caseData.getSubmittedDate()).thenReturn(LocalDateTime.now().plusDays(1));
+            assertTrue(ClaimPredicate.submitted.test(caseData));
+        }
+
+        @Test
+        void should_return_false_for_submitted_when_claim_does_not_have_submitted_date() {
+            when(caseData.getSubmittedDate()).thenReturn(null);
+            assertFalse(ClaimPredicate.submitted.test(caseData));
+        }
+    }
+
+    @Nested
     class Submitted1v1RespondentOneUnregisteredPredicate {
 
         @Test

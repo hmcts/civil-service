@@ -100,13 +100,13 @@ class PaymentPredicateTest {
         @Test
         void should_return_true_for_payImmediatelyPartAdmission_when_pay_immediately_is_selected() {
             when(caseData.isPayImmediately()).thenReturn(true);
-            assertTrue(PaymentPredicate.payImmediatelyPartAdmit.test(caseData));
+            assertTrue(PaymentPredicate.payImmediatelyPartAdmission.test(caseData));
         }
 
         @Test
         void should_return_false_for_payImmediatelyPartAdmission_when_pay_immediately_is_not_selected() {
             when(caseData.isPayImmediately()).thenReturn(false);
-            assertFalse(PaymentPredicate.payImmediatelyPartAdmit.test(caseData));
+            assertFalse(PaymentPredicate.payImmediatelyPartAdmission.test(caseData));
         }
 
         @Test

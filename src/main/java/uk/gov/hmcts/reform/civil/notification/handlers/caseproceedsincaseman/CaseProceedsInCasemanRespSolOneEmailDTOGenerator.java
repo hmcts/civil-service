@@ -5,9 +5,9 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimPredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.NotificationPredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
+
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.claimNotified;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.takenOfflineByStaffAfterClaimIssue;
 
 @Component
 public class CaseProceedsInCasemanRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
@@ -33,10 +33,6 @@ public class CaseProceedsInCasemanRespSolOneEmailDTOGenerator extends RespSolOne
     }
 
     public Boolean getShouldNotify(CaseData caseData) {
-        return ClaimPredicate.isSpec.negate()
-            .and(NotificationPredicate.hasClaimNotifiedToBoth).test(caseData)
-            || (TakenOfflinePredicate.byStaff.and(ClaimPredicate.afterIssued).test(caseData)
-            && caseData.isLipvLROneVOne())
-            ? Boolean.TRUE : Boolean.FALSE;
+        return claimNotified.test(caseData) || (takenOfflineByStaffAfterClaimIssue.test(caseData) && caseData.isLipvLROneVOne()) ? Boolean.TRUE : Boolean.FALSE;
     }
 }

@@ -10,8 +10,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Mediation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.MediationPredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
@@ -20,6 +18,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.InMediationTransitionBuilder.casemanMarksMediationUnsuccessful;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.InMediationTransitionBuilder.takenOfflineByStaffBeforeMediationUnsuccessful;
 
 @ExtendWith(MockitoExtension.class)
 public class InMediationTransitionBuilderTest {
@@ -51,7 +51,7 @@ public class InMediationTransitionBuilderTest {
             .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
             .build();
 
-        assertTrue(MediationPredicate.unsuccessful.test(caseData));
+        assertTrue(casemanMarksMediationUnsuccessful.test(caseData));
     }
 
     @Test
@@ -60,7 +60,7 @@ public class InMediationTransitionBuilderTest {
             .atStateMediationUnsuccessfulCarm(MultiPartyScenario.ONE_V_ONE)
             .build();
 
-        assertTrue(MediationPredicate.unsuccessful.test(caseData));
+        assertTrue(casemanMarksMediationUnsuccessful.test(caseData));
     }
 
     @Test
@@ -69,7 +69,7 @@ public class InMediationTransitionBuilderTest {
             .atStateMediationSuccessful(MultiPartyScenario.ONE_V_ONE)
             .build();
 
-        assertFalse(MediationPredicate.unsuccessful.test(caseData));
+        assertFalse(casemanMarksMediationUnsuccessful.test(caseData));
     }
 
     @Test
@@ -79,7 +79,7 @@ public class InMediationTransitionBuilderTest {
             .takenOfflineByStaff()
             .build();
 
-        assertFalse(TakenOfflinePredicate.byStaff.and(MediationPredicate.beforeUnsuccessful).test(caseData));
+        assertFalse(takenOfflineByStaffBeforeMediationUnsuccessful.test(caseData));
     }
 
     @Test
@@ -89,7 +89,7 @@ public class InMediationTransitionBuilderTest {
             .takenOfflineByStaff()
             .build();
 
-        assertFalse(TakenOfflinePredicate.byStaff.and(MediationPredicate.beforeUnsuccessful).test(caseData));
+        assertFalse(takenOfflineByStaffBeforeMediationUnsuccessful.test(caseData));
     }
 
     @Test
@@ -101,7 +101,7 @@ public class InMediationTransitionBuilderTest {
             .mediation(Mediation.builder().build())
             .build();
 
-        assertTrue(TakenOfflinePredicate.byStaff.and(MediationPredicate.beforeUnsuccessful).test(caseData));
+        assertTrue(takenOfflineByStaffBeforeMediationUnsuccessful.test(caseData));
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {

@@ -8,7 +8,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
@@ -16,6 +15,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.PastApplicantResponseDeadlineAwaitingCamundaTransitionBuilder.applicantOutOfTimeProcessedByCamunda;
 
 @ExtendWith(MockitoExtension.class)
 public class PastApplicantResponseDeadlineAwaitingCamundaTransitionBuilderTest {
@@ -45,7 +45,7 @@ public class PastApplicantResponseDeadlineAwaitingCamundaTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTakenOfflinePastApplicantResponseDeadline()
             .build();
-        assertTrue(TakenOfflinePredicate.bySystem.test(caseData));
+        assertTrue(applicantOutOfTimeProcessedByCamunda.test(caseData));
     }
 
     @Test
@@ -53,7 +53,7 @@ public class PastApplicantResponseDeadlineAwaitingCamundaTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
             .build();
-        assertFalse(TakenOfflinePredicate.bySystem.test(caseData));
+        assertFalse(applicantOutOfTimeProcessedByCamunda.test(caseData));
     }
 
     @Test
@@ -61,7 +61,7 @@ public class PastApplicantResponseDeadlineAwaitingCamundaTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTakenOfflinePastApplicantResponseDeadline()
             .build();
-        assertTrue(TakenOfflinePredicate.bySystem.test(caseData));
+        assertTrue(applicantOutOfTimeProcessedByCamunda.test(caseData));
     }
 
     @Test
@@ -69,7 +69,7 @@ public class PastApplicantResponseDeadlineAwaitingCamundaTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssuedUnrepresentedDefendant()
             .build();
-        assertFalse(TakenOfflinePredicate.bySystem.test(caseData));
+        assertFalse(applicantOutOfTimeProcessedByCamunda.test(caseData));
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {

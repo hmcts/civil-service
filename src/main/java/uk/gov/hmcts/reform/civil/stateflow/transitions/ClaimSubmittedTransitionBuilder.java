@@ -5,13 +5,10 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CaseDataParent;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LanguagePredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LipPredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.PaymentPredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
@@ -19,6 +16,11 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
+import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLipCase;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.nocSubmittedForLiPDefendant;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.nocSubmittedForLiPDefendantBeforeOffline;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentSuccessful;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_FAILED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_SUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC;
@@ -36,50 +38,53 @@ public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
 
     @Override
     void setUpTransitions(List<Transition> transitions) {
-        this.moveTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL, transitions)
-            .onlyWhen(PaymentPredicate.successful, transitions)
-
-            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions)
-            .onlyWhen(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.beforeClaimIssue), transitions)
-
-            .moveTo(CLAIM_ISSUED_PAYMENT_FAILED, transitions)
-            .onlyWhen(PaymentPredicate.failed, transitions)
-
-            .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, transitions)
-            .onlyWhen(LipPredicate.isLiPvLiPCase
-                .and(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.beforeClaimIssue).negate()), transitions)
+        this.moveTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL, transitions).onlyWhen(paymentSuccessful, transitions)
+            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaffBeforeClaimIssued, transitions)
+            .moveTo(CLAIM_ISSUED_PAYMENT_FAILED, transitions).onlyWhen(paymentFailed, transitions)
+            .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, transitions).onlyWhen(
+                isLipCase.and(takenOfflineByStaffBeforeClaimIssued.negate()),
+                transitions
+            )
             .set(
                 (c, flags) -> {
-                    if (LanguagePredicate.claimantIsBilingual.test(c)) {
+                    if (claimIssueBilingual.test(c)) {
                         flags.put(FlowFlag.CLAIM_ISSUE_BILINGUAL.name(), true);
                     }
-                    if (LipPredicate.isHelpWithFees.test(c)) {
+                    if (claimIssueHwF.test(c)) {
                         flags.put(FlowFlag.CLAIM_ISSUE_HWF.name(), true);
                     }
                     flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
                     flags.put(FlowFlag.LIP_CASE.name(), true);
-                }, transitions)
-
+                }, transitions
+            )
+            .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, transitions).onlyWhen(
+                nocSubmittedForLiPApplicant,
+                transitions
+            )
+            .set(
+                flags -> flags.putAll(
+                    Map.of(
+                        FlowFlag.LIP_CASE.name(), false,
+                        FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true
+                    )), transitions
+            )
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, transitions)
-            .onlyWhen(LipPredicate.nocApplyForLiPClaimant, transitions)
-            .set(flags -> flags.putAll(
-                Map.of(
-                    FlowFlag.LIP_CASE.name(), false,
-                    FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true
-                )), transitions)
-
+            .onlyWhen(
+                not(isDefendantNoCOnlineForCase).and(isLiPvLRCase.and(not(nocSubmittedForLiPDefendant))
+                        .and(not(nocSubmittedForLiPDefendantBeforeOffline))),
+                transitions
+            )
+            .set(
+                flags -> flags.putAll(
+                    Map.of(
+                        FlowFlag.LIP_CASE.name(), true,
+                        FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
+                    )), transitions
+            )
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, transitions)
-            .onlyWhen(not(isDefendantNoCOnlineForCase)
-                .and(LipPredicate.isLiPvLRCase.and(not(LipPredicate.nocSubmittedForLiPDefendant))
-                .and(not(LipPredicate.nocSubmittedForLiPDefendantBeforeOffline))), transitions)
-            .set(flags -> flags.putAll(
-                Map.of(
-                    FlowFlag.LIP_CASE.name(), true,
-                    FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
-                )), transitions)
-
-            .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, transitions)
-            .onlyWhen(isDefendantNoCOnlineForCase.and(LipPredicate.isLiPvLRCase), transitions)
+            .onlyWhen(
+                isDefendantNoCOnlineForCase.and(isLiPvLRCase), transitions
+            )
             .set(
                 (c, flags) -> {
                     flags.putAll(
@@ -88,19 +93,45 @@ public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
                             FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
                         )
                     );
-                    if (LanguagePredicate.claimantIsBilingual.test(c)) {
+                    if (claimIssueBilingual.test(c)) {
                         flags.put(FlowFlag.CLAIM_ISSUE_BILINGUAL.name(), true);
                     }
-                }, transitions)
-
+                }, transitions
+            )
             .moveTo(SPEC_DEFENDANT_NOC, transitions).onlyWhen(not(isDefendantNoCOnlineForCase).and(
-                LipPredicate.nocSubmittedForLiPDefendantBeforeOffline), transitions)
-            .set(flags -> flags.putAll(
-                Map.of(
-                    FlowFlag.LIP_CASE.name(), true,
-                    FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
-                )), transitions);
+                nocSubmittedForLiPDefendantBeforeOffline), transitions)
+            .set(
+                flags -> flags.putAll(
+                    Map.of(
+                        FlowFlag.LIP_CASE.name(), true,
+                        FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
+                    )), transitions
+        );
     }
+
+    public static final Predicate<CaseData> paymentFailed = caseData ->
+        !caseData.isApplicantNotRepresented()
+            && ((caseData.getPaymentDetails() != null && caseData.getPaymentDetails().getStatus() == FAILED)
+            || (caseData.getClaimIssuedPaymentDetails() != null && caseData.getClaimIssuedPaymentDetails().getStatus() == FAILED));
+
+    public static final Predicate<CaseData> claimIssueBilingual = CaseDataParent::isClaimantBilingual;
+
+    public static final Predicate<CaseData> claimIssueHwF = CaseData::isHelpWithFees;
+
+    public static final Predicate<CaseData> takenOfflineByStaffBeforeClaimIssued =
+        ClaimSubmittedTransitionBuilder::getPredicateTakenOfflineByStaffBeforeClaimIssue;
+
+    public static boolean getPredicateTakenOfflineByStaffBeforeClaimIssue(CaseData caseData) {
+        // In case of SPEC and UNSPEC claim ClaimNotificationDeadline will be set when the case is issued
+        return caseData.getTakenOfflineByStaffDate() != null
+            && caseData.getClaimNotificationDeadline() == null
+            && caseData.getClaimNotificationDate() == null
+            && caseData.getSubmittedDate() != null;
+    }
+
+    public static final Predicate<CaseData> nocSubmittedForLiPApplicant = CaseData::nocApplyForLiPClaimant;
+
+    public static final Predicate<CaseData> isLiPvLRCase = CaseData::isLipvLROneVOne;
 
     public final Predicate<CaseData> isDefendantNoCOnlineForCase = featureToggleService::isDefendantNoCOnlineForCase;
 }

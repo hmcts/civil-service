@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.Party;
 
 import java.time.LocalDateTime;
@@ -218,6 +219,18 @@ class ResponsePredicateTest {
         when(caseData.getRespondent1ClaimResponseType()).thenReturn(null);
         when(caseData.getRespondent2ClaimResponseType()).thenReturn(null);
         assertFalse(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceived.test(caseData));
+    }
+
+    @Test
+    void should_return_true_for_isOneVOneResponseFlagSpec_when_flag_exists() {
+        when(caseData.getShowResponseOneVOneFlag()).thenReturn(ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE);
+        assertTrue(ResponsePredicate.isOneVOneResponseFlagSpec.test(caseData));
+    }
+
+    @Test
+    void should_return_false_for_isOneVOneResponseFlagSpec_when_flag_does_not_exist() {
+        when(caseData.getShowResponseOneVOneFlag()).thenReturn(null);
+        assertFalse(ResponsePredicate.isOneVOneResponseFlagSpec.test(caseData));
     }
 
     @Test

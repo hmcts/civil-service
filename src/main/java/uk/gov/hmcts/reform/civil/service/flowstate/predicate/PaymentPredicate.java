@@ -13,16 +13,8 @@ public non-sealed interface PaymentPredicate extends CaseDataPredicate {
         summary = "Pay Immediately (Part admission)",
         description = "Part admission where the payment time selected is 'IMMEDIATELY'"
     )
-    Predicate<CaseData> payImmediatelyPartAdmit =
+    Predicate<CaseData> payImmediatelyPartAdmission =
         CaseDataPredicate.Payment.isPayImmediately;
-
-    @BusinessRule(
-        group = "Payment",
-        summary = "Payment Pay Immediately Accepted",
-        description = "Part admission payment time (IMMEDIATELY) Accepted"
-    )
-    Predicate<CaseData> payImmediatelyAcceptedPartAdmit =
-        CaseDataPredicate.Payment.isPartAdmitPayImmediately;
 
     @BusinessRule(
         group = "Payment",

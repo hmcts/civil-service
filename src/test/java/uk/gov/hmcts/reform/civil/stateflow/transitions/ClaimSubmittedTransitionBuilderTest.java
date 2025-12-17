@@ -13,10 +13,6 @@ import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LanguagePredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LipPredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.PaymentPredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.HashMap;
@@ -28,6 +24,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimSubmittedTransitionBuilder.claimIssueBilingual;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimSubmittedTransitionBuilder.claimIssueHwF;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimSubmittedTransitionBuilder.paymentFailed;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimSubmittedTransitionBuilder.takenOfflineByStaffBeforeClaimIssued;
 
 @ExtendWith(MockitoExtension.class)
 class ClaimSubmittedTransitionBuilderTest {
@@ -66,7 +66,7 @@ class ClaimSubmittedTransitionBuilderTest {
         result = claimSubmittedTransitionBuilder.buildTransitions();
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedPaymentFailed().build();
-        assertTrue(PaymentPredicate.failed.test(caseData));
+        assertTrue(paymentFailed.test(caseData));
         assertThat(getCaseFlags(result.get(3), caseData)).hasSize(2).contains(
             entry(FlowFlag.LIP_CASE.name(), true),
             entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true)
@@ -89,80 +89,21 @@ class ClaimSubmittedTransitionBuilderTest {
     }
 
     @Test
-    void shouldSetHwfFlag_whenLiPvLiP_andHelpWithFees() {
-        // Transition index 3: LiP v LiP path (not taken offline) sets flags and conditionally HWF/Bilingual
-        ClaimSubmittedTransitionBuilder claimSubmittedTransitionBuilder = new ClaimSubmittedTransitionBuilder(
-            mockFeatureToggleService);
-        result = claimSubmittedTransitionBuilder.buildTransitions();
-
-        // Build case with Help With Fees = YES and no bilingual preference
-        CaseData caseData = buildCaseDataWithHelpWithFees(YesOrNo.YES);
-        Map<String, Boolean> flags = getCaseFlags(result.get(3), caseData);
-        assertThat(flags).hasSizeGreaterThanOrEqualTo(3).contains(
-            entry(FlowFlag.LIP_CASE.name(), true),
-            entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
-            entry(FlowFlag.CLAIM_ISSUE_HWF.name(), true)
-        );
-    }
-
-    @Test
-    void shouldSetFlags_whenNocAppliedForLiPClaimant() {
-        // Transition index 4: nocApplyForLiPClaimant path
-        ClaimSubmittedTransitionBuilder claimSubmittedTransitionBuilder = new ClaimSubmittedTransitionBuilder(
-            mockFeatureToggleService);
-        result = claimSubmittedTransitionBuilder.buildTransitions();
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-        assertThat(getCaseFlags(result.get(4), caseData)).hasSize(2).contains(
-            entry(FlowFlag.LIP_CASE.name(), false),
-            entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true)
-        );
-    }
-
-    @Test
-    void shouldSetFlags_whenLiPvLR_NoNocSubmittedAndFeatureOff() {
-        // Transition index 5: LiP v LR, NOC feature OFF and no NOC submitted
-        ClaimSubmittedTransitionBuilder claimSubmittedTransitionBuilder = new ClaimSubmittedTransitionBuilder(
-            mockFeatureToggleService);
-        result = claimSubmittedTransitionBuilder.buildTransitions();
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-        assertThat(getCaseFlags(result.get(5), caseData)).hasSize(2).contains(
-            entry(FlowFlag.LIP_CASE.name(), true),
-            entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false)
-        );
-    }
-
-    @Test
-    void shouldSetFlags_whenSpecDefendantNocPath() {
-        // Transition index 7: SPEC_DEFENDANT_NOC path sets LIP flags
-        ClaimSubmittedTransitionBuilder claimSubmittedTransitionBuilder = new ClaimSubmittedTransitionBuilder(
-            mockFeatureToggleService);
-        result = claimSubmittedTransitionBuilder.buildTransitions();
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-        assertThat(getCaseFlags(result.get(7), caseData)).hasSize(2).contains(
-            entry(FlowFlag.LIP_CASE.name(), true),
-            entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false)
-        );
-    }
-
-    @Test
     void shouldReturnTrue_whenCaseDataAtIssuedStateClaimIssuedPayment() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedPaymentFailed().build();
-        assertTrue(PaymentPredicate.failed.test(caseData));
+        assertTrue(paymentFailed.test(caseData));
     }
 
     @Test
     void shouldReturnTrue_whenCaseDataAtIssuedState() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentFailed().build();
-        assertTrue(PaymentPredicate.failed.test(caseData));
+        assertTrue(paymentFailed.test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenCaseDataIsAtDraftState() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-        assertFalse(PaymentPredicate.failed.test(caseData));
+        assertFalse(paymentFailed.test(caseData));
     }
 
     @Test
@@ -170,7 +111,7 @@ class ClaimSubmittedTransitionBuilderTest {
         CaseData caseData = CaseData.builder()
             .claimantBilingualLanguagePreference("BOTH")
             .build();
-        assertTrue(LanguagePredicate.claimantIsBilingual.test(caseData));
+        assertTrue(claimIssueBilingual.test(caseData));
     }
 
     @Test
@@ -178,25 +119,25 @@ class ClaimSubmittedTransitionBuilderTest {
         CaseData caseData = CaseData.builder()
             .claimantBilingualLanguagePreference(null)
             .build();
-        assertFalse(LanguagePredicate.claimantIsBilingual.test(caseData));
+        assertFalse(claimIssueBilingual.test(caseData));
     }
 
     @Test
     void shouldReturnTrue_whenHelpWithFeeIsYes() {
         CaseData caseData = buildCaseDataWithHelpWithFees(YesOrNo.YES);
-        assertTrue(LipPredicate.isHelpWithFees.test(caseData));
+        assertTrue(claimIssueHwF.test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenHelpWithFeeIsNo() {
         CaseData caseData = buildCaseDataWithHelpWithFees(YesOrNo.NO);
-        assertFalse(LipPredicate.isHelpWithFees.test(caseData));
+        assertFalse(claimIssueHwF.test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenHelpWithFeeIsNull() {
         CaseData caseData = buildCaseDataWithHelpWithFees(null);
-        assertFalse(LipPredicate.isHelpWithFees.test(caseData));
+        assertFalse(claimIssueHwF.test(caseData));
     }
 
     @Test
@@ -204,7 +145,7 @@ class ClaimSubmittedTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
             .takenOfflineByStaff()
             .build();
-        Assertions.assertTrue(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.beforeClaimIssue).test(caseData));
+        Assertions.assertTrue(takenOfflineByStaffBeforeClaimIssued.test(caseData));
     }
 
     private CaseData buildCaseDataWithHelpWithFees(YesOrNo helpWithFee) {
@@ -228,13 +169,7 @@ class ClaimSubmittedTransitionBuilderTest {
 
     private Map<String, Boolean> getCaseFlags(Transition result, CaseData caseData) {
         Map<String, Boolean> flags = new HashMap<>();
-        if (result.getDynamicFlags() != null) {
-            // Prefer dynamic flags (BiConsumer<CaseData, Map<...>>) when present
-            result.getDynamicFlags().accept(caseData, flags);
-        } else if (result.getFlags() != null) {
-            // Fall back to static flags (Consumer<Map<...>>) when dynamic flags are not set
-            result.getFlags().accept(flags);
-        }
+        result.getDynamicFlags().accept(caseData, flags);
         return flags;
     }
 }

@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.time.LocalDateTime;
@@ -19,6 +18,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isDefendantNoCOnlineForCaseAfterJBA;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaff;
 
 @ExtendWith(MockitoExtension.class)
 class PartAdmissionAgreeRepaymentTransitionBuilderTest {
@@ -58,7 +59,7 @@ class PartAdmissionAgreeRepaymentTransitionBuilderTest {
             .changeOfRepresentation(ChangeOfRepresentation.builder().build())
             .build();
 
-        assertTrue(TakenOfflinePredicate.isDefendantNoCOnlineForCaseAfterJBA.test(caseData));
+        assertTrue(isDefendantNoCOnlineForCaseAfterJBA.test(caseData));
     }
 
     @Test
@@ -67,7 +68,7 @@ class PartAdmissionAgreeRepaymentTransitionBuilderTest {
             .takenOfflineByStaffDate(LocalDateTime.now())
             .build();
 
-        assertTrue(TakenOfflinePredicate.byStaff.test(caseData));
+        assertTrue(takenOfflineByStaff.test(caseData));
     }
 
 }
