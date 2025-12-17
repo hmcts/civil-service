@@ -216,11 +216,10 @@ public abstract class DocumentHandler<T> {
                         || upload.getDocumentUpload().getDocumentUrl() == null;
                 });
                 if (!containsValue) {
-                    var newDocument = UploadEvidenceDocumentType.builder()
-                        .typeOfDocument(evidenceUploadType.getDocumentTypeDisplayName())
-                        .createdDatetime(documentCreatedDateTime)
-                        .documentUpload(documentToAdd)
-                        .build();
+                    var newDocument = new UploadEvidenceDocumentType()
+                        .setTypeOfDocument(evidenceUploadType.getDocumentTypeDisplayName())
+                        .setCreatedDatetime(documentCreatedDateTime)
+                        .setDocumentUpload(documentToAdd);
                     finalAdditionalBundleDocs.add(element(newDocument));
                     applyDocumentUpdateToCollection(caseDataBuilder, finalAdditionalBundleDocs);
                 }

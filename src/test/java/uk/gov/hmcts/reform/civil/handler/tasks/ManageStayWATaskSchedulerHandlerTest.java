@@ -14,6 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.ManageStayWATaskEvent;
 import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.ManageStayUpdateRequestedSearchService;
 
@@ -63,7 +64,7 @@ class ManageStayWATaskSchedulerHandlerTest {
     void shouldEmitManageStayWATaskEventEvent_whenCasesFound() {
         long caseId = 1L;
         Map<String, Object> data = Map.of("data", "some data");
-        Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
+        Set<CaseDetails> caseDetails = Set.of(new CaseDetailsBuilder().id(caseId).data(data).build());
 
         when(searchService.getCases()).thenReturn(caseDetails);
 
@@ -127,8 +128,8 @@ class ManageStayWATaskSchedulerHandlerTest {
         long otherId = 2L;
         Map<String, Object> data = Map.of("data", "some data");
         Set<CaseDetails> caseDetails = Set.of(
-            CaseDetails.builder().id(caseId).data(data).build(),
-            CaseDetails.builder().id(otherId).data(data).build());
+            new CaseDetailsBuilder().id(caseId).data(data).build(),
+            new CaseDetailsBuilder().id(otherId).data(data).build());
 
         when(searchService.getCases()).thenReturn(caseDetails);
 

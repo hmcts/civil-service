@@ -16,12 +16,11 @@ public class UploadEvidenceDocumentTypeBuilder implements DocumentTypeBuilder<Up
             .documentHash(fromValue.getDocumentUpload().getDocumentHash())
             .documentUrl(fromValue.getDocumentUpload().getDocumentUrl())
             .build();
-        return UploadEvidenceDocumentType.builder()
-            .witnessOptionName(fromValue.getWitnessOptionName())
-            .documentIssuedDate(fromValue.getDocumentIssuedDate())
-            .typeOfDocument(fromValue.getTypeOfDocument())
-            .createdDatetime(fromValue.getCreatedDatetime())
-            .documentUpload(newDoc)
-            .build();
+        return new UploadEvidenceDocumentType()
+            .setWitnessOptionName(fromValue.getWitnessOptionName())
+            .setDocumentIssuedDate(fromValue.getDocumentIssuedDate())
+            .setTypeOfDocument(fromValue.getTypeOfDocument())
+            .setCreatedDatetime(fromValue.getCreatedDatetime())
+            .setDocumentUpload(newDoc);
     }
 }
