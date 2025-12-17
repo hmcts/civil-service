@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.migration;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.PartyDetailsCaseReference;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -89,41 +90,42 @@ public class UpdatePartyDetailsTask extends MigrationTask<PartyDetailsCaseRefere
             return original;
         }
 
-        Party.PartyBuilder builder = original.toBuilder();
+        Party updated = new Party();
+        BeanUtils.copyProperties(original, updated);
 
         // Common fields
-        builder.partyID(updateIfExists(updates.getPartyID(), original.getPartyID()));
-        builder.primaryAddress(updateIfExists(updates.getPrimaryAddress(), original.getPrimaryAddress()));
-        builder.partyEmail(updateIfExists(updates.getPartyEmail(), original.getPartyEmail()));
-        builder.partyPhone(updateIfExists(updates.getPartyPhone(), original.getPartyPhone()));
-        builder.legalRepHeading(updateIfExists(updates.getLegalRepHeading(), original.getLegalRepHeading()));
-        builder.unavailableDates(updateIfExists(updates.getUnavailableDates(), original.getUnavailableDates()));
-        builder.flags(updateIfExists(updates.getFlags(), original.getFlags()));
+        updated.setPartyID(updateIfExists(updates.getPartyID(), original.getPartyID()));
+        updated.setPrimaryAddress(updateIfExists(updates.getPrimaryAddress(), original.getPrimaryAddress()));
+        updated.setPartyEmail(updateIfExists(updates.getPartyEmail(), original.getPartyEmail()));
+        updated.setPartyPhone(updateIfExists(updates.getPartyPhone(), original.getPartyPhone()));
+        updated.setLegalRepHeading(updateIfExists(updates.getLegalRepHeading(), original.getLegalRepHeading()));
+        updated.setUnavailableDates(updateIfExists(updates.getUnavailableDates(), original.getUnavailableDates()));
+        updated.setFlags(updateIfExists(updates.getFlags(), original.getFlags()));
 
         if (original.isIndividual()) {
-            builder.individualTitle(updateIfExists(updates.getIndividualTitle(), original.getIndividualTitle()));
-            builder.individualFirstName(updateIfExists(updates.getIndividualFirstName(), original.getIndividualFirstName()));
-            builder.individualLastName(updateIfExists(updates.getIndividualLastName(), original.getIndividualLastName()));
-            builder.individualDateOfBirth(updateIfExists(updates.getIndividualDateOfBirth(), original.getIndividualDateOfBirth()));
+            updated.setIndividualTitle(updateIfExists(updates.getIndividualTitle(), original.getIndividualTitle()));
+            updated.setIndividualFirstName(updateIfExists(updates.getIndividualFirstName(), original.getIndividualFirstName()));
+            updated.setIndividualLastName(updateIfExists(updates.getIndividualLastName(), original.getIndividualLastName()));
+            updated.setIndividualDateOfBirth(updateIfExists(updates.getIndividualDateOfBirth(), original.getIndividualDateOfBirth()));
         }
 
         if (original.isSoleTrader()) {
-            builder.soleTraderTitle(updateIfExists(updates.getSoleTraderTitle(), original.getSoleTraderTitle()));
-            builder.soleTraderFirstName(updateIfExists(updates.getSoleTraderFirstName(), original.getSoleTraderFirstName()));
-            builder.soleTraderLastName(updateIfExists(updates.getSoleTraderLastName(), original.getSoleTraderLastName()));
-            builder.soleTraderTradingAs(updateIfExists(updates.getSoleTraderTradingAs(), original.getSoleTraderTradingAs()));
-            builder.soleTraderDateOfBirth(updateIfExists(updates.getSoleTraderDateOfBirth(), original.getSoleTraderDateOfBirth()));
+            updated.setSoleTraderTitle(updateIfExists(updates.getSoleTraderTitle(), original.getSoleTraderTitle()));
+            updated.setSoleTraderFirstName(updateIfExists(updates.getSoleTraderFirstName(), original.getSoleTraderFirstName()));
+            updated.setSoleTraderLastName(updateIfExists(updates.getSoleTraderLastName(), original.getSoleTraderLastName()));
+            updated.setSoleTraderTradingAs(updateIfExists(updates.getSoleTraderTradingAs(), original.getSoleTraderTradingAs()));
+            updated.setSoleTraderDateOfBirth(updateIfExists(updates.getSoleTraderDateOfBirth(), original.getSoleTraderDateOfBirth()));
         }
 
         if (original.isCompany()) {
-            builder.companyName(updateIfExists(updates.getCompanyName(), original.getCompanyName()));
+            updated.setCompanyName(updateIfExists(updates.getCompanyName(), original.getCompanyName()));
         }
 
         if (original.isOrganisation()) {
-            builder.organisationName(updateIfExists(updates.getOrganisationName(), original.getOrganisationName()));
+            updated.setOrganisationName(updateIfExists(updates.getOrganisationName(), original.getOrganisationName()));
         }
 
-        return builder.build();
+        return updated;
     };
 
     private static <T> T updateIfExists(T newValue, T oldValue) {

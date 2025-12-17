@@ -1,16 +1,16 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Builder
+@Accessors(chain = true)
 public class DashboardResponse {
 
     private List<DashboardClaimInfo> claims;

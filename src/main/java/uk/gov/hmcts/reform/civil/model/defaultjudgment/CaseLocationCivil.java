@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 @Accessors(chain = true)
 @Data
-@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class CaseLocationCivil {

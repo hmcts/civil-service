@@ -244,8 +244,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
         void shouldNotTriggerGeneralApplicationEvent_whenCaseHasNoGeneralApplicationLip() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
                 .caseManagementLocation(
-                CaseLocationCivil.builder().baseLocation("00000")
-                    .region("2").build()).build();
+                new CaseLocationCivil().setBaseLocation("00000")
+                    .setRegion("2")).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -257,8 +257,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
         @Test
         void shouldNotTriggerGeneralApplicationEvent_whenCaseHasNoGeneralApplication() {
             CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnrepresentedDefendant().caseManagementLocation(
-                CaseLocationCivil.builder().baseLocation("00000")
-                    .region("2").build()).build();
+                new CaseLocationCivil().setBaseLocation("00000")
+                    .setRegion("2")).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -270,8 +270,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
         @Test
         void shouldTriggerCivilServiceEvent_whenLocationIsNotInEaRegion() {
             CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnrepresentedDefendant().caseManagementLocation(
-                CaseLocationCivil.builder().baseLocation("00000")
-                    .region("2").build()).build();
+                new CaseLocationCivil().setBaseLocation("00000")
+                    .setRegion("2")).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

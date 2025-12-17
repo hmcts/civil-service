@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.CaseManagementCategoryElement;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -116,8 +118,10 @@ public class SubmitClaimTask {
             caseData.setRespondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
         }
 
-        caseData.setCaseManagementLocation(CaseLocationCivil.builder().region(regionId).baseLocation(epimmsId).build());
-        caseData.setRespondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build());
+        caseData.setCaseManagementLocation(new CaseLocationCivil().setRegion(regionId).setBaseLocation(epimmsId));
+        Party respondent1 = new Party();
+        BeanUtils.copyProperties(caseData.getRespondent1(), respondent1);
+        caseData.setRespondent1DetailsForClaimDetailsTab(respondent1.setFlags(null));
         caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
 
         List<LocationRefData> locations = (locationRefDataService
@@ -128,7 +132,9 @@ public class SubmitClaimTask {
             .ifPresent(locationRefData -> caseData.setLocationName(locationRefData.getSiteName()));
 
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            caseData.setRespondent2DetailsForClaimDetailsTab(caseData.getRespondent2().toBuilder().flags(null).build());
+            Party respondent2 = new Party();
+            BeanUtils.copyProperties(caseData.getRespondent2(), respondent2);
+            caseData.setRespondent2DetailsForClaimDetailsTab(respondent2.setFlags(null));
         }
 
         caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
@@ -139,11 +145,11 @@ public class SubmitClaimTask {
         caseData.setCaseNamePublic(buildCaseName(caseData));
 
         CaseManagementCategoryElement civil =
-            CaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
+            new CaseManagementCategoryElement().setCode("Civil").setLabel("Civil");
         List<Element<CaseManagementCategoryElement>> itemList = new ArrayList<>();
         itemList.add(element(civil));
         caseData.setCaseManagementCategory(
-            CaseManagementCategory.builder().value(civil).list_items(itemList).build());
+            new CaseManagementCategory().setValue(civil).setList_items(itemList));
 
         OrgPolicyUtils.addMissingOrgPolicies(caseData);
 
@@ -248,14 +254,18 @@ public class SubmitClaimTask {
     private void setSharedData(CaseData caseData, String authToken, String eventId) {
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
         UserDetails userDetails = userService.getUserDetails(authToken);
-        IdamUserDetails.IdamUserDetailsBuilder idam = IdamUserDetails.builder().id(userDetails.getId());
+        IdamUserDetails idam = new IdamUserDetails().setId(userDetails.getId());
         CorrectEmail applicantSolicitor1CheckEmail = caseData.getApplicantSolicitor1CheckEmail();
 
         if (applicantSolicitor1CheckEmail != null && applicantSolicitor1CheckEmail.isCorrect()) {
-            caseData.setApplicantSolicitor1UserDetails(idam.email(applicantSolicitor1CheckEmail.getEmail()).build());
+            IdamUserDetails updatedIdam = new IdamUserDetails();
+            BeanUtils.copyProperties(idam, updatedIdam);
+            caseData.setApplicantSolicitor1UserDetails(updatedIdam.setEmail(applicantSolicitor1CheckEmail.getEmail()));
         } else {
             IdamUserDetails applicantSolicitor1UserDetails = caseData.getApplicantSolicitor1UserDetails();
-            caseData.setApplicantSolicitor1UserDetails(idam.email(applicantSolicitor1UserDetails.getEmail()).build());
+            IdamUserDetails updatedIdam = new IdamUserDetails();
+            BeanUtils.copyProperties(idam, updatedIdam);
+            caseData.setApplicantSolicitor1UserDetails(updatedIdam.setEmail(applicantSolicitor1UserDetails.getEmail()));
         }
 
         caseData.setSubmittedDate(time.now());
@@ -308,9 +318,9 @@ public class SubmitClaimTask {
         if (matchedLocations.isEmpty()) {
             throw new CallbackException(String.format(LOCATION_NOT_FOUND_MESSAGE, locationEpimmsId));
         } else {
-            return CaseLocationCivil.builder()
-                .region(matchedLocations.get(0).getRegionId())
-                .baseLocation(matchedLocations.get(0).getEpimmsId()).build();
+            return new CaseLocationCivil()
+                .setRegion(matchedLocations.get(0).getRegionId())
+                .setBaseLocation(matchedLocations.get(0).getEpimmsId());
         }
     }
 

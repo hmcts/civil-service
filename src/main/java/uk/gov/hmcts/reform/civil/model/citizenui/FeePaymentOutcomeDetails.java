@@ -10,10 +10,9 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import java.util.List;
 
 @Data
-@Builder(toBuilder = true)
+@Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Accessors(chain = true)
 public class FeePaymentOutcomeDetails {
 
     private YesOrNo hwfNumberAvailable;

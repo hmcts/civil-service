@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.migration;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -100,9 +101,10 @@ public class UpdatePartyWitnessTask extends MigrationTask<CaseReference> {
             .details(updateElements(dq.getApplicant1DQWitnesses().getDetails(), transformer))
             .build();
 
-        return dq.toBuilder()
-            .applicant1DQWitnesses(updatedWitness)
-            .build();
+        Applicant1DQ updatedDQ = new Applicant1DQ();
+        BeanUtils.copyProperties(dq, updatedDQ);
+        updatedDQ.setApplicant1DQWitnesses(updatedWitness);
+        return updatedDQ;
     }
 
     private Respondent1DQ updateRespondent1DQWitness(Respondent1DQ dq, UnaryOperator<Witness> transformer) {
@@ -114,9 +116,10 @@ public class UpdatePartyWitnessTask extends MigrationTask<CaseReference> {
             .details(updateElements(dq.getRespondent1DQWitnesses().getDetails(), transformer))
             .build();
 
-        return dq.toBuilder()
-            .respondent1DQWitnesses(updatedWitness)
-            .build();
+        Respondent1DQ updatedDQ = new Respondent1DQ();
+        BeanUtils.copyProperties(dq, updatedDQ);
+        updatedDQ.setRespondent1DQWitnesses(updatedWitness);
+        return updatedDQ;
     }
 
     private Respondent2DQ updateRespondent2DQWitness(Respondent2DQ dq, UnaryOperator<Witness> transformer) {

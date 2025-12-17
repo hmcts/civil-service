@@ -187,10 +187,8 @@ class GenerateClaimantLipManualDeterminationCallBackHandlerTest extends BaseCall
 
     private CaseData createCaseData(Party.Type type) {
         return CaseDataBuilder.builder()
-            .respondent1(PartyBuilder.builder()
-                             .soleTrader().build().toBuilder()
-                             .type(type)
-                             .build())
+            .respondent1(new Party()
+                             .setType(type))
             .build();
     }
 }

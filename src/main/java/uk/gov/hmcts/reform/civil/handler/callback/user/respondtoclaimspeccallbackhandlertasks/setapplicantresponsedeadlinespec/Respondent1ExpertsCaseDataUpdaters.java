@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.setapplicantresponsedeadlinespec;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -24,21 +26,21 @@ public class Respondent1ExpertsCaseDataUpdaters implements ExpertsAndWitnessesCa
                     && caseData.getRespondent1DQ().getSmallClaimExperts() != null) {
                 log.info("Setting respondent1DQExperts with expert details for caseId: {}", caseData.getCcdCaseReference());
                 Expert expert = fromSmallClaimExpertDetails(caseData.getRespondent1DQ().getSmallClaimExperts());
-                caseData.setRespondent1DQ(
-                        caseData.getRespondent1DQ().toBuilder()
-                                .respondent1DQExperts(Experts.builder()
+                Respondent1DQ updatedDQ = new Respondent1DQ();
+                BeanUtils.copyProperties(caseData.getRespondent1DQ(), updatedDQ);
+                updatedDQ.setRespondent1DQExperts(Experts.builder()
                                         .expertRequired(caseData.getResponseClaimExpertSpecRequired())
                                         .details(wrapElements(expert))
-                                        .build())
-                                .build());
+                                        .build());
+                caseData.setRespondent1DQ(updatedDQ);
             } else if (NO.equals(caseData.getResponseClaimExpertSpecRequired())) {
                 log.info("Setting respondent1DQExperts with expertRequired as NO for caseId: {}", caseData.getCcdCaseReference());
-                caseData.setRespondent1DQ(
-                        caseData.getRespondent1DQ().toBuilder()
-                                .respondent1DQExperts(Experts.builder()
+                Respondent1DQ updatedDQ = new Respondent1DQ();
+                BeanUtils.copyProperties(caseData.getRespondent1DQ(), updatedDQ);
+                updatedDQ.setRespondent1DQExperts(Experts.builder()
                                         .expertRequired(caseData.getResponseClaimExpertSpecRequired())
-                                        .build())
-                                .build());
+                                        .build());
+                caseData.setRespondent1DQ(updatedDQ);
             }
         }
         return caseData;

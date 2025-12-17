@@ -1,8 +1,11 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import org.springframework.beans.BeanUtils;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
@@ -46,8 +49,10 @@ public class WitnessUtils {
                 caseData.getRespondent1ResponseDate().toLocalDate(),
                 DEFENDANT_RESPONSE_EVENT.getValue()
             );
-            caseData.setRespondent1DQ(caseData.getRespondent1DQ().toBuilder()
-                                      .respondent1DQWitnesses(updatedRespondent1Witnesses).build());
+            Respondent1DQ updatedDQ = new Respondent1DQ();
+            BeanUtils.copyProperties(caseData.getRespondent1DQ(), updatedDQ);
+            updatedDQ.setRespondent1DQWitnesses(updatedRespondent1Witnesses);
+            caseData.setRespondent1DQ(updatedDQ);
 
             // copy in respondent2 for 1v2SS single response
             if (caseData.getRespondent2() != null
@@ -92,8 +97,10 @@ public class WitnessUtils {
                 caseData.getApplicant1ResponseDate().toLocalDate(),
                 CLAIMANT_INTENTION_EVENT.getValue()
             );
-            caseData.setApplicant1DQ(caseData.getApplicant1DQ().toBuilder()
-                                         .applicant1DQWitnesses(updatedApplicant1Witnesses).build());
+            Applicant1DQ updatedDQ = new Applicant1DQ();
+            BeanUtils.copyProperties(caseData.getApplicant1DQ(), updatedDQ);
+            updatedDQ.setApplicant1DQWitnesses(updatedApplicant1Witnesses);
+            caseData.setApplicant1DQ(updatedDQ);
 
             // copy in applicant 2 for single response
             if (caseData.getApplicant2() != null

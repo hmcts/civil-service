@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.citizen;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
@@ -13,7 +14,9 @@ import uk.gov.hmcts.reform.civil.model.CaseManagementCategoryElement;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.AirlineEpimsService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -58,11 +61,11 @@ public class UpdateCaseManagementDetailsService {
         caseData.setCaseNameHmctsInternal(caseParticipants(caseData).toString());
 
         CaseManagementCategoryElement civil =
-            CaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
+            new CaseManagementCategoryElement().setCode("Civil").setLabel("Civil");
         List<Element<CaseManagementCategoryElement>> itemList = new ArrayList<>();
         itemList.add(element(civil));
         caseData.setCaseManagementCategory(
-            CaseManagementCategory.builder().value(civil).list_items(itemList).build());
+            new CaseManagementCategory().setValue(civil).setList_items(itemList));
     }
 
     private void updateFlightDelayCaseManagementLocation(
@@ -88,34 +91,39 @@ public class UpdateCaseManagementDetailsService {
         return Optional.ofNullable(airlineEpimsService.getEpimsIdForAirlineIgnoreCase(airlineName))
             .map(locationEpimmsId -> availableLocations.stream().filter(loc -> loc.getEpimmsId().equals(locationEpimmsId)).toList())
             .filter(matchedLocations -> !matchedLocations.isEmpty())
-            .map(matchedLocations -> CaseLocationCivil.builder()
-                .region(matchedLocations.get(0).getRegionId())
-                .baseLocation(matchedLocations.get(0).getEpimmsId()).build())
+            .map(matchedLocations -> new CaseLocationCivil()
+                .setRegion(matchedLocations.get(0).getRegionId())
+                .setBaseLocation(matchedLocations.get(0).getEpimmsId()))
             .orElse(availableLocations.stream()
                         .filter(locationRefData -> LIVERPOOL_SITE_NAME.equals(locationRefData.getSiteName()))
                         .findFirst()
-                        .map(locationRefData -> CaseLocationCivil.builder()
-                            .region(locationRefData.getRegionId())
-                            .baseLocation(locationRefData.getEpimmsId())
-                            .build())
+                        .map(locationRefData -> new CaseLocationCivil()
+                            .setRegion(locationRefData.getRegionId())
+                            .setBaseLocation(locationRefData.getEpimmsId()))
                         .orElse(null));
     }
 
     private void updateApplicant1RequestedCourtDetails(CaseData caseData, List<LocationRefData> availableLocations) {
         Optional.ofNullable(caseData.getApplicant1DQ())
             .ifPresent(dq -> Optional.ofNullable(dq.getApplicant1DQRequestedCourt())
-                .ifPresent(requestedCourt -> caseData.setApplicant1DQ(
-                    dq.toBuilder().applicant1DQRequestedCourt(correctCaseLocation(requestedCourt, availableLocations))
-                        .build())));
+                .ifPresent(requestedCourt -> {
+                    Applicant1DQ updatedDq = new Applicant1DQ();
+                    BeanUtils.copyProperties(dq, updatedDq);
+                    updatedDq.setApplicant1DQRequestedCourt(correctCaseLocation(requestedCourt, availableLocations));
+                    caseData.setApplicant1DQ(updatedDq);
+                }));
     }
 
     public void updateRespondent1RequestedCourtDetails(CaseData caseData, List<LocationRefData> availableLocations) {
         if (caseData.isRespondent1LiP()) {
             Optional.ofNullable(caseData.getRespondent1DQ())
                 .ifPresent(dq -> Optional.ofNullable(dq.getRespondent1DQRequestedCourt())
-                    .ifPresent(requestedCourt -> caseData.setRespondent1DQ(
-                        dq.toBuilder().respondent1DQRequestedCourt(correctCaseLocation(requestedCourt, availableLocations))
-                            .build())));
+                    .ifPresent(requestedCourt -> {
+                        Respondent1DQ updatedDq = new Respondent1DQ();
+                        BeanUtils.copyProperties(dq, updatedDq);
+                        updatedDq.setRespondent1DQRequestedCourt(correctCaseLocation(requestedCourt, availableLocations));
+                        caseData.setRespondent1DQ(updatedDq);
+                    }));
         }
     }
 
@@ -127,10 +135,11 @@ public class UpdateCaseManagementDetailsService {
         LocationRefData preferredLocation = locations.stream()
             .filter(locationRefData -> courtLocationUtils.checkLocation(locationRefData, locationLabel))
             .findFirst().orElseThrow(RuntimeException::new);
-        return requestedCourt.toBuilder()
-            .responseCourtCode(preferredLocation.getCourtLocationCode())
-            .caseLocation(LocationHelper.buildCaseLocation(preferredLocation))
-            .build();
+        RequestedCourt updatedCourt = new RequestedCourt();
+        BeanUtils.copyProperties(requestedCourt, updatedCourt);
+        updatedCourt.setResponseCourtCode(preferredLocation.getCourtLocationCode())
+            .setCaseLocation(LocationHelper.buildCaseLocation(preferredLocation));
+        return updatedCourt;
     }
 
     public List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.managecontactinform
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -11,12 +12,15 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ContactDetailsUpdatedEvent;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
 import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -161,10 +165,11 @@ public class SubmitChangesTask {
         if (partyId.equals(CLAIMANT_ONE_EXPERTS_ID)) {
             mappedExperts = mapUpdatePartyDetailsFormToDQExperts(
                 caseData.getApplicant1DQ().getApplicant1DQExperts(), formData);
-            caseData.setApplicant1DQ(caseData.getApplicant1DQ().toBuilder()
-                                     .applicant1DQExperts(
-                                         buildExperts(caseData.getApplicant1DQ().getApplicant1DQExperts(), mappedExperts))
-                                     .build());
+            Applicant1DQ updatedDQ = new Applicant1DQ();
+            BeanUtils.copyProperties(caseData.getApplicant1DQ(), updatedDQ);
+            updatedDQ.setApplicant1DQExperts(
+                                         buildExperts(caseData.getApplicant1DQ().getApplicant1DQExperts(), mappedExperts));
+            caseData.setApplicant1DQ(updatedDQ);
             List<Element<PartyFlagStructure>> updatedApplicantExperts = updatePartyDQExperts(
                 unwrapElements(caseData.getApplicantExperts()),
                 unwrapElements(mappedExperts)
@@ -182,10 +187,11 @@ public class SubmitChangesTask {
         } else if (partyId.equals(DEFENDANT_ONE_EXPERTS_ID)) {
             mappedExperts = mapUpdatePartyDetailsFormToDQExperts(
                 caseData.getRespondent1DQ().getRespondent1DQExperts(), formData);
-            caseData.setRespondent1DQ(caseData.getRespondent1DQ().toBuilder()
-                                      .respondent1DQExperts(
-                                          buildExperts(caseData.getRespondent1DQ().getRespondent1DQExperts(), mappedExperts))
-                                      .build());
+            Respondent1DQ updatedDQ = new Respondent1DQ();
+            BeanUtils.copyProperties(caseData.getRespondent1DQ(), updatedDQ);
+            updatedDQ.setRespondent1DQExperts(
+                                          buildExperts(caseData.getRespondent1DQ().getRespondent1DQExperts(), mappedExperts));
+            caseData.setRespondent1DQ(updatedDQ);
             List<Element<PartyFlagStructure>> updatedRespondent1Experts = updatePartyDQExperts(
                 unwrapElements(caseData.getRespondent1Experts()),
                 unwrapElements(mappedExperts)
@@ -222,10 +228,11 @@ public class SubmitChangesTask {
         if (partyId.equals(CLAIMANT_ONE_WITNESSES_ID)) {
             mappedWitnesses = mapUpdatePartyDetailsFormToDQWitnesses(
                 caseData.getApplicant1DQ().getApplicant1DQWitnesses(), formData);
-            caseData.setApplicant1DQ(caseData.getApplicant1DQ().toBuilder()
-                                     .applicant1DQWitnesses(
-                                         buildWitnesses(caseData.getApplicant1DQ().getApplicant1DQWitnesses(), mappedWitnesses))
-                                     .build());
+            Applicant1DQ updatedDQ = new Applicant1DQ();
+            BeanUtils.copyProperties(caseData.getApplicant1DQ(), updatedDQ);
+            updatedDQ.setApplicant1DQWitnesses(
+                                         buildWitnesses(caseData.getApplicant1DQ().getApplicant1DQWitnesses(), mappedWitnesses));
+            caseData.setApplicant1DQ(updatedDQ);
             List<Element<PartyFlagStructure>> updatedApplicantWitnesses = updatePartyDQWitnesses(
                 unwrapElements(caseData.getApplicantWitnesses()),
                 unwrapElements(mappedWitnesses)
@@ -242,10 +249,11 @@ public class SubmitChangesTask {
         } else if (partyId.equals(DEFENDANT_ONE_WITNESSES_ID)) {
             mappedWitnesses = mapUpdatePartyDetailsFormToDQWitnesses(
                 caseData.getRespondent1DQ().getRespondent1DQWitnesses(), formData);
-            caseData.setRespondent1DQ(caseData.getRespondent1DQ().toBuilder()
-                                      .respondent1DQWitnesses(
-                                          buildWitnesses(caseData.getRespondent1DQ().getRespondent1DQWitnesses(), mappedWitnesses))
-                                      .build());
+            Respondent1DQ updatedDQ = new Respondent1DQ();
+            BeanUtils.copyProperties(caseData.getRespondent1DQ(), updatedDQ);
+            updatedDQ.setRespondent1DQWitnesses(
+                                          buildWitnesses(caseData.getRespondent1DQ().getRespondent1DQWitnesses(), mappedWitnesses));
+            caseData.setRespondent1DQ(updatedDQ);
             List<Element<PartyFlagStructure>> updatedRespondent1Witnesses = updatePartyDQWitnesses(
                 unwrapElements(caseData.getRespondent1Witnesses()),
                 unwrapElements(mappedWitnesses)
@@ -337,10 +345,14 @@ public class SubmitChangesTask {
     }
 
     private void updateClaimDetailsTab(CaseData caseData) {
-        caseData.setRespondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build());
+        Party respondent1 = new Party();
+        BeanUtils.copyProperties(caseData.getRespondent1(), respondent1);
+        caseData.setRespondent1DetailsForClaimDetailsTab(respondent1.setFlags(null));
 
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            caseData.setRespondent2DetailsForClaimDetailsTab(caseData.getRespondent2().toBuilder().flags(null).build());
+            Party respondent2 = new Party();
+            BeanUtils.copyProperties(caseData.getRespondent2(), respondent2);
+            caseData.setRespondent2DetailsForClaimDetailsTab(respondent2.setFlags(null));
         }
     }
 

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallba
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.CaseTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -132,11 +134,17 @@ public class PopulateRespondent1Copy implements CaseTask {
 
     private void updateRespondentDetails(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
         log.info("Updating respondent details for caseId: {}", caseData.getCcdCaseReference());
-        updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build());
+        Party respondent1 = new Party();
+        BeanUtils.copyProperties(caseData.getRespondent1(), respondent1);
+        updatedCaseData.respondent1DetailsForClaimDetailsTab(respondent1.setFlags(null));
 
         ofNullable(caseData.getRespondent2())
-                .ifPresent(r2 -> updatedCaseData.respondent2Copy(r2)
-                        .respondent2DetailsForClaimDetailsTab(r2.toBuilder().flags(null).build()));
+                .ifPresent(r2 -> {
+                    Party respondent2 = new Party();
+                    BeanUtils.copyProperties(r2, respondent2);
+                    updatedCaseData.respondent2Copy(r2)
+                            .respondent2DetailsForClaimDetailsTab(respondent2.setFlags(null));
+                });
     }
 
     private void updateCourtLocation(Set<DefendantResponseShowTag> initialShowTags, CaseData.CaseDataBuilder<?, ?> updatedCaseData, CallbackParams callbackParams) {
@@ -145,20 +153,17 @@ public class PopulateRespondent1Copy implements CaseTask {
         DynamicList courtLocationList = courtLocationUtils.getLocationsFromList(respondToClaimSpecUtils.getLocationData(callbackParams));
         if (initialShowTags.contains(CAN_ANSWER_RESPONDENT_1)) {
             log.debug("CaseId {}: Updating court location for Respondent 1", callbackParams.getCaseData().getCcdCaseReference());
-            updatedCaseData.respondent1DQ(Respondent1DQ.builder()
-                    .respondToCourtLocation(
-                            RequestedCourt.builder()
-                                    .responseCourtLocations(courtLocationList)
-                                    .build())
-                    .build());
+            updatedCaseData.respondent1DQ(new Respondent1DQ()
+                    .setRespondToCourtLocation(
+                            new RequestedCourt()
+                                    .setResponseCourtLocations(courtLocationList)));
         }
         if (initialShowTags.contains(CAN_ANSWER_RESPONDENT_2)) {
             log.debug("CaseId {}: Updating court location for Respondent 2", callbackParams.getCaseData().getCcdCaseReference());
             updatedCaseData.respondent2DQ(Respondent2DQ.builder()
                     .respondToCourtLocation2(
-                            RequestedCourt.builder()
-                                    .responseCourtLocations(courtLocationList)
-                                    .build())
+                            new RequestedCourt()
+                                    .setResponseCourtLocations(courtLocationList))
                     .build());
         }
 

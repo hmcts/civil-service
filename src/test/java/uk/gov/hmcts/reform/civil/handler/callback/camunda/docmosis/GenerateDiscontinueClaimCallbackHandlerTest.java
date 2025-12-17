@@ -462,24 +462,24 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
     }
 
     private Party getRespondent1PartyDetails() {
-        return PartyBuilder.builder().individual().build().toBuilder()
-                .individualFirstName("John")
-                .individualLastName("Doe")
-                .build();
+        return new Party()
+                .setType(Party.Type.INDIVIDUAL)
+                .setIndividualFirstName("John")
+                .setIndividualLastName("Doe");
     }
 
     private Party getRespondent2PartyDetails() {
-        return PartyBuilder.builder().individual().build().toBuilder()
-                .individualFirstName("Jane")
-                .individualLastName("Doe")
-                .build();
+        return new Party()
+                .setType(Party.Type.INDIVIDUAL)
+                .setIndividualFirstName("Jane")
+                .setIndividualLastName("Doe");
     }
 
     private Party getApplicant1PartyDetails() {
-        return PartyBuilder.builder().individual().build().toBuilder()
-                .individualFirstName("Carl")
-                .individualLastName("Foster")
-                .build();
+        return new Party()
+                .setType(Party.Type.INDIVIDUAL)
+                .setIndividualFirstName("Carl")
+                .setIndividualLastName("Foster");
     }
 
     private CaseDocument getCaseDocument() {

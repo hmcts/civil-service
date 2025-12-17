@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
@@ -359,8 +360,13 @@ public class PartyUtils {
     }
 
     public static Party appendWithNewPartyId(Party party) {
-        return party != null && party.getPartyID() == null
-            ? party.toBuilder().partyID(createPartyId()).build() : party;
+        if (party != null && party.getPartyID() == null) {
+            Party updated = new Party();
+            BeanUtils.copyProperties(party, updated);
+            updated.setPartyID(createPartyId());
+            return updated;
+        }
+        return party;
     }
 
     public static LitigationFriend appendWithNewPartyId(LitigationFriend litigationFriend) {
@@ -419,11 +425,15 @@ public class PartyUtils {
     }
 
     public static Applicant1DQ appendWithNewPartyIds(Applicant1DQ applicant1DQ) {
-        return applicant1DQ != null ? applicant1DQ.toBuilder()
-            .applicant1DQExperts(appendWithNewPartyIds(applicant1DQ.getApplicant1DQExperts()))
-            .applicant1RespondToClaimExperts(appendWithNewPartyIds(applicant1DQ.getApplicant1RespondToClaimExperts()))
-            .applicant1DQWitnesses(appendWithNewPartyIds(applicant1DQ.getApplicant1DQWitnesses()))
-            .build() : null;
+        if (applicant1DQ != null) {
+            Applicant1DQ updated = new Applicant1DQ();
+            BeanUtils.copyProperties(applicant1DQ, updated);
+            updated.setApplicant1DQExperts(appendWithNewPartyIds(applicant1DQ.getApplicant1DQExperts()))
+                .setApplicant1RespondToClaimExperts(appendWithNewPartyIds(applicant1DQ.getApplicant1RespondToClaimExperts()))
+                .setApplicant1DQWitnesses(appendWithNewPartyIds(applicant1DQ.getApplicant1DQWitnesses()));
+            return updated;
+        }
+        return null;
     }
 
     public static Applicant2DQ appendWithNewPartyIds(Applicant2DQ applicant2DQ) {
@@ -435,11 +445,15 @@ public class PartyUtils {
     }
 
     public static Respondent1DQ appendWithNewPartyIds(Respondent1DQ respondent1DQ) {
-        return respondent1DQ != null ? respondent1DQ.toBuilder()
-            .respondent1DQExperts(appendWithNewPartyIds(respondent1DQ.getRespondent1DQExperts()))
-            .respondToClaimExperts(appendWithNewPartyIds(respondent1DQ.getRespondToClaimExperts()))
-            .respondent1DQWitnesses(appendWithNewPartyIds(respondent1DQ.getRespondent1DQWitnesses()))
-            .build() : null;
+        if (respondent1DQ != null) {
+            Respondent1DQ updated = new Respondent1DQ();
+            BeanUtils.copyProperties(respondent1DQ, updated);
+            updated.setRespondent1DQExperts(appendWithNewPartyIds(respondent1DQ.getRespondent1DQExperts()))
+                .setRespondToClaimExperts(appendWithNewPartyIds(respondent1DQ.getRespondToClaimExperts()))
+                .setRespondent1DQWitnesses(appendWithNewPartyIds(respondent1DQ.getRespondent1DQWitnesses()));
+            return updated;
+        }
+        return null;
     }
 
     public static Respondent2DQ appendWithNewPartyIds(Respondent2DQ respondent2DQ) {

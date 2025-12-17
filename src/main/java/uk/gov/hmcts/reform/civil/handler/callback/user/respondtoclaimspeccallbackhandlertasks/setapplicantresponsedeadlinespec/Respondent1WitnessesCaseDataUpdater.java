@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.setapplicantresponsedeadlinespec;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 
 @Component
 @Slf4j
@@ -14,10 +16,10 @@ public class Respondent1WitnessesCaseDataUpdater implements ExpertsAndWitnessesC
 
         if (caseData.getRespondent1DQWitnessesSmallClaim() != null) {
             log.info("Setting respondent1DQWitnesses with small claim witnesses for caseId: {}", caseData.getCcdCaseReference());
-            caseData.setRespondent1DQ(
-                    caseData.getRespondent1DQ().toBuilder()
-                            .respondent1DQWitnesses(caseData.getRespondent1DQWitnessesSmallClaim())
-                            .build());
+            Respondent1DQ updatedDQ = new Respondent1DQ();
+            BeanUtils.copyProperties(caseData.getRespondent1DQ(), updatedDQ);
+            updatedDQ.setRespondent1DQWitnesses(caseData.getRespondent1DQWitnessesSmallClaim());
+            caseData.setRespondent1DQ(updatedDQ);
         }
         return caseData;
     }

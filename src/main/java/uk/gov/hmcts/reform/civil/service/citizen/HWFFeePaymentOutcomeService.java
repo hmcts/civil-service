@@ -2,11 +2,14 @@ package uk.gov.hmcts.reform.civil.service.citizen;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.service.citizenui.HelpWithFeesForTabService;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -27,11 +30,15 @@ public class HWFFeePaymentOutcomeService {
             && caseData.getFeePaymentOutcomeDetails().getHwfNumberAvailable() == YesOrNo.YES) {
             if (caseData.isHWFTypeClaimIssued()) {
                 var caseDataLip = caseData.getCaseDataLiP();
-                HelpWithFees helpWithFees = HelpWithFees.builder()
-                    .helpWithFee(YesOrNo.YES)
-                    .helpWithFeesReferenceNumber(caseData.getFeePaymentOutcomeDetails().getHwfNumberForFeePaymentOutcome())
-                    .build();
-                caseData.setCaseDataLiP(caseDataLip.toBuilder().helpWithFees(helpWithFees).build());
+                HelpWithFees helpWithFees = new HelpWithFees()
+                    .setHelpWithFee(YesOrNo.YES)
+                    .setHelpWithFeesReferenceNumber(caseData.getFeePaymentOutcomeDetails().getHwfNumberForFeePaymentOutcome());
+                if (caseDataLip != null) {
+                    caseDataLip.setHelpWithFees(helpWithFees);
+                } else {
+                    caseDataLip = new CaseDataLiP().setHelpWithFees(helpWithFees);
+                }
+                caseData.setCaseDataLiP(caseDataLip);
                 helpWithFeesForTabService.setUpHelpWithFeeTab(caseData);
             }
             if (caseData.isHWFTypeHearing()) {
@@ -43,9 +50,11 @@ public class HWFFeePaymentOutcomeService {
     }
 
     private void clearHwfReferenceProperties(CaseData caseData) {
-        caseData.setFeePaymentOutcomeDetails(caseData.getFeePaymentOutcomeDetails().toBuilder()
-                                                     .hwfNumberAvailable(null)
-                                                     .hwfNumberForFeePaymentOutcome(null).build());
+        if (caseData.getFeePaymentOutcomeDetails() != null) {
+            caseData.getFeePaymentOutcomeDetails()
+                .setHwfNumberAvailable(null)
+                .setHwfNumberForFeePaymentOutcome(null);
+        }
     }
 
     public CaseData updateOutstandingFee(CaseData caseData, String caseEventId) {
@@ -61,21 +70,27 @@ public class HWFFeePaymentOutcomeService {
 
         if (caseData.isHWFTypeClaimIssued() && BigDecimal.ZERO.compareTo(claimFeeAmount) != 0) {
             outstandingFeeAmount = claimFeeAmount.subtract(claimIssuedRemissionAmount);
-            caseData.setClaimIssuedHwfDetails(
-                caseData.getClaimIssuedHwfDetails().toBuilder()
-                    .remissionAmount(claimIssuedRemissionAmount)
-                    .outstandingFeeInPounds(MonetaryConversions.penniesToPounds(outstandingFeeAmount))
-                    .build()
-            );
+            if (caseData.getClaimIssuedHwfDetails() != null) {
+                caseData.getClaimIssuedHwfDetails()
+                    .setRemissionAmount(claimIssuedRemissionAmount)
+                    .setOutstandingFeeInPounds(MonetaryConversions.penniesToPounds(outstandingFeeAmount));
+            } else {
+                caseData.setClaimIssuedHwfDetails(new HelpWithFeesDetails()
+                    .setRemissionAmount(claimIssuedRemissionAmount)
+                    .setOutstandingFeeInPounds(MonetaryConversions.penniesToPounds(outstandingFeeAmount)));
+            }
             helpWithFeesForTabService.setUpHelpWithFeeTab(caseData);
         } else if (caseData.isHWFTypeHearing() && BigDecimal.ZERO.compareTo(hearingFeeAmount) != 0) {
             outstandingFeeAmount = hearingFeeAmount.subtract(hearingRemissionAmount);
-            caseData.setHearingHwfDetails(
-                caseData.getHearingHwfDetails().toBuilder()
-                    .remissionAmount(hearingRemissionAmount)
-                    .outstandingFeeInPounds(MonetaryConversions.penniesToPounds(outstandingFeeAmount))
-                    .build()
-            );
+            if (caseData.getHearingHwfDetails() != null) {
+                caseData.getHearingHwfDetails()
+                    .setRemissionAmount(hearingRemissionAmount)
+                    .setOutstandingFeeInPounds(MonetaryConversions.penniesToPounds(outstandingFeeAmount));
+            } else {
+                caseData.setHearingHwfDetails(new HelpWithFeesDetails()
+                    .setRemissionAmount(hearingRemissionAmount)
+                    .setOutstandingFeeInPounds(MonetaryConversions.penniesToPounds(outstandingFeeAmount)));
+            }
             helpWithFeesForTabService.setUpHelpWithFeeTab(caseData);
         }
         return caseData;

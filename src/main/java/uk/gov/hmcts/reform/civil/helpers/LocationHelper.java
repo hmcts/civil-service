@@ -137,10 +137,9 @@ public class LocationHelper {
 
     private Optional<RequestedCourt> getUnspecClaimantRequestedCourt(CaseData caseData) {
         return Optional.ofNullable(caseData.getCourtLocation())
-            .map(courtLocation -> RequestedCourt.builder()
-                .responseCourtCode(courtLocation.getApplicantPreferredCourt())
-                .caseLocation(courtLocation.getCaseLocation())
-                .build());
+            .map(courtLocation -> new RequestedCourt()
+                .setResponseCourtCode(courtLocation.getApplicantPreferredCourt())
+                .setCaseLocation(courtLocation.getCaseLocation()));
     }
 
     /**
@@ -174,10 +173,9 @@ public class LocationHelper {
      * @return case location built from location
      */
     public static CaseLocationCivil buildCaseLocation(LocationRefData location) {
-        return CaseLocationCivil.builder()
-            .region(location.getRegionId())
-            .baseLocation(location.getEpimmsId())
-            .build();
+        return new CaseLocationCivil()
+            .setRegion(location.getRegionId())
+            .setBaseLocation(location.getEpimmsId());
     }
 
     /**

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.migration;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -98,9 +99,10 @@ public class UpdatePartyExpertsTask extends MigrationTask<CaseReference> {
             .details(updateElements(dq.getApplicant1DQExperts().getDetails(), transformer))
             .build();
 
-        return dq.toBuilder()
-            .applicant1DQExperts(updatedExperts)
-            .build();
+        Applicant1DQ updatedDQ = new Applicant1DQ();
+        BeanUtils.copyProperties(dq, updatedDQ);
+        updatedDQ.setApplicant1DQExperts(updatedExperts);
+        return updatedDQ;
     }
 
     private Respondent1DQ updateRespondent1DQExperts(Respondent1DQ dq, UnaryOperator<Expert> transformer) {
@@ -112,9 +114,10 @@ public class UpdatePartyExpertsTask extends MigrationTask<CaseReference> {
             .details(updateElements(dq.getRespondent1DQExperts().getDetails(), transformer))
             .build();
 
-        return dq.toBuilder()
-            .respondent1DQExperts(updatedExperts)
-            .build();
+        Respondent1DQ updatedDQ = new Respondent1DQ();
+        BeanUtils.copyProperties(dq, updatedDQ);
+        updatedDQ.setRespondent1DQExperts(updatedExperts);
+        return updatedDQ;
     }
 
     private Respondent2DQ updateRespondent2DQExperts(Respondent2DQ dq, UnaryOperator<Expert> transformer) {

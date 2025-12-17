@@ -16,7 +16,6 @@ import java.util.Optional;
 
 @Accessors(chain = true)
 @Data
-@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class CaseDataLiP {

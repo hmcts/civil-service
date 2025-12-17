@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallba
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -311,7 +312,7 @@ public class RespondToClaimSpecUtils {
         log.info("CaseId {}: Cleared Respondent 2 Spec Defence Response Document", caseData.getCcdCaseReference());
 
         if (nonNull(caseData.getRespondent1DQ())) {
-            caseData.setRespondent1DQ(caseData.getRespondent1DQ().toBuilder().respondent1DQDraftDirections(null).build());
+            caseData.getRespondent1DQ().setRespondent1DQDraftDirections(null);
             log.info("CaseId {}: Cleared Respondent 1 DQ Draft Directions", caseData.getCcdCaseReference());
         }
         if (nonNull(caseData.getRespondent2DQ())) {

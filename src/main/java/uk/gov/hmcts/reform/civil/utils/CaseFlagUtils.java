@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import org.springframework.beans.BeanUtils;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -97,8 +98,16 @@ public class CaseFlagUtils {
     }
 
     public static Party updateParty(String roleOnCase, Party partyToUpdate) {
-        return partyToUpdate != null ? partyToUpdate.getFlags() != null ? partyToUpdate :
-            partyToUpdate.toBuilder().flags(createFlags(partyToUpdate.getPartyName(), roleOnCase)).build() : null;
+        if (partyToUpdate != null) {
+            if (partyToUpdate.getFlags() != null) {
+                return partyToUpdate;
+            }
+            Party updated = new Party();
+            BeanUtils.copyProperties(partyToUpdate, updated);
+            updated.setFlags(createFlags(partyToUpdate.getPartyName(), roleOnCase));
+            return updated;
+        }
+        return null;
     }
 
     public static LitigationFriend updateLitFriend(String roleOnCase, LitigationFriend litFriendToUpdate) {
@@ -345,9 +354,13 @@ public class CaseFlagUtils {
     }
 
     private static Party updatePartyNameForFlags(Party party) {
-        return party.toBuilder().flags(party.getFlags().toBuilder()
+        Party updated = new Party();
+        BeanUtils.copyProperties(party, updated);
+        Flags updatedFlags = party.getFlags().toBuilder()
                                            .partyName(party.getPartyName())
-                                           .build()).build();
+                                           .build();
+        updated.setFlags(updatedFlags);
+        return updated;
     }
 
     private static LitigationFriend updatePartyNameForLitigationFriendFlags(LitigationFriend litigationFriend) {

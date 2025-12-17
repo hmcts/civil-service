@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallb
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -11,6 +12,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.CaseTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -120,10 +122,9 @@ public class PopulateRespondentCopyObjects implements CaseTask {
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1())
             .isRespondent1(isRespondent1)
-            .respondent1DQ(Respondent1DQ.builder()
-                               .respondent1DQRequestedCourt(
-                                   requestedCourt1)
-                               .build());
+            .respondent1DQ(new Respondent1DQ()
+                               .setRespondent1DQRequestedCourt(
+                                   requestedCourt1));
 
         if (caseData.getRespondent2() != null) {
             updatedCaseData.respondent2DQ(
@@ -131,22 +132,24 @@ public class PopulateRespondentCopyObjects implements CaseTask {
                     .respondent2DQRequestedCourt(requestedCourt1).build());
         }
 
-        updatedCaseData.respondent1DetailsForClaimDetailsTab(updatedCaseData.build().getRespondent1()
-                                                                 .toBuilder().flags(null).build());
+        Party respondent1 = new Party();
+        BeanUtils.copyProperties(updatedCaseData.build().getRespondent1(), respondent1);
+        updatedCaseData.respondent1DetailsForClaimDetailsTab(respondent1.setFlags(null));
 
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
+            Party respondent2 = new Party();
+            BeanUtils.copyProperties(updatedCaseData.build().getRespondent2(), respondent2);
             updatedCaseData
                 .respondent2Copy(caseData.getRespondent2())
-                .respondent2DetailsForClaimDetailsTab(updatedCaseData.build().getRespondent2()
-                                                          .toBuilder().flags(null).build());
+                .respondent2DetailsForClaimDetailsTab(respondent2.setFlags(null));
         }
         return updatedCaseData;
     }
 
     private RequestedCourt createRequestedCourt(List<LocationRefData> locations, CaseData caseData) {
         DynamicList courtLocationList = courtLocationUtils.getLocationsFromList(locations);
-        RequestedCourt.RequestedCourtBuilder requestedCourt = RequestedCourt.builder();
-        requestedCourt.responseCourtLocations(courtLocationList);
+        RequestedCourt requestedCourt = new RequestedCourt();
+        requestedCourt.setResponseCourtLocations(courtLocationList);
 
         Optional.ofNullable(caseData.getCourtLocation())
             .map(CourtLocation::getApplicantPreferredCourt)
@@ -154,9 +157,9 @@ public class PopulateRespondentCopyObjects implements CaseTask {
                 .filter(locationRefData -> applicantCourt.equals(locationRefData.getCourtLocationCode()))
                 .findFirst())
             .ifPresent(locationRefData -> requestedCourt
-                .otherPartyPreferredSite(locationRefData.getCourtLocationCode()
+                .setOtherPartyPreferredSite(locationRefData.getCourtLocationCode()
                                              + " " + locationRefData.getSiteName()));
-        return requestedCourt.build();
+        return requestedCourt;
     }
 
     private boolean isSubmissionForDefendantAlreadySubmitted(CallbackParams callbackParams, CaseData caseData) {

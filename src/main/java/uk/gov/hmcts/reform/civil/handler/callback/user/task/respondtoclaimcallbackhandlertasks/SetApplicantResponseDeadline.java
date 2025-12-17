@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallb
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -172,9 +173,13 @@ public class SetApplicantResponseDeadline implements CaseTask {
     }
 
     private static void updateClaimsDetailsForClaimDetailsTab(CaseData updatedData, CaseData caseData) {
-        updatedData.setRespondent1DetailsForClaimDetailsTab(updatedData.getRespondent1().toBuilder().flags(null).build());
+        Party respondent1 = new Party();
+        BeanUtils.copyProperties(updatedData.getRespondent1(), respondent1);
+        updatedData.setRespondent1DetailsForClaimDetailsTab(respondent1.setFlags(null));
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            updatedData.setRespondent2DetailsForClaimDetailsTab(updatedData.getRespondent2().toBuilder().flags(null).build());
+            Party respondent2 = new Party();
+            BeanUtils.copyProperties(updatedData.getRespondent2(), respondent2);
+            updatedData.setRespondent2DetailsForClaimDetailsTab(respondent2.setFlags(null));
         }
     }
 
@@ -199,8 +204,7 @@ public class SetApplicantResponseDeadline implements CaseTask {
         updatedData.setRespondent2ClaimResponseDocument(null);
         if (caseData.getRespondent1() != null
             && updatedData.getRespondent1DQ() != null) {
-            updatedData.setRespondent1DQ(updatedData.getRespondent1DQ().toBuilder().respondent1DQDraftDirections(
-                null).build());
+            updatedData.getRespondent1DQ().setRespondent1DQDraftDirections(null);
         }
         if (caseData.getRespondent2() != null
             && updatedData.getRespondent2DQ() != null) {
@@ -211,18 +215,18 @@ public class SetApplicantResponseDeadline implements CaseTask {
 
     private void updateRespondentAddresses(CaseData caseData) {
 
-        Party updatedRespondent1 = caseData.getRespondent1().toBuilder()
-            .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
-            .build();
+        Party updatedRespondent1 = new Party();
+        BeanUtils.copyProperties(caseData.getRespondent1(), updatedRespondent1);
+        updatedRespondent1.setPrimaryAddress(caseData.getRespondent1Copy().getPrimaryAddress());
 
         caseData.setRespondent1(updatedRespondent1);
         caseData.setRespondent1Copy(null);
 
         if (ofNullable(caseData.getRespondent2()).isPresent()
             && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
-            Party updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
-                .build();
+            Party updatedRespondent2 = new Party();
+            BeanUtils.copyProperties(caseData.getRespondent2(), updatedRespondent2);
+            updatedRespondent2.setPrimaryAddress(caseData.getRespondent2Copy().getPrimaryAddress());
 
             caseData.setRespondent2(updatedRespondent2);
             caseData.setRespondent2Copy(null);
