@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -24,21 +25,19 @@ public class Respondent1ExpertsCaseDataUpdaters implements ExpertsAndWitnessesCa
                     && caseData.getRespondent1DQ().getSmallClaimExperts() != null) {
                 log.info("Setting respondent1DQExperts with expert details for caseId: {}", caseData.getCcdCaseReference());
                 Expert expert = fromSmallClaimExpertDetails(caseData.getRespondent1DQ().getSmallClaimExperts());
-                caseData.setRespondent1DQ(
-                        caseData.getRespondent1DQ().toBuilder()
-                                .respondent1DQExperts(Experts.builder()
-                                        .expertRequired(caseData.getResponseClaimExpertSpecRequired())
-                                        .details(wrapElements(expert))
-                                        .build())
-                                .build());
+                Experts experts = new Experts();
+                experts.setExpertRequired(caseData.getResponseClaimExpertSpecRequired());
+                experts.setDetails(wrapElements(expert));
+                Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
+                respondent1DQ.setRespondent1DQExperts(experts);
+                caseData.setRespondent1DQ(respondent1DQ);
             } else if (NO.equals(caseData.getResponseClaimExpertSpecRequired())) {
                 log.info("Setting respondent1DQExperts with expertRequired as NO for caseId: {}", caseData.getCcdCaseReference());
-                caseData.setRespondent1DQ(
-                        caseData.getRespondent1DQ().toBuilder()
-                                .respondent1DQExperts(Experts.builder()
-                                        .expertRequired(caseData.getResponseClaimExpertSpecRequired())
-                                        .build())
-                                .build());
+                Experts experts = new Experts();
+                experts.setExpertRequired(caseData.getResponseClaimExpertSpecRequired());
+                Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
+                respondent1DQ.setRespondent1DQExperts(experts);
+                caseData.setRespondent1DQ(respondent1DQ);
             }
         }
         return caseData;

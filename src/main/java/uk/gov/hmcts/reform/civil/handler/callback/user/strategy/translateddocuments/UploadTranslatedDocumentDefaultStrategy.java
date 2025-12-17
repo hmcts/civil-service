@@ -60,22 +60,20 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
     @Override
     public CallbackResponse uploadDocument(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder
             aboutToStartOrSubmitCallbackResponseBuilder = AboutToStartOrSubmitCallbackResponse.builder();
         updateSystemGeneratedDocumentsWithOriginalDocuments(
             callbackParams,
-            caseDataBuilder,
             aboutToStartOrSubmitCallbackResponseBuilder
         );
         CaseEvent businessProcessEvent = getBusinessProcessEvent(caseData);
-        updateNoticeOfDiscontinuanceTranslatedDoc(callbackParams, caseDataBuilder);
+        updateNoticeOfDiscontinuanceTranslatedDoc(callbackParams);
         updateDocumentCollectionsWithTranslationDocuments(
-            caseData, caseDataBuilder);
+            caseData);
         CaseDataLiP caseDataLip = caseData.getCaseDataLiP();
 
         if (businessProcessEvent != null) {
-            caseDataBuilder = caseDataBuilder.businessProcess(BusinessProcess.ready(businessProcessEvent));
+            caseData.setBusinessProcess(BusinessProcess.ready(businessProcessEvent));
         }
 
         if (Objects.nonNull(caseDataLip)) {
@@ -83,22 +81,20 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         }
 
         if (Objects.nonNull(caseData.getPreTranslationDocumentType())) {
-            caseDataBuilder = caseDataBuilder.preTranslationDocumentType(null);
+            caseData.setPreTranslationDocumentType(null);
         }
 
         if (Objects.nonNull(caseData.getBilingualHint())) {
-            caseDataBuilder = caseDataBuilder.bilingualHint(YesOrNo.NO);
+            caseData.setBilingualHint(YesOrNo.NO);
         }
 
-        caseDataBuilder.caseDataLiP(caseDataLip);
-        CaseData updatedCaseData = caseDataBuilder.build();
+        caseData.setCaseDataLiP(caseDataLip);
 
-        aboutToStartOrSubmitCallbackResponseBuilder.data(updatedCaseData.toMap(objectMapper));
+        aboutToStartOrSubmitCallbackResponseBuilder.data(caseData.toMap(objectMapper));
         return aboutToStartOrSubmitCallbackResponseBuilder.build();
     }
 
     private void updateSystemGeneratedDocumentsWithOriginalDocuments(CallbackParams callbackParams,
-                                                                     CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                                                      AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder
                                                                          aboutToStartOrSubmitCallbackResponseBuilder) {
         CaseData caseData = callbackParams.getCaseData();
@@ -176,10 +172,10 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                     noticeOfDiscontinuanceOpt.ifPresent(noticeOfDiscontinuance -> {
                         renameTranslatedDocument(noticeOfDiscontinuance, document);
                         preTranslationDocuments.remove(noticeOfDiscontinuance);
-                        caseDataBuilder.applicant1NoticeOfDiscontinueAllPartyViewDoc(caseData.getApplicant1NoticeOfDiscontinueCWViewDoc());
-                        caseDataBuilder.applicant1NoticeOfDiscontinueCWViewDoc(null);
-                        caseDataBuilder.respondent1NoticeOfDiscontinueCWViewDoc(null);
-                        caseDataBuilder.respondent1NoticeOfDiscontinueAllPartyViewDoc(noticeOfDiscontinuance.getValue());
+                        caseData.setApplicant1NoticeOfDiscontinueAllPartyViewDoc(caseData.getApplicant1NoticeOfDiscontinueCWViewDoc());
+                        caseData.setApplicant1NoticeOfDiscontinueCWViewDoc(null);
+                        caseData.setRespondent1NoticeOfDiscontinueCWViewDoc(null);
+                        caseData.setRespondent1NoticeOfDiscontinueAllPartyViewDoc(noticeOfDiscontinuance.getValue());
                     });
                 } else if (document.getValue().getDocumentType().equals(SETTLEMENT_AGREEMENT)) {
                     Optional<Element<CaseDocument>> preTranslationSettlementAgreement =
@@ -209,7 +205,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                                 )
                             );
                         });
-                        caseDataBuilder.urgentFlag(null);
+                        caseData.setUrgentFlag(null);
                         preTranslationCourtOfficerOrder.ifPresent(preTranslationDocuments::remove);
                         preTranslationCourtOfficerOrder.ifPresent(courtOfficerOrderDocuments::add);
                     }
@@ -266,7 +262,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                         || (featureToggleService.isWelshEnabledForMainCase()
                         && originalDocument.getValue().getDocumentType() == DocumentType.SEALED_CLAIM)) {
                         if (originalDocument.getValue().getDocumentType().equals((DocumentType.DEFENDANT_DEFENCE))) {
-                            caseDataBuilder.respondent1ClaimResponseDocumentSpec(originalDocument.getValue());
+                            caseData.setRespondent1ClaimResponseDocumentSpec(originalDocument.getValue());
                         }
                         systemGeneratedDocuments.add(originalDocument);
                     }
@@ -275,24 +271,23 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             });
         }
         if (!courtOfficerOrderDocuments.isEmpty()) {
-            caseDataBuilder.courtOfficersOrders(courtOfficerOrderDocuments);
+            caseData.setCourtOfficersOrders(courtOfficerOrderDocuments);
         }
         boolean isDefendantResponse = isContainsSpecifiedDocType(translatedDocuments, DEFENDANT_RESPONSE);
         if (featureToggleService.isWelshEnabledForMainCase() && caseData.getRespondent1OriginalDqDoc() != null
             && isDefendantResponse) {
             systemGeneratedDocuments.add(element(caseData.getRespondent1OriginalDqDoc()));
-            caseDataBuilder.respondent1OriginalDqDoc(null);
+            caseData.setRespondent1OriginalDqDoc(null);
         }
         if (isDefendantResponse) {
             LocalDateTime applicant1ResponseDeadline =
                 deadlinesCalculator.calculateApplicantResponseDeadlineSpec(LocalDateTime.now());
-            caseDataBuilder.applicant1ResponseDeadline(applicant1ResponseDeadline)
-                .nextDeadline(applicant1ResponseDeadline.toLocalDate());
+            caseData.setApplicant1ResponseDeadline(applicant1ResponseDeadline);
+            caseData.setNextDeadline(applicant1ResponseDeadline.toLocalDate());
         }
     }
 
-    private void updateNoticeOfDiscontinuanceTranslatedDoc(CallbackParams callbackParams,
-                                                           CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+    private void updateNoticeOfDiscontinuanceTranslatedDoc(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
         Iterator<Element<TranslatedDocument>> iterator = translatedDocuments.iterator();
@@ -300,7 +295,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             Element<TranslatedDocument> translateDocument = iterator.next();
             if (translateDocument.getValue().getDocumentType().equals(NOTICE_OF_DISCONTINUANCE_DEFENDANT)) {
                 translateDocument.getValue().getFile().setCategoryID(DocCategory.NOTICE_OF_DISCONTINUE.getValue());
-                caseDataBuilder.respondent1NoticeOfDiscontinueAllPartyTranslatedDoc(CaseDocument.toCaseDocument(
+                caseData.setRespondent1NoticeOfDiscontinueAllPartyTranslatedDoc(CaseDocument.toCaseDocument(
                     translateDocument.getValue().getFile(),
                     translateDocument.getValue()
                         .getCorrespondingDocumentType(translateDocument.getValue().getDocumentType())
@@ -310,8 +305,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         }
     }
 
-    private void updateDocumentCollectionsWithTranslationDocuments(CaseData caseData,
-                                                                   CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+    private void updateDocumentCollectionsWithTranslationDocuments(CaseData caseData) {
         List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
         List<Element<TranslatedDocument>> addToSystemGenerated = new ArrayList<>();
         List<Element<TranslatedDocument>> addToHearingDocuments = new ArrayList<>();
@@ -350,8 +344,8 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
 
         if (!addToCourtOfficerOrders.isEmpty()) {
             List<Element<CaseDocument>> updatedCourtOfficeOrder =
-                systemGeneratedDocumentService.getCourtOfficerOrdersWithAddedDocument(addToCourtOfficerOrders, caseDataBuilder.build());
-            caseDataBuilder.courtOfficersOrders(updatedCourtOfficeOrder);
+                systemGeneratedDocumentService.getCourtOfficerOrdersWithAddedDocument(addToCourtOfficerOrders, caseData);
+            caseData.setCourtOfficersOrders(updatedCourtOfficeOrder);
         }
 
         if (!addToHearingDocuments.isEmpty()) {
@@ -360,13 +354,13 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                     addToHearingDocuments,
                     caseData
                 );
-            caseDataBuilder.hearingDocumentsWelsh(updatedHearingDocumentsWelsh);
+            caseData.setHearingDocumentsWelsh(updatedHearingDocumentsWelsh);
         }
         List<Element<CaseDocument>> updatedFinalOrderDocuments =
             systemGeneratedDocumentService.getFinalOrderDocumentsWithAddedDocument(addToFinalOrders, caseData);
 
-        caseDataBuilder.systemGeneratedCaseDocuments(updatedSystemGeneratedDocuments);
-        caseDataBuilder.finalOrderDocumentCollection(updatedFinalOrderDocuments);
+        caseData.setSystemGeneratedCaseDocuments(updatedSystemGeneratedDocuments);
+        caseData.setFinalOrderDocumentCollection(updatedFinalOrderDocuments);
     }
 
     private CaseEvent getBusinessProcessEvent(CaseData caseData) {

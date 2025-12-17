@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.handleadmitpartofclaim.DefenceAdmitPartPaymentTimeRouteCaseUpdater;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
@@ -19,49 +20,40 @@ class DefenceAdmitPartPaymentTimeRouteCaseUpdaterTest {
     @InjectMocks
     private DefenceAdmitPartPaymentTimeRouteCaseUpdater updater;
 
-    private CaseData.CaseDataBuilder<?, ?> caseDataBuilder;
-
     @BeforeEach
     void setUp() {
-        caseDataBuilder = CaseData.builder();
     }
 
     @Test
     void shouldUpdateDefenceAdmitPartPaymentTimeRouteForRespondent1() {
-        CaseData caseData = CaseData.builder()
-                .isRespondent1(YES)
-                .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setIsRespondent1(YES);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY);
 
-        updater.update(caseData, caseDataBuilder);
+        updater.update(caseData);
 
-        CaseData updatedCaseData = caseDataBuilder.build();
-        assertThat(updatedCaseData.getDefenceAdmitPartPaymentTimeRouteGeneric()).isEqualTo(IMMEDIATELY);
+        assertThat(caseData.getDefenceAdmitPartPaymentTimeRouteGeneric()).isEqualTo(IMMEDIATELY);
     }
 
     @Test
     void shouldUpdateDefenceAdmitPartPaymentTimeRouteForRespondent2() {
-        CaseData caseData = CaseData.builder()
-                .isRespondent2(YES)
-                .defenceAdmitPartPaymentTimeRouteRequired2(IMMEDIATELY)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setIsRespondent2(YES);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired2(IMMEDIATELY);
 
-        updater.update(caseData, caseDataBuilder);
+        updater.update(caseData);
 
-        CaseData updatedCaseData = caseDataBuilder.build();
-        assertThat(updatedCaseData.getDefenceAdmitPartPaymentTimeRouteGeneric()).isEqualTo(IMMEDIATELY);
+        assertThat(caseData.getDefenceAdmitPartPaymentTimeRouteGeneric()).isEqualTo(IMMEDIATELY);
     }
 
     @Test
     void shouldNotUpdateWhenNoConditionsMet() {
-        CaseData caseData = CaseData.builder()
-                .isRespondent1(NO)
-                .isRespondent2(NO)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setIsRespondent1(NO);
+        caseData.setIsRespondent2(NO);
 
-        updater.update(caseData, caseDataBuilder);
+        updater.update(caseData);
 
-        CaseData updatedCaseData = caseDataBuilder.build();
-        assertThat(updatedCaseData.getDefenceAdmitPartPaymentTimeRouteGeneric()).isNull();
+        assertThat(caseData.getDefenceAdmitPartPaymentTimeRouteGeneric()).isNull();
     }
 }
