@@ -99,11 +99,12 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
 
         if (sdoDocLatest.isPresent()) {
             String sdoDate = formatLocalDateTime(sdoDocLatest.get().getValue().getCreatedDatetime(), DATE);
-            caseData.setUpholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
-                                                       .reasonForReconsiderationTxtYes(String.format(
-                                                           UPHOLDING_PREVIOUS_ORDER_REASON,
-                                                           sdoDate
-                                                       )).build());
+            UpholdingPreviousOrderReason upholdingPreviousOrderReason = new UpholdingPreviousOrderReason();
+            upholdingPreviousOrderReason.setReasonForReconsiderationTxtYes(String.format(
+                UPHOLDING_PREVIOUS_ORDER_REASON,
+                sdoDate
+            ));
+            caseData.setUpholdingPreviousOrderReason(upholdingPreviousOrderReason);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
@@ -171,16 +172,11 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
     }
 
     private String getBody(DecisionOnRequestReconsiderationOptions decisionOnRequestReconsiderationOptions) {
-        switch (decisionOnRequestReconsiderationOptions) {
-            case YES:
-                return CONFIRMATION_BODY_YES;
-            case CREATE_SDO:
-                return CONFIRMATION_BODY_CREATE_SDO;
-            default:
-                return featureToggleService.isCaseProgressionEnabled()
-                    ? CONFIRMATION_BODY_CREATE_MAKE_AN_ORDER
-                    : CONFIRMATION_BODY_CREATE_GENERAL_ORDER;
-        }
+        return switch (decisionOnRequestReconsiderationOptions) {
+            case YES -> CONFIRMATION_BODY_YES;
+            case CREATE_SDO -> CONFIRMATION_BODY_CREATE_SDO;
+            default -> CONFIRMATION_BODY_CREATE_MAKE_AN_ORDER;
+        };
     }
 
     @Override

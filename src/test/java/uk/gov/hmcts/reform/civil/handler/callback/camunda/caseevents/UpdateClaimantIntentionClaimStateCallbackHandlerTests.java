@@ -77,8 +77,9 @@ class UpdateClaimantIntentionClaimStateCallbackHandlerTests extends BaseCallback
     @Test
     void shouldUpdateCaseStateForFullDefenceNotProcessIfClaimantBilingual() {
         // given
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder().claimantBilingualLanguagePreference("BOTH")
-            .applicant1ProceedWithClaim(YesOrNo.NO).build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setClaimantBilingualLanguagePreference("BOTH");
+        caseData.setApplicant1ProceedWithClaim(YesOrNo.NO);
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -111,13 +112,11 @@ class UpdateClaimantIntentionClaimStateCallbackHandlerTests extends BaseCallback
     void shouldNotChangeCaseStateIfClaimantSignedSettlementAgreement() {
         // given
         CaseData caseData = CaseDataBuilder.builder().build();
-        caseData = caseData.toBuilder()
-            .caseDataLiP(CaseDataLiP.builder()
-                .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                    .applicant1SignedSettlementAgreement(YesOrNo.YES)
-                    .build())
-                .build())
-            .build();
+        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+        claimantLiPResponse.setApplicant1SignedSettlementAgreement(YesOrNo.YES);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+        caseData.setCaseDataLiP(caseDataLiP);
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 

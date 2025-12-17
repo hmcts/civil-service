@@ -19,13 +19,12 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.LiPRequestReconsiderationGeneratorService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -44,10 +43,10 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDE
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
-import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
 
 @Service
@@ -60,26 +59,25 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
     private static final String REASON_NOT_PROVIDED = "Not provided";
     protected final ObjectMapper objectMapper;
     private static final String ERROR_MESSAGE_DEADLINE_EXPIRED
-        = "You can no longer request a reconsideration because the deadline has expired";
+            = "You can no longer request a reconsideration because the deadline has expired";
     private static final String ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_TEN_THOUSAND = "You can only request a reconsideration for claims of £10,000 or less.";
     private final UserService userService;
     private final CoreCaseUserService coreCaseUserService;
     private static final String CONFIRMATION_HEADER = "# Your request has been submitted";
     private static final String CONFIRMATION_BODY = "### What happens next \n" +
-        "You should receive an update on your request for determination after 10 days, please monitor" +
-        " your notifications/dashboard for an update.";
+            "You should receive an update on your request for determination after 10 days, please monitor" +
+            " your notifications/dashboard for an update.";
 
     private final LiPRequestReconsiderationGeneratorService documentGenerator;
-    private final FeatureToggleService featureToggleService;
     private static final String ERROR_MESSAGE_EVENT_NOT_ALLOWED = "You can only request a reconsideration where a Legal Advisor has drawn the SDO.";
 
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::validateRequestEligibilityAndGetPartyDetails)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::saveRequestForReconsiderationReason)
-            .put(callbackKey(SUBMITTED), this::buildConfirmation)
-            .build();
+                .put(callbackKey(ABOUT_TO_START), this::validateRequestEligibilityAndGetPartyDetails)
+                .put(callbackKey(ABOUT_TO_SUBMIT), this::saveRequestForReconsiderationReason)
+                .put(callbackKey(SUBMITTED), this::buildConfirmation)
+                .build();
     }
 
     private CallbackResponse validateRequestEligibilityAndGetPartyDetails(CallbackParams callbackParams) {
@@ -114,11 +112,11 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             caseData = callbackParams.getCaseData();
             setPartyDetails(caseData, callbackParams);
             return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseData.toMap(objectMapper)).build();
+                    .data(caseData.toMap(objectMapper)).build();
         } else {
             return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(errors)
-                .build();
+                    .errors(errors)
+                    .build();
         }
     }
 
@@ -139,12 +137,12 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
 
     private boolean respondent2Present(CaseData caseData) {
         return caseData.getAddRespondent2() != null
-            && caseData.getAddRespondent2() == YES;
+                && caseData.getAddRespondent2() == YES;
     }
 
     private boolean respondent2HasSameLegalRep(CaseData caseData) {
         return caseData.getRespondent2SameLegalRepresentative() != null
-            && caseData.getRespondent2SameLegalRepresentative() == YES;
+                && caseData.getRespondent2SameLegalRepresentative() == YES;
     }
 
     private CallbackResponse saveRequestForReconsiderationReason(CallbackParams callbackParams) {
@@ -155,18 +153,18 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             partyName.append("Applicant - ");
             partyName.append(caseData.getApplicant1().getPartyName());
             partyName.append(applicant2Present(caseData)
-                                 ? AND + caseData.getApplicant2().getPartyName() : "");
+                    ? AND + caseData.getApplicant2().getPartyName() : "");
             ReasonForReconsideration reasonForReconsideration = caseData.getReasonForReconsiderationApplicant();
             reasonForReconsideration.setRequestor(partyName.toString());
             if (StringUtils.isBlank(reasonForReconsideration.getReasonForReconsiderationTxt())) {
                 reasonForReconsideration.setReasonForReconsiderationTxt(REASON_NOT_PROVIDED);
             }
             caseData.setReasonForReconsiderationApplicant(reasonForReconsideration);
-            if (featureToggleService.isCaseProgressionEnabled() && caseData.isRespondent1LiP()) {
+            if (caseData.isRespondent1LiP()) {
                 caseData.setRequestForReconsiderationDocument(documentGenerator.generateLiPDocument(
-                    caseData,
-                    callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                    true
+                        caseData,
+                        callbackParams.getParams().get(BEARER_TOKEN).toString(),
+                        true
                 ));
                 caseData.setBusinessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_CLAIMANT));
                 caseData.setOrderRequestedForReviewClaimant(YES);
@@ -175,7 +173,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             partyName.append(DEFENDANT);
             partyName.append(caseData.getRespondent1().getPartyName());
             partyName.append(respondent2Present(caseData) && respondent2HasSameLegalRep(caseData)
-                                 ? AND + caseData.getRespondent2().getPartyName() : "");
+                    ? AND + caseData.getRespondent2().getPartyName() : "");
 
             ReasonForReconsideration reasonForReconsideration = caseData.getReasonForReconsiderationRespondent1();
             reasonForReconsideration.setRequestor(partyName.toString());
@@ -183,11 +181,11 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
                 reasonForReconsideration.setReasonForReconsiderationTxt(REASON_NOT_PROVIDED);
             }
             caseData.setReasonForReconsiderationRespondent1(reasonForReconsideration);
-            if (featureToggleService.isCaseProgressionEnabled() && caseData.isApplicantLiP()) {
+            if (caseData.isApplicantLiP()) {
                 caseData.setRequestForReconsiderationDocumentRes(documentGenerator.generateLiPDocument(
-                    caseData,
-                    callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                    false
+                        caseData,
+                        callbackParams.getParams().get(BEARER_TOKEN).toString(),
+                        false
                 ));
                 caseData.setBusinessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_DEFENDANT));
                 caseData.setOrderRequestedForReviewDefendant(YES);
@@ -201,59 +199,59 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
                 reasonForReconsideration.setReasonForReconsiderationTxt(REASON_NOT_PROVIDED);
             }
             caseData.setReasonForReconsiderationRespondent2(reasonForReconsideration);
-        } else if (featureToggleService.isCaseProgressionEnabled() && isLIPClaimant(roles)) {
+        } else if (isLIPClaimant(roles)) {
             ReasonForReconsideration reasonForReconsideration = Optional
-                .ofNullable(caseData.getReasonForReconsiderationApplicant())
-                .orElseGet(ReasonForReconsideration::new);
+                    .ofNullable(caseData.getReasonForReconsiderationApplicant())
+                    .orElseGet(ReasonForReconsideration::new);
             reasonForReconsideration.setRequestor(getPartyAsRequestor(
-                "Applicant - ",
-                caseData.getApplicant1(),
-                caseData.getApplicant2()
+                    "Applicant - ",
+                    caseData.getApplicant1(),
+                    caseData.getApplicant2()
             ));
             caseData.setReasonForReconsiderationApplicant(reasonForReconsideration);
             reasonForReconsideration.setReasonForReconsiderationTxt(Optional.ofNullable(caseData.getCaseDataLiP())
-                                                                        .map(CaseDataLiP::getRequestForReviewCommentsClaimant)
-                                                                        .filter(StringUtils::isNotBlank)
-                                                                        .orElse(REASON_NOT_PROVIDED));
+                    .map(CaseDataLiP::getRequestForReviewCommentsClaimant)
+                    .filter(StringUtils::isNotBlank)
+                    .orElse(REASON_NOT_PROVIDED));
 
             // visible if respondent is LiP but also because CUI confirmation page includes the link
             caseData.setRequestForReconsiderationDocument(documentGenerator.generateLiPDocument(
-                caseData,
-                callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                true
+                    caseData,
+                    callbackParams.getParams().get(BEARER_TOKEN).toString(),
+                    true
             ));
 
             caseData.setOrderRequestedForReviewClaimant(YES);
             caseData.setBusinessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_CLAIMANT));
-        } else if (featureToggleService.isCaseProgressionEnabled() && isLIPDefendant(roles)) {
+        } else if (isLIPDefendant(roles)) {
             ReasonForReconsideration reasonForReconsideration = Optional
-                .ofNullable(caseData.getReasonForReconsiderationRespondent1())
-                .orElseGet(ReasonForReconsideration::new);
+                    .ofNullable(caseData.getReasonForReconsiderationRespondent1())
+                    .orElseGet(ReasonForReconsideration::new);
             reasonForReconsideration.setRequestor(getPartyAsRequestor(
-                DEFENDANT,
-                caseData.getRespondent1(), null
+                    DEFENDANT,
+                    caseData.getRespondent1(), null
             ));
             caseData.setReasonForReconsiderationRespondent1(reasonForReconsideration);
             reasonForReconsideration.setReasonForReconsiderationTxt(
-                Optional.ofNullable(caseData.getCaseDataLiP())
-                    .map(CaseDataLiP::getRequestForReviewCommentsDefendant)
-                    .filter(StringUtils::isNotBlank)
-                    .orElse(REASON_NOT_PROVIDED)
+                    Optional.ofNullable(caseData.getCaseDataLiP())
+                            .map(CaseDataLiP::getRequestForReviewCommentsDefendant)
+                            .filter(StringUtils::isNotBlank)
+                            .orElse(REASON_NOT_PROVIDED)
             );
 
             // visible if applicant is LiP but also because CUI confirmation page includes the link
             caseData.setRequestForReconsiderationDocumentRes(documentGenerator.generateLiPDocument(
-                caseData,
-                callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                false
+                    caseData,
+                    callbackParams.getParams().get(BEARER_TOKEN).toString(),
+                    false
             ));
 
             caseData.setOrderRequestedForReviewDefendant(YES);
             caseData.setBusinessProcess(BusinessProcess.ready(REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_DEFENDANT));
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(objectMapper))
-            .build();
+                .data(caseData.toMap(objectMapper))
+                .build();
     }
 
     private String getPartyAsRequestor(String prefix, Party party1, Party party2) {
@@ -261,7 +259,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
         partyName.append(prefix);
         partyName.append(party1.getPartyName());
         Optional.ofNullable(party2)
-            .ifPresent(p -> partyName.append(AND).append(p.getPartyName()));
+                .ifPresent(p -> partyName.append(AND).append(p.getPartyName()));
         return partyName.toString();
     }
 
@@ -269,16 +267,16 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         return coreCaseUserService.getUserCaseRoles(
-            callbackParams.getCaseData().getCcdCaseReference().toString(),
-            userInfo.getUid()
+                callbackParams.getCaseData().getCcdCaseReference().toString(),
+                userInfo.getUid()
         );
     }
 
     private CallbackResponse buildConfirmation(CallbackParams callbackParams) {
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(CONFIRMATION_HEADER)
-            .confirmationBody(CONFIRMATION_BODY)
-            .build();
+                .confirmationHeader(CONFIRMATION_HEADER)
+                .confirmationBody(CONFIRMATION_BODY)
+                .build();
     }
 
     @Override

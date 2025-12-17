@@ -375,6 +375,13 @@ public class CaseFlagUtils {
         flagCollection.addAll(getFlagDetails(caseData.getRespondent1Witnesses()));
         flagCollection.addAll(getFlagDetails(caseData.getRespondent2Experts()));
         flagCollection.addAll(getFlagDetails(caseData.getRespondent2Witnesses()));
+        flagCollection.addAll(getFlagDetails(caseData.getApplicant1OrgIndividuals()));
+        flagCollection.addAll(getFlagDetails(caseData.getApplicant2OrgIndividuals()));
+        flagCollection.addAll(getFlagDetails(caseData.getRespondent1OrgIndividuals()));
+        flagCollection.addAll(getFlagDetails(caseData.getRespondent2OrgIndividuals()));
+        flagCollection.addAll(getFlagDetails(caseData.getApplicant1LRIndividuals()));
+        flagCollection.addAll(getFlagDetails(caseData.getRespondent1LRIndividuals()));
+        flagCollection.addAll(getFlagDetails(caseData.getRespondent2LRIndividuals()));
         return flagCollection.stream().filter(Objects::nonNull).collect(Collectors.toList());
     }
 

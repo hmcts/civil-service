@@ -294,33 +294,28 @@ public class BundleTestUtil {
 
     private static List<Element<UploadEvidenceDocumentType>> getDocumentEvidenceForTrial() {
         List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = new ArrayList<>();
-        Arrays.stream(TypeOfDocDocumentaryEvidenceOfTrial.values()).toList().forEach(type -> otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
-                                                       .builder()
-                                                       .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
+        Arrays.stream(TypeOfDocDocumentaryEvidenceOfTrial.values()).toList().forEach(type -> otherEvidenceDocs.add(ElementUtils.element(new UploadEvidenceDocumentType()
+                                                       .setDocumentUpload(Document.builder().documentBinaryUrl(TEST_URL)
                                                                            .documentFileName(TEST_FILE_NAME).categoryID("").build())
-                                                       .typeOfDocument(type.getDisplayNames().get(0))
-                                                       .documentIssuedDate(LocalDate.of(2023, 1, 12))
-                                                       .build())));
-        otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
-                                                       .builder()
-                                                       .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
+                                                       .setTypeOfDocument(type.getDisplayNames().get(0))
+                                                       .setDocumentIssuedDate(LocalDate.of(2023, 1, 12)))));
+        otherEvidenceDocs.add(ElementUtils.element(new UploadEvidenceDocumentType()
+                                                       .setDocumentUpload(Document.builder().documentBinaryUrl(TEST_URL)
                                                                            .documentFileName(TEST_FILE_NAME).categoryID("").build())
-                                                       .typeOfDocument("Other")
-                                                       .documentIssuedDate(LocalDate.of(2023, 1, 12))
-                                                       .build()));
+                                                       .setTypeOfDocument("Other")
+                                                       .setDocumentIssuedDate(LocalDate.of(2023, 1, 12))));
         return otherEvidenceDocs;
     }
 
     private static List<Element<UploadEvidenceDocumentType>> setupOtherEvidenceDocs(String witnessOptionName) {
         List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = new ArrayList<>();
-        otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
-                                                       .builder()
-                                                       .witnessOptionName(witnessOptionName)
-                                                       .typeOfDocument(TEST_FILE_TYPE)
-                                                       .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
+        otherEvidenceDocs.add(ElementUtils.element(new UploadEvidenceDocumentType()
+                                                       .setWitnessOptionName(witnessOptionName)
+                                                       .setTypeOfDocument(TEST_FILE_TYPE)
+                                                       .setDocumentUpload(Document.builder().documentBinaryUrl(TEST_URL)
                                                                            .documentFileName(TEST_FILE_NAME).categoryID("").build())
-                                                       .documentIssuedDate(LocalDate.of(2022, 12, 12))
-                                                       .createdDatetime(LocalDateTime.of(2023, 12, 12, 8, 8, 5)).build()));
+                                                       .setDocumentIssuedDate(LocalDate.of(2022, 12, 12))
+                                                       .setCreatedDatetime(LocalDateTime.of(2023, 12, 12, 8, 8, 5))));
         return otherEvidenceDocs;
     }
 
@@ -550,27 +545,21 @@ public class BundleTestUtil {
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(11).getValue().getDocumentFileName());
     }
 
-    public static void assertDirectionsQuestionnaires(final boolean caseProgressionCuiEnabled, final BundleCreateRequest bundleCreateRequest) {
+    public static void assertDirectionsQuestionnairesWithCategoryIds(final BundleCreateRequest bundleCreateRequest) {
         assertEquals("CL 1 Directions Questionnaire 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(0).getValue().getDocumentFileName());
         assertEquals("DF 1 Directions Questionnaire 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(1).getValue().getDocumentFileName());
-        if (caseProgressionCuiEnabled) {
-            assertEquals("DF 1 Directions Questionnaire 12/03/2023",
-                         bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(2).getValue().getDocumentFileName());
-        }
+        assertEquals("DF 1 Directions Questionnaire 12/03/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(2).getValue().getDocumentFileName());
         assertEquals("DF 2 Directions Questionnaire 10/02/2023",
-                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(
-                         caseProgressionCuiEnabled ? 3 : 2).getValue().getDocumentFileName());
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(3).getValue().getDocumentFileName());
         assertEquals("DF 2 Directions Questionnaire 11/02/2023",
-                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(
-                         caseProgressionCuiEnabled ? 4 : 3).getValue().getDocumentFileName());
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(4).getValue().getDocumentFileName());
         assertEquals("DF 2 Directions Questionnaire 10/03/2023",
-                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(
-                         caseProgressionCuiEnabled ? 5 : 4).getValue().getDocumentFileName());
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(5).getValue().getDocumentFileName());
         assertEquals("Directions Questionnaire 10/02/2023",
-                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(
-                         caseProgressionCuiEnabled ? 6 : 5).getValue().getDocumentFileName());
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(6).getValue().getDocumentFileName());
     }
 
     public static void assertDirectionsQuestionnaires(final BundleCreateRequest bundleCreateRequest) {

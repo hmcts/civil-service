@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionQuestionnaireLipGeneratorFactory;
@@ -80,37 +81,46 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
         mapper.registerModule(new JavaTimeModule());
     }
 
-    private static final CaseDocument FORM = CaseDocument.builder()
-        .createdBy("John")
-        .documentName("claimant_document_name")
-        .documentSize(0L)
-        .documentType(DIRECTIONS_QUESTIONNAIRE)
-        .createdDatetime(LocalDateTime.now())
-        .documentLink(Document.builder()
-                          .documentUrl("fake-url")
-                          .documentFileName("file-name")
-                          .documentBinaryUrl("binary-url")
-                          .build())
-        .build();
-    private static final CaseDocument FORM_DEFENDANT = CaseDocument.builder()
-        .createdBy("John")
-        .documentName("defendant_doc")
-        .documentSize(0L)
-        .documentType(DIRECTIONS_QUESTIONNAIRE)
-        .createdDatetime(LocalDateTime.now())
-        .documentLink(Document.builder()
-                          .documentUrl("fake-url")
-                          .documentFileName("defendant_directions_questionnaire_form")
-                          .documentBinaryUrl("binary-url")
-                          .build())
-        .build();
+    public static final CaseDocument FORM;
+    public static final CaseDocument FORM_DEFENDANT;
+
+    static {
+        Document documentLink = new Document();
+        documentLink.setDocumentUrl("fake-url");
+        documentLink.setDocumentFileName("file-name");
+        documentLink.setDocumentBinaryUrl("binary-url");
+
+        CaseDocument document = new CaseDocument();
+        document.setCreatedBy("John");
+        document.setDocumentName("claimant_document_name");
+        document.setDocumentSize(0L);
+        document.setDocumentType(DIRECTIONS_QUESTIONNAIRE);
+        document.setCreatedDatetime(LocalDateTime.now());
+        document.setDocumentLink(documentLink);
+        FORM = document;
+
+        Document documentLink1 = new Document();
+        documentLink1.setDocumentUrl("fake-url");
+        documentLink1.setDocumentFileName("defendant_directions_questionnaire_form");
+        documentLink1.setDocumentBinaryUrl("binary-url");
+
+        CaseDocument document2 = new CaseDocument();
+        document2.setCreatedBy("John");
+        document2.setDocumentName("defendant_doc");
+        document2.setDocumentSize(0L);
+        document2.setDocumentType(DIRECTIONS_QUESTIONNAIRE);
+        document2.setCreatedDatetime(LocalDateTime.now());
+        document2.setDocumentLink(documentLink1);
+        FORM_DEFENDANT = document2;
+    }
+
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
 
     @Test
     void shouldGenerateForm_whenAboutToSubmitCalled() {
         given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(directionsQuestionnaireLipGenerator);
         given(directionsQuestionnaireLipGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         verify(directionsQuestionnaireLipGenerator).generate(caseData, BEARER_TOKEN);
@@ -123,7 +133,7 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
         given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(directionsQuestionnaireLipGenerator);
         given(directionsQuestionnaireLipGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .claimantBilingualLanguagePreference("BOTH").build();
 
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
@@ -136,7 +146,7 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
         given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(directionsQuestionnaireLipGenerator);
         given(directionsQuestionnaireLipGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .claimantBilingualLanguagePreference("ENGLISH").build();
 
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
@@ -148,10 +158,12 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
         given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(directionsQuestionnaireLipGenerator);
         given(directionsQuestionnaireLipGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-        CaseData caseData = CaseData.builder()
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                         .respondent1ResponseLanguage("BOTH").build()).build()).build();
+        RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
+        respondentLiPResponse.setRespondent1ResponseLanguage("BOTH");
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseDataLiP(caseDataLiP);
 
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         verify(directionsQuestionnaireLipGenerator).generate(caseData, BEARER_TOKEN);
@@ -164,7 +176,7 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
             directionQuestionnaireLipResponseGenerator);
         given(directionQuestionnaireLipResponseGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         verify(directionQuestionnaireLipResponseGenerator).generate(caseData, BEARER_TOKEN);
@@ -175,7 +187,7 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
     @Test
     void shouldNotGenerateForm_whenAboutToSubmitCalledWithFullAdmission() {
         // Given
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .build();
 
@@ -190,7 +202,7 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
     @Test
     void shouldNotGenerateForm_whenAboutToSubmitCalledWhenClaimantAcceptThePartAdmit() {
         // Given
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
             .build();
@@ -207,7 +219,7 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
     void shouldGenerateForm_whenAboutToSubmitCalledWhenClaimantRejectsThePartAdmit() {
         given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(directionsQuestionnaireLipGenerator);
         given(directionsQuestionnaireLipGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
             .build();
@@ -224,7 +236,7 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
     void shouldGenerateForm_whenAboutToSubmitCalled_defendantDoc() {
         given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(directionsQuestionnaireLipGenerator);
         given(directionsQuestionnaireLipGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM_DEFENDANT);
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         verify(directionsQuestionnaireLipGenerator).generate(caseData, BEARER_TOKEN);
@@ -241,7 +253,7 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
             anyString()
         )).willReturn(FORM_DEFENDANT);
         given(featureToggleService.isWelshEnabledForMainCase()).willReturn(true);
-        CaseData caseData = CaseData.builder().claimantBilingualLanguagePreference("BOTH").build();
+        CaseData caseData = CaseDataBuilder.builder().claimantBilingualLanguagePreference("BOTH").build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getData().get("respondent1OriginalDqDoc")).isNotNull();
@@ -259,11 +271,12 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
             anyString()
         )).willReturn(FORM_DEFENDANT);
         given(featureToggleService.isWelshEnabledForMainCase()).willReturn(true);
-        CaseData caseData = CaseData.builder().caseDataLiP(CaseDataLiP.builder()
-                                                               .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                                                           .respondent1ResponseLanguage(
-                                                                                               "BOTH")
-                                                                                           .build()).build()).build();
+        RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
+        respondentLiPResponse.setRespondent1ResponseLanguage("BOTH");
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseDataLiP(caseDataLiP);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getData().get("respondent1OriginalDqDoc")).isNotNull();
@@ -279,7 +292,7 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
         given(directionsQuestionnaireLipGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
 
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));

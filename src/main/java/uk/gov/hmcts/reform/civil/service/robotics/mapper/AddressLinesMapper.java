@@ -34,34 +34,31 @@ public class AddressLinesMapper {
         if (addressLines.size() > 3 || anyLineExceedsLimit) {
             return resolveAddressBySpace(originalAddress);
         } else {
-            return originalAddress.toBuilder()
-                .addressLine1(Iterables.get(addressLines, 0, null))
-                .addressLine2(Iterables.get(addressLines, 1, null))
-                .addressLine3(Iterables.get(addressLines, 2, null))
-                .build();
+            originalAddress.setAddressLine1(Iterables.get(addressLines, 0, null));
+            originalAddress.setAddressLine2(Iterables.get(addressLines, 1, null));
+            originalAddress.setAddressLine3(Iterables.get(addressLines, 2, null));
+            return originalAddress;
         }
     }
 
     private Address resolveAddressBySpace(Address originalAddress) {
-        Address.AddressBuilder addressBuilder = originalAddress.toBuilder();
-
         Queue<String> addressParts = resolveAddressLine(originalAddress.getAddressLine1(), STRING_EMPTY, true);
         String addressLine1 = addressParts.poll();
-        addressBuilder.addressLine1(StringUtils.isEmpty(addressLine1) ? null : addressLine1);
+        originalAddress.setAddressLine1(StringUtils.isEmpty(addressLine1) ? null : addressLine1);
 
         addressParts = resolveAddressLine(originalAddress.getAddressLine2(), addressParts.poll(), true);
         String addressLine2 = addressParts.poll();
-        addressBuilder.addressLine2(StringUtils.isEmpty(addressLine2) ? null : addressLine2);
+        originalAddress.setAddressLine2(StringUtils.isEmpty(addressLine2) ? null : addressLine2);
 
         addressParts = resolveAddressLine(originalAddress.getAddressLine3(), addressParts.poll(), true);
         String addressLine3 = addressParts.poll();
-        addressBuilder.addressLine3(StringUtils.isEmpty(addressLine3) ? null : addressLine3);
+        originalAddress.setAddressLine3(StringUtils.isEmpty(addressLine3) ? null : addressLine3);
 
         addressParts = resolveAddressLine(originalAddress.getPostTown(), addressParts.poll(), false);
         String postTown = addressParts.poll();
-        addressBuilder.postTown(StringUtils.isEmpty(postTown) ? null : postTown);
+        originalAddress.setPostTown(StringUtils.isEmpty(postTown) ? null : postTown);
 
-        return addressBuilder.build();
+        return originalAddress;
     }
 
     private Queue<String> resolveAddressLine(String addressLine, String overflow, boolean overflowAllowed) {

@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StoredObligationData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
@@ -80,17 +81,21 @@ class ConfirmOrderReviewTaskHandlerTest {
 
     @Test
     void shouldHaveCorrectEventDetails_whenObligationDataIsProvided() {
-        CaseData caseData = CaseData.builder()
-            .storedObligationData(List.of(Element.<StoredObligationData>builder().id(UUID.randomUUID()).value(StoredObligationData.builder().obligationReason(
-                ObligationReason.DISMISS_CASE).obligationDate(
-                null).obligationAction("action").build()).build()))
+        CaseData caseData = new CaseDataBuilder()
             .businessProcess(
-                BusinessProcess.builder()
-                    .status(BusinessProcessStatus.READY)
-                    .processInstanceId("process-id").build())
+                new BusinessProcess()
+                    .setStatus(BusinessProcessStatus.READY)
+                    .setProcessInstanceId("process-id"))
             .build();
+        caseData.setStoredObligationData(List.of(
+            new Element<StoredObligationData>()
+                .setId(UUID.randomUUID())
+                .setValue(new StoredObligationData()
+                              .setObligationReason(ObligationReason.DISMISS_CASE)
+                              .setObligationDate(null)
+                              .setObligationAction("action"))));
 
-        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
         when(coreCaseDataService.startUpdate(CASE_ID, UPDATE_CONFIRM_REVIEW_ORDER_EVENT))
             .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
                             .eventId(UPDATE_CONFIRM_REVIEW_ORDER_EVENT.name()).build());
