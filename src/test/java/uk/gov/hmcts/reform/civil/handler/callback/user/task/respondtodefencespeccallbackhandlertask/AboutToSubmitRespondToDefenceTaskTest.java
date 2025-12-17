@@ -396,7 +396,6 @@ class AboutToSubmitRespondToDefenceTaskTest {
         assertThat(file.get("categoryID")).isEqualTo("directionsQuestionnaire");
     }
 
-
     private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
         return objectMapper.convertValue(response.getData(), CaseData.class);
     }
