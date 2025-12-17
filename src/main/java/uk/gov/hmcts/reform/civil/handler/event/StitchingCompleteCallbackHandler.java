@@ -75,20 +75,19 @@ public class StitchingCompleteCallbackHandler extends CallbackHandler {
             YesOrNo hasBundleErrors = getLatestBundle(caseData)
                 .map(bundle -> "FAILED".equalsIgnoreCase(bundle.getStitchStatus().orElse(null)) ? YesOrNo.YES : null)
                 .orElse(null);
-            caseData = caseData.toBuilder().bundleError(hasBundleErrors).build();
+            caseData.setBundleError(hasBundleErrors);
 
             String bundleEvent = caseData.getBundleEvent();
             if (hasBundleErrors == null && bundleEvent != null && (BUNDLE_CREATED_NOTIFICATION_EVENT.equals(bundleEvent) || AMEND_RESTITCH_BUNDLE_EVENT.equals(bundleEvent))) {
                 CaseEvent processEvent = BUNDLE_CREATED_NOTIFICATION_EVENT.equals(bundleEvent) ? BUNDLE_CREATION_NOTIFICATION : AMEND_RESTITCH_BUNDLE;
 
                 List<Element<UploadEvidenceDocumentType>> evidenceUploadedAfterBundle = List.of(
-                    ElementUtils.element(UploadEvidenceDocumentType.builder().build())
+                    ElementUtils.element(new UploadEvidenceDocumentType())
                 );
 
-                caseData = caseData.toBuilder()
-                    .applicantDocsUploadedAfterBundle(evidenceUploadedAfterBundle)
-                    .respondentDocsUploadedAfterBundle(evidenceUploadedAfterBundle)
-                    .businessProcess(BusinessProcess.ready(processEvent)).build();
+                caseData.setApplicantDocsUploadedAfterBundle(evidenceUploadedAfterBundle)
+                    .setRespondentDocsUploadedAfterBundle(evidenceUploadedAfterBundle);
+                caseData.setBusinessProcess(BusinessProcess.ready(processEvent));
             }
         }
 

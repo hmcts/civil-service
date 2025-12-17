@@ -70,11 +70,12 @@ class EndBusinessProcessTaskHandlerTest {
 
     @Test
     void shouldNotTriggerEndBusinessProcessCCDEvent_whenCalledMoreThanOnceInSequence() {
-        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.FINISHED).build())
+        CaseData caseData = new CaseDataBuilder()
+            .atStateClaimDraft()
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.FINISHED))
             .build();
 
-        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
         when(coreCaseDataService.startUpdate(CASE_ID, END_BUSINESS_PROCESS)).thenReturn(startEventResponse);
@@ -96,11 +97,12 @@ class EndBusinessProcessTaskHandlerTest {
 
     @Test
     void shouldTriggerEndBusinessProcessCCDEventAndUpdateBusinessProcessStatusToFinished_whenCalled() {
-        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+        CaseData caseData = new CaseDataBuilder()
+            .atStateClaimDraft()
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .build();
 
-        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
         when(coreCaseDataService.startUpdate(CASE_ID, END_BUSINESS_PROCESS)).thenReturn(startEventResponse);
@@ -122,9 +124,7 @@ class EndBusinessProcessTaskHandlerTest {
     }
 
     private CaseDataContent getCaseDataContent(CaseDetails caseDetails, StartEventResponse value) {
-        caseDetails.getData().put("businessProcess", BusinessProcess.builder()
-            .status(BusinessProcessStatus.FINISHED)
-            .build());
+        caseDetails.getData().put("businessProcess", new BusinessProcess().setStatus(BusinessProcessStatus.FINISHED));
 
         return CaseDataContent.builder()
             .eventToken(value.getToken())

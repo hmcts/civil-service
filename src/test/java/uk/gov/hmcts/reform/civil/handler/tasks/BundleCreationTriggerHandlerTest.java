@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,6 +31,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -46,37 +47,29 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 class BundleCreationTriggerHandlerTest {
 
+    private static final String ACCESS_TOKEN = "ACCESS_TOKEN";
+    private static final String TEST = "test";
     @Mock
     private ExternalTask mockTask;
-
     @Mock
     private ExternalTaskService externalTaskService;
-
     @Mock
     private BundleCreationTriggerService searchService;
-
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
-
     @Mock
     private CoreCaseDataService coreCaseDataService;
-
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
-
     @Mock
     private SystemUpdateUserConfiguration userConfig;
-
     @Mock
     private NoCacheUserService noCacheUserService;
-
     @InjectMocks
     private BundleCreationTriggerHandler handler;
     private CaseData caseData;
     private CaseDetails caseDetails;
     private List<IdValue<Bundle>> caseBundles;
-    private static final String ACCESS_TOKEN = "ACCESS_TOKEN";
-    private static final String TEST = "test";
 
     @BeforeEach
     void init() {
@@ -87,20 +80,23 @@ class BundleCreationTriggerHandlerTest {
         when(noCacheUserService.getAccessToken(TEST, TEST)).thenReturn(ACCESS_TOKEN);
 
         caseBundles = new ArrayList<>();
-        caseBundles.add(new IdValue<>("1", uk.gov.hmcts.reform.civil.model.Bundle.builder().id("1")
-            .title("Trial Bundle")
-            .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
-            .build()));
-        caseData = CaseData.builder().caseBundles(caseBundles).build();
+        caseBundles.add(new IdValue<>(
+                            "1",
+                            new Bundle().setId("1")
+                                .setTitle("Trial Bundle")
+                                .setStitchStatus(Optional.of("NEW"))
+                                .setDescription("Trial Bundle")
+                        )
+        );
+        caseData = new CaseDataBuilder().caseBundles(caseBundles).build();
     }
 
     @Test
     void shouldEmitBundleCreationEvent_whenCasesFound() {
         long caseId = 1L;
         ReflectionTestUtils.setField(handler, "waitTime", 0);
-        CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
-        Map<String, Object> data = Map.of("data", caseData);
-        Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
+        CaseData caseData = new CaseDataBuilder().atStateHearingDateScheduled().build();
+        Set<CaseDetails> caseDetails = Set.of(new CaseDetailsBuilder().id(caseId).data(caseData).build());
 
         when(searchService.getCases()).thenReturn(caseDetails);
         when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.iterator().next());
@@ -163,12 +159,11 @@ class BundleCreationTriggerHandlerTest {
         long otherId = 2L;
         Map<String, Object> data = Map.of("data", "some data");
         Set<CaseDetails> caseDetails = Set.of(
-            CaseDetails.builder().id(caseId).data(data).build(),
-            CaseDetails.builder().id(otherId).data(data).build());
+            new CaseDetailsBuilder().id(caseId).data(data).build(),
+            new CaseDetailsBuilder().id(otherId).data(data).build()
+        );
 
         when(searchService.getCases()).thenReturn(caseDetails);
-
-        String errorMessage = "there was an error";
 
         handler.execute(mockTask, externalTaskService);
 
@@ -185,74 +180,90 @@ class BundleCreationTriggerHandlerTest {
     void shouldReturnFalseWhenBundleHearingDateIsNotEqualToHearingDate() {
         //Given: caseData with hearing date different from caseBundles hearing date
         caseData.setHearingDate(LocalDate.of(2023, 10, 12));
-        caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        caseDetails = new CaseDetailsBuilder().data(caseData).build();
         when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
         //When: getIsBundleCreatedForHearingDate is called
         //Then: its should return false indicating that bundle is not already created for this hearingDate
-        Assertions.assertEquals(false, handler.getIsBundleCreatedForHearingDate(1L));
+        assertFalse(handler.getIsBundleCreatedForHearingDate(1L));
     }
 
     @Test
     void shouldReturnFalseWhenBundleHearingDateIsNull() {
         //Given: caseBundles with bundle hearing date null
         List<IdValue<Bundle>> caseBundles = new ArrayList<>();
-        caseBundles.add(new IdValue<>("1", uk.gov.hmcts.reform.civil.model.Bundle.builder().id("1")
-            .title("Trial Bundle")
-            .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
-            .build()));
+        caseBundles.add(new IdValue<>(
+            "1",
+            new Bundle()
+                .setId("1")
+                .setTitle("Trial Bundle")
+                .setStitchStatus(Optional.of("NEW"))
+                .setDescription("Trial Bundle")
+        ));
 
-        caseData = CaseData.builder().caseBundles(caseBundles).hearingDate(LocalDate.now()).build();
+        caseData = new CaseDataBuilder().caseBundles(caseBundles).hearingDate(LocalDate.now()).build();
         when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
-        caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        caseDetails = new CaseDetailsBuilder().data(caseData).build();
         when(coreCaseDataService.getCase(anyLong())).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
         //When: getIsBundleCreatedForHearingDate is called
         //Then: its should return false indicating that bundle is not already created for this hearingDate
-        Assertions.assertEquals(false, handler.getIsBundleCreatedForHearingDate(1L));
+        assertFalse(handler.getIsBundleCreatedForHearingDate(1L));
     }
 
     @Test
     void shouldReturnFalseWhenAnyBundleHearingDateIsNull() {
         //Given: caseBundles with bundle hearing date null
-        caseData = CaseData.builder().caseBundles(caseBundles).hearingDate(LocalDate.now()).build();
+        caseData = new CaseDataBuilder().caseBundles(caseBundles).hearingDate(LocalDate.now()).build();
         caseData.setHearingDate(LocalDate.of(2023, 12, 12));
         List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> caseBundles = new ArrayList<>();
-        caseBundles.add(new IdValue<>("1", uk.gov.hmcts.reform.civil.model.Bundle.builder().id("1")
-            .title("Trial Bundle")
-            .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
-            .build()));
-        caseBundles.add(new IdValue<>("2", uk.gov.hmcts.reform.civil.model.Bundle.builder().id("1")
-            .title("Trial Bundle")
-            .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
-            .createdOn(Optional.of(LocalDateTime.now()))
-            .bundleHearingDate(Optional.of(LocalDate.of(2023, 12, 12)))
-            .build()));
-        caseData = CaseData.builder().caseBundles(caseBundles).hearingDate(LocalDate.of(2023, 12, 12)).build();
-        caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        caseBundles.add(new IdValue<>(
+            "1",
+            new Bundle()
+                .setId("1")
+                .setTitle("Trial Bundle")
+                .setStitchStatus(Optional.of("NEW"))
+                .setDescription("Trial Bundle")
+        ));
+        caseBundles.add(new IdValue<>(
+            "2",
+            new Bundle()
+                .setId("1")
+                .setTitle("Trial Bundle")
+                .setStitchStatus(Optional.of("NEW"))
+                .setDescription("Trial Bundle")
+                .setCreatedOn(Optional.of(LocalDateTime.now()))
+                .setBundleHearingDate(Optional.of(LocalDate.of(2023, 12, 12)))
+        ));
+        caseData = new CaseDataBuilder().caseBundles(caseBundles).hearingDate(LocalDate.of(2023, 12, 12)).build();
+        caseDetails = new CaseDetailsBuilder().data(caseData).build();
         when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
         //When: getIsBundleCreatedForHearingDate is called
         //Then: its should return false indicating that bundle is not already created for this hearingDate
-        Assertions.assertEquals(true, handler.getIsBundleCreatedForHearingDate(1L));
+        assertTrue(handler.getIsBundleCreatedForHearingDate(1L));
     }
 
     @Test
     void shouldReturnTrueWhenBundleHearingDateIsEqualToHearingDate() {
-        caseBundles.add(new IdValue<>("2", uk.gov.hmcts.reform.civil.model.Bundle.builder().id("1")
-            .title("Trial Bundle")
-            .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
-            .createdOn(Optional.of(LocalDateTime.now()))
-            .bundleHearingDate(Optional.of(LocalDate.of(2023, 12, 12)))
-            .build()));
+        caseBundles.add(new IdValue<>(
+            "2",
+            new Bundle()
+                .setId("1")
+                .setTitle("Trial Bundle")
+                .setStitchStatus(Optional.of("NEW"))
+                .setDescription("Trial Bundle")
+                .setCreatedOn(Optional.of(LocalDateTime.now()))
+                .setBundleHearingDate(Optional.of(LocalDate.of(2023, 12, 12)))
+        ));
         //Given : caseData with hearing date same as caseBundles hearing date
         caseData.setHearingDate(LocalDate.of(2023, 12, 12));
-        caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        caseDetails = new CaseDetailsBuilder().data(caseData).build();
         when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
         //When: getIsBundleCreatedForHearingDate is called
         //Then: its should return true indicating that bundle is already created for this hearingDate
-        Assertions.assertEquals(true, handler.getIsBundleCreatedForHearingDate(1L));
+        assertTrue(handler.getIsBundleCreatedForHearingDate(1L));
     }
 }
 

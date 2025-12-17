@@ -459,12 +459,12 @@ class DocumentRemovalServiceTest {
         void shouldFlagBundlesAsSystemGeneratedRemoveDocuments_TopLevelDoc() {
 
             List<IdValue<Bundle>> bundles = List.of(
-                new IdValue<>("1", Bundle.builder().stitchStatus(Optional.of("NEW")).description("Trial Bundle")
-                    .stitchedDocument(Optional.of(Document.builder()
+                new IdValue<>("1", new Bundle().setStitchStatus(Optional.of("NEW")).setDescription("Trial Bundle")
+                    .setStitchedDocument(Optional.of(Document.builder()
                         .documentUrl("https://example1.com/1234")
                         .documentBinaryUrl("https://example1.com/1234/binary")
                         .documentFileName("Trial-Bundle.pdf")
-                        .build())).build()));
+                        .build()))));
 
             CaseData caseData = CaseData.builder()
                 .ccdCaseReference(CASE_ID)

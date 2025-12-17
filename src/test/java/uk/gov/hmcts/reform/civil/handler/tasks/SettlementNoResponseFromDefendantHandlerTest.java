@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.SettlementNoResponseFromDefendantEvent;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.search.SettlementNoResponseFromDefendantSearchService;
 
 import java.util.Map;
@@ -38,8 +39,10 @@ public class SettlementNoResponseFromDefendantHandlerTest {
     void shouldEmit_SettlementNoResponseFromDefendantEvent_whenCasesFound() {
         // Given: one case found from search service
         long caseId = 1L;
-        Map<String, Object> data = Map.of("data", "some data");
-        Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
+        Set<CaseDetails> caseDetails = Set.of(new CaseDetailsBuilder()
+                                                  .id(caseId)
+                                                  .data(Map.of("data", "some data"))
+                                                  .build());
 
         given(caseSearchService.getCases()).willReturn(caseDetails);
 
