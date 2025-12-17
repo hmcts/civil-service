@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -38,7 +39,7 @@ class SetUploadTimelineTypeFlagTest {
     void setUp() {
         objectMapper = new ObjectMapper();
         setUploadTimelineTypeFlag = new SetUploadTimelineTypeFlag(objectMapper);
-        caseData = CaseData.builder()
+        caseData = CaseDataBuilder.builder()
                 .isRespondent1(YES)
                 .build();
 
@@ -55,9 +56,7 @@ class SetUploadTimelineTypeFlagTest {
 
     @Test
     void shouldAddTimelineUploadFlagWhenTimelineIsUpload() {
-        caseData = caseData.toBuilder()
-                .specClaimResponseTimelineList(TimelineUploadTypeSpec.UPLOAD)
-                .build();
+        caseData.setSpecClaimResponseTimelineList(TimelineUploadTypeSpec.UPLOAD);
 
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
@@ -67,9 +66,7 @@ class SetUploadTimelineTypeFlagTest {
 
     @Test
     void shouldAddTimelineManualFlagWhenTimelineIsManual() {
-        caseData = caseData.toBuilder()
-                .specClaimResponseTimelineList(TimelineUploadTypeSpec.MANUAL)
-                .build();
+        caseData.setSpecClaimResponseTimelineList(TimelineUploadTypeSpec.MANUAL);
 
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
@@ -79,10 +76,8 @@ class SetUploadTimelineTypeFlagTest {
 
     @Test
     void shouldRemoveExistingTimelineFlags() {
-        caseData = caseData.toBuilder()
-                .specClaimResponseTimelineList(TimelineUploadTypeSpec.UPLOAD)
-                .showConditionFlags(new HashSet<>(EnumSet.of(TIMELINE_MANUALLY, TIMELINE_UPLOAD)))
-                .build();
+        caseData.setSpecClaimResponseTimelineList(TimelineUploadTypeSpec.UPLOAD);
+        caseData.setShowConditionFlags(new HashSet<>(EnumSet.of(TIMELINE_MANUALLY, TIMELINE_UPLOAD)));
 
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
@@ -92,10 +87,8 @@ class SetUploadTimelineTypeFlagTest {
 
     @Test
     void shouldNotAddTimelineManualFlagWhenTimelineIsNotManual() {
-        caseData = caseData.toBuilder()
-                .specClaimResponseTimelineList(null)
-                .isRespondent1(YES)
-                .build();
+        caseData.setSpecClaimResponseTimelineList(null);
+        caseData.setIsRespondent1(YES);
 
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
@@ -105,10 +98,8 @@ class SetUploadTimelineTypeFlagTest {
 
     @Test
     void shouldNotAddTimelineUploadFlagWhenRespondent1IsNotYes() {
-        caseData = caseData.toBuilder()
-                .specClaimResponseTimelineList(TimelineUploadTypeSpec.UPLOAD)
-                .isRespondent1(null)
-                .build();
+        caseData.setSpecClaimResponseTimelineList(TimelineUploadTypeSpec.UPLOAD);
+        caseData.setIsRespondent1(null);
 
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
@@ -118,10 +109,8 @@ class SetUploadTimelineTypeFlagTest {
 
     @Test
     void shouldAddTimelineUploadFlagForRespondent2WhenTimelineIsUpload() {
-        caseData = caseData.toBuilder()
-                .isRespondent2(YES)
-                .specClaimResponseTimelineList2(TimelineUploadTypeSpec.UPLOAD)
-                .build();
+        caseData.setIsRespondent2(YES);
+        caseData.setSpecClaimResponseTimelineList2(TimelineUploadTypeSpec.UPLOAD);
 
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
@@ -131,10 +120,8 @@ class SetUploadTimelineTypeFlagTest {
 
     @Test
     void shouldAddTimelineManualFlagForRespondent2WhenTimelineIsManual() {
-        caseData = caseData.toBuilder()
-                .isRespondent2(YES)
-                .specClaimResponseTimelineList2(TimelineUploadTypeSpec.MANUAL)
-                .build();
+        caseData.setIsRespondent2(YES);
+        caseData.setSpecClaimResponseTimelineList2(TimelineUploadTypeSpec.MANUAL);
 
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
@@ -144,10 +131,8 @@ class SetUploadTimelineTypeFlagTest {
 
     @Test
     void shouldAddTimelineManualFlagWhenRespondent1TimelineIsManual() {
-        caseData = caseData.toBuilder()
-                .isRespondent1(YES)
-                .specClaimResponseTimelineList(TimelineUploadTypeSpec.MANUAL)
-                .build();
+        caseData.setIsRespondent1(YES);
+        caseData.setSpecClaimResponseTimelineList(TimelineUploadTypeSpec.MANUAL);
 
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
@@ -157,10 +142,8 @@ class SetUploadTimelineTypeFlagTest {
 
     @Test
     void shouldNotAddAnyTimelineFlagForRespondent2WhenTimelineIsNull() {
-        caseData = caseData.toBuilder()
-                .isRespondent2(YES)
-                .specClaimResponseTimelineList2(null)
-                .build();
+        caseData.setIsRespondent2(YES);
+        caseData.setSpecClaimResponseTimelineList2(null);
 
         when(callbackParams.getCaseData()).thenReturn(caseData);
 

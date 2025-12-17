@@ -72,7 +72,7 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
 
     private CallbackResponse updateNextHearingDetails(CallbackParams callbackParams) {
         Long caseId = callbackParams.getRequest().getCaseDetails().getId();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
+        CaseData caseData = callbackParams.getCaseData();
         HearingsResponse hearingsResponse = getHearings(caseId);
 
         CaseHearing latestHearing = getLatestHearing(hearingsResponse);
@@ -81,24 +81,22 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
 
         if (UPDATE_HEARING_DATE_STATUSES.contains(latestHearing.getHmcStatus())) {
             LocalDateTime nextHearingDate = getNextHearingDate(latestHearing);
-            caseDataBuilder.nextHearingDetails(
-                    nextHearingDate != null
-                        ? NextHearingDetails.builder()
-                            .hearingID(latestHearing.getHearingId().toString())
-                            .hearingDateTime(nextHearingDate)
-                            .build() : null)
-                .build();
+            NextHearingDetails nextHearingDetails = new NextHearingDetails();
+            nextHearingDetails.setHearingID(latestHearing.getHearingId().toString());
+            nextHearingDetails.setHearingDateTime(nextHearingDate);
+            caseData.setNextHearingDetails(
+                    nextHearingDate != null ? nextHearingDetails : null);
             log.info("Next Hearing Details Update - Case [{}] Hearing [{}] nextHearingDetals [{}] - Updating next hearing details",
-                     caseId, latestHearing.getHearingId(), caseDataBuilder.build().getNextHearingDetails());
+                     caseId, latestHearing.getHearingId(), caseData.getNextHearingDetails());
         }
 
         if (CLEAR_HEARING_DATE_STATUSES.contains(latestHearing.getHmcStatus())) {
             log.info("Next Hearing Details Update - Case [{}] Hearing [{}] HmcStatus [{}] - Clearing next hearing details",
                      caseId, latestHearing.getHearingId(), latestHearing.getHmcStatus());
-            caseDataBuilder.nextHearingDetails(null);
+            caseData.setNextHearingDetails(null);
         }
 
-        Map<String, Object> data = caseDataBuilder.build().toMap(objectMapper);
+        Map<String, Object> data = caseData.toMap(objectMapper);
         if (callbackParams.getRequest().getEventId().equals(UpdateNextHearingInfo.name())) {
             // When the UpdateNextHearingInfo is triggered via a non caseworker and we have cleared nextHearingDetails field
             // in the caseDataBuilder this change does not persist in database once submitted. This issue does not happen when event
@@ -127,7 +125,7 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
             .stream()
             .filter(day -> day.getHearingStartDateTime().isAfter(datetime.now().withHour(0).withMinute(0).withSecond(0)))
             .min(Comparator.comparing(HearingDaySchedule::getHearingStartDateTime))
-            .orElse(HearingDaySchedule.builder().build())
+            .orElse(new HearingDaySchedule())
             .getHearingStartDateTime();
     }
 }

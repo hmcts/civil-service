@@ -38,8 +38,8 @@ public class ApplicantOneTrialSkeletonDocumentHandler extends
     }
 
     @Override
-    protected void addDocumentsToCopyToCaseData(CaseData.CaseDataBuilder<?, ?> builder, List<Element<UploadEvidenceDocumentType>> evidenceDocsToAdd) {
-        builder.documentSkeletonArgumentApp2(evidenceDocsToAdd);
+    protected void addDocumentsToCopyToCaseData(CaseData caseData, List<Element<UploadEvidenceDocumentType>> evidenceDocsToAdd) {
+        caseData.setDocumentSkeletonArgumentApp2(evidenceDocsToAdd);
     }
 
     @Override
