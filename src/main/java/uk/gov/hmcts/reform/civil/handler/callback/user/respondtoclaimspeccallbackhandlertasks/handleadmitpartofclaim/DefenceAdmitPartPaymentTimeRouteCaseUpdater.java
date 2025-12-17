@@ -11,15 +11,15 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 public class DefenceAdmitPartPaymentTimeRouteCaseUpdater implements HandleAdmitPartOfClaimCaseUpdater {
 
     @Override
-    public void update(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+    public void update(CaseData caseData, CaseData updatedCaseData) {
         log.info("Updating Defence Admit Part Payment Time Route for caseId: {}", caseData.getCcdCaseReference());
 
         if (YES.equals(caseData.getIsRespondent1()) && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null) {
             log.debug("Respondent 1 condition met for caseId: {}", caseData.getCcdCaseReference());
-            updatedCaseData.defenceAdmitPartPaymentTimeRouteGeneric(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
+            updatedCaseData.setDefenceAdmitPartPaymentTimeRouteGeneric(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
         } else if (YES.equals(caseData.getIsRespondent2()) && caseData.getDefenceAdmitPartPaymentTimeRouteRequired2() != null) {
             log.debug("Respondent 2 condition met for caseId: {}", caseData.getCcdCaseReference());
-            updatedCaseData.defenceAdmitPartPaymentTimeRouteGeneric(caseData.getDefenceAdmitPartPaymentTimeRouteRequired2());
+            updatedCaseData.setDefenceAdmitPartPaymentTimeRouteGeneric(caseData.getDefenceAdmitPartPaymentTimeRouteRequired2());
         }
     }
 }

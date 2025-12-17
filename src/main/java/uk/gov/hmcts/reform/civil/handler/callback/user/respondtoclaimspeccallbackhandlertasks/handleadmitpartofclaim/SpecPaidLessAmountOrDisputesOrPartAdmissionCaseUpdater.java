@@ -15,17 +15,17 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 public class SpecPaidLessAmountOrDisputesOrPartAdmissionCaseUpdater implements HandleAdmitPartOfClaimCaseUpdater {
 
     @Override
-    public void update(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+    public void update(CaseData caseData, CaseData updatedCaseData) {
         log.info("Updating SpecPaidLessAmountOrDisputesOrPartAdmissionCase for caseId: {}", caseData.getCcdCaseReference());
 
         if (RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT == caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()
                 || DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
                 || RespondentResponseTypeSpec.PART_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec()) {
             log.debug("Setting specPaidLessAmountOrDisputesOrPartAdmission to YES for caseId: {}", caseData.getCcdCaseReference());
-            updatedCaseData.specPaidLessAmountOrDisputesOrPartAdmission(YES);
+            updatedCaseData.setSpecPaidLessAmountOrDisputesOrPartAdmission(YES);
         } else {
             log.debug("Setting specPaidLessAmountOrDisputesOrPartAdmission to NO for caseId: {}", caseData.getCcdCaseReference());
-            updatedCaseData.specPaidLessAmountOrDisputesOrPartAdmission(NO);
+            updatedCaseData.setSpecPaidLessAmountOrDisputesOrPartAdmission(NO);
         }
     }
 }

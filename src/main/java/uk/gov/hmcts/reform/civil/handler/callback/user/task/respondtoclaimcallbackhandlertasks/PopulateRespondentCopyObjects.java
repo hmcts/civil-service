@@ -81,10 +81,10 @@ public class PopulateRespondentCopyObjects implements CaseTask {
 
         RequestedCourt requestedCourt1 = createRequestedCourt(locations, caseData);
 
-        CaseData.CaseDataBuilder<?, ?> updatedCaseData = updateCaseData(caseData, isRespondent1, requestedCourt1);
+        CaseData updatedCaseData = updateCaseData(caseData, isRespondent1, requestedCourt1);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.build().toMap(objectMapper))
+            .data(updatedCaseData.toMap(objectMapper))
             .build();
     }
 
@@ -116,29 +116,31 @@ public class PopulateRespondentCopyObjects implements CaseTask {
             .build();
     }
 
-    private CaseData.CaseDataBuilder<?, ?> updateCaseData(CaseData caseData, YesOrNo isRespondent1, RequestedCourt requestedCourt1) {
-        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder()
-            .respondent1Copy(caseData.getRespondent1())
-            .isRespondent1(isRespondent1)
-            .respondent1DQ(Respondent1DQ.builder()
-                               .respondent1DQRequestedCourt(
-                                   requestedCourt1)
-                               .build());
+    private CaseData updateCaseData(CaseData caseData, YesOrNo isRespondent1, RequestedCourt requestedCourt1) {
+        CaseData updatedCaseData = new CaseData()
+            .setRespondent1Copy(caseData.getRespondent1())
+            .setIsRespondent1(isRespondent1)
+            .setRespondent1DQ(new Respondent1DQ()
+                               .setRespondent1DQRequestedCourt(requestedCourt1));
 
         if (caseData.getRespondent2() != null) {
-            updatedCaseData.respondent2DQ(
-                Respondent2DQ.builder()
-                    .respondent2DQRequestedCourt(requestedCourt1).build());
+            updatedCaseData.setRespondent2DQ(
+                new Respondent2DQ()
+                    .setRespondent2DQRequestedCourt(requestedCourt1));
         }
 
-        updatedCaseData.respondent1DetailsForClaimDetailsTab(updatedCaseData.build().getRespondent1()
-                                                                 .toBuilder().flags(null).build());
+        if (updatedCaseData.getRespondent1() != null) {
+            updatedCaseData.setRespondent1DetailsForClaimDetailsTab(
+                updatedCaseData.getRespondent1().setFlags(null));
+        }
 
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             updatedCaseData
-                .respondent2Copy(caseData.getRespondent2())
-                .respondent2DetailsForClaimDetailsTab(updatedCaseData.build().getRespondent2()
-                                                          .toBuilder().flags(null).build());
+                .setRespondent2Copy(caseData.getRespondent2());
+            if (updatedCaseData.getRespondent2() != null) {
+                updatedCaseData.setRespondent2DetailsForClaimDetailsTab(
+                    updatedCaseData.getRespondent2().setFlags(null));
+            }
         }
         return updatedCaseData;
     }

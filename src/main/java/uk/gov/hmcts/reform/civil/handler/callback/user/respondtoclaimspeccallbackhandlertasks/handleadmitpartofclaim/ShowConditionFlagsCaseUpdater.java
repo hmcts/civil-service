@@ -41,7 +41,7 @@ public class ShowConditionFlagsCaseUpdater implements HandleAdmitPartOfClaimCase
     private final FeatureToggleService featureToggleService;
 
     @Override
-    public void update(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+    public void update(CaseData caseData, CaseData updatedCaseData) {
         log.info("Updating show condition flags for caseId: {}", caseData.getCcdCaseReference());
         Set<DefendantResponseShowTag> currentShowFlags = new HashSet<>(caseData.getShowConditionFlags());
         currentShowFlags.removeAll(EnumSet.of(
@@ -55,7 +55,7 @@ public class ShowConditionFlagsCaseUpdater implements HandleAdmitPartOfClaimCase
         if (mustWhenWillClaimBePaidBeShown(caseData)) {
             currentShowFlags.add(WHEN_WILL_CLAIM_BE_PAID);
         }
-        updatedCaseData.showConditionFlags(currentShowFlags);
+        updatedCaseData.setShowConditionFlags(currentShowFlags);
         check1v1PartAdmitLRBulkAdmission(updatedCaseData);
 
     }
@@ -290,8 +290,8 @@ public class ShowConditionFlagsCaseUpdater implements HandleAdmitPartOfClaimCase
                 && caseData.getRespondentClaimResponseTypeForSpecGeneric() != FULL_DEFENCE;
     }
 
-    private void check1v1PartAdmitLRBulkAdmission(CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+    private void check1v1PartAdmitLRBulkAdmission(CaseData updatedCaseData) {
         log.info("Checking 1v1 Part Admit LR Bulk Admission");
-        updatedCaseData.build();
+        // No action needed - method kept for potential future logic
     }
 }

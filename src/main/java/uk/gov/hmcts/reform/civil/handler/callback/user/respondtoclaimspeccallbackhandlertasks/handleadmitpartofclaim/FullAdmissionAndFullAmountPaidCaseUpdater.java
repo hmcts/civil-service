@@ -12,18 +12,18 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 public class FullAdmissionAndFullAmountPaidCaseUpdater implements HandleAdmitPartOfClaimCaseUpdater {
 
     @Override
-    public void update(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+    public void update(CaseData caseData, CaseData updatedCaseData) {
         log.info("Updating Full Admission and Full Amount Paid for caseId: {}", caseData.getCcdCaseReference());
 
         if (YES.equals(caseData.getIsRespondent2()) && YES.equals(caseData.getSpecDefenceFullAdmitted2Required())) {
             log.debug("Condition met for Respondent 2 for caseId: {}", caseData.getCcdCaseReference());
-            updatedCaseData.fullAdmissionAndFullAmountPaid(YES);
+            updatedCaseData.setFullAdmissionAndFullAmountPaid(YES);
         } else if (YES.equals(caseData.getIsRespondent1()) && YES.equals(caseData.getSpecDefenceFullAdmittedRequired())) {
             log.debug("Condition met for Respondent 1 for caseId: {}", caseData.getCcdCaseReference());
-            updatedCaseData.fullAdmissionAndFullAmountPaid(YES);
+            updatedCaseData.setFullAdmissionAndFullAmountPaid(YES);
         } else {
             log.debug("No conditions met for caseId: {}", caseData.getCcdCaseReference());
-            updatedCaseData.fullAdmissionAndFullAmountPaid(NO);
+            updatedCaseData.setFullAdmissionAndFullAmountPaid(NO);
         }
     }
 }

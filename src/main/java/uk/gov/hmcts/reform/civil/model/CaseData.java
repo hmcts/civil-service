@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -122,7 +121,6 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
 @Accessors(chain = true)
-@SuperBuilder(toBuilder = true)
 @Jacksonized
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -164,10 +162,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private  Document generalAppN245FormUpload;
     private  YesOrNo gaEaCourtLocation;
 
-    @Builder.Default
     private  List<Element<GASolicitorDetailsGAspec>> generalAppRespondentSolicitors = new ArrayList<>();
 
-    @Builder.Default
     private  List<Element<GeneralApplication>> generalApplications = new ArrayList<>();
 
     private  List<Element<GeneralApplicationsDetails>> claimantGaAppDetails;
@@ -238,10 +234,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private  StatementOfTruth applicant1ServiceStatementOfTruthToRespondentSolicitor1;
     private  RespondentSolicitorDetails respondentSolicitorDetails;
 
-    @Builder.Default
     private  List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
 
-    @Builder.Default
     private  List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
     private  List<Element<ManageDocument>> manageDocuments;
     private  Document specClaimTemplateDocumentFiles;
@@ -273,7 +267,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private  CaseDocument respondent2GeneratedResponseDocument;
     private  LocalDate claimMovedToMediationOn;
 
-    @Builder.Default
     private  List<Element<CaseDocument>> defendantResponseDocuments = new ArrayList<>();
 
     private  YesOrNo applicant1ProceedWithClaim;
@@ -285,13 +278,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private  ResponseDocument applicant1DefenceResponseDocument;
     private  ResponseDocument claimantDefenceResDocToDefendant2;
 
-    @Builder.Default
     private  List<Element<CaseDocument>> claimantResponseDocuments = new ArrayList<>();
 
-    @Builder.Default
     private  List<Element<CaseDocument>> duplicateSystemGeneratedCaseDocs = new ArrayList<>();
 
-    @Builder.Default
     @JsonProperty("duplicateClaimantDefResponseDocs")
     private  List<Element<CaseDocument>> duplicateClaimantDefendantResponseDocs = new ArrayList<>();
 
@@ -518,7 +508,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private  LocalDateTime respondent1LitigationFriendCreatedDate;
     private  LocalDateTime respondent2LitigationFriendCreatedDate;
 
-    @Builder.Default
     private  List<IdValue<Bundle>> caseBundles = new ArrayList<>();
 
     private  Respondent1DebtLRspec specDefendant1Debts;
@@ -548,7 +537,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private  YesOrNo claimFixedCostsExist;
     private  YesOrNo partAdmit1v1Defendant;
 
-    @Builder.Default
     private  List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
 
     private  String hearingSelection;
@@ -619,10 +607,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private  List<Element<CaseDocument>> gaRespondDoc;
     private  List<Element<CaseDocument>> preTranslationGaDocsApplicant;
     private  List<Element<CaseDocument>> preTranslationGaDocsRespondent;
-    @Builder.Default
     private  List<Element<CaseDocument>> hearingDocuments = new ArrayList<>();
 
-    @Builder.Default
     private  List<Element<CaseDocument>> hearingDocumentsWelsh = new ArrayList<>();
 
     // GA for LIP
@@ -640,7 +626,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private  PreferredLanguage claimantLanguagePreferenceDisplay;
     private  PreferredLanguage defendantLanguagePreferenceDisplay;
 
-    @Builder.Default
     private  List<Element<CaseDocument>> queryDocuments = new ArrayList<>();
 
     private  PreTranslationDocumentType preTranslationDocumentType;
@@ -649,7 +634,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private  YesOrNo isMintiLipCase;
 
-    @Builder.Default
     private  List<Element<CaseDocument>> courtOfficersOrders = new ArrayList<>();
     private  YesOrNo isReferToJudgeClaim;
 

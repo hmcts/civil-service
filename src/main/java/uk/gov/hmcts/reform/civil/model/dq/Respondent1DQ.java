@@ -20,7 +20,6 @@ import java.util.stream.Stream;
 
 @Setter
 @Data
-@Builder(toBuilder = true)
 @Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor

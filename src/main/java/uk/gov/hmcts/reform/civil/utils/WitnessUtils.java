@@ -54,12 +54,11 @@ public class WitnessUtils {
                 && YES.equals(caseData.getRespondent2SameLegalRepresentative())
                 && YES.equals(caseData.getRespondentResponseIsSame())) {
                 if (caseData.getRespondent2DQ() == null) {
-                    caseData.setRespondent2DQ(Respondent2DQ.builder()
-                                              .respondent2DQWitnesses(updatedRespondent1Witnesses)
-                                              .build());
+                    caseData.setRespondent2DQ(new Respondent2DQ()
+                                              .setRespondent2DQWitnesses(updatedRespondent1Witnesses));
                 } else {
-                    caseData.setRespondent2DQ(caseData.getRespondent2DQ().toBuilder()
-                                              .respondent2DQWitnesses(updatedRespondent1Witnesses).build());
+                    caseData.setRespondent2DQ(caseData.getRespondent2DQ()
+                                              .setRespondent2DQWitnesses(updatedRespondent1Witnesses));
                 }
             }
         }

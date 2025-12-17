@@ -73,18 +73,18 @@ public class PopulateRespondent1Copy implements CaseTask {
 
         log.info("CaseId {}: Returning updated callback response", caseData.getCcdCaseReference());
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedCaseData.build().toMap(objectMapper))
+                .data(updatedCaseData.toMap(objectMapper))
                 .build();
     }
 
-    private CaseData.CaseDataBuilder<?, ?> updateCaseData(CaseData caseData, Set<DefendantResponseShowTag> initialShowTags, CallbackParams callbackParams) {
+    private CaseData updateCaseData(CaseData caseData, Set<DefendantResponseShowTag> initialShowTags, CallbackParams callbackParams) {
         log.info("Updating case data for caseId: {}", caseData.getCcdCaseReference());
 
-        var updatedCaseData = caseData.toBuilder()
-                .respondent1Copy(caseData.getRespondent1())
-                .respondent1ClaimResponseTestForSpec(caseData.getRespondent1ClaimResponseTypeForSpec())
-                .respondent2ClaimResponseTestForSpec(caseData.getRespondent2ClaimResponseTypeForSpec())
-                .showConditionFlags(initialShowTags);
+        var updatedCaseData = objectMapper.convertValue(caseData.toMap(objectMapper), CaseData.class)
+                .setRespondent1Copy(caseData.getRespondent1())
+                .setRespondent1ClaimResponseTestForSpec(caseData.getRespondent1ClaimResponseTypeForSpec())
+                .setRespondent2ClaimResponseTestForSpec(caseData.getRespondent2ClaimResponseTypeForSpec())
+                .setShowConditionFlags(initialShowTags);
 
         log.info("CaseId {}: Updating CARM fields", caseData.getCcdCaseReference());
         updateCarmFields(caseData, updatedCaseData);
@@ -99,23 +99,23 @@ public class PopulateRespondent1Copy implements CaseTask {
         return updatedCaseData;
     }
 
-    private void updateCarmFields(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+    private void updateCarmFields(CaseData caseData, CaseData updatedCaseData) {
         log.info("Updating CARM fields for caseId: {}", caseData.getCcdCaseReference());
 
         if (toggleService.isCarmEnabledForCase(caseData)) {
             log.debug("CaseId {}: CARM is enabled for the case", caseData.getCcdCaseReference());
-            updatedCaseData.showCarmFields(YES);
+            updatedCaseData.setShowCarmFields(YES);
         } else {
             log.debug("CaseId {}: CARM is not enabled for the case", caseData.getCcdCaseReference());
-            updatedCaseData.showCarmFields(NO);
+            updatedCaseData.setShowCarmFields(NO);
         }
 
         BigDecimal claimInPounds = caseData.getClaimAmountInPounds();
         if (claimInPounds != null && caseData.getTotalClaimAmount() != null) {
             log.debug("CaseId {}: Calculating total claim amount with interest", caseData.getCcdCaseReference());
             BigDecimal claimScaled = claimInPounds.setScale(2);
-            updatedCaseData.totalClaimAmountPlusInterest(claimScaled);
-            updatedCaseData.totalClaimAmountPlusInterestString(claimScaled.toString());
+            updatedCaseData.setTotalClaimAmountPlusInterest(claimScaled);
+            updatedCaseData.setTotalClaimAmountPlusInterestString(claimScaled.toString());
 
             BigDecimal interest = interestCalculator.calculateInterest(caseData);
             if (interest == null) {
@@ -123,43 +123,44 @@ public class PopulateRespondent1Copy implements CaseTask {
             }
             interest = interest.setScale(2);
             BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount().add(interest).setScale(2);
-            updatedCaseData.totalClaimAmountPlusInterestAdmitPart(totalAmountWithInterest);
-            updatedCaseData.totalClaimAmountPlusInterestAdmitPartString(totalAmountWithInterest.toString());
+            updatedCaseData.setTotalClaimAmountPlusInterestAdmitPart(totalAmountWithInterest);
+            updatedCaseData.setTotalClaimAmountPlusInterestAdmitPartString(totalAmountWithInterest.toString());
         }
 
         log.info("CaseId {}: CARM fields update complete", caseData.getCcdCaseReference());
     }
 
-    private void updateRespondentDetails(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+    private void updateRespondentDetails(CaseData caseData, CaseData updatedCaseData) {
         log.info("Updating respondent details for caseId: {}", caseData.getCcdCaseReference());
-        updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build());
+        if (caseData.getRespondent1() != null) {
+            updatedCaseData.setRespondent1DetailsForClaimDetailsTab(
+                caseData.getRespondent1().setFlags(null));
+        }
 
         ofNullable(caseData.getRespondent2())
-                .ifPresent(r2 -> updatedCaseData.respondent2Copy(r2)
-                        .respondent2DetailsForClaimDetailsTab(r2.toBuilder().flags(null).build()));
+                .ifPresent(r2 -> {
+                    updatedCaseData.setRespondent2Copy(r2);
+                    updatedCaseData.setRespondent2DetailsForClaimDetailsTab(r2.setFlags(null));
+                });
     }
 
-    private void updateCourtLocation(Set<DefendantResponseShowTag> initialShowTags, CaseData.CaseDataBuilder<?, ?> updatedCaseData, CallbackParams callbackParams) {
+    private void updateCourtLocation(Set<DefendantResponseShowTag> initialShowTags, CaseData updatedCaseData, CallbackParams callbackParams) {
         log.info("Updating court location for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
 
         DynamicList courtLocationList = courtLocationUtils.getLocationsFromList(respondToClaimSpecUtils.getLocationData(callbackParams));
         if (initialShowTags.contains(CAN_ANSWER_RESPONDENT_1)) {
             log.debug("CaseId {}: Updating court location for Respondent 1", callbackParams.getCaseData().getCcdCaseReference());
-            updatedCaseData.respondent1DQ(Respondent1DQ.builder()
-                    .respondToCourtLocation(
-                            RequestedCourt.builder()
-                                    .responseCourtLocations(courtLocationList)
-                                    .build())
-                    .build());
+            updatedCaseData.setRespondent1DQ(new Respondent1DQ()
+                    .setRespondToCourtLocation(
+                            new RequestedCourt()
+                                    .setResponseCourtLocations(courtLocationList)));
         }
         if (initialShowTags.contains(CAN_ANSWER_RESPONDENT_2)) {
             log.debug("CaseId {}: Updating court location for Respondent 2", callbackParams.getCaseData().getCcdCaseReference());
-            updatedCaseData.respondent2DQ(Respondent2DQ.builder()
-                    .respondToCourtLocation2(
-                            RequestedCourt.builder()
-                                    .responseCourtLocations(courtLocationList)
-                                    .build())
-                    .build());
+            updatedCaseData.setRespondent2DQ(new Respondent2DQ()
+                    .setRespondToCourtLocation2(
+                            new RequestedCourt()
+                                    .setResponseCourtLocations(courtLocationList)));
         }
 
         log.info("CaseId {}: Court location update complete", callbackParams.getCaseData().getCcdCaseReference());

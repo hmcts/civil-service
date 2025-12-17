@@ -17,7 +17,6 @@ import java.util.List;
 
 @Setter
 @Data
-@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Respondent2DQ implements DQ {

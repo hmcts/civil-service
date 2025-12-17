@@ -11,16 +11,16 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 public class EmploymentTypeCaseUpdater implements HandleAdmitPartOfClaimCaseUpdater {
 
     @Override
-    public void update(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+    public void update(CaseData caseData, CaseData updatedCaseData) {
         log.info("Updating Employment Type for caseId: {}", caseData.getCcdCaseReference());
 
         if (YES.equals(caseData.getDefenceAdmitPartEmploymentTypeRequired())) {
             log.debug("Defence Admit Part Employment Type condition met for caseId: {}", caseData.getCcdCaseReference());
-            updatedCaseData.respondToClaimAdmitPartEmploymentTypeLRspecGeneric(caseData.getRespondToClaimAdmitPartEmploymentTypeLRspec());
+            updatedCaseData.setRespondToClaimAdmitPartEmploymentTypeLRspecGeneric(caseData.getRespondToClaimAdmitPartEmploymentTypeLRspec());
         }
         if (YES.equals(caseData.getDefenceAdmitPartEmploymentType2Required())) {
             log.debug("Defence Admit Part Employment Type 2 condition met for caseId: {}", caseData.getCcdCaseReference());
-            updatedCaseData.respondToClaimAdmitPartEmploymentTypeLRspecGeneric(caseData.getRespondToClaimAdmitPartEmploymentTypeLRspec2());
+            updatedCaseData.setRespondToClaimAdmitPartEmploymentTypeLRspecGeneric(caseData.getRespondToClaimAdmitPartEmploymentTypeLRspec2());
         }
     }
 }

@@ -10,7 +10,7 @@ plugins {
   id 'com.github.ben-manes.versions' version '0.52.0'
   id 'org.sonarqube' version '6.2.0.5505'
   id 'au.com.dius.pact' version '4.6.17'
-  id "io.freefair.lombok" version "8.14"
+  id "io.freefair.lombok" version "9.1.0"
   id 'com.github.hmcts.rse-cft-lib' version '0.19.1903'
   id "org.flywaydb.flyway" version "10.22.0"
   id 'maven-publish'
@@ -24,7 +24,7 @@ def versions = [
   junitPlatform     : '1.11.4',
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.0',
-  lombok            : '1.18.38',
+  lombok            : '1.18.42',
   springSecurity    : '5.8.16',
   camunda           : '7.20.0',
   jackson           : '2.19.2',
@@ -50,6 +50,7 @@ allprojects {
   apply plugin: 'org.springframework.boot'
   apply plugin: 'org.owasp.dependencycheck'
   apply plugin: 'com.github.ben-manes.versions'
+  apply plugin: 'io.freefair.lombok'
 
   checkstyle {
     maxWarnings = 0
@@ -402,9 +403,6 @@ dependencies {
   implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.59.2'
   implementation group: 'com.sendgrid', name: 'sendgrid-java', version: '4.10.3'
 
-  annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-  implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
   implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.2'
 
@@ -461,9 +459,6 @@ dependencies {
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
   testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.17.6'
   testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.17.6'
-
-  testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-  testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
   testImplementation libraries.junit5
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'

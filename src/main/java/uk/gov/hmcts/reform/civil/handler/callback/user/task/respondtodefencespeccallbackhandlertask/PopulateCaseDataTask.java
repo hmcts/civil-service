@@ -82,11 +82,10 @@ public class PopulateCaseDataTask implements CaseTask {
         }
 
         List<LocationRefData> locations = fetchLocationData(callbackParams);
-        updatedCaseData.applicant1DQ(
-            Applicant1DQ.builder().applicant1DQRequestedCourt(
-                RequestedCourt.builder().responseCourtLocations(
-                    courtLocationUtils.getLocationsFromList(locations)).build()
-            ).build());
+        updatedCaseData.setApplicant1DQ(
+            new Applicant1DQ().setApplicant1DQRequestedCourt(
+                new RequestedCourt().setResponseCourtLocations(
+                    courtLocationUtils.getLocationsFromList(locations))));
 
         if (V_2.equals(callbackParams.getVersion())) {
             updatedCaseData.showResponseOneVOneFlag(responseOneVOneShowTagService.setUpOneVOneFlow(caseData));

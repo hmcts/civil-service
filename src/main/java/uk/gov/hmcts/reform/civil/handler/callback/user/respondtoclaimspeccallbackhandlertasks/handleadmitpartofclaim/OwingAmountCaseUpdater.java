@@ -12,13 +12,13 @@ import java.util.Optional;
 public class OwingAmountCaseUpdater implements HandleAdmitPartOfClaimCaseUpdater {
 
     @Override
-    public void update(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+    public void update(CaseData caseData, CaseData updatedCaseData) {
         log.info("Updating Owing Amount for caseId: {}", caseData.getCcdCaseReference());
         Optional.ofNullable(caseData.getRespondToAdmittedClaimOwingAmount())
                 .map(MonetaryConversions::penniesToPounds)
-                .ifPresent(updatedCaseData::respondToAdmittedClaimOwingAmountPounds);
+                .ifPresent(updatedCaseData::setRespondToAdmittedClaimOwingAmountPounds);
         Optional.ofNullable(caseData.getRespondToAdmittedClaimOwingAmount2())
                 .map(MonetaryConversions::penniesToPounds)
-                .ifPresent(updatedCaseData::respondToAdmittedClaimOwingAmountPounds2);
+                .ifPresent(updatedCaseData::setRespondToAdmittedClaimOwingAmountPounds2);
     }
 }

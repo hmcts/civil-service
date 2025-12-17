@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 
 @Setter
 @Data
-@Builder(toBuilder = true)
 @Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor

@@ -91,7 +91,6 @@ import java.util.List;
 import static java.util.Optional.ofNullable;
 
 @Accessors(chain = true)
-@SuperBuilder(toBuilder = true)
 @EqualsAndHashCode(callSuper = false)
 @Data
 public class CaseDataCaseProgression extends CaseDataCaseSdo implements MappableObject {

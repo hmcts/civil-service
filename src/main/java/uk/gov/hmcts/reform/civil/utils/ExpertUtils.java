@@ -54,12 +54,11 @@ public class ExpertUtils {
                 && YES.equals(caseData.getRespondent2SameLegalRepresentative())
                 && YES.equals(caseData.getRespondentResponseIsSame())) {
                 if (caseData.getRespondent2DQ() == null) {
-                    caseData.setRespondent2DQ(Respondent2DQ.builder()
-                                                  .respondent2DQExperts(updatedRespondent1Experts)
-                                                  .build());
+                    caseData.setRespondent2DQ(new Respondent2DQ()
+                                                  .setRespondent2DQExperts(updatedRespondent1Experts));
                 } else {
-                    caseData.setRespondent2DQ(caseData.getRespondent2DQ().toBuilder()
-                                                  .respondent2DQExperts(updatedRespondent1Experts).build());
+                    caseData.setRespondent2DQ(caseData.getRespondent2DQ()
+                                                  .setRespondent2DQExperts(updatedRespondent1Experts));
                 }
             }
         }

@@ -106,7 +106,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Accessors(chain = true)
-@SuperBuilder(toBuilder = true)
 @Data
 public class CaseDataCaseSdo implements MappableObject {
 
