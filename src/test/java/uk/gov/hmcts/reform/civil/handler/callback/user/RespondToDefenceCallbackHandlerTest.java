@@ -247,15 +247,15 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 caseData.setAddRespondent2(YES);
                 caseData.setRespondent2(PartyBuilder.builder().individual().build());
                 caseData.setRespondent2SameLegalRepresentative(YES);
-                Document document = new Document();
-                document.setDocumentUrl("url");
-                document.setDocumentHash("hash");
-                document.setDocumentFileName("respondent defense");
-                document.setDocumentBinaryUrl("binUrl");
-                CaseDocument caseDocument = new CaseDocument();
-                caseDocument.setCreatedBy("Defendant");
-                caseDocument.setDocumentType(DEFENDANT_DEFENCE);
-                caseDocument.setDocumentLink(document);
+                Document document = new Document()
+                .setDocumentUrl("url")
+                .setDocumentHash("hash")
+                .setDocumentFileName("respondent defense")
+                .setDocumentBinaryUrl("binUrl");
+                CaseDocument caseDocument = new CaseDocument()
+                .setCreatedBy("Defendant")
+                .setDocumentType(DEFENDANT_DEFENCE)
+                .setDocumentLink(document);
                 caseData.setDefendantResponseDocuments(wrapElements(caseDocument));
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
