@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.helpers.bundle.mappers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import uk.gov.hmcts.reform.civil.enums.caseprogression.BundleFileNameList;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.helpers.bundle.BundleDocumentsRetrieval;
