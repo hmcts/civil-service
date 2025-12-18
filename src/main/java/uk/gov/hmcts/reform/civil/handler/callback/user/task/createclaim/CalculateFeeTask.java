@@ -36,25 +36,24 @@ public class CalculateFeeTask {
     }
 
     public CallbackResponse calculateFees(CaseData caseData, String authorizationToken) {
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        updatePaymentDetails(caseData);
 
-        updatePaymentDetails(caseData, caseDataBuilder);
+        updatePaymentType(caseData);
 
-        updatePaymentType(caseDataBuilder);
+        updatePbaAccounts(authorizationToken, caseData);
 
-        updatePbaAccounts(authorizationToken, caseDataBuilder);
+        setClaimFee(caseData);
 
-        setClaimFee(caseData, caseDataBuilder);
-
-        return buildCallbackResponse(caseDataBuilder);
+        return buildCallbackResponse(caseData);
     }
 
-    private void updatePaymentDetails(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
+    private void updatePaymentDetails(CaseData caseData) {
         String solicitorReference = getSolicitorReference(caseData);
         String customerReference = getCustomerReference(caseData, solicitorReference);
 
-        PaymentDetails updatedDetails = PaymentDetails.builder().customerReference(customerReference).build();
-        caseDataBuilder.claimIssuedPaymentDetails(updatedDetails);
+        PaymentDetails updatedDetails = new PaymentDetails();
+        updatedDetails.setCustomerReference(customerReference);
+        caseData.setClaimIssuedPaymentDetails(updatedDetails);
     }
 
     private String getSolicitorReference(CaseData caseData) {
@@ -69,23 +68,23 @@ public class CalculateFeeTask {
             .orElse(solicitorReference);
     }
 
-    private void updatePaymentType(CaseData.CaseDataBuilder caseDataBuilder) {
-        caseDataBuilder.paymentTypePBASpec("PBAv3");
+    private void updatePaymentType(CaseData caseData) {
+        caseData.setPaymentTypePBASpec("PBAv3");
     }
 
-    private void updatePbaAccounts(String authToken, CaseData.CaseDataBuilder caseDataBuilder) {
+    private void updatePbaAccounts(String authToken, CaseData caseData) {
         List<String> pbaNumbers = getPbaAccounts(authToken);
-        caseDataBuilder.applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
-            .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
+        caseData.setApplicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers));
+        caseData.setApplicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
     }
 
-    private void setClaimFee(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
-        caseDataBuilder.claimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()));
+    private void setClaimFee(CaseData caseData) {
+        caseData.setClaimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()));
     }
 
-    private CallbackResponse buildCallbackResponse(CaseData.CaseDataBuilder caseDataBuilder) {
+    private CallbackResponse buildCallbackResponse(CaseData caseData) {
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

@@ -10,11 +10,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.ValidateRespondentDetailsTask;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.Party.Type;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -56,13 +54,15 @@ class ValidateRespondentDetailsTaskTest extends BaseCallbackHandlerTest {
     @Test
     void shouldReturnNoErrors_whenRespondent1AddressValid() {
         Party respondent1 = PartyBuilder.builder().company().build();
-        respondent1.setPrimaryAddress(Address.builder().addressLine1("Address line 1").build());
+        Address address = new Address();
+        address.setAddressLine1("Address line 1");
+        respondent1.setPrimaryAddress(address);
 
         List<String> errorList = List.of();
         given(postcodeValidator.validate(any())).willReturn(errorList);
         given(partyValidator.validateAddress(respondent1.getPrimaryAddress(), errorList)).willReturn(errorList);
 
-        CaseData caseData = CaseData.builder().respondent1(respondent1).build();
+        CaseData caseData = CaseDataBuilder.builder().respondent1(respondent1).build();
         validateRespondentDetailsTask.setGetRespondent(CaseData::getRespondent1);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateRespondentDetailsTask
@@ -75,15 +75,15 @@ class ValidateRespondentDetailsTaskTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldReturnErrors_whenRespondent1AddressNotValid() {
-        Party respondent1 = Party.builder().type(Type.ORGANISATION)
-            .primaryAddress(Address.builder()
-                                .addressLine1("Line 1 test again for more than 35 characters")
-                                .addressLine2("Line 2 test again for more than 35 characters")
-                                .addressLine3("Line 3 test again for more than 35 characters")
-                                .county("County line test again for more than 35 characters")
-                                .postCode("PostCode test more than 8 characters")
-                                .postTown("Post town line test again for more than 35 characters").build())
-            .build();
+        Address address = new Address();
+        address.setAddressLine1("Line 1 test again for more than 35 characters");
+        address.setAddressLine2("Line 2 test again for more than 35 characters");
+        address.setAddressLine3("Line 3 test again for more than 35 characters");
+        address.setCounty("County line test again for more than 35 characters");
+        address.setPostCode("PostCode test more than 8 characters");
+        address.setPostTown("Post town line test again for more than 35 characters");
+        Party respondent1 = PartyBuilder.builder().organisation().build();
+        respondent1.setPrimaryAddress(address);
 
         validateRespondentDetailsTask.setGetRespondent(CaseData::getRespondent1);
 

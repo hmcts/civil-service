@@ -24,9 +24,9 @@ class ApplicantOneWitnessReferredDocumentHandlerTest extends BaseDocumentHandler
 
     @Test
     void shouldCopyWitnessReferredDocumentsToLegalRep2() {
-        handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore, builder);
+        handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore);
 
-        assertEquals(2, builder.build().getDocumentReferredInStatementApp2().size());
+        assertEquals(2, caseData.getDocumentReferredInStatementApp2().size());
     }
 
     @Test

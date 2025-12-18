@@ -26,22 +26,19 @@ public class Respondent1CaseDataUpdater implements SetApplicantResponseDeadlineC
         Party updatedRespondent1;
         if (NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())) {
             log.info("Setting primary address to applicant correspondence address for caseId: {}", caseData.getCcdCaseReference());
-            updatedRespondent1 = caseData.getRespondent1().toBuilder()
-                    .primaryAddress(caseData.getSpecAoSApplicantCorrespondenceAddressdetails())
-                    .build();
+            updatedRespondent1 = caseData.getRespondent1();
+            updatedRespondent1.setPrimaryAddress(caseData.getSpecAoSApplicantCorrespondenceAddressdetails());
         } else {
             log.info("Setting primary address to respondent1 copy's primary address for caseId: {}", caseData.getCcdCaseReference());
-            updatedRespondent1 = caseData.getRespondent1().toBuilder()
-                    .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
-                    .build();
+            updatedRespondent1 = caseData.getRespondent1();
+            updatedRespondent1.setPrimaryAddress(caseData.getRespondent1Copy().getPrimaryAddress());
         }
         caseData.setRespondent1(updatedRespondent1);
 
         if (caseData.getRespondent1Copy() != null) {
             log.info("Copying flags from respondent1 copy for caseId: {}", caseData.getCcdCaseReference());
-            updatedRespondent1 = caseData.getRespondent1().toBuilder()
-                    .flags(caseData.getRespondent1Copy().getFlags())
-                    .build();
+            updatedRespondent1 = caseData.getRespondent1();
+            updatedRespondent1.setFlags(caseData.getRespondent1Copy().getFlags());
             caseData.setRespondent1(updatedRespondent1);
         }
 
