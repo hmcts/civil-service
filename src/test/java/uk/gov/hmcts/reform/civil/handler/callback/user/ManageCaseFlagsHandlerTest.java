@@ -33,11 +33,13 @@ class ManageCaseFlagsHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldUpdateUrgentFlagWhenActiveAndCodeMatches() {
         //Given: Flag with urgent flag code and active status
-        FlagDetail flagDetail = FlagDetail.builder().flagCode("CF0007").status("Active").build();
-        Flags flags = Flags.builder().details(ElementUtils.wrapElements(flagDetail)).build();
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .caseFlags(flags)
-            .build();
+        FlagDetail flagDetail = new FlagDetail();
+        flagDetail.setFlagCode("CF0007");
+        flagDetail.setStatus("Active");
+        Flags flags = new Flags();
+        flags.setDetails(ElementUtils.wrapElements(flagDetail));
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseFlags(flags);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         // When: handler is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -47,11 +49,13 @@ class ManageCaseFlagsHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldNotUpdateUrgentFlagWhenActiveAndCodeMatches() {
-        FlagDetail flagDetail = FlagDetail.builder().flagCode("CF0008").status("Active").build();
-        Flags flags = Flags.builder().details(ElementUtils.wrapElements(flagDetail)).build();
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .caseFlags(flags)
-            .build();
+        FlagDetail flagDetail = new FlagDetail();
+        flagDetail.setFlagCode("CF0008");
+        flagDetail.setStatus("Active");
+        Flags flags = new Flags();
+        flags.setDetails(ElementUtils.wrapElements(flagDetail));
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseFlags(flags);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
