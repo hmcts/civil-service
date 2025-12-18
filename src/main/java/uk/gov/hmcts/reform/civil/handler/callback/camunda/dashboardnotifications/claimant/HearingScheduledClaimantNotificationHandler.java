@@ -34,6 +34,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTI
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting.LISTING;
+import static uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting.RELISTING;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT;
@@ -107,9 +108,14 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
             caseData.setHearingFee(HearingFeeUtils.calculateAndApplyFee(hearingFeesService, caseData, caseData.getAssignedTrack()));
         }
 
+        boolean isManualListingNeedingFee = caseData.getCcdState() == HEARING_READINESS
+            && (caseData.getListingOrRelisting() == null
+            || caseData.getListingOrRelisting() == LISTING
+            || caseData.getListingOrRelisting() == RELISTING);
+
         boolean shouldRecordFeeScenario = caseData.isApplicant1NotRepresented() && !hasPaidFee
-            && ((!isAutoHearingNotice && caseData.getCcdState() == HEARING_READINESS && caseData.getListingOrRelisting() == LISTING)
-                || (isAutoHearingNotice && hearingFeeRequired(camundaVars.getHearingType())));
+            && ((isAutoHearingNotice && hearingFeeRequired(camundaVars.getHearingType()))
+                || (!isAutoHearingNotice && isManualListingNeedingFee));
 
         if (shouldRecordFeeScenario) {
             dashboardScenariosService.recordScenarios(authToken,
