@@ -87,16 +87,16 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
 
     static {
         Document documentLink = new Document()
-        .setDocumentUrl("fake-url")
-        .setDocumentFileName("file-name")
-        .setDocumentBinaryUrl("binary-url");
+            .setDocumentUrl("fake-url")
+            .setDocumentFileName("file-name")
+            .setDocumentBinaryUrl("binary-url");
         CaseDocument doc = new CaseDocument()
-        .setCreatedBy("John")
-        .setDocumentName("document name")
-        .setDocumentSize(0L)
-        .setDocumentType(DECISION_MADE_ON_APPLICATIONS)
-        .setCreatedDatetime(LocalDateTime.now())
-        .setDocumentLink(documentLink);
+            .setCreatedBy("John")
+            .setDocumentName("document name")
+            .setDocumentSize(0L)
+            .setDocumentType(DECISION_MADE_ON_APPLICATIONS)
+            .setCreatedDatetime(LocalDateTime.now())
+            .setDocumentLink(documentLink);
         document = doc;
     }
 

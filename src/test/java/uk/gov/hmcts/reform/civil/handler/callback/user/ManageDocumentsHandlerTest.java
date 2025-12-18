@@ -55,10 +55,10 @@ class ManageDocumentsHandlerTest extends BaseCallbackHandlerTest {
             manageDocument.setDocumentType(ManageDocumentType.N9A_PAPER_ADMISSION_FULL_OR_PART);
             manageDocument.setDocumentName("defendant");
             Document document1 = new Document()
-            .setDocumentUrl("http://test.com")
-            .setDocumentBinaryUrl("http://test.com/binary")
-            .setDocumentFileName("document")
-            .setCategoryID("ApplicantTestCategory");
+                .setDocumentUrl("http://test.com")
+                .setDocumentBinaryUrl("http://test.com/binary")
+                .setDocumentFileName("document")
+                .setCategoryID("ApplicantTestCategory");
             manageDocument.setDocumentLink(document1);
             Element<ManageDocument> document = new Element<>(
                 UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
@@ -72,9 +72,9 @@ class ManageDocumentsHandlerTest extends BaseCallbackHandlerTest {
             manageDocument1.setDocumentType(ManageDocumentType.N9A_PAPER_ADMISSION_FULL_OR_PART);
             manageDocument1.setDocumentName("defendant");
             Document document3 = new Document()
-            .setDocumentUrl("http://test2.com")
-            .setDocumentBinaryUrl("http://test2.com/binary")
-            .setDocumentFileName("document2");
+                .setDocumentUrl("http://test2.com")
+                .setDocumentBinaryUrl("http://test2.com/binary")
+                .setDocumentFileName("document2");
             manageDocument1.setDocumentLink(document3);
             Element<ManageDocument> document2 = new Element<>(
                 UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f45"),
