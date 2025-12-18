@@ -2189,6 +2189,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                    .whenWillThisAmountBePaid(LocalDate.now().plusDays(5)).build())
                 .ccjPaymentDetails(ccjPaymentDetails)
                 .ccdState(All_FINAL_ORDERS_ISSUED)
+                .allocatedTrack(MULTI_CLAIM)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
                 .respondent1(Party.builder()
                                  .primaryAddress(Address.builder().build())

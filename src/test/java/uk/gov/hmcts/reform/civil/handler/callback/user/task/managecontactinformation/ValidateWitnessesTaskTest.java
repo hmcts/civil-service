@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -49,15 +50,19 @@ public class ValidateWitnessesTaskTest {
 
     @BeforeEach
     void setup() {
-        witness = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name").build();
+        witness = new UpdatePartyDetailsForm();
+        witness.setFirstName("First");
+        witness.setLastName("Name");
     }
 
     @Test
     void shouldNotReturnErrorWhenAdminAddsWitnesses() {
-        CaseData caseData = CaseData.builder()
-            .updateDetailsForm(UpdateDetailsForm.builder()
-                                   .updateWitnessesDetailsForm(wrapElements(UpdatePartyDetailsForm.builder().partyId(null).build()))
-                                   .build())
+        UpdatePartyDetailsForm updatePartyDetailsForm = new UpdatePartyDetailsForm();
+        updatePartyDetailsForm.setPartyId(null);
+        UpdateDetailsForm updateDetailsForm = new UpdateDetailsForm();
+        updateDetailsForm.setUpdateWitnessesDetailsForm(wrapElements(updatePartyDetailsForm));
+        CaseData caseData = CaseDataBuilder.builder()
+            .updateDetailsForm(updateDetailsForm)
             .build();
         when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
 
@@ -68,10 +73,12 @@ public class ValidateWitnessesTaskTest {
 
     @Test
     void shouldNotReturnErrorWhenNonAdminHasValidWitnesses() {
-        CaseData caseData = CaseData.builder()
-            .updateDetailsForm(UpdateDetailsForm.builder()
-                                   .updateWitnessesDetailsForm(wrapElements(UpdatePartyDetailsForm.builder().partyId("123").build()))
-                                   .build())
+        UpdatePartyDetailsForm updatePartyDetailsForm = new UpdatePartyDetailsForm();
+        updatePartyDetailsForm.setPartyId("123");
+        UpdateDetailsForm updateDetailsForm = new UpdateDetailsForm();
+        updateDetailsForm.setUpdateWitnessesDetailsForm(wrapElements(updatePartyDetailsForm));
+        CaseData caseData = CaseDataBuilder.builder()
+            .updateDetailsForm(updateDetailsForm)
             .build();
         when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
 
@@ -82,10 +89,12 @@ public class ValidateWitnessesTaskTest {
 
     @Test
     void shouldReturnErrorWhenNonAdminAddsWitnessesWithoutPartyId() {
-        CaseData caseData = CaseData.builder()
-            .updateDetailsForm(UpdateDetailsForm.builder()
-                                   .updateWitnessesDetailsForm(wrapElements(UpdatePartyDetailsForm.builder().partyId(null).build()))
-                                   .build())
+        UpdatePartyDetailsForm updatePartyDetailsForm = new UpdatePartyDetailsForm();
+        updatePartyDetailsForm.setPartyId(null);
+        UpdateDetailsForm updateDetailsForm = new UpdateDetailsForm();
+        updateDetailsForm.setUpdateWitnessesDetailsForm(wrapElements(updatePartyDetailsForm));
+        CaseData caseData = CaseDataBuilder.builder()
+            .updateDetailsForm(updateDetailsForm)
             .build();
         when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
 
@@ -96,10 +105,10 @@ public class ValidateWitnessesTaskTest {
 
     @Test
     void shouldNotReturnErrorWhenNonAdminHasEmptyUpdateWitnessesDetailsForm() {
-        CaseData caseData = CaseData.builder()
-            .updateDetailsForm(UpdateDetailsForm.builder()
-                                   .updateWitnessesDetailsForm(wrapElements()) // Empty list of witnesses
-                                   .build())
+        UpdateDetailsForm updateDetailsForm = new UpdateDetailsForm();
+        updateDetailsForm.setUpdateWitnessesDetailsForm(wrapElements()); // Empty list of witnesses
+        CaseData caseData = CaseDataBuilder.builder()
+            .updateDetailsForm(updateDetailsForm)
             .build();
         when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
 
@@ -110,10 +119,10 @@ public class ValidateWitnessesTaskTest {
 
     @Test
     void shouldNotReturnErrorWhenAdminHasEmptyUpdateWitnessesDetailsForm() {
-        CaseData caseData = CaseData.builder()
-            .updateDetailsForm(UpdateDetailsForm.builder()
-                                   .updateWitnessesDetailsForm(wrapElements()) // Empty list of witnesses
-                                   .build())
+        UpdateDetailsForm updateDetailsForm = new UpdateDetailsForm();
+        updateDetailsForm.setUpdateWitnessesDetailsForm(wrapElements()); // Empty list of witnesses
+        CaseData caseData = CaseDataBuilder.builder()
+            .updateDetailsForm(updateDetailsForm)
             .build();
         when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
 

@@ -21,12 +21,12 @@ class UploadEvidenceDocumentRetrieverTest {
 
     @Test
     void shouldReturnDocument() {
-        Document document = Document.builder().documentFileName("OriginalName.pdf").build();
+        Document document = new Document();
+        document.setDocumentFileName("OriginalName.pdf");
         UploadEvidenceDocumentType uploadEvidenceDocumentType = new UploadEvidenceDocumentType()
-                .setDocumentUpload(document);
-        Element<UploadEvidenceDocumentType> element = Element.<UploadEvidenceDocumentType>builder()
-                .value(uploadEvidenceDocumentType)
-                .build();
+            .setDocumentUpload(document);
+        Element<UploadEvidenceDocumentType> element = new Element<>();
+        element.setValue(uploadEvidenceDocumentType);
 
         Document result = uploadEvidenceDocumentRetriever.getDocument(element);
 
@@ -37,10 +37,9 @@ class UploadEvidenceDocumentRetrieverTest {
     void shouldReturnDocumentDateTime() {
         LocalDateTime dateTime = LocalDateTime.of(2022, 2, 10, 10, 0);
         UploadEvidenceDocumentType uploadEvidenceDocumentType = new UploadEvidenceDocumentType()
-                .setCreatedDatetime(dateTime);
-        Element<UploadEvidenceDocumentType> element = Element.<UploadEvidenceDocumentType>builder()
-                .value(uploadEvidenceDocumentType)
-                .build();
+            .setCreatedDatetime(dateTime);
+        Element<UploadEvidenceDocumentType> element = new Element<>();
+        element.setValue(uploadEvidenceDocumentType);
 
         LocalDateTime result = uploadEvidenceDocumentRetriever.getDocumentDateTime(element);
 

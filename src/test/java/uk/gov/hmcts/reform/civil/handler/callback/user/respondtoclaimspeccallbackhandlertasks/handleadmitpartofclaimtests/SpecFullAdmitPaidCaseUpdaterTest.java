@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.handleadmitpartofclaim.SpecFullAdmitPaidCaseUpdater;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -19,34 +20,29 @@ class SpecFullAdmitPaidCaseUpdaterTest {
     @InjectMocks
     private SpecFullAdmitPaidCaseUpdater updater;
 
-    private CaseData.CaseDataBuilder<?, ?> caseDataBuilder;
-
     @BeforeEach
     void setUp() {
-        caseDataBuilder = CaseData.builder();
     }
 
     @Test
     void shouldSetSpecFullAdmitPaidToNo_whenConditionsAreMet() {
-        CaseData caseData = CaseData.builder()
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .specDefenceFullAdmittedRequired(NO)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData.setSpecDefenceFullAdmittedRequired(NO);
 
-        updater.update(caseData, caseDataBuilder);
+        updater.update(caseData);
 
-        assertThat(caseDataBuilder.build().getSpecFullAdmitPaid()).isEqualTo(NO);
+        assertThat(caseData.getSpecFullAdmitPaid()).isEqualTo(NO);
     }
 
     @Test
     void shouldNotSetSpecFullAdmitPaid_whenConditionsAreNotMet() {
-        CaseData caseData = CaseData.builder()
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .specDefenceFullAdmittedRequired(YES)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData.setSpecDefenceFullAdmittedRequired(YES);
 
-        updater.update(caseData, caseDataBuilder);
+        updater.update(caseData);
 
-        assertThat(caseDataBuilder.build().getSpecFullAdmitPaid()).isNull();
+        assertThat(caseData.getSpecFullAdmitPaid()).isNull();
     }
 }
