@@ -5,7 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -78,8 +80,17 @@ public class CalculateFeeTask {
         caseData.setApplicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
     }
 
-    private void setClaimFee(CaseData caseData) {
-        caseData.setClaimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()));
+    private void setClaimFee(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
+        if(YesOrNo.NO.equals(caseData.getIsClaimDeclarationAdded())) {
+            caseDataBuilder.claimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()));
+        } else if(YesOrNo.YES.equals(caseData.getIsClaimDeclarationAdded())) {
+            Fee claimFee = feesService.getFeeDataByClaimValue(caseData.getClaimValue());
+            Fee otherRemedyFee = feesService.getFeeDataForOtherRemedy(caseData.getClaimValue());
+            Fee totalFee = Fee.builder().code(claimFee.getCode()).version(claimFee.getVersion()).calculatedAmountInPence(
+                claimFee.getCalculatedAmountInPence().add(otherRemedyFee.getCalculatedAmountInPence())).build();
+            caseDataBuilder.claimFee(totalFee);
+            caseDataBuilder.otherRemedyFee(otherRemedyFee);
+        }
     }
 
     private CallbackResponse buildCallbackResponse(CaseData caseData) {

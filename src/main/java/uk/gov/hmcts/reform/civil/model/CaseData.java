@@ -202,6 +202,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private  String detailsOfClaim;
     private  ClaimValue claimValue;
     private  Fee claimFee;
+    private  Fee otherRemedyFee;
     private  String serviceRequestReference;
     private  String paymentReference;
     private  DynamicList applicantSolicitor1PbaAccounts;
@@ -1653,5 +1654,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isClaimUnderTranslationAfterClaimantResponse() {
         return this.getApplicant1ResponseDate() != null
             && this.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION;
+    }
+
+    @JsonIgnore
+    public boolean isOtherRemedyClaim() {
+        return this.getClaimType() != null
+            && (ClaimTypeUnspec.DAMAGES_AND_OTHER_REMEDY.equals(this.getClaimType())
+            || ClaimTypeUnspec.HOUSING_DISREPAIR.equals(this.getClaimType()));
     }
 }
