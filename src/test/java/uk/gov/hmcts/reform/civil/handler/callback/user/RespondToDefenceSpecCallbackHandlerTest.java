@@ -1894,7 +1894,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 CaseLocationCivil flightLocation = CaseLocationCivil.builder().baseLocation("111000").region("2").build();
 
                 List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>();
-                airlineEpimsIDList.add(AirlineEpimsId.builder().airline("BA/Cityflyer").epimsID("111000").build());
+                airlineEpimsIDList.add(new AirlineEpimsId().setAirline("BA/Cityflyer").setEpimsID("111000"));
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
