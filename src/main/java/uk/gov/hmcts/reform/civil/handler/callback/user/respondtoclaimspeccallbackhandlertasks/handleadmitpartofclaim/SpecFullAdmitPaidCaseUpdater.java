@@ -12,13 +12,13 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 public class SpecFullAdmitPaidCaseUpdater implements HandleAdmitPartOfClaimCaseUpdater {
 
     @Override
-    public void update(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+    public void update(CaseData caseData) {
         log.info("Updating SpecFullAdmitPaidCase for caseId: {}", caseData.getCcdCaseReference());
 
         if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION
                 && caseData.getSpecDefenceFullAdmittedRequired() == NO) {
             log.debug("Setting specFullAdmitPaid to NO for caseId: {}", caseData.getCcdCaseReference());
-            updatedCaseData.specFullAdmitPaid(NO);
+            caseData.setSpecFullAdmitPaid(NO);
         }
     }
 }

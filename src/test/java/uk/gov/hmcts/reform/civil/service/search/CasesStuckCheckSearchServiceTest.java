@@ -39,7 +39,7 @@ class CasesStuckCheckSearchServiceTest {
             "\"from\":0",
             "\"_source\":[\"reference\"]",
             "now-7d",
-            "FINISHED"
+            "finished"
         );
     }
 

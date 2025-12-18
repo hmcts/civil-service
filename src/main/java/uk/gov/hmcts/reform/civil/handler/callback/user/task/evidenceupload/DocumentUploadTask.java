@@ -33,16 +33,16 @@ public abstract class DocumentUploadTask<L1 extends LegalRepresentativeOneDocume
         this.legalRepresentativeTwoDocumentHandlers = legalRepresentativeTwoDocumentHandlers;
     }
 
-    abstract void applyDocumentUploadDate(CaseData.CaseDataBuilder caseDataBuilder, LocalDateTime now);
+    abstract void applyDocumentUploadDate(CaseData caseData, LocalDateTime now);
 
-    private void updateDocumentListUploadedAfterBundle(CaseData.CaseDataBuilder caseDataBuilder, CaseData caseData) {
-        legalRepresentativeOneDocumentHandlers.forEach(handler -> handler.addUploadDocList(caseDataBuilder, caseData));
-        legalRepresentativeTwoDocumentHandlers.forEach(handler -> handler.addUploadDocList(caseDataBuilder, caseData));
+    private void doUpdateDocumentListUploadedAfterBundle(CaseData caseData) {
+        legalRepresentativeOneDocumentHandlers.forEach(handler -> handler.addUploadDocList(caseData));
+        legalRepresentativeTwoDocumentHandlers.forEach(handler -> handler.addUploadDocList(caseData));
     }
 
-    private void updateDocumentListUploadedAfterBundle(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
+    private void updateDocumentListUploadedAfterBundle(CaseData caseData) {
         if (nonNull(caseData.getCaseBundles()) && !caseData.getCaseBundles().isEmpty()) {
-            updateDocumentListUploadedAfterBundle(caseDataBuilder, caseData);
+            doUpdateDocumentListUploadedAfterBundle(caseData);
         }
     }
 
@@ -63,20 +63,18 @@ public abstract class DocumentUploadTask<L1 extends LegalRepresentativeOneDocume
     }
 
     public CallbackResponse uploadDocuments(CaseData caseData, CaseData caseDataBefore, String selectedRole) {
-
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.evidenceUploadNotificationSent(YesOrNo.NO);
+        caseData.setEvidenceUploadNotificationSent(YesOrNo.NO);
         // If notification has already been populated in current day, we want to append to that existing notification
         StringBuilder notificationTextBuilder = initiateNotificationTextBuilder(caseData);
-        applyDocumentUploadDate(caseDataBuilder, LocalDateTime.now());
-        updateDocumentListUploadedAfterBundle(caseData, caseDataBuilder);
+        applyDocumentUploadDate(caseData, LocalDateTime.now());
+        updateDocumentListUploadedAfterBundle(caseData);
 
         String litigantTypeString = getLegalRepresentativeTypeString(selectedRole);
         if (selectedRole.equals(getSolicitorOneRole()) || selectedRole.equals(getSelectedValueForBoth())) {
             for (LegalRepresentativeOneDocumentHandler handler : legalRepresentativeOneDocumentHandlers) {
                 handler.handleDocuments(caseData, litigantTypeString, notificationTextBuilder);
                 if (selectedRole.equals(getSelectedValueForBoth()) && handler.shouldCopyDocumentsToLegalRep2()) {
-                    caseData = handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore, caseDataBuilder);
+                    caseData = handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore);
                 }
             }
         }
@@ -87,31 +85,31 @@ public abstract class DocumentUploadTask<L1 extends LegalRepresentativeOneDocume
             }
         }
         // null the values of the lists, so that on future retriggers of the event, they are blank
-        clearDocumentCollections(caseDataBuilder);
-        caseDataBuilder.notificationText(notificationTextBuilder.toString());
+        clearDocumentCollections(caseData);
+        caseData.setNotificationText(notificationTextBuilder.toString());
 
-        caseDataBuilder.businessProcess(BusinessProcess.ready(EVIDENCE_UPLOADED));
+        caseData.setBusinessProcess(BusinessProcess.ready(EVIDENCE_UPLOADED));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
-    private static void clearDocumentCollections(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
-        caseDataBuilder.disclosureSelectionEvidence(null);
-        caseDataBuilder.disclosureSelectionEvidenceRes(null);
-        caseDataBuilder.witnessSelectionEvidence(null);
-        caseDataBuilder.witnessSelectionEvidenceSmallClaim(null);
-        caseDataBuilder.witnessSelectionEvidenceRes(null);
-        caseDataBuilder.witnessSelectionEvidenceSmallClaimRes(null);
-        caseDataBuilder.expertSelectionEvidenceRes(null);
-        caseDataBuilder.expertSelectionEvidence(null);
-        caseDataBuilder.expertSelectionEvidenceSmallClaim(null);
-        caseDataBuilder.expertSelectionEvidenceSmallClaimRes(null);
-        caseDataBuilder.trialSelectionEvidence(null);
-        caseDataBuilder.trialSelectionEvidenceSmallClaim(null);
-        caseDataBuilder.trialSelectionEvidenceRes(null);
-        caseDataBuilder.trialSelectionEvidenceSmallClaimRes(null);
+    private static void clearDocumentCollections(CaseData caseData) {
+        caseData.setDisclosureSelectionEvidence(null);
+        caseData.setDisclosureSelectionEvidenceRes(null);
+        caseData.setWitnessSelectionEvidence(null);
+        caseData.setWitnessSelectionEvidenceSmallClaim(null);
+        caseData.setWitnessSelectionEvidenceRes(null);
+        caseData.setWitnessSelectionEvidenceSmallClaimRes(null);
+        caseData.setExpertSelectionEvidenceRes(null);
+        caseData.setExpertSelectionEvidence(null);
+        caseData.setExpertSelectionEvidenceSmallClaim(null);
+        caseData.setExpertSelectionEvidenceSmallClaimRes(null);
+        caseData.setTrialSelectionEvidence(null);
+        caseData.setTrialSelectionEvidenceSmallClaim(null);
+        caseData.setTrialSelectionEvidenceRes(null);
+        caseData.setTrialSelectionEvidenceSmallClaimRes(null);
     }
 
 }

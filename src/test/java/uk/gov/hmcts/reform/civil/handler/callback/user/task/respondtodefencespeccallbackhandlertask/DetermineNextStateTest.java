@@ -106,7 +106,7 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldDetermineNextStateWhenCallbackIsVersion1(boolean postTranslation) {
 
-        BusinessProcess businessProcess = BusinessProcess.builder().build();
+        BusinessProcess businessProcess = new BusinessProcess();
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateLipClaimantDoesNotSettle()
@@ -157,7 +157,7 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
         }
 
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-        BusinessProcess businessProcess = BusinessProcess.builder().build();
+        BusinessProcess businessProcess = new BusinessProcess();
 
         String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
                                                                    "", businessProcess);
@@ -168,7 +168,7 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldSetStateInMediationWhenClaimantAgreeToFreeMediation(boolean postTranslation) {
 
-        BusinessProcess businessProcess = BusinessProcess.builder().build();
+        BusinessProcess businessProcess = new BusinessProcess();
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
@@ -189,27 +189,26 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     @Test
     void shouldSetStateAllFinalOrdersIssuedWhenApplicantAcceptedRepaymentPlan() {
 
-        BusinessProcess businessProcess = BusinessProcess.builder().build();
+        BusinessProcess businessProcess = new BusinessProcess();
 
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
 
-        JudgmentDetails activeJudgment = JudgmentDetails.builder()
-            .judgmentId(123)
-            .lastUpdateTimeStamp(now)
-            .courtLocation("123456")
-            .totalAmount("123")
-            .orderedAmount("500")
-            .costs("150")
-            .claimFeeAmount("12")
-            .amountAlreadyPaid("234")
-            .issueDate(now.toLocalDate())
-            .rtlState(JudgmentRTLStatus.ISSUED.getRtlState())
-            .cancelDate(now.toLocalDate())
-            .defendant1Name("Defendant 1")
-            .defendant1Dob(LocalDate.of(1980, 1, 1))
-            .build();
+        JudgmentDetails activeJudgment = new JudgmentDetails();
+        activeJudgment.setJudgmentId(123);
+        activeJudgment.setLastUpdateTimeStamp(now);
+        activeJudgment.setCourtLocation("123456");
+        activeJudgment.setTotalAmount("123");
+        activeJudgment.setOrderedAmount("500");
+        activeJudgment.setCosts("150");
+        activeJudgment.setClaimFeeAmount("12");
+        activeJudgment.setAmountAlreadyPaid("234");
+        activeJudgment.setIssueDate(now.toLocalDate());
+        activeJudgment.setRtlState(JudgmentRTLStatus.ISSUED.getRtlState());
+        activeJudgment.setCancelDate(now.toLocalDate());
+        activeJudgment.setDefendant1Name("Defendant 1");
+        activeJudgment.setDefendant1Dob(LocalDate.of(1980, 1, 1));
 
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1AcceptPartAdmitPaymentPlanSpec(YES)
@@ -242,7 +241,7 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldSetProceedsInHeritageSystemWhenApplicantRejectedRepaymentPlan(boolean postTranslation) {
 
-        BusinessProcess businessProcess = BusinessProcess.builder().build();
+        BusinessProcess businessProcess = new BusinessProcess();
 
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
@@ -264,7 +263,7 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldSetStateJudicialReferralWhenClaimIsNotSettled(boolean postTranslation) {
 
-        BusinessProcess businessProcess = BusinessProcess.builder().build();
+        BusinessProcess businessProcess = new BusinessProcess();
 
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1AcceptAdmitAmountPaidSpec(NO)
@@ -288,7 +287,7 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldNotSetStateWhenMultiClaimIsNotSettled(boolean postTranslation) {
 
-        BusinessProcess businessProcess = BusinessProcess.builder().build();
+        BusinessProcess businessProcess = new BusinessProcess();
 
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1AcceptAdmitAmountPaidSpec(NO)
@@ -316,7 +315,7 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldNotSetStateWhenIntermediateClaimIsNotSettled(boolean postTranslation) {
 
-        BusinessProcess businessProcess = BusinessProcess.builder().build();
+        BusinessProcess businessProcess = new BusinessProcess();
 
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1ProceedWithClaim(YES)
@@ -344,20 +343,22 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldSetStateCaseSettledWhenClaimIsPartAdmitSettled(boolean postTranslation) {
 
-        BusinessProcess businessProcess = BusinessProcess.builder().build();
-
+        CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+        caseLocationCivil.setBaseLocation("11111");
+        caseLocationCivil.setRegion("2");
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .applicant1PartAdmitIntentionToSettleClaimSpec(YES)
             .applicant1PartAdmitConfirmAmountPaidSpec(YES)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
+            .caseManagementLocation(caseLocationCivil)
             .build();
 
         String resultState;
         if (postTranslation) {
             resultState = determineNextState.determineNextStatePostTranslation(caseData, callbackParams(caseData));
         } else {
+            BusinessProcess businessProcess = new BusinessProcess();
             resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
                                                                 "", businessProcess);
         }
@@ -370,17 +371,13 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldSetStateCaseStayedWhenItsLipVLipOneVOne(boolean postTranslation) {
 
-        BusinessProcess businessProcess = BusinessProcess.builder().build();
-
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
-            .toBuilder()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .respondent1Represented(NO)
-            .applicant1Represented(YES)
-            .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-            .applicant1ProceedWithClaim(NO)
-            .defenceRouteRequired(SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build();
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+        caseData.setRespondent1Represented(NO);
+        caseData.setApplicant1Represented(YES);
+        caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
+        caseData.setApplicant1ProceedWithClaim(NO);
+        caseData.setDefenceRouteRequired(SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM);
 
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
@@ -388,6 +385,7 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
         if (postTranslation) {
             resultState = determineNextState.determineNextStatePostTranslation(caseData, callbackParams(caseData));
         } else {
+            BusinessProcess businessProcess = new BusinessProcess();
             resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
                                                                 "", businessProcess);
         }
@@ -398,27 +396,24 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     @Test
     void shouldSetProceedsInHeritageSystemWhenApplicantAcceptedRepaymentPlanAndNotLrVLip() {
 
-        BusinessProcess businessProcess = BusinessProcess.builder().build();
-
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
 
-        JudgmentDetails activeJudgment = JudgmentDetails.builder()
-            .judgmentId(123)
-            .lastUpdateTimeStamp(now)
-            .courtLocation("123456")
-            .totalAmount("123")
-            .orderedAmount("500")
-            .costs("150")
-            .claimFeeAmount("12")
-            .amountAlreadyPaid("234")
-            .issueDate(now.toLocalDate())
-            .rtlState(JudgmentRTLStatus.ISSUED.getRtlState())
-            .cancelDate(now.toLocalDate())
-            .defendant1Name("Defendant 1")
-            .defendant1Dob(LocalDate.of(1980, 1, 1))
-            .build();
+        JudgmentDetails activeJudgment = new JudgmentDetails();
+        activeJudgment.setJudgmentId(123);
+        activeJudgment.setLastUpdateTimeStamp(now);
+        activeJudgment.setCourtLocation("123456");
+        activeJudgment.setTotalAmount("123");
+        activeJudgment.setOrderedAmount("500");
+        activeJudgment.setCosts("150");
+        activeJudgment.setClaimFeeAmount("12");
+        activeJudgment.setAmountAlreadyPaid("234");
+        activeJudgment.setIssueDate(now.toLocalDate());
+        activeJudgment.setRtlState(JudgmentRTLStatus.ISSUED.getRtlState());
+        activeJudgment.setCancelDate(now.toLocalDate());
+        activeJudgment.setDefendant1Name("Defendant 1");
+        activeJudgment.setDefendant1Dob(LocalDate.of(1980, 1, 1));
 
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1AcceptPartAdmitPaymentPlanSpec(YES)
@@ -436,6 +431,7 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
 
         String resultState;
         try (MockedStatic<LocalDateTime> mock = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
+            BusinessProcess businessProcess = new BusinessProcess();
             mock.when(LocalDateTime::now).thenReturn(now);
             resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
                                                                 "", businessProcess);
@@ -452,8 +448,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     @ValueSource(booleans = {true, false})
     void shouldSetAwaitingApplicantIntentionWhenApplicantAcceptedImmediatePaymentPlanFor1V1(boolean postTranslation) {
 
-        BusinessProcess businessProcess = BusinessProcess.builder().build();
-
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1AcceptAdmitAmountPaidSpec(YES)
             .respondent1Represented(YES)
@@ -468,6 +462,7 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
         if (postTranslation) {
             resultState = determineNextState.determineNextStatePostTranslation(caseData, callbackParams(caseData));
         } else {
+            BusinessProcess businessProcess = new BusinessProcess();
             resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
                                                                 "", businessProcess);
         }
@@ -479,8 +474,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     @Test
     void shouldSetAwaitingApplicantIntentionWhenApplicantWantToProceedImmediatePaymentPlanFor1V1() {
 
-        BusinessProcess businessProcess = BusinessProcess.builder().build();
-
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1AcceptAdmitAmountPaidSpec(NO)
             .respondent1Represented(YES)
@@ -490,6 +483,7 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .build();
 
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+        BusinessProcess businessProcess = new BusinessProcess();
         String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
                                                                    "", businessProcess);
         assertNotNull(resultState);
