@@ -80,16 +80,17 @@ public class CalculateFeeTask {
         caseData.setApplicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
     }
 
-    private void setClaimFee(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
+    private void setClaimFee(CaseData caseData) {
+        caseData.setClaimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()));
         if(YesOrNo.NO.equals(caseData.getIsClaimDeclarationAdded())) {
-            caseDataBuilder.claimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()));
+            caseData.setClaimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()));
         } else if(YesOrNo.YES.equals(caseData.getIsClaimDeclarationAdded())) {
             Fee claimFee = feesService.getFeeDataByClaimValue(caseData.getClaimValue());
             Fee otherRemedyFee = feesService.getFeeDataForOtherRemedy(caseData.getClaimValue());
             Fee totalFee = Fee.builder().code(claimFee.getCode()).version(claimFee.getVersion()).calculatedAmountInPence(
                 claimFee.getCalculatedAmountInPence().add(otherRemedyFee.getCalculatedAmountInPence())).build();
-            caseDataBuilder.claimFee(totalFee);
-            caseDataBuilder.otherRemedyFee(otherRemedyFee);
+            caseData.setClaimFee(totalFee);
+            caseData.setOtherRemedyFee(otherRemedyFee);
         }
     }
 
