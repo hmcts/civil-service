@@ -3,6 +3,11 @@
 !gradle/wrapper/gradle-wrapper.jar
 *.class
 bin/main/application.yaml
+bin/cftlib/
+bin/contractTest/
+bin/integrationTest/
+bin/main/
+bin/test/
 **/target
 
 ### STS ###
