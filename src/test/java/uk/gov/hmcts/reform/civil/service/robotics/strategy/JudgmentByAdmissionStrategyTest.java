@@ -204,7 +204,6 @@ class JudgmentByAdmissionStrategyTest {
     void usesDefendantSetDateWhenJoActive() {
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
-        when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(false);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(41, 42);
 
         LocalDateTime issueDate = LocalDateTime.of(2024, 7, 10, 14, 0);
@@ -242,7 +241,6 @@ class JudgmentByAdmissionStrategyTest {
     void excludesInterestWhenLrAdmissionBulkEnabled() {
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
-        when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(61, 62);
 
         LocalDateTime responseDate = LocalDateTime.of(2024, 11, 5, 10, 0);

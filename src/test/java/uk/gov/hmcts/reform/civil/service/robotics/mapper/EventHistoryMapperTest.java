@@ -9204,7 +9204,6 @@ class EventHistoryMapperTest {
         when(ccjPaymentDetails.getCcjJudgmentAmountClaimAmount()).thenReturn(BigDecimal.valueOf(1000));
         when(caseData.getTotalInterest()).thenReturn(BigDecimal.valueOf(200));
         when(caseData.isLipvLipOneVOne()).thenReturn(false);
-        when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(false);
 
         BigDecimal result = ReflectionTestUtils.invokeMethod(
             judgmentByAdmissionStrategy, "resolveJudgmentAmount", caseData);
@@ -9221,7 +9220,6 @@ class EventHistoryMapperTest {
         when(ccjPaymentDetails.getCcjJudgmentLipInterest()).thenReturn(BigDecimal.valueOf(150));
         when(caseData.isLipvLipOneVOne()).thenReturn(true);
         when(caseData.isPartAdmitClaimSpec()).thenReturn(false);
-        when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(false);
 
         BigDecimal result = ReflectionTestUtils.invokeMethod(
             judgmentByAdmissionStrategy, "resolveJudgmentAmount", caseData);
@@ -9238,7 +9236,6 @@ class EventHistoryMapperTest {
         when(ccjPaymentDetails.getCcjJudgmentLipInterest()).thenReturn(BigDecimal.valueOf(150));
         when(caseData.isLipvLipOneVOne()).thenReturn(true);
         when(caseData.isPartAdmitClaimSpec()).thenReturn(true);
-        when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(false);
 
         BigDecimal result = ReflectionTestUtils.invokeMethod(
             judgmentByAdmissionStrategy, "resolveJudgmentAmount", caseData);
