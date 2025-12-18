@@ -383,19 +383,17 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         static Stream<Arguments> caseDataStream() {
-            DocumentWithRegex documentRegex = new DocumentWithRegex(Document.builder()
-                                                                        .documentUrl("fake-url")
-                                                                        .documentFileName("file-name")
-                                                                        .documentBinaryUrl("binary-url")
-                                                                        .build());
+            DocumentWithRegex documentRegex = new DocumentWithRegex(new Document()
+                                                                        .setDocumentUrl("fake-url")
+                                                                        .setDocumentFileName("file-name")
+                                                                        .setDocumentBinaryUrl("binary-url"));
             List<Element<DocumentWithRegex>> documentList = new ArrayList<>();
             List<Element<Document>> documentList2 = new ArrayList<>();
             documentList.add(element(documentRegex));
-            documentList2.add(element(Document.builder()
-                                          .documentUrl("fake-url")
-                                          .documentFileName("file-name")
-                                          .documentBinaryUrl("binary-url")
-                                          .build()));
+            documentList2.add(element(new Document()
+                                          .setDocumentUrl("fake-url")
+                                          .setDocumentFileName("file-name")
+                                          .setDocumentBinaryUrl("binary-url")));
 
             ServedDocumentFiles documentToUpload = new ServedDocumentFiles();
             documentToUpload.setParticularsOfClaimDocument(documentList2);

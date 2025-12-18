@@ -51,40 +51,38 @@ class ManageDocumentsHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldUploadManageDocumentsSuccessfully() {
             //Given
+            ManageDocument manageDocument = new ManageDocument();
+            manageDocument.setDocumentType(ManageDocumentType.N9A_PAPER_ADMISSION_FULL_OR_PART);
+            manageDocument.setDocumentName("defendant");
+            Document document1 = new Document()
+                .setDocumentUrl("http://test.com")
+                .setDocumentBinaryUrl("http://test.com/binary")
+                .setDocumentFileName("document")
+                .setCategoryID("ApplicantTestCategory");
+            manageDocument.setDocumentLink(document1);
             Element<ManageDocument> document = new Element<>(
                 UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
-                ManageDocument.builder()
-                    .documentType(ManageDocumentType.N9A_PAPER_ADMISSION_FULL_OR_PART)
-                    .documentName("defendant")
-                    .documentLink(Document.builder()
-                                      .documentUrl("http://test.com")
-                                      .documentBinaryUrl("http://test.com/binary")
-                                      .documentFileName("document")
-                                      .categoryID("ApplicantTestCategory")
-                                      .build())
-                    .build()
+                manageDocument
             );
 
+            CaseData caseDataBefore = CaseDataBuilder.builder().build();
+            caseDataBefore.setManageDocuments(List.of(document));
+
+            ManageDocument manageDocument1 = new ManageDocument();
+            manageDocument1.setDocumentType(ManageDocumentType.N9A_PAPER_ADMISSION_FULL_OR_PART);
+            manageDocument1.setDocumentName("defendant");
+            Document document3 = new Document()
+                .setDocumentUrl("http://test2.com")
+                .setDocumentBinaryUrl("http://test2.com/binary")
+                .setDocumentFileName("document2");
+            manageDocument1.setDocumentLink(document3);
             Element<ManageDocument> document2 = new Element<>(
                 UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f45"),
-                ManageDocument.builder()
-                    .documentType(ManageDocumentType.N9A_PAPER_ADMISSION_FULL_OR_PART)
-                    .documentName("defendant")
-                    .documentLink(Document.builder()
-                                      .documentUrl("http://test2.com")
-                                      .documentBinaryUrl("http://test2.com/binary")
-                                      .documentFileName("document2")
-                                      .build())
-                    .build()
+                manageDocument1
             );
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setManageDocuments(List.of(document, document2));
 
-            CaseData caseDataBefore = CaseDataBuilder.builder().build().toBuilder()
-                .manageDocuments(List.of(document))
-                .build();
-
-            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-                .manageDocuments(List.of(document, document2))
-                .build();
             CallbackParams params = callbackParamsOf(caseData, caseDataBefore, CallbackType.ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
