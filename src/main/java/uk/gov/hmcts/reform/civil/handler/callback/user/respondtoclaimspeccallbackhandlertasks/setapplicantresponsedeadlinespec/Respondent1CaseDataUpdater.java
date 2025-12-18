@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallba
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -24,19 +23,21 @@ public class Respondent1CaseDataUpdater implements SetApplicantResponseDeadlineC
     public void update(CaseData caseData) {
         log.info("Updating Respondent1CaseData for caseId: {}", caseData.getCcdCaseReference());
 
-        Party updatedRespondent1 = new Party();
-        BeanUtils.copyProperties(caseData.getRespondent1(), updatedRespondent1);
+        Party updatedRespondent1;
         if (NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())) {
             log.info("Setting primary address to applicant correspondence address for caseId: {}", caseData.getCcdCaseReference());
+            updatedRespondent1 = caseData.getRespondent1();
             updatedRespondent1.setPrimaryAddress(caseData.getSpecAoSApplicantCorrespondenceAddressdetails());
         } else {
             log.info("Setting primary address to respondent1 copy's primary address for caseId: {}", caseData.getCcdCaseReference());
+            updatedRespondent1 = caseData.getRespondent1();
             updatedRespondent1.setPrimaryAddress(caseData.getRespondent1Copy().getPrimaryAddress());
         }
         caseData.setRespondent1(updatedRespondent1);
 
         if (caseData.getRespondent1Copy() != null) {
             log.info("Copying flags from respondent1 copy for caseId: {}", caseData.getCcdCaseReference());
+            updatedRespondent1 = caseData.getRespondent1();
             updatedRespondent1.setFlags(caseData.getRespondent1Copy().getFlags());
             caseData.setRespondent1(updatedRespondent1);
         }

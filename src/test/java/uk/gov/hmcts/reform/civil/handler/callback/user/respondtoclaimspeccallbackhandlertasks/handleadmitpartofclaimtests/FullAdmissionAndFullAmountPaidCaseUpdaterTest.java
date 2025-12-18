@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.handleadmitpartofclaim.FullAdmissionAndFullAmountPaidCaseUpdater;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -18,49 +19,40 @@ class FullAdmissionAndFullAmountPaidCaseUpdaterTest {
     @InjectMocks
     private FullAdmissionAndFullAmountPaidCaseUpdater updater;
 
-    private CaseData.CaseDataBuilder<?, ?> caseDataBuilder;
-
     @BeforeEach
     void setUp() {
-        caseDataBuilder = CaseData.builder();
     }
 
     @Test
     void shouldSetFullAdmissionAndFullAmountPaidToYesForRespondent2() {
-        CaseData caseData = CaseData.builder()
-                .isRespondent2(YES)
-                .specDefenceFullAdmitted2Required(YES)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setIsRespondent2(YES);
+        caseData.setSpecDefenceFullAdmitted2Required(YES);
 
-        updater.update(caseData, caseDataBuilder);
+        updater.update(caseData);
 
-        CaseData updatedCaseData = caseDataBuilder.build();
-        assertThat(updatedCaseData.getFullAdmissionAndFullAmountPaid()).isEqualTo(YES);
+        assertThat(caseData.getFullAdmissionAndFullAmountPaid()).isEqualTo(YES);
     }
 
     @Test
     void shouldSetFullAdmissionAndFullAmountPaidToYesForRespondent1() {
-        CaseData caseData = CaseData.builder()
-                .isRespondent1(YES)
-                .specDefenceFullAdmittedRequired(YES)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setIsRespondent1(YES);
+        caseData.setSpecDefenceFullAdmittedRequired(YES);
 
-        updater.update(caseData, caseDataBuilder);
+        updater.update(caseData);
 
-        CaseData updatedCaseData = caseDataBuilder.build();
-        assertThat(updatedCaseData.getFullAdmissionAndFullAmountPaid()).isEqualTo(YES);
+        assertThat(caseData.getFullAdmissionAndFullAmountPaid()).isEqualTo(YES);
     }
 
     @Test
     void shouldSetFullAdmissionAndFullAmountPaidToNoWhenConditionsAreNotMet() {
-        CaseData caseData = CaseData.builder()
-                .isRespondent1(NO)
-                .isRespondent2(NO)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setIsRespondent1(NO);
+        caseData.setIsRespondent2(NO);
 
-        updater.update(caseData, caseDataBuilder);
+        updater.update(caseData);
 
-        CaseData updatedCaseData = caseDataBuilder.build();
-        assertThat(updatedCaseData.getFullAdmissionAndFullAmountPaid()).isEqualTo(NO);
+        assertThat(caseData.getFullAdmissionAndFullAmountPaid()).isEqualTo(NO);
     }
 }

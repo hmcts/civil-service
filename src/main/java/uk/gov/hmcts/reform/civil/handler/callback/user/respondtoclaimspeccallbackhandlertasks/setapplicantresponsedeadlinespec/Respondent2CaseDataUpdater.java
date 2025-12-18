@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallba
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.RespondToClaimSpecUtils;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -45,7 +44,27 @@ public class Respondent2CaseDataUpdater implements SetApplicantResponseDeadlineC
             caseData.getRespondent2().setFlags(caseData.getRespondent2Copy().getFlags());
             caseData.setRespondent2Copy(null);
             Party respondent2DetailsForTab = new Party();
-            BeanUtils.copyProperties(caseData.getRespondent2(), respondent2DetailsForTab);
+            respondent2DetailsForTab.setPartyID(caseData.getRespondent2().getPartyID());
+            respondent2DetailsForTab.setType(caseData.getRespondent2().getType());
+            respondent2DetailsForTab.setIndividualTitle(caseData.getRespondent2().getIndividualTitle());
+            respondent2DetailsForTab.setIndividualFirstName(caseData.getRespondent2().getIndividualFirstName());
+            respondent2DetailsForTab.setIndividualLastName(caseData.getRespondent2().getIndividualLastName());
+            respondent2DetailsForTab.setIndividualDateOfBirth(caseData.getRespondent2().getIndividualDateOfBirth());
+            respondent2DetailsForTab.setCompanyName(caseData.getRespondent2().getCompanyName());
+            respondent2DetailsForTab.setOrganisationName(caseData.getRespondent2().getOrganisationName());
+            respondent2DetailsForTab.setSoleTraderTitle(caseData.getRespondent2().getSoleTraderTitle());
+            respondent2DetailsForTab.setSoleTraderFirstName(caseData.getRespondent2().getSoleTraderFirstName());
+            respondent2DetailsForTab.setSoleTraderLastName(caseData.getRespondent2().getSoleTraderLastName());
+            respondent2DetailsForTab.setSoleTraderTradingAs(caseData.getRespondent2().getSoleTraderTradingAs());
+            respondent2DetailsForTab.setSoleTraderDateOfBirth(caseData.getRespondent2().getSoleTraderDateOfBirth());
+            respondent2DetailsForTab.setPrimaryAddress(caseData.getRespondent2().getPrimaryAddress());
+            respondent2DetailsForTab.setPartyName(caseData.getRespondent2().getPartyName());
+            respondent2DetailsForTab.setBulkClaimPartyName(caseData.getRespondent2().getBulkClaimPartyName());
+            respondent2DetailsForTab.setPartyTypeDisplayValue(caseData.getRespondent2().getPartyTypeDisplayValue());
+            respondent2DetailsForTab.setPartyEmail(caseData.getRespondent2().getPartyEmail());
+            respondent2DetailsForTab.setPartyPhone(caseData.getRespondent2().getPartyPhone());
+            respondent2DetailsForTab.setLegalRepHeading(caseData.getRespondent2().getLegalRepHeading());
+            respondent2DetailsForTab.setUnavailableDates(caseData.getRespondent2().getUnavailableDates());
             respondent2DetailsForTab.setFlags(null);
             caseData.setRespondent2DetailsForClaimDetailsTab(respondent2DetailsForTab);
         }

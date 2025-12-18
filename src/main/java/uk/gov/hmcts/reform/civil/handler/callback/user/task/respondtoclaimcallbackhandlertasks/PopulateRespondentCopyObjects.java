@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallb
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -12,7 +11,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.CaseTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -83,10 +81,10 @@ public class PopulateRespondentCopyObjects implements CaseTask {
 
         RequestedCourt requestedCourt1 = createRequestedCourt(locations, caseData);
 
-        CaseData.CaseDataBuilder<?, ?> updatedCaseData = updateCaseData(caseData, isRespondent1, requestedCourt1);
+        updateCaseData(caseData, isRespondent1, requestedCourt1);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
@@ -118,32 +116,28 @@ public class PopulateRespondentCopyObjects implements CaseTask {
             .build();
     }
 
-    private CaseData.CaseDataBuilder<?, ?> updateCaseData(CaseData caseData, YesOrNo isRespondent1, RequestedCourt requestedCourt1) {
-        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder()
-            .respondent1Copy(caseData.getRespondent1())
-            .isRespondent1(isRespondent1)
-            .respondent1DQ(new Respondent1DQ()
-                               .setRespondent1DQRequestedCourt(
-                                   requestedCourt1));
+    private CaseData updateCaseData(CaseData caseData, YesOrNo isRespondent1, RequestedCourt requestedCourt1) {
+        caseData.setRespondent1Copy(caseData.getRespondent1());
+        caseData.setIsRespondent1(isRespondent1);
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt1);
+        caseData.setRespondent1DQ(respondent1DQ);
 
         if (caseData.getRespondent2() != null) {
-            updatedCaseData.respondent2DQ(
-                Respondent2DQ.builder()
-                    .respondent2DQRequestedCourt(requestedCourt1).build());
+            Respondent2DQ respondent2DQ = new Respondent2DQ();
+            respondent2DQ.setRespondent2DQRequestedCourt(requestedCourt1);
+            caseData.setRespondent2DQ(respondent2DQ);
         }
 
-        Party respondent1 = new Party();
-        BeanUtils.copyProperties(updatedCaseData.build().getRespondent1(), respondent1);
-        updatedCaseData.respondent1DetailsForClaimDetailsTab(respondent1.setFlags(null));
+        caseData.getRespondent1().setFlags(null);
+        caseData.setRespondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
 
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            Party respondent2 = new Party();
-            BeanUtils.copyProperties(updatedCaseData.build().getRespondent2(), respondent2);
-            updatedCaseData
-                .respondent2Copy(caseData.getRespondent2())
-                .respondent2DetailsForClaimDetailsTab(respondent2.setFlags(null));
+            caseData.setRespondent2Copy(caseData.getRespondent2());
+            caseData.getRespondent2().setFlags(null);
+            caseData.setRespondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
         }
-        return updatedCaseData;
+        return caseData;
     }
 
     private RequestedCourt createRequestedCourt(List<LocationRefData> locations, CaseData caseData) {

@@ -1,12 +1,10 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
@@ -82,12 +80,12 @@ public class UpdateDataRespondentDeadlineResponse {
     private void updateRespondent2StatementOfTruth(CallbackParams callbackParams, CaseData caseData) {
 
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-        Respondent2DQ.Respondent2DQBuilder dq = caseData.getRespondent2DQ().toBuilder()
-            .respondent2DQStatementOfTruth(statementOfTruth);
+        Respondent2DQ dq = caseData.getRespondent2DQ();
+        dq.setRespondent2DQStatementOfTruth(statementOfTruth);
         handleCourtLocationForRespondent2DQ(caseData, dq, callbackParams);
-        caseData.setRespondent2DQ(dq.build());
+        caseData.setRespondent2DQ(dq);
 
-        caseData.setUiStatementOfTruth(StatementOfTruth.builder().build());
+        caseData.setUiStatementOfTruth(new StatementOfTruth());
     }
 
     private Optional<CaseLocationCivil> buildWithMatching(LocationRefData courtLocation) {
@@ -96,8 +94,7 @@ public class UpdateDataRespondentDeadlineResponse {
 
     private void setApplicantDeadLineIfRespondent1DateExist(CaseData caseData, LocalDateTime applicant1Deadline) {
         if (caseData.getRespondent1ResponseDate() != null) {
-            caseData
-                .setNextDeadline(applicant1Deadline.toLocalDate());
+            caseData.setNextDeadline(applicant1Deadline.toLocalDate());
             caseData.setApplicant1ResponseDeadline(applicant1Deadline);
         } else {
             caseData.setNextDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate());
@@ -120,16 +117,13 @@ public class UpdateDataRespondentDeadlineResponse {
     private void updateRespondent2AdressesAndSetDeadline(CaseData caseData) {
         if (ofNullable(caseData.getRespondent2()).isPresent()
             && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
-            Party updatedRespondent2 = new Party();
-            BeanUtils.copyProperties(caseData.getRespondent2(), updatedRespondent2);
+            var updatedRespondent2 = caseData.getRespondent2();
             updatedRespondent2.setPrimaryAddress(caseData.getRespondent2Copy().getPrimaryAddress());
 
-            caseData
-                .setRespondent2(updatedRespondent2);
+            caseData.setRespondent2(updatedRespondent2);
             caseData.setRespondent2Copy(null);
-            Party updatedRespondent2WithoutFlags = new Party();
-            BeanUtils.copyProperties(updatedRespondent2, updatedRespondent2WithoutFlags);
-            caseData.setRespondent2DetailsForClaimDetailsTab(updatedRespondent2WithoutFlags.setFlags(null));
+            updatedRespondent2.setFlags(null);
+            caseData.setRespondent2DetailsForClaimDetailsTab(updatedRespondent2);
 
             if (caseData.getRespondent2ResponseDate() == null) {
                 caseData.setNextDeadline(caseData.getRespondent2ResponseDeadline().toLocalDate());
@@ -149,12 +143,11 @@ public class UpdateDataRespondentDeadlineResponse {
 
     private void updateRespondent1StatementOfTruth(CallbackParams callbackParams, CaseData caseData) {
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-        Respondent1DQ dq = new Respondent1DQ();
-        BeanUtils.copyProperties(caseData.getRespondent1DQ(), dq);
+        Respondent1DQ dq = caseData.getRespondent1DQ();
         dq.setRespondent1DQStatementOfTruth(statementOfTruth);
         handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
         caseData.setRespondent1DQ(dq);
-        caseData.setUiStatementOfTruth(StatementOfTruth.builder().build());
+        caseData.setUiStatementOfTruth(new StatementOfTruth());
     }
 
     private void handleCourtLocationForRespondent1DQ(CaseData caseData, Respondent1DQ dq,
@@ -168,28 +161,27 @@ public class UpdateDataRespondentDeadlineResponse {
                 .getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtLocations();
             LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
                 getLocationData(callbackParams), courtLocations);
-            RequestedCourt updatedRequestedCourt = new RequestedCourt();
-            BeanUtils.copyProperties(caseData.getRespondent1DQ()
-                .getRespondent1DQRequestedCourt(), updatedRequestedCourt);
-            updatedRequestedCourt.setResponseCourtLocations(null)
-                .setResponseCourtCode(Optional.ofNullable(courtLocation)
+            RequestedCourt requestedCourt = caseData.getRespondent1DQ()
+                .getRespondent1DQRequestedCourt();
+            requestedCourt.setResponseCourtLocations(null);
+            requestedCourt.setResponseCourtCode(Optional.ofNullable(courtLocation)
                                        .map(LocationRefData::getCourtLocationCode)
                                        .orElse(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
                                                    .getResponseCourtCode()));
-            buildWithMatching(courtLocation).ifPresent(updatedRequestedCourt::setCaseLocation);
-            dq.setRespondent1DQRequestedCourt(updatedRequestedCourt);
+            buildWithMatching(courtLocation).ifPresent(requestedCourt::setCaseLocation);
+            dq.setRespondent1DQRequestedCourt(requestedCourt);
         } else if (Optional.ofNullable(caseData.getRespondent1DQ())
             .map(Respondent1DQ::getRespondent1DQRequestedCourt)
             .map(RequestedCourt::getResponseCourtLocations).isPresent()) {
-            RequestedCourt updatedRequestedCourt = new RequestedCourt();
-            BeanUtils.copyProperties(caseData.getRespondent1DQ()
-                                               .getRespondent1DQRequestedCourt(), updatedRequestedCourt);
-            updatedRequestedCourt.setResponseCourtLocations(null);
-            dq.setRespondent1DQRequestedCourt(updatedRequestedCourt);
+            caseData.getRespondent1DQ()
+                .getRespondent1DQRequestedCourt()
+                .setResponseCourtLocations(null);
+            dq.setRespondent1DQRequestedCourt(caseData.getRespondent1DQ()
+                                               .getRespondent1DQRequestedCourt());
         }
     }
 
-    private void handleCourtLocationForRespondent2DQ(CaseData caseData, Respondent2DQ.Respondent2DQBuilder dq,
+    private void handleCourtLocationForRespondent2DQ(CaseData caseData, Respondent2DQ dq,
                                                      CallbackParams callbackParams) {
 
         if (Optional.ofNullable(caseData.getRespondent2DQ())
@@ -200,23 +192,22 @@ public class UpdateDataRespondentDeadlineResponse {
                 .getRespondent2DQ().getRespondent2DQRequestedCourt().getResponseCourtLocations();
             LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
                 getLocationData(callbackParams), courtLocations);
-            RequestedCourt updatedRequestedCourt = new RequestedCourt();
-            BeanUtils.copyProperties(caseData.getRespondent2DQ().getRequestedCourt(), updatedRequestedCourt);
-            updatedRequestedCourt.setResponseCourtLocations(null)
-                .setResponseCourtCode(Optional.ofNullable(courtLocation)
+            RequestedCourt requestedCourt = caseData.getRespondent2DQ().getRequestedCourt();
+            requestedCourt.setResponseCourtLocations(null);
+            requestedCourt.setResponseCourtCode(Optional.ofNullable(courtLocation)
                                        .map(LocationRefData::getCourtLocationCode)
                                        .orElse(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt()
                                                    .getResponseCourtCode()));
-            buildWithMatching(courtLocation).ifPresent(updatedRequestedCourt::setCaseLocation);
-            dq.respondent2DQRequestedCourt(updatedRequestedCourt);
+            buildWithMatching(courtLocation).ifPresent(requestedCourt::setCaseLocation);
+            dq.setRespondent2DQRequestedCourt(requestedCourt);
         } else if (Optional.ofNullable(caseData.getRespondent2DQ())
             .map(Respondent2DQ::getRespondent2DQRequestedCourt)
             .map(RequestedCourt::getResponseCourtLocations).isPresent()) {
-            RequestedCourt updatedRequestedCourt = new RequestedCourt();
-            BeanUtils.copyProperties(caseData.getRespondent2DQ()
-                                               .getRespondent2DQRequestedCourt(), updatedRequestedCourt);
-            updatedRequestedCourt.setResponseCourtLocations(null);
-            dq.respondent2DQRequestedCourt(updatedRequestedCourt);
+            caseData.getRespondent2DQ()
+                .getRespondent2DQRequestedCourt()
+                .setResponseCourtLocations(null);
+            dq.setRespondent2DQRequestedCourt(caseData.getRespondent2DQ()
+                                               .getRespondent2DQRequestedCourt());
         }
 
     }
@@ -244,23 +235,20 @@ public class UpdateDataRespondentDeadlineResponse {
         caseData.setApplicant1ResponseDeadline(applicant1Deadline);
 
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-        Respondent1DQ dq = new Respondent1DQ();
-        BeanUtils.copyProperties(caseData.getRespondent1DQ(), dq);
+        Respondent1DQ dq = caseData.getRespondent1DQ();
         dq.setRespondent1DQStatementOfTruth(statementOfTruth);
 
         handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
 
         caseData.setRespondent1DQ(dq);
-
-        caseData.setUiStatementOfTruth(StatementOfTruth.builder().build());
+        caseData.setUiStatementOfTruth(new StatementOfTruth());
     }
 
     private void responseDoesNotHaveSameUpdateValues(CallbackParams callbackParams,
                                                      LocalDateTime responseDate,
                                                      LocalDateTime applicant1Deadline,
                                                      CaseData caseData) {
-        caseData
-            .setBusinessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
+        caseData.setBusinessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
         caseData.setRespondent1ResponseDate(responseDate);
         caseData.setRespondent2ResponseDate(responseDate);
         caseData.setNextDeadline(applicant1Deadline.toLocalDate());
@@ -268,8 +256,7 @@ public class UpdateDataRespondentDeadlineResponse {
 
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
         if (FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())) {
-            Respondent1DQ dq = new Respondent1DQ();
-            BeanUtils.copyProperties(caseData.getRespondent1DQ(), dq);
+            Respondent1DQ dq = caseData.getRespondent1DQ();
             dq.setRespondent1DQStatementOfTruth(statementOfTruth);
             handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
             caseData.setRespondent1DQ(dq);
@@ -280,16 +267,16 @@ public class UpdateDataRespondentDeadlineResponse {
 
         if (FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType())) {
 
-            Respondent2DQ.Respondent2DQBuilder dq2 = caseData.getRespondent2DQ().toBuilder()
-                .respondent2DQStatementOfTruth(statementOfTruth);
+            Respondent2DQ dq2 = caseData.getRespondent2DQ();
+            dq2.setRespondent2DQStatementOfTruth(statementOfTruth);
             handleCourtLocationForRespondent2DQ(caseData, dq2, callbackParams);
-            caseData.setRespondent2DQ(dq2.build());
+            caseData.setRespondent2DQ(dq2);
 
         } else {
             caseData.setRespondent2DQ(null);
         }
 
-        caseData.setUiStatementOfTruth(StatementOfTruth.builder().build());
+        caseData.setUiStatementOfTruth(new StatementOfTruth());
     }
 
     private List<LocationRefData> getLocationData(CallbackParams callbackParams) {

@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallba
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -15,6 +14,8 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantRespon
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -312,11 +313,15 @@ public class RespondToClaimSpecUtils {
         log.info("CaseId {}: Cleared Respondent 2 Spec Defence Response Document", caseData.getCcdCaseReference());
 
         if (nonNull(caseData.getRespondent1DQ())) {
-            caseData.getRespondent1DQ().setRespondent1DQDraftDirections(null);
+            Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
+            respondent1DQ.setRespondent1DQDraftDirections(null);
+            caseData.setRespondent1DQ(respondent1DQ);
             log.info("CaseId {}: Cleared Respondent 1 DQ Draft Directions", caseData.getCcdCaseReference());
         }
         if (nonNull(caseData.getRespondent2DQ())) {
-            caseData.setRespondent2DQ(caseData.getRespondent2DQ().toBuilder().respondent2DQDraftDirections(null).build());
+            Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
+            respondent2DQ.setRespondent2DQDraftDirections(null);
+            caseData.setRespondent2DQ(respondent2DQ);
             log.info("CaseId {}: Cleared Respondent 2 DQ Draft Directions", caseData.getCcdCaseReference());
         }
     }

@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallb
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -173,13 +172,11 @@ public class SetApplicantResponseDeadline implements CaseTask {
     }
 
     private static void updateClaimsDetailsForClaimDetailsTab(CaseData updatedData, CaseData caseData) {
-        Party respondent1 = new Party();
-        BeanUtils.copyProperties(updatedData.getRespondent1(), respondent1);
-        updatedData.setRespondent1DetailsForClaimDetailsTab(respondent1.setFlags(null));
+        updatedData.getRespondent1().setFlags(null);
+        updatedData.setRespondent1DetailsForClaimDetailsTab(updatedData.getRespondent1());
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            Party respondent2 = new Party();
-            BeanUtils.copyProperties(updatedData.getRespondent2(), respondent2);
-            updatedData.setRespondent2DetailsForClaimDetailsTab(respondent2.setFlags(null));
+            updatedData.getRespondent2().setFlags(null);
+            updatedData.setRespondent2DetailsForClaimDetailsTab(updatedData.getRespondent2());
         }
     }
 
@@ -205,18 +202,18 @@ public class SetApplicantResponseDeadline implements CaseTask {
         if (caseData.getRespondent1() != null
             && updatedData.getRespondent1DQ() != null) {
             updatedData.getRespondent1DQ().setRespondent1DQDraftDirections(null);
+            updatedData.setRespondent1DQ(updatedData.getRespondent1DQ());
         }
         if (caseData.getRespondent2() != null
             && updatedData.getRespondent2DQ() != null) {
-            updatedData.setRespondent2DQ(updatedData.getRespondent2DQ().toBuilder().respondent2DQDraftDirections(
-                null).build());
+            updatedData.getRespondent2DQ().setRespondent2DQDraftDirections(null);
+            updatedData.setRespondent2DQ(updatedData.getRespondent2DQ());
         }
     }
 
     private void updateRespondentAddresses(CaseData caseData) {
 
-        Party updatedRespondent1 = new Party();
-        BeanUtils.copyProperties(caseData.getRespondent1(), updatedRespondent1);
+        Party updatedRespondent1 = caseData.getRespondent1();
         updatedRespondent1.setPrimaryAddress(caseData.getRespondent1Copy().getPrimaryAddress());
 
         caseData.setRespondent1(updatedRespondent1);
@@ -224,8 +221,7 @@ public class SetApplicantResponseDeadline implements CaseTask {
 
         if (ofNullable(caseData.getRespondent2()).isPresent()
             && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
-            Party updatedRespondent2 = new Party();
-            BeanUtils.copyProperties(caseData.getRespondent2(), updatedRespondent2);
+            Party updatedRespondent2 = caseData.getRespondent2();
             updatedRespondent2.setPrimaryAddress(caseData.getRespondent2Copy().getPrimaryAddress());
 
             caseData.setRespondent2(updatedRespondent2);
@@ -254,15 +250,15 @@ public class SetApplicantResponseDeadline implements CaseTask {
                     defendantSolicitorRef1 = caseData.getSolicitorReferences().getRespondentSolicitor1Reference();
                 }
 
-                return SolicitorReferences.builder()
-                    .applicantSolicitor1Reference(
-                        refMap.getOrDefault("applicantSolicitor1Reference", null))
-                    .respondentSolicitor1Reference(
+                SolicitorReferences solicitorReferences1 = new SolicitorReferences();
+                solicitorReferences1.setApplicantSolicitor1Reference(
+                        refMap.getOrDefault("applicantSolicitor1Reference", null));
+                solicitorReferences1.setRespondentSolicitor1Reference(
                         ofNullable(defendantSolicitorRef1)
-                            .orElse(refMap.getOrDefault("respondentSolicitor1Reference", null)))
-                    .respondentSolicitor2Reference(
-                        refMap.getOrDefault("respondentSolicitor2Reference", null))
-                    .build();
+                            .orElse(refMap.getOrDefault("respondentSolicitor1Reference", null)));
+                solicitorReferences1.setRespondentSolicitor2Reference(
+                        refMap.getOrDefault("respondentSolicitor2Reference", null));
+                return solicitorReferences1;
             })
             .orElse(null);
 

@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantRespon
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.Party.Type;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -81,9 +82,11 @@ class PopulateRespondent1CopyTest {
             respondToClaimSpecUtils,
             interestCalculator
         );
-        caseData = CaseData.builder()
-            .respondent1(Party.builder().type(Type.INDIVIDUAL).build())
-            .respondent2(Party.builder().type(Type.INDIVIDUAL).build())
+        Party party = new Party();
+        party.setType(Type.INDIVIDUAL);
+        caseData = CaseDataBuilder.builder()
+            .respondent1(party)
+            .respondent2(party)
             .ccdCaseReference(1234L)
             .build();
 
@@ -127,9 +130,7 @@ class PopulateRespondent1CopyTest {
         when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(true);
 
         // respondent1 has already submitted
-        caseData = caseData.toBuilder()
-            .respondent1ResponseDate(java.time.LocalDateTime.now())
-            .build();
+        caseData.setRespondent1ResponseDate(java.time.LocalDateTime.now());
 
         Map<CallbackParams.Params, Object> params = new EnumMap<>(CallbackParams.Params.class);
         params.put(BEARER_TOKEN, "testBearerToken");
@@ -155,9 +156,7 @@ class PopulateRespondent1CopyTest {
         // interest calculation mocked
         when(interestCalculator.calculateInterest(any())).thenReturn(new java.math.BigDecimal("12.34"));
 
-        caseData = caseData.toBuilder()
-            .totalClaimAmount(new java.math.BigDecimal("200"))
-            .build();
+        caseData.setTotalClaimAmount(new java.math.BigDecimal("200"));
 
         Map<CallbackParams.Params, Object> params = new EnumMap<>(CallbackParams.Params.class);
         params.put(BEARER_TOKEN, "testBearerToken");
@@ -235,10 +234,10 @@ class PopulateRespondent1CopyTest {
         when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
         when(courtLocationUtils.getLocationsFromList(any())).thenReturn(null);
 
-        caseData = CaseData.builder()
-            .respondent1(Party.builder().type(Type.INDIVIDUAL).build())
-            .respondent2(null)
-            .build();
+        Party party = new Party();
+        party.setType(Type.INDIVIDUAL);
+        caseData.setRespondent1(party);
+        caseData.setRespondent2(null);
 
         Map<CallbackParams.Params, Object> params =  new EnumMap<>(CallbackParams.Params.class);
         params.put(BEARER_TOKEN, "testBearerToken");
@@ -262,9 +261,11 @@ class PopulateRespondent1CopyTest {
         when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
         when(courtLocationUtils.getLocationsFromList(any())).thenReturn(null);
 
-        caseData = CaseData.builder()
-            .respondent1(Party.builder().type(Type.INDIVIDUAL).build())
-            .respondent2(Party.builder().type(Type.INDIVIDUAL).build())
+        Party party = new Party();
+        party.setType(Type.INDIVIDUAL);
+        caseData = CaseDataBuilder.builder()
+            .respondent1(party)
+            .respondent2(party)
             .respondent2SameLegalRepresentative(YES)
             .ccdCaseReference(1234L)
             .build();
@@ -293,8 +294,10 @@ class PopulateRespondent1CopyTest {
         when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
         when(courtLocationUtils.getLocationsFromList(any())).thenReturn(null);
 
-        caseData = CaseData.builder()
-            .respondent1(Party.builder().type(Type.INDIVIDUAL).build())
+        Party party = new Party();
+        party.setType(Type.INDIVIDUAL);
+        caseData = CaseDataBuilder.builder()
+            .respondent1(party)
             .respondent2(null)
             .ccdCaseReference(1234L)
             .build();
