@@ -75,6 +75,13 @@ public class StatementsOfCaseMapper implements ManageDocMapper {
         // Defendant defence and Claimant reply
         List<Element<CaseDocument>> clAndDfDocList = caseData.getDefendantResponseDocuments();
         clAndDfDocList.addAll(caseData.getClaimantResponseDocuments());
+        caseData.getSystemGeneratedCaseDocuments().stream()
+            .filter(caseDocumentElement ->
+                        DocumentType.DEFENDANT_DEFENCE.equals(caseDocumentElement.getValue().getDocumentType())
+                            || DocumentType.CLAIMANT_DEFENCE.equals(caseDocumentElement.getValue().getDocumentType())
+            )
+            .filter(caseDocumentElement -> !clAndDfDocList.contains(caseDocumentElement))
+            .forEach(clAndDfDocList::add);
         List<Element<CaseDocument>> sortedDefendantDefenceAndClaimantReply =
             bundleDocumentsRetrieval.getSortedDefendantDefenceAndClaimantReply(clAndDfDocList);
         sortedDefendantDefenceAndClaimantReply.forEach(caseDocumentElement -> {
