@@ -21,6 +21,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -134,5 +135,37 @@ class RespondentTemplateForDQGeneratorTest {
         List<uk.gov.hmcts.reform.civil.model.docmosis.dq.Expert> experts = respondentTemplateForDQGenerator.getExpertsDetails(dq);
 
         assertEquals("£0.00", experts.get(0).getFormattedCost());
+    }
+
+    @Test
+    void shouldReturnRequestedCourtWithNoWhenRequestedCourtIsNull() {
+        //Given
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQRequestedCourt(null);
+
+        //When
+        uk.gov.hmcts.reform.civil.model.dq.RequestedCourt result =
+            respondentTemplateForDQGenerator.getRequestedCourt(respondent1DQ, BEARER_TOKEN);
+
+        //Then
+        assertNotNull(result);
+        assertEquals(NO, result.getRequestHearingAtSpecificCourt());
+    }
+
+    @Test
+    void shouldReturnRequestedCourtWithNoWhenCaseLocationIsNull() {
+        //Given
+        uk.gov.hmcts.reform.civil.model.dq.RequestedCourt requestedCourt = new uk.gov.hmcts.reform.civil.model.dq.RequestedCourt();
+        requestedCourt.setCaseLocation(null);
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt);
+
+        //When
+        uk.gov.hmcts.reform.civil.model.dq.RequestedCourt result =
+            respondentTemplateForDQGenerator.getRequestedCourt(respondent1DQ, BEARER_TOKEN);
+
+        //Then
+        assertNotNull(result);
+        assertEquals(NO, result.getRequestHearingAtSpecificCourt());
     }
 }

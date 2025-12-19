@@ -230,4 +230,23 @@ class DQGeneratorFormBuilderTest {
 
         assertTrue(actualMessage.contains(ERROR_FLOW_STATE_PAST_DEADLINE));
     }
+
+
+    @Test
+    void shouldNotSetStatementOfTruthTextWhenSpecClaim() {
+        Witnesses mockWitnesses = mock(Witnesses.class);
+        when(respondentTemplateForDQGenerator.getWitnesses(any())).thenReturn(mockWitnesses);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentFullDefence()
+            .respondent1DQ()
+            .build().toBuilder()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .build();
+
+        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder result =
+            dqGeneratorFormBuilder.getDirectionsQuestionnaireFormBuilder(caseData, DEFENDANT);
+
+        assertNotNull(result);
+        assertNull(result.build().getStatementOfTruthText());
+    }
 }
