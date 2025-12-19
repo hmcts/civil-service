@@ -22,8 +22,8 @@ public class ApplicantDocumentUploadTask extends DocumentUploadTask<ApplicantOne
     }
 
     @Override
-    void applyDocumentUploadDate(CaseData.CaseDataBuilder caseDataBuilder, LocalDateTime now) {
-        caseDataBuilder.caseDocumentUploadDate(now);
+    void applyDocumentUploadDate(CaseData caseData, LocalDateTime now) {
+        caseData.setCaseDocumentUploadDate(now);
     }
 
     @Override

@@ -93,7 +93,7 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
                 CallbackRequest.builder()
                     .eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
             ).build();
-            // When
+
             handler.handle(params);
 
             // Then
@@ -180,10 +180,9 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
             ).build();
-            // When
+
             handler.handle(params);
 
-            // Then
             verifyDeleteNotificationsAndTaskListUpdates(caseData);
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
@@ -195,7 +194,6 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
 
         @Test
         void shouldRecordQMScenario_whenInvokedForCaseWithOpenApplicantCitizenQuery() {
-            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec()
                 .includesApplicantCitizenQueryFollowUp(OffsetDateTime.now()).build();
             caseData.setRespondent1Represented(YesOrNo.NO);
@@ -211,10 +209,9 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
             ).build();
-            // When
+
             handler.handle(params);
 
-            // Then
             verifyDeleteNotificationsAndTaskListUpdates(caseData);
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
@@ -222,7 +219,6 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
                 caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
-
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_CLAIMANT.getScenario(),
@@ -233,10 +229,7 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
     }
 
     private void verifyDeleteNotificationsAndTaskListUpdates(CaseData caseData) {
-        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
-            caseData.getCcdCaseReference().toString(),
-            "CLAIMANT"
-        );
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(caseData.getCcdCaseReference().toString(), "CLAIMANT");
         verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
             caseData.getCcdCaseReference().toString(),
             "CLAIMANT",

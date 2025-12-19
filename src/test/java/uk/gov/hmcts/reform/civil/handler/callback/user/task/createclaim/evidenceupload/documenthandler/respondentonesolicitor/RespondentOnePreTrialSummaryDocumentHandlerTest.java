@@ -25,9 +25,9 @@ class RespondentOnePreTrialSummaryDocumentHandlerTest extends BaseDocumentHandle
 
     @Test
     void shouldCopyPreTrialSummaryDocumentsToLegalRep2() {
-        handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore, builder);
+        handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore);
 
-        assertEquals(2, builder.build().getDocumentCaseSummaryRes2().size());
+        assertEquals(2, caseData.getDocumentCaseSummaryRes2().size());
     }
 
     @Test

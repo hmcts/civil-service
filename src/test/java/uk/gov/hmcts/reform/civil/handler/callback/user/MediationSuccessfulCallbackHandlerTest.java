@@ -41,21 +41,22 @@ class MediationSuccessfulCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldCallSubmitSuccessfulMediationUponAboutToSubmit() {
+            MediationAgreementDocument mediationAgreementDoc = new MediationAgreementDocument();
+            mediationAgreementDoc.setDocument(new Document());
+            mediationAgreementDoc.setDocumentType(DocumentType.MEDIATION_AGREEMENT);
+            mediationAgreementDoc.setName("Mediation Agreement");
+
+            MediationSuccessful mediationSuccessful = new MediationSuccessful();
+            mediationSuccessful.setMediationSettlementAgreedAt(LocalDate.now());
+            mediationSuccessful.setMediationAgreement(mediationAgreementDoc);
+
+            Mediation mediation = new Mediation();
+            mediation.setMediationSuccessful(mediationSuccessful);
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStatePendingClaimIssued()
-                .build()
-                .toBuilder()
-                .mediation(Mediation.builder()
-                    .mediationSuccessful(MediationSuccessful.builder()
-                        .mediationSettlementAgreedAt(LocalDate.now())
-                        .mediationAgreement(MediationAgreementDocument.builder()
-                            .document(Document.builder().build())
-                            .documentType(DocumentType.MEDIATION_AGREEMENT)
-                            .name("Mediation Agreement")
-                            .build())
-                        .build())
-                    .build())
                 .build();
+            caseData.setMediation(mediation);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

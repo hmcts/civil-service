@@ -296,7 +296,9 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldValidatePaymentInstalmentDate() {
 
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
-            caseData.setJoInstalmentDetails(JudgmentInstalmentDetails.builder().startDate(LocalDate.now().minusDays(2)).build());
+            JudgmentInstalmentDetails judgmentInstalmentDetails = new JudgmentInstalmentDetails();
+            judgmentInstalmentDetails.setStartDate(LocalDate.now().minusDays(2));
+            caseData.setJoInstalmentDetails(judgmentInstalmentDetails);
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validateDates");
             //When: handler is called with MID event
@@ -344,86 +346,79 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     private JudgmentDetails getJudgementDetailsPayImmediately() {
-        return JudgmentDetails.builder()
-            .state(JudgmentState.ISSUED)
-            .rtlState(JudgmentRTLStatus.ISSUED.getRtlState())
-            .type(JudgmentType.JUDGMENT_FOLLOWING_HEARING)
-            .isRegisterWithRTL(YesOrNo.YES)
-            .judgmentId(1)
-            .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_IMMEDIATELY).build())
-            .orderedAmount("1200")
-            .costs("1100")
-            .totalAmount("2300")
-            .issueDate(LocalDate.of(2022, 12, 12))
-            .defendant1Name("Mr. Sole Trader")
-            .defendant1Address(JudgmentAddress.builder().build())
-            .defendant1Dob(LocalDate.of(1950, 12, 12))
-            .build();
+        return new JudgmentDetails()
+            .setState(JudgmentState.ISSUED)
+            .setRtlState(JudgmentRTLStatus.ISSUED.getRtlState())
+            .setType(JudgmentType.JUDGMENT_FOLLOWING_HEARING)
+            .setIsRegisterWithRTL(YesOrNo.YES)
+            .setJudgmentId(1)
+            .setPaymentPlan(new JudgmentPaymentPlan().setType(PAY_IMMEDIATELY))
+            .setOrderedAmount("1200")
+            .setCosts("1100")
+            .setTotalAmount("2300")
+            .setIssueDate(LocalDate.of(2022, 12, 12))
+            .setDefendant1Name("Mr. Sole Trader")
+            .setDefendant1Address(new JudgmentAddress())
+            .setDefendant1Dob(LocalDate.of(1950, 12, 12));
     }
 
     private JudgmentDetails getJudgementDetailsPayInstalments() {
-        return JudgmentDetails.builder()
-            .state(JudgmentState.ISSUED)
-            .rtlState(JudgmentRTLStatus.ISSUED.getRtlState())
-            .type(JudgmentType.JUDGMENT_FOLLOWING_HEARING)
-            .judgmentId(1)
-            .isRegisterWithRTL(YesOrNo.YES)
-            .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_IN_INSTALMENTS).build())
-            .orderedAmount("1200")
-            .costs("1100")
-            .totalAmount("2300")
-            .issueDate(LocalDate.of(2022, 12, 12))
-            .instalmentDetails(JudgmentInstalmentDetails.builder()
-                                   .paymentFrequency(PaymentFrequency.MONTHLY)
-                                   .amount("120")
-                                   .build())
-            .defendant1Name("Mr. John Rambo")
-            .defendant1Address(JudgmentAddress.builder().build())
-            .defendant1Dob(LocalDate.of(1950, 12, 12)) // or any valid date
-            .build();
+        return new JudgmentDetails()
+            .setState(JudgmentState.ISSUED)
+            .setRtlState(JudgmentRTLStatus.ISSUED.getRtlState())
+            .setType(JudgmentType.JUDGMENT_FOLLOWING_HEARING)
+            .setJudgmentId(1)
+            .setIsRegisterWithRTL(YesOrNo.YES)
+            .setPaymentPlan(new JudgmentPaymentPlan().setType(PAY_IN_INSTALMENTS))
+            .setOrderedAmount("1200")
+            .setCosts("1100")
+            .setTotalAmount("2300")
+            .setIssueDate(LocalDate.of(2022, 12, 12))
+            .setInstalmentDetails(new JudgmentInstalmentDetails()
+                                   .setPaymentFrequency(PaymentFrequency.MONTHLY)
+                                   .setAmount("120"))
+            .setDefendant1Name("Mr. John Rambo")
+            .setDefendant1Address(new JudgmentAddress())
+            .setDefendant1Dob(LocalDate.of(1950, 12, 12)); // or any valid date;
     }
 
     private JudgmentDetails getActiveJudgmentPayByDate() {
-        return JudgmentDetails.builder()
-            .state(JudgmentState.ISSUED)
-            .rtlState(JudgmentRTLStatus.ISSUED.getRtlState())
-            .type(JudgmentType.JUDGMENT_FOLLOWING_HEARING)
-            .judgmentId(1)
-            .isRegisterWithRTL(YesOrNo.YES)
-            .paymentPlan(JudgmentPaymentPlan.builder()
-                             .type(PaymentPlanSelection.PAY_BY_DATE)
-                             .paymentDeadlineDate(LocalDate.of(2023, 12, 12))
-                             .build())
-            .orderedAmount("1200")
-            .costs("1100")
-            .totalAmount("2300")
-            .issueDate(LocalDate.of(2022, 12, 12))
-            .defendant1Name("The Organisation")
-            .defendant1Address(JudgmentAddress.builder().build())
-            .build();
+        return new JudgmentDetails()
+            .setState(JudgmentState.ISSUED)
+            .setRtlState(JudgmentRTLStatus.ISSUED.getRtlState())
+            .setType(JudgmentType.JUDGMENT_FOLLOWING_HEARING)
+            .setJudgmentId(1)
+            .setIsRegisterWithRTL(YesOrNo.YES)
+            .setPaymentPlan(new JudgmentPaymentPlan()
+                             .setType(PaymentPlanSelection.PAY_BY_DATE)
+                             .setPaymentDeadlineDate(LocalDate.of(2023, 12, 12)))
+            .setOrderedAmount("1200")
+            .setCosts("1100")
+            .setTotalAmount("2300")
+            .setIssueDate(LocalDate.of(2022, 12, 12))
+            .setDefendant1Name("The Organisation")
+            .setDefendant1Address(new JudgmentAddress());
     }
 
     private JudgmentDetails getActiveJudgmentPayByDateMultiParty() {
-        return JudgmentDetails.builder()
-            .state(JudgmentState.ISSUED)
-            .rtlState(JudgmentRTLStatus.ISSUED.getRtlState())
-            .type(JudgmentType.JUDGMENT_FOLLOWING_HEARING)
-            .judgmentId(1)
-            .isRegisterWithRTL(YesOrNo.YES)
-            .paymentPlan(JudgmentPaymentPlan.builder()
-                             .type(PaymentPlanSelection.PAY_BY_DATE)
-                             .paymentDeadlineDate(LocalDate.of(2023, 12, 12))
-                             .build())
-            .orderedAmount("1200")
-            .costs("1100")
-            .totalAmount("2300")
-            .issueDate(LocalDate.of(2022, 12, 12))
-            .defendant1Name("The Organisation")
-            .defendant1Address(JudgmentAddress.builder().build())
-            .defendant2Name("Mr. John Rambo")
-            .defendant2Address(JudgmentAddress.builder().build())
-            .defendant2Dob(LocalDate.of(1950, 12, 12)) // or any valid date
-            .build();
+        return new JudgmentDetails()
+            .setState(JudgmentState.ISSUED)
+            .setRtlState(JudgmentRTLStatus.ISSUED.getRtlState())
+            .setType(JudgmentType.JUDGMENT_FOLLOWING_HEARING)
+            .setJudgmentId(1)
+            .setIsRegisterWithRTL(YesOrNo.YES)
+            .setPaymentPlan(new JudgmentPaymentPlan()
+                             .setType(PaymentPlanSelection.PAY_BY_DATE)
+                             .setPaymentDeadlineDate(LocalDate.of(2023, 12, 12)))
+            .setOrderedAmount("1200")
+            .setCosts("1100")
+            .setTotalAmount("2300")
+            .setIssueDate(LocalDate.of(2022, 12, 12))
+            .setDefendant1Name("The Organisation")
+            .setDefendant1Address(new JudgmentAddress())
+            .setDefendant2Name("Mr. John Rambo")
+            .setDefendant2Address(new JudgmentAddress())
+            .setDefendant2Dob(LocalDate.of(1950, 12, 12)); // or any valid date
     }
 
 }
