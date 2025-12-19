@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import feign.FeignException;
 import feign.Request;
 import feign.Response;
 import org.apache.http.HttpStatus;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.cmc.model.DefendantLinkStatus;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -269,6 +271,32 @@ class DefendantPinToPostLRspecServiceTest {
 
         private DefendantLinkStatus createDefendantLinkStatus(boolean linked) {
             return DefendantLinkStatus.builder().linked(linked).build();
+        }
+
+        @Test
+        void shouldHandleFeignExceptionWhenRemovePinInPostDataFails() {
+            CaseData caseData = createCaseDataWithPin("TEST1234", 180);
+            CaseDetails caseDetails = createCaseDetails(caseData);
+            FeignException feignException = new FeignException.BadRequest("Bad request", Request.create(Request.HttpMethod.GET, "url", Map.of(), null, null, null), null, null);
+
+            when(caseDetailsConverter.toCaseData(caseDetails)).thenThrow(feignException);
+
+            assertThrows(FeignException.class, () -> defendantPinToPostLRspecService.removePinInPostData(caseDetails));
+        }
+
+        @Test
+        void shouldHandleMissingLocationHeaderWhenValidateOcmcPin() {
+            Map<String, Collection<String>> headers = new HashMap<>();
+            headers.put("Location", Collections.emptyList());
+            Response response = Response.builder()
+                .request(Request.create(Request.HttpMethod.GET, "url", Map.of(), null, null, null))
+                .status(HttpStatus.SC_MOVED_TEMPORARILY)
+                .headers(headers)
+                .build();
+
+            when(cuiIdamClientService.authenticatePinUser("TEST1234", "620MC123")).thenReturn(response);
+
+            assertThrows(IllegalArgumentException.class, () -> defendantPinToPostLRspecService.validateOcmcPin("TEST1234", "620MC123"));
         }
     }
 }

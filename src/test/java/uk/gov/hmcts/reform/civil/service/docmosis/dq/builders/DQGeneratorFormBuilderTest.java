@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq.builders;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -227,10 +228,8 @@ class DQGeneratorFormBuilderTest {
         });
 
         String actualMessage = exception.getMessage();
-
-        assertTrue(actualMessage.contains(ERROR_FLOW_STATE_PAST_DEADLINE));
+        Assertions.assertTrue(actualMessage.contains(ERROR_FLOW_STATE_PAST_DEADLINE));
     }
-
 
     @Test
     void shouldNotSetStatementOfTruthTextWhenSpecClaim() {
