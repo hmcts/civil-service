@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.citizen.HWFFeePaymentOutcomeService;
 
 import java.math.BigDecimal;
@@ -57,12 +58,12 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
 
         @Test
         void shouldCallPartialRemissionHwfEventWhenFeeTypeIsClaimIssued() {
-            CaseData caseData = CaseData.builder()
-                .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
-                .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
-                                           .remissionAmount(BigDecimal.valueOf(1000))
-                                           .hwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED)
-                                           .build())
+            HelpWithFeesDetails helpWithFeesDetails = new HelpWithFeesDetails();
+            helpWithFeesDetails.setRemissionAmount(BigDecimal.valueOf(1000));
+            helpWithFeesDetails.setHwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED);
+            CaseData caseData = CaseDataBuilder.builder()
+                .claimFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10000)).setCode("OOOCM002"))
+                .claimIssuedHwfDetails(helpWithFeesDetails)
                 .hwfFeeType(FeeType.CLAIMISSUED)
                 .build();
 
@@ -80,12 +81,12 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
 
         @Test
         void shouldCallPartialRemissionHwfEventWhenFeeTypeIsHearing() {
-            CaseData caseData = CaseData.builder()
-                .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
-                .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                       .remissionAmount(BigDecimal.valueOf(1000))
-                                       .hwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED)
-                                       .build())
+            HelpWithFeesDetails helpWithFeesDetails = new HelpWithFeesDetails();
+            helpWithFeesDetails.setRemissionAmount(BigDecimal.valueOf(1000));
+            helpWithFeesDetails.setHwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED);
+            CaseData caseData = CaseDataBuilder.builder()
+                .claimFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10000)).setCode("OOOCM002"))
+                .hearingHwfDetails(helpWithFeesDetails)
                 .hwfFeeType(FeeType.HEARING)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
@@ -105,12 +106,12 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
     @Test
     void shouldPopulateErrorWhenClaimIssuedRemissionAmountIsNegative() {
         //Given
-        CaseData caseData = CaseData.builder()
+        HelpWithFeesDetails helpWithFeesDetails = new HelpWithFeesDetails();
+        helpWithFeesDetails.setRemissionAmount(BigDecimal.valueOf(-1000));
+        CaseData caseData = CaseDataBuilder.builder()
             .hearingReferenceNumber("000HN001")
-            .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
-            .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
-                                       .remissionAmount(BigDecimal.valueOf(-1000))
-                                       .build())
+            .hearingFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(30000)))
+            .claimIssuedHwfDetails(helpWithFeesDetails)
             .hwfFeeType(FeeType.CLAIMISSUED)
             .build();
 
@@ -126,15 +127,13 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
     @Test
     void shouldPopulateErrorWhenHearingRemissionAmountIsNegative() {
         //Given
-        CaseData caseData = CaseData.builder()
+        HelpWithFeesDetails helpWithFeesDetails = new HelpWithFeesDetails();
+        helpWithFeesDetails.setRemissionAmount(BigDecimal.valueOf(-1000));
+        CaseData caseData = CaseDataBuilder.builder()
             .hearingReferenceNumber("000HN001")
-            .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
-            .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
-                                       .remissionAmount(BigDecimal.valueOf(-1000))
-                                       .build())
-            .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                   .remissionAmount(BigDecimal.valueOf(-1000))
-                                   .build())
+            .hearingFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(30000)))
+            .claimIssuedHwfDetails(helpWithFeesDetails)
+            .hearingHwfDetails(helpWithFeesDetails)
             .hwfFeeType(FeeType.CLAIMISSUED)
 
             .build();
@@ -151,12 +150,12 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
     @MethodSource("provideFeeTypes")
     void shouldPopulateErrorWhenRemissionAmountIsNotValidForDifferentFeeTypes(FeeType feeType, String errMsg) {
         //Given
-        CaseData caseData = CaseData.builder()
+        HelpWithFeesDetails helpWithFeesDetails = new HelpWithFeesDetails();
+        helpWithFeesDetails.setRemissionAmount(BigDecimal.valueOf(35000));
+        CaseData caseData = CaseDataBuilder.builder()
             .hearingReferenceNumber("000HN001")
-            .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
-            .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                   .remissionAmount(BigDecimal.valueOf(35000))
-                                   .build())
+            .hearingFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(30000)))
+            .hearingHwfDetails(helpWithFeesDetails)
             .hwfFeeType(feeType)
             .build();
         CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "remission-amount");
