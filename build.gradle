@@ -471,7 +471,7 @@ dependencies {
   testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.3'
 
   testImplementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
-  testImplementation 'com.github.hmcts:fortify-client:1.4.9:all'
+  testImplementation 'com.github.hmcts:fortify-client:1.4.10:all'
   //pact contract testing
   contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.17'
   contractTestImplementation 'au.com.dius.pact.provider:junit5:4.6.17'
