@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypesLR;
 
@@ -12,9 +13,10 @@ import java.util.List;
 @Setter
 @Data
 @Builder(toBuilder = true)
+@NoArgsConstructor
 public class GAApplicationTypeLR {
 
-    private final List<GeneralApplicationTypesLR> types;
+    private List<GeneralApplicationTypesLR> types;
 
     @JsonCreator
     GAApplicationTypeLR(@JsonProperty("types") List<GeneralApplicationTypesLR> types) {
