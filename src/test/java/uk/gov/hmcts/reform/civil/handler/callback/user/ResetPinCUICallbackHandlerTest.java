@@ -58,23 +58,23 @@ public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmitCallback {
 
-        private final DefendantPinToPostLRspec givenPin =
-            DefendantPinToPostLRspec.builder()
-                .expiryDate(LocalDate.of(
-                        2021,
-                        1,
-                        1
-                    )
-                )
-                .citizenCaseRole("citizen")
-                .respondentCaseRole("citizen")
-                .accessCode("123").build();
-        private final DefendantPinToPostLRspec pin =
-            DefendantPinToPostLRspec.builder()
-                .expiryDate(LocalDate.now())
-                .citizenCaseRole("citizen")
-                .respondentCaseRole("citizen")
-                .accessCode("123").build();
+        private final DefendantPinToPostLRspec givenPin = new DefendantPinToPostLRspec();
+
+        {
+            givenPin.setExpiryDate(LocalDate.of(2021, 1, 1));
+            givenPin.setCitizenCaseRole("citizen");
+            givenPin.setRespondentCaseRole("citizen");
+            givenPin.setAccessCode("123");
+        }
+
+        private final DefendantPinToPostLRspec pin = new DefendantPinToPostLRspec();
+
+        {
+            pin.setExpiryDate(LocalDate.now());
+            pin.setCitizenCaseRole("citizen");
+            pin.setRespondentCaseRole("citizen");
+            pin.setAccessCode("123");
+        }
 
         @Test
         void shouldResetPinExpiryDate() {
@@ -114,12 +114,12 @@ public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnErrorWhenDefendantEmailIsMissing() {
+            DefendantPinToPostLRspec defendantPinToPostLRspec = new DefendantPinToPostLRspec();
+            defendantPinToPostLRspec.setAccessCode("000MC08");
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .respondent1(null)
-                .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
-                                                   .accessCode("000MC08")
-                                                   .build())
+                .addRespondent1PinToPostLRspec(defendantPinToPostLRspec)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -134,13 +134,14 @@ public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotReturnErrorWhenDefendantEmailIsPresent() {
+            Party party = new Party();
+            party.setPartyEmail("test@gmail.com");
+            DefendantPinToPostLRspec defendantPinToPostLRspec = new DefendantPinToPostLRspec();
+            defendantPinToPostLRspec.setAccessCode("000MC08");
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
-                .respondent1(Party.builder()
-                                 .partyEmail("test@gmail.com").build())
-                .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
-                                                   .accessCode("000MC08")
-                                                   .build())
+                .respondent1(party)
+                .addRespondent1PinToPostLRspec(defendantPinToPostLRspec)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -152,12 +153,14 @@ public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnErrorWhenAccessCodeIsMissing() {
+            Party party = new Party();
+            party.setPartyEmail("test@gmail.com");
+            DefendantPinToPostLRspec defendantPinToPostLRspec = new DefendantPinToPostLRspec();
+            defendantPinToPostLRspec.setAccessCode(null);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
-                .respondent1(Party.builder().partyEmail("test@gmail.com").build())
-                .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
-                                                   .accessCode(null)
-                                                   .build())
+                .respondent1(party)
+                .addRespondent1PinToPostLRspec(defendantPinToPostLRspec)
                 .build();
 
             when(pipInPostConfiguration.getRespondToClaimUrl()).thenReturn("dummy_respond_to_claim_url");
