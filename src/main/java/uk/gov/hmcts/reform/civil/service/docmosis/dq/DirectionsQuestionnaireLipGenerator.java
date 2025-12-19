@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -32,6 +33,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.docmosis.dq.HearingLipSupportRequirements.toHearingSupportRequirements;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_LR_V_LIP_RESPONSE;
 
+@Slf4j
 @Service
 public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaireGenerator {
 
@@ -109,7 +111,9 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
     @Override
     protected DocmosisTemplates getTemplateId(CaseData caseData) {
         if (caseData.isRespondent1NotRepresented()) {
-            return DQ_LR_V_LIP_RESPONSE;
+            final DocmosisTemplates dqLrVLipResponse = DQ_LR_V_LIP_RESPONSE;
+            log.info("{} {}", caseData.getCcdCaseReference(), dqLrVLipResponse.getTemplate());
+            return dqLrVLipResponse;
         }
         return super.getTemplateId(caseData);
     }

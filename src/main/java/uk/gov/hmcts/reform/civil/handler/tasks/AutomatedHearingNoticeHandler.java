@@ -42,7 +42,7 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
         List<String> dispatchedHearingIds = getDispatchedHearingIds(schedulerVars);
         UnNotifiedHearingResponse unnotifiedHearings = getUnnotifiedHearings(schedulerVars.getServiceId());
 
-        log.info("Found [{}] unnotified hearings", unnotifiedHearings.getTotalFound());
+        log.info("Found [{}] unnotified hearings, {}", unnotifiedHearings.getTotalFound(), unnotifiedHearings.getHearingIds());
 
         unnotifiedHearings.getHearingIds()
             .stream()

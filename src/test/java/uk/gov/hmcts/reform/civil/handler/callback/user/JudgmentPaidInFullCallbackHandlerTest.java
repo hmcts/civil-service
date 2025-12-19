@@ -61,14 +61,16 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateDate() {
             //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
+            JudgmentPaymentPlan paymentPlan = new JudgmentPaymentPlan();
+            paymentPlan.setType(PaymentPlanSelection.PAY_IMMEDIATELY);
+            JudgmentDetails judgmentDetails = new JudgmentDetails();
+            judgmentDetails.setIssueDate(LocalDate.now());
+            judgmentDetails.setPaymentPlan(paymentPlan);
+            judgmentDetails.setOrderedAmount("100");
+            judgmentDetails.setCosts("50");
+            judgmentDetails.setTotalAmount("150");
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
-            caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now())
-                                           .paymentPlan(JudgmentPaymentPlan.builder()
-                                                            .type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
-                                           .orderedAmount("100")
-                                           .costs("50")
-                                           .totalAmount("150")
-                                           .build());
+            caseData.setActiveJudgment(judgmentDetails);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -89,14 +91,16 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateJudgementStatusAsSatisfied() {
             //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
+            JudgmentPaymentPlan paymentPlan = new JudgmentPaymentPlan();
+            paymentPlan.setType(PaymentPlanSelection.PAY_IMMEDIATELY);
+            JudgmentDetails judgmentDetails = new JudgmentDetails();
+            judgmentDetails.setIssueDate(LocalDate.now());
+            judgmentDetails.setPaymentPlan(paymentPlan);
+            judgmentDetails.setOrderedAmount("100");
+            judgmentDetails.setCosts("50");
+            judgmentDetails.setTotalAmount("150");
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
-            caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now())
-                                           .paymentPlan(JudgmentPaymentPlan.builder()
-                                                            .type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
-                                           .orderedAmount("100")
-                                           .costs("50")
-                                           .totalAmount("150")
-                                           .build());
+            caseData.setActiveJudgment(judgmentDetails);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -114,15 +118,16 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateJudgementStatusAsCancelled() {
             //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
+            JudgmentPaymentPlan paymentPlan = new JudgmentPaymentPlan();
+            paymentPlan.setType(PaymentPlanSelection.PAY_IMMEDIATELY);
+            JudgmentDetails judgmentDetails = new JudgmentDetails();
+            judgmentDetails.setIssueDate(LocalDate.now());
+            judgmentDetails.setPaymentPlan(paymentPlan);
+            judgmentDetails.setOrderedAmount("100");
+            judgmentDetails.setCosts("50");
+            judgmentDetails.setTotalAmount("150");
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31Days();
-            caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now())
-                                           .paymentPlan(JudgmentPaymentPlan.builder()
-                                                            .type(PaymentPlanSelection.PAY_IMMEDIATELY)
-                                                            .build())
-                                           .orderedAmount("100")
-                                           .costs("50")
-                                           .totalAmount("150")
-                                           .build());
+            caseData.setActiveJudgment(judgmentDetails);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -143,15 +148,17 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateJudgementStatusAsCancelledForDefaultJudgment() {
             //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
+            JudgmentPaymentPlan paymentPlan = new JudgmentPaymentPlan();
+            paymentPlan.setType(PaymentPlanSelection.PAY_IMMEDIATELY);
+            JudgmentDetails judgmentDetails = new JudgmentDetails();
+            judgmentDetails.setIssueDate(LocalDate.now());
+            judgmentDetails.setPaymentPlan(paymentPlan);
+            judgmentDetails.setOrderedAmount("100");
+            judgmentDetails.setCosts("50");
+            judgmentDetails.setTotalAmount("150");
             CaseData caseData = CaseDataBuilder.builder()
                 .getDefaultJudgment1v1CaseJudgmentPaid();
-            caseData.setActiveJudgment(JudgmentDetails.builder().issueDate(LocalDate.now())
-                                           .paymentPlan(JudgmentPaymentPlan.builder()
-                                                            .type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
-                                           .orderedAmount("100")
-                                           .costs("50")
-                                           .totalAmount("150")
-                                           .build());
+            caseData.setActiveJudgment(judgmentDetails);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event

@@ -24,15 +24,15 @@ public class Respondent2ExpertsCaseDataUpdater implements ExpertsAndWitnessesCas
                     && caseData.getRespondent2DQ().getSmallClaimExperts() != null) {
                 log.info("Setting respondent2DQExperts with expert details for caseId: {}", caseData.getCcdCaseReference());
                 Expert expert = fromSmallClaimExpertDetails(caseData.getRespondent2DQ().getSmallClaimExperts());
-                caseData.getRespondent2DQ().setRespondent2DQExperts(Experts.builder()
-                        .expertRequired(caseData.getResponseClaimExpertSpecRequired2())
-                        .details(wrapElements(expert))
-                        .build());
+                Experts experts = new Experts();
+                experts.setExpertRequired(caseData.getResponseClaimExpertSpecRequired2());
+                experts.setDetails(wrapElements(expert));
+                caseData.getRespondent2DQ().setRespondent2DQExperts(experts);
             } else if (NO.equals(caseData.getResponseClaimExpertSpecRequired2())) {
                 log.info("Setting respondent2DQExperts with expertRequired as NO for caseId: {}", caseData.getCcdCaseReference());
-                caseData.getRespondent2DQ().setRespondent2DQExperts(Experts.builder()
-                        .expertRequired(caseData.getResponseClaimExpertSpecRequired2())
-                        .build());
+                Experts experts = new Experts();
+                experts.setExpertRequired(caseData.getResponseClaimExpertSpecRequired2());
+                caseData.getRespondent2DQ().setRespondent2DQExperts(experts);
             }
         }
         return caseData;

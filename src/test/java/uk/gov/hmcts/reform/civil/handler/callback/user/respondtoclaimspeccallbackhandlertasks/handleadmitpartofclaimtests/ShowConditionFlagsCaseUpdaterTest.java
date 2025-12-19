@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbac
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.EnumSet;
@@ -37,158 +38,153 @@ class ShowConditionFlagsCaseUpdaterTest {
     @InjectMocks
     private ShowConditionFlagsCaseUpdater updater;
 
-    private CaseData.CaseDataBuilder<?, ?> caseDataBuilder;
-
     @BeforeEach
     void setUp() {
-        caseDataBuilder = CaseData.builder();
     }
 
     @Test
     void shouldAddWhy2DoesNotPayImmediatelyWhenRespondent2DoesNotPayImmediately() {
-        CaseData caseData = CaseData.builder()
-                .isRespondent2(YES)
-                .respondent2(Party.builder().type(Party.Type.INDIVIDUAL).build())
-                .defenceAdmitPartPaymentTimeRouteRequired2(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-                .showConditionFlags(EnumSet.of(CAN_ANSWER_RESPONDENT_2))
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setIsRespondent2(YES);
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        caseData.setRespondent2(party);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired2(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+        caseData.setShowConditionFlags(EnumSet.of(CAN_ANSWER_RESPONDENT_2));
 
-        updater.update(caseData, caseDataBuilder);
+        updater.update(caseData);
 
-        CaseData updatedCaseData = caseDataBuilder.build();
-        assertThat(updatedCaseData.getShowConditionFlags()).contains(WHY_2_DOES_NOT_PAY_IMMEDIATELY);
+        assertThat(caseData.getShowConditionFlags()).contains(WHY_2_DOES_NOT_PAY_IMMEDIATELY);
     }
 
     @Test
     void shouldAddRepaymentPlan2WhenRepaymentPlanForRespondent2() {
-        CaseData caseData = CaseData.builder()
-                .respondentResponseIsSame(YES)
-                .respondent2(Party.builder().type(Party.Type.INDIVIDUAL).build())
-                .defenceAdmitPartPaymentTimeRouteRequired2(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
-                .showConditionFlags(EnumSet.of(CAN_ANSWER_RESPONDENT_2))
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondentResponseIsSame(YES);
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        caseData.setRespondent2(party);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired2(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN);
+        caseData.setShowConditionFlags(EnumSet.of(CAN_ANSWER_RESPONDENT_2));
 
-        updater.update(caseData, caseDataBuilder);
+        updater.update(caseData);
 
-        CaseData updatedCaseData = caseDataBuilder.build();
-        assertThat(updatedCaseData.getShowConditionFlags()).contains(REPAYMENT_PLAN_2);
+        assertThat(caseData.getShowConditionFlags()).contains(REPAYMENT_PLAN_2);
     }
 
     @Test
     void shouldNotAddAnyFlagsWhenConditionsAreNotMet() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
-        updater.update(caseData, caseDataBuilder);
+        updater.update(caseData);
 
-        CaseData updatedCaseData = caseDataBuilder.build();
-        assertThat(updatedCaseData.getShowConditionFlags()).isEmpty();
+        assertThat(caseData.getShowConditionFlags()).isEmpty();
     }
 
     @Test
     void shouldAddNeedFinancialDetails1WhenRespondent1ConditionsAreMet() {
-        CaseData caseData = CaseData.builder()
-                .isRespondent1(YES)
-                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-                .specDefenceAdmittedRequired(YesOrNo.NO)
-                .specDefenceFullAdmittedRequired(YesOrNo.NO)
-                .respondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.PART_ADMISSION)
-                .sameSolicitorSameResponse(YES)
-                .defendantSingleResponseToBothClaimants(YES)
-                .showConditionFlags(EnumSet.of(CAN_ANSWER_RESPONDENT_1))
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setIsRespondent1(YES);
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        caseData.setRespondent1(party);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+        caseData.setSpecDefenceAdmittedRequired(YesOrNo.NO);
+        caseData.setSpecDefenceFullAdmittedRequired(YesOrNo.NO);
+        caseData.setRespondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.PART_ADMISSION);
+        caseData.setSameSolicitorSameResponse(YES);
+        caseData.setDefendantSingleResponseToBothClaimants(YES);
+        caseData.setShowConditionFlags(EnumSet.of(CAN_ANSWER_RESPONDENT_1));
 
-        updater.update(caseData, caseDataBuilder);
+        updater.update(caseData);
 
-        CaseData updatedCaseData = caseDataBuilder.build();
-        assertThat(updatedCaseData.getShowConditionFlags()).contains(NEED_FINANCIAL_DETAILS_1);
+        assertThat(caseData.getShowConditionFlags()).contains(NEED_FINANCIAL_DETAILS_1);
     }
 
     @Test
     void shouldAddWhy1DoesNotPayImmediatelyWhenRespondent1DoesNotPayImmediately() {
-        CaseData caseData = CaseData.builder()
-                .isRespondent1(YES)
-                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-                .specDefenceAdmittedRequired(YesOrNo.NO)
-                .specDefenceFullAdmittedRequired(YesOrNo.NO)
-                .respondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.PART_ADMISSION)
-                .sameSolicitorSameResponse(YES)
-                .defendantSingleResponseToBothClaimants(YES)
-                .showConditionFlags(EnumSet.of(CAN_ANSWER_RESPONDENT_1))
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setIsRespondent1(YES);
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        caseData.setRespondent1(party);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+        caseData.setSpecDefenceAdmittedRequired(YesOrNo.NO);
+        caseData.setSpecDefenceFullAdmittedRequired(YesOrNo.NO);
+        caseData.setRespondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.PART_ADMISSION);
+        caseData.setSameSolicitorSameResponse(YES);
+        caseData.setDefendantSingleResponseToBothClaimants(YES);
+        caseData.setShowConditionFlags(EnumSet.of(CAN_ANSWER_RESPONDENT_1));
 
-        updater.update(caseData, caseDataBuilder);
+        updater.update(caseData);
 
-        CaseData updatedCaseData = caseDataBuilder.build();
-        assertThat(updatedCaseData.getShowConditionFlags()).contains(WHY_1_DOES_NOT_PAY_IMMEDIATELY);
+        assertThat(caseData.getShowConditionFlags()).contains(WHY_1_DOES_NOT_PAY_IMMEDIATELY);
     }
 
     @Test
     void shouldNotAddFinancialDetails1WhenRespondent1ConditionsAreNotMet() {
-        CaseData caseData = CaseData.builder()
-                .isRespondent1(YES)
-                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-                .specDefenceAdmittedRequired(YesOrNo.YES)
-                .specDefenceFullAdmittedRequired(YesOrNo.YES)
-                .respondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .sameSolicitorSameResponse(NO)
-                .defendantSingleResponseToBothClaimants(NO)
-                .showConditionFlags(EnumSet.of(CAN_ANSWER_RESPONDENT_1))
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setIsRespondent1(YES);
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        caseData.setRespondent1(party);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+        caseData.setSpecDefenceAdmittedRequired(YesOrNo.YES);
+        caseData.setSpecDefenceFullAdmittedRequired(YesOrNo.YES);
+        caseData.setRespondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.FULL_DEFENCE);
+        caseData.setSameSolicitorSameResponse(NO);
+        caseData.setDefendantSingleResponseToBothClaimants(NO);
+        caseData.setShowConditionFlags(EnumSet.of(CAN_ANSWER_RESPONDENT_1));
 
-        updater.update(caseData, caseDataBuilder);
+        updater.update(caseData);
 
-        CaseData updatedCaseData = caseDataBuilder.build();
-
-        assertThat(updatedCaseData.getShowConditionFlags()).isNotEmpty();
-        assertThat(updatedCaseData.getShowConditionFlags()).doesNotContain(NEED_FINANCIAL_DETAILS_1);
+        assertThat(caseData.getShowConditionFlags()).isNotEmpty();
+        assertThat(caseData.getShowConditionFlags()).doesNotContain(NEED_FINANCIAL_DETAILS_1);
     }
 
     @Test
     void shouldAddWhenWillClaimBePaidWhenConditionsAreMetForRespondent2() {
-        CaseData caseData = CaseData.builder()
-                .isRespondent2(YES)
-                .respondent2(Party.builder().type(Party.Type.INDIVIDUAL).build())
-                .defenceAdmitPartPaymentTimeRouteRequired2(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-                .specDefenceAdmitted2Required(YesOrNo.NO)
-                .specDefenceFullAdmitted2Required(YesOrNo.NO)
-                .respondentResponseIsSame(NO)
-                .respondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .sameSolicitorSameResponse(NO)
-                .defendantSingleResponseToBothClaimants(NO)
-                .showConditionFlags(EnumSet.of(CAN_ANSWER_RESPONDENT_2))
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setIsRespondent2(YES);
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        caseData.setRespondent2(party);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired2(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+        caseData.setSpecDefenceAdmitted2Required(YesOrNo.NO);
+        caseData.setSpecDefenceFullAdmitted2Required(YesOrNo.NO);
+        caseData.setRespondentResponseIsSame(NO);
+        caseData.setRespondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.FULL_DEFENCE);
+        caseData.setSameSolicitorSameResponse(NO);
+        caseData.setDefendantSingleResponseToBothClaimants(NO);
+        caseData.setShowConditionFlags(EnumSet.of(CAN_ANSWER_RESPONDENT_2));
 
-        updater.update(caseData, caseDataBuilder);
+        updater.update(caseData);
 
-        CaseData updatedCaseData = caseDataBuilder.build();
-        assertThat(updatedCaseData.getShowConditionFlags()).contains(WHEN_WILL_CLAIM_BE_PAID);
+        assertThat(caseData.getShowConditionFlags()).contains(WHEN_WILL_CLAIM_BE_PAID);
     }
 
     @Test
     void shouldAddWhenWillClaimBePaidWhenRespondent2ConditionsMetViaRespondentResponseIsSame() {
-        CaseData caseData = CaseData.builder()
-                .respondentResponseIsSame(YES)
-                .isRespondent2(YES)
-                .respondent2(Party.builder().type(Party.Type.INDIVIDUAL).build())
-                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
-                .defenceAdmitPartPaymentTimeRouteRequired2(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
-                .specDefenceAdmittedRequired(YesOrNo.NO)
-                .specDefenceFullAdmittedRequired(YesOrNo.NO)
-                .specDefenceAdmitted2Required(YesOrNo.NO)
-                .specDefenceFullAdmitted2Required(YesOrNo.NO)
-                .respondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.COUNTER_CLAIM)
-                .sameSolicitorSameResponse(YES)
-                .defendantSingleResponseToBothClaimants(YES)
-                .showConditionFlags(EnumSet.of(CAN_ANSWER_RESPONDENT_2))
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondentResponseIsSame(YES);
+        caseData.setIsRespondent2(YES);
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        caseData.setRespondent2(party);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired2(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN);
+        caseData.setSpecDefenceAdmittedRequired(YesOrNo.NO);
+        caseData.setSpecDefenceFullAdmittedRequired(YesOrNo.NO);
+        caseData.setSpecDefenceAdmitted2Required(YesOrNo.NO);
+        caseData.setSpecDefenceFullAdmitted2Required(YesOrNo.NO);
+        caseData.setRespondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.COUNTER_CLAIM);
+        caseData.setSameSolicitorSameResponse(YES);
+        caseData.setDefendantSingleResponseToBothClaimants(YES);
+        caseData.setShowConditionFlags(EnumSet.of(CAN_ANSWER_RESPONDENT_2));
 
-        updater.update(caseData, caseDataBuilder);
+        updater.update(caseData);
 
-        CaseData updatedCaseData = caseDataBuilder.build();
-        assertThat(updatedCaseData.getShowConditionFlags()).contains(
+        assertThat(caseData.getShowConditionFlags()).contains(
                 REPAYMENT_PLAN_2,
                 WHEN_WILL_CLAIM_BE_PAID
         );
@@ -196,39 +192,38 @@ class ShowConditionFlagsCaseUpdaterTest {
 
     @Test
     void shouldNotAddRepaymentPlan2WhenRespondentResponseIsNotSameAndNoRepaymentPlanSet() {
-        CaseData caseData = CaseData.builder()
-                .respondentResponseIsSame(NO)
-                .isRespondent2(YES)
-                .respondent2(Party.builder().type(Party.Type.INDIVIDUAL).build())
-                .defenceAdmitPartPaymentTimeRouteRequired2(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-                .showConditionFlags(EnumSet.of(CAN_ANSWER_RESPONDENT_2))
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondentResponseIsSame(NO);
+        caseData.setIsRespondent2(YES);
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        caseData.setRespondent2(party);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired2(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+        caseData.setShowConditionFlags(EnumSet.of(CAN_ANSWER_RESPONDENT_2));
 
-        updater.update(caseData, caseDataBuilder);
+        updater.update(caseData);
 
-        CaseData updatedCaseData = caseDataBuilder.build();
-
-        assertThat(updatedCaseData.getShowConditionFlags()).isNotEmpty();
-        assertThat(updatedCaseData.getShowConditionFlags()).doesNotContain(REPAYMENT_PLAN_2);
+        assertThat(caseData.getShowConditionFlags()).isNotEmpty();
+        assertThat(caseData.getShowConditionFlags()).doesNotContain(REPAYMENT_PLAN_2);
     }
 
     @Test
     void shouldRemoveOldFlagsBeforeAddingNewOnes() {
-        CaseData caseData = CaseData.builder()
-                .showConditionFlags(EnumSet.of(
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setShowConditionFlags(EnumSet.of(
                         DefendantResponseShowTag.NEED_FINANCIAL_DETAILS_1,
                         DefendantResponseShowTag.WHY_2_DOES_NOT_PAY_IMMEDIATELY
-                ))
-                .isRespondent2(YES)
-                .respondent2(Party.builder().type(Party.Type.INDIVIDUAL).build())
-                .defenceAdmitPartPaymentTimeRouteRequired2(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
-                .showConditionFlags(EnumSet.of(CAN_ANSWER_RESPONDENT_2))
-                .build();
+                ));
+        caseData.setIsRespondent2(YES);
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        caseData.setRespondent2(party);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired2(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN);
+        caseData.setShowConditionFlags(EnumSet.of(CAN_ANSWER_RESPONDENT_2));
 
-        updater.update(caseData, caseDataBuilder);
+        updater.update(caseData);
 
-        CaseData updatedCaseData = caseDataBuilder.build();
-        assertThat(updatedCaseData.getShowConditionFlags()).doesNotContain(
+        assertThat(caseData.getShowConditionFlags()).doesNotContain(
                 DefendantResponseShowTag.NEED_FINANCIAL_DETAILS_1
         ).contains(
                 DefendantResponseShowTag.REPAYMENT_PLAN_2
@@ -237,24 +232,23 @@ class ShowConditionFlagsCaseUpdaterTest {
 
     @Test
     void shouldNotAddWhenWillClaimBePaidWhenConditionsAreNotMet() {
-        CaseData caseData = CaseData.builder()
-                .isRespondent2(YES)
-                .respondent2(Party.builder().type(Party.Type.INDIVIDUAL).build())
-                .defenceAdmitPartPaymentTimeRouteRequired2(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-                .specDefenceAdmitted2Required(YesOrNo.YES)
-                .specDefenceFullAdmitted2Required(YesOrNo.YES)
-                .respondentResponseIsSame(NO)
-                .respondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .sameSolicitorSameResponse(NO)
-                .defendantSingleResponseToBothClaimants(NO)
-                .showConditionFlags(EnumSet.of(CAN_ANSWER_RESPONDENT_2))
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setIsRespondent2(YES);
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        caseData.setRespondent2(party);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired2(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+        caseData.setSpecDefenceAdmitted2Required(YesOrNo.YES);
+        caseData.setSpecDefenceFullAdmitted2Required(YesOrNo.YES);
+        caseData.setRespondentResponseIsSame(NO);
+        caseData.setRespondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.FULL_DEFENCE);
+        caseData.setSameSolicitorSameResponse(NO);
+        caseData.setDefendantSingleResponseToBothClaimants(NO);
+        caseData.setShowConditionFlags(EnumSet.of(CAN_ANSWER_RESPONDENT_2));
 
-        updater.update(caseData, caseDataBuilder);
+        updater.update(caseData);
 
-        CaseData updatedCaseData = caseDataBuilder.build();
-
-        assertThat(updatedCaseData.getShowConditionFlags()).isNotEmpty();
-        assertThat(updatedCaseData.getShowConditionFlags()).doesNotContain(WHEN_WILL_CLAIM_BE_PAID);
+        assertThat(caseData.getShowConditionFlags()).isNotEmpty();
+        assertThat(caseData.getShowConditionFlags()).doesNotContain(WHEN_WILL_CLAIM_BE_PAID);
     }
 }
