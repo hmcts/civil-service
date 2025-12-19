@@ -22,7 +22,7 @@ class TaskCompletionPredicateTest {
     @Test
     void shouldReturnTrueWhenAllConditionsAreMet() {
         CaseData caseData = CaseData.builder()
-            .lastMessage(Message.builder().messageId(MESSAGE_ID).build())
+            .lastMessage(new Message().setMessageId(MESSAGE_ID))
             .build();
         Task task = Task.builder()
             .permissions(TaskPermissions.builder().values(Set.of(CLAIM)).build())
@@ -36,7 +36,7 @@ class TaskCompletionPredicateTest {
     @Test
     void shouldReturnFalseWhenAdditionalPropertiesAreNull() {
         CaseData caseData = CaseData.builder()
-            .lastMessage(Message.builder().build().builder().messageId(MESSAGE_ID).build())
+            .lastMessage(new Message().setMessageId(MESSAGE_ID))
             .build();
         Task task = Task.builder()
             .permissions(TaskPermissions.builder().values(Set.of(CLAIM)).build())
@@ -50,7 +50,7 @@ class TaskCompletionPredicateTest {
     @Test
     void shouldReturnFalseWhenTaskTaskPermissionsDoNotContainClaim() {
         CaseData caseData = CaseData.builder()
-            .lastMessage(Message.builder().messageId(MESSAGE_ID).build())
+            .lastMessage(new Message().setMessageId(MESSAGE_ID))
             .build();
         Task task = Task.builder()
             .permissions(TaskPermissions.builder().values(Collections.emptySet()).build())
@@ -64,7 +64,7 @@ class TaskCompletionPredicateTest {
     @Test
     void shouldReturnFalseWhenMessageIdsDoNotMatch() {
         CaseData caseData = CaseData.builder()
-            .lastMessage(Message.builder().messageId(MESSAGE_ID).build())
+            .lastMessage(new Message().setMessageId(MESSAGE_ID))
             .build();
         Task task = Task.builder()
             .permissions(TaskPermissions.builder().values(Set.of(CLAIM)).build())
@@ -78,7 +78,7 @@ class TaskCompletionPredicateTest {
     @Test
     void shouldReturnFalseWhenMessageIdIsNull() {
         CaseData caseData = CaseData.builder()
-            .lastMessage(Message.builder().messageId(null).build())
+            .lastMessage(new Message().setMessageId(null))
             .build();
         Task task = Task.builder()
             .permissions(TaskPermissions.builder().values(Set.of(CLAIM)).build())
