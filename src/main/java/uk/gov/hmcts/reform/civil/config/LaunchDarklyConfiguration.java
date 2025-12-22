@@ -5,11 +5,13 @@ import com.launchdarkly.sdk.server.LDConfig;
 import com.launchdarkly.sdk.server.integrations.FileData;
 import com.launchdarkly.sdk.server.subsystems.ComponentConfigurer;
 import com.launchdarkly.sdk.server.subsystems.DataSource;
+import com.launchdarkly.sdk.server.interfaces.LDClientInterface;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import uk.gov.hmcts.reform.civil.launchdarkly.NoopLaunchDarklyClient;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,9 +33,14 @@ public class LaunchDarklyConfiguration {
      * @return Launch Darkly Client.
      */
     @Bean
-    public LDClient ldClient(@Value("${launchdarkly.sdk-key}") String sdkKey,
-                             @Value("${launchdarkly.offline-mode:false}") Boolean offlineMode,
-                             @Value("${launchdarkly.file:''}") String[] flagFiles) {
+    public LDClientInterface ldClient(@Value("${launchdarkly.sdk-key}") String sdkKey,
+                                      @Value("${launchdarkly.offline-mode:false}") Boolean offlineMode,
+                                      @Value("${launchdarkly.file:''}") String[] flagFiles) {
+        if (StringUtils.isBlank(sdkKey)) {
+            log.warn("LaunchDarkly SDK key not configured. Using noop LaunchDarkly client.");
+            return new NoopLaunchDarklyClient();
+        }
+
         LDConfig.Builder builder = new LDConfig.Builder().offline(offlineMode);
         getExistingFiles(flagFiles)
             .map(this::getDataSource)
