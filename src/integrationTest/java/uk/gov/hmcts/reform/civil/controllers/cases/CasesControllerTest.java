@@ -80,7 +80,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
     private static final String USER_CASE_ROLES = "/cases/{caseId}/userCaseRoles";
     private static final String COURT_DECISION_URL = "/cases/{caseId}/courtDecision";
 
-    private static final String GA_CLAIMS_LIST_URL = "/cases/ga/";
+    private static final String GA_CLAIMS_LIST_URL = "/cases/ga";
     private static final String GA_SUBMIT_EVENT_URL = "/cases/{caseId}/ga/citizen/{submitterId}/event";
     private static final String GA_CASE_APP_URL = "/cases/{caseId}/ga/applications";
 
@@ -471,7 +471,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
             when(gaCoreCaseDataService.searchGeneralApplication(any(), anyString()))
                 .thenReturn(expectedCaseDetails);
 
-            doPost(BEARER_TOKEN, ELASTICSEARCH, GA_CLAIMS_LIST_URL, "")
+            doPost(BEARER_TOKEN, ELASTICSEARCH, GA_CLAIMS_LIST_URL)
                 .andExpect(content().json(toJson(expectedCaseData)))
                 .andExpect(status().isOk());
 
