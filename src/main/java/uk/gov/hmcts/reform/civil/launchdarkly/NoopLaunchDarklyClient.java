@@ -98,6 +98,11 @@ public class NoopLaunchDarklyClient implements LDClientInterface {
         }
 
         @Override
+        public boolean isStatusMonitoringEnabled() {
+            return false;
+        }
+
+        @Override
         public void addStatusListener(StatusListener listener) {
             // no-op
         }

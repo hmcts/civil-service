@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.launchdarkly;
 
 import com.launchdarkly.sdk.LDUser;
-import com.launchdarkly.sdk.server.LDClient;
+import com.launchdarkly.sdk.server.interfaces.LDClientInterface;
 import lombok.SneakyThrows;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -33,7 +33,7 @@ class FeatureToggleAspectTest {
     FeatureToggleAspect featureToggleAspect;
 
     @MockitoBean
-    LDClient ldClient;
+    LDClientInterface ldClient;
     @MockitoBean
     ProceedingJoinPoint proceedingJoinPoint;
     @MockitoBean
