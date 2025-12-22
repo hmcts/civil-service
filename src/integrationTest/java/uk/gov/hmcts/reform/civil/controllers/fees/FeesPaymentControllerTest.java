@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.client.models.StatusHistoryDto;
 import uk.gov.hmcts.reform.payments.request.CardPaymentServiceRequestDTO;
 import uk.gov.hmcts.reform.payments.response.CardPaymentServiceRequestResponse;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
