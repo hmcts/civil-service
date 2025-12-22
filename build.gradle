@@ -139,6 +139,11 @@ allprojects {
         entry 'logback-classic'
       }
 
+      dependencySet(group: 'org.apache.logging.log4j', version: '2.25.1') {
+        entry 'log4j-api'
+        entry 'log4j-core'
+      }
+
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.9'
@@ -609,6 +614,7 @@ tasks.register('contract', Test) {
   setClasspath(sourceSets.contractTest.runtimeClasspath)
   useJUnitPlatform()
   systemProperty 'pact.rootDir', "pacts"
+  maxParallelForks = 1
 }
 
 tasks.register('runAndPublishConsumerPactTests', Test) {
@@ -617,6 +623,7 @@ tasks.register('runAndPublishConsumerPactTests', Test) {
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
   finalizedBy(pactPublish)
+  maxParallelForks = 1
 }
 
 tasks.register('providerContractTests', Test) {
