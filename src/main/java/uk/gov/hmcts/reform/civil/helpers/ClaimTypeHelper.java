@@ -23,6 +23,10 @@ public class ClaimTypeHelper {
                 return ClaimType.CONSUMER;
             case CONSUMER_CREDIT:
                 return ClaimType.CONSUMER_CREDIT;
+            case DAMAGES_AND_OTHER_REMEDY:
+                return ClaimType.DAMAGES_AND_OTHER_REMEDY;
+            case HOUSING_DISREPAIR:
+                return ClaimType.HOUSING_DISREPAIR;
             case OTHER:
                 return ClaimType.OTHER;
             default:
