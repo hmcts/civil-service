@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -27,6 +28,7 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataServ
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -35,7 +37,6 @@ import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CMC_CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.GENERALAPPLICATION_CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
-import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataContentFromStartEventResponse;
 
 @Service
 @Slf4j
@@ -76,10 +77,6 @@ public class CoreCaseDataService {
                                               String transferReason,
                                               String eventSummary,
                                               String eventDescription) {
-        StartEventResponse startEventResponse = startUpdate(caseId.toString(), eventName);
-
-        CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         List<LocationRefData> locationRefDataList = referenceDataService.getCourtLocationsByEpimmsId(
             getSystemUpdateUser().getUserToken(),
@@ -87,15 +84,21 @@ public class CoreCaseDataService {
         );
         LocationRefData locationRefData = locationRefDataList.get(0);
 
-        DynamicList transferCourtLocationList = DynamicList.builder()
-                .value(DynamicListElement.builder().code(UUID.randomUUID().toString())
-                .label(getCourtName(locationRefData)).build()).build();
+        DynamicListElement dynamicListElement = new DynamicListElement();
+        dynamicListElement.setCode(UUID.randomUUID().toString());
+        dynamicListElement.setLabel(getCourtName(locationRefData));
 
-        caseDataBuilder.transferCourtLocationList(transferCourtLocationList);
-        caseDataBuilder.reasonForTransfer(transferReason);
+        DynamicList transferCourtLocationList = new DynamicList();
+        transferCourtLocationList.setValue(dynamicListElement);
+
+        StartEventResponse startEventResponse = startUpdate(caseId.toString(), eventName);
+        CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
+
+        caseData.setTransferCourtLocationList(transferCourtLocationList);
+        caseData.setReasonForTransfer(transferReason);
 
         mapper.registerModule(new JavaTimeModule());
-        Map<String, Object> payload = caseDataBuilder.build().toMap(mapper);
+        Map<String, Object> payload = caseData.toMap(mapper);
 
         //set payload
         CaseDataContent caseDataContent = caseDataContentFromStartEventResponse(startEventResponse, Map.of());
@@ -219,7 +222,7 @@ public class CoreCaseDataService {
     private UserAuthContent getSystemUpdateUser() {
         String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         String userId = userService.getUserInfo(userToken).getUid();
-        return UserAuthContent.builder().userToken(userToken).userId(userId).build();
+        return new UserAuthContent().setUserToken(userToken).setUserId(userId);
     }
 
     public CaseDetails setSupplementaryData(Long caseId, Map<String, Map<String,
@@ -256,6 +259,20 @@ public class CoreCaseDataService {
     public SearchResult getCCDDataBasedOnIndex(String authorization, int startIndex, String userEmailField) {
         String query = createQuery(authorization, startIndex, userEmailField);
         return coreCaseDataApi.searchCases(authorization, authTokenGenerator.generate(), CASE_TYPE, query);
+    }
+
+    public CaseDataContent caseDataContentFromStartEventResponse(
+        StartEventResponse startEventResponse, Map<String, Object> contentModified) {
+        var payload = new HashMap<>(startEventResponse.getCaseDetails().getData());
+        payload.putAll(contentModified);
+
+        return CaseDataContent.builder()
+            .eventToken(startEventResponse.getToken())
+            .event(Event.builder()
+                       .id(startEventResponse.getEventId())
+                       .build())
+            .data(payload)
+            .build();
     }
 
     private String createQuery(String authorization, int startIndex, String userEmailField) {

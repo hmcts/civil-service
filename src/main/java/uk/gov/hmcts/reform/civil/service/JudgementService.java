@@ -33,20 +33,20 @@ public class JudgementService {
     private final InterestCalculator interestCalculator;
 
     public CCJPaymentDetails buildJudgmentAmountSummaryDetails(CaseData caseData) {
-        return CCJPaymentDetails.builder()
-            .ccjJudgmentAmountClaimAmount(ccjJudgmentClaimAmount(caseData))
-            .ccjJudgmentAmountClaimFee(ccjJudgmentClaimFee(caseData))
-            .ccjJudgmentSummarySubtotalAmount(ccjJudgementSubTotal(caseData))
-            .ccjJudgmentTotalStillOwed(ccjJudgmentFinalTotal(caseData))
-            .ccjJudgmentAmountInterestToDate(ccjJudgmentInterest(caseData))
-            .ccjPaymentPaidSomeAmount(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount())
-            .ccjPaymentPaidSomeAmountInPounds(ccjJudgmentPaidAmount(caseData))
-            .ccjJudgmentFixedCostAmount(ccjJudgmentFixedCost(caseData))
-            .ccjJudgmentFixedCostOption(checkFixedCostOption(caseData))
-            .ccjJudgmentStatement(ccjJudgmentStatement(caseData))
-            .ccjPaymentPaidSomeOption(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption())
-            .ccjJudgmentLipInterest(caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest())
-            .build();
+        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
+        ccjPaymentDetails.setCcjJudgmentAmountClaimAmount(ccjJudgmentClaimAmount(caseData));
+        ccjPaymentDetails.setCcjJudgmentAmountClaimFee(ccjJudgmentClaimFee(caseData));
+        ccjPaymentDetails.setCcjJudgmentSummarySubtotalAmount(ccjJudgementSubTotal(caseData));
+        ccjPaymentDetails.setCcjJudgmentTotalStillOwed(ccjJudgmentFinalTotal(caseData));
+        ccjPaymentDetails.setCcjJudgmentAmountInterestToDate(ccjJudgmentInterest(caseData));
+        ccjPaymentDetails.setCcjPaymentPaidSomeAmount(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount());
+        ccjPaymentDetails.setCcjPaymentPaidSomeAmountInPounds(ccjJudgmentPaidAmount(caseData));
+        ccjPaymentDetails.setCcjJudgmentFixedCostAmount(ccjJudgmentFixedCost(caseData));
+        ccjPaymentDetails.setCcjJudgmentFixedCostOption(checkFixedCostOption(caseData));
+        ccjPaymentDetails.setCcjJudgmentStatement(ccjJudgmentStatement(caseData));
+        ccjPaymentDetails.setCcjPaymentPaidSomeOption(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption());
+        ccjPaymentDetails.setCcjJudgmentLipInterest(caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest());
+        return ccjPaymentDetails;
     }
 
     public List<String> validateAmountPaid(CaseData caseData) {
@@ -125,12 +125,12 @@ public class JudgementService {
     private String ccjJudgmentStatement(CaseData caseData) {
         if (caseData.isLRvLipOneVOne()) {
             boolean hasPaymentOption = caseData.isPayImmediately() || caseData.isPayByInstallment() || caseData.isPayBySetDate();
-            if (hasPaymentOption) {
-                return String.format(JUDGEMENT_ORDER_V2, ccjJudgementSubTotal(caseData).toString());
-            }
             if (featureToggleService.isJudgmentOnlineLive()
                 && hasPaymentOption) {
                 return JUDGEMENT_BY_COURT_NOT_OFFLINE;
+            }
+            if (hasPaymentOption) {
+                return String.format(JUDGEMENT_ORDER_V2, ccjJudgementSubTotal(caseData).toString());
             }
             return JUDGEMENT_BY_COURT;
         } else {

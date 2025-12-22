@@ -90,51 +90,57 @@ public class DashboardNotificationsParamsMapperTest {
     }
 
     public CaseDocument generateOrder(DocumentType documentType) {
-        return CaseDocument.builder()
-            .createdBy("Test")
-            .documentName("document test name")
-            .documentSize(0L)
-            .documentType(documentType)
-            .createdDatetime(LocalDateTime.of(2024, Month.APRIL, 4, 14, 14))
-            .documentLink(Document.builder()
-                .documentUrl("fake-url")
-                .documentFileName("file-name.pdf")
-                .documentBinaryUrl("binary-url")
-                .build())
-            .build();
+        Document document = new Document();
+        document.setDocumentUrl("fake-url");
+        document.setDocumentFileName("file-name.pdf");
+        document.setDocumentBinaryUrl("binary-url");
+
+        CaseDocument caseDocument = new CaseDocument();
+        caseDocument.setCreatedBy("Test");
+        caseDocument.setDocumentName("document test name");
+        caseDocument.setDocumentSize(0L);
+        caseDocument.setDocumentType(documentType);
+        caseDocument.setCreatedDatetime(LocalDateTime.of(2024, Month.APRIL, 4, 14, 14));
+        caseDocument.setDocumentLink(document);
+        return caseDocument;
     }
 
     @Test
     public void shouldMapAllParameters_WhenIsRequested() {
-
-        LocalDate date = LocalDate.of(2024, Month.FEBRUARY, 22);
-        LocalDateTime now = LocalDateTime.now();
-        List<IdValue<Bundle>> bundles = List.of(
-            new IdValue<>("1", Bundle.builder().createdOn(Optional.of(now.minusDays(1))).build()),
-            new IdValue<>("2", Bundle.builder().createdOn(Optional.of(now)).build()),
-            new IdValue<>("3", Bundle.builder().createdOn(Optional.of(now.minusDays(2))).build())
-        );
         when(claimantResponseUtils.getDefendantAdmittedAmount(any(), anyBoolean())).thenReturn(BigDecimal.valueOf(100));
 
+        caseData.setHwfFeeType(FeeType.CLAIMISSUED);
+        caseData.setTotalClaimAmount(BigDecimal.valueOf(124.67));
+        caseData.setRespondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(100));
+
+        LocalDate date = LocalDate.of(2024, Month.FEBRUARY, 22);
+        caseData.setRespondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec(date));
+        caseData.setRespondent1RespondToSettlementAgreementDeadline(LocalDateTime.now());
+        caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YES);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1ClaimSettledDate(LocalDate.now());
+        caseData.setCaseDataLiP(caseDataLiP);
         LocalDateTime applicant1ResponseDeadline = LocalDateTime.of(2024, 3, 21, 16, 0);
-        caseData = caseData.toBuilder()
-            .hwfFeeType(FeeType.CLAIMISSUED)
-            .totalClaimAmount(BigDecimal.valueOf(124.67))
-            .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(100))
-            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec(date))
-            .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.now())
-            .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
-            .caseDataLiP(CaseDataLiP.builder().applicant1ClaimSettledDate(LocalDate.now()).build())
-            .applicant1ResponseDeadline(applicant1ResponseDeadline)
-            .hearingDate(LocalDate.of(2024, 4, 1))
-            .hearingDueDate(LocalDate.of(2024, 4, 1))
-            .hearingFee(new Fee(new BigDecimal(10000), "Test", "Test"))
-            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
-            .hearingLocationCourtName("County Court")
-            .applicant1Represented(NO)
-            .requestForReconsiderationDeadline(LocalDateTime.of(2024, 4, 1, 10, 20))
-            .caseBundles(bundles)
-            .build();
+        caseData.setApplicant1ResponseDeadline(applicant1ResponseDeadline);
+        caseData.setHearingDate(LocalDate.of(2024, 4, 1));
+        caseData.setHearingDueDate(LocalDate.of(2024, 4, 1));
+        caseData.setHearingFee(new Fee(new BigDecimal(10000), "Test", "Test"));
+        DynamicListElement dynamicListElement = new DynamicListElement();
+        dynamicListElement.setLabel("County Court");
+        DynamicList hearingLocation = new DynamicList();
+        hearingLocation.setValue(dynamicListElement);
+        caseData.setHearingLocation(hearingLocation);
+        caseData.setHearingLocationCourtName("County Court");
+        caseData.setApplicant1Represented(NO);
+        caseData.setRequestForReconsiderationDeadline(LocalDateTime.of(2024, 4, 1, 10, 20));
+
+        LocalDateTime now = LocalDateTime.now();
+        List<IdValue<Bundle>> bundles = List.of(
+            new IdValue<>("1", new Bundle().setCreatedOn(Optional.of(now.minusDays(1)))),
+            new IdValue<>("2", new Bundle().setCreatedOn(Optional.of(now))),
+            new IdValue<>("3", new Bundle().setCreatedOn(Optional.of(now.minusDays(2))))
+        );
+        caseData.setCaseBundles(bundles);
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
@@ -238,23 +244,24 @@ public class DashboardNotificationsParamsMapperTest {
     @EnumSource(PaymentFrequency.class)
     void shouldMapParameters_WhenRecordJudgmentDeterminationOfMeans(PaymentFrequency paymentFrequency) {
 
-        caseData = caseData.toBuilder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .respondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay())
-            .respondent1Represented(YesOrNo.NO)
-            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
-            .joJudgmentRecordReason(JudgmentRecordedReason.DETERMINATION_OF_MEANS)
-            .joInstalmentDetails(JudgmentInstalmentDetails.builder()
-                .startDate(LocalDate.of(2022, 12, 12))
-                .amount("120")
-                .paymentFrequency(paymentFrequency).build())
-            .joAmountOrdered("1200")
-            .joAmountCostOrdered("1100")
-            .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IN_INSTALMENTS).build())
-            .joOrderMadeDate(LocalDate.of(2022, 12, 12))
-            .joIsRegisteredWithRTL(YES)
-            .build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay());
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setCcdState(CaseState.All_FINAL_ORDERS_ISSUED);
+        caseData.setJoJudgmentRecordReason(JudgmentRecordedReason.DETERMINATION_OF_MEANS);
+        JudgmentInstalmentDetails instalmentDetails = new JudgmentInstalmentDetails();
+        instalmentDetails.setStartDate(LocalDate.of(2022, 12, 12));
+        instalmentDetails.setAmount("120");
+        instalmentDetails.setPaymentFrequency(paymentFrequency);
+        caseData.setJoInstalmentDetails(instalmentDetails);
+        caseData.setJoAmountOrdered("1200");
+        caseData.setJoAmountCostOrdered("1100");
+        JudgmentPaymentPlan paymentPlan = new JudgmentPaymentPlan();
+        paymentPlan.setType(PaymentPlanSelection.PAY_IN_INSTALMENTS);
+        caseData.setJoPaymentPlan(paymentPlan);
+        caseData.setJoOrderMadeDate(LocalDate.of(2022, 12, 12));
+        caseData.setJoIsRegisteredWithRTL(YES);
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
@@ -285,7 +292,7 @@ public class DashboardNotificationsParamsMapperTest {
     @Test
     public void shouldMapParameters_WhenGeneralApplicationsIsEnabled() {
 
-        caseData = caseData.toBuilder().build();
+        // caseData already initialized in setup
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
@@ -301,25 +308,24 @@ public class DashboardNotificationsParamsMapperTest {
     public void shouldMapParameters_WhenJudgementByAdmissionInstalmentsIsIssued(PaymentFrequency paymentFrequency) {
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
-        caseData = caseData.toBuilder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .respondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay())
-            .respondent1Represented(YesOrNo.NO)
-            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
-            .activeJudgment(JudgmentDetails.builder()
-                .state(ISSUED)
-                .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_IN_INSTALMENTS).build())
-                .orderedAmount("150001")
-                .totalAmount("150001")
-                .instalmentDetails(JudgmentInstalmentDetails.builder()
-                    .amount("20001")
-                    .paymentFrequency(paymentFrequency)
-                    .startDate(LocalDate.of(2050, Month.AUGUST, 8))
-                    .build())
-                .build())
-            .build();
-        ;
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay());
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setCcdState(CaseState.All_FINAL_ORDERS_ISSUED);
+        JudgmentInstalmentDetails instalmentDetails2 = new JudgmentInstalmentDetails();
+        instalmentDetails2.setAmount("20001");
+        instalmentDetails2.setPaymentFrequency(paymentFrequency);
+        instalmentDetails2.setStartDate(LocalDate.of(2050, Month.AUGUST, 8));
+        JudgmentPaymentPlan paymentPlan2 = new JudgmentPaymentPlan();
+        paymentPlan2.setType(PAY_IN_INSTALMENTS);
+        JudgmentDetails activeJudgment = new JudgmentDetails();
+        activeJudgment.setState(ISSUED);
+        activeJudgment.setPaymentPlan(paymentPlan2);
+        activeJudgment.setOrderedAmount("150001");
+        activeJudgment.setTotalAmount("150001");
+        activeJudgment.setInstalmentDetails(instalmentDetails2);
+        caseData.setActiveJudgment(activeJudgment);
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
@@ -347,20 +353,19 @@ public class DashboardNotificationsParamsMapperTest {
     public void shouldMapParameters_WhenJudgementByAdmissionIssuedImmediately() {
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
-        caseData = caseData.toBuilder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .respondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay())
-            .respondent1Represented(YesOrNo.NO)
-            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
-            .activeJudgment(JudgmentDetails.builder()
-                .state(ISSUED)
-                .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_IMMEDIATELY).build())
-                .orderedAmount("150001")
-                .totalAmount("150001")
-                .build())
-            .build();
-        ;
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay());
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setCcdState(CaseState.All_FINAL_ORDERS_ISSUED);
+        JudgmentPaymentPlan paymentPlan3 = new JudgmentPaymentPlan();
+        paymentPlan3.setType(PAY_IMMEDIATELY);
+        JudgmentDetails activeJudgment3 = new JudgmentDetails();
+        activeJudgment3.setState(ISSUED);
+        activeJudgment3.setPaymentPlan(paymentPlan3);
+        activeJudgment3.setOrderedAmount("150001");
+        activeJudgment3.setTotalAmount("150001");
+        caseData.setActiveJudgment(activeJudgment3);
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
@@ -373,23 +378,20 @@ public class DashboardNotificationsParamsMapperTest {
     public void shouldMapParameters_WhenJudgementByAdmissionIssuedPayByDate() {
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
-        caseData = caseData.toBuilder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(1234L)
-            .respondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay())
-            .respondent1Represented(YesOrNo.NO)
-            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
-            .activeJudgment(JudgmentDetails.builder()
-                .state(ISSUED)
-                .paymentPlan(JudgmentPaymentPlan.builder()
-                    .type(PAY_BY_DATE)
-                    .paymentDeadlineDate(LocalDate.of(2050, Month.AUGUST, 19))
-                    .build())
-                .orderedAmount("150001")
-                .totalAmount("150001")
-                .build())
-            .build();
-        ;
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay());
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setCcdState(CaseState.All_FINAL_ORDERS_ISSUED);
+        JudgmentPaymentPlan paymentPlan4 = new JudgmentPaymentPlan();
+        paymentPlan4.setType(PAY_BY_DATE);
+        paymentPlan4.setPaymentDeadlineDate(LocalDate.of(2050, Month.AUGUST, 19));
+        JudgmentDetails activeJudgment4 = new JudgmentDetails();
+        activeJudgment4.setState(ISSUED);
+        activeJudgment4.setPaymentPlan(paymentPlan4);
+        activeJudgment4.setOrderedAmount("150001");
+        activeJudgment4.setTotalAmount("150001");
+        caseData.setActiveJudgment(activeJudgment4);
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
@@ -401,15 +403,12 @@ public class DashboardNotificationsParamsMapperTest {
     @Test
     public void shouldMapParameters_WhenResponseDeadlineAndClaimFeeIsNull() {
 
-        caseData = caseData.toBuilder()
-            .respondent1ResponseDeadline(null)
-            .respondToAdmittedClaimOwingAmountPounds(null)
-            .respondToClaimAdmitPartLRspec(null)
-            .respondent1ResponseDeadline(null)
-            .claimFee(null)
-            .respondent1RespondToSettlementAgreementDeadline(null)
-            .applicant1ResponseDeadline(null)
-            .build();
+        caseData.setRespondent1ResponseDeadline(null);
+        caseData.setRespondToAdmittedClaimOwingAmountPounds(null);
+        caseData.setRespondToClaimAdmitPartLRspec(null);
+        caseData.setClaimFee(null);
+        caseData.setRespondent1RespondToSettlementAgreementDeadline(null);
+        caseData.setApplicant1ResponseDeadline(null);
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
@@ -440,13 +439,12 @@ public class DashboardNotificationsParamsMapperTest {
     @Test
     public void shouldMapCaseSettleAmountAndCaseSettledDateWheResponseTypeIsFullDefence() {
 
-        caseData = caseData.toBuilder().respondent1ResponseDeadline(null)
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .respondToClaim(RespondToClaim.builder()
-                .howMuchWasPaid(new BigDecimal("100050"))
-                .whenWasThisAmountPaid(LocalDate.parse("2023-03-29"))
-                .build())
-            .build();
+        caseData.setRespondent1ResponseDeadline(null);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+        RespondToClaim respondToClaim = new RespondToClaim();
+        respondToClaim.setHowMuchWasPaid(new BigDecimal("100050"));
+        respondToClaim.setWhenWasThisAmountPaid(LocalDate.parse("2023-03-29"));
+        caseData.setRespondToClaim(respondToClaim);
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
@@ -460,13 +458,12 @@ public class DashboardNotificationsParamsMapperTest {
     @Test
     public void shouldMapCaseSettleAmountAndCaseSettledDateWhenResponseTypeIsPartAdmit() {
 
-        caseData = caseData.toBuilder().respondent1ResponseDeadline(null)
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .respondToAdmittedClaim(RespondToClaim.builder()
-                .howMuchWasPaid(new BigDecimal("100055"))
-                .whenWasThisAmountPaid(LocalDate.parse("2023-03-29"))
-                .build())
-            .build();
+        caseData.setRespondent1ResponseDeadline(null);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+        RespondToClaim respondToAdmittedClaim = new RespondToClaim();
+        respondToAdmittedClaim.setHowMuchWasPaid(new BigDecimal("100055"));
+        respondToAdmittedClaim.setWhenWasThisAmountPaid(LocalDate.parse("2023-03-29"));
+        caseData.setRespondToAdmittedClaim(respondToAdmittedClaim);
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
@@ -477,9 +474,11 @@ public class DashboardNotificationsParamsMapperTest {
 
     @Test
     public void shouldMapParameters_whenHwFPartRemissionGranted() {
-        caseData = caseData.toBuilder().hwfFeeType(FeeType.CLAIMISSUED)
-            .claimIssuedHwfDetails(HelpWithFeesDetails.builder().remissionAmount(BigDecimal.valueOf(2500))
-                .outstandingFeeInPounds(BigDecimal.valueOf(100)).build()).build();
+        caseData.setHwfFeeType(FeeType.CLAIMISSUED);
+        HelpWithFeesDetails hwfDetails = new HelpWithFeesDetails();
+        hwfDetails.setRemissionAmount(BigDecimal.valueOf(2500));
+        hwfDetails.setOutstandingFeeInPounds(BigDecimal.valueOf(100));
+        caseData.setClaimIssuedHwfDetails(hwfDetails);
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
@@ -489,9 +488,10 @@ public class DashboardNotificationsParamsMapperTest {
 
     @Test
     public void shouldMapParameters_whenClaimantSubmitSettlmentEvent() {
-        caseData = caseData.toBuilder().hwfFeeType(FeeType.CLAIMISSUED)
-            .caseDataLiP(CaseDataLiP.builder().applicant1ClaimSettledDate(LocalDate.of(2024, 3, 19)).build())
-            .build();
+        caseData.setHwfFeeType(FeeType.CLAIMISSUED);
+        CaseDataLiP caseDataLiP2 = new CaseDataLiP();
+        caseDataLiP2.setApplicant1ClaimSettledDate(LocalDate.of(2024, 3, 19));
+        caseData.setCaseDataLiP(caseDataLiP2);
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
@@ -503,12 +503,11 @@ public class DashboardNotificationsParamsMapperTest {
     public void shouldMapParameters_whenRepaymentPlanIsSet() {
         LocalDate date = LocalDate.of(2024, Month.FEBRUARY, 22);
 
-        caseData = caseData.toBuilder().respondent1RepaymentPlan(
-            RepaymentPlanLRspec.builder()
-                .firstRepaymentDate(date)
-                .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
-                .paymentAmount(new BigDecimal(1000))
-                .build()).build();
+        RepaymentPlanLRspec repaymentPlan = new RepaymentPlanLRspec();
+        repaymentPlan.setFirstRepaymentDate(date);
+        repaymentPlan.setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK);
+        repaymentPlan.setPaymentAmount(new BigDecimal(1000));
+        caseData.setRespondent1RepaymentPlan(repaymentPlan);
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
@@ -522,8 +521,7 @@ public class DashboardNotificationsParamsMapperTest {
     @Test
     public void shouldMapParameters_whenHearingDueDate() {
         LocalDate date = LocalDate.of(2024, Month.MARCH, 22);
-        caseData = caseData.toBuilder().hearingDueDate(date)
-            .build();
+        caseData.setHearingDueDate(date);
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
@@ -533,13 +531,10 @@ public class DashboardNotificationsParamsMapperTest {
 
     @Test
     public void shouldMapParameters_whenStatesPaidInFull() {
-        caseData = caseData.toBuilder()
-            .respondent1ResponseDeadline(null)
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .applicant1ResponseDeadline(LocalDate.parse("2020-03-29").atStartOfDay())
-            .respondToClaim(RespondToClaim.builder()
-                .build())
-            .build();
+        caseData.setRespondent1ResponseDeadline(null);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+        caseData.setApplicant1ResponseDeadline(LocalDate.parse("2020-03-29").atStartOfDay());
+        caseData.setRespondToClaim(new RespondToClaim());
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
@@ -550,9 +545,11 @@ public class DashboardNotificationsParamsMapperTest {
 
     @Test
     public void shouldMapParameters_whenHearingFeeHwFPartRemissionGranted() {
-        caseData = caseData.toBuilder().hwfFeeType(FeeType.HEARING)
-            .hearingHwfDetails(HelpWithFeesDetails.builder().remissionAmount(BigDecimal.valueOf(2500))
-                .outstandingFeeInPounds(BigDecimal.valueOf(100)).build()).build();
+        caseData.setHwfFeeType(FeeType.HEARING);
+        HelpWithFeesDetails hearingHwfDetails = new HelpWithFeesDetails();
+        hearingHwfDetails.setRemissionAmount(BigDecimal.valueOf(2500));
+        hearingHwfDetails.setOutstandingFeeInPounds(BigDecimal.valueOf(100));
+        caseData.setHearingHwfDetails(hearingHwfDetails);
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
@@ -570,7 +567,7 @@ public class DashboardNotificationsParamsMapperTest {
     void shouldMapOrderParameters(CaseEvent caseEvent) {
         List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
         finalCaseDocuments.add(element(generateOrder(JUDGE_FINAL_ORDER)));
-        caseData = caseData.toBuilder().finalOrderDocumentCollection(finalCaseDocuments).build();
+        caseData.setFinalOrderDocumentCollection(finalCaseDocuments);
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData, caseEvent);
 
@@ -585,7 +582,7 @@ public class DashboardNotificationsParamsMapperTest {
         "UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_DEFENDANT"
     })
     void shouldNotThrowExceptionWhenNoFinalOrders(CaseEvent caseEvent) {
-        caseData = caseData.toBuilder().finalOrderDocumentCollection(new ArrayList<>()).build();
+        caseData.setFinalOrderDocumentCollection(new ArrayList<>());
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData, caseEvent);
 
@@ -600,7 +597,7 @@ public class DashboardNotificationsParamsMapperTest {
         "UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_DEFENDANT"
     })
     void shouldNotThrowExceptionWhenFinalOrdersNull(CaseEvent caseEvent) {
-        caseData = caseData.toBuilder().finalOrderDocumentCollection(null).build();
+        caseData.setFinalOrderDocumentCollection(null);
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData, caseEvent);
 
@@ -611,7 +608,7 @@ public class DashboardNotificationsParamsMapperTest {
     void shouldMapOrderParameters_whenEventIsSdoDj() {
         List<Element<CaseDocument>> sdoDjCaseDocuments = new ArrayList<>();
         sdoDjCaseDocuments.add(element(generateOrder(SDO_ORDER)));
-        caseData = caseData.toBuilder().orderSDODocumentDJCollection(sdoDjCaseDocuments).build();
+        caseData.setOrderSDODocumentDJCollection(sdoDjCaseDocuments);
 
         Map<String, Object> resultClaimant =
             mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT);
@@ -628,9 +625,8 @@ public class DashboardNotificationsParamsMapperTest {
         systemGeneratedDocuments.add(element(generateOrder(SDO_ORDER)));
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
         preTranslationDocuments.add(element(generateOrder(SDO_ORDER)));
-        caseData = caseData.toBuilder()
-            .systemGeneratedCaseDocuments(systemGeneratedDocuments)
-            .preTranslationDocuments(preTranslationDocuments).build();
+        caseData.setSystemGeneratedCaseDocuments(systemGeneratedDocuments);
+        caseData.setPreTranslationDocuments(preTranslationDocuments);
 
         Map<String, Object> resultClaimant =
             mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT);
@@ -647,7 +643,7 @@ public class DashboardNotificationsParamsMapperTest {
     void shouldReturnNull_whenEventIsIncorrect() {
         List<Element<CaseDocument>> systemGeneratedDocuments = new ArrayList<>();
         systemGeneratedDocuments.add(element(generateOrder(SDO_ORDER)));
-        caseData = caseData.toBuilder().systemGeneratedCaseDocuments(systemGeneratedDocuments).build();
+        caseData.setSystemGeneratedCaseDocuments(systemGeneratedDocuments);
 
         Map<String, Object> result =
             mapper.mapCaseDataToParams(caseData, CaseEvent.ADD_CASE_NOTE);
@@ -658,7 +654,7 @@ public class DashboardNotificationsParamsMapperTest {
     void shouldReturnNull_whenEventIsNull() {
         List<Element<CaseDocument>> systemGeneratedDocuments = new ArrayList<>();
         systemGeneratedDocuments.add(element(generateOrder(SDO_ORDER)));
-        caseData = caseData.toBuilder().systemGeneratedCaseDocuments(systemGeneratedDocuments).build();
+        caseData.setSystemGeneratedCaseDocuments(systemGeneratedDocuments);
 
         Map<String, Object> result =
             mapper.mapCaseDataToParams(caseData, null);
@@ -667,20 +663,17 @@ public class DashboardNotificationsParamsMapperTest {
 
     @Test
     public void shouldMapParameters_whenHearingFast() {
+        caseData.setRespondent1ResponseDeadline(null);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+        caseData.setApplicant1ResponseDeadline(LocalDate.parse("2020-03-29").atStartOfDay());
+        caseData.setRespondToClaim(new RespondToClaim());
+        caseData.setDrawDirectionsOrderRequired(YES);
+        caseData.setDrawDirectionsOrderSmallClaims(YesOrNo.NO);
+        caseData.setOrderType(OrderType.DECIDE_DAMAGES);
+        FastTrackDisclosureOfDocuments fastTrackDisclosure = new FastTrackDisclosureOfDocuments();
         LocalDate date = LocalDate.now();
-        caseData = caseData.toBuilder()
-            .respondent1ResponseDeadline(null)
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .applicant1ResponseDeadline(LocalDate.parse("2020-03-29").atStartOfDay())
-            .respondToClaim(RespondToClaim.builder()
-                .build())
-            .drawDirectionsOrderRequired(YES)
-            .drawDirectionsOrderSmallClaims(YesOrNo.NO)
-            .orderType(OrderType.DECIDE_DAMAGES)
-            .fastTrackDisclosureOfDocuments(FastTrackDisclosureOfDocuments.builder()
-                .date3(date)
-                .build())
-            .build();
+        fastTrackDisclosure.setDate3(date);
+        caseData.setFastTrackDisclosureOfDocuments(fastTrackDisclosure);
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
@@ -703,13 +696,14 @@ public class DashboardNotificationsParamsMapperTest {
     @Test
     void shouldMapParameters_whenCertOfSc() {
         LocalDate fullPaymentDate = LocalDate.now();
-        CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build().toBuilder()
-            .applicant1Represented(YesOrNo.NO)
-            .certOfSC(CertOfSC.builder().defendantFinalPaymentDate(fullPaymentDate).build())
-            .build();
+        CaseData currentCaseData = CaseDataBuilder.builder().atCaseProgressionCheck().build();
+        currentCaseData.setApplicant1Represented(YesOrNo.NO);
+        CertOfSC certOfSC = new CertOfSC();
+        certOfSC.setDefendantFinalPaymentDate(fullPaymentDate);
+        currentCaseData.setCertOfSC(certOfSC);
 
         Map<String, Object> result =
-            mapper.mapCaseDataToParams(caseData, null);
+            mapper.mapCaseDataToParams(currentCaseData, null);
         assertThat(result).extracting("coscFullPaymentDateEn")
             .isEqualTo(DateUtils.formatDate(fullPaymentDate));
         assertThat(result).extracting("coscFullPaymentDateCy")
@@ -722,11 +716,12 @@ public class DashboardNotificationsParamsMapperTest {
 
     @Test
     void shouldMapParameters_whenClaimantMarkedPaidInFull() {
-        LocalDate markedPaidInFullDate = LocalDate.now();
-        caseData = caseData.toBuilder().legacyCaseReference("reference")
-            .ccdCaseReference(1234L).respondent1Represented(YesOrNo.NO)
-            .markPaidConsent(MarkPaidConsentList.YES).build();
+        caseData.setLegacyCaseReference("reference");
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setMarkPaidConsent(MarkPaidConsentList.YES);
 
+        LocalDate markedPaidInFullDate = LocalDate.now();
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData, null);
         assertThat(result).extracting("settleClaimPaidInFullDateEn").isEqualTo(DateUtils.formatDate(markedPaidInFullDate));
         assertThat(result).extracting("settleClaimPaidInFullDateCy").isEqualTo(DateUtils.formatDateInWelsh(

@@ -44,7 +44,7 @@ public class EndHearingScheduledBusinessProcessCallbackHandler extends CallbackH
 
     private CallbackResponse endHearingScheduledBusinessProcess(CallbackParams callbackParams) {
         log.info("End hearing scheduled business process for caseId: {}",
-                 ((GeneralApplicationCaseData)callbackParams.getBaseCaseData()).getCcdCaseReference());
+                 callbackParams.getGeneralApplicationCaseData().getCcdCaseReference());
         GeneralApplicationCaseData data = caseDetailsConverter.toGeneralApplicationCaseData(callbackParams.getRequest().getCaseDetails());
         parentCaseUpdateHelper.updateParentWithGAState(
                 data, HEARING_SCHEDULED.getDisplayedValue());
@@ -55,7 +55,7 @@ public class EndHearingScheduledBusinessProcessCallbackHandler extends CallbackH
     private CallbackResponse evaluateReady(CallbackParams callbackParams,
                                            CaseState newState) {
         log.info("Evaluate ready for caseId: {}",
-                 ((GeneralApplicationCaseData)callbackParams.getBaseCaseData()).getCcdCaseReference());
+                 callbackParams.getGeneralApplicationCaseData().getCcdCaseReference());
         Map<String, Object> output = callbackParams.getRequest().getCaseDetails().getData();
 
         return AboutToStartOrSubmitCallbackResponse.builder()

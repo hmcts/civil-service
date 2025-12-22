@@ -18,18 +18,41 @@ public class CallbackParams {
     private Map<Params, Object> params;
     private CallbackVersion version;
     private String pageId;
-    private CaseData caseData;
-    private CaseData caseDataBefore;
-    private BaseCaseData baseCaseData;
-    private BaseCaseData baseCaseDataBefore;
-    private boolean isGeneralApplicationCase;
-    private boolean isCivilCase;
+    private BaseCaseData caseData;
+    private BaseCaseData caseDataBefore;
+    private boolean isGeneralApplicationCaseType;
+    private boolean isCivilCaseType;
+
+    public CaseData getCaseData() {
+        if (caseData instanceof CaseData civilCaseData) {
+            return civilCaseData;
+        }
+        throw new IllegalStateException("CallbackParams does not contain CaseData");
+    }
+
+    public CaseData getCaseDataBefore() {
+        if (null == caseDataBefore) {
+            return null;
+        } else if (caseDataBefore instanceof CaseData civilCaseData) {
+            return civilCaseData;
+        }
+        throw new IllegalStateException("CallbackParams does not contain CaseDataBefore");
+    }
 
     public GeneralApplicationCaseData getGeneralApplicationCaseData() {
-        if (baseCaseData instanceof GeneralApplicationCaseData gaCaseData) {
+        if (caseData instanceof GeneralApplicationCaseData gaCaseData) {
             return gaCaseData;
         }
         throw new IllegalStateException("CallbackParams does not contain GeneralApplicationCaseData");
+    }
+
+    public GeneralApplicationCaseData getGeneralApplicationCaseDataBefore() {
+        if (null == caseDataBefore) {
+            return null;
+        } else if (caseDataBefore instanceof GeneralApplicationCaseData gaCaseData) {
+            return gaCaseData;
+        }
+        throw new IllegalStateException("CallbackParams does not contain GeneralApplicationCaseDataBefore");
     }
 
     public enum Params {

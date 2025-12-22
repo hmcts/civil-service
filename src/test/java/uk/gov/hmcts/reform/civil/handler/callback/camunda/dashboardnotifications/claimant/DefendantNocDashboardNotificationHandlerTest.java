@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -109,14 +110,13 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         void shouldRecordScenarioWhenTrialReadyApplicantIsNullAndFastTrack() {
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
-            CaseData caseData = CaseData.builder()
-                .ccdCaseReference(123455L)
-                .trialReadyApplicant(null)
-                .drawDirectionsOrderRequired(YesOrNo.YES)
-                .drawDirectionsOrderSmallClaims(NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .orderType(OrderType.DECIDE_DAMAGES)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCcdCaseReference(123455L);
+            caseData.setTrialReadyApplicant(null);
+            caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
+            caseData.setDrawDirectionsOrderSmallClaims(NO);
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setOrderType(OrderType.DECIDE_DAMAGES);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_NOC.name()).build()
@@ -145,7 +145,8 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         void shouldRecordScenarioWhenHearingFeePaymentStatusIsNotPaid() {
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
-            CaseData caseData = CaseData.builder().ccdCaseReference(123455L).build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCcdCaseReference(123455L);
 
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -176,11 +177,11 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         void shouldRecordScenarioWhenHearingFeePaymentStatusIsFailed() {
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
-            PaymentDetails paymentDetails = PaymentDetails.builder().status(PaymentStatus.FAILED).build();
-            CaseData caseData = CaseData.builder()
-                .ccdCaseReference(123455L)
-                .hearingFeePaymentDetails(paymentDetails)
-                .build();
+            PaymentDetails paymentDetails = new PaymentDetails();
+            paymentDetails.setStatus(PaymentStatus.FAILED);
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCcdCaseReference(123455L);
+            caseData.setHearingFeePaymentDetails(paymentDetails);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_NOC.name()).build()
@@ -207,14 +208,13 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         void shouldNotRecordScenarioWhenHearingFeePaymentStatusIsHelpWithFeeRequestedFullRemission() {
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
-            CaseData caseData = CaseData.builder()
-                .ccdCaseReference(123455L)
-                .hearingFeePaymentDetails(null)
-                .hwfFeeType(FeeType.HEARING)
-                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
-                                              .hwfFullRemissionGrantedForHearingFee(YesOrNo.YES)
-                                              .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCcdCaseReference(123455L);
+            caseData.setHearingFeePaymentDetails(null);
+            caseData.setHwfFeeType(FeeType.HEARING);
+            FeePaymentOutcomeDetails feePaymentOutcomeDetails  = new FeePaymentOutcomeDetails();
+            feePaymentOutcomeDetails.setHwfFullRemissionGrantedForHearingFee(YesOrNo.YES);
+            caseData.setFeePaymentOutcomeDetails(feePaymentOutcomeDetails);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_NOC.name()).build()
@@ -241,13 +241,11 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         void shouldRecordScenarioWhenHearingFeePaymentStatusIsHelpWithFeeRequestedButFeePaymentOutcomeIsNotDone() {
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
-            CaseData caseData = CaseData.builder()
-                .ccdCaseReference(123455L)
-                .hearingFeePaymentDetails(null)
-                .hwfFeeType(FeeType.HEARING)
-                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
-                                              .build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCcdCaseReference(123455L);
+            caseData.setHearingFeePaymentDetails(null);
+            caseData.setHwfFeeType(FeeType.HEARING);
+            caseData.setFeePaymentOutcomeDetails(new FeePaymentOutcomeDetails());
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_NOC.name()).build()
@@ -274,10 +272,9 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         void shouldNotRecordTrialArrangementsScenarioWhenTrialReadyApplicantIsNotNull() {
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
-            CaseData caseData = CaseData.builder()
-                .ccdCaseReference(123455L)
-                .trialReadyApplicant(YesOrNo.YES)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCcdCaseReference(123455L);
+            caseData.setTrialReadyApplicant(YesOrNo.YES);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_NOC.name()).build()
@@ -304,11 +301,11 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         void shouldNotRecordHearingFeeScenarioWhenPaymentStatusIsSuccess() {
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
-            PaymentDetails paymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS).build();
-            CaseData caseData = CaseData.builder()
-                .ccdCaseReference(123455L)
-                .hearingFeePaymentDetails(paymentDetails)
-                .build();
+            PaymentDetails paymentDetails = new PaymentDetails();
+            paymentDetails.setStatus(PaymentStatus.SUCCESS);
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCcdCaseReference(123455L);
+            caseData.setHearingFeePaymentDetails(paymentDetails);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_NOC.name()).build()
@@ -336,9 +333,8 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             when(toggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
 
-            CaseData caseData = CaseData.builder()
-                .ccdCaseReference(123455L)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCcdCaseReference(123455L);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_NOC.name()).build()
@@ -360,15 +356,14 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
             when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
             when(toggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
 
-            JudgmentDetails activeJudgment = JudgmentDetails.builder().judgmentId(123).build();
-
-            CaseData caseData = CaseData.builder()
-                .ccdCaseReference(123455L)
-                .previousCCDState(All_FINAL_ORDERS_ISSUED)
-                .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
-                .applicant1Represented(YesOrNo.NO)
-                .activeJudgment(activeJudgment)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCcdCaseReference(123455L);
+            caseData.setPreviousCCDState(All_FINAL_ORDERS_ISSUED);
+            caseData.setCcdState(PROCEEDS_IN_HERITAGE_SYSTEM);
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            JudgmentDetails activeJudgment = new JudgmentDetails();
+            activeJudgment.setJudgmentId(123);
+            caseData.setActiveJudgment(activeJudgment);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_NOC.name()).build()

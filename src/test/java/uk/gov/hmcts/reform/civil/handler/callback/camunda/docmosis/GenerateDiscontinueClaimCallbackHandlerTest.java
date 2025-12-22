@@ -56,7 +56,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_NOTICE_OF_DISCONTINUANCE;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.NOTICE_OF_DISCONTINUANCE;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DIRECTIONS_QUESTIONNAIRE;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -88,13 +88,15 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
         @ValueSource(booleans = {true, false})
         void shouldUpdateCamundaVariables_whenInvoked(Boolean toggleState) {
             //Given
+            Organisation organisation = new Organisation();
+            organisation.setOrganisationID("Id");
+            OrganisationPolicy organisationPolicy = new OrganisationPolicy();
+            organisationPolicy.setOrganisation(organisation);
+            BusinessProcess businessProcess = new BusinessProcess();
+            businessProcess.setProcessInstanceId(PROCESS_INSTANCE_ID);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                                  .organisation(Organisation.builder()
-                                                                    .organisationID("Id")
-                                                                    .build())
-                                                  .build())
-                .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build()).build();
+                .applicant1OrganisationPolicy(organisationPolicy)
+                .businessProcess(businessProcess).build();
             caseData.setCourtPermissionNeeded(
                 toggleState ? SettleDiscontinueYesOrNoList.YES : SettleDiscontinueYesOrNoList.NO);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -110,15 +112,16 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
             when(formGenerator.generateDocs(any(CaseData.class), anyString(), any(Address.class), anyString(), anyString(), anyBoolean())).thenReturn(getCaseDocument());
             when(organisationService.findOrganisationById(anyString())).thenReturn(getOrganisation());
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                    .respondent1(getRespondent1PartyDetails())
-                    .applicant1(getApplicant1PartyDetails())
-                    .courtPermissionNeeded(SettleDiscontinueYesOrNoList.YES)
-                .respondent1DQ(Respondent1DQ.builder().build())
-                    .isPermissionGranted(SettleDiscontinueYesOrNoList.YES)
-                    .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
-                    .typeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE)
-                    .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1(getRespondent1PartyDetails());
+            caseData.setApplicant1(getApplicant1PartyDetails());
+            caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.YES);
+            caseData.setRespondent1DQ(new Respondent1DQ());
+            caseData.setIsPermissionGranted(SettleDiscontinueYesOrNoList.YES);
+            BusinessProcess businessProcess = new BusinessProcess();
+            businessProcess.setProcessInstanceId(PROCESS_INSTANCE_ID);
+            caseData.setBusinessProcess(businessProcess);
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().setEventId(GEN_NOTICE_OF_DISCONTINUANCE.name());
 
@@ -155,25 +158,26 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
             when(formGenerator.generateDocs(any(CaseData.class), anyString(), any(Address.class), anyString(), anyString(), anyBoolean())).thenReturn(getCaseDocument());
             when(organisationService.findOrganisationById(anyString())).thenReturn(getOrganisationWithoutName());
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                    .respondent1(getRespondent1PartyDetails())
-                .respondent1DQ(Respondent1DQ.builder()
-                                   .respondent1DQStatementOfTruth(StatementOfTruth.builder()
-                                                                      .name("Signer 2 Name")
-                                                                      .build())
-                                   .build())
-                .respondent2DQ(Respondent2DQ.builder()
-                                   .respondent2DQStatementOfTruth(StatementOfTruth.builder()
-                                                                      .name("Signer 3 Name")
-                                                                      .build())
-                                   .build())
-                .addRespondent2(YesOrNo.YES)
-                .respondent2SameLegalRepresentative(YesOrNo.NO)
-                    .applicant1(getApplicant1PartyDetails())
-                    .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO)
-                    .typeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE)
-                    .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
-                    .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1(getRespondent1PartyDetails());
+            StatementOfTruth statementOfTruth = new StatementOfTruth();
+            statementOfTruth.setName("Signer 2 Name");
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQStatementOfTruth(statementOfTruth);
+            caseData.setRespondent1DQ(respondent1DQ);
+            StatementOfTruth statementOfTruth1 = new StatementOfTruth();
+            statementOfTruth1.setName("Signer 3 Name");
+            Respondent2DQ respondent2DQ = new Respondent2DQ();
+            respondent2DQ.setRespondent2DQStatementOfTruth(statementOfTruth1);
+            caseData.setRespondent2DQ(respondent2DQ);
+            caseData.setAddRespondent2(YesOrNo.YES);
+            caseData.setRespondent2SameLegalRepresentative(YesOrNo.NO);
+            caseData.setApplicant1(getApplicant1PartyDetails());
+            caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.NO);
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE);
+            BusinessProcess businessProcess = new BusinessProcess();
+            businessProcess.setProcessInstanceId(PROCESS_INSTANCE_ID);
+            caseData.setBusinessProcess(businessProcess);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().setEventId(GEN_NOTICE_OF_DISCONTINUANCE.name());
 
@@ -219,13 +223,14 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
             when(formGenerator.generateDocs(any(CaseData.class), anyString(), any(Address.class), anyString(), anyString(), anyBoolean())).thenReturn(getCaseDocument());
             when(organisationService.findOrganisationById(anyString())).thenReturn(getOrganisationWithoutName());
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1(getRespondent1PartyDetails())
-                .applicant1(getApplicant1PartyDetails())
-                .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO)
-                .typeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE)
-                .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1(getRespondent1PartyDetails());
+            caseData.setApplicant1(getApplicant1PartyDetails());
+            caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.NO);
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE);
+            BusinessProcess businessProcess = new BusinessProcess();
+            businessProcess.setProcessInstanceId(PROCESS_INSTANCE_ID);
+            caseData.setBusinessProcess(businessProcess);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().setEventId(GEN_NOTICE_OF_DISCONTINUANCE.name());
 
@@ -262,17 +267,18 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
             when(formGenerator.generateDocs(any(CaseData.class), anyString(), any(Address.class), anyString(), anyString(), anyBoolean())).thenReturn(getCaseDocument());
             when(organisationService.findOrganisationById(anyString())).thenReturn(getOrganisationWithoutName());
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1(getRespondent1PartyDetails())
-                .respondent2(getRespondent2PartyDetails())
-                .respondent1Represented(YesOrNo.NO)
-                .respondent2Represented(YesOrNo.NO)
-                .addRespondent2(YesOrNo.YES)
-                .applicant1(getApplicant1PartyDetails())
-                .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO)
-                .typeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE)
-                .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1(getRespondent1PartyDetails());
+            caseData.setRespondent2(getRespondent2PartyDetails());
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setRespondent2Represented(YesOrNo.NO);
+            caseData.setAddRespondent2(YesOrNo.YES);
+            caseData.setApplicant1(getApplicant1PartyDetails());
+            caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.NO);
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE);
+            BusinessProcess businessProcess = new BusinessProcess();
+            businessProcess.setProcessInstanceId(PROCESS_INSTANCE_ID);
+            caseData.setBusinessProcess(businessProcess);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().setEventId(GEN_NOTICE_OF_DISCONTINUANCE.name());
 
@@ -308,21 +314,24 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
         void shouldGenerateNoticeOfDiscontinueDocForAllParties_whenNoCourtPermissionRequired_1vs2_serviceAddress() {
             when(formGenerator.generateDocs(any(CaseData.class), anyString(), any(Address.class), anyString(), anyString(), anyBoolean())).thenReturn(getCaseDocument());
             when(organisationService.findOrganisationById(anyString())).thenReturn(getOrganisationWithoutName());
-            Address serviceAddress = Address.builder().addressLine1("Service").postCode("S3RV 1C3").build();
+            Address serviceAddress = new Address();
+            serviceAddress.setAddressLine1("Service");
+            serviceAddress.setPostCode("S3RV 1C3");
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1(getRespondent1PartyDetails())
-                .respondent2(getRespondent2PartyDetails())
-                .addRespondent2(YesOrNo.YES)
-                .respondent2SameLegalRepresentative(YesOrNo.NO)
-                .respondentSolicitor1ServiceAddress(serviceAddress)
-                .applicantSolicitor1ServiceAddress(serviceAddress)
-                .respondentSolicitor2ServiceAddress(serviceAddress)
-                .applicant1(getApplicant1PartyDetails())
-                .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO)
-                .typeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE)
-                .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1(getRespondent1PartyDetails());
+            caseData.setRespondent2(getRespondent2PartyDetails());
+            caseData.setAddRespondent2(YesOrNo.YES);
+            caseData.setRespondent2SameLegalRepresentative(YesOrNo.NO);
+            caseData.setRespondentSolicitor1ServiceAddress(serviceAddress);
+            caseData.setApplicantSolicitor1ServiceAddress(serviceAddress);
+            caseData.setRespondentSolicitor2ServiceAddress(serviceAddress);
+            caseData.setApplicant1(getApplicant1PartyDetails());
+            caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.NO);
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE);
+            BusinessProcess businessProcess = new BusinessProcess();
+            businessProcess.setProcessInstanceId(PROCESS_INSTANCE_ID);
+            caseData.setBusinessProcess(businessProcess);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().setEventId(GEN_NOTICE_OF_DISCONTINUANCE.name());
 
@@ -356,25 +365,29 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             when(formGenerator.generateDocs(any(CaseData.class), anyString(), any(Address.class), anyString(), anyString(), anyBoolean())).thenReturn(getCaseDocument());
             when(organisationService.findOrganisationById(anyString())).thenReturn(getOrganisation());
-            Address serviceAddress = Address.builder().addressLine1("Service").postCode("S3RV 1C3").build();
-            Address correspondenceAddress =
-                Address.builder().addressLine1("Correspondence").postCode("C0RR 5P0N").build();
+            Address serviceAddress = new Address();
+            serviceAddress.setAddressLine1("Service");
+            serviceAddress.setPostCode("S3RV 1C3");
+            Address correspondenceAddress = new Address();
+            correspondenceAddress.setAddressLine1("Correspondence");
+            correspondenceAddress.setPostCode("C0RR 5P0N");
 
-            CaseData caseData = CaseDataBuilder.builder().atStateSpec1v2ClaimSubmitted().build().toBuilder()
-                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                .respondent1(getRespondent1PartyDetails())
-                .respondent2SameLegalRepresentative(YesOrNo.NO)
-                .specApplicantCorrespondenceAddressdetails(correspondenceAddress)
-                .specRespondentCorrespondenceAddressdetails(correspondenceAddress)
-                .specRespondent2CorrespondenceAddressdetails(correspondenceAddress)
-                .respondent2(getRespondent2PartyDetails())
-                .respondentSolicitor1ServiceAddress(serviceAddress)
-                .applicantSolicitor1ServiceAddress(serviceAddress)
-                .applicant1(getApplicant1PartyDetails())
-                .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO)
-                .typeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE)
-                .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateSpec1v2ClaimSubmitted().build();
+            caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+            caseData.setRespondent1(getRespondent1PartyDetails());
+            caseData.setRespondent2SameLegalRepresentative(YesOrNo.NO);
+            caseData.setSpecApplicantCorrespondenceAddressdetails(correspondenceAddress);
+            caseData.setSpecRespondentCorrespondenceAddressdetails(correspondenceAddress);
+            caseData.setSpecRespondent2CorrespondenceAddressdetails(correspondenceAddress);
+            caseData.setRespondent2(getRespondent2PartyDetails());
+            caseData.setRespondentSolicitor1ServiceAddress(serviceAddress);
+            caseData.setApplicantSolicitor1ServiceAddress(serviceAddress);
+            caseData.setApplicant1(getApplicant1PartyDetails());
+            caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.NO);
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE);
+            BusinessProcess businessProcess = new BusinessProcess();
+            businessProcess.setProcessInstanceId(PROCESS_INSTANCE_ID);
+            caseData.setBusinessProcess(businessProcess);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().setEventId(GEN_NOTICE_OF_DISCONTINUANCE.name());
 
@@ -411,17 +424,20 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
             any(CaseData.class),
             anyString(), any(Address.class), anyString(), anyString(), anyBoolean()
         )).thenReturn(getCaseDocument());
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .respondent1(getRespondent1PartyDetails())
-            .applicant1(getApplicant1PartyDetails())
-            .respondent1Represented(YesOrNo.NO)
-            .typeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE)
-            .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO)
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH")
-                                                         .build()).build())
-            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        caseData.setRespondent1(getRespondent1PartyDetails());
+        caseData.setApplicant1(getApplicant1PartyDetails());
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE);
+        caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.NO);
+        RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
+        respondentLiPResponse.setRespondent1ResponseLanguage("BOTH");
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
+        caseData.setCaseDataLiP(caseDataLiP);
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setProcessInstanceId(PROCESS_INSTANCE_ID);
+        caseData.setBusinessProcess(businessProcess);
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GEN_NOTICE_OF_DISCONTINUANCE.name());
@@ -467,18 +483,18 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
     }
 
     private CaseDocument getCaseDocument() {
-        return CaseDocument.builder()
-                .createdBy("John")
-                .documentName("document name")
-                .documentSize(0L)
-                .documentType(NOTICE_OF_DISCONTINUANCE)
-                .createdDatetime(LocalDateTime.now())
-                .documentLink(Document.builder()
-                        .documentUrl("fake-url")
-                        .documentFileName("file-name")
-                        .documentBinaryUrl("binary-url")
-                        .build())
-                .build();
+        CaseDocument caseDocument = new CaseDocument();
+        caseDocument.setCreatedBy("John");
+        caseDocument.setDocumentName("document name");
+        caseDocument.setDocumentSize(0L);
+        caseDocument.setDocumentType(DIRECTIONS_QUESTIONNAIRE);
+        caseDocument.setCreatedDatetime(LocalDateTime.now());
+        Document documentLink = new Document();
+        documentLink.setDocumentUrl("fake-url");
+        documentLink.setDocumentFileName("file-name");
+        documentLink.setDocumentBinaryUrl("binary-url");
+        caseDocument.setDocumentLink(documentLink);
+        return  caseDocument;
     }
 
     private Optional<uk.gov.hmcts.reform.civil.prd.model.Organisation> getOrganisation() {

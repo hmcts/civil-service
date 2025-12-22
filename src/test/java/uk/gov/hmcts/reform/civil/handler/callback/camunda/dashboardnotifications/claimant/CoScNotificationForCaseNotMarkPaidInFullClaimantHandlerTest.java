@@ -53,8 +53,8 @@ class CoScNotificationForCaseNotMarkPaidInFullClaimantHandlerTest extends BaseCa
 
         @Test
         void shouldRecordScenario_whenInvokedCoScCaseNotMarkedPaidInFull() {
-            CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build().toBuilder().applicant1Represented(
-                YesOrNo.NO).build();
+            CaseData caseData = CaseDataBuilder.builder().atCaseProgressionCheck().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
 

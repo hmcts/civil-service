@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.PayImmediatelyConfText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.PartialAdmitPayImmediatelyConfirmationText;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 
@@ -183,7 +184,7 @@ class CaseDataToTextGeneratorTest {
     private PartialAdmitPayImmediatelyConfirmationText generatorHeader;
 
     private CaseData buildFullAdmitPayImmediatelyWithoutWhenBePaidProceedCaseData() {
-        return CaseData.builder()
+        return CaseDataBuilder.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .legacyCaseReference("claimNumber")
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)

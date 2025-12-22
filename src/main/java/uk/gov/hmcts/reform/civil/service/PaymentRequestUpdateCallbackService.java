@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.GENERALAPPLICATION_CASE_TYPE;
@@ -89,8 +90,7 @@ public class PaymentRequestUpdateCallbackService {
     private void handlePaymentUpdate(ServiceRequestUpdateDto dto, CaseData caseData, FeeType feeType) {
         CardPaymentStatusResponse paymentStatusResponse = buildPaymentStatusResponse(dto);
         String customerReference = getCustomerReference(dto, caseData, feeType);
-        caseData = updateCaseDataWithPaymentDetails(paymentStatusResponse, caseData, feeType, customerReference);
-        updatePaymentStatus(feeType, dto.getCcdCaseNumber(), caseData);
+        updatePaymentStatus(feeType, dto.getCcdCaseNumber(), updateCaseDataWithPaymentDetails(paymentStatusResponse, caseData, feeType, customerReference));
     }
 
     private boolean isPaid(ServiceRequestUpdateDto dto) {
@@ -206,22 +206,18 @@ public class PaymentRequestUpdateCallbackService {
                                                       FeeType feeType,
                                                       String customerReference) {
         PaymentDetails existingPayment = getPaymentDetails(feeType, caseData);
-        PaymentDetails.PaymentDetailsBuilder builder = Optional.ofNullable(existingPayment)
-                .map(PaymentDetails::toBuilder)
-                .orElse(PaymentDetails.builder());
+        PaymentDetails paymentDetails = existingPayment != null ? existingPayment : new PaymentDetails();
 
-        builder.status(resolvePaymentStatus(response.getStatus()))
-                .reference(response.getPaymentReference())
-                .errorCode(response.getErrorCode())
-                .errorMessage(response.getErrorDescription());
+        paymentDetails.setStatus(resolvePaymentStatus(response.getStatus()));
+        paymentDetails.setReference(response.getPaymentReference());
+        paymentDetails.setErrorCode(response.getErrorCode());
+        paymentDetails.setErrorMessage(response.getErrorDescription());
 
         if (customerReference != null) {
-            builder.customerReference(customerReference);
-        } else if (existingPayment != null) {
-            builder.customerReference(existingPayment.getCustomerReference());
+            paymentDetails.setCustomerReference(customerReference);
         }
 
-        return applyPaymentDetails(caseData, feeType, builder.build());
+        return applyPaymentDetails(caseData, feeType, paymentDetails);
     }
 
     private PaymentDetails getPaymentDetails(FeeType feeType, CaseData caseData) {
@@ -233,11 +229,12 @@ public class PaymentRequestUpdateCallbackService {
     }
 
     private CaseData applyPaymentDetails(CaseData caseData, FeeType feeType, PaymentDetails paymentDetails) {
-        return switch (feeType) {
-            case HEARING -> caseData.toBuilder().hearingFeePaymentDetails(paymentDetails).build();
-            case CLAIMISSUED -> caseData.toBuilder().claimIssuedPaymentDetails(paymentDetails).build();
+        switch (feeType) {
+            case HEARING -> caseData.setHearingFeePaymentDetails(paymentDetails);
+            case CLAIMISSUED -> caseData.setClaimIssuedPaymentDetails(paymentDetails);
             default -> throw new IllegalArgumentException("Unsupported fee type for case update: " + feeType);
-        };
+        }
+        return caseData;
     }
 
     private PaymentStatus resolvePaymentStatus(String status) {

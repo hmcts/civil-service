@@ -1,19 +1,20 @@
 package uk.gov.hmcts.reform.civil.ga.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
+import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
+import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaPaymentRequestUpdateCallbackService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.ga.service.HwfNotificationService;
@@ -36,27 +37,31 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_GA_ADD_HWF;
 
 @Slf4j
 @Service
-public class GaFeePaymentOutcomeHWFCallBackHandler extends HWFCallbackHandlerBase {
+@RequiredArgsConstructor
+public class GaFeePaymentOutcomeHWFCallBackHandler extends CallbackHandler implements GeneralApplicationCallbackHandler {
 
     public static final String WRONG_REMISSION_TYPE_SELECTED = "Incorrect remission type selected";
     public static final String CASE_STATE_INVALID = "Case is in invalid state";
     public static final String PROCESS_FEE_PAYMENT_FAILED = "Process fee payment failed";
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.FEE_PAYMENT_OUTCOME_GA);
 
-    public GaFeePaymentOutcomeHWFCallBackHandler(ObjectMapper objectMapper,
-                                                 GaPaymentRequestUpdateCallbackService paymentRequestUpdateCallbackService,
-                                                 HwfNotificationService hwfNotificationService, FeatureToggleService featureToggleService) {
-        super(objectMapper, EVENTS, paymentRequestUpdateCallbackService, hwfNotificationService, featureToggleService);
+    private final ObjectMapper objectMapper;
+    private final GaPaymentRequestUpdateCallbackService paymentRequestUpdateCallbackService;
+    private final HwfNotificationService hwfNotificationService;
+
+    @Override
+    public List<CaseEvent> handledEvents() {
+        return EVENTS;
     }
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::setData)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::submitFeePaymentOutcome)
-            .put(callbackKey(MID, "remission-type"), this::validateSelectedRemissionType)
-            .put(callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse)
-            .build();
+        return Map.of(
+            callbackKey(ABOUT_TO_START), this::setData,
+            callbackKey(ABOUT_TO_SUBMIT), this::submitFeePaymentOutcome,
+            callbackKey(MID, "remission-type"), this::validateSelectedRemissionType,
+            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
+        );
     }
 
     private CallbackResponse setData(CallbackParams callbackParams) {
@@ -107,14 +112,14 @@ public class GaFeePaymentOutcomeHWFCallBackHandler extends HWFCallbackHandlerBas
         caseData = caseDataBuilder.build();
         caseData = HwFFeeTypeUtil.updateHwfReferenceNumber(caseData);
 
-        assert paymentRequestUpdateCallbackService != null;
         GeneralApplicationCaseData processedCaseData = paymentRequestUpdateCallbackService.processHwf(caseData);
-        assert hwfNotificationService != null;
-        hwfNotificationService.sendNotification(processedCaseData, CaseEvent.FEE_PAYMENT_OUTCOME_GA);
+
         List<String> errors = new ArrayList<>();
         if (Objects.isNull(processedCaseData)) {
             errors.add(PROCESS_FEE_PAYMENT_FAILED);
         } else {
+            hwfNotificationService.sendNotification(processedCaseData, CaseEvent.FEE_PAYMENT_OUTCOME_GA);
+
             if (processedCaseData.isHWFTypeApplication()) {
 
                 CaseEvent caseEvent = INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT;

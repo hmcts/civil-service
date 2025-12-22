@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbac
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.handleadmitpartofclaim.HandleAdmitPartOfClaimCaseUpdater;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 
@@ -55,7 +56,7 @@ class HandleAdmitPartOfClaimTest {
 
     @Test
     void shouldReturnErrorResponseWhenPaymentDateIsInvalid() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
         List<String> errors = Collections.singletonList("Invalid payment date");
 
@@ -70,7 +71,7 @@ class HandleAdmitPartOfClaimTest {
 
     @Test
     void shouldUpdateCaseDataWhenPaymentDateIsValid() {
-        CaseData caseData = CaseData.builder().totalClaimAmount(BigDecimal.valueOf(1000)).build();
+        CaseData caseData = CaseDataBuilder.builder().totalClaimAmount(BigDecimal.valueOf(1000)).build();
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
         List<String> errors = Collections.emptyList();
@@ -86,7 +87,7 @@ class HandleAdmitPartOfClaimTest {
 
     @Test
     void shouldUpdateResponseClaimTrackWhenEventIsDefendantResponseSpec() {
-        CaseData caseData = CaseData.builder().totalClaimAmount(BigDecimal.valueOf(1000)).build();
+        CaseData caseData = CaseDataBuilder.builder().totalClaimAmount(BigDecimal.valueOf(1000)).build();
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
         List<String> errors = Collections.emptyList();

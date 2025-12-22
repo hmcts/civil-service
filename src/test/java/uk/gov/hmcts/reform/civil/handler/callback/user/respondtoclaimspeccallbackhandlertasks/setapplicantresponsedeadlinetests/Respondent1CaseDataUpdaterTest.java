@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbac
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 
 import java.time.LocalDateTime;
@@ -35,28 +36,25 @@ class Respondent1CaseDataUpdaterTest {
 
     @BeforeEach
     void setUp() {
-        correspondenceAddress = Address.builder()
-                .postCode("SW1A 1AA")
-                .addressLine1("Correspondence Street")
-                .build();
+        correspondenceAddress = new Address();
+        correspondenceAddress.setPostCode("SW1A 1AA");
+        correspondenceAddress.setAddressLine1("Correspondence Street");
 
-        respondent1CopyAddress = Address.builder()
-                .addressLine1("Triple street")
-                .postCode("AB1 2CD")
-                .build();
+        respondent1CopyAddress = new Address();
+        respondent1CopyAddress.setAddressLine1("Triple street");
+        respondent1CopyAddress.setPostCode("AB1 2CD");
 
-        caseData = CaseData.builder()
-                .specAoSApplicantCorrespondenceAddressRequired(NO)
-                .specAoSApplicantCorrespondenceAddressdetails(correspondenceAddress)
-                .respondent1(Party.builder()
-                        .type(Party.Type.INDIVIDUAL)
-                        .partyName("RESPONDENT_INDIVIDUAL")
-                        .build())
-                .respondent1Copy(Party.builder()
-                        .partyName("Party 2")
-                        .primaryAddress(respondent1CopyAddress)
-                        .build())
-                .build();
+        caseData = CaseDataBuilder.builder().build();
+        caseData.setSpecAoSApplicantCorrespondenceAddressRequired(NO);
+        caseData.setSpecAoSApplicantCorrespondenceAddressdetails(correspondenceAddress);
+        Party individual = new Party();
+        individual.setType(Party.Type.INDIVIDUAL);
+        individual.setPartyName("RESPONDENT_INDIVIDUAL");
+        caseData.setRespondent1(individual);
+        Party party = new Party();
+        party.setPartyName("Party 2");
+        party.setPrimaryAddress(respondent1CopyAddress);
+        caseData.setRespondent1Copy(party);
 
         // Mock the deadline calculator
         when(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(anyInt(), any()))

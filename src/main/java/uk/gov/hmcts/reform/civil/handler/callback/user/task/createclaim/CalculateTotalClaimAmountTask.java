@@ -57,18 +57,16 @@ public class CalculateTotalClaimAmountTask {
                 .build();
         }
 
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-
-        caseDataBuilder.totalClaimAmount(
+        caseData.setTotalClaimAmount(
             MonetaryConversions.penniesToPounds(totalClaimAmount).setScale(2));
 
         totalAmount = totalAmount.concat(" | **Total** | £ " + MonetaryConversions
             .penniesToPounds(totalClaimAmount).setScale(2) + " | ");
 
-        caseDataBuilder.claimAmountBreakupSummaryObject(totalAmount);
+        caseData.setClaimAmountBreakupSummaryObject(totalAmount);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 }

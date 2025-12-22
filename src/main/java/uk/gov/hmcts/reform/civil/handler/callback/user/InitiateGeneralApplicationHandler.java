@@ -138,7 +138,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             errors.add(RESP_NOT_ASSIGNED_ERROR);
         }
         log.info("initiating general application allowed for caseId {}", caseData.getCcdCaseReference());
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
 
         if (initiateGeneralApplicationService.caseContainsLiP(caseData)) {
@@ -290,8 +289,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
 
         if (caseData.getGeneralAppTypeLR() != null && isCoscEnabledAndUserNotLip(callbackParams)) {
-            caseData.setGeneralAppType(GAApplicationType.builder().types(GATypeHelper.getGATypes(
-                caseData.getGeneralAppTypeLR().getTypes())).build());
+            GAApplicationType gaApplicationType = new GAApplicationType();
+            gaApplicationType.setTypes(GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes()));
+            caseData.setGeneralAppType(gaApplicationType);
         }
         caseData = setWithNoticeByType(caseData);
         Fee feeForGA = feesService.getFeeForGA(caseData);
@@ -305,19 +305,10 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 .build();
     }
 
-    private CaseData.CaseDataBuilder<?, ?> getSharedData(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        return caseData.toBuilder();
-    }
-
     private CallbackResponse submitApplication(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         caseData = setWithNoticeByType(caseData);
         final UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
-
-        // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        final CaseData.CaseDataBuilder<?, ?> dataBuilder = getSharedData(callbackParams);
 
         if (caseData.getGeneralAppPBADetails() == null) {
             GAPbaDetails generalAppPBADetails = new GAPbaDetails();
@@ -349,11 +340,13 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         }
         if (caseData.getGeneralAppTypeLR() != null && isCoscEnabledAndUserNotLip(callbackParams)) {
             var generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
-            caseData.setGeneralAppType(GAApplicationType.builder().types(generalAppTypes).build());
+            GAApplicationType gaApplicationType = new GAApplicationType();
+            gaApplicationType.setTypes(generalAppTypes);
+            caseData.setGeneralAppType(gaApplicationType);
         }
 
         Map<String, Object> data = initiateGeneralApplicationService
-                .buildCaseData(dataBuilder, caseData, userDetails, callbackParams.getParams().get(BEARER_TOKEN)
+                .buildCaseData(caseData, userDetails, callbackParams.getParams().get(BEARER_TOKEN)
                         .toString()).toMap(objectMapper);
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(data).build();

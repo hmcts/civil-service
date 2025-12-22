@@ -59,13 +59,13 @@ class FreeFormOrderGeneratorTest {
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
 
-    private static final String templateName = "Free_form_order_%s.pdf";
-    private static final String fileName_application = String.format(
-        templateName,
+    private static final String TEMPLATE_NAME = "Free_form_order_%s.pdf";
+    private static final String FILE_NAME_APPLICATION = String.format(
+        TEMPLATE_NAME,
         LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
     );
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
-        .documentName(fileName_application)
+        .documentName(FILE_NAME_APPLICATION)
         .documentType(GENERAL_ORDER)
         .build();
 
@@ -184,7 +184,6 @@ class FreeFormOrderGeneratorTest {
 
     @Test
     void test_getTemplate() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
         assertThat(generator.getTemplate(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE)).isEqualTo(DocmosisTemplates.FREE_FORM_ORDER);
     }
 
@@ -214,7 +213,7 @@ class FreeFormOrderGeneratorTest {
             () -> assertEquals(freeFormOrder.getClaimant1Name(), caseData.getClaimant1PartyName()),
             () -> assertEquals(freeFormOrder.getJudgeNameTitle(), caseData.getJudgeTitle()),
             () -> assertEquals(freeFormOrder.getClaimant2Name(), caseData.getClaimant2PartyName()),
-            () -> assertEquals(freeFormOrder.getCourtName(), "London"),
+            () -> assertEquals("London", freeFormOrder.getCourtName()),
             () -> assertEquals(freeFormOrder.getDefendant1Name(), caseData.getDefendant1PartyName()),
             () -> assertEquals(freeFormOrder.getDefendant2Name(), caseData.getDefendant2PartyName()),
             () -> assertEquals(YES, freeFormOrder.getIsMultiParty())
@@ -252,7 +251,7 @@ class FreeFormOrderGeneratorTest {
             () -> assertEquals(freeFormOrder.getClaimant1Name(), caseData.getClaimant1PartyName()),
             () -> assertEquals(freeFormOrder.getJudgeNameTitle(), caseData.getJudgeTitle()),
             () -> assertNull(freeFormOrder.getClaimant2Name()),
-            () -> assertEquals(freeFormOrder.getCourtName(), "Manchester"),
+            () -> assertEquals("Manchester", freeFormOrder.getCourtName()),
             () -> assertEquals(freeFormOrder.getDefendant1Name(), caseData.getDefendant1PartyName()),
             () -> assertNull(freeFormOrder.getDefendant2Name()),
             () -> assertEquals(NO, freeFormOrder.getIsMultiParty())

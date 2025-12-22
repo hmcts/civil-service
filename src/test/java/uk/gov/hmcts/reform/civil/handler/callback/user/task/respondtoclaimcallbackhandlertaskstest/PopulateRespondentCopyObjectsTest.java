@@ -93,8 +93,8 @@ class PopulateRespondentCopyObjectsTest  {
         CaseData caseData = CaseDataBuilder.builder()
             .multiPartyClaimOneDefendantSolicitor()
             .respondent1ResponseDate(LocalDateTime.now())
-            .build().toBuilder().ccdCaseReference(1234L)
             .build();
+        caseData.setCcdCaseReference(1234L);
 
         CallbackParams callbackParams = CallbackParams.builder()
             .caseData(caseData)
@@ -115,8 +115,8 @@ class PopulateRespondentCopyObjectsTest  {
 
         CaseData caseData = CaseDataBuilder.builder()
             .respondent2ResponseDate(LocalDateTime.now())
-            .build().toBuilder().ccdCaseReference(1234L)
             .build();
+        caseData.setCcdCaseReference(1234L);
 
         CallbackParams callbackParams = CallbackParams.builder()
             .caseData(caseData)
@@ -139,8 +139,8 @@ class PopulateRespondentCopyObjectsTest  {
         LocalDateTime pastDeadline = LocalDateTime.now().minusDays(3);
         CaseData caseData = CaseDataBuilder.builder()
             .respondent1ResponseDeadline(pastDeadline)
-            .build().toBuilder().ccdCaseReference(1234L)
             .build();
+        caseData.setCcdCaseReference(1234L);
 
         when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
 
@@ -162,8 +162,8 @@ class PopulateRespondentCopyObjectsTest  {
         LocalDateTime pastDeadline = LocalDateTime.now().minusDays(3);
         CaseData caseData = CaseDataBuilder.builder()
             .respondent2ResponseDeadline(pastDeadline)
-            .build().toBuilder().ccdCaseReference(1234L)
             .build();
+        caseData.setCcdCaseReference(1234L);
 
         when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(false);
         when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);

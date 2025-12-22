@@ -831,13 +831,12 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     }
 
     private Bundle createBundle(String id, String title, String description, Optional<String> stitchStatus, Optional<LocalDateTime> createdOn) {
-        Bundle bundle = Bundle.builder()
-            .id(id)
-            .title(title)
-            .description(description)
-            .stitchStatus(stitchStatus)
-            .createdOn(createdOn)
-            .build();
+        Bundle bundle = new Bundle()
+            .setId(id)
+            .setTitle(title)
+            .setDescription(description)
+            .setStitchStatus(stitchStatus)
+            .setCreatedOn(createdOn);
         return bundle;
     }
 
@@ -1031,10 +1030,9 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
             "Trial Bundle",
             Optional.of("NEW"),
             Optional.of(LocalDateTime.of(2022, 05, 15, 12, 12, 12)))));
-        Bundle bundle2 = Bundle.builder()
-            .id("1")
-            .title("Trial Bundle")
-            .build();
+        Bundle bundle2 = new Bundle()
+            .setId("1")
+            .setTitle("Trial Bundle");
         caseBundles.add(new IdValue<>("1", bundle2));
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();

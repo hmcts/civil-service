@@ -97,7 +97,7 @@ public abstract class GeneralApplicationBaseCallbackHandlerTest {
             .request(CallbackRequest.builder()
                          .caseDetails(CaseDetails.builder().data(new HashMap<>()).id(CASE_ID).build())
                          .build())
-            .baseCaseData(caseData)
+            .caseData(caseData)
             .version(version)
             .params(params)
             .build();
@@ -144,7 +144,7 @@ public abstract class GeneralApplicationBaseCallbackHandlerTest {
                          .caseDetails(CaseDetails.builder().data(new HashMap<>()).id(CASE_ID).build())
                          .eventId(eventId)
                          .build())
-            .baseCaseData(caseData)
+            .caseData(caseData)
             .version(version)
             .params(params)
             .build();

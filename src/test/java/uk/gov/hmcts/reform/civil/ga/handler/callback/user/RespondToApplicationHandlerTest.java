@@ -534,7 +534,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             case 0 -> CallbackParams.builder()
                 .type(CallbackType.MID)
                 .pageId("hearing-screen-response")
-                .baseCaseData(getCaseWithInvalidTrailDateRange())
+                .caseData(getCaseWithInvalidTrailDateRange())
                 .request(CallbackRequest.builder()
                              .eventId("RESPOND_TO_APPLICATION")
                              .build())
@@ -542,7 +542,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             case 1 -> CallbackParams.builder()
                 .type(CallbackType.MID)
                 .pageId("hearing-screen-response")
-                .baseCaseData(getCaseWithInvalidDateToRange())
+                .caseData(getCaseWithInvalidDateToRange())
                 .request(CallbackRequest.builder()
                              .eventId("RESPOND_TO_APPLICATION")
                              .build())
@@ -550,7 +550,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             case 2 -> CallbackParams.builder()
                 .type(CallbackType.MID)
                 .pageId("hearing-screen-response")
-                .baseCaseData(getCaseWithNullFromAndToDate())
+                .caseData(getCaseWithNullFromAndToDate())
                 .request(CallbackRequest.builder()
                              .eventId("RESPOND_TO_APPLICATION")
                              .build())
@@ -558,7 +558,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             case 3 -> CallbackParams.builder()
                 .type(CallbackType.MID)
                 .pageId("hearing-screen-response")
-                .baseCaseData(getCaseWithUnavailableDates())
+                .caseData(getCaseWithUnavailableDates())
                 .request(CallbackRequest.builder()
                              .eventId("RESPOND_TO_APPLICATION")
                              .build())
@@ -566,7 +566,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             case 4 -> CallbackParams.builder()
                 .type(CallbackType.MID)
                 .pageId("hearing-screen-response")
-                .baseCaseData(getCaseWithUnavailableDatesBeforeToday())
+                .caseData(getCaseWithUnavailableDatesBeforeToday())
                 .request(CallbackRequest.builder()
                              .eventId("RESPOND_TO_APPLICATION")
                              .build())
@@ -574,7 +574,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             case 5 -> CallbackParams.builder()
                 .type(CallbackType.MID)
                 .pageId("hearing-screen-response")
-                .baseCaseData(getCaseWithNullUnavailableDates())
+                .caseData(getCaseWithNullUnavailableDates())
                 .request(CallbackRequest.builder()
                              .eventId("RESPOND_TO_APPLICATION")
                              .build())
@@ -582,7 +582,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             case 6 -> CallbackParams.builder()
                 .type(CallbackType.MID)
                 .pageId("hearing-screen-response")
-                .baseCaseData(getCaseWithNullUnavailableDateFrom())
+                .caseData(getCaseWithNullUnavailableDateFrom())
                 .request(CallbackRequest.builder()
                              .eventId("RESPOND_TO_APPLICATION")
                              .build())
@@ -590,7 +590,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             default -> CallbackParams.builder()
                 .type(CallbackType.MID)
                 .pageId("hearing-screen-response")
-                .baseCaseData(getCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION))
+                .caseData(getCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION))
                 .request(CallbackRequest.builder()
                              .eventId("RESPOND_TO_APPLICATION")
                              .build())
@@ -717,7 +717,6 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
         callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
-        GeneralApplicationCaseData responseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
         assertThat(response).isNotNull();
     }
 
@@ -755,7 +754,6 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
         callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
-        GeneralApplicationCaseData responseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
         assertThat(response).isNotNull();
     }
 

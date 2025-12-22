@@ -35,11 +35,11 @@ import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -64,17 +64,18 @@ class GaHearingFormGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
-    List<DynamicListElement> listItems = Arrays.asList(DynamicListElement.builder()
+    List<DynamicListElement> listItems = singletonList(DynamicListElement.builder()
                                                            .code("code").label("label").build());
 
     DynamicListElement selectedLocation = DynamicListElement
         .builder().label("sitename - location name - D12 8997").build();
 
-    private static final String templateName = "Application_Hearing_Notice_%s.pdf";
-    private static final String fileName_application = String.format(templateName,
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+    private static final String TEMPLATE_NAME = "Application_Hearing_Notice_%s.pdf";
+    private static final String FILE_NAME_APPLICATION = String.format(
+        TEMPLATE_NAME,
+        LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
-            .documentName(fileName_application)
+            .documentName(FILE_NAME_APPLICATION)
             .documentType(HEARING_NOTICE)
             .build();
 
@@ -338,7 +339,6 @@ class GaHearingFormGeneratorTest {
 
     @Test
     void test_getTemplate() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
         assertThat(generator.getTemplate(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE)).isEqualTo(HEARING_APPLICATION);
     }
 

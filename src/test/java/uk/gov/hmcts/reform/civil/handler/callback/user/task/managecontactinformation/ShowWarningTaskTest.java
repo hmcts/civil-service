@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.validation.PartyValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
@@ -64,27 +65,24 @@ class ShowWarningTaskTest {
     @Test
     void shouldReturnLitigationFriendWarningWhenLitigationFriendExists() {
         // Given a party with a litigation friend
-        UpdateDetailsForm updateDetailsForm = UpdateDetailsForm.builder()
-            .partyChosen(DynamicList.builder()
-                             .value(DynamicListElement.builder()
-                                        .code(CLAIMANT_ONE_ID)
-                                        .build())
-                             .build())
-            .build();
+        DynamicListElement dynamicListElement = new DynamicListElement();
+        dynamicListElement.setCode(CLAIMANT_ONE_ID);
+        DynamicList dynamicList = new DynamicList();
+        dynamicList.setValue(dynamicListElement);
+        UpdateDetailsForm updateDetailsForm = new UpdateDetailsForm();
+        updateDetailsForm.setPartyChosen(dynamicList);
         Party applicant1 = PartyBuilder.builder().company().build();
         Party respondent1 = PartyBuilder.builder().company().build();
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .applicant1(applicant1)
             .respondent1(respondent1)
-            .updateDetailsForm(updateDetailsForm)
-            .applicant1LitigationFriendRequired(YES)
-            .build();
-        CaseData oldCaseData = CaseData.builder()
+            .updateDetailsForm(updateDetailsForm).build();
+        caseData.setApplicant1LitigationFriendRequired(YES);
+        CaseData oldCaseData = CaseDataBuilder.builder()
             .applicant1(applicant1)
             .respondent1(respondent1)
-            .updateDetailsForm(updateDetailsForm)
-            .applicant1LitigationFriendRequired(YES)
-            .build();
+            .updateDetailsForm(updateDetailsForm).build();
+        oldCaseData.setApplicant1LitigationFriendRequired(YES);
         uk.gov.hmcts.reform.ccd.client.model.CaseDetails caseDetailsBefore = CaseDetails.builder().build();
 
         when(caseDetailsConverter.toCaseData(caseDetailsBefore)).thenReturn(oldCaseData);
@@ -99,28 +97,25 @@ class ShowWarningTaskTest {
     @Test
     void shouldReturnNoWarningForNoLitigationFriend() {
         // Given no litigation friend
-        UpdateDetailsForm updateDetailsForm = UpdateDetailsForm.builder()
-            .partyChosen(DynamicList.builder()
-                             .value(DynamicListElement.builder()
-                                        .code(CLAIMANT_ONE_ID)
-                                        .build())
-                             .build())
-            .build();
+        DynamicListElement dynamicListElement = new DynamicListElement();
+        dynamicListElement.setCode(CLAIMANT_ONE_ID);
+        DynamicList dynamicList = new DynamicList();
+        dynamicList.setValue(dynamicListElement);
+        UpdateDetailsForm updateDetailsForm = new UpdateDetailsForm();
+        updateDetailsForm.setPartyChosen(dynamicList);
 
         Party applicant1 = PartyBuilder.builder().company().build();
         Party respondent1 = PartyBuilder.builder().company().build();
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .applicant1(applicant1)
             .respondent1(respondent1)
-            .updateDetailsForm(updateDetailsForm)
-            .applicant1LitigationFriendRequired(NO)
-            .build();
-        CaseData oldCaseData = CaseData.builder()
+            .updateDetailsForm(updateDetailsForm).build();
+        caseData.setApplicant1LitigationFriendRequired(NO);
+        CaseData oldCaseData = CaseDataBuilder.builder()
             .applicant1(applicant1)
             .respondent1(respondent1)
-            .updateDetailsForm(updateDetailsForm)
-            .applicant1LitigationFriendRequired(NO)
-            .build();
+            .updateDetailsForm(updateDetailsForm).build();
+        oldCaseData.setApplicant1LitigationFriendRequired(NO);
         uk.gov.hmcts.reform.ccd.client.model.CaseDetails caseDetailsBefore = CaseDetails.builder().build();
 
         when(caseDetailsConverter.toCaseData(caseDetailsBefore)).thenReturn(oldCaseData);
@@ -134,18 +129,26 @@ class ShowWarningTaskTest {
     @Test
     void shouldReturnPostcodeValidationErrorWhenSpecClaim() {
         // Given a SPEC_CLAIM
+        DynamicListElement dynamicListElement = new DynamicListElement();
+        dynamicListElement.setCode(CLAIMANT_ONE_ID);
+        dynamicListElement.setLabel("Claimant 1");
+        DynamicList dynamicList = new DynamicList();
+        dynamicList.setValue(dynamicListElement);
+        DynamicListElement dynamicListElement1 = new DynamicListElement();
+        dynamicListElement1.setLabel("something");
+        dynamicList.setListItems(List.of(dynamicListElement1));
+        UpdateDetailsForm updateDetailsForm = new UpdateDetailsForm();
+        updateDetailsForm.setPartyChosen(dynamicList);
+        UpdatePartyDetailsForm updatePartyDetailsForm = new UpdatePartyDetailsForm();
+        updatePartyDetailsForm.setPartyId("123");
+        updateDetailsForm.setUpdateExpertsDetailsForm(wrapElements(updatePartyDetailsForm));
         Party applicant1 = PartyBuilder.builder().company().build();
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .caseAccessCategory(SPEC_CLAIM)
-            .updateDetailsForm(UpdateDetailsForm.builder()
-                                   .partyChosen(DynamicList.builder()
-                                                    .value(DynamicListElement.builder().code(CLAIMANT_ONE_ID).label("Claimant 1").build())
-                                                    .listItems(List.of(DynamicListElement.builder().label("something").build())).build())
-                                   .updateExpertsDetailsForm(wrapElements(UpdatePartyDetailsForm.builder().partyId("123").build()))
-                                   .build())
+            .updateDetailsForm(updateDetailsForm)
             .applicant1(applicant1)
             .build();
-        CaseData oldCaseData = CaseData.builder().build();
+        CaseData oldCaseData = CaseDataBuilder.builder().build();
         uk.gov.hmcts.reform.ccd.client.model.CaseDetails caseDetailsBefore = CaseDetails.builder().build();
 
         when(caseDetailsConverter.toCaseData(caseDetailsBefore)).thenReturn(oldCaseData);
@@ -160,20 +163,25 @@ class ShowWarningTaskTest {
     @Test
     void shouldValidateNameWhenFeatureToggleEnabled() {
         // Given the feature toggle is enabled and name is too long
-        UpdateDetailsForm updateDetailsForm = UpdateDetailsForm.builder()
-            .partyChosen(DynamicList.builder()
-                             .value(DynamicListElement.builder()
-                                        .code(CLAIMANT_ONE_ID)
-                                        .build())
-                             .build())
+        DynamicListElement dynamicListElement = new DynamicListElement();
+        dynamicListElement.setCode(CLAIMANT_ONE_ID);
+        DynamicList dynamicList = new DynamicList();
+        dynamicList.setValue(dynamicListElement);
+        UpdateDetailsForm updateDetailsForm = new UpdateDetailsForm();
+        updateDetailsForm.setPartyChosen(dynamicList);
+        Party applicant1 = PartyBuilder.builder().individual().build();
+        applicant1.setPartyName("seventyoneseventyoneseventyoneseventyoneseventyoneseventyoneseventyoneseventyone");
+        Address address = new Address();
+        address.setPostCode("1234");
+        applicant1.setPrimaryAddress(address);
+        CaseData caseData = CaseDataBuilder.builder()
+            .caseAccessCategory(SPEC_CLAIM)
+            .applicant1(applicant1)
+            .updateDetailsForm(updateDetailsForm)
             .build();
-        Party applicant1 = Party.builder().type(Party.Type.INDIVIDUAL)
-            .partyName("seventyoneseventyoneseventyoneseventyoneseventyoneseventyoneseventyoneseventyone")
-            .primaryAddress(Address.builder()
-                                .postCode("1234").build())
+        CaseData oldCaseData = CaseDataBuilder.builder()
+            .applicant1(applicant1)
             .build();
-        CaseData caseData = CaseData.builder().caseAccessCategory(SPEC_CLAIM).applicant1(applicant1).updateDetailsForm(updateDetailsForm).build();
-        CaseData oldCaseData = CaseData.builder().applicant1(applicant1).build();
         uk.gov.hmcts.reform.ccd.client.model.CaseDetails caseDetailsBefore = CaseDetails.builder().build();
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(partyValidator.validateName(caseData.getApplicant1().getPartyName(), List.of())).thenReturn(List.of("Name exceeds maximum length 70"));
@@ -189,24 +197,31 @@ class ShowWarningTaskTest {
     @Test
     void shouldValidateAddressWhenFeatureToggleEnabled() {
         // Given the feature toggle is enabled and address is too long
-        UpdateDetailsForm updateDetailsForm = UpdateDetailsForm.builder()
-            .partyChosen(DynamicList.builder()
-                             .value(DynamicListElement.builder()
-                                        .code(CLAIMANT_ONE_ID)
-                                        .build())
-                             .build())
+        DynamicListElement dynamicListElement = new DynamicListElement();
+        dynamicListElement.setCode(CLAIMANT_ONE_ID);
+        DynamicList dynamicList = new DynamicList();
+        dynamicList.setValue(dynamicListElement);
+        UpdateDetailsForm updateDetailsForm = new UpdateDetailsForm();
+        updateDetailsForm.setPartyChosen(dynamicList);
+
+        Party applicant1 = PartyBuilder.builder().individual().build();
+        applicant1.setBulkClaimPartyName("bulk claim party name");
+        Address address = new Address();
+        address.setAddressLine1("Line 1 test again for more than 35 characters test test test test test");
+        address.setAddressLine2("Line 1 test again for more than 35 characters test test");
+        address.setAddressLine3("Line 1 test again for more than 35 characters");
+        address.setCounty("Line 1 test again for more than 35 characters");
+        address.setPostCode("Line 1 test again for more than 35 characters");
+        address.setPostTown("Line 1 test again for more than 35 characters");
+        applicant1.setPrimaryAddress(address);
+        CaseData caseData = CaseDataBuilder.builder()
+            .caseAccessCategory(SPEC_CLAIM)
+            .applicant1(applicant1)
+            .updateDetailsForm(updateDetailsForm)
             .build();
-        Party applicant1 = Party.builder().type(Party.Type.INDIVIDUAL)
-            .bulkClaimPartyName("bulk claim party name")
-            .primaryAddress(Address.builder()
-                                .addressLine1("Line 1 test again for more than 35 characters test test test test test")
-                                .addressLine2("Line 1 test again for more than 35 characters test test")
-                                .addressLine3("Line 1 test again for more than 35 characters")
-                                .county("Line 1 test again for more than 35 characters")
-                                .postCode("Line 1 test again for more than 35 characters")
-                                .postTown("Line 1 test again for more than 35 characters").build()).build();
-        CaseData caseData = CaseData.builder().caseAccessCategory(SPEC_CLAIM).applicant1(applicant1).updateDetailsForm(updateDetailsForm).build();
-        CaseData oldCaseData = CaseData.builder().applicant1(applicant1).build();
+        CaseData oldCaseData = CaseDataBuilder.builder()
+            .applicant1(applicant1)
+            .build();
         uk.gov.hmcts.reform.ccd.client.model.CaseDetails caseDetailsBefore = CaseDetails.builder().build();
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         List<String> errorList = List.of("exceeds maximum length 35");
@@ -225,35 +240,32 @@ class ShowWarningTaskTest {
     @Test
     void shouldReturnLitigationFriendUpdateWarning() {
         // Given both claimants have litigation friends
-        UpdateDetailsForm updateDetailsForm = UpdateDetailsForm.builder()
-            .partyChosen(DynamicList.builder()
-                             .value(DynamicListElement.builder()
-                                        .code(CLAIMANT_ONE_ID)
-                                        .build())
-                             .build())
-            .build();
-        uk.gov.hmcts.reform.ccd.client.model.CaseDetails caseDetailsBefore = CaseDetails.builder().build();
+        DynamicListElement dynamicListElement = new DynamicListElement();
+        dynamicListElement.setCode(CLAIMANT_ONE_ID);
+        DynamicList dynamicList = new DynamicList();
+        dynamicList.setValue(dynamicListElement);
+        UpdateDetailsForm updateDetailsForm = new UpdateDetailsForm();
+        updateDetailsForm.setPartyChosen(dynamicList);
         Party applicant1 = PartyBuilder.builder().company().build();
         Party applicant2 = PartyBuilder.builder().company().build();
-        LitigationFriend litigationFriend = LitigationFriend.builder().build();
-        CaseData oldCaseData = CaseData.builder()
+        LitigationFriend litigationFriend = new LitigationFriend();
+        CaseData oldCaseData = CaseDataBuilder.builder()
             .applicant1(applicant1)
             .applicant2(applicant2)
-            .updateDetailsForm(updateDetailsForm)
-            .applicant1LitigationFriend(litigationFriend)
-            .applicant1LitigationFriendRequired(YES)
-            .applicant2LitigationFriend(litigationFriend)
-            .applicant2LitigationFriendRequired(YES)
-            .build();
-        CaseData caseData = CaseData.builder()
+            .updateDetailsForm(updateDetailsForm).build();
+        oldCaseData.setApplicant1LitigationFriend(litigationFriend);
+        oldCaseData.setApplicant1LitigationFriendRequired(YES);
+        oldCaseData.setApplicant2LitigationFriend(litigationFriend);
+        oldCaseData.setApplicant2LitigationFriendRequired(YES);
+        CaseData caseData = CaseDataBuilder.builder()
             .applicant1(applicant1)
             .applicant2(applicant2)
-            .updateDetailsForm(updateDetailsForm)
-            .applicant1LitigationFriend(litigationFriend)
-            .applicant1LitigationFriendRequired(YES)
-            .applicant2LitigationFriend(litigationFriend)
-            .applicant2LitigationFriendRequired(YES)
-            .build();
+            .updateDetailsForm(updateDetailsForm).build();
+        caseData.setApplicant1LitigationFriend(litigationFriend);
+        caseData.setApplicant1LitigationFriendRequired(YES);
+        caseData.setApplicant2LitigationFriend(litigationFriend);
+        caseData.setApplicant2LitigationFriendRequired(YES);
+        uk.gov.hmcts.reform.ccd.client.model.CaseDetails caseDetailsBefore = CaseDetails.builder().build();
         when(caseDetailsConverter.toCaseData(caseDetailsBefore)).thenReturn(oldCaseData);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse)

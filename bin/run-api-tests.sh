@@ -83,11 +83,26 @@ run_failed_not_executed_functional_tests() {
 #MAIN SCRIPT
 TEST_FILES_REPORT="test-results/functional/testFilesReport.json"
 PREV_TEST_FILES_REPORT="test-results/functional/prevTestFilesReport.json"
+FT_TYPE_STATE_FILE="test-results/functional/prevFtType.txt"
+
+echo "Running functional tests for '$FT_TYPE'"
+
+if [ ! -f "$FT_TYPE_STATE_FILE" ]; then
+  echo "No previous functional type file '$FT_TYPE_STATE_FILE' new state '$FT_TYPE'."
+else
+  echo "FT_TYPE previous state '$(cat "$FT_TYPE_STATE_FILE")' new state '$FT_TYPE'."
+fi
 
 #Check if RUN_ALL_FUNCTIONAL_TESTS is set to true
 if [ "$RUN_ALL_FUNCTIONAL_TESTS" = "true" ]; then
   echo "The label 'runAllFunctionalTests' exists on the PR."
   echo "Running all fucntional tests."
+  run_functional_tests
+
+#Check if FT_TYPE has changed since the previous run
+elif [ -f "$FT_TYPE_STATE_FILE" ] && [ "$(cat "$FT_TYPE_STATE_FILE")" != "$FT_TYPE" ]; then
+  echo "FT_TYPE changed from '$(cat "$FT_TYPE_STATE_FILE")' to '$FT_TYPE'."
+  echo "Ignoring $TEST_FILES_REPORT and running all functional tests."
   run_functional_tests
 
 #Check if testFilesReport.json exists and is non-empty
@@ -108,3 +123,7 @@ elif ! compare_ft_groups; then
 else
   run_failed_not_executed_functional_tests
 fi
+
+# Update saved FT_TYPE for next run
+mkdir -p "$(dirname "$FT_TYPE_STATE_FILE")"
+echo -n "$FT_TYPE" > "$FT_TYPE_STATE_FILE"

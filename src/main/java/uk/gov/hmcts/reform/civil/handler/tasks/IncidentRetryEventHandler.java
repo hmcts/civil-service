@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeApi;
+import uk.gov.hmcts.reform.civil.service.search.CasesStuckCheckSearchService;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -27,18 +28,23 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
+    private final CasesStuckCheckSearchService casesStuckCheckSearchService;
     private final CamundaRuntimeApi camundaRuntimeApi;
     private final AuthTokenGenerator authTokenGenerator;
 
     private static final int MAX_THREADS = 10;
     private static final String CASE_ID_VARIABLE = "caseId";
     private static final int PAGE_SIZE = 50;
+    private static final Pattern ALREADY_PROCESSED_PATTERN =
+        Pattern.compile("already processed|already performed", Pattern.CASE_INSENSITIVE);
+    private static final String ACTIVITY_ID = "activityId";
     private static final DateTimeFormatter INCIDENT_FORMATTER =
         DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
             .withZone(ZoneOffset.UTC);
@@ -80,7 +86,12 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             caseIds
         );
 
-        return ExternalTaskData.builder().build();
+        log.info("Call cases stuck check search service to log cases being stuck in app insights");
+
+        String stuckCasesFromPastDays = externalTask.getVariable("stuckCasesFromPastDays");
+        casesStuckCheckSearchService.getCases(stuckCasesFromPastDays != null ? stuckCasesFromPastDays : "7");
+
+        return new ExternalTaskData();
     }
 
     private void processAllIncidents(
@@ -186,7 +197,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
     private String resolveStartTime(String incidentStartTime) {
         return (incidentStartTime == null || incidentStartTime.isBlank())
-            ? INCIDENT_FORMATTER.format(Instant.now().minus(23, ChronoUnit.HOURS))
+            ? INCIDENT_FORMATTER.format(Instant.now().minus(24, ChronoUnit.HOURS))
             : incidentStartTime;
     }
 
@@ -239,7 +250,13 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 incident.getId(), processInstanceId, jobId, incidentCaseId, failedActivityId
             );
 
-            retryProcessInstance(processInstanceId, serviceAuthorization, failedActivityId);
+            boolean alreadyProcessed = incident.getIncidentMessage() != null
+                && ALREADY_PROCESSED_PATTERN.matcher(incident.getIncidentMessage()).find();
+            if (alreadyProcessed) {
+                completeAlreadyProcessedIncident(incident.getProcessInstanceId(), serviceAuthorization, failedActivityId);
+            } else {
+                retryProcessInstance(processInstanceId, serviceAuthorization, failedActivityId);
+            }
 
             log.info(
                 "Retries reset for job {} (processInstanceId={}, caseId={})",
@@ -261,6 +278,37 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         }
     }
 
+    private void completeAlreadyProcessedIncident(String processInstanceId, String serviceAuthorization, String failedActivityId) {
+        try {
+            log.info("Completing incident for processInstance {} (already processed)",
+                      processInstanceId);
+
+            Map<String, Object> modificationRequest = new HashMap<>();
+            modificationRequest.put("skipCustomListeners", true);
+            modificationRequest.put("skipIoMappings", true);
+
+            List<Map<String, Object>> instructions = new ArrayList<>();
+            Map<String, Object> startAfterInstruction = new HashMap<>();
+            startAfterInstruction.put("type", "startAfterActivity");
+            startAfterInstruction.put(ACTIVITY_ID, failedActivityId);
+            instructions.add(startAfterInstruction);
+
+            modificationRequest.put("instructions", instructions);
+
+            camundaRuntimeApi.modifyProcessInstance(
+                serviceAuthorization,
+                processInstanceId,
+                modificationRequest
+            );
+
+            log.info("Successfully completed activity {} for process instance {}", failedActivityId, processInstanceId);
+
+        } catch (Exception e) {
+            log.error("Failed to complete already processed activity {} for processInstance {}: {}",
+                      failedActivityId, processInstanceId, e.getMessage(), e);
+        }
+    }
+
     private void retryProcessInstance(String processInstanceId, String serviceAuthorization, String failedActivityId) {
         Map<String, Object> modificationRequest = new HashMap<>();
         modificationRequest.put("skipCustomListeners", true);
@@ -269,12 +317,12 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         List<Map<String, Object>> instructions = new ArrayList<>();
         Map<String, Object> cancelInstruction = new HashMap<>();
         cancelInstruction.put("type", "cancel");
-        cancelInstruction.put("activityId", failedActivityId);
+        cancelInstruction.put(ACTIVITY_ID, failedActivityId);
         instructions.add(cancelInstruction);
 
         Map<String, Object> startBeforeInstruction = new HashMap<>();
         startBeforeInstruction.put("type", "startBeforeActivity");
-        startBeforeInstruction.put("activityId", failedActivityId);
+        startBeforeInstruction.put(ACTIVITY_ID, failedActivityId);
         instructions.add(startBeforeInstruction);
 
         modificationRequest.put("instructions", instructions);

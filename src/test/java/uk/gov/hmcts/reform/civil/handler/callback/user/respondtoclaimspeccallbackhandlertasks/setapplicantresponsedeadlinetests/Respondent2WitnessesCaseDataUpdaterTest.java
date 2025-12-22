@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.List;
 
@@ -28,26 +29,25 @@ class Respondent2WitnessesCaseDataUpdaterTest {
 
     @BeforeEach
     void setUp() {
-        List<Element<Witness>> testWitness = wrapElements(Witness.builder().firstName("test witness").build());
+        Witness witness = new Witness();
+        witness.setFirstName("test witness");
+        List<Element<Witness>> testWitness = wrapElements(witness);
 
-        caseData = CaseData.builder()
-                .respondent2DQ(Respondent2DQ.builder()
-                        .respondent2DQWitnesses(Witnesses.builder()
-                                .witnessesToAppear(YES)
-                                .details(testWitness)
-                                .build())
-                        .build())
-                .build();
+        caseData = CaseDataBuilder.builder().build();
+        Witnesses witnesses = new Witnesses();
+        witnesses.setWitnessesToAppear(YES);
+        witnesses.setDetails(testWitness);
+        Respondent2DQ respondent2DQ = new Respondent2DQ();
+        respondent2DQ.setRespondent2DQWitnesses(witnesses);
+        caseData.setRespondent2DQ(respondent2DQ);
     }
 
     @Test
     void shouldUpdateCaseDataWithWitnesses() {
-        CaseData.CaseDataBuilder<?, ?> updatedData = CaseData.builder()
-                .respondent2DQ(caseData.getRespondent2DQ());
 
         updater.update(caseData);
 
-        Respondent2DQ updatedRespondent2DQ = updatedData.build().getRespondent2DQ();
+        Respondent2DQ updatedRespondent2DQ = caseData.getRespondent2DQ();
         assertThat(updatedRespondent2DQ).isNotNull();
         Witnesses updatedWitnesses = updatedRespondent2DQ.getRespondent2DQWitnesses();
         assertThat(updatedWitnesses).isNotNull();
@@ -56,16 +56,11 @@ class Respondent2WitnessesCaseDataUpdaterTest {
 
     @Test
     void shouldHandleNullWitnesses() {
-        caseData = caseData.toBuilder()
-                .respondent2DQ(Respondent2DQ.builder().build())
-                .build();
-
-        CaseData.CaseDataBuilder<?, ?> updatedData = CaseData.builder()
-                .respondent2DQ(caseData.getRespondent2DQ());
+        caseData.setRespondent2DQ(new Respondent2DQ());
 
         updater.update(caseData);
 
-        Respondent2DQ updatedRespondent2DQ = updatedData.build().getRespondent2DQ();
+        Respondent2DQ updatedRespondent2DQ = caseData.getRespondent2DQ();
         assertThat(updatedRespondent2DQ).isNotNull();
         assertThat(updatedRespondent2DQ.getRespondent2DQWitnesses()).isNull();
     }

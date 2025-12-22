@@ -49,7 +49,7 @@ public class EndJudgeMakesDecisionBusinessProcessCallbackHandler extends Callbac
 
     private CallbackResponse endJudgeBusinessProcess(CallbackParams callbackParams) {
         log.info("End judge makes decision business process for caseId: {}",
-                 ((GeneralApplicationCaseData)callbackParams.getBaseCaseData()).getCcdCaseReference());
+                 callbackParams.getGeneralApplicationCaseData().getCcdCaseReference());
         GeneralApplicationCaseData data = caseDetailsConverter.toGeneralApplicationCaseData(callbackParams.getRequest().getCaseDetails());
         CaseState newState = getNewStateDependingOn(data);
         if (isApplicationMakeVisibleToDefendant(data)) {

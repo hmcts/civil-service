@@ -166,13 +166,12 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocalDate cosNotifyDate = LocalDate.now().plusDays(4);
             LocalDate deemedServedDate = LocalDate.now();
 
+            CertificateOfService certificateOfService = new CertificateOfService();
+            certificateOfService.setCosDateOfServiceForDefendant(cosNotifyDate);
+            certificateOfService.setCosDateDeemedServedForDefendant(deemedServedDate);
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimNotified1v1LiP(CertificateOfService.builder()
-                                                .build())
-                .cosNotifyClaimDefendant1(CertificateOfService.builder()
-                                              .cosDateOfServiceForDefendant(cosNotifyDate)
-                                              .cosDateDeemedServedForDefendant(deemedServedDate)
-                                              .build())
+                .atStateClaimNotified1v1LiP(new CertificateOfService())
+                .cosNotifyClaimDefendant1(certificateOfService)
                 .build();
 
             CertificateOfService certificateOfServiceDef = caseData.getCosNotifyClaimDefendant1();
@@ -190,13 +189,11 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldNot_ThrowError_whenNotifyingDate_isCurrentDate() {
             ArrayList<String> cosUIStatement = new ArrayList<>();
             cosUIStatement.add("CERTIFIED");
-            LocalDate cosNotifyDate = LocalDate.now();
-            LocalDate deemedServedDate = LocalDate.now();
+            CertificateOfService certificateOfService = new CertificateOfService();
+            certificateOfService.setCosDateOfServiceForDefendant(LocalDate.now());
+            certificateOfService.setCosDateDeemedServedForDefendant(LocalDate.now());
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimNotified1v1LiP(CertificateOfService.builder()
-                                                .cosDateDeemedServedForDefendant(LocalDate.now())
-                                                .cosDateOfServiceForDefendant(LocalDate.now())
-                                                .build())
+                .atStateClaimNotified1v1LiP(certificateOfService)
                 .build();
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 2))
@@ -214,11 +211,11 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldNot_ThrowError_whenNotifyingDate_isPastDate_notOlderThan14days() {
             LocalDate cosNotifyDate = LocalDate.now().minusDays(3);
             LocalDate deemedServedDate = LocalDate.now().minusDays(3);
+            CertificateOfService certificateOfService = new CertificateOfService();
+            certificateOfService.setCosDateOfServiceForDefendant(cosNotifyDate);
+            certificateOfService.setCosDateDeemedServedForDefendant(deemedServedDate);
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimNotified1v1LiP(CertificateOfService.builder()
-                                                .cosDateOfServiceForDefendant(cosNotifyDate)
-                                                .cosDateDeemedServedForDefendant(deemedServedDate)
-                                                .build())
+                .atStateClaimNotified1v1LiP(certificateOfService)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -236,13 +233,12 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldThrowError_whenDeemedServedDateIsOlderThan14Days() {
             LocalDate currentDate = LocalDate.now();
             LocalDate deemedServedDate = currentDate.minusDays(15);
+            CertificateOfService certificateOfService = new CertificateOfService();
+            certificateOfService.setCosDateOfServiceForDefendant(currentDate);
+            certificateOfService.setCosDateDeemedServedForDefendant(deemedServedDate);
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimNotified1v1LiP(CertificateOfService.builder()
-                                                .build())
-                .cosNotifyClaimDefendant1(CertificateOfService.builder()
-                                              .cosDateOfServiceForDefendant(currentDate)
-                                              .cosDateDeemedServedForDefendant(deemedServedDate)
-                                              .build())
+                .atStateClaimNotified1v1LiP(new CertificateOfService())
+                .cosNotifyClaimDefendant1(certificateOfService)
                 .build();
 
             CertificateOfService certificateOfServiceDef = caseData.getCosNotifyClaimDefendant1();
@@ -262,13 +258,12 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldThrowError_whenDeemedServedDateExceeds2WorkingDays() {
             LocalDate currentDate = LocalDate.now();
             LocalDate deemedServedDate = currentDate.plusDays(5);
+            CertificateOfService certificateOfService = new CertificateOfService();
+            certificateOfService.setCosDateOfServiceForDefendant(currentDate);
+            certificateOfService.setCosDateDeemedServedForDefendant(deemedServedDate);
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimNotified1v1LiP(CertificateOfService.builder()
-                                                .build())
-                .cosNotifyClaimDefendant1(CertificateOfService.builder()
-                                              .cosDateOfServiceForDefendant(currentDate)
-                                              .cosDateDeemedServedForDefendant(deemedServedDate)
-                                              .build())
+                .atStateClaimNotified1v1LiP(new CertificateOfService())
+                .cosNotifyClaimDefendant1(certificateOfService)
                 .build();
 
             CertificateOfService certificateOfServiceDef = caseData.getCosNotifyClaimDefendant1();
@@ -288,13 +283,12 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldThrowError_whenDeemedServedDateIsWorkingDay() {
             LocalDate currentDate = LocalDate.now();
             LocalDate deemedServedDate = currentDate;
+            CertificateOfService certificateOfService = new CertificateOfService();
+            certificateOfService.setCosDateOfServiceForDefendant(currentDate);
+            certificateOfService.setCosDateDeemedServedForDefendant(deemedServedDate);
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimNotified1v1LiP(CertificateOfService.builder()
-                                                .build())
-                .cosNotifyClaimDefendant1(CertificateOfService.builder()
-                                              .cosDateOfServiceForDefendant(currentDate)
-                                              .cosDateDeemedServedForDefendant(deemedServedDate)
-                                              .build())
+                .atStateClaimNotified1v1LiP(new CertificateOfService())
+                .cosNotifyClaimDefendant1(certificateOfService)
                 .build();
 
             CertificateOfService certificateOfServiceDef = caseData.getCosNotifyClaimDefendant1();
@@ -321,12 +315,12 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocalDate cosNotifyDate = LocalDate.now().plusDays(4);
             LocalDate deemedServedDate = LocalDate.now();
 
+            CertificateOfService certificateOfService = new CertificateOfService();
+            certificateOfService.setCosDateOfServiceForDefendant(cosNotifyDate);
+            certificateOfService.setCosDateDeemedServedForDefendant(deemedServedDate);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v2RespondentLiP()
-                .cosNotifyClaimDefendant2(CertificateOfService.builder()
-                                              .cosDateDeemedServedForDefendant(deemedServedDate)
-                                              .cosDateOfServiceForDefendant(cosNotifyDate)
-                                              .build())
+                .cosNotifyClaimDefendant2(certificateOfService)
                 .build();
 
             CertificateOfService certificateOfServiceDef2 = caseData.getCosNotifyClaimDefendant2();
@@ -345,12 +339,12 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             LocalDate cosNotifyDate = LocalDate.of(2021, 5, 1);
             LocalDate deemedServedDeadline = cosNotifyDate;
+            CertificateOfService certificateOfService = new CertificateOfService();
+            certificateOfService.setCosDateOfServiceForDefendant(cosNotifyDate);
+            certificateOfService.setCosDateDeemedServedForDefendant(deemedServedDeadline);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v2RespondentLiP()
-                .cosNotifyClaimDefendant2(CertificateOfService.builder()
-                                              .cosDateOfServiceForDefendant(cosNotifyDate)
-                                              .cosDateDeemedServedForDefendant(deemedServedDeadline)
-                                              .build())
+                .cosNotifyClaimDefendant2(certificateOfService)
                 .build();
 
             CertificateOfService certificateOfServiceDef2 = caseData.getCosNotifyClaimDefendant2();
@@ -369,13 +363,12 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             ArrayList<String> cosUIStatement = new ArrayList<>();
             cosUIStatement.add("CERTIFIED");
             LocalDate cosNotifyDate = LocalDate.now();
-            LocalDate deemedServedDate = LocalDate.now();
+            CertificateOfService certificateOfService = new CertificateOfService();
+            certificateOfService.setCosDateOfServiceForDefendant(cosNotifyDate);
+            certificateOfService.setCosDateDeemedServedForDefendant(LocalDate.now());
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v2RespondentLiP()
-                .cosNotifyClaimDefendant2(CertificateOfService.builder()
-                                              .cosDateOfServiceForDefendant(cosNotifyDate)
-                                              .cosDateDeemedServedForDefendant(LocalDate.now())
-                                              .build())
+                .cosNotifyClaimDefendant2(certificateOfService)
                 .build();
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 2))
@@ -391,14 +384,13 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNot_ThrowError_whenCosServiceDate_notOlderThan14Days() {
             LocalDate cosNotifyDate = LocalDate.now().minusDays(5);
-            LocalDate deemedServedDate = LocalDate.now();
 
+            CertificateOfService certificateOfService = new CertificateOfService();
+            certificateOfService.setCosDateOfServiceForDefendant(cosNotifyDate);
+            certificateOfService.setCosDateDeemedServedForDefendant(LocalDate.now());
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v2RespondentLiP()
-                .cosNotifyClaimDefendant2(CertificateOfService.builder()
-                                              .cosDateOfServiceForDefendant(cosNotifyDate)
-                                              .cosDateDeemedServedForDefendant(LocalDate.now())
-                                              .build())
+                .cosNotifyClaimDefendant2(certificateOfService)
                 .build();
 
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
@@ -420,12 +412,12 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocalDate cosNotifyDate = LocalDate.of(2021, 5, 1);
             LocalDate deemedServedDate = LocalDate.of(2021, 5, 1);
 
+            CertificateOfService certificateOfService = new CertificateOfService();
+            certificateOfService.setCosDateOfServiceForDefendant(cosNotifyDate);
+            certificateOfService.setCosDateDeemedServedForDefendant(deemedServedDate);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v2RespondentLiP()
-                .cosNotifyClaimDefendant2(CertificateOfService.builder()
-                                              .cosDateOfServiceForDefendant(cosNotifyDate)
-                                              .cosDateDeemedServedForDefendant(deemedServedDate)
-                                              .build())
+                .cosNotifyClaimDefendant2(certificateOfService)
                 .build();
 
             when(time.now()).thenReturn(LocalDateTime.of(2021, 5, 15, 15, 05));
@@ -445,12 +437,12 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldThrowError_whenDeemedServedDateIsOlderThan14Days() {
             LocalDate currentDate = LocalDate.now();
             LocalDate deemedServedDate = currentDate.minusDays(15);
+            CertificateOfService certificateOfService = new CertificateOfService();
+            certificateOfService.setCosDateOfServiceForDefendant(currentDate);
+            certificateOfService.setCosDateDeemedServedForDefendant(deemedServedDate);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v2RespondentLiP()
-                .cosNotifyClaimDefendant2(CertificateOfService.builder()
-                                              .cosDateOfServiceForDefendant(currentDate)
-                                              .cosDateDeemedServedForDefendant(deemedServedDate)
-                                              .build())
+                .cosNotifyClaimDefendant2(certificateOfService)
                 .build();
 
             CertificateOfService certificateOfServiceDef2 = caseData.getCosNotifyClaimDefendant2();
@@ -470,12 +462,12 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldThrowError_whenDeemedServedDateExceeds2WorkingDays() {
             LocalDate currentDate = LocalDate.now();
             LocalDate deemedServedDate = currentDate.plusDays(5);
+            CertificateOfService certificateOfService = new CertificateOfService();
+            certificateOfService.setCosDateOfServiceForDefendant(currentDate);
+            certificateOfService.setCosDateDeemedServedForDefendant(deemedServedDate);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v2RespondentLiP()
-                .cosNotifyClaimDefendant2(CertificateOfService.builder()
-                                              .cosDateOfServiceForDefendant(currentDate)
-                                              .cosDateDeemedServedForDefendant(deemedServedDate)
-                                              .build())
+                .cosNotifyClaimDefendant2(certificateOfService)
                 .build();
 
             CertificateOfService certificateOfServiceDef2 = caseData.getCosNotifyClaimDefendant2();
@@ -496,12 +488,12 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldThrowError_whenDeemedServedDateIsWorkingDay() {
             LocalDate currentDate = LocalDate.now();
             LocalDate deemedServedDate = currentDate;
+            CertificateOfService certificateOfService = new CertificateOfService();
+            certificateOfService.setCosDateOfServiceForDefendant(currentDate);
+            certificateOfService.setCosDateDeemedServedForDefendant(deemedServedDate);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v2RespondentLiP()
-                .cosNotifyClaimDefendant2(CertificateOfService.builder()
-                                              .cosDateOfServiceForDefendant(currentDate)
-                                              .cosDateDeemedServedForDefendant(deemedServedDate)
-                                              .build())
+                .cosNotifyClaimDefendant2(certificateOfService)
                 .build();
 
             CertificateOfService certificateOfServiceDef2 = caseData.getCosNotifyClaimDefendant2();
@@ -647,10 +639,10 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 when(deadlinesCalculator.plus14DaysDeadline(cosNotifyDate.atTime(15, 05)))
                     .thenReturn(claimDetailsNotificationDeadline);
 
+                CertificateOfService certificateOfService = new CertificateOfService();
+                certificateOfService.setCosDateOfServiceForDefendant(cosNotifyDate);
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified1v2RespondentLiP()
-                    .cosNotifyClaimDefendant1(CertificateOfService.builder()
-                                                  .cosDateOfServiceForDefendant(cosNotifyDate)
-                                                  .build())
+                    .cosNotifyClaimDefendant1(certificateOfService)
                     .claimNotificationDeadline(claimNotificationDeadline)
                     .addRespondent2(YesOrNo.YES)
                     .build();
@@ -678,10 +670,10 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 when(deadlinesCalculator.plus14DaysDeadline(cosNotifyDate.atTime(15, 05)))
                     .thenReturn(claimDetailsNotificationDeadline);
 
+                CertificateOfService certificateOfService = new CertificateOfService();
+                certificateOfService.setCosDateOfServiceForDefendant(cosNotifyDate);
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified1v2RespondentLiP()
-                    .cosNotifyClaimDefendant2(CertificateOfService.builder()
-                                                  .cosDateOfServiceForDefendant(cosNotifyDate)
-                                                  .build())
+                    .cosNotifyClaimDefendant2(certificateOfService)
                     .respondent1Represented(YesOrNo.YES)
                     .respondent2Represented(YesOrNo.NO)
                     .addRespondent2(YesOrNo.YES)
@@ -705,19 +697,19 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             void shouldSetDetailsNotificationDeadline_Cos_1v2_bothDefendantsLip_def1NotifiedEarlier() {
 
                 LocalDate cosDef1NotifyDate = LocalDate.of(2021, 5, 1);
-                LocalDate cosDef2NotifyDate = LocalDate.of(2021, 5, 2);
                 when(time.now()).thenReturn(LocalDateTime.of(2021, 5, 3, 15, 05));
 
                 when(deadlinesCalculator.plus14DaysDeadline(cosDef1NotifyDate.atTime(15, 05)))
                     .thenReturn(claimDetailsNotificationDeadline);
 
+                CertificateOfService certificateOfService = new CertificateOfService();
+                certificateOfService.setCosDateOfServiceForDefendant(cosDef1NotifyDate);
+                CertificateOfService certificateOfService1 = new CertificateOfService();
+                LocalDate cosDef2NotifyDate = LocalDate.of(2021, 5, 2);
+                certificateOfService1.setCosDateOfServiceForDefendant(cosDef2NotifyDate);
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified1v2RespondentLiP()
-                    .cosNotifyClaimDefendant1(CertificateOfService.builder()
-                                                  .cosDateOfServiceForDefendant(cosDef1NotifyDate)
-                                                  .build())
-                    .cosNotifyClaimDefendant2(CertificateOfService.builder()
-                                                  .cosDateOfServiceForDefendant(cosDef2NotifyDate)
-                                                  .build())
+                    .cosNotifyClaimDefendant1(certificateOfService)
+                    .cosNotifyClaimDefendant2(certificateOfService1)
                     .respondent1Represented(YesOrNo.NO)
                     .respondent2Represented(YesOrNo.NO)
                     .addRespondent2(YesOrNo.YES)
@@ -743,13 +735,13 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 when(deadlinesCalculator.plus14DaysDeadline(cosDef2NotifyDate.atTime(15, 05)))
                     .thenReturn(claimDetailsNotificationDeadline);
 
+                CertificateOfService certificateOfService = new CertificateOfService();
+                certificateOfService.setCosDateOfServiceForDefendant(cosDef1NotifyDate);
+                CertificateOfService certificateOfService1 = new CertificateOfService();
+                certificateOfService1.setCosDateOfServiceForDefendant(cosDef2NotifyDate);
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified1v2RespondentLiP()
-                    .cosNotifyClaimDefendant1(CertificateOfService.builder()
-                                                  .cosDateOfServiceForDefendant(cosDef1NotifyDate)
-                                                  .build())
-                    .cosNotifyClaimDefendant2(CertificateOfService.builder()
-                                                  .cosDateOfServiceForDefendant(cosDef2NotifyDate)
-                                                  .build())
+                    .cosNotifyClaimDefendant1(certificateOfService)
+                    .cosNotifyClaimDefendant2(certificateOfService1)
                     .respondent1Represented(YesOrNo.NO)
                     .respondent2Represented(YesOrNo.NO)
                     .addRespondent2(YesOrNo.YES)
@@ -769,19 +761,19 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             void shouldSetDetailsNotificationDeadline_Cos_1v2_bothDefendantsLip_sameDates() {
 
                 LocalDate cosDef1NotifyDate = LocalDate.of(2021, 4, 2);
-                LocalDate cosDef2NotifyDate = LocalDate.of(2021, 4, 2);
 
                 when(time.now()).thenReturn(LocalDateTime.of(2021, 5, 3, 15, 05));
                 when(deadlinesCalculator.plus14DaysDeadline(cosDef1NotifyDate.atTime(15, 05)))
                     .thenReturn(claimDetailsNotificationDeadline);
 
+                CertificateOfService certificateOfService = new CertificateOfService();
+                certificateOfService.setCosDateOfServiceForDefendant(cosDef1NotifyDate);
+                CertificateOfService certificateOfService1 = new CertificateOfService();
+                LocalDate cosDef2NotifyDate = LocalDate.of(2021, 4, 2);
+                certificateOfService1.setCosDateOfServiceForDefendant(cosDef2NotifyDate);
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified1v2RespondentLiP()
-                    .cosNotifyClaimDefendant1(CertificateOfService.builder()
-                                                  .cosDateOfServiceForDefendant(cosDef1NotifyDate)
-                                                  .build())
-                    .cosNotifyClaimDefendant2(CertificateOfService.builder()
-                                                  .cosDateOfServiceForDefendant(cosDef2NotifyDate)
-                                                  .build())
+                    .cosNotifyClaimDefendant1(certificateOfService)
+                    .cosNotifyClaimDefendant2(certificateOfService1)
                     .respondent1Represented(YesOrNo.NO)
                     .respondent2Represented(YesOrNo.NO)
                     .addRespondent2(YesOrNo.YES)
@@ -806,10 +798,10 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 when(deadlinesCalculator.plus14DaysDeadline(cosNotifyDate.atTime(15, 05)))
                     .thenReturn(claimDetailsNotificationDeadline);
 
+                CertificateOfService certificateOfService = new CertificateOfService();
+                certificateOfService.setCosDateOfServiceForDefendant(cosNotifyDate);
                 CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimNotified1v1LiP(CertificateOfService.builder()
-                                                    .cosDateOfServiceForDefendant(cosNotifyDate)
-                                                    .build())
+                    .atStateClaimNotified1v1LiP(certificateOfService)
                     .claimNotificationDeadline(claimNotificationDeadline)
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(
@@ -825,13 +817,16 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Nested
         class SetOrganisationPolicy {
-            OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
-                .organisation(Organisation.builder()
-                                  .organisationID(null)
-                                  .build())
-                .orgPolicyReference("orgreference")
-                .orgPolicyCaseAssignedRole("orgassignedrole")
-                .build();
+
+            OrganisationPolicy organisationPolicy = new OrganisationPolicy();
+
+            {
+                Organisation organisation = new Organisation();
+                organisation.setOrganisationID(null);
+                organisationPolicy.setOrganisation(organisation);
+                organisationPolicy.setOrgPolicyReference("orgreference");
+                organisationPolicy.setOrgPolicyCaseAssignedRole("orgassignedrole");
+            }
 
             @BeforeEach
             void setup() {
@@ -841,15 +836,14 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldSetOrganisationPolicy_1v1() {
-                LocalDateTime claimNotificationDeadline = notificationDate.plusMonths(4);
-                OrganisationPolicy expectedOrganisationPolicy = OrganisationPolicy.builder()
-                    .organisation(Organisation.builder()
-                                      .organisationID("QWERTY R")
-                                      .build())
-                    .orgPolicyReference("orgreference")
-                    .orgPolicyCaseAssignedRole("orgassignedrole")
-                    .build();
+                OrganisationPolicy expectedOrganisationPolicy = new OrganisationPolicy();
+                Organisation organisation = new Organisation();
+                organisation.setOrganisationID("QWERTY R");
+                expectedOrganisationPolicy.setOrganisation(organisation);
+                expectedOrganisationPolicy.setOrgPolicyReference("orgreference");
+                expectedOrganisationPolicy.setOrgPolicyCaseAssignedRole("orgassignedrole");
 
+                LocalDateTime claimNotificationDeadline = notificationDate.plusMonths(4);
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
                     .respondent1OrganisationIDCopy("QWERTY R")
                     .respondent1OrganisationPolicy(organisationPolicy)
@@ -874,20 +868,19 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldSetOrganisationPolicy_1v2() {
-                OrganisationPolicy expectedOrganisationPolicy1 = OrganisationPolicy.builder()
-                    .organisation(Organisation.builder()
-                                      .organisationID("QWERTY R")
-                                      .build())
-                    .orgPolicyReference("orgreference")
-                    .orgPolicyCaseAssignedRole("orgassignedrole")
-                    .build();
-                OrganisationPolicy expectedOrganisationPolicy2 = OrganisationPolicy.builder()
-                    .organisation(Organisation.builder()
-                                      .organisationID("QWERTY R2")
-                                      .build())
-                    .orgPolicyReference("orgreference")
-                    .orgPolicyCaseAssignedRole("orgassignedrole")
-                    .build();
+                OrganisationPolicy expectedOrganisationPolicy1 = new OrganisationPolicy();
+                Organisation organisation1 = new Organisation();
+                organisation1.setOrganisationID("QWERTY R");
+                expectedOrganisationPolicy1.setOrganisation(organisation1);
+                expectedOrganisationPolicy1.setOrgPolicyReference("orgreference");
+                expectedOrganisationPolicy1.setOrgPolicyCaseAssignedRole("orgassignedrole");
+
+                OrganisationPolicy expectedOrganisationPolicy2 = new OrganisationPolicy();
+                Organisation organisation2 = new Organisation();
+                organisation2.setOrganisationID("QWERTY R2");
+                expectedOrganisationPolicy2.setOrganisation(organisation2);
+                expectedOrganisationPolicy2.setOrgPolicyReference("orgreference");
+                expectedOrganisationPolicy2.setOrgPolicyCaseAssignedRole("orgassignedrole");
                 LocalDateTime claimNotificationDeadline = notificationDate.plusMonths(4);
 
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors()
@@ -999,10 +992,10 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_Defendant1Lip_whenInvoked() {
+            CertificateOfService certificateOfService = new CertificateOfService();
+            certificateOfService.setCosDateOfServiceForDefendant(LocalDate.now());
             CaseData caseData = CaseDataBuilder
-                .builder().atStateClaimNotified1v1LiP(CertificateOfService
-                                                          .builder().cosDateOfServiceForDefendant(LocalDate.now())
-                                                          .build())
+                .builder().atStateClaimNotified1v1LiP(certificateOfService)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
@@ -1020,11 +1013,11 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_Defendant2Lip_whenInvoked() {
+            CertificateOfService certificateOfService = new CertificateOfService();
+            certificateOfService.setCosDateOfServiceForDefendant(LocalDate.now());
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v2RespondentLiP()
-                .cosNotifyClaimDefendant2(CertificateOfService.builder()
-                                              .cosDateOfServiceForDefendant(LocalDate.now())
-                                              .build())
+                .cosNotifyClaimDefendant2(certificateOfService)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);

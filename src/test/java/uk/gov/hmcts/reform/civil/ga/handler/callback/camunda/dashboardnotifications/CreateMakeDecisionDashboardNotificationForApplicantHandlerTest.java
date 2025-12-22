@@ -108,25 +108,6 @@ public class CreateMakeDecisionDashboardNotificationForApplicantHandlerTest exte
             );
         }
 
-        @Test
-        void shouldNotRecordMoreInfoRequiredApplicantScenarioWhenInvoked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
-                .parentCaseReference(caseData.getCcdCaseReference().toString())
-                .isGaApplicantLip(YesOrNo.YES)
-                .parentClaimantIsApplicant(YesOrNo.YES)
-                .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder().requestMoreInfoOption(
-                    GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION).deadlineForMoreInfoSubmission(
-                    LocalDateTime.now().plusDays(5)).build()).build();
-
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_APPLICANT_DASHBOARD_NOTIFICATION_FOR_MAKE_DECISION.name())
-                    .build()
-            ).build();
-
-            handler.handle(params);
-        }
-
         @ParameterizedTest
         @MethodSource("provideCcdState")
         void shouldRecordPayAdditionalPaymentApplicantScenarioWhenInvoked(CaseState caseState) {

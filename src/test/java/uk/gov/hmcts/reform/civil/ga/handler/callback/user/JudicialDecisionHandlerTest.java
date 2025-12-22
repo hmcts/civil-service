@@ -193,7 +193,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
     private static final String ACTIVITY_ID = "anyActivity";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd MMMM yy");
     private static final DateTimeFormatter DATE_FORMATTER_SUBMIT_CALLBACK = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    private static final String expectedDismissalOrder = "This application is dismissed.\n\n";
+    private static final String EXPECTED_DISMISSAL_ORDER = "This application is dismissed.\n\n";
 
     private static final String JUDICIAL_REQUEST_MORE_INFO_RECITAL_TEXT = "<Title> <Name> \n"
         + "Upon reviewing the application made and upon considering the information "
@@ -583,11 +583,11 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         @Test
         void testAboutToStartForHearingDetails() {
 
-            String expecetedJudicialTimeEstimateText =
+            String expectedJudicialTimeEstimateText =
                 "Applicant estimates %s. Respondent 1 estimates %s. Respondent 2 estimates %s.";
-            String expecetedJudicialPreferrenceText =
+            String expectedJudicialPreferrenceText =
                 "Applicant prefers %s. Respondent 1 prefers %s. Respondent 2 prefers %s.";
-            String expecetedJudicialSupportText =
+            String expectedJudicialSupportText =
                 "Applicant requires %s. Respondent 1 requires %s. Respondent 2 requires %s.";
             String expectedJudicialPreferenceLocationText =
                 "Applicant prefers Location %s. Respondent 1 prefers Location %s. Respondent 2 prefers Location %s.";
@@ -607,7 +607,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             assertThat(responseCaseData.getJudgeHearingTimeEstimateText1())
                 .isEqualTo(String.format(
-                    expecetedJudicialTimeEstimateText,
+                    expectedJudicialTimeEstimateText,
                     getHearingOrderApplnAndResp1and2(types, NO, YES, YES)
                         .getGeneralAppHearingDetails().getHearingDuration()
                         .getDisplayedValue(),
@@ -621,7 +621,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             assertThat(responseCaseData.getHearingPreferencesPreferredTypeLabel1())
                 .isEqualTo(String.format(
-                    expecetedJudicialPreferrenceText,
+                    expectedJudicialPreferrenceText,
                     getHearingOrderApplnAndResp1and2(types, NO, YES, YES)
                         .getGeneralAppHearingDetails().getHearingPreferencesPreferredType()
                         .getDisplayedValue(),
@@ -647,7 +647,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             assertThat(responseCaseData.getJudgeHearingSupportReqText1())
                 .isEqualTo(String.format(
-                    expecetedJudicialSupportText,
+                    expectedJudicialSupportText,
                     getHearingOrderApplnAndResp1and2(types, NO, YES, YES)
                         .getGeneralAppHearingDetails()
                         .getSupportRequirement().get(0).getDisplayedValue(),
@@ -732,9 +732,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         @Test
         void testAboutToStartForHearingScreenForUrgentApp() {
 
-            String expecetedJudicialTimeEstimateText = "Applicant estimates 1 hour";
-            String expecetedJudicialPreferrenceText = "Applicant prefers In person";
-            String expecetedJudicialSupportReqText = "Applicant requires Hearing loop, Other support";
+            String expectedJudicialTimeEstimateText = "Applicant estimates 1 hour";
+            String expectedJudicialPreferenceText = "Applicant prefers In person";
+            String expectedJudicialSupportReqText = "Applicant requires Hearing loop, Other support";
 
             CallbackParams params = callbackParamsOf(getCaseDateForUrgentApp(), ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -743,20 +743,20 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             GAJudgesHearingListGAspec responseCaseData = getJudicialHearingOrder(response);
 
             assertThat(responseCaseData.getJudgeHearingTimeEstimateText1())
-                .isEqualTo(expecetedJudicialTimeEstimateText);
+                .isEqualTo(expectedJudicialTimeEstimateText);
 
             assertThat(responseCaseData.getHearingPreferencesPreferredTypeLabel1())
-                .isEqualTo(expecetedJudicialPreferrenceText);
+                .isEqualTo(expectedJudicialPreferenceText);
 
             assertThat(responseCaseData.getJudgeHearingSupportReqText1())
-                .isEqualTo(expecetedJudicialSupportReqText);
+                .isEqualTo(expectedJudicialSupportReqText);
 
         }
 
         @Test
         void testAboutToStartForHearingScreenForUrgentApp_noTimeEstimates() {
 
-            String expecetedJudicialTimeEstimateText = "Applicant and respondent have not provided estimates";
+            String expectedJudicialTimeEstimateText = "Applicant and respondent have not provided estimates";
 
             GeneralApplicationCaseData caseData = getCaseDateForUrgentApp();
             caseData = caseData.toBuilder()
@@ -772,13 +772,13 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             GAJudgesHearingListGAspec responseCaseData = getJudicialHearingOrder(response);
 
             assertThat(responseCaseData.getJudgeHearingTimeEstimateText1())
-                .isEqualTo(expecetedJudicialTimeEstimateText);
+                .isEqualTo(expectedJudicialTimeEstimateText);
         }
 
         @Test
         void testHearingScreenSupportReqWithNoApplnHearingSupport() {
 
-            String expecetedJudicialSupportReqText = "Applicant requires no support";
+            String expectedJudicialSupportReqText = "Applicant requires no support";
 
             GAUrgencyRequirement urgentApp = GAUrgencyRequirement.builder().generalAppUrgency(YES).build();
 
@@ -792,14 +792,14 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             GAJudgesHearingListGAspec responseCaseData = getJudicialHearingOrder(response);
 
             assertThat(responseCaseData.getJudgeHearingSupportReqText1())
-                .isEqualTo(expecetedJudicialSupportReqText);
+                .isEqualTo(expectedJudicialSupportReqText);
 
         }
 
         @Test
         void testHearingScreenSupportReqWithNoApplnHearingSupportAndRespWithSupportReq() {
 
-            String expecetedJudicialSupportReqText = "Applicant requires no support. "
+            String expectedJudicialSupportReqText = "Applicant requires no support. "
                 + "Respondent requires Other support, Hearing loop.";
 
             GAUrgencyRequirement urgentApp = GAUrgencyRequirement.builder().generalAppUrgency(YES).build();
@@ -816,17 +816,17 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             GAJudgesHearingListGAspec responseCaseData = getJudicialHearingOrder(response);
 
             assertThat(responseCaseData.getJudgeHearingSupportReqText1())
-                .isEqualTo(expecetedJudicialSupportReqText);
+                .isEqualTo(expectedJudicialSupportReqText);
 
         }
 
         @Test
         void shouldMatchHearingReqForDifferentPreferences() {
 
-            String expecetedJudicialTimeEstimateText = "Applicant estimates 45 minutes. Respondent estimates 1 hour.";
-            String expecetedJudicialPreferrenceText = "Applicant prefers Video conference hearing. Respondent "
+            String expectedJudicialTimeEstimateText = "Applicant estimates 45 minutes. Respondent estimates 1 hour.";
+            String expectedJudicialPreferenceText = "Applicant prefers Video conference hearing. Respondent "
                 + "prefers In person.";
-            String expecetedJudicialSupportReqText = "Applicant requires Disabled access, Sign language interpreter. "
+            String expectedJudicialSupportReqText = "Applicant requires Disabled access, Sign language interpreter. "
                 + "Respondent requires Other support, Hearing loop.";
 
             List<GeneralApplicationTypes> types = List.of(
@@ -839,13 +839,13 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             GAJudgesHearingListGAspec responseCaseData = getJudicialHearingOrder(response);
 
             assertThat(responseCaseData.getJudgeHearingTimeEstimateText1())
-                .isEqualTo(expecetedJudicialTimeEstimateText);
+                .isEqualTo(expectedJudicialTimeEstimateText);
 
             assertThat(responseCaseData.getHearingPreferencesPreferredTypeLabel1())
-                .isEqualTo(expecetedJudicialPreferrenceText);
+                .isEqualTo(expectedJudicialPreferenceText);
 
             assertThat(responseCaseData.getJudgeHearingSupportReqText1())
-                .isEqualTo(expecetedJudicialSupportReqText);
+                .isEqualTo(expectedJudicialSupportReqText);
 
         }
 
@@ -871,7 +871,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 .respondentsResponses(respondentResponses)
                 .build();
 
-            String expecetedJudicialTimeEstimateText = "Applicant and respondent have not provided estimates";
+            String expectedJudicialTimeEstimateText = "Applicant and respondent have not provided estimates";
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -880,7 +880,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             GAJudgesHearingListGAspec responseCaseData = getJudicialHearingOrder(response);
 
             assertThat(responseCaseData.getJudgeHearingTimeEstimateText1())
-                .isEqualTo(expecetedJudicialTimeEstimateText);
+                .isEqualTo(expectedJudicialTimeEstimateText);
         }
 
         @Test
@@ -898,7 +898,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 expectedRecitalText,
                 DATE_FORMATTER.format(LocalDate.now())
             ));
-            assertThat(makeAnOrder.getDismissalOrderText()).isEqualTo(expectedDismissalOrder);
+            assertThat(makeAnOrder.getDismissalOrderText()).isEqualTo(EXPECTED_DISMISSAL_ORDER);
         }
 
         @Test
@@ -916,7 +916,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 expectedRecitalText,
                 DATE_FORMATTER.format(LocalDate.now())
             ));
-            assertThat(makeAnOrder.getDismissalOrderText()).isEqualTo(expectedDismissalOrder);
+            assertThat(makeAnOrder.getDismissalOrderText()).isEqualTo(EXPECTED_DISMISSAL_ORDER);
         }
 
         @Test
@@ -935,7 +935,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 expectedRecitalText,
                 DATE_FORMATTER.format(LocalDate.now())
             ));
-            assertThat(makeAnOrder.getDismissalOrderText()).isEqualTo(expectedDismissalOrder);
+            assertThat(makeAnOrder.getDismissalOrderText()).isEqualTo(EXPECTED_DISMISSAL_ORDER);
         }
 
         @Test
@@ -954,7 +954,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 expectedRecitalText,
                 DATE_FORMATTER.format(LocalDate.now())
             ));
-            assertThat(makeAnOrder.getDismissalOrderText()).isEqualTo(expectedDismissalOrder);
+            assertThat(makeAnOrder.getDismissalOrderText()).isEqualTo(EXPECTED_DISMISSAL_ORDER);
         }
 
         @Test
@@ -1040,7 +1040,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 expectedRecitalText,
                 DATE_FORMATTER.format(LocalDate.now())
             ));
-            assertThat(makeAnOrder.getDismissalOrderText()).isEqualTo(expectedDismissalOrder);
+            assertThat(makeAnOrder.getDismissalOrderText()).isEqualTo(EXPECTED_DISMISSAL_ORDER);
         }
 
         @Test
@@ -1229,8 +1229,12 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         @Test
         void shouldMatchExpectedVulnerabilityText() {
 
-            String expecetedVulnerabilityText = "Applicant requires support with regards to vulnerability\n"
-                + "dummy\n\nRespondent requires support with regards to vulnerability\ndummy";
+            String expectedVulnerabilityText = """
+                Applicant requires support with regards to vulnerability
+                dummy
+
+                Respondent requires support with regards to vulnerability
+                dummy""";
 
             List<GeneralApplicationTypes> types = List.of(
                 (GeneralApplicationTypes.EXTEND_TIME), (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
@@ -1242,14 +1246,14 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             GAJudgesHearingListGAspec responseCaseData = getJudicialHearingOrder(response);
 
             assertThat(responseCaseData.getJudicialVulnerabilityText())
-                .isEqualTo(expecetedVulnerabilityText);
+                .isEqualTo(expectedVulnerabilityText);
 
         }
 
         @Test
         void shouldHaveVulTextWithRespondentRespond() {
 
-            String expecetedVulnerabilityText = "Respondent requires support with regards to vulnerability\n"
+            String expectedVulnerabilityText = "Respondent requires support with regards to vulnerability\n"
                 + "dummy";
 
             List<GeneralApplicationTypes> types = List.of(
@@ -1265,14 +1269,14 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             GAJudgesHearingListGAspec responseCaseData = getJudicialHearingOrder(response);
 
             assertThat(responseCaseData.getJudicialVulnerabilityText())
-                .isEqualTo(expecetedVulnerabilityText);
+                .isEqualTo(expectedVulnerabilityText);
 
         }
 
         @Test
         void shouldHaveVulTextWithRespondent1and2Respond() {
 
-            String expecetedVulnerabilityText = "\n\nRespondent 1 requires support with regards to vulnerability\n"
+            String expectedVulnerabilityText = "\n\nRespondent 1 requires support with regards to vulnerability\n"
                 + "dummy1\n\nRespondent 2 requires support with regards to vulnerability\ndummy2";
 
             List<GeneralApplicationTypes> types = List.of(
@@ -1288,14 +1292,14 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             GAJudgesHearingListGAspec responseCaseData = getJudicialHearingOrder(response);
 
             assertThat(responseCaseData.getJudicialVulnerabilityText())
-                .isEqualTo(expecetedVulnerabilityText);
+                .isEqualTo(expectedVulnerabilityText);
 
         }
 
         @Test
         void shouldHaveVulTextWithApplicantRespondent1and2Respond() {
 
-            String expecetedVulnerabilityText = "Applicant requires support with regards to vulnerability\ndummy"
+            String expectedVulnerabilityText = "Applicant requires support with regards to vulnerability\ndummy"
                 + "\n\nRespondent 1 requires support with regards to vulnerability\n"
                 + "dummy1\n\nRespondent 2 requires support with regards to vulnerability\ndummy2";
 
@@ -1312,14 +1316,14 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             GAJudgesHearingListGAspec responseCaseData = getJudicialHearingOrder(response);
 
             assertThat(responseCaseData.getJudicialVulnerabilityText())
-                .isEqualTo(expecetedVulnerabilityText);
+                .isEqualTo(expectedVulnerabilityText);
 
         }
 
         @Test
         void shouldHaveVulTextWithApplicantRespondent1Respond() {
 
-            String expecetedVulnerabilityText = "Applicant requires support with regards to vulnerability\ndummy"
+            String expectedVulnerabilityText = "Applicant requires support with regards to vulnerability\ndummy"
                 + "\n\nRespondent 1 requires support with regards to vulnerability\n"
                 + "dummy1";
 
@@ -1336,14 +1340,14 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             GAJudgesHearingListGAspec responseCaseData = getJudicialHearingOrder(response);
 
             assertThat(responseCaseData.getJudicialVulnerabilityText())
-                .isEqualTo(expecetedVulnerabilityText);
+                .isEqualTo(expectedVulnerabilityText);
 
         }
 
         @Test
         void shouldHaveVulTextWithApplicantRespondent2Respond() {
 
-            String expecetedVulnerabilityText = "Applicant requires support with regards to vulnerability\ndummy"
+            String expectedVulnerabilityText = "Applicant requires support with regards to vulnerability\ndummy"
                 + "\n\nRespondent 2 requires support with regards to vulnerability\ndummy2";
 
             List<GeneralApplicationTypes> types = List.of(
@@ -1359,14 +1363,14 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             GAJudgesHearingListGAspec responseCaseData = getJudicialHearingOrder(response);
 
             assertThat(responseCaseData.getJudicialVulnerabilityText())
-                .isEqualTo(expecetedVulnerabilityText);
+                .isEqualTo(expectedVulnerabilityText);
 
         }
 
         @Test
         void shouldHaveVulTextWithRespondent2Respond() {
 
-            String expecetedVulnerabilityText =
+            String expectedVulnerabilityText =
                 "\n\nRespondent 2 requires support with regards to vulnerability\ndummy2";
 
             List<GeneralApplicationTypes> types = List.of(
@@ -1382,14 +1386,14 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             GAJudgesHearingListGAspec responseCaseData = getJudicialHearingOrder(response);
 
             assertThat(responseCaseData.getJudicialVulnerabilityText())
-                .isEqualTo(expecetedVulnerabilityText);
+                .isEqualTo(expectedVulnerabilityText);
 
         }
 
         @Test
         void shouldHaveVulTextWithRespondent1Respond() {
 
-            String expecetedVulnerabilityText =
+            String expectedVulnerabilityText =
                 "\n\nRespondent 1 requires support with regards to vulnerability\ndummy1";
 
             List<GeneralApplicationTypes> types = List.of(
@@ -1405,14 +1409,14 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             GAJudgesHearingListGAspec responseCaseData = getJudicialHearingOrder(response);
 
             assertThat(responseCaseData.getJudicialVulnerabilityText())
-                .isEqualTo(expecetedVulnerabilityText);
+                .isEqualTo(expectedVulnerabilityText);
 
         }
 
         @Test
         void shouldHaveVulTextWithApplicantRespond() {
 
-            String expecetedVulnerabilityText = "Applicant requires support with regards to vulnerability\n"
+            String expectedVulnerabilityText = "Applicant requires support with regards to vulnerability\n"
                 + "dummy";
 
             List<GeneralApplicationTypes> types = List.of(
@@ -1425,14 +1429,14 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             GAJudgesHearingListGAspec responseCaseData = getJudicialHearingOrder(response);
 
             assertThat(responseCaseData.getJudicialVulnerabilityText())
-                .isEqualTo(expecetedVulnerabilityText);
+                .isEqualTo(expectedVulnerabilityText);
 
         }
 
         @Test
         void shouldReturnExpectedTextWithNOVulRespond() {
 
-            String expecetedVulnerabilityText = "No support required with regards to vulnerability";
+            String expectedVulnerabilityText = "No support required with regards to vulnerability";
 
             List<GeneralApplicationTypes> types = List.of(
                 (GeneralApplicationTypes.EXTEND_TIME), (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
@@ -1444,7 +1448,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             GAJudgesHearingListGAspec responseCaseData = getJudicialHearingOrder(response);
 
             assertThat(responseCaseData.getJudicialVulnerabilityText())
-                .isEqualTo(expecetedVulnerabilityText);
+                .isEqualTo(expectedVulnerabilityText);
 
         }
 
@@ -2261,8 +2265,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             assertThat(response).isNotNull();
             assertThat(response.getErrors()).isNotNull();
-            response.getErrors().get(0)
-                .equals("The application needs to be uncloaked before requesting written representations");
+            assertThat(response.getErrors().get(0))
+                .isEqualTo("The application needs to be uncloaked before requesting written representations");
         }
 
         @Test
@@ -2282,8 +2286,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             assertThat(response).isNotNull();
             assertThat(response.getErrors()).isNotNull();
-            response.getErrors().get(0)
-                .equals("The application needs to be uncloaked before requesting written representations");
+            assertThat(response.getErrors().get(0))
+                .isEqualTo("The application needs to be uncloaked before requesting written representations");
         }
 
         @Test
@@ -2383,8 +2387,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             assertThat(response).isNotNull();
             assertThat(response.getErrors()).isNotNull();
-            response.getErrors().get(0)
-                .equals("The application needs to be uncloaked before requesting written representations");
+            assertThat(response.getErrors().get(0))
+                .isEqualTo("The application needs to be uncloaked before requesting written representations");
         }
 
         @Test
@@ -2404,8 +2408,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             assertThat(response).isNotNull();
             assertThat(response.getErrors()).isNotNull();
-            response.getErrors().get(0)
-                .equals("The application needs to be uncloaked before requesting written representations");
+            assertThat(response.getErrors().get(0))
+                .isEqualTo("The application needs to be uncloaked before requesting written representations");
         }
 
         @Test
@@ -2677,7 +2681,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             assertThat(makeAnOrder.getJudgeRecitalText())
                 .isEqualTo(String.format(expectedRecitalText, DATE_FORMATTER.format(LocalDate.now())));
-            assertThat(makeAnOrder.getDismissalOrderText()).isEqualTo(expectedDismissalOrder);
+            assertThat(makeAnOrder.getDismissalOrderText()).isEqualTo(EXPECTED_DISMISSAL_ORDER);
         }
 
         @Test
@@ -2700,7 +2704,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             assertThat(makeAnOrder.getJudgeRecitalText())
                 .isEqualTo(String.format(expectedRecitalText, DATE_FORMATTER.format(LocalDate.now())));
-            assertThat(makeAnOrder.getDismissalOrderText()).isEqualTo(expectedDismissalOrder);
+            assertThat(makeAnOrder.getDismissalOrderText()).isEqualTo(EXPECTED_DISMISSAL_ORDER);
         }
 
         @Test
@@ -2722,7 +2726,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             assertThat(makeAnOrder.getJudgeRecitalText())
                 .isEqualTo(String.format(expectedRecitalText, DATE_FORMATTER.format(LocalDate.now())));
-            assertThat(makeAnOrder.getDismissalOrderText()).isEqualTo(expectedDismissalOrder);
+            assertThat(makeAnOrder.getDismissalOrderText()).isEqualTo(EXPECTED_DISMISSAL_ORDER);
         }
     }
 
@@ -2742,8 +2746,6 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         }
 
         private static final String VALIDATE_MAKE_DECISION_SCREEN = "validate-make-decision-screen";
-        public static final String RESPOND_TO_DIRECTIONS_DATE_REQUIRED = "The date, by which the response to direction"
-                + " should be given, is required.";
         public static final String RESPOND_TO_DIRECTIONS_DATE_IN_PAST = "The date, by which the response to direction"
                 + " should be given, cannot be in past.";
 

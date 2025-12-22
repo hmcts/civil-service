@@ -355,11 +355,10 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetNewResponseDeadlineAndUpdateBusinessProcess_whenInvokedFor1v1() {
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .addApplicant2(NO)
-                .addRespondent2(NO)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1Copy(PartyBuilder.builder().individual().build());
+            caseData.setAddApplicant2(NO);
+            caseData.setAddRespondent2(NO);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -384,11 +383,10 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetNewResponseDeadlineAndUpdateBusinessProcess_whenInvokedFor2v1() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .addApplicant2(YES)
-                .applicant2(PartyBuilder.builder().individual().build())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1Copy(PartyBuilder.builder().individual().build());
+            caseData.setAddApplicant2(YES);
+            caseData.setApplicant2(PartyBuilder.builder().individual().build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

@@ -1,13 +1,17 @@
 package uk.gov.hmcts.reform.civil.ga.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
+import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
@@ -15,7 +19,6 @@ import uk.gov.hmcts.reform.civil.ga.utils.HwFFeeTypeUtil;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -28,26 +31,27 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_LIP_
 
 @Slf4j
 @Service
-public class GaMoreInformationHwfCallbackHandler extends HWFCallbackHandlerBase {
+@RequiredArgsConstructor
+public class GaMoreInformationHwfCallbackHandler extends CallbackHandler implements GeneralApplicationCallbackHandler {
 
     private static final String ERROR_MESSAGE_DOCUMENT_DATE_MUST_BE_AFTER_TODAY = "Documents date must be future date";
+    public static final List<CaseEvent> EVENTS = List.of(MORE_INFORMATION_HWF_GA);
 
-    private final Map<String, Callback> callbackMap = Map.of(
-        callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-        callbackKey(MID, "more-information-hwf"), this::validationMoreInformation,
-        callbackKey(ABOUT_TO_SUBMIT), this::submitMoreInformationHwf,
-        callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
-    );
+    private final ObjectMapper objectMapper;
 
-    public GaMoreInformationHwfCallbackHandler(ObjectMapper objectMapper) {
-        super(objectMapper, Collections.singletonList(
-                MORE_INFORMATION_HWF_GA
-        ));
+    @Override
+    public List<CaseEvent> handledEvents() {
+        return EVENTS;
     }
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return callbackMap;
+        return Map.of(
+            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+            callbackKey(MID, "more-information-hwf"), this::validationMoreInformation,
+            callbackKey(ABOUT_TO_SUBMIT), this::submitMoreInformationHwf,
+            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
+        );
     }
 
     private CallbackResponse validationMoreInformation(CallbackParams callbackParams) {

@@ -73,19 +73,17 @@ public class ParentCaseUpdateHelper {
     private static final String GENERAL_APPLICATIONS_DETAILS_FOR_JUDGE = "gaDetailsMasterCollection";
     private static final String GENERAL_APPLICATIONS_DETAILS_FOR_WELSH = "gaDetailsTranslationCollection";
     private static final String GA_DRAFT_FORM = "gaDraft";
+    private static final String GA_ADDL = "gaAddl";
     private static final String[] DOCUMENT_TYPES = {
         "generalOrder", "dismissalOrder",
         "directionOrder", "hearingNotice",
-        "gaResp", GA_DRAFT_FORM, "gaAddl"
+        "gaResp", GA_DRAFT_FORM, GA_ADDL
     };
     private static final String CLAIMANT_ROLE = "Claimant";
-    private static final String RESPONDENTSOL_ROLE = "RespondentSol";
-    private static final String RESPONDENTSOL_TWO_ROLE = "RespondentSolTwo";
-    private String[] roles = {CLAIMANT_ROLE, RESPONDENTSOL_ROLE, RESPONDENTSOL_TWO_ROLE};
+    private static final String RESPONDENT_SOL_ROLE = "RespondentSol";
+    private static final String RESPONDENT_SOL_TWO_ROLE = "RespondentSolTwo";
     private static final String GA_EVIDENCE = "gaEvidence";
-    private static final String GA_ADDL = "gaAddl";
     private static final String CIVIL_GA_EVIDENCE = "generalAppEvidence";
-    private static final String FREE_KEYWORD = "FREE";
 
     protected static List<CaseState> DOCUMENT_STATES = Arrays.asList(
             AWAITING_ADDITIONAL_INFORMATION,
@@ -94,6 +92,8 @@ public class ParentCaseUpdateHelper {
             PENDING_APPLICATION_ISSUED,
             APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION
     );
+
+    private final String[] roles = {CLAIMANT_ROLE, RESPONDENT_SOL_ROLE, RESPONDENT_SOL_TWO_ROLE};
 
     public void updateParentWithGAState(GeneralApplicationCaseData generalAppCaseData, String newState) {
 
@@ -122,7 +122,7 @@ public class ParentCaseUpdateHelper {
                 respondentSpecficGADetails.stream()
                     .filter(gaRespondentApp -> gaRespSolAppFilterCriteria(gaRespondentApp, applicationId))
                     .findAny().orElseThrow(IllegalArgumentException::new).getValue().setCaseState(newState);
-                docVisibilityRoles[0] = RESPONDENTSOL_ROLE;
+                docVisibilityRoles[0] = RESPONDENT_SOL_ROLE;
             }
         }
 
@@ -143,7 +143,7 @@ public class ParentCaseUpdateHelper {
                 respondentSpecficGADetailsTwo.stream()
                     .filter(gaRespondentApp -> gaRespSolAppFilterCriteria(gaRespondentApp, applicationId))
                     .findAny().orElseThrow(IllegalArgumentException::new).getValue().setCaseState(newState);
-                docVisibilityRoles[1] = RESPONDENTSOL_TWO_ROLE;
+                docVisibilityRoles[1] = RESPONDENT_SOL_TWO_ROLE;
             }
         }
 
@@ -252,7 +252,7 @@ public class ParentCaseUpdateHelper {
             return CLAIMANT_ROLE;
         }
         if (generalAppCaseData.getIsGaApplicantLip() == YES) {
-            return RESPONDENTSOL_ROLE;
+            return RESPONDENT_SOL_ROLE;
         }
         String creatorId = generalAppCaseData.getGeneralAppApplnSolicitor().getOrganisationIdentifier();
         String respondent1OrganisationId = civilCaseData.getRespondent1OrganisationPolicy().getOrganisation()
@@ -262,7 +262,7 @@ public class ParentCaseUpdateHelper {
         if (creatorId
                 .equals(respondent1OrganisationId)) {
             log.info("GA creator is Respondent Solicitor 1.");
-            return RESPONDENTSOL_ROLE;
+            return RESPONDENT_SOL_ROLE;
         }
         String respondent2OrganisationId = civilCaseData.getRespondent2OrganisationPolicy().getOrganisation()
                 != null ? civilCaseData.getRespondent2OrganisationPolicy().getOrganisation()
@@ -272,7 +272,7 @@ public class ParentCaseUpdateHelper {
                 && creatorId
                 .equals(respondent2OrganisationId)) {
             log.info("GA creator is Respondent Solicitor 2.");
-            return RESPONDENTSOL_TWO_ROLE;
+            return RESPONDENT_SOL_TWO_ROLE;
         }
         return null;
     }
@@ -370,13 +370,13 @@ public class ParentCaseUpdateHelper {
 
         if (generalAppCaseData.getParentClaimantIsApplicant().equals(YES)) {
             addClaimantApplicationDetails(generalAppCaseData, applicationId, gaMasterDetails, gaClaimantDetails);
-            /**
-             * When main claim's 1 V 2 Same Legal Representative happens,
-             * Check if main claim "Respondent2SameLegalRespresentative" value is true,
-             * if so, ADD GA application has to master collection
-             *
-             * In addition to above, the condition : generalAppCaseData.getIsMultiParty().equals(NO)
-             * Add GA into mater collection if it's not multiparty scenario and GA initiated by Main claim Defendant 1v1
+            /*
+              When main claim's 1 V 2 Same Legal Representative happens,
+              Check if main claim "Respondent2SameLegalRespresentative" value is true,
+              if so, ADD GA application has to master collection
+
+              In addition to above, the condition : generalAppCaseData.getIsMultiParty().equals(NO)
+              Add GA into mater collection if it's not multiparty scenario and GA initiated by Main claim Defendant 1v1
              */
         } else if ((Objects.nonNull(parentCaseData.getRespondent2SameLegalRepresentative())
             && parentCaseData.getRespondent2SameLegalRepresentative().equals(YES))
@@ -400,10 +400,10 @@ public class ParentCaseUpdateHelper {
             updateJudgeOrClaimantFromRespCollection(generalAppCaseData, applicationId, gaMasterDetails, gaDetailsRespondentSol2);
         }
 
-        /**
-         * Respondent Agreement is NO and with notice.
-         * Application should be visible to all solicitor
-         * Consent order should be visible to all solicitors
+        /*
+          Respondent Agreement is NO and with notice.
+          Application should be visible to all solicitor
+          Consent order should be visible to all solicitors
          */
         if ((generalAppCaseData.getGeneralAppRespondentAgreement().getHasAgreed().equals(NO)
             && ofNullable(generalAppCaseData.getGeneralAppInformOtherParty()).isPresent()
@@ -420,23 +420,23 @@ public class ParentCaseUpdateHelper {
                     && parentCaseData.getRespondent2SameLegalRepresentative().equals(YES))
                     || generalAppCaseData.getIsMultiParty().equals(NO)) {
 
-                    /**
-                     * When main claim's 1 V 2 Same Legal Representative happens,
-                     * Check if main claim "Respondent2SameLegalRespresentative" value is true,
-                     * if so, ADD GA application has to master collection
-                     *
-                     * In addition to above, above condition, Add GA into mater collection if it's not multiparty scenario
+                    /*
+                      When main claim's 1 V 2 Same Legal Representative happens,
+                      Check if main claim "Respondent2SameLegalRespresentative" value is true,
+                      if so, ADD GA application has to master collection
+
+                      In addition to above, above condition, Add GA into mater collection if it's not multiparty scenario
                      */
                     updateJudgeOrClaimantFromRespCollection(generalAppCaseData, applicationId, gaClaimantDetails, gaDetailsRespondentSol);
 
                 }
             }
 
-            /**
-             * Parties : Claimant, Respondent 1, Respondent 2
-             *
-             * Condition : Multiparty - Yes, Respondent One initiates the GA - Yes
-             * Add GA from Respondent One Collection into Claimant's and Respondent Two's collections
+            /*
+              Parties : Claimant, Respondent 1, Respondent 2
+
+              Condition : Multiparty - Yes, Respondent One initiates the GA - Yes
+              Add GA from Respondent One Collection into Claimant's and Respondent Two's collections
              */
             if (generalAppCaseData.getIsMultiParty().equals(YES) && !gaDetailsRespondentSol.isEmpty()) {
                 log.info("Multiparty case and Respondent One initiates the GA for Case ID: {}", generalAppCaseData.getCcdCaseReference());
@@ -444,11 +444,11 @@ public class ParentCaseUpdateHelper {
                 updateRespCollectionForMultiParty(generalAppCaseData, applicationId, gaDetailsRespondentSol2, gaDetailsRespondentSol);
             }
 
-            /**
-             * Parties : Claimant, Respondent 1, Respondent 2
-             *
-             * Condition : Multiparty - Yes, Respondent Two initiates the GA - Yes
-             * Add GA from Respondent Two Collection into Claimant's and Respondent One's collections
+            /*
+              Parties : Claimant, Respondent 1, Respondent 2
+
+              Condition : Multiparty - Yes, Respondent Two initiates the GA - Yes
+              Add GA from Respondent Two Collection into Claimant's and Respondent One's collections
              */
             if (generalAppCaseData.getIsMultiParty().equals(YES) && !gaDetailsRespondentSol2.isEmpty()) {
                 log.info("Multiparty case and Respondent Two initiates the GA for Case ID: {}", generalAppCaseData.getCcdCaseReference());
@@ -546,8 +546,8 @@ public class ParentCaseUpdateHelper {
         Optional<Element<GADetailsRespondentSol>> gaToBeAdded = gaDetailsRespondentSol
             .stream().filter(respCollectionElement -> gaRespSolAppFilterCriteria(respCollectionElement, applicationId)).findAny();
 
-        /**
-         * To Prevent duplicate, Check if the application already present in the Respondent Collection before adding it from another Collection
+        /*
+          To Prevent duplicate, Check if the application already present in the Respondent Collection before adding it from another Collection
          */
         if (!gaToBeAdded.isPresent()) {
             respCollection.ifPresent(generalApplicationsDetailsElement -> gaDetailsRespondentSol.add(
@@ -593,8 +593,8 @@ public class ParentCaseUpdateHelper {
             Optional<Element<GeneralApplicationsDetails>> masterCollection = gaMasterDetails
                 .stream().filter(masterCollectionElement -> applicationFilterCriteria(masterCollectionElement, applicationId)).findAny();
 
-            /**
-             * To Prevent duplicate, Check if the application already present in the Master Collection before adding it from Respondent Collection
+            /*
+              To Prevent duplicate, Check if the application already present in the Master Collection before adding it from Respondent Collection
              */
             if (!masterCollection.isPresent()) {
                 log.info("Application with Case ID {} is added to respondent solicitor collection", generalAppCaseData.getCcdCaseReference());

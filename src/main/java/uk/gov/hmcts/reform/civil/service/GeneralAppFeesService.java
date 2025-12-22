@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -38,15 +37,20 @@ public class GeneralAppFeesService {
     private final FeesApiClient feesApiClient;
     private final GeneralAppFeesConfiguration feesConfiguration;
     public static final String FREE_REF = "FREE";
-    private static final Fee FREE_FEE = Fee.builder()
-        .calculatedAmountInPence(BigDecimal.ZERO).code(FREE_REF).version("1").build();
+    private static final Fee FREE_FEE;
+
+    static {
+        FREE_FEE = new Fee();
+        FREE_FEE.setCalculatedAmountInPence(BigDecimal.ZERO);
+        FREE_FEE.setCode(FREE_REF);
+        FREE_FEE.setVersion("1");
+    }
+
     private static final String MISCELLANEOUS = "miscellaneous";
     private static final String OTHER = "other";
 
     protected static final List<GeneralApplicationTypes> VARY_TYPES
-        = Arrays.asList(
-        GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT
-    );
+        = List.of(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT);
     protected static final List<GeneralApplicationTypes> SET_ASIDE
         = List.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT);
     protected static final List<GeneralApplicationTypes> ADJOURN_TYPES
@@ -99,7 +103,7 @@ public class GeneralAppFeesService {
         if (CollectionUtils.containsAny(caseData.getGeneralAppType().getTypes(), VARY_TYPES)) {
             //only minus 1 as VARY_PAYMENT_TERMS_OF_JUDGMENT can't be multi selected
             typeSize--;
-            result = getFeeForGA(feesConfiguration.getAppnToVaryOrSuspend(), "miscellaneous", "other");
+            result = getFeeForGA(feesConfiguration.getAppnToVaryOrSuspend(), MISCELLANEOUS, OTHER);
         }
         if (typeSize > 0
             && CollectionUtils.containsAny(caseData.getGeneralAppType().getTypes(), SD_CONSENT_TYPES)) {
@@ -130,7 +134,7 @@ public class GeneralAppFeesService {
         }
         if (isUpdateCoScGATypeSize(typeSize, caseData.getGeneralAppType().getTypes())) {
             typeSize--;
-            Fee certOfSatisfactionOrCancel = getFeeForGA(feesConfiguration.getCertificateOfSatisfaction(), "miscellaneous", "other");
+            Fee certOfSatisfactionOrCancel = getFeeForGA(feesConfiguration.getCertificateOfSatisfaction(), MISCELLANEOUS, OTHER);
             result = getCoScFeeResult(result, certOfSatisfactionOrCancel);
         }
         if (typeSize > 0) {
@@ -153,7 +157,8 @@ public class GeneralAppFeesService {
     }
 
     private Fee getFeeForGA(List<GeneralApplicationTypes> types, Boolean respondentAgreed, Boolean informOtherParty, LocalDate hearingScheduledDate) {
-        Fee result = Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(Integer.MAX_VALUE)).build();
+        Fee result = new Fee();
+        result.setCalculatedAmountInPence(BigDecimal.valueOf(Integer.MAX_VALUE));
         int typeSize = types.size();
         if (CollectionUtils.containsAny(types, VARY_TYPES)) {
             //only minus 1 as VARY_PAYMENT_TERMS_OF_JUDGMENT can't be multi selected
@@ -186,7 +191,7 @@ public class GeneralAppFeesService {
         }
         if (isUpdateCoScGATypeSize(typeSize, types)) {
             typeSize--;
-            Fee certOfSatisfactionOrCancel = getFeeForGA(feesConfiguration.getCertificateOfSatisfaction(), "miscellaneous", "other");
+            Fee certOfSatisfactionOrCancel = getFeeForGA(feesConfiguration.getCertificateOfSatisfaction(), MISCELLANEOUS, OTHER);
             result = getCoScFeeResult(result, certOfSatisfactionOrCancel);
         }
         if (typeSize > 0) {
@@ -294,11 +299,11 @@ public class GeneralAppFeesService {
             .multiply(PENCE_PER_POUND)
             .setScale(0, RoundingMode.UNNECESSARY);
 
-        return Fee.builder()
-            .calculatedAmountInPence(calculatedAmount)
-            .code(feeLookupResponseDto.getCode())
-            .version(feeLookupResponseDto.getVersion().toString())
-            .build();
+        Fee fee = new Fee();
+        fee.setCalculatedAmountInPence(calculatedAmount);
+        fee.setCode(feeLookupResponseDto.getCode());
+        fee.setVersion(feeLookupResponseDto.getVersion().toString());
+        return fee;
     }
 
     protected Boolean getRespondentAgreed(CaseData caseData) {

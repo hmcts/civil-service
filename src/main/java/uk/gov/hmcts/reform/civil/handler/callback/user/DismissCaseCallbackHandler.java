@@ -46,20 +46,20 @@ public class DismissCaseCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataUpdated = caseData.toBuilder()
-            .businessProcess(BusinessProcess.ready(DISMISS_CASE))
-            .hearingDate(null).hearingDueDate(null)
-            .hearingNoticeList(null)
-            .listingOrRelisting(null)
-            .hearingLocation(null)
-            .channel(null)
-            .hearingTimeHourMinute(null)
-            .hearingDuration(null)
-            .information(null)
-            .hearingNoticeListOther(null);
+        caseData.setBusinessProcess(BusinessProcess.ready(DISMISS_CASE));
+        caseData.setHearingDate(null);
+        caseData.setHearingDueDate(null);
+        caseData.setHearingNoticeList(null);
+        caseData.setListingOrRelisting(null);
+        caseData.setHearingLocation(null);
+        caseData.setChannel(null);
+        caseData.setHearingTimeHourMinute(null);
+        caseData.setHearingDuration(null);
+        caseData.setInformation(null);
+        caseData.setHearingNoticeListOther(null);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataUpdated.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 

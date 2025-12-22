@@ -1,14 +1,17 @@
 package uk.gov.hmcts.reform.civil.ga.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
+import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.utils.HwFFeeTypeUtil;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -26,28 +29,29 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF
 
 @Service
 @Slf4j
-public class GaPartialRemissionHWFCallbackHandler extends HWFCallbackHandlerBase {
+@RequiredArgsConstructor
+public class GaPartialRemissionHWFCallbackHandler extends CallbackHandler implements GeneralApplicationCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(PARTIAL_REMISSION_HWF_GA);
     public static final String ERR_MSG_REMISSION_AMOUNT_LESS_THAN_GA_FEE = "Remission amount must be less than application fee";
     public static final String ERR_MSG_REMISSION_AMOUNT_LESS_THAN_ADDITIONAL_FEE = "Remission amount must be less than additional application fee";
     public static final String ERR_MSG_REMISSION_AMOUNT_LESS_THAN_ZERO = "Remission amount must be greater than zero";
 
-    private final Map<String, Callback> callbackMap = Map.of(
-        callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-        callbackKey(MID, "remission-amount"), this::validateRemissionAmount,
-        callbackKey(ABOUT_TO_SUBMIT),
-        this::partRemissionHWF,
-        callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
-    );
+    private final ObjectMapper objectMapper;
 
-    public GaPartialRemissionHWFCallbackHandler(ObjectMapper objectMapper) {
-        super(objectMapper, EVENTS);
+    @Override
+    public List<CaseEvent> handledEvents() {
+        return EVENTS;
     }
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return callbackMap;
+        return Map.of(
+            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+            callbackKey(MID, "remission-amount"), this::validateRemissionAmount,
+            callbackKey(ABOUT_TO_SUBMIT), this::partRemissionHWF,
+            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
+        );
     }
 
     private CallbackResponse validateRemissionAmount(CallbackParams callbackParams) {

@@ -85,11 +85,10 @@ public class HearingNoticeSchedulerEventHandler {
                 && HmcDataUtils.hearingDataChanged(partiesNotified, hearing)) {
                 log.info("Dispatching hearing notice task for hearing [{}].",
                         hearingId);
-                triggerHearingNoticeEvent(HearingNoticeMessageVars.builder()
-                        .hearingId(hearingId)
-                        .caseId(caseReference)
-                        .triggeredViaScheduler(true)
-                        .build());
+                triggerHearingNoticeEvent(new HearingNoticeMessageVars()
+                        .setHearingId(hearingId)
+                        .setCaseId(caseReference)
+                        .setTriggeredViaScheduler(true));
 
             } else {
                 notifyHmc(hearingId, hearing, partiesNotified.getServiceData());
@@ -120,7 +119,7 @@ public class HearingNoticeSchedulerEventHandler {
     private UserAuthContent getSystemUpdateUser() {
         String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         String userId = userService.getUserInfo(userToken).getUid();
-        return UserAuthContent.builder().userToken(userToken).userId(userId).build();
+        return new UserAuthContent().setUserToken(userToken).setUserId(userId);
     }
 
     private void notifyHmc(String hearingId, HearingGetResponse hearing, PartiesNotifiedServiceData serviceData) {

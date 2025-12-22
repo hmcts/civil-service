@@ -90,6 +90,7 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DE
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -241,22 +242,21 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldSetRespondentSharedClaimResponseDocumentSameSolicitorScenario_WhenAboutToStartIsInvoked() {
-                CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceAfterNotifyClaimDetails().build().toBuilder()
-                    .respondent2(PartyBuilder.builder().individual().build())
-                    .addRespondent2(YES)
-                    .respondent2(PartyBuilder.builder().individual().build())
-                    .respondent2SameLegalRepresentative(YES)
-                    .defendantResponseDocuments(wrapElements(CaseDocument.builder()
-                                                                 .createdBy("Defendant")
-                                                                 .documentType(DEFENDANT_DEFENCE)
-                                                                 .documentLink(Document.builder()
-                                                                                   .documentUrl("url")
-                                                                                   .documentHash("hash")
-                                                                                   .documentFileName(
-                                                                                       "respondent defense")
-                                                                                   .documentBinaryUrl("binUrl")
-                                                                                   .build()).build()))
-                    .build();
+                CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceAfterNotifyClaimDetails().build();
+                caseData.setRespondent2(PartyBuilder.builder().individual().build());
+                caseData.setAddRespondent2(YES);
+                caseData.setRespondent2(PartyBuilder.builder().individual().build());
+                caseData.setRespondent2SameLegalRepresentative(YES);
+                Document document = new Document()
+                    .setDocumentUrl("url")
+                    .setDocumentHash("hash")
+                    .setDocumentFileName("respondent defense")
+                    .setDocumentBinaryUrl("binUrl");
+                CaseDocument caseDocument = new CaseDocument()
+                    .setCreatedBy("Defendant")
+                    .setDocumentType(DEFENDANT_DEFENCE)
+                    .setDocumentLink(document);
+                caseData.setDefendantResponseDocuments(wrapElements(caseDocument));
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -267,18 +267,17 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldSetRespondent1ClaimResponseDocument_WhenAboutToStartIsInvoked() {
-                CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceAfterNotifyClaimDetails().build().toBuilder()
-                    .defendantResponseDocuments(wrapElements(CaseDocument.builder()
-                                                                 .createdBy("Defendant")
-                                                                 .documentType(DEFENDANT_DEFENCE)
-                                                                 .documentLink(Document.builder()
-                                                                                   .documentUrl("url")
-                                                                                   .documentHash("hash")
-                                                                                   .documentFileName(
-                                                                                       "respondent defense")
-                                                                                   .documentBinaryUrl("binUrl")
-                                                                                   .build()).build()))
-                    .build();
+                Document document = new Document();
+                document.setDocumentUrl("url");
+                document.setDocumentHash("hash");
+                document.setDocumentFileName("respondent defense");
+                document.setDocumentBinaryUrl("binUrl");
+                CaseDocument caseDocument = new CaseDocument();
+                caseDocument.setCreatedBy("Defendant");
+                caseDocument.setDocumentType(DEFENDANT_DEFENCE);
+                caseDocument.setDocumentLink(document);
+                CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceAfterNotifyClaimDetails().build();
+                caseData.setDefendantResponseDocuments(wrapElements(caseDocument));
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -289,18 +288,17 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldSetRespondent2ClaimResponseDocument_WhenAboutToStartIsInvoked() {
-                CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceAfterNotifyClaimDetails().build().toBuilder()
-                    .defendantResponseDocuments(wrapElements(CaseDocument.builder()
-                                                                 .createdBy("Defendant 2")
-                                                                 .documentType(DEFENDANT_DEFENCE)
-                                                                 .documentLink(Document.builder()
-                                                                                   .documentUrl("url")
-                                                                                   .documentHash("hash")
-                                                                                   .documentFileName(
-                                                                                       "respondent defense")
-                                                                                   .documentBinaryUrl("binUrl")
-                                                                                   .build()).build()))
-                    .build();
+                Document document = new Document();
+                document.setDocumentUrl("url");
+                document.setDocumentHash("hash");
+                document.setDocumentFileName("respondent defense");
+                document.setDocumentBinaryUrl("binUrl");
+                CaseDocument caseDocument = new CaseDocument();
+                caseDocument.setCreatedBy("Defendant 2");
+                caseDocument.setDocumentType(DEFENDANT_DEFENCE);
+                caseDocument.setDocumentLink(document);
+                CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceAfterNotifyClaimDetails().build();
+                caseData.setDefendantResponseDocuments(wrapElements(caseDocument));
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -331,20 +329,18 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenUnavailableDateIsMoreThanOneYearInFuture() {
-            CaseData.CaseDataBuilder caseDataBuilder = CaseData.builder();
-            caseDataBuilder
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQHearing(Hearing.builder()
-                                                           .unavailableDatesRequired(YES)
-                                                           .unavailableDates(wrapElements(
-                                                               UnavailableDate.builder()
-                                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                                   .date(LocalDate.now().plusYears(5)).build()))
-                                                           .build())
-                                  .build())
-                .build();
+            UnavailableDate unavailableDate = new UnavailableDate();
+            unavailableDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
+            unavailableDate.setDate(LocalDate.now().plusYears(5));
+            Hearing hearing = new Hearing();
+            hearing.setUnavailableDatesRequired(YES);
+            hearing.setUnavailableDates(wrapElements(unavailableDate));
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQHearing(hearing);
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setApplicant1DQ(applicant1DQ);
 
-            CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, "validate-unavailable-dates");
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-unavailable-dates");
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -355,20 +351,18 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenUnavailableDateIsInPast() {
-            CaseData.CaseDataBuilder caseDataBuilder = CaseData.builder();
-            caseDataBuilder
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQHearing(Hearing.builder()
-                                                           .unavailableDatesRequired(YES)
-                                                           .unavailableDates(wrapElements(
-                                                               UnavailableDate.builder()
-                                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                                   .date(LocalDate.now().minusYears(5)).build()))
-                                                           .build())
-                                  .build())
-                .build();
+            UnavailableDate unavailableDate = new UnavailableDate();
+            unavailableDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
+            unavailableDate.setDate(LocalDate.now().minusYears(5));
+            Hearing hearing = new Hearing();
+            hearing.setUnavailableDatesRequired(YES);
+            hearing.setUnavailableDates(wrapElements(unavailableDate));
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQHearing(hearing);
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setApplicant1DQ(applicant1DQ);
 
-            CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, "validate-unavailable-dates");
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-unavailable-dates");
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -379,20 +373,18 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenUnavailableDateIsValid() {
-            CaseData.CaseDataBuilder caseDataBuilder = CaseData.builder();
-            caseDataBuilder
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQHearing(Hearing.builder()
-                                                           .unavailableDatesRequired(YES)
-                                                           .unavailableDates(wrapElements(
-                                                               UnavailableDate.builder()
-                                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                                   .date(LocalDate.now().plusDays(5)).build()))
-                                                           .build())
-                                  .build())
-                .build();
+            UnavailableDate unavailableDate = new UnavailableDate();
+            unavailableDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
+            unavailableDate.setDate(LocalDate.now().plusDays(5));
+            Hearing hearing = new Hearing();
+            hearing.setUnavailableDatesRequired(YES);
+            hearing.setUnavailableDates(wrapElements(unavailableDate));
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQHearing(hearing);
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setApplicant1DQ(applicant1DQ);
 
-            CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, "validate-unavailable-dates");
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-unavailable-dates");
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -402,11 +394,12 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenNoUnavailableDate() {
-            CaseData.CaseDataBuilder caseDataBuilder = CaseData.builder();
-            caseDataBuilder
-                .applicant1DQ(Applicant1DQ.builder().applicant1DQHearing(Hearing.builder().build()).build()).build();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQHearing(new Hearing());
+            caseData.setApplicant1DQ(applicant1DQ);
 
-            CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, "validate-unavailable-dates");
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-unavailable-dates");
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -416,12 +409,14 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenUnavailableDatesNotRequired() {
-            CaseData.CaseDataBuilder caseDataBuilder = CaseData.builder();
-            Hearing hearing = Hearing.builder().unavailableDatesRequired(NO).build();
-            caseDataBuilder
-                .applicant1DQ(Applicant1DQ.builder().applicant1DQHearing(hearing).build()).build();
+            CaseData caseData = CaseData.builder().build();
+            Hearing hearing = new Hearing();
+            hearing.setUnavailableDatesRequired(NO);
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQHearing(hearing);
+            caseData.setApplicant1DQ(applicant1DQ);
 
-            CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, "validate-unavailable-dates");
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-unavailable-dates");
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -437,9 +432,12 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenWitnessRequiredAndNullDetails() {
-            Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).build();
+            Witnesses witnesses = new Witnesses();
+            witnesses.setWitnessesToAppear(YES);
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQWitnesses(witnesses);
             CaseData caseData = CaseDataBuilder.builder()
-                .applicant1DQ(Applicant1DQ.builder().applicant1DQWitnesses(witnesses).build())
+                .applicant1DQ(applicant1DQ)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -450,10 +448,16 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenWitnessRequiredAndDetailsProvided() {
-            List<Element<Witness>> testWitness = wrapElements(Witness.builder().name("test witness").build());
-            Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).details(testWitness).build();
+            Witness witness = new Witness();
+            witness.setName("test witness");
+            List<Element<Witness>> testWitness = wrapElements(witness);
+            Witnesses witnesses = new Witnesses();
+            witnesses.setWitnessesToAppear(YES);
+            witnesses.setDetails(testWitness);
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQWitnesses(witnesses);
             CaseData caseData = CaseDataBuilder.builder()
-                .applicant1DQ(Applicant1DQ.builder().applicant1DQWitnesses(witnesses).build())
+                .applicant1DQ(applicant1DQ)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -464,11 +468,19 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenWitnessRequiredAndDetailsProvidedAndRespondentFlagEnabled() {
-            List<Element<Witness>> testWitness = wrapElements(Witness.builder().name("test witness").build());
-            Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).details(testWitness).build();
+            Witness witness = new Witness();
+            witness.setName("test witness");
+            List<Element<Witness>> testWitness = wrapElements(witness);
+            Witnesses witnesses = new Witnesses();
+            witnesses.setWitnessesToAppear(YES);
+            witnesses.setDetails(testWitness);
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQWitnesses(witnesses);
+            Applicant2DQ applicant2DQ = new Applicant2DQ();
+            applicant2DQ.setApplicant2DQWitnesses(witnesses);
             CaseData caseData = CaseDataBuilder.builder()
-                .applicant1DQ(Applicant1DQ.builder().applicant1DQWitnesses(witnesses).build())
-                .applicant2DQ(Applicant2DQ.builder().applicant2DQWitnesses(witnesses).build())
+                .applicant1DQ(applicant1DQ)
+                .applicant2DQ(applicant2DQ)
                 .enableRespondent2ResponseFlag()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -480,9 +492,12 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenWitnessNotRequired() {
-            Witnesses witnesses = Witnesses.builder().witnessesToAppear(NO).build();
+            Witnesses witnesses = new Witnesses();
+            witnesses.setWitnessesToAppear(NO);
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQWitnesses(witnesses);
             CaseData caseData = CaseDataBuilder.builder()
-                .applicant1DQ(Applicant1DQ.builder().applicant1DQWitnesses(witnesses).build())
+                .applicant1DQ(applicant1DQ)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -499,12 +514,12 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenExpertRequiredAndNullDetails() {
+            Experts experts = new Experts();
+            experts.setExpertRequired(YES);
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQExperts(experts);
             CaseData caseData = CaseDataBuilder.builder()
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQExperts(Experts.builder()
-                                                           .expertRequired(YES)
-                                                           .build())
-                                  .build())
+                .applicant1DQ(applicant1DQ)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -515,14 +530,15 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenExpertRequiredAndDetailsProvided() {
+            Expert expert = new Expert();
+            expert.setName("test expert");
+            Experts experts = new Experts();
+            experts.setExpertRequired(YES);
+            experts.setDetails(wrapElements(expert));
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQExperts(experts);
             CaseData caseData = CaseDataBuilder.builder()
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQExperts(Experts.builder()
-                                                           .expertRequired(YES)
-                                                           .details(wrapElements(Expert.builder()
-                                                                                     .name("test expert").build()))
-                                                           .build())
-                                  .build())
+                .applicant1DQ(applicant1DQ)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -533,21 +549,18 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenExpertRequiredAndDetailsProvidedInApplicant2() {
+            Expert expert = new Expert();
+            expert.setName("test expert");
+            Experts experts = new Experts();
+            experts.setExpertRequired(YES);
+            experts.setDetails(wrapElements(expert));
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQExperts(experts);
+            Applicant2DQ applicant2DQ = new Applicant2DQ();
+            applicant2DQ.setApplicant2DQExperts(experts);
             CaseData caseData = CaseDataBuilder.builder()
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQExperts(Experts.builder()
-                                                           .expertRequired(YES)
-                                                           .details(wrapElements(Expert.builder()
-                                                                                     .name("test expert").build()))
-                                                           .build())
-                                  .build())
-                .applicant2DQ(Applicant2DQ.builder()
-                                  .applicant2DQExperts(Experts.builder()
-                                                           .expertRequired(YES)
-                                                           .details(wrapElements(Expert.builder()
-                                                                                     .name("test expert").build()))
-                                                           .build())
-                                  .build())
+                .applicant1DQ(applicant1DQ)
+                .applicant2DQ(applicant2DQ)
                 .enableRespondent2ResponseFlag()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -559,12 +572,12 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenExpertNotRequired() {
+            Experts experts = new Experts();
+            experts.setExpertRequired(NO);
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQExperts(experts);
             CaseData caseData = CaseDataBuilder.builder()
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQExperts(Experts.builder()
-                                                           .expertRequired(NO)
-                                                           .build())
-                                  .build())
+                .applicant1DQ(applicant1DQ)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -582,8 +595,11 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             String name = "John Smith";
             String role = "Solicitor";
 
+            StatementOfTruth statementOfTruth = new StatementOfTruth();
+            statementOfTruth.setName(name);
+            statementOfTruth.setRole(role);
             CaseData caseData = CaseDataBuilder.builder()
-                .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
+                .uiStatementOfTruth(statementOfTruth)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, "statement-of-truth");
@@ -602,14 +618,17 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(time.now()).thenReturn(localDateTime);
             given(toggleConfiguration.getFeatureToggle()).willReturn("WA 3.5");
 
-            Address address = Address.builder()
-                .postCode("E11 5BB")
-                .build();
+            Address address = new Address();
+            address.setPostCode("E11 5BB");
+            Party party = new Party();
+            party.setPartyName("name");
+            party.setType(INDIVIDUAL);
+            party.setPrimaryAddress(address);
             CaseData oldCaseData = CaseDataBuilder.builder()
-                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
-                .applicant2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
-                .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
-                .respondent2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .applicant1(party)
+                .applicant2(party)
+                .respondent1(party)
+                .respondent2(party)
                 .build();
             when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
         }
@@ -638,19 +657,18 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
                 .build();
+            Party party = new Party();
+            party.setCompanyName("company");
+            party.setType(COMPANY);
+            caseData.setApplicant2(party);
+            caseData.setAddApplicant2(YES);
+            Applicant2DQ applicant2DQ = new Applicant2DQ();
+            applicant2DQ.setApplicant2DQFileDirectionsQuestionnaire(
+                caseData.getApplicant1DQ()
+                    .getApplicant1DQFileDirectionsQuestionnaire());
+            caseData.setApplicant2DQ(applicant2DQ);
             var params = callbackParamsOf(
-                caseData.toBuilder()
-                    .applicant2(Party.builder()
-                                    .companyName("company")
-                                    .type(Party.Type.COMPANY)
-                                    .build())
-                    .addApplicant2(YES)
-                    .applicant2DQ(Applicant2DQ.builder()
-                                      .applicant2DQFileDirectionsQuestionnaire(
-                                          caseData.getApplicant1DQ()
-                                              .getApplicant1DQFileDirectionsQuestionnaire())
-                                      .build())
-                    .build(),
+                caseData,
                 ABOUT_TO_SUBMIT
             );
 
@@ -716,42 +734,44 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssembleClaimantResponseDocuments2v1ProceedBoth() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            var caseData = CaseDataBuilder.builder().build().toBuilder()
-                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
-                .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
-                .applicant1DefenceResponseDocument(ResponseDocument.builder()
-                                                       .file(DocumentBuilder.builder().documentName(
-                                                           "claimant-response-def1.pdf").build())
-                                                       .build())
-                .claimantDefenceResDocToDefendant2(ResponseDocument.builder()
-                                                       .file(DocumentBuilder.builder().documentName(
-                                                           "claimant-response-def2.pdf").build())
-                                                       .build())
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQDraftDirections(DocumentBuilder.builder().documentName(
-                                          "claimant-1-draft-dir.pdf")
-                                                                   .build())
-                                  .build())
-                .addApplicant2(YesOrNo.YES)
-                .applicant2DQ(Applicant2DQ.builder()
-                                  .applicant2DQDraftDirections(DocumentBuilder.builder().documentName(
-                                          "claimant-2-draft-dir.pdf")
-                                                                   .build())
-                                  .build())
-                .build().toBuilder()
-                .courtLocation(CourtLocation.builder().applicantPreferredCourt("127").build())
-                .claimValue(ClaimValue.builder()
-                                .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
-                                .build())
-                .applicant1ProceedWithClaimMultiParty2v1(YES)
-                .applicant2ProceedWithClaimMultiParty2v1(YES)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
-                .build();
-            /*
-            CourtLocation.builder()
-            .applicantPreferredCourt("127")
-            .build();
-             */
+            Party party = new Party();
+            party.setCompanyName("company");
+            party.setType(COMPANY);
+            Party party1 = new Party();
+            party1.setPartyName("name");
+            party1.setType(INDIVIDUAL);
+            var caseData = CaseDataBuilder.builder().build();
+            caseData.setApplicant1(party1);
+            caseData.setRespondent1(party);
+            ResponseDocument responseDocument = new ResponseDocument();
+            responseDocument.setFile(DocumentBuilder.builder().documentName(
+                "claimant-response-def1.pdf").build());
+            ResponseDocument  responseDocument1 = new ResponseDocument();
+            responseDocument1.setFile(DocumentBuilder.builder().documentName(
+                "claimant-response-def2.pdf").build());
+            caseData.setApplicant1DefenceResponseDocument(responseDocument);
+            caseData.setClaimantDefenceResDocToDefendant2(responseDocument1);
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQDraftDirections(DocumentBuilder.builder().documentName(
+                    "claimant-1-draft-dir.pdf").build());
+            caseData.setApplicant1DQ(applicant1DQ);
+            caseData.setAddApplicant2(YesOrNo.YES);
+            Applicant2DQ applicant2DQ = new Applicant2DQ();
+            applicant2DQ.setApplicant2DQDraftDirections(DocumentBuilder.builder().documentName(
+                    "claimant-2-draft-dir.pdf").build());
+            caseData.setApplicant2DQ(applicant2DQ);
+            CourtLocation courtLocation = new CourtLocation();
+            courtLocation.setApplicantPreferredCourt("127");
+            caseData.setCourtLocation(courtLocation);
+            ClaimValue claimValue = new ClaimValue();
+            claimValue.setStatementOfValueInPennies(BigDecimal.valueOf(1000_00));
+            caseData.setClaimValue(claimValue);
+            caseData.setApplicant1ProceedWithClaimMultiParty2v1(YES);
+            caseData.setApplicant2ProceedWithClaimMultiParty2v1(YES);
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("00000");
+            caseLocationCivil.setRegion("4");
+            caseData.setCaseManagementLocation(caseLocationCivil);
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -779,42 +799,45 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssembleClaimantResponseDocuments2v1ProceedOne() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            var caseData = CaseDataBuilder.builder().build().toBuilder()
-                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
-                .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
-                .applicant1DefenceResponseDocument(ResponseDocument.builder()
-                                                       .file(DocumentBuilder.builder().documentName(
-                                                           "claimant-response-def1.pdf").build())
-                                                       .build())
-                .claimantDefenceResDocToDefendant2(ResponseDocument.builder()
-                                                       .file(DocumentBuilder.builder().documentName(
-                                                           "claimant-response-def2.pdf").build())
-                                                       .build())
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQDraftDirections(DocumentBuilder.builder().documentName(
-                                          "claimant-1-draft-dir.pdf")
-                                                                   .build())
-                                  .build())
-                .addApplicant2(YesOrNo.YES)
-                .applicant2DQ(Applicant2DQ.builder()
-                                  .applicant2DQDraftDirections(DocumentBuilder.builder().documentName(
-                                          "claimant-2-draft-dir.pdf")
-                                                                   .build())
-                                  .build())
-                .build().toBuilder()
-                .courtLocation(CourtLocation.builder().applicantPreferredCourt("127").build())
-                .claimValue(ClaimValue.builder()
-                                .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
-                                .build())
-                .applicant1ProceedWithClaimMultiParty2v1(NO)
-                .applicant2ProceedWithClaimMultiParty2v1(YES)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
-                .build();
-            /*
-            CourtLocation.builder()
-            .applicantPreferredCourt("127")
-            .build();
-             */
+            Party party = new Party();
+            party.setCompanyName("company");
+            party.setType(COMPANY);
+            Party party1 = new Party();
+            party1.setPartyName("name");
+            party1.setType(INDIVIDUAL);
+            var caseData = CaseDataBuilder.builder().build();
+            caseData.setApplicant1(party1);
+            caseData.setRespondent1(party);
+            ResponseDocument responseDocument = new ResponseDocument();
+            responseDocument.setFile(DocumentBuilder.builder().documentName(
+                "claimant-response-def1.pdf").build());
+            ResponseDocument  responseDocument1 = new ResponseDocument();
+            responseDocument1.setFile(DocumentBuilder.builder().documentName(
+                "claimant-response-def2.pdf").build());
+            caseData.setApplicant1DefenceResponseDocument(responseDocument);
+            caseData.setClaimantDefenceResDocToDefendant2(responseDocument1);
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQDraftDirections(DocumentBuilder.builder().documentName(
+                "claimant-1-draft-dir.pdf").build());
+            caseData.setApplicant1DQ(applicant1DQ);
+            caseData.setAddApplicant2(YesOrNo.YES);
+            Applicant2DQ applicant2DQ = new Applicant2DQ();
+            applicant2DQ.setApplicant2DQDraftDirections(DocumentBuilder.builder().documentName(
+                "claimant-2-draft-dir.pdf").build());
+            caseData.setApplicant2DQ(applicant2DQ);
+            CourtLocation courtLocation = new CourtLocation();
+            courtLocation.setApplicantPreferredCourt("127");
+            caseData.setCourtLocation(courtLocation);
+            ClaimValue claimValue = new ClaimValue();
+            claimValue.setStatementOfValueInPennies(BigDecimal.valueOf(1000_00));
+            caseData.setCourtLocation(courtLocation);
+            caseData.setClaimValue(claimValue);
+            caseData.setApplicant1ProceedWithClaimMultiParty2v1(NO);
+            caseData.setApplicant2ProceedWithClaimMultiParty2v1(YES);
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("00000");
+            caseLocationCivil.setRegion("4");
+            caseData.setCaseManagementLocation(caseLocationCivil);
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -842,42 +865,48 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssembleClaimantResponseDocuments2v1NotProceed() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            var caseData = CaseDataBuilder.builder().build().toBuilder()
-                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
-                .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
-                .applicant1DefenceResponseDocument(ResponseDocument.builder()
-                                                       .file(DocumentBuilder.builder().documentName(
-                                                           "claimant-response-def1.pdf").build())
-                                                       .build())
-                .claimantDefenceResDocToDefendant2(ResponseDocument.builder()
-                                                       .file(DocumentBuilder.builder().documentName(
-                                                           "claimant-response-def2.pdf").build())
-                                                       .build())
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQDraftDirections(DocumentBuilder.builder().documentName(
-                                          "claimant-1-draft-dir.pdf")
-                                                                   .build())
-                                  .build())
-                .addApplicant2(YesOrNo.YES)
-                .applicant2DQ(Applicant2DQ.builder()
-                                  .applicant2DQDraftDirections(DocumentBuilder.builder().documentName(
-                                          "claimant-2-draft-dir.pdf")
-                                                                   .build())
-                                  .build())
-                .build().toBuilder()
-                .courtLocation(CourtLocation.builder().applicantPreferredCourt("127").build())
-                .claimValue(ClaimValue.builder()
-                                .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
-                                .build())
-                .applicant1ProceedWithClaimMultiParty2v1(NO)
-                .applicant2ProceedWithClaimMultiParty2v1(NO)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
-                .build();
-            /*
-            CourtLocation.builder()
-            .applicantPreferredCourt("127")
-            .build();
-             */
+            Party party = new Party();
+            party.setCompanyName("company");
+            party.setType(COMPANY);
+            Party party1 = new Party();
+            party1.setPartyName("name");
+            party1.setType(INDIVIDUAL);
+            var caseData = CaseDataBuilder.builder().build();
+            caseData.setApplicant1(party1);
+            caseData.setRespondent1(party);
+            ResponseDocument responseDocument = new ResponseDocument();
+            responseDocument.setFile(DocumentBuilder.builder().documentName(
+                "claimant-response-def1.pdf").build());
+            ResponseDocument  responseDocument1 = new ResponseDocument();
+            responseDocument1.setFile(DocumentBuilder.builder().documentName(
+                "claimant-response-def2.pdf").build());
+            caseData.setApplicant1DefenceResponseDocument(responseDocument);
+            caseData.setClaimantDefenceResDocToDefendant2(responseDocument1);
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQDraftDirections(DocumentBuilder.builder().documentName(
+                "claimant-1-draft-dir.pdf").build());
+            caseData.setApplicant1DQ(applicant1DQ);
+            caseData.setAddApplicant2(YesOrNo.YES);
+            Applicant2DQ applicant2DQ = new Applicant2DQ();
+            applicant2DQ.setApplicant2DQDraftDirections(DocumentBuilder.builder().documentName(
+                "claimant-2-draft-dir.pdf").build());
+            caseData.setApplicant2DQ(applicant2DQ);
+            CourtLocation courtLocation = new CourtLocation();
+            courtLocation.setApplicantPreferredCourt("127");
+            caseData.setCourtLocation(courtLocation);
+            ClaimValue claimValue = new ClaimValue();
+            claimValue.setStatementOfValueInPennies(BigDecimal.valueOf(1000_00));
+            caseData.setCourtLocation(courtLocation);
+            caseData.setClaimValue(claimValue);
+            caseData.setCourtLocation(courtLocation);
+            caseData.setClaimValue(claimValue);
+            caseData.setApplicant1ProceedWithClaimMultiParty2v1(NO);
+            caseData.setApplicant2ProceedWithClaimMultiParty2v1(NO);
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("00000");
+            caseLocationCivil.setRegion("4");
+            caseData.setCaseManagementLocation(caseLocationCivil);
+
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -905,35 +934,41 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssembleClaimantResponseDocuments1v1Proceed() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            var caseData = CaseDataBuilder.builder().build().toBuilder()
-                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
-                .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
-                .applicant1DefenceResponseDocument(ResponseDocument.builder()
-                                                       .file(DocumentBuilder.builder().documentName(
-                                                           "claimant-response-def1.pdf").build())
-                                                       .build())
-                .claimantDefenceResDocToDefendant2(ResponseDocument.builder()
-                                                       .file(DocumentBuilder.builder().documentName(
-                                                           "claimant-response-def2.pdf").build())
-                                                       .build())
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQDraftDirections(DocumentBuilder.builder().documentName(
-                                          "claimant-1-draft-dir.pdf")
-                                                                   .build())
-                                  .build())
-                .build().toBuilder()
-                .courtLocation(CourtLocation.builder().applicantPreferredCourt("127").build())
-                .claimValue(ClaimValue.builder()
-                                .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
-                                .build())
-                .applicant1ProceedWithClaim(YES)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
-                .build();
-            /*
-            CourtLocation.builder()
-            .applicantPreferredCourt("127")
-            .build();
-             */
+            Party party = new Party();
+            party.setCompanyName("company");
+            party.setType(COMPANY);
+            Party party1 = new Party();
+            party1.setPartyName("name");
+            party1.setType(INDIVIDUAL);
+            var caseData = CaseDataBuilder.builder().build();
+            caseData.setApplicant1(party1);
+            caseData.setRespondent1(party);
+            ResponseDocument responseDocument = new ResponseDocument();
+            responseDocument.setFile(DocumentBuilder.builder().documentName(
+                "claimant-response-def1.pdf").build());
+            ResponseDocument  responseDocument1 = new ResponseDocument();
+            responseDocument1.setFile(DocumentBuilder.builder().documentName(
+                "claimant-response-def2.pdf").build());
+            caseData.setApplicant1DefenceResponseDocument(responseDocument);
+            caseData.setClaimantDefenceResDocToDefendant2(responseDocument1);
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQDraftDirections(DocumentBuilder.builder().documentName(
+                "claimant-1-draft-dir.pdf").build());
+            caseData.setApplicant1DQ(applicant1DQ);
+            CourtLocation courtLocation = new CourtLocation();
+            courtLocation.setApplicantPreferredCourt("127");
+            caseData.setCourtLocation(courtLocation);
+            ClaimValue claimValue = new ClaimValue();
+            claimValue.setStatementOfValueInPennies(BigDecimal.valueOf(1000_00));
+            caseData.setCourtLocation(courtLocation);
+            caseData.setClaimValue(claimValue);
+            caseData.setCourtLocation(courtLocation);
+            caseData.setClaimValue(claimValue);
+            caseData.setApplicant1ProceedWithClaim(YES);
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("00000");
+            caseLocationCivil.setRegion("4");
+            caseData.setCaseManagementLocation(caseLocationCivil);
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -960,36 +995,40 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssembleClaimantResponseDocuments1v1NotProceed() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            var caseData = CaseDataBuilder.builder().build().toBuilder()
-                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
-                .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
-                .applicant1DefenceResponseDocument(ResponseDocument.builder()
-                                                       .file(DocumentBuilder.builder().documentName(
-                                                           "claimant-response-def1.pdf").build())
-                                                       .build())
-                .claimantDefenceResDocToDefendant2(ResponseDocument.builder()
-                                                       .file(DocumentBuilder.builder().documentName(
-                                                           "claimant-response-def2.pdf").build())
-                                                       .build())
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQDraftDirections(DocumentBuilder.builder().documentName(
-                                          "claimant-1-draft-dir.pdf")
-                                                                   .build())
-                                  .build())
-                .build().toBuilder()
-                .courtLocation(CourtLocation.builder().applicantPreferredCourt("127").build())
-                .claimValue(ClaimValue.builder()
-                                .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
-                                .build())
-                .applicant1ProceedWithClaim(NO)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
+            Party party = new Party();
+            party.setCompanyName("company");
+            party.setType(COMPANY);
+            Party party1 = new Party();
+            party1.setPartyName("name");
+            party1.setType(INDIVIDUAL);
+            var caseData = CaseDataBuilder.builder().build();
+            caseData.setApplicant1(party1);
+            caseData.setRespondent1(party);
+            ResponseDocument responseDocument = new ResponseDocument();
+            responseDocument.setFile(DocumentBuilder.builder().documentName(
+                "claimant-response-def1.pdf").build());
+            ResponseDocument  responseDocument1 = new ResponseDocument();
+            responseDocument1.setFile(DocumentBuilder.builder().documentName(
+                "claimant-response-def2.pdf").build());
+            caseData.setApplicant1DefenceResponseDocument(responseDocument);
+            caseData.setClaimantDefenceResDocToDefendant2(responseDocument1);
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQDraftDirections(DocumentBuilder.builder().documentName(
+                "claimant-1-draft-dir.pdf").build());
+            caseData.setApplicant1DQ(applicant1DQ);
+            CourtLocation courtLocation = new CourtLocation();
+            courtLocation.setApplicantPreferredCourt("127");
+            caseData.setCourtLocation(courtLocation);
+            ClaimValue claimValue = new ClaimValue();
+            claimValue.setStatementOfValueInPennies(BigDecimal.valueOf(1000_00));
+            caseData.setCourtLocation(courtLocation);
+            caseData.setClaimValue(claimValue);
+            caseData.setApplicant1ProceedWithClaim(NO);
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("00000");
+            caseLocationCivil.setRegion("4");
+            caseData.setCaseManagementLocation(caseLocationCivil);
 
-                .build();
-            /*
-            CourtLocation.builder()
-            .applicantPreferredCourt("127")
-            .build();
-             */
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1016,40 +1055,45 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssembleClaimantResponseDocuments1v2ssProceedBoth() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            var caseData = CaseDataBuilder.builder().build().toBuilder()
-                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
-                .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
-                .applicant1DefenceResponseDocument(ResponseDocument.builder()
-                                                       .file(DocumentBuilder.builder().documentName(
-                                                           "claimant-response-def1.pdf").build())
-                                                       .build())
-                .claimantDefenceResDocToDefendant2(ResponseDocument.builder()
-                                                       .file(DocumentBuilder.builder().documentName(
-                                                           "claimant-response-def2.pdf").build())
-                                                       .build())
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQDraftDirections(DocumentBuilder.builder().documentName(
-                                          "claimant-1-draft-dir.pdf")
-                                                                   .build())
-                                  .build())
-                .respondent2(Party.builder().companyName("company 2")
-                                 .type(Party.Type.COMPANY)
-                                 .build())
-                .respondentResponseIsSame(YesOrNo.YES)
-                .build().toBuilder()
-                .courtLocation(CourtLocation.builder().applicantPreferredCourt("127").build())
-                .claimValue(ClaimValue.builder()
-                                .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
-                                .build())
-                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YES)
-                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YES)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
-                .build();
-            /*
-            CourtLocation.builder()
-            .applicantPreferredCourt("127")
-            .build();
-             */
+            Party party = new Party();
+            party.setCompanyName("company");
+            party.setType(COMPANY);
+            Party party1 = new Party();
+            party1.setPartyName("name");
+            party1.setType(INDIVIDUAL);
+            var caseData = CaseDataBuilder.builder().build();
+            caseData.setApplicant1(party1);
+            caseData.setRespondent1(party);
+            ResponseDocument responseDocument = new ResponseDocument();
+            responseDocument.setFile(DocumentBuilder.builder().documentName(
+                "claimant-response-def1.pdf").build());
+            ResponseDocument  responseDocument1 = new ResponseDocument();
+            responseDocument1.setFile(DocumentBuilder.builder().documentName(
+                "claimant-response-def2.pdf").build());
+            caseData.setApplicant1DefenceResponseDocument(responseDocument);
+            caseData.setClaimantDefenceResDocToDefendant2(responseDocument1);
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQDraftDirections(DocumentBuilder.builder().documentName(
+                "claimant-1-draft-dir.pdf").build());
+            caseData.setApplicant1DQ(applicant1DQ);
+            Party party3 = new Party();
+            party3.setCompanyName("company 2");
+            party3.setType(COMPANY);
+            caseData.setRespondent2(party3);
+            caseData.setRespondentResponseIsSame(YesOrNo.YES);
+            CourtLocation courtLocation = new CourtLocation();
+            courtLocation.setApplicantPreferredCourt("127");
+            caseData.setCourtLocation(courtLocation);
+            ClaimValue claimValue = new ClaimValue();
+            claimValue.setStatementOfValueInPennies(BigDecimal.valueOf(1000_00));
+            caseData.setCourtLocation(courtLocation);
+            caseData.setClaimValue(claimValue);
+            caseData.setApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YES);
+            caseData.setApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YES);
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("00000");
+            caseLocationCivil.setRegion("4");
+            caseData.setCaseManagementLocation(caseLocationCivil);
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1076,40 +1120,45 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssembleClaimantResponseDocuments1v2ssProceedOne() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            var caseData = CaseDataBuilder.builder().build().toBuilder()
-                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
-                .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
-                .applicant1DefenceResponseDocument(ResponseDocument.builder()
-                                                       .file(DocumentBuilder.builder().documentName(
-                                                           "claimant-response-def1.pdf").build())
-                                                       .build())
-                .claimantDefenceResDocToDefendant2(ResponseDocument.builder()
-                                                       .file(DocumentBuilder.builder().documentName(
-                                                           "claimant-response-def2.pdf").build())
-                                                       .build())
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQDraftDirections(DocumentBuilder.builder().documentName(
-                                          "claimant-1-draft-dir.pdf")
-                                                                   .build())
-                                  .build())
-                .respondent2(Party.builder().companyName("company 2")
-                                 .type(Party.Type.COMPANY)
-                                 .build())
-                .respondentResponseIsSame(YesOrNo.YES)
-                .build().toBuilder()
-                .courtLocation(CourtLocation.builder().applicantPreferredCourt("127").build())
-                .claimValue(ClaimValue.builder()
-                                .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
-                                .build())
-                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YES)
-                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(NO)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
-                .build();
-            /*
-            CourtLocation.builder()
-            .applicantPreferredCourt("127")
-            .build();
-             */
+            Party party = new Party();
+            party.setCompanyName("company");
+            party.setType(COMPANY);
+            Party party1 = new Party();
+            party1.setPartyName("name");
+            party1.setType(INDIVIDUAL);
+            var caseData = CaseDataBuilder.builder().build();
+            caseData.setApplicant1(party1);
+            caseData.setRespondent1(party);
+            ResponseDocument responseDocument = new ResponseDocument();
+            responseDocument.setFile(DocumentBuilder.builder().documentName(
+                "claimant-response-def1.pdf").build());
+            ResponseDocument  responseDocument1 = new ResponseDocument();
+            responseDocument1.setFile(DocumentBuilder.builder().documentName(
+                "claimant-response-def2.pdf").build());
+            caseData.setApplicant1DefenceResponseDocument(responseDocument);
+            caseData.setClaimantDefenceResDocToDefendant2(responseDocument1);
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQDraftDirections(DocumentBuilder.builder().documentName(
+                "claimant-1-draft-dir.pdf").build());
+            caseData.setApplicant1DQ(applicant1DQ);
+            Party party3 = new Party();
+            party3.setCompanyName("company 2");
+            party3.setType(COMPANY);
+            caseData.setRespondent2(party3);
+            caseData.setRespondentResponseIsSame(YesOrNo.YES);
+            CourtLocation courtLocation = new CourtLocation();
+            courtLocation.setApplicantPreferredCourt("127");
+            caseData.setCourtLocation(courtLocation);
+            ClaimValue claimValue = new ClaimValue();
+            claimValue.setStatementOfValueInPennies(BigDecimal.valueOf(1000_00));
+            caseData.setCourtLocation(courtLocation);
+            caseData.setClaimValue(claimValue);
+            caseData.setApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YES);
+            caseData.setApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(NO);
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("00000");
+            caseLocationCivil.setRegion("4");
+            caseData.setCaseManagementLocation(caseLocationCivil);
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1136,40 +1185,45 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssembleClaimantResponseDocuments1v2ssNotProceed() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            var caseData = CaseDataBuilder.builder().build().toBuilder()
-                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
-                .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
-                .applicant1DefenceResponseDocument(ResponseDocument.builder()
-                                                       .file(DocumentBuilder.builder().documentName(
-                                                           "claimant-response-def1.pdf").build())
-                                                       .build())
-                .claimantDefenceResDocToDefendant2(ResponseDocument.builder()
-                                                       .file(DocumentBuilder.builder().documentName(
-                                                           "claimant-response-def2.pdf").build())
-                                                       .build())
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQDraftDirections(DocumentBuilder.builder().documentName(
-                                          "claimant-1-draft-dir.pdf")
-                                                                   .build())
-                                  .build())
-                .respondent2(Party.builder().companyName("company 2")
-                                 .type(Party.Type.COMPANY)
-                                 .build())
-                .respondentResponseIsSame(YesOrNo.YES)
-                .build().toBuilder()
-                .courtLocation(CourtLocation.builder().applicantPreferredCourt("127").build())
-                .claimValue(ClaimValue.builder()
-                                .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
-                                .build())
-                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(NO)
-                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(NO)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
-                .build();
-            /*
-            CourtLocation.builder()
-            .applicantPreferredCourt("127")
-            .build();
-             */
+            Party party = new Party();
+            party.setCompanyName("company");
+            party.setType(COMPANY);
+            Party party1 = new Party();
+            party1.setPartyName("name");
+            party1.setType(INDIVIDUAL);
+            var caseData = CaseDataBuilder.builder().build();
+            caseData.setApplicant1(party1);
+            caseData.setRespondent1(party);
+            ResponseDocument responseDocument = new ResponseDocument();
+            responseDocument.setFile(DocumentBuilder.builder().documentName(
+                "claimant-response-def1.pdf").build());
+            ResponseDocument  responseDocument1 = new ResponseDocument();
+            responseDocument1.setFile(DocumentBuilder.builder().documentName(
+                "claimant-response-def2.pdf").build());
+            caseData.setApplicant1DefenceResponseDocument(responseDocument);
+            caseData.setClaimantDefenceResDocToDefendant2(responseDocument1);
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQDraftDirections(DocumentBuilder.builder().documentName(
+                "claimant-1-draft-dir.pdf").build());
+            caseData.setApplicant1DQ(applicant1DQ);
+            Party party3 = new Party();
+            party3.setCompanyName("company 2");
+            party3.setType(COMPANY);
+            caseData.setRespondent2(party3);
+            caseData.setRespondentResponseIsSame(YesOrNo.YES);
+            CourtLocation courtLocation = new CourtLocation();
+            courtLocation.setApplicantPreferredCourt("127");
+            caseData.setCourtLocation(courtLocation);
+            ClaimValue claimValue = new ClaimValue();
+            claimValue.setStatementOfValueInPennies(BigDecimal.valueOf(1000_00));
+            caseData.setCourtLocation(courtLocation);
+            caseData.setClaimValue(claimValue);
+            caseData.setApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(NO);
+            caseData.setApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(NO);
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("00000");
+            caseLocationCivil.setRegion("4");
+            caseData.setCaseManagementLocation(caseLocationCivil);
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1197,34 +1251,42 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldAssignCategoryId_whenInvoked() {
             // Given
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            var caseData = CaseDataBuilder.builder().build().toBuilder()
-                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
-                .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
-                .applicant1DefenceResponseDocument(ResponseDocument.builder()
-                                                       .file(DocumentBuilder.builder().documentName(
-                                                           "claimant-response-def1.pdf").build())
-                                                       .build())
-                .claimantDefenceResDocToDefendant2(ResponseDocument.builder()
-                                                       .file(DocumentBuilder.builder().documentName(
-                                                           "claimant-response-def2.pdf").build())
-                                                       .build())
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQDraftDirections(DocumentBuilder.builder().documentName(
-                                          "claimant-1-draft-dir.pdf")
-                                                                   .build())
-                                  .build())
-                .applicant2DQ(Applicant2DQ.builder()
-                                  .applicant2DQDraftDirections(DocumentBuilder.builder().documentName(
-                                          "claimant-2-draft-dir.pdf")
-                                                                   .build())
-                                  .build())
-                .build().toBuilder()
-                .courtLocation(CourtLocation.builder().applicantPreferredCourt("127").build())
-                .claimValue(ClaimValue.builder()
-                                .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
-                                .build())
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
-                .build();
+            Party party = new Party();
+            party.setCompanyName("company");
+            party.setType(COMPANY);
+            Party party1 = new Party();
+            party1.setPartyName("name");
+            party1.setType(INDIVIDUAL);
+            var caseData = CaseDataBuilder.builder().build();
+            caseData.setApplicant1(party1);
+            caseData.setRespondent1(party);
+            ResponseDocument responseDocument = new ResponseDocument();
+            responseDocument.setFile(DocumentBuilder.builder().documentName(
+                "claimant-response-def1.pdf").build());
+            ResponseDocument  responseDocument1 = new ResponseDocument();
+            responseDocument1.setFile(DocumentBuilder.builder().documentName(
+                "claimant-response-def2.pdf").build());
+            caseData.setApplicant1DefenceResponseDocument(responseDocument);
+            caseData.setClaimantDefenceResDocToDefendant2(responseDocument1);
+            Applicant1DQ applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQDraftDirections(DocumentBuilder.builder().documentName(
+                "claimant-1-draft-dir.pdf").build());
+            caseData.setApplicant1DQ(applicant1DQ);
+            Applicant2DQ applicant2DQ = new Applicant2DQ();
+            applicant2DQ.setApplicant2DQDraftDirections(DocumentBuilder.builder().documentName(
+                    "claimant-2-draft-dir.pdf").build());
+            caseData.setApplicant2DQ(applicant2DQ);
+            CourtLocation courtLocation = new CourtLocation();
+            courtLocation.setApplicantPreferredCourt("127");
+            caseData.setCourtLocation(courtLocation);
+            ClaimValue claimValue = new ClaimValue();
+            claimValue.setStatementOfValueInPennies(BigDecimal.valueOf(1000_00));
+            caseData.setCourtLocation(courtLocation);
+            caseData.setClaimValue(claimValue);
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("00000");
+            caseLocationCivil.setRegion("4");
+            caseData.setCaseManagementLocation(caseLocationCivil);
             //When
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1298,14 +1360,21 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void updateApplicant1DQRequestedCourtWhenNoCourtLocationIsReturnedByRefData() {
+                LocationRefData locationRefData = new LocationRefData();
+                locationRefData.setSiteName("SiteName");
+                locationRefData.setCourtAddress("1");
+                locationRefData.setPostcode("1");
+                locationRefData.setCourtName("Court Name");
+                locationRefData.setRegion("Region");
+                locationRefData.setRegionId("regionId1");
+                locationRefData.setCourtVenueId("000");
+                locationRefData.setCourtTypeId("10");
+                locationRefData.setEpimmsId("4532");
+                List<LocationRefData> locations = new ArrayList<>();
+                locations.add(locationRefData);
                 CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                     .courtLocation()
                     .build();
-                List<LocationRefData> locations = new ArrayList<>();
-                locations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
-                                  .courtName("Court Name").region("Region").regionId("regionId1").courtVenueId("000")
-                                  .courtTypeId("10")
-                                  .epimmsId("4532").build());
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                     callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
 
@@ -1325,10 +1394,11 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 String name = "John Smith";
                 String role = "Solicitor";
 
-                CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build()
-                    .toBuilder()
-                    .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
-                    .build();
+                CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+                StatementOfTruth statementOfTruth = new StatementOfTruth();
+                statementOfTruth.setName(name);
+                statementOfTruth.setRole(role);
+                caseData.setUiStatementOfTruth(statementOfTruth);
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                     callbackParamsOf(
@@ -1356,11 +1426,12 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent2(PartyBuilder.builder().individual().build())
                     .respondent2SameLegalRepresentative(YES)
                     .build();
+                caseData.setRespondentSharedClaimResponseDocument(
+                    caseData.getRespondent1ClaimResponseDocument());
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                     callbackParamsOf(
-                        caseData.toBuilder().respondentSharedClaimResponseDocument(
-                            caseData.getRespondent1ClaimResponseDocument()).build(), ABOUT_TO_SUBMIT
+                        caseData, ABOUT_TO_SUBMIT
                     ));
 
                 assertThat(response.getData().get("respondentSharedClaimResponseDocument")).isNull();
@@ -1370,10 +1441,12 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldUpdateLocation_WhenCmlIsCcmccAndToggleOn() {
             // Given
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation(handler.ccmccEpimsId);
+            caseLocationCivil.setRegion("ccmcRegion");
             var caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.ccmccEpimsId).region(
-                    "ccmcRegion").build())
+                .caseManagementLocation(caseLocationCivil)
                 .build();
             //When
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1388,9 +1461,12 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotUpdateLocation_WhenCmlIsNotCcmccAndToggleOn() {
             // Given
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("12345");
+            caseLocationCivil.setRegion("3");
             var caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("12345").region("3").build())
+                .caseManagementLocation(caseLocationCivil)
                 .build();
             //When
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1405,9 +1481,12 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldCallUpdateWaCourtLocationsServiceWhenPresent_AndMintiEnabled() {
             when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("12345");
+            caseLocationCivil.setRegion("3");
             var caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("12345").region("3").build())
+                .caseManagementLocation(caseLocationCivil)
                 .build();
             //When
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1425,9 +1504,12 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                           caseDetailsConverter, frcDocumentsUtils, Optional.empty(),
                                                           requestedCourtForClaimDetailsTab);
             when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("12345");
+            caseLocationCivil.setRegion("3");
             var caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("12345").region("3").build())
+                .caseManagementLocation(caseLocationCivil)
                 .build();
             //When
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

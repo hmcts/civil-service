@@ -47,7 +47,7 @@ class GaInvalidHwFCallbackHandlerTest {
 
             CallbackParams params = CallbackParams.builder()
                 .type(CallbackType.ABOUT_TO_SUBMIT)
-                .baseCaseData(caseData)
+                .caseData(caseData)
                 .build();
 
             AboutToStartOrSubmitCallbackResponse response =

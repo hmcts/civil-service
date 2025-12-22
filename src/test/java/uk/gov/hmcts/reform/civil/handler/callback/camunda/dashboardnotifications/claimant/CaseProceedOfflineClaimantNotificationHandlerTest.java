@@ -78,12 +78,12 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
         @Test
         void shouldRecordScenario_whenInvokedWithoutCPEnabled() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                    .respondent1Represented(YesOrNo.NO)
-                    .applicant1Represented(YesOrNo.NO)
-                    .ccdCaseReference(1234L)
-                .generalApplications(List.of(Element.<GeneralApplication>builder().build()))
-                    .previousCCDState(AWAITING_APPLICANT_INTENTION).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setCcdCaseReference(1234L);
+            caseData.setGeneralApplications(List.of(new Element<>(null, new GeneralApplication())));
+            caseData.setPreviousCCDState(AWAITING_APPLICANT_INTENTION);
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
@@ -93,7 +93,7 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
                 CallbackRequest.builder()
                     .eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
             ).build();
-            // When
+
             handler.handle(params);
 
             // Then
@@ -122,12 +122,12 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
         @Test
         void shouldRecordScenarioForLipVsLr_whenInvokedWithoutCPEnabled() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                .respondent1Represented(YesOrNo.YES)
-                .applicant1Represented(YesOrNo.NO)
-                .ccdCaseReference(1234L)
-                .generalApplications(List.of(Element.<GeneralApplication>builder().build()))
-                .previousCCDState(AWAITING_APPLICANT_INTENTION).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
+            caseData.setRespondent1Represented(YesOrNo.YES);
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setCcdCaseReference(1234L);
+            caseData.setGeneralApplications(List.of(new Element<>(null, new GeneralApplication())));
+            caseData.setPreviousCCDState(AWAITING_APPLICANT_INTENTION);
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
@@ -166,11 +166,11 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
         @Test
         void shouldRecordScenario_whenInvokedForCaseProgressionFeatureToggle() {
             // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .applicant1Represented(YesOrNo.NO)
-                .ccdCaseReference(1234L)
-                .previousCCDState(All_FINAL_ORDERS_ISSUED).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setCcdCaseReference(1234L);
+            caseData.setPreviousCCDState(All_FINAL_ORDERS_ISSUED);
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
@@ -180,10 +180,9 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
             ).build();
-            // When
+
             handler.handle(params);
 
-            // Then
             verifyDeleteNotificationsAndTaskListUpdates(caseData);
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
@@ -195,14 +194,12 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
 
         @Test
         void shouldRecordQMScenario_whenInvokedForCaseWithOpenApplicantCitizenQuery() {
-            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec()
-                .includesApplicantCitizenQueryFollowUp(OffsetDateTime.now())
-                .build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .applicant1Represented(YesOrNo.NO)
-                .ccdCaseReference(1234L)
-                .previousCCDState(All_FINAL_ORDERS_ISSUED).build();
+                .includesApplicantCitizenQueryFollowUp(OffsetDateTime.now()).build();
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setCcdCaseReference(1234L);
+            caseData.setPreviousCCDState(All_FINAL_ORDERS_ISSUED);
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
@@ -212,10 +209,9 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
             ).build();
-            // When
+
             handler.handle(params);
 
-            // Then
             verifyDeleteNotificationsAndTaskListUpdates(caseData);
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
@@ -223,7 +219,6 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
                 caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
-
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_CLAIMANT.getScenario(),
@@ -234,10 +229,7 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
     }
 
     private void verifyDeleteNotificationsAndTaskListUpdates(CaseData caseData) {
-        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
-            caseData.getCcdCaseReference().toString(),
-            "CLAIMANT"
-        );
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(caseData.getCcdCaseReference().toString(), "CLAIMANT");
         verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
             caseData.getCcdCaseReference().toString(),
             "CLAIMANT",

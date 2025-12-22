@@ -41,7 +41,7 @@ public class ApplyForHwFDashboardNotificationHandler extends CallbackHandler imp
     }
 
     private CallbackResponse updateHWFDetailsAndSendNotification(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = ((GeneralApplicationCaseData)callbackParams.getBaseCaseData()).toBuilder().build();
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData().toBuilder().build();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = HwFFeeTypeUtil.updateHwfDetails(caseData);
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         HashMap<String, Object> paramsMap = mapper.mapCaseDataToParams(caseData);
