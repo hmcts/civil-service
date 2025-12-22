@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.auth.checker.core.user.User;
 import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.civil.Application;
 import uk.gov.hmcts.reform.civil.TestIdamConfiguration;
+import uk.gov.hmcts.reform.civil.config.EmbeddedPostgresTestConfiguration;
 import uk.gov.hmcts.reform.civil.service.AuthorisationService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
@@ -49,7 +50,11 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("integration-test")
-@SpringBootTest(classes = {Application.class, TestIdamConfiguration.class})
+@SpringBootTest(classes = {
+    Application.class,
+    TestIdamConfiguration.class,
+    EmbeddedPostgresTestConfiguration.class
+})
 @AutoConfigureMockMvc
 public abstract class BaseIntegrationTest {
 
