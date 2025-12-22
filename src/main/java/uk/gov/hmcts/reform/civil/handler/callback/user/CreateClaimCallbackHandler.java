@@ -304,14 +304,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         PaymentDetails updatedDetails = new PaymentDetails();
         updatedDetails.setCustomerReference(customerReference);
         caseData.setClaimIssuedPaymentDetails(updatedDetails);
-        if(YesOrNo.NO.equals(caseData.getIsClaimDeclarationAdded())) {
-            caseData.setClaimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()));
-        } else if(YesOrNo.YES.equals(caseData.getIsClaimDeclarationAdded())) {
-            Fee claimFee = feesService.getFeeDataByClaimValue(caseData.getClaimValue());
+        caseData.setClaimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()));
+        if(YesOrNo.YES.equals(caseData.getIsClaimDeclarationAdded())) {
             Fee otherRemedyFee = feesService.getFeeDataForOtherRemedy(caseData.getClaimValue());
-            Fee totalFee = Fee.builder().code(claimFee.getCode()).version(claimFee.getVersion()).calculatedAmountInPence(
-                claimFee.getCalculatedAmountInPence().add(otherRemedyFee.getCalculatedAmountInPence())).build();
-            caseData.setClaimFee(totalFee);
             caseData.setOtherRemedyFee(otherRemedyFee);
         }
         caseData.setPaymentTypePBA("PBAv3");

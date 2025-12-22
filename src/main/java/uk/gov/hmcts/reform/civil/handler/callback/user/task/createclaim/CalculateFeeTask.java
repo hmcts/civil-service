@@ -46,6 +46,8 @@ public class CalculateFeeTask {
 
         setClaimFee(caseData);
 
+        setOtherRemedyFee(caseData);
+
         return buildCallbackResponse(caseData);
     }
 
@@ -82,14 +84,11 @@ public class CalculateFeeTask {
 
     private void setClaimFee(CaseData caseData) {
         caseData.setClaimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()));
-        if(YesOrNo.NO.equals(caseData.getIsClaimDeclarationAdded())) {
-            caseData.setClaimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()));
-        } else if(YesOrNo.YES.equals(caseData.getIsClaimDeclarationAdded())) {
-            Fee claimFee = feesService.getFeeDataByClaimValue(caseData.getClaimValue());
+    }
+
+    private void setOtherRemedyFee(CaseData caseData) {
+        if(YesOrNo.YES.equals(caseData.getIsClaimDeclarationAdded())) {
             Fee otherRemedyFee = feesService.getFeeDataForOtherRemedy(caseData.getClaimValue());
-            Fee totalFee = Fee.builder().code(claimFee.getCode()).version(claimFee.getVersion()).calculatedAmountInPence(
-                claimFee.getCalculatedAmountInPence().add(otherRemedyFee.getCalculatedAmountInPence())).build();
-            caseData.setClaimFee(totalFee);
             caseData.setOtherRemedyFee(otherRemedyFee);
         }
     }
