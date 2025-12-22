@@ -13,7 +13,6 @@ import com.launchdarkly.sdk.server.interfaces.FlagTracker;
 import com.launchdarkly.sdk.server.interfaces.FlagValueChangeListener;
 import com.launchdarkly.sdk.server.interfaces.LDClientInterface;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -25,7 +24,8 @@ import java.time.Instant;
 public class NoopLaunchDarklyClient implements LDClientInterface {
 
     private static final FeatureFlagsState EMPTY_FLAG_STATE = FeatureFlagsState.builder().build();
-    private static final FlagChangeListener NOOP_FLAG_CHANGE_LISTENER = event -> { };
+    private static final FlagChangeListener NOOP_FLAG_CHANGE_LISTENER = event -> {
+    };
     private static final FlagTracker NOOP_FLAG_TRACKER = new FlagTracker() {
         @Override
         public void addFlagChangeListener(FlagChangeListener listener) {
