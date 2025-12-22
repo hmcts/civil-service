@@ -87,7 +87,7 @@ public class CalculateFeeTask {
     }
 
     private void setOtherRemedyFee(CaseData caseData) {
-        if(YesOrNo.YES.equals(caseData.getIsClaimDeclarationAdded())) {
+        if (YesOrNo.YES.equals(caseData.getIsClaimDeclarationAdded())) {
             Fee otherRemedyFee = feesService.getFeeDataForOtherRemedy(caseData.getClaimValue());
             caseData.setOtherRemedyFee(otherRemedyFee);
         }

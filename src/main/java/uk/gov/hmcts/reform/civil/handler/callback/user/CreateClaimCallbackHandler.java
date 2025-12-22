@@ -305,7 +305,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         updatedDetails.setCustomerReference(customerReference);
         caseData.setClaimIssuedPaymentDetails(updatedDetails);
         caseData.setClaimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()));
-        if(YesOrNo.YES.equals(caseData.getIsClaimDeclarationAdded())) {
+        if (YesOrNo.YES.equals(caseData.getIsClaimDeclarationAdded())) {
             Fee otherRemedyFee = feesService.getFeeDataForOtherRemedy(caseData.getClaimValue());
             caseData.setOtherRemedyFee(otherRemedyFee);
         }
