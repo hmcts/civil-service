@@ -12,5 +12,7 @@ public enum ClaimTypeUnspec {
     BREACH_OF_CONTRACT,
     CONSUMER,
     CONSUMER_CREDIT,
-    OTHER;
+    HOUSING_DISREPAIR,
+    DAMAGES_AND_OTHER_REMEDY,
+    OTHER
 }
