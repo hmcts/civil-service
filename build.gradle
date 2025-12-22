@@ -321,6 +321,8 @@ configurations.all {
   }
   exclude group: 'org.springframework.security', module: 'spring-security-rsa'
   exclude group: 'org.projectlombok', module: 'lombok-mapstruct-binding'
+  // Avoid duplicate org.json classes coming from legacy android-json artifact
+  exclude group: 'com.vaadin.external.google', module: 'android-json'
 }
 
 dependencies {
@@ -337,6 +339,7 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
+  implementation group: 'org.json', name: 'json', version: '20240303'
 
   implementation group: 'org.springframework.statemachine', name: 'spring-statemachine-core', version: versions.springStatemachine
   implementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
