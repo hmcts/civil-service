@@ -207,6 +207,8 @@ tasks.withType(Test) {
 test {
   failFast = true
   maxParallelForks = 1
+  maxHeapSize = "1536m"
+  jvmArgs "-XX:MaxMetaspaceSize=512m"
 }
 
 tasks.withType(Copy) {
