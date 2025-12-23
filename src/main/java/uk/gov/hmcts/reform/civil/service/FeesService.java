@@ -22,7 +22,7 @@ public class FeesService {
     private static final BigDecimal PENCE_PER_POUND = BigDecimal.valueOf(100);
     private final FeesClientService feesClient;
     private final FeesConfiguration feesConfiguration;
-    OtherRemedyFeesConfiguration otherRemedyFeesConfiguration;
+    private final OtherRemedyFeesConfiguration otherRemedyFeesConfiguration;
 
     public Fee getFeeDataByClaimValue(ClaimValue claimValue) {
         FeeLookupResponseDto feeLookupResponseDto = lookupFee(claimValue);
@@ -31,6 +31,9 @@ public class FeesService {
     }
 
     public Fee getFeeDataForOtherRemedy(ClaimValue claimValue) {
+        if (otherRemedyFeesConfiguration == null) {
+            throw new IllegalStateException("Other remedy fees configuration is not set");
+        }
         FeeLookupResponseDto feeLookupResponseDto = lookupOtherRemedyFees(otherRemedyFeesConfiguration, claimValue);
 
         return buildFeeDto(feeLookupResponseDto);

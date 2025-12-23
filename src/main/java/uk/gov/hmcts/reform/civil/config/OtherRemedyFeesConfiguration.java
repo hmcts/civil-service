@@ -27,7 +27,7 @@ public class OtherRemedyFeesConfiguration {
             @Value("${otherRemediesFees.channel}") String channel,
             @Value("${otherRemediesFees.event}") String event,
             @Value("${otherRemediesFees.jurisdiction2Hearing}") String jurisdiction2Hearing,
-            @Value("${otherRemediesFees.keywords.anyOtherRemedyKeyword}") String anyOtherRemedyKeyword) {
+            @Value("${otherRemediesFees.keywords.anyOtherRemedy}") String anyOtherRemedyKeyword) {
         this.url = url;
         this.endpoint = endpoint;
         this.service = service;
