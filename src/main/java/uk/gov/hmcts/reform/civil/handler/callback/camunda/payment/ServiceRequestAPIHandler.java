@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
@@ -140,5 +141,11 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
 
     private boolean isServiceRequestNotRequested(SRPbaDetails details) {
         return isNull(details) || isNull(details.getServiceReqReference());
+    }
+
+    private boolean isOtherRemedeyClaimFeeServiceRequest(CaseData caseData) {
+        return isNull(caseData.getHearingDueDate())
+            && isServiceRequestNotRequested(caseData.getClaimIssuedPBADetails())
+            && YesOrNo.YES.equals(caseData.getIsClaimDeclarationAdded());
     }
 }
