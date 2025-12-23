@@ -8,7 +8,7 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
@@ -65,22 +65,22 @@ public class GeneralApplicationCreationNotificationServiceTest {
 
     @Autowired
     private GeneralApplicationCreationNotificationService gaNotificationService;
-    @MockBean
+    @MockitoBean
     private SolicitorEmailValidation solicitorEmailValidation;
-    @MockBean
+    @MockitoBean
     private NotificationService notificationService;
 
-    @MockBean
+    @MockitoBean
     private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
+    @MockitoBean
     private GaCoreCaseDataService coreCaseDataService;
 
-    @MockBean
+    @MockitoBean
     private NotificationsProperties notificationsProperties;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @MockitoBean
     private NotificationsSignatureConfiguration configuration;
     @Captor
     ArgumentCaptor<Map<String, String>> argumentCaptor;

@@ -9,7 +9,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -48,16 +48,16 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
     private static final String SUCCESSFUL_PAYMENT_REFERENCE = "2022-1655915218557";
     private static final String FREE_PAYMENT_REFERENCE = "FREE";
 
-    @MockBean
+    @MockitoBean
     private PaymentsService paymentsService;
 
-    @MockBean
+    @MockitoBean
     private PaymentServiceResponse paymentServiceResponse;
 
-    @MockBean
+    @MockitoBean
     private Time time;
 
-    @MockBean
+    @MockitoBean
     private GaForLipService gaForLipService;
 
     @Autowired
@@ -65,7 +65,7 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
 
     @Autowired
     private ObjectMapper objectMapper;
-    @MockBean
+    @MockitoBean
     private GeneralAppFeesService generalAppFeesService;
     private GeneralApplicationCaseData caseData;
     private CallbackParams params;

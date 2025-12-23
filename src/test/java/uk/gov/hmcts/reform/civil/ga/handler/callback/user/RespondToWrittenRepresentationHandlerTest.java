@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -65,18 +65,18 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
 
     @Autowired
     CaseDetailsConverter caseDetailsConverter;
-    @MockBean
+    @MockitoBean
     IdamClient idamClient;
-    @MockBean
+    @MockitoBean
     RespondToWrittenRepresentationGenerator respondToWrittenRepresentationGenerator;
 
-    @MockBean
+    @MockitoBean
     DocUploadDashboardNotificationService docUploadDashboardNotificationService;
 
-    @MockBean
+    @MockitoBean
     GaForLipService gaForLipService;
 
-    @MockBean
+    @MockitoBean
     FeatureToggleService featureToggleService;
 
     private static final String CAMUNDA_EVENT = "INITIATE_GENERAL_APPLICATION";

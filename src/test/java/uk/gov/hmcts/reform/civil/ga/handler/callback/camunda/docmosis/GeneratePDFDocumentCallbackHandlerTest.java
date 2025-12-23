@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -77,55 +77,55 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     properties = {"print.service.enabled=true"})
 class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @MockBean
+    @MockitoBean
     private Time time;
 
-    @MockBean
+    @MockitoBean
     private GeneralOrderGenerator generalOrderGenerator;
 
-    @MockBean
+    @MockitoBean
     private ConsentOrderGenerator consentOrderGenerator;
 
-    @MockBean
+    @MockitoBean
     private RequestForInformationGenerator requestForInformationGenerator;
 
-    @MockBean
+    @MockitoBean
     private DirectionOrderGenerator directionOrderGenerator;
 
-    @MockBean
+    @MockitoBean
     private DismissalOrderGenerator dismissalOrderGenerator;
 
-    @MockBean
+    @MockitoBean
     private HearingOrderGenerator hearingOrderGenerator;
 
-    @MockBean
+    @MockitoBean
     private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
+    @MockitoBean
     private CoreCaseDataService coreCaseDataService;
 
-    @MockBean
+    @MockitoBean
     private WrittenRepresentationConcurrentOrderGenerator writtenRepresentationConcurrentOrderGenerator;
 
-    @MockBean
+    @MockitoBean
     private WrittenRepresentationSequentialOrderGenerator writtenRepresentationSequentailOrderGenerator;
 
-    @MockBean
+    @MockitoBean
     private FreeFormOrderGenerator freeFormOrderGenerator;
 
-    @MockBean
+    @MockitoBean
     private AssistedOrderFormGenerator assistedOrderFormGenerator;
 
     @Autowired
     private AssignCategoryId assignCategoryId;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     private GaForLipService gaForLipService;
 
-    @MockBean
+    @MockitoBean
     private SendFinalOrderPrintService sendFinalOrderPrintService;
 
     @Autowired

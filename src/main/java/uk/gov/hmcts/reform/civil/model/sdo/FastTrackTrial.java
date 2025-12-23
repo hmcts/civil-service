@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
 
 import java.time.LocalDate;
 import java.util.List;
-import javax.validation.constraints.Future;
+import jakarta.validation.constraints.Future;
 
 @Data
 @Builder(toBuilder = true)

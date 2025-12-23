@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GAByCourtsInitiativeGAspec;
@@ -39,7 +39,7 @@ public class DocmosisServiceTest {
         );
     @Autowired
     private DocmosisService docmosisService;
-    @MockBean
+    @MockitoBean
     private GeneralAppLocationRefDataService generalAppLocationRefDataService;
 
     @Test

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -131,61 +131,61 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
     @Autowired
     JudicialDecisionHandler handler;
 
-    @MockBean
+    @MockitoBean
     JudicialDecisionWrittenRepService service;
 
-    @MockBean
+    @MockitoBean
     JudicialDecisionHelper helper;
 
-    @MockBean
+    @MockitoBean
     GeneralAppLocationRefDataService locationRefDataService;
 
-    @MockBean
+    @MockitoBean
     private Time time;
 
-    @MockBean
+    @MockitoBean
     private DeadlinesCalculator deadlinesCalculator;
 
-    @MockBean
+    @MockitoBean
     private GaForLipService gaForLipService;
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     private CoreCaseUserService coreCaseUserService;
 
-    @MockBean
+    @MockitoBean
     private GeneralOrderGenerator generalOrderGenerator;
 
-    @MockBean
+    @MockitoBean
     private RequestForInformationGenerator requestForInformationGenerator;
 
-    @MockBean
+    @MockitoBean
     private DirectionOrderGenerator directionOrderGenerator;
 
-    @MockBean
+    @MockitoBean
     private DismissalOrderGenerator dismissalOrderGenerator;
 
-    @MockBean
+    @MockitoBean
     private HearingOrderGenerator hearingOrderGenerator;
 
-    @MockBean
+    @MockitoBean
     private WrittenRepresentationConcurrentOrderGenerator writtenRepresentationConcurrentOrderGenerator;
 
-    @MockBean
+    @MockitoBean
     private WrittenRepresentationSequentialOrderGenerator writtenRepresentationSequentialOrderGenerator;
 
-    @MockBean
+    @MockitoBean
     private FreeFormOrderGenerator gaFreeFormOrderGenerator;
 
-    @MockBean
+    @MockitoBean
     private IdamClient idamClient;
-    @MockBean
+    @MockitoBean
     private CaseDetailsConverter caseDetailsConverter;
-    @MockBean
+    @MockitoBean
     private CoreCaseDataService coreCaseDataService;
-    @MockBean
+    @MockitoBean
     private JudicialTimeEstimateHelper timeEstimateHelper;
 
     private static final String CAMUNDA_EVENT = "INITIATE_GENERAL_APPLICATION";

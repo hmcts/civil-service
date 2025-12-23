@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -101,24 +101,24 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     @Autowired
     ObjectMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @MockitoBean
     private DocUploadDashboardNotificationService dashboardNotificationService;
-    @MockBean
+    @MockitoBean
     IdamClient idamClient;
-    @MockBean
+    @MockitoBean
     GaForLipService gaForLipService;
-    @MockBean
+    @MockitoBean
     ParentCaseUpdateHelper parentCaseUpdateHelper;
 
-    @MockBean
+    @MockitoBean
     private CoreCaseDataService coreCaseDataService;
 
-    @MockBean
+    @MockitoBean
     protected GeneralAppLocationRefDataService locationRefDataService;
     List<Element<Document>> documents = new ArrayList<>();
     @BeforeEach

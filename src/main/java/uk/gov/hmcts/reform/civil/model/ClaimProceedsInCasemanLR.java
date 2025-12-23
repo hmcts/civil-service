@@ -5,7 +5,7 @@ import lombok.Data;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.validation.groups.CasemanTransferDateGroup;
 
-import javax.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
 
 @Data

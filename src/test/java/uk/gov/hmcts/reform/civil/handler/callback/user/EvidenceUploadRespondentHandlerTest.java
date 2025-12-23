@@ -11,7 +11,7 @@ import org.junit.platform.commons.util.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -99,7 +99,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private EvidenceUploadRespondentHandler handler;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     private final LocalDateTime time = LocalDateTime.now();
@@ -107,7 +107,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private RespondentSetOptionsTask respondentSetOptionsTask;
 
-    @MockBean
+    @MockitoBean
     private CoreCaseUserService coreCaseUserService;
 
     @Autowired

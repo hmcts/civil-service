@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -33,9 +33,9 @@ public class GeneralApplicationCreationNotificationHandlerTest extends GeneralAp
 
     @Autowired
     private GeneralApplicationCreationNotificationHandler handler;
-    @MockBean
+    @MockitoBean
     private GeneralApplicationCreationNotificationService gaNotificationService;
-    @MockBean
+    @MockitoBean
     private GeneralAppFeesService generalAppFeesService;
     private CallbackParams params;
 

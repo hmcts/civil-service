@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -57,15 +57,15 @@ class DismissalOrderGeneratorTest {
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
 
-    @MockBean
+    @MockitoBean
     private SecuredDocumentManagementService documentManagementService;
-    @MockBean
+    @MockitoBean
     private DocumentGeneratorService documentGeneratorService;
     @Autowired
     private DismissalOrderGenerator dismissalOrderGenerator;
     @Autowired
     private ObjectMapper mapper;
-    @MockBean
+    @MockitoBean
     private DocmosisService docmosisService;
 
     @Test

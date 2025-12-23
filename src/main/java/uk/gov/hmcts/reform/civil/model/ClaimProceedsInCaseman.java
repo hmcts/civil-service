@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.validation.groups.CasemanTransferDateGroup;
 
 import java.time.LocalDate;
-import javax.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.PastOrPresent;
 
 @Data
 @Builder

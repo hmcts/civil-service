@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -62,22 +62,22 @@ class GaPaymentRequestUpdateCallbackServiceTest {
     public static final String TOKEN = "1234";
     @Mock
     ObjectMapper objectMapper;
-    @MockBean
+    @MockitoBean
     private GaCoreCaseDataService coreCaseDataService;
 
-    @MockBean
+    @MockitoBean
     private GeneralApplicationCreationNotificationService gaNotificationService;
 
-    @MockBean
+    @MockitoBean
     private JudicialNotificationService judicialNotificationService;
-    @MockBean
+    @MockitoBean
     Time time;
     @Autowired
     GaPaymentRequestUpdateCallbackService paymentRequestUpdateCallbackService;
-    @MockBean
+    @MockitoBean
     StateGeneratorService stateGeneratorService;
 
-    @MockBean
+    @MockitoBean
     CaseDetailsConverter caseDetailsConverter;
 
     @BeforeEach

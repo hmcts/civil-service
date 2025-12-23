@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.bankholidays.NonWorkingDaysCollection;
@@ -257,10 +257,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         return clone;
     }
 
-    @MockBean
+    @MockitoBean
     private Time time;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     @Autowired
@@ -272,28 +272,28 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     protected LocationReferenceDataService locationRefDataService;
 
-    @MockBean
+    @MockitoBean
     private WorkingDayIndicator workingDayIndicator;
 
-    @MockBean
+    @MockitoBean
     private DeadlinesCalculator deadlinesCalculator;
 
-    @MockBean
+    @MockitoBean
     private SdoGeneratorService sdoGeneratorService;
 
-    @MockBean
+    @MockitoBean
     private NonWorkingDaysCollection nonWorkingDaysCollection;
 
-    @MockBean
+    @MockitoBean
     private CategoryService categoryService;
 
     @Mock
     private LocationHelper locationHelper;
 
-    @MockBean
+    @MockitoBean
     private UpdateWaCourtLocationsService updateWaCourtLocationsService;
 
     @Nested

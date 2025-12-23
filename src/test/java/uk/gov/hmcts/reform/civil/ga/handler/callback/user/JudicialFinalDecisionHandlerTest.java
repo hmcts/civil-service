@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -83,21 +83,21 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     private static final LocalDate localDatePlus21days = LocalDate.now().plusDays(21);
     @Autowired
     private JudicialFinalDecisionHandler handler;
-    @MockBean
+    @MockitoBean
     private FreeFormOrderGenerator freeFormOrderGenerator;
-    @MockBean
+    @MockitoBean
     private AssistedOrderFormGenerator assistedOrderFormGenerator;
     @Autowired
     private ObjectMapper objMapper;
-    @MockBean
+    @MockitoBean
     private GeneralAppLocationRefDataService locationRefDataService;
-    @MockBean
+    @MockitoBean
     private DeadlinesCalculator deadlinesCalculator;
-    @MockBean
+    @MockitoBean
     private IdamClient idamClient;
-    @MockBean
+    @MockitoBean
     private CaseDetailsConverter caseDetailsConverter;
-    @MockBean
+    @MockitoBean
     private CoreCaseDataService coreCaseDataService;
 
     @BeforeEach

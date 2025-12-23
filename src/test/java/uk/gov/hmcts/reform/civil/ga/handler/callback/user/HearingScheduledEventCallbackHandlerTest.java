@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -55,7 +55,7 @@ class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCal
     private final ObjectMapper mapper = new ObjectMapper();
     @Autowired
     private HearingScheduledEventCallbackHandler handler;
-    @MockBean
+    @MockitoBean
     private GeneralAppLocationRefDataService locationRefDataService;
 
     @Nested

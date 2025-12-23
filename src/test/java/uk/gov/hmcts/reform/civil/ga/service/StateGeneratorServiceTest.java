@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.ga.service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -68,7 +68,7 @@ public class StateGeneratorServiceTest {
 
     @Autowired
     StateGeneratorService stateGeneratorService;
-    @MockBean
+    @MockitoBean
     JudicialDecisionHelper judicialDecisionHelper;
     private static final String JUDGES_DECISION = "MAKE_DECISION";
 

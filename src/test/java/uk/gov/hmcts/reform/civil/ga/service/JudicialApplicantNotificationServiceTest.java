@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.NotificationDataGA;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
@@ -75,36 +75,36 @@ import static uk.gov.hmcts.reform.civil.ga.utils.JudicialDecisionNotificationUti
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class JudicialApplicantNotificationServiceTest {
 
-    @MockBean
+    @MockitoBean
     private NotificationsProperties notificationsProperties;
-    @MockBean
+    @MockitoBean
     private Time time;
-    @MockBean
+    @MockitoBean
     private DeadlinesCalculator deadlinesCalculator;
     @Autowired
     private JudicialNotificationService judicialNotificationService;
 
-    @MockBean
+    @MockitoBean
     private NotificationService notificationService;
 
-    @MockBean
+    @MockitoBean
     private SolicitorEmailValidation solicitorEmailValidation;
 
-    @MockBean
+    @MockitoBean
     private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
+    @MockitoBean
     private CoreCaseDataService coreCaseDataService;
 
-    @MockBean
+    @MockitoBean
     private JudicialDecisionHelper judicialDecisionHelper;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @MockitoBean
     private GaForLipService gaForLipService;
 
-    @MockBean
+    @MockitoBean
     private NotificationsSignatureConfiguration configuration;
 
     private static final String APPLICANT = "applicant";

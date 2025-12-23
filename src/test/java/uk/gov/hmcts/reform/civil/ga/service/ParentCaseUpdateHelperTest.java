@@ -7,7 +7,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
@@ -71,11 +71,11 @@ class ParentCaseUpdateHelperTest {
 
     @Autowired
     ParentCaseUpdateHelper parentCaseUpdateHelper;
-    @MockBean
+    @MockitoBean
     GaCoreCaseDataService coreCaseDataService;
-    @MockBean
+    @MockitoBean
     CaseDetailsConverter caseDetailsConverter;
-    @MockBean
+    @MockitoBean
     FeatureToggleService featureToggleService;
     @Autowired
     ObjectMapper objectMapper;

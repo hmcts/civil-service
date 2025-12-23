@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -72,9 +72,9 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 })
 class MoveToJudicialDecisionStateEventCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @MockBean
+    @MockitoBean
     private ParentCaseUpdateHelper parentCaseUpdateHelper;
-    @MockBean
+    @MockitoBean
     private Time time;
     @Autowired
     ObjectMapper objectMapper;
@@ -82,12 +82,12 @@ class MoveToJudicialDecisionStateEventCallbackHandlerTest extends GeneralApplica
     @Autowired
     CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
+    @MockitoBean
     private GeneralApplicationDraftGenerator generalApplicationDraftGenerator;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     private GaForLipService gaForLipService;
     @Autowired
     private MoveToJudicialDecisionStateEventCallbackHandler handler;

@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -75,7 +75,7 @@ public class PostcodeLookupService {
                 String.class
             );
 
-            HttpStatus responseStatus = ((ResponseEntity) response).getStatusCode();
+            HttpStatusCode responseStatus = ((ResponseEntity<?>) response).getStatusCode();
 
             if (responseStatus.value() == org.apache.http.HttpStatus.SC_OK) {
                 JSONObject jsonObj = new JSONObject(response.getBody());

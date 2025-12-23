@@ -11,7 +11,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
@@ -114,15 +114,15 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
     @Autowired
     private ParentCaseUpdateHelper parentCaseUpdateHelper;
 
-    @MockBean
+    @MockitoBean
     private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
+    @MockitoBean
     private GaCoreCaseDataService coreCaseDataService;
 
-    @MockBean
+    @MockitoBean
     private GaForLipService gaForLipService;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
     @Captor
     private ArgumentCaptor<Map<String, Object>> mapCaptor;

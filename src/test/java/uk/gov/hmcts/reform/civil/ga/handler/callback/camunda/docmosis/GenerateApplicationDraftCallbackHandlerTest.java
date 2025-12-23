@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -77,9 +77,9 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 })
 class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @MockBean
+    @MockitoBean
     private Time time;
-    @MockBean
+    @MockitoBean
     private GeneralApplicationDraftGenerator generalApplicationDraftGenerator;
     @Autowired
     private GenerateApplicationDraftCallbackHandler handler;
@@ -87,11 +87,11 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
     private final ObjectMapper mapper = new ObjectMapper();
     @Autowired
     private AssignCategoryId assignCategoryId;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @MockitoBean
     private GeneralAppFeesService generalAppFeesService;
-    @MockBean
+    @MockitoBean
     private GaForLipService gaForLipService;
 
     private final LocalDate submittedOn = now();

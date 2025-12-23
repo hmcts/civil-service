@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -109,19 +109,19 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 })
 class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @MockitoBean
     private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
+    @MockitoBean
     private Time time;
 
-    @MockBean
+    @MockitoBean
     private LocationReferenceDataService locationRefDataService;
 
-    @MockBean
+    @MockitoBean
     private CaseFlagsInitialiser caseFlagsInitialiser;
 
-    @MockBean
+    @MockitoBean
     private LocationRefDataUtil locationRefDataUtil;
 
     @Autowired
@@ -136,16 +136,16 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private AssignCategoryId assignCategoryId;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     private ToggleConfiguration toggleConfiguration;
 
     @Autowired
     private FrcDocumentsUtils frcDocumentsUtils;
 
-    @MockBean
+    @MockitoBean
     private UpdateWaCourtLocationsService updateWaCourtLocationsService;
 
     @Mock
@@ -154,7 +154,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private LocationHelper locationHelper;
 
-    @MockBean
+    @MockitoBean
     private RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
 
     @Nested

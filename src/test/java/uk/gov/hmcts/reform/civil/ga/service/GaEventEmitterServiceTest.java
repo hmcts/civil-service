@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.ApplicationEventPublisher;
 import uk.gov.hmcts.reform.civil.event.DispatchBusinessProcessEvent;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
@@ -36,10 +36,10 @@ class GaEventEmitterServiceTest {
     @Mock
     private RemoteProcessEngineException mockedRemoteProcessEngineException;
 
-    @MockBean
+    @MockitoBean
     private RuntimeService runtimeService;
 
-    @MockBean
+    @MockitoBean
     private MessageCorrelationBuilder messageCorrelationBuilder;
 
     private GaEventEmitterService eventEmitterService;

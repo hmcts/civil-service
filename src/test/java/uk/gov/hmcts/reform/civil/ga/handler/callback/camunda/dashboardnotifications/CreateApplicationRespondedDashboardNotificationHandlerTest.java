@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
@@ -60,13 +60,13 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
     properties = {"reference.database.enabled=false"})
 public class CreateApplicationRespondedDashboardNotificationHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @MockitoBean
     private DocUploadDashboardNotificationService dashboardNotificationService;
-    @MockBean
+    @MockitoBean
     IdamClient idamClient;
-    @MockBean
+    @MockitoBean
     GaForLipService gaForLipService;
     @Autowired
     CreateApplicationRespondedDashboardNotificationHandler handler;

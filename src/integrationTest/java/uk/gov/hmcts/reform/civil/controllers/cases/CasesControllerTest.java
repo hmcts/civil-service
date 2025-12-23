@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.auth.checker.core.exceptions.BearerTokenMissingException;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -102,43 +102,43 @@ public class CasesControllerTest extends BaseIntegrationTest {
                                       .build());
     private static final String EVENT_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOi";
 
-    @MockBean
+    @MockitoBean
     private CoreCaseDataService coreCaseDataService;
-    @MockBean
+    @MockitoBean
     private GaCoreCaseDataService gaCoreCaseDataService;
-    @MockBean
+    @MockitoBean
     private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
+    @MockitoBean
     private RoleAssignmentsService roleAssignmentsService;
 
-    @MockBean
+    @MockitoBean
     private DashboardClaimInfoService dashboardClaimInfoService;
 
-    @MockBean
+    @MockitoBean
     private CaseEventService caseEventService;
 
-    @MockBean
+    @MockitoBean
     private GaCaseEventService gaCaseEventService;
 
-    @MockBean
+    @MockitoBean
     private CaseworkerCaseEventService caseworkerCaseEventService;
-    @MockBean
+    @MockitoBean
     private CaseSdtRequestSearchService caseSdtRequestSearchService;
 
-    @MockBean
+    @MockitoBean
     private DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
 
-    @MockBean
+    @MockitoBean
     CoreCaseDataApi coreCaseDataApi;
 
-    @MockBean
+    @MockitoBean
     PostcodeValidator postcodeValidator;
 
-    @MockBean
+    @MockitoBean
     private UserInformationService userInformationService;
 
-    @MockBean
+    @MockitoBean
     private RepaymentPlanDecisionService repaymentPlanDecisionService;
 
     @Test

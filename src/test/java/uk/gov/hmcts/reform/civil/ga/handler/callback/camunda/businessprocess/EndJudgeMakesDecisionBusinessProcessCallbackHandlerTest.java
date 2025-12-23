@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
@@ -37,17 +37,17 @@ class EndJudgeMakesDecisionBusinessProcessCallbackHandlerTest extends GeneralApp
 
     @Autowired
     private EndJudgeMakesDecisionBusinessProcessCallbackHandler handler;
-    @MockBean
+    @MockitoBean
     private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
+    @MockitoBean
     private CoreCaseDataService coreCaseDataService;
 
-    @MockBean
+    @MockitoBean
     private StateGeneratorService stateGeneratorService;
-    @MockBean
+    @MockitoBean
     private ParentCaseUpdateHelper parentCaseUpdateHelper;
-    @MockBean
+    @MockitoBean
     private JudicialDecisionHelper judicialDecisionHelper;
     private CallbackParams params;
 

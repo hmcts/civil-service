@@ -12,7 +12,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
@@ -59,24 +59,24 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WAIT_GA_DRAFT;
 })
 public class WaitCivilDocUpdatedTaskHandlerTest {
 
-    @MockBean
+    @MockitoBean
     private ExternalTask externalTask;
 
-    @MockBean
+    @MockitoBean
     private ExternalTaskService externalTaskService;
-    @MockBean
+    @MockitoBean
     private GaCoreCaseDataService coreCaseDataService;
-    @MockBean
+    @MockitoBean
     private ObjectMapper mapper;
-    @MockBean
+    @MockitoBean
     private CaseDetailsConverter caseDetailsConverter;
-    @MockBean
+    @MockitoBean
     private GaForLipService gaForLipService;
     @Mock
     private ExternalTask mockTask;
     @Autowired
     private WaitCivilDocUpdatedTaskHandler waitCivilDocUpdatedTaskHandler;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     private GeneralApplicationCaseData gaCaseData;

@@ -7,7 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -38,11 +38,11 @@ public class EndHearingScheduledBusinessProcessCallbackHandlerTest extends Gener
 
     @Autowired
     private EndHearingScheduledBusinessProcessCallbackHandler handler;
-    @MockBean
+    @MockitoBean
     private CaseDetailsConverter caseDetailsConverter;
-    @MockBean
+    @MockitoBean
     private CoreCaseDataService coreCaseDataService;
-    @MockBean
+    @MockitoBean
     private ParentCaseUpdateHelper parentCaseUpdateHelper;
     private CallbackParams params;
 

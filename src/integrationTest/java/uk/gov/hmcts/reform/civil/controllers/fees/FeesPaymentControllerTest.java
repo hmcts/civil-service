@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
@@ -47,15 +47,15 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
     private static final String HEARING_PAYMENT_RETURN_URL =
         "http://localhost:3001/hearing-payment-confirmation/" + CASE_REFERENCE;
 
-    @MockBean
+    @MockitoBean
     private PaymentsClient paymentsClient;
-    @MockBean
+    @MockitoBean
     private CoreCaseDataService coreCaseDataService;
-    @MockBean
+    @MockitoBean
     private PaymentRequestUpdateCallbackService paymentRequestUpdateCallbackService;
-    @MockBean
+    @MockitoBean
     private GaCoreCaseDataService gaCoreCaseDataService;
-    @MockBean
+    @MockitoBean
     private UpdatePaymentStatusService updatePaymentStatusService;
 
     @BeforeEach

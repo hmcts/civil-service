@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -44,12 +44,12 @@ public class GaRespondentResponseDeadlineCallbackHandlerTest extends GeneralAppl
 
     @Autowired
     private GaRespondentResponseDeadlineCallbackHandler handler;
-    @MockBean
+    @MockitoBean
     private GaDashboardNotificationsParamsMapper mapper;
-    @MockBean
+    @MockitoBean
     private DashboardApiClient dashboardApiClient;
 
-    @MockBean
+    @MockitoBean
     private DocUploadDashboardNotificationService dashboardNotificationService;
 
     @Test

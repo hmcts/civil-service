@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.ga.service.search.GaEvidenceUploadNotificationSearchService;
@@ -28,19 +28,19 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GA_EVIDENCE_UPLOAD_CH
     DocUploadNotifyTaskHandler.class})
 public class DocUploadNotifyTaskHandlerTest {
 
-    @MockBean
+    @MockitoBean
     private ExternalTask externalTask;
 
-    @MockBean
+    @MockitoBean
     private ExternalTaskService externalTaskService;
 
-    @MockBean
+    @MockitoBean
     private GaEvidenceUploadNotificationSearchService searchService;
 
-    @MockBean
+    @MockitoBean
     private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
+    @MockitoBean
     private GaCoreCaseDataService coreCaseDataService;
 
     @Autowired

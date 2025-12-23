@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
@@ -67,20 +67,20 @@ import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeWrittenRepresentation
 })
 class GAJudgeRevisitTaskHandlerTest {
 
-    @MockBean
+    @MockitoBean
     private ExternalTask externalTask;
 
-    @MockBean
+    @MockitoBean
     private ExternalTaskService externalTaskService;
 
-    @MockBean
+    @MockitoBean
     private CaseStateSearchService caseStateSearchService;
 
-    @MockBean
+    @MockitoBean
     private GaCoreCaseDataService coreCaseDataService;
-    @MockBean
+    @MockitoBean
     private DocUploadDashboardNotificationService dashboardNotificationService;
-    @MockBean
+    @MockitoBean
     private GaForLipService gaForLipService;
 
     @Autowired

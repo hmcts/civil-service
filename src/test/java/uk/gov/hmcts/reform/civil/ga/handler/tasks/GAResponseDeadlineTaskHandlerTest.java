@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
@@ -49,16 +49,16 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_RESP
     GAResponseDeadlineTaskHandler.class})
 class GAResponseDeadlineTaskHandlerTest {
 
-    @MockBean
+    @MockitoBean
     private ExternalTask externalTask;
 
-    @MockBean
+    @MockitoBean
     private ExternalTaskService externalTaskService;
 
-    @MockBean
+    @MockitoBean
     private CaseStateSearchService caseSearchService;
 
-    @MockBean
+    @MockitoBean
     private GaCoreCaseDataService coreCaseDataService;
 
     @Autowired

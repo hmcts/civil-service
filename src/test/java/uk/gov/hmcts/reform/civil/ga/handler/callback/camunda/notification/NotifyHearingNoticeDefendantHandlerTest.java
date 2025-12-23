@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -34,7 +34,7 @@ public class NotifyHearingNoticeDefendantHandlerTest extends GeneralApplicationB
 
     @Autowired
     private NotifyHearingNoticeDefendantHandler handler;
-    @MockBean
+    @MockitoBean
     HearingScheduledNotificationService hearingScheduledNotificationService;
     private CallbackParams params;
 

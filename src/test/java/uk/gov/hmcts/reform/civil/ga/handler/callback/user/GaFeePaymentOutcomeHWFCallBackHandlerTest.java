@@ -9,7 +9,7 @@ import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -59,11 +59,11 @@ public class GaFeePaymentOutcomeHWFCallBackHandlerTest extends GeneralApplicatio
     private GaFeePaymentOutcomeHWFCallBackHandler handler;
     @Autowired
     private ObjectMapper mapper = new ObjectMapper();
-    @MockBean
+    @MockitoBean
     private GaPaymentRequestUpdateCallbackService service;
-    @MockBean
+    @MockitoBean
     private HwfNotificationService hwfNotificationService;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     @Test

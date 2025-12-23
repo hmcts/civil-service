@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
@@ -27,7 +27,7 @@ public class JudicialDecisionRespondentNotificationHandlerTest extends GeneralAp
 
     @Autowired
     private JudicialDecisionRespondentNotificationHandler handler;
-    @MockBean
+    @MockitoBean
     JudicialNotificationService judicialNotificationService;
     private CallbackParams params;
 

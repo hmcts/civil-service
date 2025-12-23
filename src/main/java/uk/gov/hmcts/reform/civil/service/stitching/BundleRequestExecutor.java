@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
@@ -56,15 +57,16 @@ public class BundleRequestExecutor {
                                                                                              serviceAuthorizationToken,
                                                                                              payload
             );
-            if (response1.getStatusCode().equals(HttpStatus.OK)) {
+            HttpStatusCode statusCode = response1.getStatusCode();
+            if (statusCode.equals(HttpStatus.OK)) {
                 return Optional.of(caseDetailsConverter.toCaseData(requireNonNull(response1.getBody())));
             } else {
                 log.warn("The call to the endpoint with URL {} returned a non positive outcome (HTTP-{}). This may "
-                             + "cause problems down the line.", endpoint, response1.getStatusCode().value());
+                             + "cause problems down the line.", endpoint, statusCode.value());
                 log.info(
                     "Stitching endpoint returned {} with reason {}",
                     response1.getStatusCodeValue(),
-                    response1.getStatusCode().getReasonPhrase()
+                    statusCode instanceof HttpStatus ? ((HttpStatus) statusCode).getReasonPhrase() : "N/A"
                 );
                 throw new RetryableStitchingException();
             }
@@ -115,4 +117,3 @@ public class BundleRequestExecutor {
     }
 
 }
-

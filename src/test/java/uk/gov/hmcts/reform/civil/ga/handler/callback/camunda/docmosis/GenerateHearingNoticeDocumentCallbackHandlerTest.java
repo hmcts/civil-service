@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -47,24 +47,24 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest extends GeneralApplicatio
 
     @Autowired
     private GenerateHearingNoticeDocumentCallbackHandler handler;
-    @MockBean
+    @MockitoBean
     private GaHearingFormGenerator hearingFormGenerator;
     @Autowired
     private ObjectMapper mapper;
 
-    @MockBean
+    @MockitoBean
     private GaForLipService gaForLipService;
-    @MockBean
+    @MockitoBean
     private CaseDetailsConverter caseDetailsConverter;
-    @MockBean
+    @MockitoBean
     private CoreCaseDataService coreCaseDataService;
-    @MockBean
+    @MockitoBean
     private SendFinalOrderPrintService sendFinalOrderPrintService;
 
     @Autowired
     private AssignCategoryId assignCategoryId;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     @Test
