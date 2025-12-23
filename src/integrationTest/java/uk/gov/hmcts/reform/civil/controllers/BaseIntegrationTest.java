@@ -7,7 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.auth.checker.core.user.User;
 import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.civil.Application;
 import uk.gov.hmcts.reform.civil.TestIdamConfiguration;
+import uk.gov.hmcts.reform.civil.config.EmbeddedPostgresTestConfiguration;
 import uk.gov.hmcts.reform.civil.service.AuthorisationService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
@@ -49,7 +50,11 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("integration-test")
-@SpringBootTest(classes = {Application.class, TestIdamConfiguration.class})
+@SpringBootTest(classes = {
+    Application.class,
+    TestIdamConfiguration.class,
+    EmbeddedPostgresTestConfiguration.class
+})
 @AutoConfigureMockMvc
 public abstract class BaseIntegrationTest {
 
@@ -78,22 +83,22 @@ public abstract class BaseIntegrationTest {
         .build();
 
     protected static final String s2sToken = "s2s AuthToken";
-    @MockBean
+    @MockitoBean
     private ServiceAuthorisationApi serviceAuthorisationApi;
-    @MockBean (name = "userService")
+    @MockitoBean (name = "userService")
     protected UserService userService;
-    @MockBean
+    @MockitoBean
     protected Authentication authentication;
-    @MockBean
+    @MockitoBean
     protected SecurityContext securityContext;
-    @MockBean
+    @MockitoBean
     protected JwtDecoder jwtDecoder;
-    @MockBean
+    @MockitoBean
     public AuthorisationService authorisationService;
-    @MockBean
+    @MockitoBean
     public IdamApi idamApi;
 
-    @MockBean
+    @MockitoBean
     public RequestAuthorizer<User> userRequestAuthorizerMock;
 
     @Autowired

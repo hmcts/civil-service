@@ -6,9 +6,10 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
@@ -26,23 +27,14 @@ public class HttpClientConfiguration {
     }
 
     @Bean
-    public RestTemplate restTemplate() {
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(getRestTemplateHttpClient()));
-        return restTemplate;
-    }
-
-    private CloseableHttpClient getRestTemplateHttpClient() {
-        RequestConfig config = RequestConfig.custom()
-            .setConnectTimeout(readTimeout)
-            .setConnectionRequestTimeout(readTimeout)
-            .setSocketTimeout(readTimeout)
-            .build();
-
-        return HttpClientBuilder
-            .create()
-            .useSystemProperties()
-            .setDefaultRequestConfig(config)
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        return builder
+            .requestFactory(() -> {
+                SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+                factory.setConnectTimeout(readTimeout);
+                factory.setReadTimeout(readTimeout);
+                return factory;
+            })
             .build();
     }
 

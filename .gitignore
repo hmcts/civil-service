@@ -18,7 +18,7 @@ bin/main/application.yaml
 /out
 *.iws
 *.iml
-*.ipr
+*.ip
 .mirrord
 
 .DS_Store
@@ -42,3 +42,4 @@ infrastructure/override.tf
 .aat-env
 /java_pid*.hprof
 /pacts/
+/.gradle-user/
