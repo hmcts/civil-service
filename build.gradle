@@ -34,9 +34,6 @@ def versions = [
 ]
 
 allprojects {
-  sourceCompatibility = JavaVersion.VERSION_21
-  targetCompatibility = JavaVersion.VERSION_21
-
   java {
     toolchain {
       languageVersion = JavaLanguageVersion.of(21)
@@ -520,7 +517,9 @@ dependencies {
   }
 }
 
-mainClassName = 'uk.gov.hmcts.reform.civil.Application'
+application {
+  mainClass = 'uk.gov.hmcts.reform.civil.Application'
+}
 
 bootJar {
   getArchiveFileName().set(provider {
