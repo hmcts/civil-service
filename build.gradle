@@ -693,6 +693,8 @@ tasks.withType(Test).configureEach { t ->
   minHeapSize = "256m"
   maxHeapSize = "1536m"
   jvmArgs "-XX:MaxMetaspaceSize=512m"
+  // Temurin 21.0.7 occasionally crashes in C2 (BoolNode::Ideal SIGSEGV); stay on C1 until upstream fix.
+  jvmArgs "-XX:TieredStopAtLevel=1"
 
   testLogging {
     exceptionFormat = 'full'
