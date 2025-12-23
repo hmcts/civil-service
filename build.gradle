@@ -198,11 +198,44 @@ tasks.withType(JavaCompile) {
   options.compilerArgs << "-Xlint:unchecked" << "-Werror"
 }
 
-tasks.withType(Test) {
+tasks.withType(Test).configureEach { t ->
   useJUnitPlatform()
-  maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+
+  // --- Pipeline-stable settings with JaCoCo enabled ---
+  // JaCoCo increases memory/RSS; keep it predictable and stop long-lived worker growth.
+  maxParallelForks = 1
+  forkEvery = 50
+
+  // Keep within typical Jenkins container limits (tune if your pod is larger/smaller)
+  minHeapSize = "256m"
+  maxHeapSize = "1536m"
+  jvmArgs "-XX:MaxMetaspaceSize=512m"
+
   testLogging {
     exceptionFormat = 'full'
+    showCauses = true
+    showExceptions = true
+    showStackTraces = true
+
+    // Massive stdout in CI can add pressure/noise; only log failures by default
+    showStandardStreams = false
+    events "failed", "skipped"
+  }
+
+  // --- Keep Pact systemProperty wiring (moved here so there's only one Test config) ---
+  if (project.hasProperty('pact.verifier.publishResults')) {
+    systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
+  }
+  if (project.hasProperty('pact.provider.version')) {
+    systemProperty 'pact.provider.version', project.property('pact.provider.version')
+  } else {
+    systemProperty 'pact.provider.version', project.pactVersion
+  }
+
+  if (project.hasProperty('pact.provider.branch')) {
+    systemProperty 'pact.provider.branch', project.property('pact.provider.branch')
+  } else {
+    systemProperty 'pact.provider.branch', System.getenv("PACT_BRANCH_NAME") ?: "Dev"
   }
 }
 
@@ -215,14 +248,20 @@ tasks.withType(Copy) {
 }
 
 task integration(type: Test) {
-  maxHeapSize = '3G'
   description = "Runs integration tests"
   group = "Verification"
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
   classpath = sourceSets.integrationTest.runtimeClasspath
   failFast = true
   testLogging.showStandardStreams = false
+  useJUnitPlatform()
 
+  // Pipeline-stable defaults
+  maxParallelForks = 1
+  forkEvery = 25
+  minHeapSize = "256m"
+  maxHeapSize = "1536m"
+  jvmArgs "-XX:MaxMetaspaceSize=512m"
 }
 
 task fortifyScan(type: JavaExec, description: 'Run fortify scan.') {
@@ -310,6 +349,7 @@ jacocoTestReport {
     sourceSets it.sourceSets.main
   }
   reports {
+    html.required.set(false)
     xml.required.set(true)
     csv.required.set(false)
     xml.outputLocation.set(file("${buildDir}/reports/jacoco/test/jacocoTestReport.xml"))
@@ -626,7 +666,6 @@ tasks.register('contract', Test) {
   setClasspath(sourceSets.contractTest.runtimeClasspath)
   useJUnitPlatform()
   systemProperty 'pact.rootDir', "pacts"
-  maxParallelForks = 1
 }
 
 tasks.register('runAndPublishConsumerPactTests', Test) {
@@ -635,7 +674,6 @@ tasks.register('runAndPublishConsumerPactTests', Test) {
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
   finalizedBy(pactPublish)
-  maxParallelForks = 1
 }
 
 tasks.register('providerContractTests', Test) {
@@ -648,49 +686,11 @@ tasks.register('providerContractTests', Test) {
   include '**/provider/**'
 }
 
-allprojects {
-  tasks.withType(Test).configureEach {
-    jacoco.enabled = false
-  }
-  tasks.withType(JacocoReport).configureEach {
-    enabled = false
-  }
-  tasks.withType(JacocoCoverageVerification).configureEach {
-    enabled = false
-  }
-}
-
 tasks.register('runProviderPactVerification') {
   description = 'Entry point for Jenkins to run provider contract tests.'
   group = 'Verification'
 
   dependsOn tasks.named('providerContractTests')
-}
-
-tasks.withType(Test).configureEach { t ->
-  testLogging {
-    exceptionFormat = 'full'
-    showCauses = true
-    showExceptions = true
-    showStackTraces = true
-    showStandardStreams = true
-    events "passed", "skipped", "failed", "standard_out", "standard_error"
-  }
-
-  if (project.hasProperty('pact.verifier.publishResults')) {
-    systemProperty 'pact.verifier.publishResults', project.property('pact.verifier.publishResults')
-  }
-  if (project.hasProperty('pact.provider.version')) {
-    systemProperty 'pact.provider.version', project.property('pact.provider.version')
-  } else {
-    systemProperty 'pact.provider.version', project.pactVersion
-  }
-
-  if (project.hasProperty('pact.provider.branch')) {
-    systemProperty 'pact.provider.branch', project.property('pact.provider.branch')
-  } else {
-    systemProperty 'pact.provider.branch', System.getenv("PACT_BRANCH_NAME") ?: "Dev"
-  }
 }
 
 def getCheckedOutGitCommitHash() {
