@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,7 +32,7 @@ public class Notification {
 
     private NotificationAction notificationAction;
 
-    private HashMap<String, Object> params;
+    private Map<String, Object> params;
 
     private OffsetDateTime createdAt;
 

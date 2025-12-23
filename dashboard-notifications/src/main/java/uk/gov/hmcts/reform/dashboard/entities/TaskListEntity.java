@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
-import com.vladmihalcea.hibernate.type.json.JsonType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -15,8 +15,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
-import java.util.HashMap;
 import java.util.UUID;
+import java.util.Map;
 
 @lombok.Data
 @lombok.Builder(toBuilder = true)
@@ -76,8 +76,8 @@ public class TaskListEntity implements Serializable {
     @Schema(name = "updated_by")
     private String updatedBy;
 
-    @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
     @Schema(name = "message_params")
-    private HashMap<String, Object> messageParams;
+    @JdbcTypeCode(SqlTypes.JSON)
+    private Map<String, Object> messageParams;
 }

@@ -6,11 +6,14 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.util.ContentCachingRequestWrapper;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.context.request.ServletWebRequest;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentUploadException;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
@@ -72,16 +75,32 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>("Document upload unsuccessful", new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public ResponseEntity<Object> documentUploadException(MaxUploadSizeExceededException maxUploadSizeExceededException,
-                                                          ContentCachingRequestWrapper contentCachingRequestWrapper) {
-        String errorMessage = "Max upload size exceeded error with message: %s for case %s run by user %s";
-        log.error(errorMessage.formatted(
-            maxUploadSizeExceededException.getMessage(),
-            getCaseId(contentCachingRequestWrapper),
-            getUserId(contentCachingRequestWrapper)
-        ));
-        return new ResponseEntity<>("Document upload unsuccessful", new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    @Override
+    protected ResponseEntity<Object> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex,
+                                                                          HttpHeaders headers,
+                                                                          HttpStatusCode status,
+                                                                          WebRequest request) {
+        ContentCachingRequestWrapper cachingWrapper = extractCachingRequest(request);
+        if (cachingWrapper != null) {
+            log.error(
+                "Max upload size exceeded error with message: {} for case {} run by user {}",
+                ex.getMessage(),
+                getCaseId(cachingWrapper),
+                getUserId(cachingWrapper)
+            );
+        } else {
+            log.error("Max upload size exceeded error with message: {}", ex.getMessage());
+        }
+        HttpHeaders responseHeaders = headers != null ? headers : new HttpHeaders();
+        return new ResponseEntity<>("Document upload unsuccessful", responseHeaders, HttpStatus.BAD_REQUEST);
+    }
+
+    private ContentCachingRequestWrapper extractCachingRequest(WebRequest request) {
+        if (request instanceof ServletWebRequest servletWebRequest
+            && servletWebRequest.getRequest() instanceof ContentCachingRequestWrapper wrapper) {
+            return wrapper;
+        }
+        return null;
     }
 
     @ExceptionHandler(MissingFieldsUpdatedException.class)

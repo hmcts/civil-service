@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
-import com.vladmihalcea.hibernate.type.json.JsonType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -14,8 +14,8 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
-import java.util.HashMap;
 import java.util.UUID;
+import java.util.Map;
 
 @lombok.Data
 @lombok.Builder(toBuilder = true)
@@ -58,10 +58,10 @@ public class DashboardNotificationsEntity implements Serializable {
     @Schema(name = "description_cy")
     private String descriptionCy;
 
-    @Type(JsonType.class)
     @Column(name = "message_params", columnDefinition = "jsonb")
     @Schema(name = "message_params")
-    private HashMap<String, Object> params;
+    @JdbcTypeCode(SqlTypes.JSON)
+    private Map<String, Object> params;
 
     @Schema(name = "created_by")
     private String createdBy;

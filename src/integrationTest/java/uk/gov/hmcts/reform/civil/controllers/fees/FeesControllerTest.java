@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class FeesControllerTest extends BaseIntegrationTest {
 
-    private static final String FEES_RANGES_URL = "/fees/ranges/";
+    private static final String FEES_RANGES_URL = "/fees/ranges";
     private static final String FEES_CLAIM_URL = "/fees/claim/{claimAmount}";
     private static final String FEES_CLAIM_CALCULATE_INTEREST_URL = "/fees/claim/calculate-interest";
     private static final String FEES_HEARING_URL = "/fees/hearing/{claimAmount}";
@@ -96,28 +96,29 @@ public class FeesControllerTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     public void shouldReturnFeeRanges() {
-        Fee2Dto[] response = buildFeeRangeResponse();
-        when(feesService.getFeeRange()).thenReturn(List.of(response));
+        List<Fee2Dto> response = buildFeeRangeResponse();
+        when(feesService.getFeeRange()).thenReturn(response);
         doGet(BEARER_TOKEN, FEES_RANGES_URL)
             .andExpect(content().json(toJson(response)))
             .andExpect(status().isOk());
     }
 
-    private Fee2Dto[] buildFeeRangeResponse() {
-        return new Fee2Dto[]{
-            Fee2Dto
-                .builder()
+    private List<Fee2Dto> buildFeeRangeResponse() {
+        return List.of(
+            Fee2Dto.builder()
                 .minRange(new BigDecimal("0.1"))
                 .maxRange(new BigDecimal("300"))
-                .currentVersion(FeeVersionDto
-                                    .builder()
-                                    .flatAmount(FlatAmountDto
-                                                    .builder()
-                                                    .amount(new BigDecimal("35"))
-                                                    .build())
-                                    .build())
+                .currentVersion(
+                    FeeVersionDto.builder()
+                        .flatAmount(
+                            FlatAmountDto.builder()
+                                .amount(new BigDecimal("35"))
+                                .build()
+                        )
+                        .build()
+                )
                 .build()
-        };
+        );
     }
 
     private Fee buildFeeResponse() {
