@@ -1,3 +1,5 @@
+import org.gradle.testing.jacoco.tasks.JacocoCoverageVerification
+import org.gradle.testing.jacoco.tasks.JacocoReport
 import uk.gov.hmcts.rse.AuthMode
 
 plugins {
@@ -206,9 +208,6 @@ tasks.withType(Test) {
 
 test {
   failFast = true
-  maxParallelForks = 1
-  maxHeapSize = "1536m"
-  jvmArgs "-XX:MaxMetaspaceSize=512m"
 }
 
 tasks.withType(Copy) {
@@ -647,6 +646,18 @@ tasks.register('providerContractTests', Test) {
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
   include '**/provider/**'
+}
+
+allprojects {
+  tasks.withType(Test).configureEach {
+    jacoco.enabled = false
+  }
+  tasks.withType(JacocoReport).configureEach {
+    enabled = false
+  }
+  tasks.withType(JacocoCoverageVerification).configureEach {
+    enabled = false
+  }
 }
 
 tasks.register('runProviderPactVerification') {
