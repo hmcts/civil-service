@@ -206,6 +206,7 @@ tasks.withType(Test) {
 
 test {
   failFast = true
+  maxHeapSize = "2g"
 }
 
 tasks.withType(Copy) {
