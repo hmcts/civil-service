@@ -142,10 +142,4 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
     private boolean isServiceRequestNotRequested(SRPbaDetails details) {
         return isNull(details) || isNull(details.getServiceReqReference());
     }
-
-    private boolean isOtherRemedeyClaimFeeServiceRequest(CaseData caseData) {
-        return isNull(caseData.getHearingDueDate())
-            && isServiceRequestNotRequested(caseData.getClaimIssuedPBADetails())
-            && YesOrNo.YES.equals(caseData.getIsClaimDeclarationAdded());
-    }
 }
