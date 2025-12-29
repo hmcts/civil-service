@@ -9,6 +9,7 @@ on:
       - 'src/main/resources/application.yaml'
       - 'scripts/generate_email_notifications_table.py'
       - 'docs/email-notifications.md'
+      - 'docs/email-notifications.html'
       - '.github/workflows/email-notifications.yml'
   workflow_dispatch:
 
@@ -29,4 +30,4 @@ jobs:
       - name: Generate email notifications table
         run: scripts/generate_email_notifications_table.py --bpmn-root ../civil-camunda-bpmn-definition
       - name: Verify docs are in sync
-        run: git diff --exit-code docs/email-notifications.md
+        run: git diff --exit-code docs/email-notifications.md docs/email-notifications.html

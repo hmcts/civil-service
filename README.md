@@ -39,6 +39,8 @@ Generated business rules from flowstate predicates in
 
 Every Camunda notifier, the parties it contacts, the Gov.Notify templates it uses, and the BPMN/CCD entry points are tracked in [`docs/email-notifications.md`](docs/email-notifications.md). The table is generated automatically by `scripts/generate_email_notifications_table.py`, which walks the notifier/aggregator/generator hierarchy, reads template IDs from `src/main/resources/application.yaml`, and links the referencing BPMN files from the neighbouring [`civil-camunda-bpmn-definition`](https://github.com/hmcts/civil-camunda-bpmn-definition) repository.
 
+The same data is published via GitHub Pages at https://hmcts.github.io/civil-service/email-notifications.html, so after commits land on `master` the interactive table is available to anyone with repo access.
+
 <details>
 <summary>How to regenerate `docs/email-notifications.md`</summary>
 
