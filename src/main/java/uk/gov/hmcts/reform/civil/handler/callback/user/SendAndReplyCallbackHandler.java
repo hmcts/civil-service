@@ -49,7 +49,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings("unchecked")
 public class SendAndReplyCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(SEND_AND_REPLY);
@@ -127,7 +126,7 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
         String userAuth = params.getParams().get(BEARER_TOKEN).toString();
 
         List<String> errorMessage = validateMessageSubjectLength(caseData);
-        if (!errorMessage.isEmpty()) {
+        if (isNotEmpty(errorMessage)) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseData.toMap(objectMapper))
                 .errors(errorMessage)
