@@ -237,8 +237,6 @@ def collect_templates(index: SourceIndex, class_name: str, notifications: Dict[s
     for getter in sorted(templates):
         prop = getter[0].lower() + getter[1:]
         result.append({
-            "getter": getter,
-            "property": prop,
             "id": notifications.get(prop)
         })
     return result
@@ -294,7 +292,7 @@ def build_table_rows(index: SourceIndex, notifications: Dict[str, str], bpmn_roo
         for generator in generators:
             templates = collect_templates(index, generator, notifications)
             if not templates:
-                templates = [{"getter": "", "property": "", "id": None}]
+                templates = [{"id": None}]
             for tpl in templates:
                 rows.append({
                     "event": event,
@@ -302,8 +300,6 @@ def build_table_rows(index: SourceIndex, notifications: Dict[str, str], bpmn_roo
                     "aggregator": notifier['aggregator'] or '—',
                     "party": describe_party(index, generator),
                     "generator": generator,
-                    "template_getter": tpl['getter'] or 'helperDefined',
-                    "template_property": tpl['property'] or 'see code',
                     "template_id": tpl['id'] or '—',
                     "bpmn_files": [os.path.relpath(path, REPO_ROOT) for path in bpmn_files] or ['—'],
                     "ccd_events": ccd_names or ['—']
@@ -318,7 +314,6 @@ def render_markdown(rows: List[Dict[str, str]], notify_service_id: Optional[str]
         "Parties selector",
         "Party",
         "Email DTO generator",
-        "Template getter/property",
         "Gov.Notify template ID",
         "BPMN file(s)",
         "CCD event(s)"
@@ -330,7 +325,6 @@ def render_markdown(rows: List[Dict[str, str]], notify_service_id: Optional[str]
     lines.append('|' + '|'.join(header) + '|')
     lines.append('|' + '|'.join(['---'] * len(header)) + '|')
     for row in rows:
-        template_cell = f"`{row['template_getter']}`<br>`{row['template_property']}`"
         template_id_cell = f"`{row['template_id']}`"
         if notify_service_id and row['template_id'] not in ('—', ''):
             template_id_cell = (
@@ -343,7 +337,6 @@ def render_markdown(rows: List[Dict[str, str]], notify_service_id: Optional[str]
             f"`{row['aggregator']}`",
             row['party'],
             f"`{row['generator']}`",
-            template_cell,
             template_id_cell,
             '<br>'.join(row['bpmn_files']),
             '<br>'.join(row['ccd_events'])
