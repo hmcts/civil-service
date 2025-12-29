@@ -46,6 +46,19 @@ Every Camunda notifier, the parties it contacts, the Gov.Notify templates it use
 scripts/generate_email_notifications_table.py --bpmn-root ../civil-camunda-bpmn-definition
 ```
 
+Need to focus on a single CCD event (or a handful)? Pass one or more `--ccd-event` filters to keep only rows whose
+CCD event column contains the provided substring, e.g.
+
+```bash
+scripts/generate_email_notifications_table.py \
+  --bpmn-root ../civil-camunda-bpmn-definition \
+  --ccd-event DEFENDANT_RESPONSE_SPEC
+```
+
+Every run also emits `docs/email-notifications.html`, which mirrors the markdown but adds a CCD event dropdown so you can
+filter interactively in a browser. Use `--html-output /path/to/file.html` to change the destination or `--html-output ""`
+to skip generating it.
+
 The `Verify email notification documentation` GitHub Action executes the same script on every push to `master` and fails if the committed markdown is out of date, so commits should always include any changes produced by the command above.
 
 </details>

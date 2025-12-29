@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import html
 import os
 import re
 import sys
@@ -242,6 +243,23 @@ def collect_templates(index: SourceIndex, class_name: str, notifications: Dict[s
     return result
 
 
+def filter_rows_by_ccd_event(rows: List[Dict[str, str]], filters: Optional[List[str]]) -> List[Dict[str, str]]:
+    if not filters:
+        return rows
+    lowered_filters = [flt.lower() for flt in filters if flt]
+    if not lowered_filters:
+        return rows
+    filtered_rows = []
+    for row in rows:
+        ccd_events = [event for event in row['ccd_events'] if event != '—']
+        if not ccd_events:
+            continue
+        event_names = [event.lower() for event in ccd_events]
+        if any(any(flt in event for event in event_names) for flt in lowered_filters):
+            filtered_rows.append(row)
+    return filtered_rows
+
+
 def describe_party(index: SourceIndex, class_name: str) -> str:
     java_class = index.get(class_name)
     if not java_class:
@@ -345,6 +363,117 @@ def render_markdown(rows: List[Dict[str, str]], notify_service_id: Optional[str]
     return '\n'.join(lines)
 
 
+def render_html(rows: List[Dict[str, str]], notify_service_id: Optional[str]) -> str:
+    header = [
+        "Camunda task",
+        "Handler",
+        "Parties selector",
+        "Party",
+        "Email DTO generator",
+        "Gov.Notify template ID",
+        "BPMN file(s)",
+        "CCD event(s)"
+    ]
+    unique_events = sorted({event for row in rows for event in row['ccd_events'] if event != '—'})
+    lines = [
+        "<!DOCTYPE html>",
+        "<html lang='en'>",
+        "<head>",
+        "  <meta charset='utf-8'>",
+        "  <title>Email notification matrix</title>",
+        "  <style>",
+        "    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 1.5rem; }",
+        "    table { border-collapse: collapse; width: 100%; font-size: 0.85rem; }",
+        "    th, td { border: 1px solid #ddd; padding: 0.4rem; vertical-align: top; }",
+        "    th { position: sticky; top: 0; background: #f5f5f5; text-align: left; }",
+        "    tr:nth-child(even) { background: #fafafa; }",
+        "    .filter-panel { margin-bottom: 1rem; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }",
+        "    .filter-panel label { font-weight: 600; }",
+        "    select { min-width: 18rem; padding: 0.2rem; }",
+        "    button { padding: 0.2rem 0.6rem; }",
+        "    .counts { font-size: 0.85rem; color: #555; }",
+        "  </style>",
+        "</head>",
+        "<body>",
+        "  <h1>Email notification matrix</h1>",
+        "  <p>The table mirrors <code>docs/email-notifications.md</code> but adds an interactive filter on the CCD event column."
+        " Use the dropdown below to focus on a single event.</p>",
+        "  <div class='filter-panel'>",
+        "    <label for='ccd-filter'>CCD event:</label>",
+        "    <select id='ccd-filter'>",
+        "      <option value=''>All CCD events</option>",
+    ]
+    for event in unique_events:
+        lines.append(f"      <option value='{html.escape(event.lower())}'>{html.escape(event)}</option>")
+    lines.extend([
+        "    </select>",
+        "    <button type='button' id='reset-filter'>Reset</button>",
+        "    <span class='counts'><span id='visible-count'>0</span> rows shown</span>",
+        "  </div>",
+        "  <table id='notifications-table'>",
+        "    <thead>",
+        "      <tr>",
+    ])
+    for col in header:
+        lines.append(f"        <th>{html.escape(col)}</th>")
+    lines.extend([
+        "      </tr>",
+        "    </thead>",
+        "    <tbody>",
+    ])
+    for row in rows:
+        ccd_attr = ' '.join(event.lower() for event in row['ccd_events'] if event != '—')
+        template_id_cell = html.escape(row['template_id'])
+        if notify_service_id and row['template_id'] not in ('—', ''):
+            template_id_cell = (
+                f"<a href='https://www.notifications.service.gov.uk/services/{notify_service_id}/templates/"
+                f"{html.escape(row['template_id'])}'>{html.escape(row['template_id'])}</a>"
+            )
+        lines.extend([
+            f"      <tr data-ccd-events='{ccd_attr}'>",
+            f"        <td><code>{html.escape(row['event'])}</code></td>",
+            f"        <td><code>{html.escape(row['handler'])}</code></td>",
+            f"        <td><code>{html.escape(row['aggregator'])}</code></td>",
+            f"        <td>{html.escape(row['party'])}</td>",
+            f"        <td><code>{html.escape(row['generator'])}</code></td>",
+            f"        <td>{template_id_cell}</td>",
+            f"        <td>{'<br>'.join(html.escape(path) for path in row['bpmn_files'])}</td>",
+            f"        <td>{'<br>'.join(html.escape(event) for event in row['ccd_events'])}</td>",
+            "      </tr>",
+        ])
+    lines.extend([
+        "    </tbody>",
+        "  </table>",
+        "  <script>",
+        "    (function() {",
+        "      const select = document.getElementById('ccd-filter');",
+        "      const reset = document.getElementById('reset-filter');",
+        "      const rows = Array.from(document.querySelectorAll('#notifications-table tbody tr'));",
+        "      const counter = document.getElementById('visible-count');",
+        "      function applyFilter() {",
+        "        const value = (select.value || '').trim();",
+        "        let visible = 0;",
+        "        rows.forEach(row => {",
+        "          if (!value || (row.dataset.ccdEvents || '').includes(value)) {",
+        "            row.style.display = '';",
+        "            visible += 1;",
+        "          } else {",
+        "            row.style.display = 'none';",
+        "          }",
+        "        });",
+        "        counter.textContent = visible;",
+        "      }",
+        "      select.addEventListener('change', applyFilter);",
+        "      reset.addEventListener('click', () => { select.value = ''; applyFilter(); });",
+        "      applyFilter();",
+        "    })();",
+        "  </script>",
+        "</body>",
+        "</html>",
+    ])
+    return '\n'.join(lines)
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(description="Generate docs/email-notifications.md")
     parser.add_argument('--bpmn-root', default=str((REPO_ROOT / '..' / 'civil-camunda-bpmn-definition').resolve()),
@@ -355,6 +484,11 @@ def main(argv: Optional[List[str]] = None) -> int:
                         or os.environ.get('GOV_NOTIFY_SERVICE_ID')
                         or 'a8b1617c-8e15-49aa-a8d3-a27a243f3c45',
                         help='Gov.Notify service ID used to build template hyperlinks.')
+    parser.add_argument('--ccd-event', dest='ccd_event_filters', action='append',
+                        help='Optional case-insensitive substring filter applied to the CCD event column. '
+                             'Repeat the flag to OR multiple filters.')
+    parser.add_argument('--html-output', default=str(REPO_ROOT / 'docs' / 'email-notifications.html'),
+                        help='Path for the interactive HTML export (leave blank to skip).')
     args = parser.parse_args(argv)
 
     bpmn_root = Path(args.bpmn_root)
@@ -365,10 +499,17 @@ def main(argv: Optional[List[str]] = None) -> int:
     notifications = parse_notifications_config(APPLICATION_YAML)
     index = SourceIndex(JAVA_ROOT)
     rows = build_table_rows(index, notifications, bpmn_root / 'src' / 'main' / 'resources' / 'camunda' if (bpmn_root / 'src').exists() else bpmn_root)
+    rows = filter_rows_by_ccd_event(rows, args.ccd_event_filters)
     markdown = render_markdown(rows, args.notify_service_id)
     output_path = Path(args.output)
     output_path.write_text(markdown + "\n", encoding="utf-8")
     print(f"Wrote {len(rows)} rows to {output_path}")
+    html_output = (args.html_output or '').strip()
+    if html_output:
+        html_markup = render_html(rows, args.notify_service_id)
+        html_path = Path(html_output)
+        html_path.write_text(html_markup + "\n", encoding="utf-8")
+        print(f"Wrote interactive HTML table to {html_path}")
     return 0
 
 
