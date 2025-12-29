@@ -1,0 +1,32 @@
+name: Verify email notification documentation
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'src/main/java/**'
+      - 'src/main/resources/application.yaml'
+      - 'scripts/generate_email_notifications_table.py'
+      - 'docs/email-notifications.md'
+      - '.github/workflows/email-notifications.yml'
+  workflow_dispatch:
+
+jobs:
+  email-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout civil-service
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Checkout civil-camunda-bpmn-definition
+        uses: actions/checkout@v4
+        with:
+          repository: hmcts/civil-camunda-bpmn-definition
+          path: ../civil-camunda-bpmn-definition
+          fetch-depth: 0
+      - name: Generate email notifications table
+        run: scripts/generate_email_notifications_table.py --bpmn-root ../civil-camunda-bpmn-definition
+      - name: Verify docs are in sync
+        run: git diff --exit-code docs/email-notifications.md
