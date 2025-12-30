@@ -30,6 +30,8 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1_MULTIPARTY_SAME_SOL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1_MULTIPARTY_SAME_SOL_OTHER_REMEDY;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1_OTHER_REMEDY;
 import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.formatCcdCaseReference;
 
 @Service
@@ -101,14 +103,11 @@ public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<S
     }
 
     private DocmosisTemplates getDocmosisTemplate(CaseData caseData) {
-        switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_ONE, ONE_V_TWO_TWO_LEGAL_REP:
-                return N1;
-            case TWO_V_ONE, ONE_V_TWO_ONE_LEGAL_REP:
-                return N1_MULTIPARTY_SAME_SOL;
-            default:
-                throw new IllegalArgumentException("Multiparty scenario doesn't exist");
-        }
+        return switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_ONE, ONE_V_TWO_TWO_LEGAL_REP -> caseData.isOtherRemedyClaim() ? N1_OTHER_REMEDY : N1;
+            case TWO_V_ONE, ONE_V_TWO_ONE_LEGAL_REP -> caseData.isOtherRemedyClaim() ? N1_MULTIPARTY_SAME_SOL_OTHER_REMEDY  : N1_MULTIPARTY_SAME_SOL;
+            default -> throw new IllegalArgumentException("Multiparty scenario doesn't exist");
+        };
     }
 
     private List<Party> getRespondents(CaseData caseData, MultiPartyScenario multiPartyScenario) {

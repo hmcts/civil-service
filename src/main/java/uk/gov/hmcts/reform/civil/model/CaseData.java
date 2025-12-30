@@ -1651,4 +1651,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return this.getApplicant1ResponseDate() != null
             && this.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION;
     }
+
+    @JsonIgnore
+    public boolean isOtherRemedyClaim() {
+        return this.getClaimType() != null
+            && (ClaimTypeUnspec.DAMAGES_AND_OTHER_REMEDY.equals(this.getClaimType())
+            || ClaimTypeUnspec.HOUSING_DISREPAIR.equals(this.getClaimType()));
+    }
 }
