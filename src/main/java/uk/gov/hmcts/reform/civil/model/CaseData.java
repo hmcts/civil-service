@@ -1655,7 +1655,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isOtherRemedyClaim() {
         return this.getClaimType() != null
-            && (ClaimTypeUnspec.DAMAGES_AND_OTHER_REMEDY.equals(this.getClaimType())
-            || ClaimTypeUnspec.HOUSING_DISREPAIR.equals(this.getClaimType()));
+            && (ClaimTypeUnspec.DAMAGES_AND_OTHER_REMEDY.equals(this.getClaimTypeUnSpec())
+            || ClaimTypeUnspec.HOUSING_DISREPAIR.equals(this.getClaimTypeUnSpec()));
     }
 }
