@@ -28,12 +28,14 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.taskmanagement.WaTaskManagementService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import static java.util.Objects.nonNull;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -47,7 +49,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@SuppressWarnings("unchecked")
 public class SendAndReplyCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(SEND_AND_REPLY);
@@ -57,6 +58,7 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
     private static final String REPLY_MESSAGE_CONFIRMATION_HEADER = "# Reply sent";
     private static final String REPLY_MESSAGE_BODY_CONFIRMATION = "<br /><h2 class=\"govuk-heading-m\">What happens next</h2>" +
         "<br />A task has been created to review your reply.";
+    private static final String SUBJECT_LIMIT_ERROR = "Subject exceeds MAX limit of 250 characters. Please keep subject line less than 250 characters.";
 
     private final SendAndReplyMessageService messageService;
 
@@ -100,7 +102,16 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
     private CallbackResponse handleAboutToStart(CallbackParams params) {
         CaseData caseData = params.getCaseData();
 
-        if (nonNull(caseData.getMessages()) && !caseData.getMessages().isEmpty()) {
+        if (isNotEmpty(caseData.getMessages())) {
+            List<Element<Message>> messages = caseData.getMessages();
+            List<Element<Message>> sentiseMessages = new ArrayList<>();
+            messages.forEach(element -> {
+                if (element.getValue().getSubject().length() > 250) {
+                    element.getValue().setSubject(element.getValue().getSubject().substring(0, 250));
+                }
+                sentiseMessages.add(element);
+            });
+            caseData.setMessages(sentiseMessages);
             caseData.setMessagesToReplyTo(messageService.createMessageSelectionList(caseData.getMessages()));
         }
 
@@ -122,6 +133,14 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
     private CallbackResponse handleAboutToSubmit(CallbackParams params) {
         CaseData caseData = params.getCaseData();
         String userAuth = params.getParams().get(BEARER_TOKEN).toString();
+
+        List<String> errorMessage = validateMessageSubjectLength(caseData);
+        if (isNotEmpty(errorMessage)) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseData.toMap(objectMapper))
+                .errors(errorMessage)
+                .build();
+        }
 
         List<Element<Message>> messagesNew;
 
@@ -184,6 +203,19 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
+    }
+
+    private List<String> validateMessageSubjectLength(CaseData caseData) {
+        List<Element<Message>> messages = caseData.getMessages();
+        List<String> errorMessage = new ArrayList<>();
+        if (isNotEmpty(messages)) {
+            messages.forEach(element -> {
+                if (element.getValue().getSubject().length() > 250) {
+                    errorMessage.add(SUBJECT_LIMIT_ERROR);
+                }
+            });
+        }
+        return errorMessage;
     }
 
     private CallbackResponse handleSubmitted(CallbackParams params) {
