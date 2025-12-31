@@ -14,7 +14,13 @@ import org.springframework.context.annotation.FilterType;
         @Filter(type = FilterType.REGEX,
             pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.dismisscase.*"),
         @Filter(type = FilterType.REGEX,
-            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.amendrestitchbundle.*")
+            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.amendrestitchbundle.*"),
+        @Filter(type = FilterType.REGEX,
+            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.trialarrangements.*"),
+        @Filter(type = FilterType.REGEX,
+            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.bundlecreation.*"),
+        @Filter(type = FilterType.REGEX,
+            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.claimsettled.*")
     }
 )
 public class DashboardMapperTestConfiguration {
