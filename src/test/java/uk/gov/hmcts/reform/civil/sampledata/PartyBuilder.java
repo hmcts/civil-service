@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.sampledata;
 
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 
 import java.time.LocalDate;
 
@@ -33,6 +34,7 @@ public class PartyBuilder {
     private String partyEmail;
     private String partyPhone;
     private String legalRepHeading;
+    private Flags flags;
 
     public static PartyBuilder builder() {
         return new PartyBuilder();

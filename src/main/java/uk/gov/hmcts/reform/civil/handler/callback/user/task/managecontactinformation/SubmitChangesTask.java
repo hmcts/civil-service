@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ContactDetailsUpdatedEvent;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
 import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
@@ -341,12 +342,14 @@ public class SubmitChangesTask {
     }
 
     private void updateClaimDetailsTab(CaseData caseData) {
-        caseData.getRespondent1().setFlags(null);
-        caseData.setRespondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
-
+        Party respondent1Clone = objectMapper.convertValue(caseData.getRespondent1(), Party.class);
+        respondent1Clone.setFlags(null);
+        caseData.setRespondent1DetailsForClaimDetailsTab(respondent1Clone);
+        //Make an copy and set the flag
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            caseData.getRespondent2().setFlags(null);
-            caseData.setRespondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
+            Party respondent2Clone = objectMapper.convertValue(caseData.getRespondent2(), Party.class);
+            respondent2Clone.setFlags(null);
+            caseData.setRespondent2DetailsForClaimDetailsTab(respondent2Clone);
         }
     }
 

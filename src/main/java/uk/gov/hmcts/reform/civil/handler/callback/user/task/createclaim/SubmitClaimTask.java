@@ -121,9 +121,11 @@ public class SubmitClaimTask {
         caseLocationCivil.setRegion(regionId);
         caseLocationCivil.setBaseLocation(epimmsId);
         caseData.setCaseManagementLocation(caseLocationCivil);
-        Party respondent1 = caseData.getRespondent1();
-        respondent1.setFlags(null);
-        caseData.setRespondent1DetailsForClaimDetailsTab(respondent1);
+
+        Party respondent1Clone = objectMapper.convertValue(caseData.getRespondent1(), Party.class);
+        respondent1Clone.setFlags(null);
+        caseData.setRespondent1DetailsForClaimDetailsTab(respondent1Clone);
+
         caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
 
         List<LocationRefData> locations = (locationRefDataService
@@ -134,9 +136,9 @@ public class SubmitClaimTask {
             .ifPresent(locationRefData -> caseData.setLocationName(locationRefData.getSiteName()));
 
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            Party respondent2 = caseData.getRespondent2();
-            respondent2.setFlags(null);
-            caseData.setRespondent2DetailsForClaimDetailsTab(respondent2);
+            Party respondent2Clone = objectMapper.convertValue(caseData.getRespondent2(), Party.class);
+            respondent2Clone.setFlags(null);
+            caseData.setRespondent2DetailsForClaimDetailsTab(respondent2Clone);
         }
 
         caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);

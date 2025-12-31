@@ -189,13 +189,13 @@ class SetApplicantResponseDeadlineSpecTest {
                 .when(deadlinesCalculator)
                 .calculateApplicantResponseDeadlineSpec(any(LocalDateTime.class));
 
-        Address address = buildAddress("123 Test Street", "AB12 3CD");
-
         Party respondent1 = new Party();
         respondent1.setPrimaryAddress(buildAddress("Old Address", ""));
         respondent1.setType(Party.Type.INDIVIDUAL);
-
+        respondent1.setFlags(new Flags());
         Party respondent2 = new Party();
+
+        Address address = buildAddress("123 Test Street", "AB12 3CD");
         respondent2.setPrimaryAddress(address);
         respondent2.setType(Party.Type.INDIVIDUAL);
         respondent2.setFlags(new Flags());
@@ -203,6 +203,7 @@ class SetApplicantResponseDeadlineSpecTest {
         CaseData caseData = buildCaseData(
                 CaseDataBuilder.builder()
                         .atStateClaimDetailsNotified()
+                        .respondent1(respondent1)
                         .respondent1Copy(respondent1)
                         .respondent1DQ(new Respondent1DQ())
                         .respondent2(respondent2)
@@ -214,8 +215,9 @@ class SetApplicantResponseDeadlineSpecTest {
 
         CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
+        assertThat(updatedCaseData.getRespondent1().getFlags()).isEqualTo(new Flags());
         assertThat(updatedCaseData.getRespondent2().getPrimaryAddress()).isEqualTo(address);
-        assertNull(updatedCaseData.getRespondent2().getFlags());
+        assertThat(updatedCaseData.getRespondent2().getFlags()).isEqualTo(new Flags());
         assertNull(updatedCaseData.getRespondent2Copy());
         assertThat(updatedCaseData.getRespondent2DetailsForClaimDetailsTab().getPrimaryAddress()).isEqualTo(address);
         assertNull(updatedCaseData.getRespondent2DetailsForClaimDetailsTab().getFlags());

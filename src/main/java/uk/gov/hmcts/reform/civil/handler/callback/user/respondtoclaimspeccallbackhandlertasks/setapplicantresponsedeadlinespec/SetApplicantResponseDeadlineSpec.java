@@ -109,13 +109,14 @@ public class SetApplicantResponseDeadlineSpec implements CaseTask {
 
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(caseData);
 
-        Party respondent1 = caseData.getRespondent1();
-        respondent1.setFlags(null);
-        caseData.setRespondent1DetailsForClaimDetailsTab(respondent1);
+        Party respondent1Clone = objectMapper.convertValue(caseData.getRespondent1(), Party.class);
+        respondent1Clone.setFlags(null);
+        caseData.setRespondent1DetailsForClaimDetailsTab(respondent1Clone);
+
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            Party respondent2 = caseData.getRespondent2();
-            respondent2.setFlags(null);
-            caseData.setRespondent2DetailsForClaimDetailsTab(respondent2);
+            Party respondent2Clone = objectMapper.convertValue(caseData.getRespondent2(), Party.class);
+            respondent2Clone.setFlags(null);
+            caseData.setRespondent2DetailsForClaimDetailsTab(respondent2Clone);
         }
 
         addEventAndDateAddedToRespondentExperts(caseData);
