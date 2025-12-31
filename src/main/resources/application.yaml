@@ -110,8 +110,9 @@ fees:
       anyOtherRemedy: AnyOtherRemedy
 
 otherRemediesFees:
-  service: other
-  jurisdiction2: civil
+  api:
+    service: other
+    jurisdiction2: civil
 
 location:
   api:

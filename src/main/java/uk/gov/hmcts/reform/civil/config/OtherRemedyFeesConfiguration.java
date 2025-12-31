@@ -20,14 +20,14 @@ public class OtherRemedyFeesConfiguration {
 
     public OtherRemedyFeesConfiguration(
             @Value("${fees.api.url}") String url,
-            @Value("${fees.endpoint}") String endpoint,
-            @Value("${otherRemediesFees.service}") String service,
-            @Value("${fees.jurisdiction1}") String jurisdiction1,
-            @Value("${otherRemediesFees.jurisdiction2}") String jurisdiction2,
-            @Value("${fees.channel}") String channel,
-            @Value("${fees.event}") String event,
-            @Value("${fees.jurisdiction2Hearing}") String jurisdiction2Hearing,
-            @Value("${fees.keywords.anyOtherRemedy}") String anyOtherRemedyKeyword) {
+            @Value("${fees.api.endpoint}") String endpoint,
+            @Value("${otherRemediesFees.api.service}") String service,
+            @Value("${fees.api.jurisdiction1}") String jurisdiction1,
+            @Value("${otherRemediesFees.api.jurisdiction2}") String jurisdiction2,
+            @Value("${fees.api.channel}") String channel,
+            @Value("${fees.api.event}") String event,
+            @Value("${fees.api.jurisdiction2Hearing}") String jurisdiction2Hearing,
+            @Value("${fees.api.keywords.anyOtherRemedy}") String anyOtherRemedyKeyword) {
         this.url = url;
         this.endpoint = endpoint;
         this.service = service;
