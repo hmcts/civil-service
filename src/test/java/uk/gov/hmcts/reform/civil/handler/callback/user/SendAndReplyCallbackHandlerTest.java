@@ -41,6 +41,7 @@ import uk.gov.hmcts.reform.civil.service.taskmanagement.WaTaskManagementService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -155,8 +156,9 @@ class SendAndReplyCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateMessagesToReplyTo_whenMessagesExist() {
-            List<Element<Message>> messages = List.of(element(new Message()));
+            List<Element<Message>> messages = new ArrayList<>();
             CaseData caseData = CaseDataBuilder.builder().build();
+            messages.add(element(getMessage("mock")));
             caseData.setMessages(messages);
             DynamicList expectedMessages = DynamicList.fromList(List.of("mock"));
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
@@ -293,23 +295,6 @@ class SendAndReplyCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors()).isNotNull();
             assertThat(response.getErrors())
                 .isEqualTo(List.of("Subject exceeds MAX limit of 250 characters. Please keep subject line less than 250 characters."));
-        }
-
-        private static @NotNull Message getMessage(String messageContent) {
-            Message expectedMessage = new Message();
-            expectedMessage.setMessageContent(messageContent);
-            expectedMessage.setRecipientRoleType(RolePool.ADMIN);
-            String subject = """
-                That was up from 27,731 in 2021, although it marked a fall from the 56,655 seen in 2023.
-                In 2024, just 26% of claims led to a payout, with an average sum of £390 given to claimants.
-                The RAC estimates that a typical repair bill for a family car with damage worse than a puncture from a pothole is £590.
-                Potholes can cause damage to shock absorbers and suspension springs, and can also distort wheels.
-                RAC head of policy Simon Williams told the BBC: "It does seem that councils have a variety of different criteria for what they class as a pothole.
-                "Often they have to be four centimetres deep and so many centimetres wide.
-                "If you hit one, it can cause a real jolt to the car and serious damage... not just damage to vehicles,
-                 it's also a serious road safety danger, particularly on two wheels.""";
-            expectedMessage.setSubject(subject);
-            return expectedMessage;
         }
 
         @Test
@@ -738,5 +723,22 @@ class SendAndReplyCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .clientContext(clientContext2)
                     .build());
         }
+    }
+
+    private static @NotNull Message getMessage(String messageContent) {
+        Message expectedMessage = new Message();
+        expectedMessage.setMessageContent(messageContent);
+        expectedMessage.setRecipientRoleType(RolePool.ADMIN);
+        String subject = """
+                That was up from 27,731 in 2021, although it marked a fall from the 56,655 seen in 2023.
+                In 2024, just 26% of claims led to a payout, with an average sum of £390 given to claimants.
+                The RAC estimates that a typical repair bill for a family car with damage worse than a puncture from a pothole is £590.
+                Potholes can cause damage to shock absorbers and suspension springs, and can also distort wheels.
+                RAC head of policy Simon Williams told the BBC: "It does seem that councils have a variety of different criteria for what they class as a pothole.
+                "Often they have to be four centimetres deep and so many centimetres wide.
+                "If you hit one, it can cause a real jolt to the car and serious damage... not just damage to vehicles,
+                 it's also a serious road safety danger, particularly on two wheels.""";
+        expectedMessage.setSubject(subject);
+        return expectedMessage;
     }
 }

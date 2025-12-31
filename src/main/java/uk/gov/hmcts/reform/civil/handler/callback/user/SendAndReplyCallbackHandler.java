@@ -102,7 +102,16 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
     private CallbackResponse handleAboutToStart(CallbackParams params) {
         CaseData caseData = params.getCaseData();
 
-        if (nonNull(caseData.getMessages()) && !caseData.getMessages().isEmpty()) {
+        if (isNotEmpty(caseData.getMessages())) {
+            List<Element<Message>> messages = caseData.getMessages();
+            List<Element<Message>> sentiseMessages = new ArrayList<>();
+            messages.forEach(element -> {
+                if (element.getValue().getSubject().length() > 250) {
+                    element.getValue().setSubject(element.getValue().getSubject().substring(0, 250));
+                }
+                sentiseMessages.add(element);
+            });
+            caseData.setMessages(sentiseMessages);
             caseData.setMessagesToReplyTo(messageService.createMessageSelectionList(caseData.getMessages()));
         }
 
