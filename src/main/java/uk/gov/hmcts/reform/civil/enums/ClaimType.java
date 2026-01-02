@@ -13,7 +13,9 @@ public enum ClaimType {
     CONSUMER(FeeType.HIGHER),
     CONSUMER_CREDIT(FeeType.HIGHER),
     OTHER(FeeType.HIGHER),
-    FLIGHT_DELAY(null);
+    FLIGHT_DELAY(null),
+    DAMAGES_AND_OTHER_REMEDY(FeeType.HIGHER),
+    HOUSING_DISREPAIR(FeeType.HIGHER);
 
     private final FeeType feeType;
 

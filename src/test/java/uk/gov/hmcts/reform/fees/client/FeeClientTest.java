@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.client.FeesApiClient;
 import uk.gov.hmcts.reform.civil.config.FeesConfiguration;
+import uk.gov.hmcts.reform.civil.config.OtherRemedyFeesConfiguration;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesClientService;
 import uk.gov.hmcts.reform.civil.model.FeeLookupResponseDto;
@@ -16,6 +17,7 @@ import java.math.BigDecimal;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.service.FeesClientService.EVENT_HEARING;
@@ -34,6 +36,8 @@ class FeeClientTest {
     private FeesApiClient feesApiClient;
     @Mock
     private FeesConfiguration feesConfiguration;
+    @Mock
+    private OtherRemedyFeesConfiguration otherRemedyFeesConfiguration;
     @Mock
     private FeatureToggleService featureToggleService;
     private FeesClientService feesClient;
@@ -104,6 +108,41 @@ class FeeClientTest {
             "jurisdiction2",
             CHANNEL,
             EVENT_ISSUE,
+            new BigDecimal("50.00")
+        );
+        assertThat(feeLookupResponseDto).isEqualTo(expectedFeeDtoFeeLookupResponseDto);
+    }
+
+    @Test
+    void shouldReturnFeeDataForOtherRemedy_whenValidClaimValue() {
+        given(feesApiClient.lookupFeeWithAmount(any(), any(), any(), any(), any(), any(), any()))
+            .willReturn(FeeLookupResponseDto.builder()
+                            .feeAmount(TEST_FEE_AMOUNT_POUNDS)
+                            .code("test_fee_code")
+                            .version(1)
+                            .build());
+
+        FeeLookupResponseDto expectedFeeDtoFeeLookupResponseDto = FeeLookupResponseDto.builder()
+            .feeAmount(TEST_FEE_AMOUNT_POUNDS)
+            .code("test_fee_code")
+            .version(1)
+            .build();
+        given(otherRemedyFeesConfiguration.getService()).willReturn("civil");
+        given(otherRemedyFeesConfiguration.getJurisdiction1()).willReturn("jurisdiction1");
+        given(otherRemedyFeesConfiguration.getJurisdiction2()).willReturn("jurisdiction2");
+        given(otherRemedyFeesConfiguration.getChannel()).willReturn(CHANNEL);
+        given(otherRemedyFeesConfiguration.getEvent()).willReturn(EVENT_ISSUE);
+        given(otherRemedyFeesConfiguration.getAnyOtherRemedyKeyword()).willReturn("OtherRemedyKeyword");
+
+        FeeLookupResponseDto feeLookupResponseDto = feesClient.lookupOtherRemedyFees(otherRemedyFeesConfiguration, new BigDecimal("50.00"));
+
+        verify(feesApiClient, times(1)).lookupFeeWithAmount(
+            "civil",
+            "jurisdiction1",
+            "jurisdiction2",
+            CHANNEL,
+            EVENT_ISSUE,
+            "OtherRemedyKeyword",
             new BigDecimal("50.00")
         );
         assertThat(feeLookupResponseDto).isEqualTo(expectedFeeDtoFeeLookupResponseDto);
