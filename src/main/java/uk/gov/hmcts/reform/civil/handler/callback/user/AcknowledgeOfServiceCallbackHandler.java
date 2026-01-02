@@ -72,17 +72,19 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
     private CallbackResponse populateRespondent1Copy(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         LocalDateTime dateTime = LocalDateTime.now();
+
         caseData.setRespondent1Copy(caseData.getRespondent1());
         ofNullable(caseData.getRespondent2())
             .ifPresent(r2 -> {
                 caseData.setRespondent2Copy(r2);
-                r2.setFlags(null);
-                caseData.setRespondent2DetailsForClaimDetailsTab(r2);
+                Party respondent2Clone = objectMapper.convertValue(r2, Party.class);
+                respondent2Clone.setFlags(null);
+                caseData.setRespondent2DetailsForClaimDetailsTab(respondent2Clone);
             });
 
         List<String> errors = new ArrayList<>();
-        var responseDedline = caseData.getRespondent1ResponseDeadline();
-        if (dateTime.toLocalDate().isAfter(responseDedline.toLocalDate())) {
+        var responseDeadline = caseData.getRespondent1ResponseDeadline();
+        if (dateTime.toLocalDate().isAfter(responseDeadline.toLocalDate())) {
             errors.add("Deadline to file Acknowledgement of Service has passed, option is not available.");
         }
 
@@ -118,7 +120,7 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
         LocalDateTime newResponseDate = deadlinesCalculator.plus14DaysAt4pmDeadline(responseDeadline);
-        var updatedRespondent1 = caseData.getRespondent1();
+        Party updatedRespondent1 = caseData.getRespondent1();
         if (caseData.getRespondent1Copy() != null) {
             updatedRespondent1.setPrimaryAddress(caseData.getRespondent1Copy().getPrimaryAddress());
         }
@@ -140,8 +142,9 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
             updatedRespondent2.setPrimaryAddress(caseData.getRespondent2Copy().getPrimaryAddress());
             caseData.setRespondent2(updatedRespondent2);
             caseData.setRespondent2Copy(null);
-            updatedRespondent2.setFlags(null);
-            caseData.setRespondent2DetailsForClaimDetailsTab(updatedRespondent2);
+            Party respondent2Clone = objectMapper.convertValue(updatedRespondent2, Party.class);
+            respondent2Clone.setFlags(null);
+            caseData.setRespondent2DetailsForClaimDetailsTab(respondent2Clone);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

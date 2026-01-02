@@ -43,7 +43,6 @@ import java.util.Optional;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
@@ -56,6 +55,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DE
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.PopulateRespondentTabDetails.updateDataForClaimDetailsTab;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToRespondentExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
@@ -109,14 +109,7 @@ public class SetApplicantResponseDeadlineSpec implements CaseTask {
 
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(caseData);
 
-        Party respondent1 = caseData.getRespondent1();
-        respondent1.setFlags(null);
-        caseData.setRespondent1DetailsForClaimDetailsTab(respondent1);
-        if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            Party respondent2 = caseData.getRespondent2();
-            respondent2.setFlags(null);
-            caseData.setRespondent2DetailsForClaimDetailsTab(respondent2);
-        }
+        updateDataForClaimDetailsTab(caseData, objectMapper, false);
 
         addEventAndDateAddedToRespondentExperts(caseData);
         addEventAndDateAddedToRespondentWitnesses(caseData);
@@ -197,8 +190,9 @@ public class SetApplicantResponseDeadlineSpec implements CaseTask {
             updatedRespondent2.setFlags(caseData.getRespondent2Copy().getFlags());
             caseData.setRespondent2(updatedRespondent2);
             caseData.setRespondent2Copy(null);
-            updatedRespondent2.setFlags(null);
-            caseData.setRespondent2DetailsForClaimDetailsTab(updatedRespondent2);
+            Party respondent2Clone = objectMapper.convertValue(updatedRespondent2, Party.class);
+            respondent2Clone.setFlags(null);
+            caseData.setRespondent2DetailsForClaimDetailsTab(respondent2Clone);
         }
 
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();

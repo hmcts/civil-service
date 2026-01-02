@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.PopulateRespondentTabDetails;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseManagementCategory;
@@ -20,7 +21,6 @@ import uk.gov.hmcts.reform.civil.model.CaseManagementCategoryElement;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -121,9 +121,6 @@ public class SubmitClaimTask {
         caseLocationCivil.setRegion(regionId);
         caseLocationCivil.setBaseLocation(epimmsId);
         caseData.setCaseManagementLocation(caseLocationCivil);
-        Party respondent1 = caseData.getRespondent1();
-        respondent1.setFlags(null);
-        caseData.setRespondent1DetailsForClaimDetailsTab(respondent1);
         caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
 
         List<LocationRefData> locations = (locationRefDataService
@@ -133,11 +130,7 @@ public class SubmitClaimTask {
             .orElseGet(Collections::emptyList).stream().findFirst()
             .ifPresent(locationRefData -> caseData.setLocationName(locationRefData.getSiteName()));
 
-        if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            Party respondent2 = caseData.getRespondent2();
-            respondent2.setFlags(null);
-            caseData.setRespondent2DetailsForClaimDetailsTab(respondent2);
-        }
+        PopulateRespondentTabDetails.updateDataForClaimDetailsTab(caseData, objectMapper, false);
 
         caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
         caseData.setFeatureToggleWA(toggleConfiguration.getFeatureToggle());

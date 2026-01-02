@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.CaseTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -38,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.PopulateRespondentTabDetails.updateDataForClaimDetailsTab;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 
 @Component
@@ -69,7 +69,7 @@ public class PopulateRespondent1Copy implements CaseTask {
         }
 
         Set<DefendantResponseShowTag> initialShowTags = getInitialShowTags(callbackParams);
-        var updatedCaseData = updateCaseData(caseData, initialShowTags, callbackParams);
+        updateCaseData(caseData, initialShowTags, callbackParams);
 
         log.info("CaseId {}: Returning updated callback response", caseData.getCcdCaseReference());
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -77,7 +77,7 @@ public class PopulateRespondent1Copy implements CaseTask {
                 .build();
     }
 
-    private CaseData updateCaseData(CaseData caseData, Set<DefendantResponseShowTag> initialShowTags, CallbackParams callbackParams) {
+    private void updateCaseData(CaseData caseData, Set<DefendantResponseShowTag> initialShowTags, CallbackParams callbackParams) {
         log.info("Updating case data for caseId: {}", caseData.getCcdCaseReference());
 
         caseData.setRespondent1Copy(caseData.getRespondent1());
@@ -89,13 +89,12 @@ public class PopulateRespondent1Copy implements CaseTask {
         updateCarmFields(caseData);
 
         log.info("CaseId {}: Updating respondent details", caseData.getCcdCaseReference());
-        updateRespondentDetails(caseData);
+        updateDataForClaimDetailsTab(caseData, objectMapper, true);
 
         log.info("CaseId {}: Updating court location", caseData.getCcdCaseReference());
         updateCourtLocation(initialShowTags, caseData, callbackParams);
 
         log.info("CaseId {}: Case data update complete", caseData.getCcdCaseReference());
-        return caseData;
     }
 
     private void updateCarmFields(CaseData caseData) {
@@ -127,20 +126,6 @@ public class PopulateRespondent1Copy implements CaseTask {
         }
 
         log.info("CaseId {}: CARM fields update complete", caseData.getCcdCaseReference());
-    }
-
-    private void updateRespondentDetails(CaseData caseData) {
-        log.info("Updating respondent details for caseId: {}", caseData.getCcdCaseReference());
-        Party party1 = caseData.getRespondent1();
-        party1.setFlags(null);
-        caseData.setRespondent1DetailsForClaimDetailsTab(party1);
-
-        Party party = caseData.getRespondent2();
-        if (party != null) {
-            party.setFlags(null);
-            caseData.setRespondent2Copy(party);
-            caseData.setRespondent2DetailsForClaimDetailsTab(party);
-        }
     }
 
     private void updateCourtLocation(Set<DefendantResponseShowTag> initialShowTags, CaseData updatedCaseData, CallbackParams callbackParams) {
