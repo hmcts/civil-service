@@ -59,7 +59,7 @@ class FeesServiceTest {
         given(feesConfiguration.getEvent()).willReturn(EVENT);
         given(feesConfiguration.getHearingEvent()).willReturn(HEARING_EVENT);
 
-        given(feesClient.lookupOtherRemedyFees(any(OtherRemedyFeesConfiguration.class),any()))
+        given(feesClient.lookupOtherRemedyFees(any(OtherRemedyFeesConfiguration.class), any()))
             .willReturn(feeLookupResponse);
     }
 
