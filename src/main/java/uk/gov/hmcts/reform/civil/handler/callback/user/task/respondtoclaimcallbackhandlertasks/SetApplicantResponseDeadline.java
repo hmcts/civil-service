@@ -36,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.PopulateRespondentTabDetails.updateDataForClaimDetailsTab;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToRespondentExperts;
@@ -50,7 +51,6 @@ public class SetApplicantResponseDeadline implements CaseTask {
     private final Time time;
     private final DeadlinesCalculator deadlinesCalculator;
     private final FrcDocumentsUtils frcDocumentsUtils;
-    private final FeatureToggleService toggleService;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final IStateFlowEngine stateFlowEngine;
     private final ObjectMapper objectMapper;
@@ -75,7 +75,6 @@ public class SetApplicantResponseDeadline implements CaseTask {
         this.time = time;
         this.deadlinesCalculator = deadlinesCalculator;
         this.frcDocumentsUtils = frcDocumentsUtils;
-        this.toggleService = toggleService;
         this.caseFlagsInitialiser = caseFlagsInitialiser;
         this.stateFlowEngine = stateFlowEngine;
         this.objectMapper = objectMapper;
@@ -112,7 +111,6 @@ public class SetApplicantResponseDeadline implements CaseTask {
                 .updateResponseDataForSecondRespondent(
                     callbackParams,
                     caseData,
-                    caseData,
                     applicant1Deadline
             );
         } else {
@@ -132,14 +130,14 @@ public class SetApplicantResponseDeadline implements CaseTask {
 
         addEventAndDateAddedToRespondentExperts(caseData);
         addEventAndDateAddedToRespondentWitnesses(caseData);
-        retainSolicitorReferences(callbackParams.getRequest().getCaseDetailsBefore().getData(), caseData, caseData);
+        retainSolicitorReferences(callbackParams.getRequest().getCaseDetailsBefore().getData(), caseData);
 
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(caseData);
-        updateClaimsDetailsForClaimDetailsTab(caseData, caseData);
+        updateDataForClaimDetailsTab(caseData, objectMapper, false);
         populateDQPartyIds(caseData);
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE, caseData);
-        updateDocumentGenerationRespondent2(callbackParams, caseData, caseData);
+        updateDocumentGenerationRespondent2(callbackParams, caseData);
 
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         if (coreCaseUserService.userHasCaseRole(
@@ -171,18 +169,9 @@ public class SetApplicantResponseDeadline implements CaseTask {
             && isAwaitingAnotherDefendantResponse(caseData);
     }
 
-    private static void updateClaimsDetailsForClaimDetailsTab(CaseData updatedData, CaseData caseData) {
-        updatedData.getRespondent1().setFlags(null);
-        updatedData.setRespondent1DetailsForClaimDetailsTab(updatedData.getRespondent1());
-        if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            updatedData.getRespondent2().setFlags(null);
-            updatedData.setRespondent2DetailsForClaimDetailsTab(updatedData.getRespondent2());
-        }
-    }
-
-    private void updateDocumentGenerationRespondent2(CallbackParams callbackParams, CaseData updatedData, CaseData caseData) {
+    private void updateDocumentGenerationRespondent2(CallbackParams callbackParams, CaseData caseData) {
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        updatedData.setRespondent2DocumentGeneration(null);
+        caseData.setRespondent2DocumentGeneration(null);
         if (!coreCaseUserService.userHasCaseRole(
             caseData.getCcdCaseReference()
                 .toString(), userInfo.getUid(), RESPONDENTSOLICITORONE
@@ -191,7 +180,7 @@ public class SetApplicantResponseDeadline implements CaseTask {
             caseData.getCcdCaseReference()
                 .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO
         )) {
-            updatedData.setRespondent2DocumentGeneration("userRespondent2");
+            caseData.setRespondent2DocumentGeneration("userRespondent2");
         }
     }
 
@@ -234,7 +223,6 @@ public class SetApplicantResponseDeadline implements CaseTask {
     }
 
     private void retainSolicitorReferences(Map<String, Object> beforeCaseData,
-                                           CaseData updatedData,
                                            CaseData caseData) {
 
         @SuppressWarnings("unchecked")
@@ -262,15 +250,15 @@ public class SetApplicantResponseDeadline implements CaseTask {
             })
             .orElse(null);
 
-        updatedData.setSolicitorReferences(solicitorReferences);
+        caseData.setSolicitorReferences(solicitorReferences);
 
         String respondentSolicitor2Reference = ofNullable(caseData.getRespondentSolicitor2Reference())
             .orElse(ofNullable(beforeCaseData.get("respondentSolicitor2Reference"))
                         .map(Object::toString).orElse(null));
 
-        updatedData.setSolicitorReferences(solicitorReferences);
-        updatedData.setRespondentSolicitor2Reference(respondentSolicitor2Reference);
-        updatedData.setCaseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(
+        caseData.setSolicitorReferences(solicitorReferences);
+        caseData.setRespondentSolicitor2Reference(respondentSolicitor2Reference);
+        caseData.setCaseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(
             solicitorReferences != null ? ofNullable(solicitorReferences.getRespondentSolicitor1Reference())
                 .map(Object::toString).orElse(null) : null,
             respondentSolicitor2Reference

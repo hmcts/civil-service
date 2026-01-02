@@ -29,7 +29,9 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -73,6 +75,7 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @BeforeEach
     void prepare() {
+        objectMapper.registerModule(new JavaTimeModule());
         ReflectionTestUtils.setField(handler, "objectMapper", new ObjectMapper().registerModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS));
     }
@@ -215,10 +218,25 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             Party respondent1Copy = new Party();
             respondent1Copy.setPartyName("Party 2");
             respondent1Copy.setPrimaryAddress(address);
+            Party respondent2Copy = new Party();
+            respondent2Copy.setPartyName("Party 2");
+            respondent2Copy.setPrimaryAddress(address);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .build();
+            caseData.setRespondent2(PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-1-party-id").build());
             caseData.setRespondent1Copy(respondent1Copy);
+            caseData.setRespondent2Copy(respondent2Copy);
+
+            Flags respondent1Flags = new Flags();
+            respondent1Flags.setPartyName("respondent1name");
+            respondent1Flags.setRoleOnCase("Defendant 1");
+            caseData.getRespondent1().setFlags(respondent1Flags);
+            Flags respondent2Flags = new Flags();
+            respondent1Flags.setPartyName("respondent2name");
+            respondent1Flags.setRoleOnCase("Defendant 2");
+            caseData.getRespondent2().setFlags(respondent2Flags);
+
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             CallbackRequest request = CallbackRequest.builder()
                 .build();
@@ -233,10 +251,15 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             String newDeadline = LocalDateTime.now().plusDays(28).withHour(16).withMinute(0).withSecond(1).truncatedTo(ChronoUnit.SECONDS).toString();
 
-            CallbackResponse response = handler.handle(params);
-            assertThat(((AboutToStartOrSubmitCallbackResponse) response)
-                           .getData().get("respondent1ResponseDeadline"))
-                .hasToString(newDeadline);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(updatedCaseData.getRespondent1ResponseDeadline()).hasToString(newDeadline);
+            assertThat(updatedCaseData.getRespondent1().getFlags()).isEqualTo(respondent1Flags);
+            assertThat(updatedCaseData.getRespondent2().getFlags()).isEqualTo(respondent2Flags);
+            Party respondent2DetailsForClaimDetailsTab = updatedCaseData.getRespondent2DetailsForClaimDetailsTab();
+            assertThat(respondent2DetailsForClaimDetailsTab).isNotNull();
+            assertThat(respondent2DetailsForClaimDetailsTab.getFlags()).isNull();
         }
 
         @Test

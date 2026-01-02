@@ -174,7 +174,7 @@ class SetApplicantResponseDeadlineSpecTest {
         CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
         assertThat(updatedCaseData.getRespondent2().getPrimaryAddress()).isEqualTo(address);
-        assertNull(updatedCaseData.getRespondent2().getFlags());
+        assertThat(updatedCaseData.getRespondent2().getFlags()).isEqualTo(new Flags());
         assertNull(updatedCaseData.getRespondent2Copy());
         assertThat(updatedCaseData.getRespondent2DetailsForClaimDetailsTab().getPrimaryAddress()).isEqualTo(address);
         assertNull(updatedCaseData.getRespondent2DetailsForClaimDetailsTab().getFlags());
