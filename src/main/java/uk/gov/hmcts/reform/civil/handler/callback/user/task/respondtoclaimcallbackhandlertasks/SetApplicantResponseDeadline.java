@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -63,7 +62,6 @@ public class SetApplicantResponseDeadline implements CaseTask {
     public SetApplicantResponseDeadline(Time time,
                                         DeadlinesCalculator deadlinesCalculator,
                                         FrcDocumentsUtils frcDocumentsUtils,
-                                        FeatureToggleService toggleService,
                                         CaseFlagsInitialiser caseFlagsInitialiser,
                                         IStateFlowEngine stateFlowEngine,
                                         ObjectMapper objectMapper,
