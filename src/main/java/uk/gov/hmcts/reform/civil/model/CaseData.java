@@ -202,6 +202,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private  String detailsOfClaim;
     private  ClaimValue claimValue;
     private  Fee claimFee;
+    private  Fee otherRemedyFee;
     private  String serviceRequestReference;
     private  String paymentReference;
     private  DynamicList applicantSolicitor1PbaAccounts;
@@ -649,15 +650,15 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private  YesOrNo isMintiLipCase;
 
-    private  YesOrNo isClaimDeclarationAdded;
-    private  String  claimDeclarationDescription;
-    private  YesOrNo isHumanRightsActIssues;
-
     @Builder.Default
     private  List<Element<CaseDocument>> courtOfficersOrders = new ArrayList<>();
     private  YesOrNo isReferToJudgeClaim;
 
     private  ClientContext clientContext;
+
+    private  YesOrNo isClaimDeclarationAdded;
+    private  String  claimDeclarationDescription;
+    private  YesOrNo isHumanRightsActIssues;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
@@ -1649,5 +1650,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isClaimUnderTranslationAfterClaimantResponse() {
         return this.getApplicant1ResponseDate() != null
             && this.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION;
+    }
+
+    @JsonIgnore
+    public boolean isOtherRemedyClaim() {
+        return this.getClaimType() != null
+            && (ClaimTypeUnspec.DAMAGES_AND_OTHER_REMEDY.equals(this.getClaimTypeUnSpec())
+            || ClaimTypeUnspec.HOUSING_DISREPAIR.equals(this.getClaimTypeUnSpec()));
     }
 }

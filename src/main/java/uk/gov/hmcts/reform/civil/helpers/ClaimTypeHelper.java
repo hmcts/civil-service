@@ -10,27 +10,17 @@ public class ClaimTypeHelper {
     }
 
     public static ClaimType getClaimTypeFromClaimTypeUnspec(ClaimTypeUnspec claimTypeUnspec) {
-        switch (claimTypeUnspec) {
-            case PERSONAL_INJURY:
-                return ClaimType.PERSONAL_INJURY;
-            case CLINICAL_NEGLIGENCE:
-                return ClaimType.CLINICAL_NEGLIGENCE;
-            case PROFESSIONAL_NEGLIGENCE:
-                return ClaimType.PROFESSIONAL_NEGLIGENCE;
-            case BREACH_OF_CONTRACT:
-                return ClaimType.BREACH_OF_CONTRACT;
-            case CONSUMER:
-                return ClaimType.CONSUMER;
-            case CONSUMER_CREDIT:
-                return ClaimType.CONSUMER_CREDIT;
-            case DAMAGES_AND_OTHER_REMEDY:
-                return ClaimType.DAMAGES_AND_OTHER_REMEDY;
-            case HOUSING_DISREPAIR:
-                return ClaimType.HOUSING_DISREPAIR;
-            case OTHER:
-                return ClaimType.OTHER;
-            default:
-                throw new IllegalArgumentException("Invalid Claim Type");
-        }
+        return switch (claimTypeUnspec) {
+            case PERSONAL_INJURY -> ClaimType.PERSONAL_INJURY;
+            case CLINICAL_NEGLIGENCE -> ClaimType.CLINICAL_NEGLIGENCE;
+            case PROFESSIONAL_NEGLIGENCE -> ClaimType.PROFESSIONAL_NEGLIGENCE;
+            case BREACH_OF_CONTRACT -> ClaimType.BREACH_OF_CONTRACT;
+            case CONSUMER -> ClaimType.CONSUMER;
+            case CONSUMER_CREDIT -> ClaimType.CONSUMER_CREDIT;
+            case DAMAGES_AND_OTHER_REMEDY -> ClaimType.DAMAGES_AND_OTHER_REMEDY;
+            case HOUSING_DISREPAIR -> ClaimType.HOUSING_DISREPAIR;
+            case OTHER -> ClaimType.OTHER;
+            default -> throw new IllegalArgumentException("Invalid Claim Type");
+        };
     }
 }
