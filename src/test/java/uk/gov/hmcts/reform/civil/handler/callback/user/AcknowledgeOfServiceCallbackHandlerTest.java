@@ -1,18 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.Collections;
-import java.util.List;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,6 +31,11 @@ import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Collections;
+import java.util.List;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -92,15 +91,34 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
         void populateRespondentCopy1_checkIfDeadlineNotPassed() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
+                .respondent2(PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-1-party-id").build())
                 .build();
+
+            Flags respondent1Flags = new Flags();
+            respondent1Flags.setPartyName("respondent1name");
+            respondent1Flags.setRoleOnCase("Defendant 1");
+            caseData.getRespondent1().setFlags(respondent1Flags);
+            Flags respondent2Flags = new Flags();
+            respondent1Flags.setPartyName("respondent2name");
+            respondent1Flags.setRoleOnCase("Defendant 2");
+            caseData.getRespondent2().setFlags(respondent2Flags);
+
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
             CallbackRequest request = CallbackRequest.builder()
                 .eventId("ACKNOWLEDGEMENT_OF_SERVICE")
                 .build();
             params = params.toBuilder().request(request).build();
 
-            CallbackResponse response = handler.handle(params);
-            assertThat(((AboutToStartOrSubmitCallbackResponse) response).getErrors()).isEmpty();
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isEmpty();
+            CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedCaseData.getRespondent1().getFlags()).isEqualTo(respondent1Flags);
+            assertThat(updatedCaseData.getRespondent2().getFlags()).isEqualTo(respondent2Flags);
+            Party respondent2DetailsForClaimDetailsTab = updatedCaseData.getRespondent2DetailsForClaimDetailsTab();
+            assertThat(respondent2DetailsForClaimDetailsTab).isNotNull();
+            assertThat(respondent2DetailsForClaimDetailsTab.getFlags()).isNull();
+            assertThat(updatedCaseData.getRespondent1Copy()).isNotNull();
+            assertThat(updatedCaseData.getRespondent2Copy()).isNotNull();
         }
 
         @Test
