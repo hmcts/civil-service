@@ -411,7 +411,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         FastTrackJudgesRecital tempFastTrackJudgesRecital = new FastTrackJudgesRecital();
         tempFastTrackJudgesRecital.setInput("Upon considering the statements of case and the information provided by the parties,");
 
-        caseData.setSmallClaimsPenalNotice(DEFAULT_PENAL_NOTICE);
+        if (SdoHelper.isSmallClaimsTrack(caseData)) {
+            caseData.setSmallClaimsPenalNotice(DEFAULT_PENAL_NOTICE);
+        }
 
         caseData.setFastTrackJudgesRecital(tempFastTrackJudgesRecital);
 
