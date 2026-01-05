@@ -94,10 +94,9 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .totalClaimAmount(BigDecimal.valueOf(800))
                 .systemGeneratedCaseDocuments(List.of(ElementUtils
-                                                  .element(CaseDocument.builder()
-                                                               .documentType(DocumentType.SDO_ORDER)
-                                                               .createdDatetime(LocalDateTime.now().minusDays(6))
-                                                               .build())))
+                                                  .element(new CaseDocument()
+                                                               .setDocumentType(DocumentType.SDO_ORDER)
+                                                               .setCreatedDatetime(LocalDateTime.now().minusDays(6)))))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -129,14 +128,12 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .totalClaimAmount(BigDecimal.valueOf(800))
                 .systemGeneratedCaseDocuments(Arrays.asList(
-                    ElementUtils.element(CaseDocument.builder()
-                                             .documentType(DocumentType.SDO_ORDER)
-                                             .createdDatetime(LocalDateTime.now().minusDays(10))
-                                             .build()),
-                    ElementUtils.element(CaseDocument.builder()
-                                             .documentType(DocumentType.SDO_ORDER)
-                                             .createdDatetime(LocalDateTime.now().minusDays(6))
-                                             .build())))
+                    ElementUtils.element(new CaseDocument()
+                                             .setDocumentType(DocumentType.SDO_ORDER)
+                                             .setCreatedDatetime(LocalDateTime.now().minusDays(10))),
+                    ElementUtils.element(new CaseDocument()
+                                             .setDocumentType(DocumentType.SDO_ORDER)
+                                             .setCreatedDatetime(LocalDateTime.now().minusDays(6)))))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -154,14 +151,12 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .totalClaimAmount(BigDecimal.valueOf(800))
                 .systemGeneratedCaseDocuments(Arrays.asList(
-                    ElementUtils.element(CaseDocument.builder()
-                                             .documentType(DocumentType.SDO_ORDER)
-                                             .createdDatetime(LocalDateTime.now().minusDays(10))
-                                             .build()),
-                    ElementUtils.element(CaseDocument.builder()
-                                             .documentType(DocumentType.SDO_ORDER)
-                                             .createdDatetime(LocalDateTime.now().minusDays(7))
-                                             .build())))
+                    ElementUtils.element(new CaseDocument()
+                                             .setDocumentType(DocumentType.SDO_ORDER)
+                                             .setCreatedDatetime(LocalDateTime.now().minusDays(10))),
+                    ElementUtils.element(new CaseDocument()
+                                             .setDocumentType(DocumentType.SDO_ORDER)
+                                             .setCreatedDatetime(LocalDateTime.now().minusDays(7)))))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -178,10 +173,9 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .totalClaimAmount(BigDecimal.valueOf(800))
                 .systemGeneratedCaseDocuments(List.of(ElementUtils
-                                                          .element(CaseDocument.builder()
-                                                                       .documentType(DocumentType.SDO_ORDER)
-                                                                       .createdDatetime(LocalDateTime.now().minusDays(7))
-                                                                       .build())))
+                                                          .element(new CaseDocument()
+                                                                       .setDocumentType(DocumentType.SDO_ORDER)
+                                                                       .setCreatedDatetime(LocalDateTime.now().minusDays(7)))))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -199,10 +193,10 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .totalClaimAmount(BigDecimal.valueOf(800))
                 .systemGeneratedCaseDocuments(List.of(ElementUtils
-                                                          .element(CaseDocument.builder()
-                                                                       .documentType(DocumentType.SDO_ORDER)
-                                                                       .createdDatetime(LocalDateTime.now().minusDays(5))
-                                                                       .build()))).build();
+                                                          .element(new CaseDocument()
+                                                                       .setDocumentType(DocumentType.SDO_ORDER)
+                                                                       .setCreatedDatetime(
+                                                                           LocalDateTime.now().minusDays(5))))).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(userRole));
@@ -228,10 +222,10 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             //Given : Casedata with small claim
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
                 .systemGeneratedCaseDocuments(List.of(ElementUtils
-                                                          .element(CaseDocument.builder()
-                                                                       .documentType(DocumentType.SDO_ORDER)
-                                                                       .createdDatetime(LocalDateTime.now().minusDays(5))
-                                                                       .build()))).build();
+                                                          .element(new CaseDocument()
+                                                                       .setDocumentType(DocumentType.SDO_ORDER)
+                                                                       .setCreatedDatetime(
+                                                                           LocalDateTime.now().minusDays(5))))).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
@@ -263,8 +257,8 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
                 .totalClaimAmount(new BigDecimal(1200))
                 .eaCourtLocation(YesOrNo.YES)
-                .respondent1Represented(YesOrNo.NO)
-                .build().toBuilder().isReferToJudgeClaim(YesOrNo.YES).build();
+                .respondent1Represented(YesOrNo.NO).build();
+            caseData.setIsReferToJudgeClaim(YesOrNo.YES);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             //When: handler is called with ABOUT_TO_START event
@@ -280,13 +274,16 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         @Test
         void shouldPopulateReasonAndRequestorDetailsOfApplicant() {
             //Given : Casedata
+            ReasonForReconsideration reasonForReconsideration = new ReasonForReconsideration();
+            reasonForReconsideration.setReasonForReconsiderationTxt("Reason");
+            Party party = new Party();
+            party.setIndividualFirstName("FirstName");
+            party.setIndividualLastName("LastName");
+            party.setType(Party.Type.INDIVIDUAL);
+            party.setPartyName("test");
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .reasonForReconsiderationApplicant(ReasonForReconsideration.builder().reasonForReconsiderationTxt("Reason").build())
-                .applicant1(Party.builder()
-                                 .individualFirstName("FirstName")
-                                 .individualLastName("LastName")
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName("test").build()).build();
+                .reasonForReconsiderationApplicant(reasonForReconsideration)
+                .applicant1(party).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
@@ -306,19 +303,23 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         @Test
         void shouldPopulateReasonAndRequestorDetailsOfBothApplicantsWhen2V1() {
             //Given : Casedata
+            Party party = new Party();
+            party.setIndividualFirstName("FirstName");
+            party.setIndividualLastName("LastName");
+            party.setType(Party.Type.INDIVIDUAL);
+            party.setPartyName("Applicant1");
+            Party party1 = new Party();
+            party1.setIndividualFirstName("FirstName2");
+            party1.setIndividualLastName("LastName2");
+            party1.setType(Party.Type.INDIVIDUAL);
+            party1.setPartyName("Applicant2");
+            ReasonForReconsideration reasonForReconsideration = new ReasonForReconsideration();
+            reasonForReconsideration.setReasonForReconsiderationTxt("Reason");
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .reasonForReconsiderationApplicant(ReasonForReconsideration.builder().reasonForReconsiderationTxt("Reason").build())
-                .applicant1(Party.builder()
-                                .individualFirstName("FirstName")
-                                .individualLastName("LastName")
-                                .type(Party.Type.INDIVIDUAL)
-                                .partyName("Applicant1").build())
+                .reasonForReconsiderationApplicant(reasonForReconsideration)
+                .applicant1(party)
                 .addApplicant2(YesOrNo.YES)
-                .applicant2(Party.builder()
-                                 .individualFirstName("FirstName2")
-                                 .individualLastName("LastName2")
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName("Applicant2").build()).build();
+                .applicant2(party1).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
@@ -338,13 +339,16 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         @Test
         void shouldPopulateReasonAndRequestorDetailsOfRespondent1() {
             //Given : Casedata
+            ReasonForReconsideration reasonForReconsideration = new ReasonForReconsideration();
+            reasonForReconsideration.setReasonForReconsiderationTxt("Reason");
+            Party party = new Party();
+            party.setIndividualFirstName("FirstName");
+            party.setIndividualLastName("LastName");
+            party.setType(Party.Type.INDIVIDUAL);
+            party.setPartyName("test");
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .reasonForReconsiderationRespondent1(ReasonForReconsideration.builder().reasonForReconsiderationTxt("Reason").build())
-                .respondent1(Party.builder()
-                                .individualFirstName("FirstName")
-                                .individualLastName("LastName")
-                                .type(Party.Type.INDIVIDUAL)
-                                .partyName("test").build()).build();
+                .reasonForReconsiderationRespondent1(reasonForReconsideration)
+                .respondent1(party).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORONE"));
@@ -364,13 +368,14 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         @Test
         void shouldPopulateReasonAndRequestorDetailsOfRespondent1Blank() {
             //Given : Casedata
+            Party party = new Party();
+            party.setIndividualFirstName("FirstName");
+            party.setIndividualLastName("LastName");
+            party.setType(Party.Type.INDIVIDUAL);
+            party.setPartyName("test");
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .reasonForReconsiderationRespondent1(ReasonForReconsideration.builder().build())
-                .respondent1(Party.builder()
-                                .individualFirstName("FirstName")
-                                .individualLastName("LastName")
-                                .type(Party.Type.INDIVIDUAL)
-                                .partyName("test").build()).build();
+                .reasonForReconsiderationRespondent1(new ReasonForReconsideration())
+                .respondent1(party).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORONE"));
@@ -390,14 +395,17 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         @Test
         void shouldPopulateReasonAndRequestorDetailsOfRespondent2() {
             //Given : Casedata
+            Party party = new Party();
+            party.setIndividualFirstName("FirstName");
+            party.setIndividualLastName("LastName");
+            party.setType(Party.Type.INDIVIDUAL);
+            party.setPartyName("test");
+            ReasonForReconsideration reasonForReconsideration = new ReasonForReconsideration();
+            reasonForReconsideration.setReasonForReconsiderationTxt("Reason");
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .reasonForReconsiderationRespondent2(ReasonForReconsideration.builder().reasonForReconsiderationTxt("Reason").build())
+                .reasonForReconsiderationRespondent2(reasonForReconsideration)
                 .addRespondent2(YesOrNo.YES)
-                .respondent2(Party.builder()
-                                .individualFirstName("FirstName")
-                                .individualLastName("LastName")
-                                .type(Party.Type.INDIVIDUAL)
-                                .partyName("test").build()).build();
+                .respondent2(party).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORTWO"));
@@ -417,14 +425,15 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         @Test
         void shouldPopulateReasonAndRequestorDetailsOfRespondent2Blank() {
             //Given : Casedata
+            Party party = new Party();
+            party.setIndividualFirstName("FirstName");
+            party.setIndividualLastName("LastName");
+            party.setType(Party.Type.INDIVIDUAL);
+            party.setPartyName("test");
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .reasonForReconsiderationRespondent2(ReasonForReconsideration.builder().build())
+                .reasonForReconsiderationRespondent2(new ReasonForReconsideration())
                 .addRespondent2(YesOrNo.YES)
-                .respondent2(Party.builder()
-                                .individualFirstName("FirstName")
-                                .individualLastName("LastName")
-                                .type(Party.Type.INDIVIDUAL)
-                                .partyName("test").build()).build();
+                .respondent2(party).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORTWO"));
@@ -444,20 +453,24 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         @Test
         void shouldPopulateReasonAndRequestorDetailsOfRespondentsWhen2V1SameDefSol() {
             //Given : Casedata
+            Party party = new Party();
+            party.setIndividualFirstName("FirstName");
+            party.setIndividualLastName("LastName");
+            party.setType(Party.Type.INDIVIDUAL);
+            party.setPartyName("test");
+            ReasonForReconsideration reasonForReconsideration = new ReasonForReconsideration();
+            reasonForReconsideration.setReasonForReconsiderationTxt("Reason");
+            Party party1 = new Party();
+            party1.setIndividualFirstName("FirstName2");
+            party1.setIndividualLastName("LastName2");
+            party1.setType(Party.Type.INDIVIDUAL);
+            party1.setPartyName("test");
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .reasonForReconsiderationRespondent1(ReasonForReconsideration.builder().reasonForReconsiderationTxt("Reason").build())
-                .respondent1(Party.builder()
-                                 .individualFirstName("FirstName")
-                                 .individualLastName("LastName")
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName("test").build())
+                .reasonForReconsiderationRespondent1(reasonForReconsideration)
+                .respondent1(party)
                 .addRespondent2(YesOrNo.YES)
                 .respondent2SameLegalRepresentative(YesOrNo.YES)
-                .respondent2(Party.builder()
-                                 .individualFirstName("FirstName2")
-                                 .individualLastName("LastName2")
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName("test").build()).build();
+                .respondent2(party1).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORONE"));
@@ -477,20 +490,22 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         @Test
         void shouldPopulateReasonAndRequestorDetailsOfRespondentsWhen2V1SameDefSolBlank() {
             //Given : Casedata
+            Party party = new Party();
+            party.setIndividualFirstName("FirstName");
+            party.setIndividualLastName("LastName");
+            party.setType(Party.Type.INDIVIDUAL);
+            party.setPartyName("test");
+            Party party1 = new Party();
+            party1.setIndividualFirstName("FirstName2");
+            party1.setIndividualLastName("LastName2");
+            party1.setType(Party.Type.INDIVIDUAL);
+            party1.setPartyName("test");
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .reasonForReconsiderationRespondent1(ReasonForReconsideration.builder().build())
-                .respondent1(Party.builder()
-                                 .individualFirstName("FirstName")
-                                 .individualLastName("LastName")
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName("test").build())
+                .reasonForReconsiderationRespondent1(new ReasonForReconsideration())
+                .respondent1(party)
                 .addRespondent2(YesOrNo.YES)
                 .respondent2SameLegalRepresentative(YesOrNo.YES)
-                .respondent2(Party.builder()
-                                 .individualFirstName("FirstName2")
-                                 .individualLastName("LastName2")
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName("test").build()).build();
+                .respondent2(party1).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORONE"));
@@ -510,18 +525,21 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         @Test
         void shouldPopulateReasonAndRequestorDetailsOfApplicantWhenRespondent1LiPWhenCuiCpEnabled() {
             //Given : Casedata
+            Party party = new Party();
+            party.setIndividualFirstName("FirstName");
+            party.setIndividualLastName("LastName");
+            party.setType(Party.Type.INDIVIDUAL);
+            party.setPartyName("test");
+            ReasonForReconsideration reasonForReconsideration = new ReasonForReconsideration();
+            reasonForReconsideration.setReasonForReconsiderationTxt("Reason");
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .reasonForReconsiderationApplicant(ReasonForReconsideration.builder().reasonForReconsiderationTxt("Reason").build())
-                .applicant1(Party.builder()
-                                .individualFirstName("FirstName")
-                                .individualLastName("LastName")
-                                .type(Party.Type.INDIVIDUAL)
-                                .partyName("test").build())
+                .reasonForReconsiderationApplicant(reasonForReconsideration)
+                .applicant1(party)
                 .respondent1Represented(YesOrNo.NO).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
-            when(documentService.generateLiPDocument(any(), anyString(), anyBoolean())).thenReturn(CaseDocument.builder().documentName("Name of document").build());
+            when(documentService.generateLiPDocument(any(), anyString(), anyBoolean())).thenReturn(new CaseDocument().setDocumentName("Name of document"));
 
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -541,18 +559,21 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         @Test
         void shouldPopulateReasonAndRequestorDetailsOfRespondent1WhenApplicantLiPWhenCuiCpEnabled() {
             //Given : Casedata
+            Party party = new Party();
+            party.setIndividualFirstName("FirstName");
+            party.setIndividualLastName("LastName");
+            party.setType(Party.Type.INDIVIDUAL);
+            party.setPartyName("test");
+            ReasonForReconsideration reasonForReconsideration = new ReasonForReconsideration();
+            reasonForReconsideration.setReasonForReconsiderationTxt("Reason");
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .reasonForReconsiderationRespondent1(ReasonForReconsideration.builder().reasonForReconsiderationTxt("Reason").build())
-                .respondent1(Party.builder()
-                                 .individualFirstName("FirstName")
-                                 .individualLastName("LastName")
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName("test").build())
+                .reasonForReconsiderationRespondent1(reasonForReconsideration)
+                .respondent1(party)
                 .applicant1Represented(YesOrNo.NO).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORONE"));
-            when(documentService.generateLiPDocument(any(), anyString(), anyBoolean())).thenReturn(CaseDocument.builder().documentName("Name of document").build());
+            when(documentService.generateLiPDocument(any(), anyString(), anyBoolean())).thenReturn(new CaseDocument().setDocumentName("Name of document"));
 
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -573,9 +594,8 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         void shouldPopulateOrderRequestedForReviewClaimantWhenItIsClaimantLiPRequest() {
             //Given : Casedata
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .caseDataLip(CaseDataLiP.builder()
-                                 .requestForReviewCommentsClaimant("Comments from claimant")
-                                 .build())
+                .caseDataLip(new CaseDataLiP()
+                                 .setRequestForReviewCommentsClaimant("Comments from claimant"))
                 .respondent1Represented(YesOrNo.NO)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -608,9 +628,8 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         void shouldPopulateOrderRequestedForReviewDefendantWhenItIsDefendantLiPRequest() {
             //Given : Casedata
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .caseDataLip(CaseDataLiP.builder()
-                                 .requestForReviewCommentsDefendant("Comments from defendant")
-                                 .build())
+                .caseDataLip(new CaseDataLiP()
+                                 .setRequestForReviewCommentsDefendant("Comments from defendant"))
                 .applicant1Represented(YesOrNo.NO)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

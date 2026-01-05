@@ -24,9 +24,9 @@ class ApplicantOneExpertJointStatmementDocumentHandlerTest extends BaseDocumentH
 
     @Test
     void shouldCopyExpertJointStatementDocumentsToLegalRep2() {
-        handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore, builder);
+        handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore);
 
-        assertEquals(2, builder.build().getDocumentJointStatementApp2().size());
+        assertEquals(2, caseData.getDocumentJointStatementApp2().size());
     }
 
     @Test

@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LengthOfUnemploymentComplexTypeLRspec;
 import uk.gov.hmcts.reform.civil.model.UnemployedComplexTypeLRspec;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.Collections;
 import java.util.List;
@@ -31,16 +32,15 @@ class ValidateLengthOfUnemploymentTest {
 
     @BeforeEach
     void setUp() {
-        caseData = CaseData.builder().build();
+        caseData = CaseDataBuilder.builder().build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
     }
 
     @Test
     void shouldReturnErrorsWhenLengthOfUnemploymentIsInvalid() {
-        caseData = caseData.toBuilder()
-                .respondToClaimAdmitPartUnemployedLRspec(
+        caseData.setRespondToClaimAdmitPartUnemployedLRspec(
                         buildUnemployedComplexType(buildLengthOfUnemployment("1.5", "2.5"))
-                ).build();
+        );
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateLengthOfUnemployment.execute(callbackParams);
@@ -51,10 +51,9 @@ class ValidateLengthOfUnemploymentTest {
 
     @Test
     void shouldReturnNoErrorsWhenLengthOfUnemploymentIsValid() {
-        caseData = caseData.toBuilder()
-                .respondToClaimAdmitPartUnemployedLRspec(
+        caseData.setRespondToClaimAdmitPartUnemployedLRspec(
                         buildUnemployedComplexType(buildLengthOfUnemployment("2", "3"))
-                ).build();
+        );
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateLengthOfUnemployment.execute(callbackParams);
@@ -64,9 +63,7 @@ class ValidateLengthOfUnemploymentTest {
 
     @Test
     void shouldReturnNoErrorsWhenRespondToClaimAdmitPartUnemployedLRspecIsNull() {
-        caseData = caseData.toBuilder()
-                .respondToClaimAdmitPartUnemployedLRspec(null)
-                .build();
+        caseData.setRespondToClaimAdmitPartUnemployedLRspec(null);
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateLengthOfUnemployment.execute(callbackParams);
@@ -76,10 +73,9 @@ class ValidateLengthOfUnemploymentTest {
 
     @Test
     void shouldReturnNoErrorsWhenLengthOfUnemploymentIsNull() {
-        caseData = caseData.toBuilder()
-                .respondToClaimAdmitPartUnemployedLRspec(
+        caseData.setRespondToClaimAdmitPartUnemployedLRspec(
                         buildUnemployedComplexType(null)
-                ).build();
+        );
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateLengthOfUnemployment.execute(callbackParams);
@@ -89,10 +85,9 @@ class ValidateLengthOfUnemploymentTest {
 
     @Test
     void shouldReturnErrorWhenNumberOfMonthsInUnemploymentIsNotWholeNumber() {
-        caseData = caseData.toBuilder()
-                .respondToClaimAdmitPartUnemployedLRspec(
+        caseData.setRespondToClaimAdmitPartUnemployedLRspec(
                         buildUnemployedComplexType(buildLengthOfUnemployment("2", "3.5"))
-                ).build();
+        );
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateLengthOfUnemployment.execute(callbackParams);
@@ -102,15 +97,15 @@ class ValidateLengthOfUnemploymentTest {
     }
 
     private LengthOfUnemploymentComplexTypeLRspec buildLengthOfUnemployment(String years, String months) {
-        return LengthOfUnemploymentComplexTypeLRspec.builder()
-                .numberOfYearsInUnemployment(years)
-                .numberOfMonthsInUnemployment(months)
-                .build();
+        LengthOfUnemploymentComplexTypeLRspec lengthOfUnemploymentComplexTypeLRspec = new LengthOfUnemploymentComplexTypeLRspec();
+        lengthOfUnemploymentComplexTypeLRspec.setNumberOfYearsInUnemployment(years);
+        lengthOfUnemploymentComplexTypeLRspec.setNumberOfMonthsInUnemployment(months);
+        return lengthOfUnemploymentComplexTypeLRspec;
     }
 
     private UnemployedComplexTypeLRspec buildUnemployedComplexType(LengthOfUnemploymentComplexTypeLRspec lengthOfUnemployment) {
-        return UnemployedComplexTypeLRspec.builder()
-                .lengthOfUnemployment(lengthOfUnemployment)
-                .build();
+        UnemployedComplexTypeLRspec unemployedComplexTypeLRspec = new UnemployedComplexTypeLRspec();
+        unemployedComplexTypeLRspec.setLengthOfUnemployment(lengthOfUnemployment);
+        return unemployedComplexTypeLRspec;
     }
 }

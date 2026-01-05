@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 
@@ -66,7 +67,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
     }
 
     public static CaseData buildFullDefenceProceedCaseData() {
-        return CaseData.builder()
+        return CaseDataBuilder.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .legacyCaseReference("claimNumber")
             .applicant1ProceedWithClaim(YesOrNo.YES)
@@ -76,7 +77,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
     }
 
     public static CaseData buildFullDefenceNotProceedCaseData() {
-        return CaseData.builder()
+        return CaseDataBuilder.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .legacyCaseReference("claimNumber")
             .applicant1ProceedWithClaim(YesOrNo.NO)
@@ -86,7 +87,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
     }
 
     public static CaseData buildFullAdmitProceedCaseData() {
-        return CaseData.builder()
+        return CaseDataBuilder.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .legacyCaseReference("claimNumber")
             .applicant1ProceedWithClaim(YesOrNo.YES)
@@ -96,31 +97,33 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
     }
 
     public static CaseData buildFullAdmitPayImmediatelyProceedCaseData() {
-        return CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .legacyCaseReference("claimNumber")
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                               .whenWillThisAmountBePaid(LocalDate.now().plusDays(5)).build())
-            .build();
+            .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY).build();
+        RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = new RespondToClaimAdmitPartLRspec();
+        respondToClaimAdmitPartLRspec.setWhenWillThisAmountBePaid(LocalDate.now().plusDays(5));
+        caseData.setRespondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec);
+        return caseData;
     }
 
     public static CaseData buildPartAdmitPayImmediatelyProceedCaseData() {
-        return CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .legacyCaseReference("claimNumber")
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
-            .respondForImmediateOption(YesOrNo.YES)
-            .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                               .whenWillThisAmountBePaid(LocalDate.now().plusDays(5)).build())
-            .build();
+            .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY).build();
+        caseData.setRespondForImmediateOption(YesOrNo.YES);
+        caseData.setApplicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES);
+        RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec = new RespondToClaimAdmitPartLRspec();
+        respondToClaimAdmitPartLRspec.setWhenWillThisAmountBePaid(LocalDate.now().plusDays(5));
+        caseData.setRespondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec);
+        return caseData;
     }
 
     public static CaseData buildFullAdmitNotProceedCaseData() {
-        return CaseData.builder()
+        return CaseDataBuilder.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .legacyCaseReference("claimNumber")
             .applicant1ProceedWithClaim(YesOrNo.NO)
@@ -130,7 +133,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
     }
 
     public static CaseData buildPartAdmitProceedCaseData() {
-        return CaseData.builder()
+        return CaseDataBuilder.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .legacyCaseReference("claimNumber")
             .applicant1ProceedWithClaim(YesOrNo.YES)
@@ -140,7 +143,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
     }
 
     public static CaseData buildPartAdmitNotProceedCaseData() {
-        return CaseData.builder()
+        return CaseDataBuilder.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .legacyCaseReference("claimNumber")
             .applicant1ProceedWithClaim(YesOrNo.NO)
@@ -150,7 +153,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
     }
 
     public static CaseData buildJudgmentSubmitProceedCaseData() {
-        return CaseData.builder()
+        return CaseDataBuilder.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .legacyCaseReference("claimNumber")
             .applicant1ProceedWithClaim(null)
@@ -161,18 +164,19 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
     }
 
     public static CaseData buildJudgmentSubmitProceedCaseDataAllFoi() {
-        return CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .legacyCaseReference("claimNumber")
-            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .build();
+        caseData.setCcdState(CaseState.All_FINAL_ORDERS_ISSUED);
+        return caseData;
     }
 
     public static CaseData buildProposePaymentPlanCaseData() {
-        return CaseData.builder()
+        return CaseDataBuilder.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .legacyCaseReference("claimNumber")
             .applicant1ProceedWithClaim(null)
@@ -183,12 +187,17 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
     }
 
     public static CaseData buildCaseWithMediation() {
-        return CaseData.builder().caseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(
-            ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.Yes).build()).build()).build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        ClaimantMediationLip claimantMediationLip = new ClaimantMediationLip();
+        claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.Yes);
+        caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(claimantMediationLip);
+        caseData.setCaseDataLiP(caseDataLiP);
+        return caseData;
     }
 
     public static CaseData buildAcceptPartAdmitAndPaidCaseData() {
-        return CaseData.builder()
+        return CaseDataBuilder.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .respondent1(PartyBuilder.builder().company().build())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
@@ -199,19 +208,20 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
     }
 
     public static CaseData buildCaseDefendantWithOutMediationData() {
-        return CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .respondent1(PartyBuilder.builder().company().build())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
-            .responseClaimMediationSpecRequired(YesOrNo.NO)
             .applicant1ProceedWithClaim(null)
             .responseClaimTrack(SMALL_CLAIM.name())
             .build();
+        caseData.setResponseClaimMediationSpecRequired(YesOrNo.NO);
+        return caseData;
     }
 
     public static CaseData buildCaseWithOutMediationFastTrackData() {
-        return CaseData.builder()
+        return CaseDataBuilder.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .respondent1(PartyBuilder.builder().company().build())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
@@ -221,20 +231,24 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
     }
 
     public static CaseData buildCaseClaimantWithOutMediationData() {
-        return CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .respondent1(PartyBuilder.builder().company().build())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
-            .responseClaimMediationSpecRequired(YesOrNo.YES)
-            .caseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(
-                ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.No).build()).build())
-            .responseClaimTrack(SMALL_CLAIM.name())
-            .build();
+            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO).build();
+        caseData.setResponseClaimMediationSpecRequired(YesOrNo.YES);
+        ClaimantMediationLip claimantMediationLip = new ClaimantMediationLip();
+        claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.No);
+        CaseDataLiP  caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(
+            claimantMediationLip);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setResponseClaimTrack(SMALL_CLAIM.name());
+        return caseData;
     }
 
     public static CaseData buildProposePaymentPlanCaseData_PartAdmit() {
-        return CaseData.builder()
+        return CaseDataBuilder.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .legacyCaseReference("claimNumber")
             .applicant1ProceedWithClaim(null)
