@@ -338,8 +338,8 @@ configurations.all {
         'netty-transport-classes-kqueue', 'netty-transport-native-epoll',
         'netty-transport-native-kqueue', 'netty-transport-native-unix-common'
       ]) {
-        details.useVersion('4.1.118.Final')
-        details.because('CVE-2025-25193')
+        details.useVersion('4.1.129.Final')
+        details.because('CVE-2025-25193, CVE-2025-67735')
       }
     }
   }
