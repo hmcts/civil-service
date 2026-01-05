@@ -135,12 +135,13 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                    List<EvidenceUploadTrial> trialDocumentarySmallTrack
     ) {
 
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         //For case which are 1v1, 2v1  we show respondent fields for documents to be uploaded,
         //if a case is 1v2 and different solicitors we want to show separate fields for each respondent solicitor i.e.
         //RESPONDENTSOLICITORTWO and RESPONDENTSOLICITORONE
         //if a case is 1v2 with same solicitor they will see respondent 2 fields as they have RESPONDENTSOLICITORTWO role
         //default flag for respondent 1 solicitor
-        caseData.setCaseTypeFlag(CASE_TYPE_FLAG_NO);
+        caseDataBuilder.caseTypeFlag(CASE_TYPE_FLAG_NO);
 
         boolean multiParts = Objects.nonNull(caseData.getEvidenceUploadOptions())
             && !caseData.getEvidenceUploadOptions().getListItems().isEmpty();
@@ -149,65 +150,65 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             if (multiParts
                 && caseData.getEvidenceUploadOptions()
                 .getValue().getLabel().startsWith(OPTION_APP2)) {
-                caseData.setCaseTypeFlag("ApplicantTwoFields");
+                caseDataBuilder.caseTypeFlag("ApplicantTwoFields");
             }
         } else if (events.get(0).equals(EVIDENCE_UPLOAD_RESPONDENT)
             && ((multiParts && caseData.getEvidenceUploadOptions().getValue().getLabel().startsWith(OPTION_DEF2))
             || (!multiParts && Objects.nonNull(caseData.getCcdCaseReference())
             && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)))) {
             // 1v2 same sol, def2 selected OR 1v2 dif sol, log in as def2
-            caseData.setCaseTypeFlag("RespondentTwoFields");
+            caseDataBuilder.caseTypeFlag("RespondentTwoFields");
         }
 
         // clears the flag, as otherwise if the user returns to previous screen and unselects an option,
         // which was previously selected, the option will still be shown
-        caseData.setWitnessStatementFlag(CASE_TYPE_FLAG_NO);
-        caseData.setWitnessSummaryFlag(CASE_TYPE_FLAG_NO);
-        caseData.setWitnessReferredStatementFlag(CASE_TYPE_FLAG_NO);
-        caseData.setExpertReportFlag(CASE_TYPE_FLAG_NO);
-        caseData.setExpertJointFlag(CASE_TYPE_FLAG_NO);
-        caseData.setTrialAuthorityFlag(CASE_TYPE_FLAG_NO);
-        caseData.setTrialCostsFlag(CASE_TYPE_FLAG_NO);
-        caseData.setTrialDocumentaryFlag(CASE_TYPE_FLAG_NO);
+        caseDataBuilder.witnessStatementFlag(CASE_TYPE_FLAG_NO);
+        caseDataBuilder.witnessSummaryFlag(CASE_TYPE_FLAG_NO);
+        caseDataBuilder.witnessReferredStatementFlag(CASE_TYPE_FLAG_NO);
+        caseDataBuilder.expertReportFlag(CASE_TYPE_FLAG_NO);
+        caseDataBuilder.expertJointFlag(CASE_TYPE_FLAG_NO);
+        caseDataBuilder.trialAuthorityFlag(CASE_TYPE_FLAG_NO);
+        caseDataBuilder.trialCostsFlag(CASE_TYPE_FLAG_NO);
+        caseDataBuilder.trialDocumentaryFlag(CASE_TYPE_FLAG_NO);
 
         // Based on claim type being fast track or small claims, there will be two different lists to select from
         // for either list we then want to display a (same) document upload field corresponding,
         // below combines what would have been two separate show conditions in CCD, into a single flag
         if (nonNull(witnessStatementFastTrack) && witnessStatementFastTrack.contains(EvidenceUploadWitness.WITNESS_STATEMENT)
             || nonNull(witnessStatementSmallTrack) && witnessStatementSmallTrack.contains(EvidenceUploadWitness.WITNESS_STATEMENT)) {
-            caseData.setWitnessStatementFlag("show_witness_statement");
+            caseDataBuilder.witnessStatementFlag("show_witness_statement");
         }
         if (nonNull(witnessSummaryFastTrack) && witnessSummaryFastTrack.contains(EvidenceUploadWitness.WITNESS_SUMMARY)
             || nonNull(witnessSummarySmallTrack) && witnessSummarySmallTrack.contains(EvidenceUploadWitness.WITNESS_SUMMARY)) {
-            caseData.setWitnessSummaryFlag("show_witness_summary");
+            caseDataBuilder.witnessSummaryFlag("show_witness_summary");
         }
         if (nonNull(witnessReferredFastTrack) && witnessReferredFastTrack.contains(EvidenceUploadWitness.DOCUMENTS_REFERRED)
             || nonNull(witnessReferredSmallTrack) && witnessReferredSmallTrack.contains(EvidenceUploadWitness.DOCUMENTS_REFERRED)) {
-            caseData.setWitnessReferredStatementFlag("show_witness_referred");
+            caseDataBuilder.witnessReferredStatementFlag("show_witness_referred");
         }
         if (nonNull(expertReportFastTrack) && expertReportFastTrack.contains(EvidenceUploadExpert.EXPERT_REPORT)
             || nonNull(expertReportSmallTrack) && expertReportSmallTrack.contains(EvidenceUploadExpert.EXPERT_REPORT)) {
-            caseData.setExpertReportFlag("show_expert_report");
+            caseDataBuilder.expertReportFlag("show_expert_report");
         }
         if (nonNull(expertJointFastTrack) && expertJointFastTrack.contains(EvidenceUploadExpert.JOINT_STATEMENT)
             || nonNull(expertJointSmallTrack) && expertJointSmallTrack.contains(EvidenceUploadExpert.JOINT_STATEMENT)) {
-            caseData.setExpertJointFlag("show_joint_expert");
+            caseDataBuilder.expertJointFlag("show_joint_expert");
         }
         if (nonNull(trialAuthorityFastTrack) && trialAuthorityFastTrack.contains(EvidenceUploadTrial.AUTHORITIES)
             || nonNull(trialAuthoritySmallTrack) && trialAuthoritySmallTrack.contains(EvidenceUploadTrial.AUTHORITIES)) {
-            caseData.setTrialAuthorityFlag("show_trial_authority");
+            caseDataBuilder.trialAuthorityFlag("show_trial_authority");
         }
         if (nonNull(trialCostsFastTrack) && trialCostsFastTrack.contains(EvidenceUploadTrial.COSTS)
             || nonNull(trialCostsSmallTrack) && trialCostsSmallTrack.contains(EvidenceUploadTrial.COSTS)) {
-            caseData.setTrialCostsFlag("show_trial_costs");
+            caseDataBuilder.trialCostsFlag("show_trial_costs");
         }
         if (nonNull(trialDocumentaryFastTrack) && trialDocumentaryFastTrack.contains(EvidenceUploadTrial.DOCUMENTARY)
             || nonNull(trialDocumentarySmallTrack) && trialDocumentarySmallTrack.contains(EvidenceUploadTrial.DOCUMENTARY)) {
-            caseData.setTrialDocumentaryFlag("show_trial_documentary");
+            caseDataBuilder.trialDocumentaryFlag("show_trial_documentary");
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(objectMapper))
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
@@ -231,51 +232,51 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         List<String> errors = new ArrayList<>();
 
         checkDateCorrectness(errors, uploadEvidenceDocumentType, date -> date.getValue()
-                .getDocumentIssuedDate(),
-            "Invalid date: \"Documents for disclosure\" "
-                + "date entered must not be in the future (1).");
+                                 .getDocumentIssuedDate(),
+                             "Invalid date: \"Documents for disclosure\" "
+                                 + "date entered must not be in the future (1).");
 
         checkDateCorrectness(errors, uploadEvidenceWitness1, date -> date.getValue()
-                .getWitnessOptionUploadDate(),
-            "Invalid date: \"witness statement\" "
-                + "date entered must not be in the future (2).");
+                                 .getWitnessOptionUploadDate(),
+                             "Invalid date: \"witness statement\" "
+                                 + "date entered must not be in the future (2).");
 
         checkDateCorrectness(errors, uploadEvidenceWitness2, date -> date.getValue()
-                .getWitnessOptionUploadDate(),
-            "Invalid date: \"witness summary\" "
-                + "date entered must not be in the future (3).");
+                                 .getWitnessOptionUploadDate(),
+                             "Invalid date: \"witness summary\" "
+                                 + "date entered must not be in the future (3).");
 
         checkDateCorrectness(errors, uploadEvidenceWitness3, date -> date.getValue()
-                .getWitnessOptionUploadDate(),
-            "Invalid date: \"Notice of the intention to rely on hearsay evidence\" "
-                + "date entered must not be in the future (4).");
+                                 .getWitnessOptionUploadDate(),
+                             "Invalid date: \"Notice of the intention to rely on hearsay evidence\" "
+                                 + "date entered must not be in the future (4).");
 
         checkDateCorrectness(errors, witnessDocumentReferred, date -> date.getValue()
-                .getDocumentIssuedDate(),
-            "Invalid date: \"Documents referred to in the statement\" "
-                + "date entered must not be in the future (5).");
+                                 .getDocumentIssuedDate(),
+                             "Invalid date: \"Documents referred to in the statement\" "
+                                 + "date entered must not be in the future (5).");
 
         checkDateCorrectness(errors, uploadEvidenceExpert1, date -> date.getValue()
-                .getExpertOptionUploadDate(),
-            "Invalid date: \"Expert's report\""
-                + " date entered must not be in the future (6).");
+                                 .getExpertOptionUploadDate(),
+                             "Invalid date: \"Expert's report\""
+                                 + " date entered must not be in the future (6).");
         checkDateCorrectness(errors, uploadEvidenceExpert2, date -> date.getValue()
-                .getExpertOptionUploadDate(),
-            "Invalid date: \"Joint statement of experts\" "
-                + "date entered must not be in the future (7).");
+                                 .getExpertOptionUploadDate(),
+                             "Invalid date: \"Joint statement of experts\" "
+                                 + "date entered must not be in the future (7).");
         checkDateCorrectness(errors, uploadEvidenceExpert3, date -> date.getValue()
-                .getExpertOptionUploadDate(),
-            "Invalid date: \"Questions for other party's expert or joint experts\" "
-                + "expert statement date entered must not be in the future (8).");
+                                 .getExpertOptionUploadDate(),
+                             "Invalid date: \"Questions for other party's expert or joint experts\" "
+                                 + "expert statement date entered must not be in the future (8).");
         checkDateCorrectness(errors, uploadEvidenceExpert4, date -> date.getValue()
-                .getExpertOptionUploadDate(),
-            "Invalid date: \"Answers to questions asked by the other party\" "
-                + "date entered must not be in the future (9).");
+                                 .getExpertOptionUploadDate(),
+                             "Invalid date: \"Answers to questions asked by the other party\" "
+                                 + "date entered must not be in the future (9).");
 
         checkDateCorrectness(errors, trialDocumentEvidence, date -> date.getValue()
-                .getDocumentIssuedDate(),
-            "Invalid date: \"Documentary evidence for trial\" "
-                + "date entered must not be in the future (10).");
+                                 .getDocumentIssuedDate(),
+                             "Invalid date: \"Documentary evidence for trial\" "
+                                 + "date entered must not be in the future (10).");
 
         CaseData caseDataBefore = callbackParams.getCaseDataBefore();
         List<Element<UploadEvidenceDocumentType>> bundleEvidenceBefore = caseDataBefore.getBundleEvidence();
@@ -376,7 +377,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                 .getValue().getLabel().startsWith(OPTION_DEF2))
                 || (!multiParts
                 && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(),
-                userInfo.getUid(), RESPONDENTSOLICITORTWO))) {
+                                                       userInfo.getUid(), RESPONDENTSOLICITORTWO))) {
                 return CaseRole.RESPONDENTSOLICITORTWO.name();
             }
             if (multiParts && caseData.getEvidenceUploadOptions()
@@ -391,7 +392,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         return SubmittedCallbackResponse.builder()
             .confirmationHeader("# Documents uploaded")
             .confirmationBody("You can continue uploading documents or return later. To upload more "
-                + "documents, go to Next step and select \"Document Upload\".")
+                                  + "documents, go to Next step and select \"Document Upload\".")
             .build();
     }
 
