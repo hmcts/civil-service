@@ -31,6 +31,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting.LISTING;
@@ -108,7 +109,7 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
         }
 
         boolean shouldRecordFeeScenario = caseData.isApplicant1NotRepresented() && !hasPaidFee
-            && ((!isAutoHearingNotice && caseData.getCcdState() == HEARING_READINESS && caseData.getListingOrRelisting() == LISTING)
+            && ((!isAutoHearingNotice && isInitialListingWhileInCaseProgression(caseData) && caseData.getListingOrRelisting() == LISTING)
                 || (isAutoHearingNotice && hearingFeeRequired(camundaVars.getHearingType())));
 
         if (shouldRecordFeeScenario) {
@@ -150,5 +151,9 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
                     locationLabel
                 )).findFirst();
         return preferredLocation.orElse(null);
+    }
+
+    private boolean isInitialListingWhileInCaseProgression(CaseData caseData) {
+        return caseData.getCcdState() == HEARING_READINESS || caseData.getCcdState() == CASE_PROGRESSION;
     }
 }
