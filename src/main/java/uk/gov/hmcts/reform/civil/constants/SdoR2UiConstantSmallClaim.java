@@ -32,7 +32,7 @@ public final class SdoR2UiConstantSmallClaim {
         + " when reaching its decision not less than 14 days before the hearing. "
         + "The Court may refuse to consider any document which has not been uploaded to the Digital Portal by the above date.";
     public static final String WITNESS_STATEMENT_TEXT = "Each party must upload to the Digital Portal copies of all "
-        + "witness statements of the witnesses upon whose evidence they intend to rely at the hearing not less than 21 days before the hearing.";
+        + "witness statements of the witnesses upon whose evidence they intend to rely at the hearing not less than 14 days before the hearing.";
     public static final String WITNESS_DESCRIPTION_TEXT = """
         a) Start with the name of the case and the claim number;
         b) State the full name and address of the witness;

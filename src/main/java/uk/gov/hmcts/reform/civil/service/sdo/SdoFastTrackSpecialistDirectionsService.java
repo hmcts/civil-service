@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackRoadTrafficAccident;
@@ -50,6 +51,7 @@ public class SdoFastTrackSpecialistDirectionsService {
         caseData.setFastTrackBuildingDispute(buildBuildingDispute());
         caseData.setFastTrackClinicalNegligence(buildClinicalNegligence());
         caseData.setSdoR2FastTrackCreditHire(buildCreditHire());
+        caseData.setFastTrackCreditHire(buildFastTrackCreditHire());
         caseData.setFastTrackHousingDisrepair(buildHousingDisrepair());
         caseData.setFastTrackPersonalInjury(buildPersonalInjury());
         caseData.setFastTrackRoadTrafficAccident(buildRoadTrafficAccident());
@@ -88,6 +90,23 @@ public class SdoFastTrackSpecialistDirectionsService {
             .input8(CREDIT_HIRE_WITNESS_LIMIT_SDO)
             .detailsShowToggle(toggleList)
             .sdoR2FastTrackCreditHireDetails(buildCreditHireDetails())
+            .build();
+    }
+
+    private FastTrackCreditHire buildFastTrackCreditHire() {
+        return FastTrackCreditHire.builder()
+            .input1(CREDIT_HIRE_DISCLOSURE_SDO)
+            .input2(CREDIT_HIRE_STATEMENT_PROMPT_SDO)
+            .date1(deadlineService.nextWorkingDayFromNowWeeks(4))
+            .input3(CREDIT_HIRE_NON_COMPLIANCE_SDO)
+            .input4(CREDIT_HIRE_PARTIES_LIAISE)
+            .date2(deadlineService.nextWorkingDayFromNowWeeks(6))
+            .input5(CREDIT_HIRE_BASIC_RATE_EVIDENCE_WITH_LIABILITY)
+            .input6(CREDIT_HIRE_DEFENDANT_UPLOAD_SDO)
+            .date3(deadlineService.nextWorkingDayFromNowWeeks(8))
+            .input7(CREDIT_HIRE_CLAIMANT_EVIDENCE_SDO)
+            .date4(deadlineService.nextWorkingDayFromNowWeeks(10))
+            .input8(CREDIT_HIRE_WITNESS_LIMIT_SDO)
             .build();
     }
 

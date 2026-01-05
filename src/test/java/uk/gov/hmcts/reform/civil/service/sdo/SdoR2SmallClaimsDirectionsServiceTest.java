@@ -85,7 +85,7 @@ class SdoR2SmallClaimsDirectionsServiceTest {
                                          .build())
             .build();
 
-        assertThat(service.getHearingMethod(caseData)).isEqualTo("by video conference");
+        assertThat(service.getHearingMethod(caseData)).isEqualTo("by video");
     }
 
     @Test

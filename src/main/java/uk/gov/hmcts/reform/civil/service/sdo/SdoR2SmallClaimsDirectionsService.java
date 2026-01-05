@@ -69,7 +69,7 @@ public class SdoR2SmallClaimsDirectionsService {
         if (HearingMethod.TELEPHONE.getLabel().equals(label)) {
             return "by telephone";
         } else if (HearingMethod.VIDEO.getLabel().equals(label)) {
-            return "by video conference";
+            return "by video";
         } else if (HearingMethod.IN_PERSON.getLabel().equals(label)) {
             return "in person";
         }
