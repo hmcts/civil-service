@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
@@ -31,12 +33,15 @@ public class UpdateDataRespondentDeadlineResponse {
 
     private final LocationReferenceDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
+    private final ObjectMapper objectMapper;
 
     public UpdateDataRespondentDeadlineResponse(LocationReferenceDataService locationRefDataService,
-                                                CourtLocationUtils courtLocationUtils) {
+                                                CourtLocationUtils courtLocationUtils,
+                                                ObjectMapper objectMapper) {
 
         this.locationRefDataService = locationRefDataService;
         this.courtLocationUtils = courtLocationUtils;
+        this.objectMapper = objectMapper;
     }
 
     void updateBothRespondentsResponseSameLegalRep(CallbackParams callbackParams,
@@ -56,10 +61,9 @@ public class UpdateDataRespondentDeadlineResponse {
     }
 
     void updateResponseDataForSecondRespondent(CallbackParams callbackParams,
-                                               CaseData updatedData,
                                                CaseData caseData,
                                                LocalDateTime applicant1Deadline) {
-        updatedData.setBusinessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
+        caseData.setBusinessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE));
         updateRespondent2StatementOfTruth(callbackParams, caseData);
         setApplicantDeadLineIfRespondent1DateExist(caseData, applicant1Deadline);
     }
@@ -122,8 +126,10 @@ public class UpdateDataRespondentDeadlineResponse {
 
             caseData.setRespondent2(updatedRespondent2);
             caseData.setRespondent2Copy(null);
-            updatedRespondent2.setFlags(null);
-            caseData.setRespondent2DetailsForClaimDetailsTab(updatedRespondent2);
+
+            Party respondent2Clone = objectMapper.convertValue(updatedRespondent2, Party.class);
+            respondent2Clone.setFlags(null);
+            caseData.setRespondent2DetailsForClaimDetailsTab(respondent2Clone);
 
             if (caseData.getRespondent2ResponseDate() == null) {
                 caseData.setNextDeadline(caseData.getRespondent2ResponseDeadline().toLocalDate());

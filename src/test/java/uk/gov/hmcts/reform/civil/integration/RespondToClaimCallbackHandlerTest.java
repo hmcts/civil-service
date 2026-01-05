@@ -185,7 +185,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToStartCallback {
 
         @BeforeEach
-        public void setup() {
+        void setup() {
             when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -219,7 +219,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Then
             assertThat(response.getErrors()).isNull();
             assertThat(response.getData().get("respondent1Copy")).isEqualTo(response.getData().get("respondent1"));
-            assertThat(response.getData().get("respondent2Copy")).isNull();
             assertThat(response.getData().get("respondent2Copy")).isNull();
         }
 
