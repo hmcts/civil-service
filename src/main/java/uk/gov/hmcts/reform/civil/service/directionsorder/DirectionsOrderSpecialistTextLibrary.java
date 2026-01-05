@@ -246,9 +246,6 @@ public final class DirectionsOrderSpecialistTextLibrary {
             + "has permission to rely upon any associated "
             + "correspondence or updating report which is uploaded "
             + "to the Digital Portal by 4pm on";
-    public static final String PERSONAL_INJURY_DEFENDANT_QUESTIONS =
-        "The Defendant(s) may ask questions of the Claimant's expert which must be sent to the expert "
-            + "directly and uploaded to the Digital Portal by 4pm on";
     public static final String PERSONAL_INJURY_QUESTIONS =
         "Any questions which are to be addressed to an expert must be sent to the expert directly "
             + "and uploaded to the Digital Portal by 4pm on";
@@ -256,8 +253,6 @@ public final class DirectionsOrderSpecialistTextLibrary {
         "The answers to the questions shall be answered by the Expert by";
     public static final String PERSONAL_INJURY_UPLOAD =
         "and uploaded to the Digital Portal by";
-    public static final String PERSONAL_INJURY_UPLOAD_BY_ASKING_PARTY =
-        PERSONAL_INJURY_UPLOAD + " the party who has asked the question by";
 
     /* Road traffic accident */
     public static final String ROAD_TRAFFIC_ACCIDENT_UPLOAD_SDO =
@@ -279,9 +274,6 @@ public final class DirectionsOrderSpecialistTextLibrary {
     public static final String SMALL_CLAIMS_DOCUMENTS_WARNING =
         "The court may refuse to consider any document which has not been uploaded to the Digital "
             + "Portal by the above date.";
-    public static final String SMALL_CLAIMS_WITNESS_STATEMENTS_UPLOAD =
-        "Each party must upload to the Digital Portal copies of all witness statements of the witnesses"
-            + " upon whose evidence they intend to rely at the hearing not less than 21 days before the hearing.";
     public static final String SMALL_CLAIMS_WITNESS_DEADLINE =
         "Witness statements shall be uploaded to the Digital Portal by 4pm on";
     public static final String SMALL_CLAIMS_WITNESS_LATE_WARNING =
@@ -437,7 +429,7 @@ public final class DirectionsOrderSpecialistTextLibrary {
             + " to the Digital Portal an updated counter schedule of loss by 4pm on";
     public static final String DISPOSAL_SCHEDULE_FUTURE_LOSS =
         "If there is a claim for future pecuniary loss and the parties have not already set out their"
-            + " case on periodical payments. then they must do so in the respective schedule and counter-schedule.";
+            + " case on periodical payments, they must do so in the respective schedule and counter-schedule.";
     public static final String DISPOSAL_BUNDLE_REQUIREMENT =
         "At least 7 days before the disposal hearing, the claimant must file and serve";
     public static final String DISPOSAL_FINAL_HEARING_LISTING_SDO =
