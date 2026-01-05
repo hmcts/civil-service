@@ -37,7 +37,7 @@ public class SdoSmallClaimsTemplateFieldService {
             if (hearing.getOtherMinutes() != null) {
                 otherLength.append(hearing.getOtherMinutes().toString().trim()).append(MINUTES);
             }
-            return otherLength.toString().trim();
+            return otherLength.toString();
         }
 
         return hearing.getTime().getLabel().toLowerCase(Locale.ROOT);

@@ -60,7 +60,6 @@ public class SdoFastTrackTemplateService {
             .fastTrackDisclosureOfDocuments(caseData.getFastTrackDisclosureOfDocuments())
             .fastTrackSchedulesOfLoss(caseData.getFastTrackSchedulesOfLoss())
             .fastTrackTrial(caseData.getFastTrackTrial())
-            .fastTrackTrialBundleTypeText(fastTrackTemplateFieldService.getTrialBundleTypeText(caseData))
             .fastTrackMethod(caseData.getFastTrackMethod())
             .fastTrackMethodInPerson(caseData.getFastTrackMethodInPerson())
             .fastTrackMethodTelephoneHearing(fastTrackTemplateFieldService.getMethodTelephoneHearingLabel(caseData))
