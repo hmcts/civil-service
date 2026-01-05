@@ -418,10 +418,14 @@ class CaseFlagUtilsTest {
             List<FlagDetail> expectedApplicant1WitnessFlags = flagDetails();
             List<FlagDetail> expectedApplicant1ExpertFlags = flagDetails();
             List<FlagDetail> expectedApplicant1LitigationFriendFlags = flagDetails();
+            List<FlagDetail> expectedApplicant1OrgIndividualFlags = flagDetails();
+            List<FlagDetail> expectedApplicant1LRIndividualFlags = flagDetails();
             List<FlagDetail> expectedRespondent1Flags = flagDetails();
             List<FlagDetail> expectedRespondent1WitnessFlags = flagDetails();
             List<FlagDetail> expectedRespondent1ExpertFlags = flagDetails();
             List<FlagDetail> expectedRespondent1LitigationFriendFlags = flagDetails();
+            List<FlagDetail> expectedRespondent1OrgIndividualFlags = flagDetails();
+            List<FlagDetail> expectedRespondent1LRIndividualFlags = flagDetails();
 
             List<FlagDetail> expected = new ArrayList<>();
             expected.addAll(expectedApplicant1Flags);
@@ -432,6 +436,10 @@ class CaseFlagUtilsTest {
             expected.addAll(expectedRespondent1WitnessFlags);
             expected.addAll(expectedRespondent1ExpertFlags);
             expected.addAll(expectedRespondent1LitigationFriendFlags);
+            expected.addAll(expectedApplicant1OrgIndividualFlags);
+            expected.addAll(expectedRespondent1OrgIndividualFlags);
+            expected.addAll(expectedApplicant1LRIndividualFlags);
+            expected.addAll(expectedRespondent1LRIndividualFlags);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -443,10 +451,14 @@ class CaseFlagUtilsTest {
                 .withApplicant1WitnessFlags()
                 .withApplicant1ExpertFlags()
                 .withApplicant1LitigationFriendFlags()
+                .withApplicant1OrgIndividualFlags()
+                .withApplicant1LRIndividualFlags()
                 .withRespondent1Flags()
                 .withRespondent1ExpertFlags()
                 .withRespondent1WitnessFlags()
                 .withRespondent1LitigationFriendFlags()
+                .withRespondent1OrgIndividualFlags()
+                .withRespondent1LRIndividualFlags()
                 .build();
 
             assertThat(getAllCaseFlags(caseData)).isEqualTo(expected);
@@ -458,20 +470,30 @@ class CaseFlagUtilsTest {
             List<FlagDetail> expectedApplicant2WitnessFlags = flagDetails();
             List<FlagDetail> expectedApplicant2ExpertFlags = flagDetails();
             List<FlagDetail> expectedApplicant2LitigationFriendFlags = flagDetails();
+            List<FlagDetail> expectedApplicant2OrgIndividualFlags = flagDetails();
             List<FlagDetail> expectedRespondent1Flags = flagDetails();
             List<FlagDetail> expectedRespondent1WitnessFlags = flagDetails();
             List<FlagDetail> expectedRespondent1ExpertFlags = flagDetails();
             List<FlagDetail> expectedRespondent1LitigationFriendFlags = flagDetails();
+            List<FlagDetail> expectedRespondent1OrgIndividualFlags = flagDetails();
+            List<FlagDetail> expectedRespondent1LRIndividualFlags = flagDetails();
+            List<FlagDetail> expectedApplicant1OrgIndividualFlags = flagDetails();
+            List<FlagDetail> expectedApplicant1LRIndividualFlags = flagDetails();
 
             List<FlagDetail> expected = new ArrayList<>();
             expected.addAll(expectedApplicant2Flags); // add other parties
             expected.addAll(expectedApplicant2WitnessFlags);
             expected.addAll(expectedApplicant2ExpertFlags);
             expected.addAll(expectedApplicant2LitigationFriendFlags);
+            expected.addAll(expectedApplicant1OrgIndividualFlags);
+            expected.addAll(expectedApplicant2OrgIndividualFlags);
             expected.addAll(expectedRespondent1Flags);
             expected.addAll(expectedRespondent1WitnessFlags);
             expected.addAll(expectedRespondent1ExpertFlags);
             expected.addAll(expectedRespondent1LitigationFriendFlags);
+            expected.addAll(expectedRespondent1OrgIndividualFlags);
+            expected.addAll(expectedApplicant1LRIndividualFlags);
+            expected.addAll(expectedRespondent1LRIndividualFlags);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicant2RespondToDefenceAndProceed_2v1()
@@ -484,10 +506,15 @@ class CaseFlagUtilsTest {
                 .withApplicant2WitnessFlags()
                 .withApplicant2ExpertFlags()
                 .withApplicant2LitigationFriendFlags()
+                .withApplicant1OrgIndividualFlags()
+                .withApplicant2OrgIndividualFlags()
+                .withApplicant1LRIndividualFlags()
                 .withRespondent1Flags()
                 .withRespondent1ExpertFlags()
                 .withRespondent1WitnessFlags()
                 .withRespondent1LitigationFriendFlags()
+                .withRespondent1OrgIndividualFlags()
+                .withRespondent1LRIndividualFlags()
                 .build();
 
             assertThat(getAllCaseFlags(caseData)).isEqualTo(expected);
@@ -499,10 +526,14 @@ class CaseFlagUtilsTest {
             List<FlagDetail> expectedRespondent1WitnessFlags = flagDetails();
             List<FlagDetail> expectedRespondent1ExpertFlags = flagDetails();
             List<FlagDetail> expectedRespondent1LitigationFriendFlags = flagDetails();
+            List<FlagDetail> expectedRespondent1OrgIndividualFlags = flagDetails();
+            List<FlagDetail> expectedRespondent1LRIndividualFlags = flagDetails();
             List<FlagDetail> expectedRespondent2Flags = flagDetails();
             List<FlagDetail> expectedRespondent2ExpertFlags = flagDetails();
             List<FlagDetail> expectedRespondent2WitnessFlags = flagDetails();
             List<FlagDetail> expectedRespondent2LitigationFriendFlags = flagDetails();
+            List<FlagDetail> expectedRespondent2OrgIndividualFlags = flagDetails();
+            List<FlagDetail> expectedRespondent2LRIndividualFlags = flagDetails();
 
             List<FlagDetail> expected = new ArrayList<>();
 
@@ -510,10 +541,14 @@ class CaseFlagUtilsTest {
             expected.addAll(expectedRespondent1WitnessFlags);
             expected.addAll(expectedRespondent1ExpertFlags);
             expected.addAll(expectedRespondent1LitigationFriendFlags);
+            expected.addAll(expectedRespondent1OrgIndividualFlags);
             expected.addAll(expectedRespondent2Flags);
             expected.addAll(expectedRespondent2ExpertFlags);
             expected.addAll(expectedRespondent2WitnessFlags);
             expected.addAll(expectedRespondent2LitigationFriendFlags);
+            expected.addAll(expectedRespondent2OrgIndividualFlags);
+            expected.addAll(expectedRespondent1LRIndividualFlags);
+            expected.addAll(expectedRespondent2LRIndividualFlags);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceSpec_1v2_BothPartiesFullDefenceResponses()
@@ -526,10 +561,14 @@ class CaseFlagUtilsTest {
                 .withRespondent1ExpertFlags()
                 .withRespondent1WitnessFlags()
                 .withRespondent1LitigationFriendFlags()
+                .withRespondent1OrgIndividualFlags()
+                .withRespondent1LRIndividualFlags()
                 .withRespondent2Flags()
                 .withRespondent2ExpertFlags()
                 .withRespondent2WitnessFlags()
                 .withRespondent2LitigationFriendFlags()
+                .withRespondent2OrgIndividualFlags()
+                .withRespondent2LRIndividualFlags()
                 .build();
 
             assertThat(getAllCaseFlags(caseData)).isEqualTo(expected);

@@ -175,7 +175,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     private CallbackResponse startClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        List<LocationRefData> locations = fetchLocationData(callbackParams);
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        List<LocationRefData> locations = fetchLocationData(authToken);
 
         CourtLocation courtLocation = new CourtLocation();
         courtLocation.setApplicantPreferredCourtLocationList(courtLocationUtils.getLocationsFromList(locations));
@@ -202,8 +203,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .data(caseData.toMap(objectMapper)).build();
     }
 
-    private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+    private List<LocationRefData> fetchLocationData(String authToken) {
         return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }
 
@@ -691,8 +691,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private void handleCourtLocationData(CaseData caseData, CallbackParams callbackParams) {
         // data for court location
         DynamicList courtLocations = caseData.getCourtLocation().getApplicantPreferredCourtLocationList();
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
-            fetchLocationData(callbackParams), courtLocations);
+            fetchLocationData(authToken), courtLocations);
         if (nonNull(courtLocation)) {
             CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
             caseLocationCivil.setBaseLocation(epimmsId);
@@ -705,6 +706,12 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             //to clear list of court locations from caseData
             courtLocation1.setApplicantPreferredCourtLocationList(null);
             caseData.setCourtLocation(courtLocation1);
+
+            List<LocationRefData> locations = locationRefDataService
+                .getCourtLocationsByEpimmsId(authToken, epimmsId);
+            Optional.ofNullable(locations)
+                .orElseGet(Collections::emptyList).stream().findFirst()
+                .ifPresent(locationRefData -> caseData.setLocationName(locationRefData.getSiteName()));
         }
     }
 

@@ -28,6 +28,6 @@ public class RequestForReconsiderationNotificationDeadlineHandler extends BaseEx
         cases.forEach(caseDetails -> {
             applicationEventPublisher.publishEvent(new RequestForReconsiderationNotificationDeadlineEvent(caseDetails.getId()));
         });
-        return ExternalTaskData.builder().build();
+        return new ExternalTaskData();
     }
 }

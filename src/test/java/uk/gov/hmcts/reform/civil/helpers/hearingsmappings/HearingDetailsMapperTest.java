@@ -542,6 +542,8 @@ public class HearingDetailsMapperTest {
         @Test
         void shouldReturnNull_whenHearingChannelIsNull() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), eq("HearingChannel"), anyString())).thenReturn(
+                Optional.empty());
             assertThat(HearingDetailsMapper.getHearingChannels("", "", caseData, categoryService)).isEqualTo(null);
         }
 

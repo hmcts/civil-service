@@ -130,12 +130,14 @@ public class HearingValuesServiceTest {
 
     @Test
     void shouldReturnExpectedHearingValuesWhenCaseDataIsReturned() throws Exception {
+        Long caseId = 1L;
         Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
             WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
             WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
+            .caseReference(caseId)
             .caseAccessCategory(UNSPEC_CLAIM)
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
                                         .region(WELSH_REGION_ID).build())
@@ -146,7 +148,6 @@ public class HearingValuesServiceTest {
             .applicant1(caseData.getApplicant1().toBuilder()
                             .flags(Flags.builder().partyName("party name").build())
                             .build()).build();
-        Long caseId = 1L;
         CaseDetails caseDetails = CaseDetails.builder()
             .data(caseData.toMap(mapper))
             .id(caseId).build();
@@ -217,10 +218,12 @@ public class HearingValuesServiceTest {
             .build();
 
         ServiceHearingValuesModel actual = hearingValuesService.getValues(caseId, "auth");
+        ServiceHearingValuesModel actualFromCaseData = hearingValuesService.getValues(caseData, "auth");
 
         verify(caseDetailsConverter).toCaseData(eq(caseDetails.getData()));
         verify(caseDataService, times(0)).triggerEvent(any(), any(), any());
         assertThat(actual).isEqualTo(expected);
+        assertThat(actualFromCaseData).isEqualTo(expected);
     }
 
     @SneakyThrows
@@ -807,4 +810,3 @@ public class HearingValuesServiceTest {
             .build();
     }
 }
-

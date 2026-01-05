@@ -179,16 +179,35 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPrePopulateDJDisposalAndTrialHearingPage() {
+            LocationRefData locationRefData = new LocationRefData();
+            locationRefData.setEpimmsId("123");
+            locationRefData.setSiteName("SiteName");
+            locationRefData.setCourtAddress("1");
+            locationRefData.setPostcode("1");
+            locationRefData.setCourtName("Court Name");
+            locationRefData.setRegion("Region");
+            locationRefData.setRegionId("1");
+            locationRefData.setCourtVenueId("000");
+            LocationRefData locationRefData1 = new LocationRefData();
+            locationRefData1.setEpimmsId("123");
+            locationRefData1.setSiteName("Loc");
+            locationRefData1.setCourtAddress("1");
+            locationRefData1.setPostcode("1");
+            locationRefData1.setCourtName("Court Name");
+            locationRefData1.setRegion("Region");
+            locationRefData1.setRegionId("1");
+            locationRefData1.setCourtVenueId("000");
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
-                              .courtName("Court Name").region("Region").regionId("1").courtVenueId("000")
-                              .epimmsId("123").build());
-            locations.add(LocationRefData.builder().siteName("Loc").courtAddress("1").postcode("1")
-                              .courtName("Court Name").region("Region").regionId("1").courtVenueId("000")
-                              .epimmsId("123").build());
+            locations.add(locationRefData);
+            locations.add(locationRefData1);
             when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
-            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
-            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            Category category = new Category();
+            category.setCategoryKey("HearingChannel");
+            category.setKey("INTER");
+            category.setValueEn("In Person");
+            category.setActiveFlag("Y");
+            CategorySearchResult categorySearchResult = new CategorySearchResult();
+            categorySearchResult.setCategories(List.of(category));
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
@@ -612,25 +631,38 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateLocationListsWithPreselectedCourt() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .atStateClaimIssuedTrialHearing()
-                .build();
-
+            LocationRefData locationRefData = new LocationRefData();
+            locationRefData.setEpimmsId("00001");
+            locationRefData.setCourtLocationCode("00001");
+            locationRefData.setSiteName("court 1");
+            locationRefData.setCourtAddress("1 address");
+            locationRefData.setPostcode("Y01 7RB");
+            LocationRefData locationRefData1 = new LocationRefData();
             String preSelectedCourt = "214320";
-
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            locationRefData1.setEpimmsId(preSelectedCourt);
+            locationRefData1.setCourtLocationCode(preSelectedCourt);
+            locationRefData1.setSiteName("court 2");
+            locationRefData1.setCourtAddress("2 address");
+            locationRefData1.setPostcode("Y02 7RB");
+            LocationRefData locationRefData2 = new LocationRefData();
+            locationRefData2.setEpimmsId("00003");
+            locationRefData2.setCourtLocationCode("00003");
+            locationRefData2.setSiteName("court 3");
+            locationRefData2.setCourtAddress("3 address");
+            locationRefData2.setPostcode("Y03 7RB");
             List<LocationRefData> locations = List.of(
-                LocationRefData.builder().epimmsId("00001").courtLocationCode("00001")
-                    .siteName("court 1").courtAddress("1 address").postcode("Y01 7RB").build(),
-                LocationRefData.builder().epimmsId(preSelectedCourt).courtLocationCode(preSelectedCourt)
-                    .siteName("court 2").courtAddress("2 address").postcode("Y02 7RB").build(),
-                LocationRefData.builder().epimmsId("00003").courtLocationCode("00003")
-                    .siteName("court 3").courtAddress("3 address").postcode("Y03 7RB").build()
+                locationRefData,
+                locationRefData1,
+                locationRefData2
             );
 
             when(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString())).thenReturn(locations);
 
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .atStateClaimIssuedTrialHearing()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
             DynamicListElement element1 = new DynamicListElement("00001", "court 1 - 1 address - Y01 7RB");
@@ -647,8 +679,13 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateDynamicLists() {
-            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
-            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            Category category = new Category();
+            category.setCategoryKey("HearingChannel");
+            category.setKey("INTER");
+            category.setValueEn("In Person");
+            category.setActiveFlag("Y");
+            CategorySearchResult categorySearchResult = new CategorySearchResult();
+            categorySearchResult.setCategories(List.of(category));
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
 
             CaseData caseData = CaseDataBuilder.builder()
@@ -690,16 +727,35 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateWelshSectionForSDOR2DJ() {
+            LocationRefData locationRefData = new LocationRefData();
+            locationRefData.setEpimmsId("123");
+            locationRefData.setSiteName("SiteName");
+            locationRefData.setCourtAddress("1");
+            locationRefData.setPostcode("1");
+            locationRefData.setCourtName("Court Name");
+            locationRefData.setRegion("Region");
+            locationRefData.setRegionId("1");
+            locationRefData.setCourtVenueId("000");
+            LocationRefData locationRefData1 = new LocationRefData();
+            locationRefData1.setEpimmsId("123");
+            locationRefData1.setSiteName("Loc");
+            locationRefData1.setCourtAddress("1");
+            locationRefData1.setPostcode("1");
+            locationRefData1.setCourtName("Court Name");
+            locationRefData1.setRegion("Region");
+            locationRefData1.setRegionId("1");
+            locationRefData1.setCourtVenueId("000");
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
-                              .courtName("Court Name").region("Region").regionId("1").courtVenueId("000")
-                              .epimmsId("123").build());
-            locations.add(LocationRefData.builder().siteName("Loc").courtAddress("1").postcode("1")
-                              .courtName("Court Name").region("Region").regionId("1").courtVenueId("000")
-                              .epimmsId("123").build());
+            locations.add(locationRefData);
+            locations.add(locationRefData1);
             when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
-            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
-            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            Category category = new Category();
+            category.setCategoryKey("HearingChannel");
+            category.setKey("INTER");
+            category.setValueEn("In Person");
+            category.setActiveFlag("Y");
+            CategorySearchResult categorySearchResult = new CategorySearchResult();
+            categorySearchResult.setCategories(List.of(category));
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()

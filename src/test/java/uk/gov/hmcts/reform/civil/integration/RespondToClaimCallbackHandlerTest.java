@@ -356,23 +356,20 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldHandleCourtLocationData() {
                 //Given
+                LocationRefData locationRefData = new LocationRefData();
+                locationRefData.setCourtLocationCode("123");
+                locationRefData.setSiteName("Site name");
                 when(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString()))
-                    .thenReturn(Collections.singletonList(
-                        LocationRefData.builder()
-                            .courtLocationCode("123")
-                            .siteName("Site name")
-                            .build()
-                    ));
+                    .thenReturn(Collections.singletonList(locationRefData));
                 when(courtLocationUtils.getLocationsFromList(any()))
                     .thenReturn(fromList(List.of("Site 1 - Lane 1 - 123", "Site 2 - Lane 2 - 124")));
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
-                    .build().toBuilder()
-                    .courtLocation(uk.gov.hmcts.reform.civil.model.CourtLocation.builder()
-                                       .applicantPreferredCourt("123")
-                                       .build())
                     .build();
+                uk.gov.hmcts.reform.civil.model.CourtLocation courtLocation = new uk.gov.hmcts.reform.civil.model.CourtLocation();
+                courtLocation.setApplicantPreferredCourt("123");
+                caseData.setCourtLocation(courtLocation);
 
                 CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_START);
                 //When
@@ -508,17 +505,21 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             given(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORTWO)))
                 .willReturn(true);
-            Hearing hearing = Hearing.builder()
-                .unavailableDatesRequired(YES)
-                .unavailableDates(wrapElements(UnavailableDate.builder()
-                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                   .date(now().plusDays(5)).build()))
-                .build();
+            Hearing hearing = new Hearing();
+            UnavailableDate unavailableDate = new UnavailableDate();
+            unavailableDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
+            unavailableDate.setDate(now().plusDays(5));
+            hearing.setUnavailableDatesRequired(YES);
+            hearing.setUnavailableDates(wrapElements(unavailableDate));
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQHearing(hearing);
+            Respondent2DQ respondent2DQ = new Respondent2DQ();
+            respondent2DQ.setRespondent2DQHearing(hearing);
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
-                .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
-                .build().toBuilder().ccdCaseReference(1234L)
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(respondent2DQ)
                 .build();
+            caseData.setCcdCaseReference(1234L);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             // When
@@ -533,18 +534,22 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             given(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORTWO))).willReturn(
                 true);
-            Hearing hearing = Hearing.builder()
-                .unavailableDatesRequired(YES)
-                .unavailableDates(wrapElements(UnavailableDate.builder()
-                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                   .date(now().plusDays(5)).build()))
-                .build();
+            Hearing hearing = new Hearing();
+            UnavailableDate unavailableDate = new UnavailableDate();
+            unavailableDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
+            unavailableDate.setDate(now().plusDays(5));
+            hearing.setUnavailableDatesRequired(YES);
+            hearing.setUnavailableDates(wrapElements(unavailableDate));
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQHearing(hearing);
+            Respondent2DQ respondent2DQ = new Respondent2DQ();
+            respondent2DQ.setRespondent2DQHearing(hearing);
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimOneDefendantSolicitor()
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
-                .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
-                .build().toBuilder().ccdCaseReference(1234L)
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(respondent2DQ)
                 .build();
+            caseData.setCcdCaseReference(1234L);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             // When
@@ -559,20 +564,24 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             given(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORTWO)))
                 .willReturn(false);
-            Hearing hearing = Hearing.builder()
-                .unavailableDatesRequired(YES)
-                .unavailableDates(wrapElements(UnavailableDate.builder()
-                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                   .date(now().plusDays(5)).build()))
-                .build();
+            Hearing hearing = new Hearing();
+            UnavailableDate unavailableDate = new UnavailableDate();
+            unavailableDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
+            unavailableDate.setDate(now().plusDays(5));
+            hearing.setUnavailableDatesRequired(YES);
+            hearing.setUnavailableDates(wrapElements(unavailableDate));
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQHearing(hearing);
+            Respondent2DQ respondent2DQ = new Respondent2DQ();
+            respondent2DQ.setRespondent2DQHearing(hearing);
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimOneDefendantSolicitor()
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
-                .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(respondent2DQ)
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(NO)
-                .build().toBuilder().ccdCaseReference(1234L)
                 .build();
+            caseData.setCcdCaseReference(1234L);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             // When
@@ -587,19 +596,23 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             given(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORTWO)))
                 .willReturn(false);
-            Hearing hearing = Hearing.builder()
-                .unavailableDatesRequired(YES)
-                .unavailableDates(wrapElements(UnavailableDate.builder()
-                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                   .date(now().plusDays(5)).build()))
-                .build();
+            Hearing hearing = new Hearing();
+            UnavailableDate unavailableDate = new UnavailableDate();
+            unavailableDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
+            unavailableDate.setDate(now().plusDays(5));
+            hearing.setUnavailableDatesRequired(YES);
+            hearing.setUnavailableDates(wrapElements(unavailableDate));
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQHearing(hearing);
+            Respondent2DQ respondent2DQ = new Respondent2DQ();
+            respondent2DQ.setRespondent2DQHearing(hearing);
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimOneDefendantSolicitor()
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
-                .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(respondent2DQ)
                 .respondent2SameLegalRepresentative(NO)
-                .build().toBuilder().ccdCaseReference(1234L)
                 .build();
+            caseData.setCcdCaseReference(1234L);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -612,20 +625,24 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             given(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORTWO)))
                 .willReturn(false);
-            Hearing hearing = Hearing.builder()
-                .unavailableDatesRequired(YES)
-                .unavailableDates(wrapElements(UnavailableDate.builder()
-                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                   .date(now().plusDays(5)).build()))
-                .build();
+            Hearing hearing = new Hearing();
+            UnavailableDate unavailableDate = new UnavailableDate();
+            unavailableDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
+            unavailableDate.setDate(now().plusDays(5));
+            hearing.setUnavailableDatesRequired(YES);
+            hearing.setUnavailableDates(wrapElements(unavailableDate));
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQHearing(hearing);
+            Respondent2DQ respondent2DQ = new Respondent2DQ();
+            respondent2DQ.setRespondent2DQHearing(hearing);
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimOneDefendantSolicitor()
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
-                .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(respondent2DQ)
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(YES)
-                .build().toBuilder().ccdCaseReference(1234L)
                 .build();
+            caseData.setCcdCaseReference(1234L);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -638,19 +655,23 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             given(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORTWO)))
                 .willReturn(false);
-            Hearing hearing = Hearing.builder()
-                .unavailableDatesRequired(YES)
-                .unavailableDates(wrapElements(UnavailableDate.builder()
-                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                   .date(now().plusDays(5)).build()))
-                .build();
+            Hearing hearing = new Hearing();
+            hearing.setUnavailableDatesRequired(YES);
+            UnavailableDate unavailableDate = new UnavailableDate();
+            unavailableDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
+            unavailableDate.setDate(now().plusDays(5));
+            hearing.setUnavailableDates(wrapElements(unavailableDate));
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQHearing(hearing);
+            Respondent2DQ respondent2DQ = new Respondent2DQ();
+            respondent2DQ.setRespondent2DQHearing(hearing);
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimOneDefendantSolicitor()
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
-                .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(respondent2DQ)
                 .respondent2SameLegalRepresentative(YES)
-                .build().toBuilder().ccdCaseReference(1234L)
                 .build();
+            caseData.setCcdCaseReference(1234L);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -663,20 +684,23 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             given(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORTWO)))
                 .willReturn(false);
-            Hearing hearing = Hearing.builder()
-                .unavailableDatesRequired(YES)
-                .unavailableDates(wrapElements(UnavailableDate.builder()
-                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                   .date(now().plusDays(5)).build()))
-                .build();
+            Hearing hearing = new Hearing();
+            hearing.setUnavailableDatesRequired(YES);
+            UnavailableDate unavailableDate = new UnavailableDate();
+            unavailableDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
+            unavailableDate.setDate(now().plusDays(5));
+            hearing.setUnavailableDates(wrapElements(unavailableDate));
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQHearing(hearing);
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimOneDefendantSolicitor()
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
-                .respondent2DQ(Respondent2DQ.builder().build())
+                .multiPartyClaimOneDefendantSolicitor()
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(new Respondent2DQ())
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(NO)
-                .build().toBuilder().ccdCaseReference(1234L)
                 .build();
+            caseData.setCcdCaseReference(1234L);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -689,19 +713,21 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Given
             when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORTWO)))
                 .thenReturn(false);
-            Hearing hearing = Hearing.builder()
-                .unavailableDatesRequired(YES)
-                .unavailableDates(wrapElements(UnavailableDate.builder()
-                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                   .date(now().plusDays(5)).build()))
-                .build();
+            Hearing hearing = new Hearing();
+            hearing.setUnavailableDatesRequired(YES);
+            UnavailableDate unavailableDate = new UnavailableDate();
+            unavailableDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
+            unavailableDate.setDate(now().plusDays(5));
+            hearing.setUnavailableDates(wrapElements(unavailableDate));
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQHearing(hearing);
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimOneDefendantSolicitor()
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
+                .respondent1DQ(respondent1DQ)
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(NO)
-                .build().toBuilder().ccdCaseReference(1234L)
                 .build();
+            caseData.setCcdCaseReference(1234L);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -714,19 +740,23 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Given
             when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORTWO)))
                 .thenReturn(false);
-            Hearing hearing = Hearing.builder()
-                .unavailableDatesRequired(YES)
-                .unavailableDates(wrapElements(UnavailableDate.builder()
-                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                   .date(now().plusDays(5)).build()))
-                .build();
+            Hearing hearing = new Hearing();
+            hearing.setUnavailableDatesRequired(YES);
+            UnavailableDate unavailableDate = new UnavailableDate();
+            unavailableDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
+            unavailableDate.setDate(now().plusDays(5));
+            hearing.setUnavailableDates(wrapElements(unavailableDate));
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQHearing(hearing);
+            Respondent2DQ respondent2DQ = new Respondent2DQ();
+            respondent2DQ.setRespondent2DQHearing(hearing);
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
-                .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
-                .build().toBuilder().ccdCaseReference(1234L)
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(respondent2DQ)
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(NO)
                 .build();
+            caseData.setCcdCaseReference(1234L);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -737,14 +767,16 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_whenUnavailableDateIsMoreThanOneYearInFuture() {
             //Given
-            Hearing hearing = Hearing.builder()
-                .unavailableDatesRequired(YES)
-                .unavailableDates(wrapElements(UnavailableDate.builder()
-                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                   .date(now().plusYears(5)).build()))
-                .build();
+            Hearing hearing = new Hearing();
+            hearing.setUnavailableDatesRequired(YES);
+            UnavailableDate unavailableDate = new UnavailableDate();
+            unavailableDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
+            unavailableDate.setDate(now().plusYears(5));
+            hearing.setUnavailableDates(wrapElements(unavailableDate));
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQHearing(hearing);
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
+                .respondent1DQ(respondent1DQ)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -758,14 +790,16 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_whenUnavailableDateIsInPast() {
             //Given
-            Hearing hearing = Hearing.builder()
-                .unavailableDatesRequired(YES)
-                .unavailableDates(wrapElements(UnavailableDate.builder()
-                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                   .date(now().minusYears(5)).build()))
-                .build();
+            Hearing hearing = new Hearing();
+            hearing.setUnavailableDatesRequired(YES);
+            UnavailableDate unavailableDate = new UnavailableDate();
+            unavailableDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
+            unavailableDate.setDate(now().minusYears(5));
+            hearing.setUnavailableDates(wrapElements(unavailableDate));
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQHearing(hearing);
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
+                .respondent1DQ(respondent1DQ)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
@@ -778,14 +812,16 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoError_whenUnavailableDateIsValid() {
             //Given
-            Hearing hearing = Hearing.builder()
-                .unavailableDatesRequired(YES)
-                .unavailableDates(wrapElements(UnavailableDate.builder()
-                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                   .date(now().plusDays(5)).build()))
-                .build();
+            Hearing hearing = new Hearing();
+            hearing.setUnavailableDatesRequired(YES);
+            UnavailableDate unavailableDate = new UnavailableDate();
+            unavailableDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
+            unavailableDate.setDate(now().plusDays(5));
+            hearing.setUnavailableDates(wrapElements(unavailableDate));
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQHearing(hearing);
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
+                .respondent1DQ(respondent1DQ)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
@@ -797,8 +833,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoError_whenNoUnavailableDate() {
             //Given
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQHearing(new Hearing());
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(Hearing.builder().build()).build())
+                .respondent1DQ(respondent1DQ)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
@@ -810,9 +848,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_whenUnavailableDatesNotRequired() {
-            Hearing hearing = Hearing.builder().unavailableDatesRequired(NO).build();
+            Hearing hearing = new Hearing();
+            hearing.setUnavailableDatesRequired(NO);
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQHearing(hearing);
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
+                .respondent1DQ(respondent1DQ)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -840,14 +881,15 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Given
             when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORONE)))
                 .thenReturn(true);
+            Experts experts = new Experts();
+            experts.setExpertRequired(NO);
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQExperts(experts);
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .respondent1DQ(Respondent1DQ
-                                   .builder().respondent1DQExperts(Experts.builder()
-                                                                       .expertRequired(NO)
-                                                                       .build()).build())
-                .build().toBuilder().ccdCaseReference(1234L)
+                .respondent1DQ(respondent1DQ)
                 .build();
+            caseData.setCcdCaseReference(1234L);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -860,13 +902,15 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Given
             when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
                 .thenReturn(false, true);
+            Experts experts = new Experts();
+            experts.setExpertRequired(NO);
+            Respondent2DQ respondent2DQ = new Respondent2DQ();
+            respondent2DQ.setRespondent2DQExperts(experts);
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .respondent2DQ(Respondent2DQ
-                                   .builder().respondent2DQExperts(Experts.builder().expertRequired(NO).build())
-                                   .build())
-                .build().toBuilder().ccdCaseReference(1234L)
+                .respondent2DQ(respondent2DQ)
                 .build();
+            caseData.setCcdCaseReference(1234L);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -879,11 +923,14 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             given(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
                 .willReturn(false, false);
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            Experts experts = new Experts();
+            experts.setExpertRequired(NO);
+            Respondent2DQ respondent2DQ = new Respondent2DQ();
+            respondent2DQ.setRespondent2DQExperts(experts);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
                 .multiPartyClaimOneDefendantSolicitor()
-                .respondent2DQ(Respondent2DQ
-                                   .builder().respondent2DQExperts(Experts.builder().expertRequired(NO).build())
-                                   .build())
+                .respondent2DQ(respondent2DQ)
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(NO)
                 .build();
@@ -901,11 +948,15 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             given(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
                 .willReturn(false, false);
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            Experts experts = new Experts();
+            experts.setExpertRequired(NO);
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQExperts(experts);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
                 .multiPartyClaimOneDefendantSolicitor()
-                .respondent1DQ(Respondent1DQ
-                                   .builder().respondent1DQExperts(Experts.builder().expertRequired(NO).build())
-                                   .build())
+                .multiPartyClaimTwoDefendantSolicitors()
+                .respondent1DQ(respondent1DQ)
                 .respondent2SameLegalRepresentative(NO)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -922,11 +973,15 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             given(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
                 .willReturn(false, false);
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            Experts experts = new Experts();
+            experts.setExpertRequired(NO);
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQExperts(experts);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
                 .multiPartyClaimOneDefendantSolicitor()
-                .respondent1DQ(Respondent1DQ
-                                   .builder().respondent1DQExperts(Experts.builder().expertRequired(NO).build())
-                                   .build())
+                .multiPartyClaimTwoDefendantSolicitors()
+                .respondent1DQ(respondent1DQ)
                 .respondent2SameLegalRepresentative(YES)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -943,11 +998,15 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             given(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
                 .willReturn(false, false);
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            Experts experts = new Experts();
+            experts.setExpertRequired(NO);
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQExperts(experts);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
                 .multiPartyClaimOneDefendantSolicitor()
-                .respondent1DQ(Respondent1DQ
-                                   .builder().respondent1DQExperts(Experts.builder().expertRequired(NO).build())
-                                   .build())
+                .multiPartyClaimTwoDefendantSolicitors()
+                .respondent1DQ(respondent1DQ)
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(YES)
                 .build();
@@ -965,11 +1024,15 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             given(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
                 .willReturn(false, false);
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            Experts experts = new Experts();
+            experts.setExpertRequired(NO);
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQExperts(experts);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
                 .multiPartyClaimOneDefendantSolicitor()
-                .respondent1DQ(Respondent1DQ
-                                   .builder().respondent1DQExperts(Experts.builder().expertRequired(NO).build())
-                                   .build())
+                .multiPartyClaimTwoDefendantSolicitors()
+                .respondent1DQ(respondent1DQ)
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(NO)
                 .build();
@@ -987,13 +1050,16 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             given(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
                 .willReturn(false, false);
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            Experts experts = new Experts();
+            experts.setExpertRequired(NO);
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQExperts(experts);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
                 .multiPartyClaimOneDefendantSolicitor()
-                .respondent2DQ(Respondent2DQ
-                                   .builder().build())
-                .respondent1DQ(Respondent1DQ
-                                   .builder().respondent1DQExperts(Experts.builder().expertRequired(NO).build())
-                                   .build())
+                .respondent2DQ(new Respondent2DQ())
+                .multiPartyClaimTwoDefendantSolicitors()
+                .respondent1DQ(respondent1DQ)
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(NO)
                 .build();
@@ -1009,12 +1075,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_whenExpertRequiredAndNullDetails() {
             //Given
+            Experts experts = new Experts();
+            experts.setExpertRequired(YES);
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQExperts(experts);
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent1DQ(Respondent1DQ.builder()
-                                   .respondent1DQExperts(Experts.builder()
-                                                             .expertRequired(YES)
-                                                             .build())
-                                   .build())
+                .respondent1DQ(respondent1DQ)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -1027,14 +1093,15 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoError_whenExpertRequiredAndDetailsProvided() {
             //Given
+            Expert expert = new Expert();
+            expert.setName("test expert");
+            Experts experts = new Experts();
+            experts.setExpertRequired(YES);
+            experts.setDetails(wrapElements(expert));
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQExperts(experts);
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent1DQ(Respondent1DQ.builder()
-                                   .respondent1DQExperts(Experts.builder()
-                                                             .expertRequired(YES)
-                                                             .details(wrapElements(Expert.builder()
-                                                                                       .name("test expert").build()))
-                                                             .build())
-                                   .build())
+                .respondent1DQ(respondent1DQ)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
@@ -1046,12 +1113,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoError_whenExpertNotRequired() {
             //Given
+            Experts experts = new Experts();
+            experts.setExpertRequired(NO);
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQExperts(experts);
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent1DQ(Respondent1DQ.builder()
-                                   .respondent1DQExperts(Experts.builder()
-                                                             .expertRequired(NO)
-                                                             .build())
-                                   .build())
+                .respondent1DQ(respondent1DQ)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
@@ -1078,10 +1145,14 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Given
             when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORONE)))
                 .thenReturn(true);
-            Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).build();
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            Witnesses witnesses = new Witnesses();
+            witnesses.setWitnessesToAppear(YES);
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQWitnesses(witnesses);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQWitnesses(witnesses).build())
+                .respondent1DQ(respondent1DQ)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
@@ -1095,10 +1166,14 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Given
             when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
                 .thenReturn(false).thenReturn(true);
-            Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).build();
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            Witnesses witnesses = new Witnesses();
+            witnesses.setWitnessesToAppear(YES);
+            Respondent2DQ respondent2DQ = new Respondent2DQ();
+            respondent2DQ.setRespondent2DQWitnesses(witnesses);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .respondent2DQ(Respondent2DQ.builder().respondent2DQWitnesses(witnesses).build())
+                .respondent2DQ(respondent2DQ)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
@@ -1162,9 +1237,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldValidateWitness_whenMultipartyAndSameLRepRespondent2DQWitNullAndRespondent1DQIsNull() {
             //Given
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            Respondent2DQ respondent2DQ = new Respondent2DQ();
+            respondent2DQ.setRespondent2DQWitnesses(null);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
                 .multiPartyClaimOneDefendantSolicitor()
-                .respondent2DQ(Respondent2DQ.builder().respondent2DQWitnesses(null).build())
+                .respondent2DQ(respondent2DQ)
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(NO)
                 .build();
@@ -1183,10 +1261,14 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Given
             when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
                 .thenReturn(false);
-            Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).build();
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            Witnesses witnesses = new Witnesses();
+            witnesses.setWitnessesToAppear(YES);
+            Respondent2DQ respondent2DQ = new Respondent2DQ();
+            respondent2DQ.setRespondent2DQWitnesses(witnesses);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
                 .multiPartyClaimOneDefendantSolicitor()
-                .respondent2DQ(Respondent2DQ.builder().respondent2DQWitnesses(witnesses).build())
+                .respondent2DQ(respondent2DQ)
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(NO)
                 .build();
@@ -1206,13 +1288,19 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 false,
                 false
             );
-            Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).build();
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            Witnesses witnesses = new Witnesses();
+            witnesses.setWitnessesToAppear(YES);
+            Respondent2DQ respondent2DQ = new Respondent2DQ();
+            respondent2DQ.setRespondent2DQWitnesses(witnesses);
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQWitnesses(witnesses);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
                 .multiPartyClaimOneDefendantSolicitor()
-                .respondent2DQ(Respondent2DQ.builder().respondent2DQWitnesses(witnesses).build())
+                .respondent2DQ(respondent2DQ)
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(YES)
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQWitnesses(witnesses).build())
+                .respondent1DQ(respondent1DQ)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -1226,9 +1314,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_whenWitnessRequiredAndNullDetails() {
             //Given
-            Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).build();
+            Witnesses witnesses = new Witnesses();
+            witnesses.setWitnessesToAppear(YES);
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQWitnesses(witnesses);
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQWitnesses(witnesses).build())
+                .respondent1DQ(respondent1DQ)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
@@ -1240,10 +1331,14 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoError_whenWitnessRequiredAndDetailsProvided() {
             //Given
-            List<Element<Witness>> testWitness = wrapElements(Witness.builder().build());
-            Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).details(testWitness).build();
+            List<Element<Witness>> testWitness = wrapElements(new Witness());
+            Witnesses witnesses = new Witnesses();
+            witnesses.setWitnessesToAppear(YES);
+            witnesses.setDetails(testWitness);
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQWitnesses(witnesses);
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQWitnesses(witnesses).build())
+                .respondent1DQ(respondent1DQ)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
@@ -1255,9 +1350,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoError_whenWitnessNotRequired() {
             //Given
-            Witnesses witnesses = Witnesses.builder().witnessesToAppear(NO).build();
+            Witnesses witnesses = new Witnesses();
+            witnesses.setWitnessesToAppear(NO);
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQWitnesses(witnesses);
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQWitnesses(witnesses).build())
+                .respondent1DQ(respondent1DQ)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
@@ -1275,8 +1373,11 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             String name = "John Smith";
             String role = "Solicitor";
             //Given
+            StatementOfTruth statementOfTruth = new StatementOfTruth();
+            statementOfTruth.setName(name);
+            statementOfTruth.setRole(role);
             CaseData caseData = CaseDataBuilder.builder()
-                .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
+                .uiStatementOfTruth(statementOfTruth)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, "statement-of-truth");
@@ -1654,6 +1755,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
 
+            RequestedCourt requestedCourt1 = new RequestedCourt();
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt1);
+            RequestedCourt requestedCourt2 = new RequestedCourt();
+            Respondent2DQ respondent2DQ = new Respondent2DQ();
+            respondent2DQ.setRespondent2DQRequestedCourt(requestedCourt2);
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimOneDefendantSolicitor()
                 .atStateClaimSubmitted()
@@ -1662,14 +1769,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                  .build())
                 .respondent1ClaimResponseType(FULL_DEFENCE)
                 .respondent2ClaimResponseType(FULL_DEFENCE)
-                .respondent1DQ(
-                    Respondent1DQ.builder().respondent1DQRequestedCourt(
-                        RequestedCourt.builder()
-                            .build()).build())
-                .respondent2DQ(
-                    Respondent2DQ.builder().respondent2DQRequestedCourt(
-                        RequestedCourt.builder()
-                            .build()).build())
+                .respondent1DQ(respondent1DQ)
+                .respondent2DQ(respondent2DQ)
                 .respondentResponseIsSame(NO)
                 .respondent1Copy(PartyBuilder.builder().individual().build())
                 .respondent2Copy(PartyBuilder.builder().individual().build())
@@ -1888,7 +1989,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .respondent1Copy(PartyBuilder.builder().individual().build())
                 .respondent2Copy(PartyBuilder.builder().individual().build())
-                .build().toBuilder()
                 .build();
             var beforeCaseData = Map.of(
                 "solicitorReferences",
@@ -1927,12 +2027,13 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORTWO)))
                 .thenReturn(false);
 
+            StatementOfTruth statementOfTruth = new StatementOfTruth();
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQStatementOfTruth(statementOfTruth);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .respondent1DQ(Respondent1DQ.builder()
-                                   .respondent1DQStatementOfTruth(StatementOfTruth.builder().build())
-                                   .build())
+                .respondent1DQ(respondent1DQ)
                 .build();
 
             caseData.setRespondent1ClaimResponseType(FULL_DEFENCE);
@@ -1998,10 +2099,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             String address = "test address";
             var expectedAddress = AddressBuilder.defaults().addressLine1(address).build();
-            caseData = caseData.toBuilder()
-                .respondent1Copy(caseData.getRespondent1().toBuilder().primaryAddress(expectedAddress).build())
-                .respondent2Copy(caseData.getRespondent2().toBuilder().primaryAddress(expectedAddress).build())
-                .build();
+            caseData.getRespondent1().setPrimaryAddress(expectedAddress);
+            caseData.setRespondent1Copy(caseData.getRespondent1());
+            caseData.getRespondent2().setPrimaryAddress(expectedAddress);
+            caseData.setRespondent2Copy(caseData.getRespondent2());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2079,12 +2180,14 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_when1DefendantRepAnswerTo2ApplicantInV1DiffResponse() {
             //Given
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
-            Hearing hearing = Hearing.builder()
-                .unavailableDatesRequired(YES)
-                .unavailableDates(wrapElements(UnavailableDate.builder()
-                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                   .date(now().plusDays(5)).build()))
-                .build();
+            Hearing hearing = new Hearing();
+            hearing.setUnavailableDatesRequired(YES);
+            UnavailableDate unavailableDate = new UnavailableDate();
+            unavailableDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
+            unavailableDate.setDate(now().plusDays(5));
+            hearing.setUnavailableDates(wrapElements(unavailableDate));
+            Respondent2DQ respondent2DQ = new Respondent2DQ();
+            respondent2DQ.setRespondent2DQHearing(hearing);
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimTwoApplicants()
                 .respondent2SameLegalRepresentative(YES)
@@ -2096,8 +2199,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2ClaimResponseType(FULL_DEFENCE)
                 .respondent1Copy(PartyBuilder.builder().individual().build())
                 .respondent2Copy(PartyBuilder.builder().individual().build())
-                .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
-                .build();
+                .respondent2DQ(respondent2DQ).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2120,12 +2222,14 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Given
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
 
-            Hearing hearing = Hearing.builder()
-                .unavailableDatesRequired(YES)
-                .unavailableDates(wrapElements(UnavailableDate.builder()
-                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                   .date(now().plusDays(5)).build()))
-                .build();
+            Hearing hearing = new Hearing();
+            hearing.setUnavailableDatesRequired(YES);
+            UnavailableDate unavailableDate = new UnavailableDate();
+            unavailableDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
+            unavailableDate.setDate(now().plusDays(5));
+            hearing.setUnavailableDates(wrapElements(unavailableDate));
+            Respondent2DQ respondent2DQ = new Respondent2DQ();
+            respondent2DQ.setRespondent2DQHearing(hearing);
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimTwoApplicants()
                 .respondent2SameLegalRepresentative(YES)
@@ -2138,8 +2242,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2ClaimResponseType(FULL_DEFENCE)
                 .respondent1Copy(PartyBuilder.builder().individual().build())
                 .respondent2Copy(PartyBuilder.builder().individual().build())
-                .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
+                .respondent2DQ(respondent2DQ)
                 .build();
+
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2215,10 +2320,13 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 String name = "John Smith";
                 String role = "Solicitor";
                 //Given
+                StatementOfTruth statementOfTruth = new StatementOfTruth();
+                statementOfTruth.setName(name);
+                statementOfTruth.setRole(role);
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                     .respondent1Copy(PartyBuilder.builder().individual().build())
-                    .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
+                    .uiStatementOfTruth(statementOfTruth)
                     .build();
                 CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                 //When
@@ -2240,13 +2348,14 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 String name = "John Smith";
                 String role = "Solicitor";
                 //Given
+                StatementOfTruth statementOfTruth = new StatementOfTruth();
+                statementOfTruth.setName(name);
+                statementOfTruth.setRole(role);
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimTwoApplicants()
                     .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
-                    .build()
-                    .toBuilder()
                     .respondent1Copy(PartyBuilder.builder().individual().build())
-                    .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
+                    .uiStatementOfTruth(statementOfTruth)
                     .build();
                 CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                 //When
@@ -2272,25 +2381,29 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 @Test
                 void shouldHandleCourtLocationData_1v1() {
                     //Given
-                    LocationRefData locationA = LocationRefData.builder()
-                        .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
-                        .courtAddress("Lane 1").postcode("123").build();
+                    LocationRefData locationA = new LocationRefData();
+                    locationA.setRegionId("regionId1");
+                    locationA.setEpimmsId("epimmsId1");
+                    locationA.setCourtLocationCode("312");
+                    locationA.setSiteName("Site 1");
+                    locationA.setCourtAddress("Lane 1");
+                    locationA.setPostcode("123");
                     when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
                         .thenReturn(locationA);
+                    RequestedCourt requestedCourt = new RequestedCourt();
+                    requestedCourt.setResponseCourtLocations(DynamicList.fromList(
+                        Collections.singletonList(locationA),
+                        LocationReferenceDataService::getDisplayEntry,
+                        locationA,
+                        false
+                    ));
+                    Respondent1DQ respondent1DQ = new Respondent1DQ();
+                    respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt);
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                         .respondent1Copy(PartyBuilder.builder().individual().build())
-                        .respondent1DQ(
-                            Respondent1DQ.builder().respondent1DQRequestedCourt(
-                                RequestedCourt.builder()
-                                    .responseCourtLocations(DynamicList.fromList(
-                                        Collections.singletonList(locationA),
-                                        LocationReferenceDataService::getDisplayEntry,
-                                        locationA,
-                                        false
-                                    ))
-                                    .build()).build())
+                        .respondent1DQ(respondent1DQ)
                         .build();
 
                     CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -2327,29 +2440,33 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         eq(RESPONDENTSOLICITORTWO)
                     )).thenReturn(true);
 
-                    LocationRefData locationA = LocationRefData.builder()
-                        .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
-                        .courtAddress("Lane 1").postcode("123").build();
+                    LocationRefData locationA = new LocationRefData();
+                    locationA.setRegionId("regionId1");
+                    locationA.setEpimmsId("epimmsId1");
+                    locationA.setCourtLocationCode("312");
+                    locationA.setSiteName("Site 1");
+                    locationA.setCourtAddress("Lane 1");
+                    locationA.setPostcode("123");
                     when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
                         .thenReturn(locationA);
 
+                    RequestedCourt requestedCourt = new RequestedCourt();
+                    requestedCourt.setResponseCourtLocations(DynamicList.fromList(
+                        Collections.singletonList(locationA),
+                        LocationReferenceDataService::getDisplayEntry,
+                        locationA,
+                        false
+                    ));
+                    Respondent1DQ respondent1DQ = new Respondent1DQ();
+                    respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt);
                     CaseData caseData = CaseDataBuilder.builder()
-                        .multiPartyClaimOneDefendantSolicitor()
-                        .atStateRespondentFullDefence()
-                        .respondentResponseIsSame(YES)
-                        .respondent1Copy(PartyBuilder.builder().individual().build())
-                        .respondent2Copy(PartyBuilder.builder().individual().build())
-                        .respondent1DQ(
-                            Respondent1DQ.builder().respondent1DQRequestedCourt(
-                                RequestedCourt.builder()
-                                    .responseCourtLocations(DynamicList.fromList(
-                                        Collections.singletonList(locationA),
-                                        LocationReferenceDataService::getDisplayEntry,
-                                        locationA,
-                                        false
-                                    ))
-                                    .build()).build())
-                        .build();
+                                .multiPartyClaimOneDefendantSolicitor()
+                                .atStateRespondentFullDefence()
+                                .respondentResponseIsSame(YES)
+                                .respondent1Copy(PartyBuilder.builder().individual().build())
+                                .respondent2Copy(PartyBuilder.builder().individual().build())
+                                .respondent1DQ(respondent1DQ)
+                                .build();
 
                     CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                     //When
@@ -2382,39 +2499,43 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         eq(RESPONDENTSOLICITORTWO)
                     )).thenReturn(true);
 
-                    LocationRefData locationA = LocationRefData.builder()
-                        .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
-                        .courtAddress("Lane 1").postcode("123").build();
+                    LocationRefData locationA = new LocationRefData();
+                    locationA.setRegionId("regionId1");
+                    locationA.setEpimmsId("epimmsId1");
+                    locationA.setCourtLocationCode("312");
+                    locationA.setSiteName("Site 1");
+                    locationA.setCourtAddress("Lane 1");
+                    locationA.setPostcode("123");
                     when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
                         .thenReturn(locationA);
+                    RequestedCourt requestedCourt1 = new RequestedCourt();
+                    requestedCourt1.setResponseCourtLocations(
+                        DynamicList.fromList(
+                            Collections.singletonList(locationA),
+                            LocationReferenceDataService::getDisplayEntry,
+                            locationA,
+                            false
+                        ));
+                    Respondent1DQ respondent1DQ = new Respondent1DQ();
+                    respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt1);
+                    RequestedCourt requestedCourt2 = new RequestedCourt();
+                    requestedCourt2.setResponseCourtLocations(DynamicList.fromList(
+                        Collections.singletonList(locationA),
+                        LocationReferenceDataService::getDisplayEntry,
+                        locationA,
+                        false
+                    ));
+                    Respondent2DQ respondent2DQ = new Respondent2DQ();
+                    respondent2DQ.setRespondent2DQRequestedCourt(requestedCourt2);
                     CaseData caseData = CaseDataBuilder.builder()
-                        .multiPartyClaimOneDefendantSolicitor()
-                        .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
-                        .respondentResponseIsSame(NO)
-                        .respondent1Copy(PartyBuilder.builder().individual().build())
-                        .respondent2Copy(PartyBuilder.builder().individual().build())
-                        .respondent1DQ(
-                            Respondent1DQ.builder().respondent1DQRequestedCourt(
-                                RequestedCourt.builder()
-                                    .responseCourtLocations(
-                                        DynamicList.fromList(
-                                            Collections.singletonList(locationA),
-                                            LocationReferenceDataService::getDisplayEntry,
-                                            locationA,
-                                            false
-                                        ))
-                                    .build()).build())
-                        .respondent2DQ(
-                            Respondent2DQ.builder().respondent2DQRequestedCourt(
-                                RequestedCourt.builder()
-                                    .responseCourtLocations(DynamicList.fromList(
-                                        Collections.singletonList(locationA),
-                                        LocationReferenceDataService::getDisplayEntry,
-                                        locationA,
-                                        false
-                                    ))
-                                    .build()).build())
-                        .build();
+                                .multiPartyClaimOneDefendantSolicitor()
+                                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                                .respondentResponseIsSame(NO)
+                                .respondent1Copy(PartyBuilder.builder().individual().build())
+                                .respondent2Copy(PartyBuilder.builder().individual().build())
+                                .respondent1DQ(respondent1DQ)
+                                .respondent2DQ(respondent2DQ)
+                                .build();
 
                     CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                     //When
@@ -2458,28 +2579,31 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO)))
                         .thenReturn(true);
 
-                    LocationRefData locationA = LocationRefData.builder()
-                        .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
-                        .courtAddress("Lane 1").postcode("123").build();
+                    LocationRefData locationA = new LocationRefData();
+                    locationA.setRegionId("regionId1");
+                    locationA.setEpimmsId("epimmsId1");
+                    locationA.setCourtLocationCode("312");
+                    locationA.setSiteName("Site 1");
+                    locationA.setCourtAddress("Lane 1");
+                    locationA.setPostcode("123");
                     when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
                         .thenReturn(locationA);
 
+                    RequestedCourt requestedCourt = new RequestedCourt();
+                    requestedCourt.setResponseCourtLocations(
+                        DynamicList.fromList(
+                            Collections.singletonList(locationA),
+                            LocationReferenceDataService::getDisplayEntry,
+                            locationA,
+                            false
+                        ));
+                    Respondent2DQ respondent2DQ = new Respondent2DQ();
+                    respondent2DQ.setRespondent2DQRequestedCourt(requestedCourt);
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                         .respondent2Responds(FULL_DEFENCE)
-                        .respondent2DQ(
-                            Respondent2DQ.builder().respondent2DQRequestedCourt(
-                                RequestedCourt.builder()
-                                    .responseCourtLocations(
-                                        DynamicList.fromList(
-                                            Collections.singletonList(locationA),
-                                            LocationReferenceDataService::getDisplayEntry,
-                                            locationA,
-                                            false
-                                        )
-                                    )
-                                    .build()).build())
+                        .respondent2DQ(respondent2DQ)
                         .respondent1Copy(PartyBuilder.builder().individual().build())
                         .respondent2Copy(PartyBuilder.builder().individual().build())
                         .build();
@@ -2508,15 +2632,16 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     //Given
                     when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO)))
                         .thenReturn(true);
+
+                    RequestedCourt requestedCourt = new RequestedCourt();
+                    requestedCourt.setResponseCourtLocations(new DynamicList());
+                    Respondent2DQ respondent2DQ = new Respondent2DQ();
+                    respondent2DQ.setRespondent2DQRequestedCourt(requestedCourt);
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                         .respondent2Responds(FULL_DEFENCE)
-                        .respondent2DQ(
-                            Respondent2DQ.builder().respondent2DQRequestedCourt(
-                                RequestedCourt.builder()
-                                    .responseCourtLocations(DynamicList.builder().build())
-                                    .build()).build())
+                        .respondent2DQ(respondent2DQ)
                         .respondent1Copy(PartyBuilder.builder().individual().build())
                         .respondent2Copy(PartyBuilder.builder().individual().build())
                         .build();
@@ -2537,14 +2662,14 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     //Given
                     when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO)))
                         .thenReturn(true);
+                    RequestedCourt requestedCourt = new RequestedCourt();
+                    Respondent2DQ respondent2DQ = new Respondent2DQ();
+                    respondent2DQ.setRespondent2DQRequestedCourt(requestedCourt);
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                         .respondent2Responds(FULL_DEFENCE)
-                        .respondent2DQ(
-                            Respondent2DQ.builder().respondent2DQRequestedCourt(
-                                RequestedCourt.builder()
-                                    .build()).build())
+                        .respondent2DQ(respondent2DQ)
                         .respondent1Copy(PartyBuilder.builder().individual().build())
                         .respondent2Copy(PartyBuilder.builder().individual().build())
                         .build();
@@ -2568,27 +2693,31 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         eq(RESPONDENTSOLICITORONE)
                     )).thenReturn(true);
 
-                    LocationRefData locationA = LocationRefData.builder()
-                        .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
-                        .courtAddress("Lane 1").postcode("123").build();
+                    LocationRefData locationA = new LocationRefData();
+                    locationA.setRegionId("regionId1");
+                    locationA.setEpimmsId("epimmsId1");
+                    locationA.setCourtLocationCode("312");
+                    locationA.setSiteName("Site 1");
+                    locationA.setCourtAddress("Lane 1");
+                    locationA.setPostcode("123");
                     when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
                         .thenReturn(locationA);
+                    RequestedCourt requestedCourt = new RequestedCourt();
+                    requestedCourt.setResponseCourtLocations(DynamicList.fromList(
+                        Collections.singletonList(locationA),
+                        LocationReferenceDataService::getDisplayEntry,
+                        locationA,
+                        false
+                    ));
+                    requestedCourt.setResponseCourtCode("312");
+                    Respondent1DQ respondent1DQ = new Respondent1DQ();
+                    respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt);
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting2ndRespondentResponse()
                         .respondent1Copy(PartyBuilder.builder().individual().build())
                         .respondent2Copy(PartyBuilder.builder().individual().build())
-                        .respondent1DQ(
-                            Respondent1DQ.builder().respondent1DQRequestedCourt(
-                                RequestedCourt.builder()
-                                    .responseCourtLocations(DynamicList.fromList(
-                                        Collections.singletonList(locationA),
-                                        LocationReferenceDataService::getDisplayEntry,
-                                        locationA,
-                                        false
-                                    ))
-                                    .responseCourtCode("312")
-                                    .build()).build())
+                        .respondent1DQ(respondent1DQ)
                         .build();
 
                     CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -2618,17 +2747,17 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         eq(RESPONDENTSOLICITORONE)
                     )).thenReturn(true);
 
+                    RequestedCourt requestedCourt = new RequestedCourt();
+                    requestedCourt.setResponseCourtLocations(new DynamicList());
+                    requestedCourt.setResponseCourtCode("312");
+                    Respondent1DQ respondent1DQ = new Respondent1DQ();
+                    respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt);
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting2ndRespondentResponse()
                         .respondent1Copy(PartyBuilder.builder().individual().build())
                         .respondent2Copy(PartyBuilder.builder().individual().build())
-                        .respondent1DQ(
-                            Respondent1DQ.builder().respondent1DQRequestedCourt(
-                                RequestedCourt.builder()
-                                    .responseCourtLocations(DynamicList.builder().build())
-                                    .responseCourtCode("312")
-                                    .build()).build())
+                        .respondent1DQ(respondent1DQ)
                         .build();
 
                     CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -2646,13 +2775,13 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 @Test
                 void shouldHandleCourtLocationData_1v1() {
                     //Given
+                    RequestedCourt requestedCourt = new RequestedCourt();
+                    Respondent1DQ respondent1DQ = new Respondent1DQ();
+                    respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt);
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                         .respondent1Copy(PartyBuilder.builder().individual().build())
-                        .respondent1DQ(
-                            Respondent1DQ.builder().respondent1DQRequestedCourt(
-                                RequestedCourt.builder()
-                                    .build()).build())
+                        .respondent1DQ(respondent1DQ)
                         .build();
 
                     CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -2675,15 +2804,15 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 @Test
                 void shouldHandleCourtLocationData_when1stRespondentAnsweringBefore2nd() {
                     //Given
+                    RequestedCourt requestedCourt = new RequestedCourt();
+                    Respondent1DQ respondent1DQ = new Respondent1DQ();
+                    respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt);
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting2ndRespondentResponse()
+                        .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                         .respondent1Copy(PartyBuilder.builder().individual().build())
-                        .respondent2Copy(PartyBuilder.builder().individual().build())
-                        .respondent1DQ(
-                            Respondent1DQ.builder().respondent1DQRequestedCourt(
-                                RequestedCourt.builder()
-                                    .build()).build())
+                        .respondent1DQ(respondent1DQ)
                         .build();
 
                     CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -2897,13 +3026,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
-                .respondent1ClaimResponseType(COUNTER_CLAIM)
-                .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
-                .respondent2ClaimResponseType(FULL_DEFENCE)
-                .respondent2SameLegalRepresentative(YES)
-                .build().toBuilder().ccdCaseReference(1234L)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build();
+            caseData.setRespondent1ClaimResponseType(COUNTER_CLAIM);
+            caseData.setRespondent1ClaimResponseTypeToApplicant2(PART_ADMISSION);
+            caseData.setRespondent2ClaimResponseType(FULL_DEFENCE);
+            caseData.setRespondent2SameLegalRepresentative(YES);
+            caseData.setCcdCaseReference(1234L);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
@@ -2919,12 +3047,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants()
                 .respondent1ClaimResponseType(FULL_DEFENCE)
                 .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
                 .respondent2ClaimResponseType(COUNTER_CLAIM)
                 .respondent2SameLegalRepresentative(YES)
-                .build().toBuilder().ccdCaseReference(1234L)
+                .ccdCaseReference(1234L)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -2941,12 +3069,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants()
                 .respondent1ClaimResponseType(COUNTER_CLAIM)
                 .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
                 .respondent2ClaimResponseType(FULL_DEFENCE)
                 .respondent2SameLegalRepresentative(YES)
-                .build().toBuilder().ccdCaseReference(1234L)
+                .ccdCaseReference(1234L)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -2963,12 +3091,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants()
                 .respondent1ClaimResponseType(COUNTER_CLAIM)
                 .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
                 .respondent2ClaimResponseType(COUNTER_CLAIM)
                 .respondent2SameLegalRepresentative(YES)
-                .build().toBuilder().ccdCaseReference(1234L)
+                .ccdCaseReference(1234L)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -2985,12 +3113,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants()
                 .respondent1ClaimResponseType(FULL_DEFENCE)
                 .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
                 .respondent2ClaimResponseType(FULL_DEFENCE)
                 .respondent2SameLegalRepresentative(YES)
-                .build().toBuilder().ccdCaseReference(1234L)
+                .ccdCaseReference(1234L)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -3007,12 +3135,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants()
                 .respondent1ClaimResponseType(FULL_DEFENCE)
                 .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
                 .respondent2ClaimResponseType(FULL_DEFENCE)
                 .respondent2SameLegalRepresentative(NO)
-                .build().toBuilder().ccdCaseReference(1234L)
+                .ccdCaseReference(1234L)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -3029,12 +3157,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants()
                 .respondent1ClaimResponseType(FULL_DEFENCE)
                 .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
                 .respondent2ClaimResponseType(COUNTER_CLAIM)
                 .respondent2SameLegalRepresentative(NO)
-                .build().toBuilder().ccdCaseReference(1234L)
+                .ccdCaseReference(1234L)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -3051,13 +3179,13 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants()
                 .respondent1ClaimResponseType(FULL_DEFENCE)
                 .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
                 .respondent2ClaimResponseType(COUNTER_CLAIM)
                 .respondent2SameLegalRepresentative(NO)
                 .addApplicant2(NO)
-                .build().toBuilder().ccdCaseReference(1234L)
+                .ccdCaseReference(1234L)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -3074,13 +3202,13 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(any(), any(), any())).thenReturn(true);
 
-            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants()
                 .respondent1ClaimResponseType(FULL_DEFENCE)
                 .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
                 .respondent2ClaimResponseType(COUNTER_CLAIM)
                 .respondent2SameLegalRepresentative(NO)
                 .addApplicant2(YES)
-                .build().toBuilder().ccdCaseReference(1234L)
+                .ccdCaseReference(1234L)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -3093,7 +3221,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetMultiPartyResponseTypeFlags_2v1NonFullDefence() {
             //Given
-            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants()
                 .respondent1ClaimResponseType(COUNTER_CLAIM)
                 .respondent1ClaimResponseTypeToApplicant2(COUNTER_CLAIM)
                 .build();
@@ -3108,7 +3236,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_WhenBothFullDefenceAndSameRespondent() {
             //Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
                 .respondent2ClaimResponseType(FULL_DEFENCE)
                 .respondent2SameLegalRepresentative(YES)
                 .build();
@@ -3125,7 +3253,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotReturnError_WhenNotBothFullDefence() {
             //Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
                 .respondent2ClaimResponseType(PART_ADMISSION)
                 .build();
 

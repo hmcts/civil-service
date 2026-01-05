@@ -14,19 +14,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import lombok.extern.slf4j.Slf4j;
+
 import static uk.gov.hmcts.reform.civil.enums.hearing.HMCLocationType.COURT;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagsHearingsUtils.getAllActiveFlags;
 import static uk.gov.hmcts.reform.civil.utils.DynamicListUtils.getDynamicListValue;
 import static uk.gov.hmcts.reform.civil.utils.HearingMethodUtils.getHearingMethodCodes;
 
+@Slf4j
 public class HearingDetailsMapper {
 
     public static final String WELSH_REGION_ID = "7";
     public static final String STANDARD_PRIORITY = "Standard";
     public static final String SECURE_DOCK_KEY = "11";
-    private static String emptyString = "";
+    private static final String EMPTY_STRING = "";
 
-    private static String audioVideoEvidenceFlag = "PF0014";
+    private static final String AUDIO_VIDEO_EVIDENCE_FLAG = "PF0014";
 
     private HearingDetailsMapper() {
         //NO-OP
@@ -109,7 +112,7 @@ public class HearingDetailsMapper {
     public static String getListingComments(CaseData caseData) {
         String comments = getAllActiveFlags(caseData).stream()
             .flatMap(flags -> flags.getDetails().stream())
-            .filter(flag -> flag.getValue() != null && flag.getValue().getFlagCode().equals(audioVideoEvidenceFlag))
+            .filter(flag -> flag.getValue() != null && flag.getValue().getFlagCode().equals(AUDIO_VIDEO_EVIDENCE_FLAG))
             .map(flag -> String.format(flag.getValue().getFlagComment() == null ? "%s, " : "%s: %s, ", flag.getValue().getName(), flag.getValue().getFlagComment()))
             .reduce("", String::concat)
             .replaceAll("\n", " ")
@@ -124,7 +127,7 @@ public class HearingDetailsMapper {
     }
 
     public static String getHearingRequester() {
-        return emptyString;
+        return EMPTY_STRING;
     }
 
     public static boolean getPrivateHearingRequiredFlag() {
@@ -136,7 +139,7 @@ public class HearingDetailsMapper {
     }
 
     public static String getLeadJudgeContractType() {
-        return emptyString;
+        return EMPTY_STRING;
     }
 
     public static JudiciaryModel getJudiciary() {
@@ -149,6 +152,10 @@ public class HearingDetailsMapper {
 
     public static List<String> getHearingChannels(String authToken, String hmctsServiceId, CaseData caseData, CategoryService categoryService) {
         Map<String, String> hearingMethodCode = getHearingMethodCodes(categoryService, hmctsServiceId, authToken);
+        if (hearingMethodCode == null) {
+            log.info("Hearing method codes are not available for hmctsServiceId {} caseId {}", hmctsServiceId, caseData.getCcdCaseReference());
+            return null;
+        }
         if (caseData.getSdoR2SmallClaimsHearing() != null && caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing() != null) {
             return List.of(hearingMethodCode.get(getDynamicListValue(caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing())));
         } else if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getMethodOfHearing() != null) {

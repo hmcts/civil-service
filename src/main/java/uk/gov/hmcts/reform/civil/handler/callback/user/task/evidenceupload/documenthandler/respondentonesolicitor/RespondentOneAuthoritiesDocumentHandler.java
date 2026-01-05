@@ -39,8 +39,8 @@ public class RespondentOneAuthoritiesDocumentHandler extends
     }
 
     @Override
-    protected void addDocumentsToCopyToCaseData(CaseData.CaseDataBuilder<?, ?> builder, List<Element<UploadEvidenceDocumentType>> evidenceDocsToAdd) {
-        builder.documentAuthoritiesRes2(evidenceDocsToAdd);
+    protected void addDocumentsToCopyToCaseData(CaseData caseData, List<Element<UploadEvidenceDocumentType>> evidenceDocsToAdd) {
+        caseData.setDocumentAuthoritiesRes2(evidenceDocsToAdd);
     }
 
     @Override
