@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.handleadmitpartofclaim.EmploymentTypeCaseUpdater;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.CaseData.CaseDataBuilder;
 
 import java.util.Collections;
 
@@ -22,35 +21,27 @@ class EmploymentTypeCaseUpdaterTest {
 
     @Test
     void shouldUpdateEmploymentTypeWhenRequired() {
-        CaseData caseData = CaseData.builder()
-                .defenceAdmitPartEmploymentTypeRequired(YesOrNo.YES)
-                .respondToClaimAdmitPartEmploymentTypeLRspec(Collections.singletonList(EmploymentTypeCheckboxFixedListLRspec.EMPLOYED))
-                .defenceAdmitPartEmploymentType2Required(YesOrNo.YES)
-                .respondToClaimAdmitPartEmploymentTypeLRspec2(Collections.singletonList(EmploymentTypeCheckboxFixedListLRspec.EMPLOYED))
-                .build();
+        CaseData caseData = uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.builder().build();
+        caseData.setDefenceAdmitPartEmploymentTypeRequired(YesOrNo.YES);
+        caseData.setRespondToClaimAdmitPartEmploymentTypeLRspec(Collections.singletonList(EmploymentTypeCheckboxFixedListLRspec.EMPLOYED));
+        caseData.setDefenceAdmitPartEmploymentType2Required(YesOrNo.YES);
+        caseData.setRespondToClaimAdmitPartEmploymentTypeLRspec2(Collections.singletonList(EmploymentTypeCheckboxFixedListLRspec.EMPLOYED));
 
-        CaseDataBuilder<?, ?> updatedCaseDataBuilder = CaseData.builder();
+        employmentTypeCaseUpdater.update(caseData);
 
-        employmentTypeCaseUpdater.update(caseData, updatedCaseDataBuilder);
-        CaseData updatedCaseData = updatedCaseDataBuilder.build();
-
-        assertThat(updatedCaseData.getRespondToClaimAdmitPartEmploymentTypeLRspecGeneric()).isNotNull();
-        assertThat(updatedCaseData.getRespondToClaimAdmitPartEmploymentTypeLRspecGeneric()).containsExactly(EmploymentTypeCheckboxFixedListLRspec.EMPLOYED);
+        assertThat(caseData.getRespondToClaimAdmitPartEmploymentTypeLRspecGeneric()).isNotNull();
+        assertThat(caseData.getRespondToClaimAdmitPartEmploymentTypeLRspecGeneric()).containsExactly(EmploymentTypeCheckboxFixedListLRspec.EMPLOYED);
     }
 
     @Test
     void shouldNotUpdateEmploymentTypeWhenNotRequired() {
-        CaseData caseData = CaseData.builder()
-                .defenceAdmitPartEmploymentTypeRequired(YesOrNo.NO)
-                .defenceAdmitPartEmploymentType2Required(YesOrNo.NO)
-                .build();
+        CaseData caseData = uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.builder().build();
+        caseData.setDefenceAdmitPartEmploymentTypeRequired(YesOrNo.NO);
+        caseData.setDefenceAdmitPartEmploymentType2Required(YesOrNo.NO);
 
-        CaseDataBuilder<?, ?> updatedCaseDataBuilder = CaseData.builder();
+        employmentTypeCaseUpdater.update(caseData);
 
-        employmentTypeCaseUpdater.update(caseData, updatedCaseDataBuilder);
-        CaseData updatedCaseData = updatedCaseDataBuilder.build();
-
-        assertThat(updatedCaseData.getRespondToClaimAdmitPartEmploymentTypeLRspec()).isNull();
-        assertThat(updatedCaseData.getRespondToClaimAdmitPartEmploymentTypeLRspec2()).isNull();
+        assertThat(caseData.getRespondToClaimAdmitPartEmploymentTypeLRspec()).isNull();
+        assertThat(caseData.getRespondToClaimAdmitPartEmploymentTypeLRspec2()).isNull();
     }
 }

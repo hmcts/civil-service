@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.lenient;
@@ -45,9 +46,9 @@ class ValidateRespondentExpertsTest {
 
     @BeforeEach
     void setUp() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder().build();
-        caseData = CaseData.builder()
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        Respondent2DQ respondent2DQ = new Respondent2DQ();
+        caseData = CaseDataBuilder.builder()
                 .respondent1DQ(respondent1DQ)
                 .respondent2DQ(respondent2DQ)
                 .build();
@@ -117,9 +118,9 @@ class ValidateRespondentExpertsTest {
 
     @Test
     void shouldReturnTrueWhenRespondentResponseIsNotSame() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder().build();
-        caseData = CaseData.builder()
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        Respondent2DQ respondent2DQ = new Respondent2DQ();
+        caseData = CaseDataBuilder.builder()
                 .respondentResponseIsSame(NO)
                 .respondent1DQ(respondent1DQ)
                 .respondent2DQ(respondent2DQ)
@@ -136,9 +137,9 @@ class ValidateRespondentExpertsTest {
 
     @Test
     void shouldReturnFalseWhenRespondentResponseIsSame() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder().build();
-        caseData = CaseData.builder()
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        Respondent2DQ respondent2DQ = new Respondent2DQ();
+        caseData = CaseDataBuilder.builder()
                 .respondentResponseIsSame(YES)
                 .respondent1DQ(respondent1DQ)
                 .respondent2DQ(respondent2DQ)
@@ -155,9 +156,9 @@ class ValidateRespondentExpertsTest {
 
     @Test
     void shouldReturnFalseWhenRespondentResponseIsNull() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder().build();
-        caseData = CaseData.builder()
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        Respondent2DQ respondent2DQ = new Respondent2DQ();
+        caseData = CaseDataBuilder.builder()
                 .respondentResponseIsSame(null)
                 .respondent1DQ(respondent1DQ)
                 .respondent2DQ(respondent2DQ)
@@ -174,14 +175,12 @@ class ValidateRespondentExpertsTest {
 
     @Test
     void shouldHandleRespondent2HasDifferentLegalRepScenario() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
-        Witnesses respondent2DQWitnesses = Witnesses.builder()
-                .witnessesToAppear(YES)
-                .build();
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder()
-                .respondent2DQWitnesses(respondent2DQWitnesses)
-                .build();
-        caseData = CaseData.builder()
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        Witnesses respondent2DQWitnesses = new Witnesses();
+        respondent2DQWitnesses.setWitnessesToAppear(YES);
+        Respondent2DQ respondent2DQ = new Respondent2DQ();
+        respondent2DQ.setRespondent2DQWitnesses(respondent2DQWitnesses);
+        caseData = CaseDataBuilder.builder()
                 .respondent1DQ(respondent1DQ)
                 .respondent2DQ(respondent2DQ)
                 .respondentResponseIsSame(NO)
@@ -201,9 +200,10 @@ class ValidateRespondentExpertsTest {
 
     @Test
     void shouldHandleRespondent2HasSameLegalRepScenario() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQExperts(null).build();
-        caseData = CaseData.builder()
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        Respondent2DQ respondent2DQ = new Respondent2DQ();
+        respondent2DQ.setRespondent2DQExperts(null);
+        caseData = CaseDataBuilder.builder()
                 .respondent1DQ(respondent1DQ)
                 .respondent2DQ(respondent2DQ)
                 .respondentResponseIsSame(YES)
@@ -223,9 +223,10 @@ class ValidateRespondentExpertsTest {
 
     @Test
     void shouldHandleRespondent2DQExpertsIsNull() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQExperts(null).build();
-        caseData = CaseData.builder()
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        Respondent2DQ respondent2DQ = new Respondent2DQ();
+        respondent2DQ.setRespondent2DQExperts(null);
+        caseData = CaseDataBuilder.builder()
                 .respondent1DQ(respondent1DQ)
                 .respondent2DQ(respondent2DQ)
                 .build();
@@ -244,9 +245,10 @@ class ValidateRespondentExpertsTest {
 
     @Test
     void shouldValidateRespondent2ExpertsWhenConditionsAreMet() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQExperts(new Experts()).build();
-        caseData = CaseData.builder()
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        Respondent2DQ respondent2DQ = new Respondent2DQ();
+        respondent2DQ.setRespondent2DQExperts(new Experts());
+        caseData = CaseDataBuilder.builder()
                 .respondentResponseIsSame(NO)
                 .respondent1DQ(respondent1DQ)
                 .respondent2DQ(respondent2DQ)
@@ -266,15 +268,13 @@ class ValidateRespondentExpertsTest {
 
     @Test
     void shouldHandleWhenRespondent2DQIsNull() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
-        Witnesses respondent2DQWitnesses = Witnesses.builder()
-                .witnessesToAppear(YES)
-                .build();
-        caseData = CaseData.builder()
-                .respondent1DQ(respondent1DQ)
-                .respondent2DQWitnessesSmallClaim(respondent2DQWitnesses)
-                .respondentResponseIsSame(NO)
-                .build();
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        Witnesses respondent2DQWitnesses = new Witnesses();
+        respondent2DQWitnesses.setWitnessesToAppear(YES);
+        caseData = CaseDataBuilder.builder()
+                .respondent1DQ(respondent1DQ).build();
+        caseData.setRespondent2DQWitnessesSmallClaim(respondent2DQWitnesses);
+        caseData.setRespondentResponseIsSame(NO);
         when(callbackParams.getCaseData()).thenReturn(caseData);
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(ONE_V_TWO_ONE_LEGAL_REP);

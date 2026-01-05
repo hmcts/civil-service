@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -25,15 +26,14 @@ class Respondent1ExpertsCaseDataUpdatersTest {
 
     @BeforeEach
     void setUp() {
-        caseData = CaseData.builder()
-                .responseClaimExpertSpecRequired(YES)
-                .respondent1DQ(Respondent1DQ.builder()
-                        .respondToClaimExperts(ExpertDetails.builder()
-                                .expertName("Expert Name")
-                                .fieldofExpertise("Field")
-                                .build())
-                        .build())
-                .build();
+        caseData = CaseDataBuilder.builder().build();
+        caseData.setResponseClaimExpertSpecRequired(YES);
+        ExpertDetails expertDetails = new ExpertDetails();
+        expertDetails.setExpertName("Expert Name");
+        expertDetails.setFieldofExpertise("Field");
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondToClaimExperts(expertDetails);
+        caseData.setRespondent1DQ(respondent1DQ);
     }
 
     @Test
@@ -54,12 +54,10 @@ class Respondent1ExpertsCaseDataUpdatersTest {
 
     @Test
     void shouldUpdateCaseDataWhenExpertNotRequired() {
-        caseData = caseData.toBuilder()
-                .responseClaimExpertSpecRequired(NO)
-                .respondent1DQ(Respondent1DQ.builder()
-                        .respondToClaimExperts(null)
-                        .build())
-                .build();
+        caseData.setResponseClaimExpertSpecRequired(NO);
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondToClaimExperts(null);
+        caseData.setRespondent1DQ(respondent1DQ);
 
         CaseData updatedData = updater.update(caseData);
 
@@ -75,9 +73,7 @@ class Respondent1ExpertsCaseDataUpdatersTest {
 
     @Test
     void shouldHandleNullRespondent1DQ() {
-        caseData = caseData.toBuilder()
-                .respondent1DQ(null)
-                .build();
+        caseData.setRespondent1DQ(null);
 
         CaseData updatedData = updater.update(caseData);
 

@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentTyp
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -62,7 +63,6 @@ public abstract class BaseDocumentHandlerTest {
     protected LocalDateTime mockDateTime;
     protected CaseData caseData;
     protected CaseData caseDataBefore;
-    protected CaseData.CaseDataBuilder<?, ?> builder;
     protected UploadEvidenceDocumentType uploadEvidenceDocumentType;
     protected UploadEvidenceExpert uploadEvidenceExpert;
     protected UploadEvidenceWitness uploadEvidenceWitness;
@@ -75,14 +75,13 @@ public abstract class BaseDocumentHandlerTest {
         mockRetriever(uploadEvidenceDocumentRetriever, document, mockDateTime);
         mockRetriever(uploadEvidenceExpertRetriever, document, mockDateTime);
         mockRetriever(uploadEvidenceWitnessRetriever, document, mockDateTime);
-
-        builder = CaseData.builder();
     }
 
     private Document createMockDocument() {
-        return Document.builder()
-                .documentFileName(DomainConstants.ORIGINAL_FILE_NAME)
-                .build();
+
+        Document document1 = new Document();
+        document1.setDocumentFileName(DomainConstants.ORIGINAL_FILE_NAME);
+        return document1;
     }
 
     private void mockRetriever(
@@ -113,63 +112,62 @@ public abstract class BaseDocumentHandlerTest {
     }
 
     protected <T> List<Element<T>> toElementArrayList(T value) {
-        return new ArrayList<>(
-                List.of(Element.<T>builder().value(value).build())
-        );
+        Element<T> element = new Element<>();
+        element.setValue(value);
+
+        List<Element<T>> list = new ArrayList<>(1);
+        list.add(element);
+        return list;
     }
 
     protected UploadEvidenceDocumentType createDocumentType(String bundleName, String typeOfDocument) {
-        UploadEvidenceDocumentType.UploadEvidenceDocumentTypeBuilder documentBuilder = UploadEvidenceDocumentType.builder()
-                .documentIssuedDate(DomainConstants.ISSUE_DATE)
-                .bundleName(bundleName)
-                .documentUpload(document);
+        UploadEvidenceDocumentType documentType = new UploadEvidenceDocumentType()
+                .setDocumentIssuedDate(DomainConstants.ISSUE_DATE)
+                .setBundleName(bundleName)
+                .setDocumentUpload(document);
 
         if (typeOfDocument != null) {
-            documentBuilder.typeOfDocument(typeOfDocument);
+            documentType.setTypeOfDocument(typeOfDocument);
         }
 
-        return documentBuilder.build();
+        return documentType;
     }
 
     protected UploadEvidenceExpert createExpert(String name) {
-        return UploadEvidenceExpert.builder()
-                .expertOptionName(name)
-                .expertOptionUploadDate(DomainConstants.ISSUE_DATE)
-                .expertDocument(document)
-                .build();
+        UploadEvidenceExpert uploadEvidenceExpert1 = new UploadEvidenceExpert();
+        uploadEvidenceExpert1.setExpertOptionName(name);
+        uploadEvidenceExpert1.setExpertOptionUploadDate(DomainConstants.ISSUE_DATE);
+        uploadEvidenceExpert1.setExpertDocument(document);
+        return uploadEvidenceExpert1;
     }
 
     protected UploadEvidenceWitness createWitness(String name) {
-        return UploadEvidenceWitness.builder()
-                .witnessOptionName(name)
-                .witnessOptionUploadDate(DomainConstants.ISSUE_DATE)
-                .witnessOptionDocument(document)
-                .build();
+        UploadEvidenceWitness uploadEvidenceWitness1 = new UploadEvidenceWitness();
+        uploadEvidenceWitness1.setWitnessOptionName(name);
+        uploadEvidenceWitness1.setWitnessOptionUploadDate(DomainConstants.ISSUE_DATE);
+        uploadEvidenceWitness1.setWitnessOptionDocument(document);
+        return uploadEvidenceWitness1;
     }
 
     protected void setUpDocumentAuthorities() {
         uploadEvidenceDocumentType = createDocumentType(DomainConstants.BUNDLE_TEST, null);
-        caseData = CaseData.builder()
-                .documentAuthorities(toElementArrayList(uploadEvidenceDocumentType))
-                .documentAuthoritiesApp2(toElementArrayList(uploadEvidenceDocumentType))
-                .documentAuthoritiesRes(toElementArrayList(uploadEvidenceDocumentType))
-                .documentAuthoritiesRes2(toElementArrayList(uploadEvidenceDocumentType))
-                .build();
+        caseData = CaseDataBuilder.builder().build();
+        caseData.setDocumentAuthorities(toElementArrayList(uploadEvidenceDocumentType));
+        caseData.setDocumentAuthoritiesApp2(toElementArrayList(uploadEvidenceDocumentType));
+        caseData.setDocumentAuthoritiesRes(toElementArrayList(uploadEvidenceDocumentType));
+        caseData.setDocumentAuthoritiesRes2(toElementArrayList(uploadEvidenceDocumentType));
 
-        caseDataBefore = CaseData.builder()
-                .documentAuthorities(new ArrayList<>())
-                .build();
+        caseDataBefore = CaseDataBuilder.builder().build();
+        caseDataBefore.setDocumentAuthorities(new ArrayList<>());
     }
 
     protected void setUpBundleEvidence() {
         uploadEvidenceDocumentType = createDocumentType(DomainConstants.BUNDLE_TEST, null);
-        caseData = CaseData.builder()
-                .bundleEvidence(toElementArrayList(uploadEvidenceDocumentType))
-                .build();
+        caseData = CaseDataBuilder.builder().build();
+        caseData.setBundleEvidence(toElementArrayList(uploadEvidenceDocumentType));
 
-        caseDataBefore = CaseData.builder()
-                .bundleEvidence(new ArrayList<>())
-                .build();
+        caseDataBefore = CaseDataBuilder.builder().build();
+        caseDataBefore.setBundleEvidence(new ArrayList<>());
     }
 
     protected void setUpDocumentForDisclosure() {
@@ -177,128 +175,108 @@ public abstract class BaseDocumentHandlerTest {
                 DomainConstants.BUNDLE_DISCLOSURE,
                 DomainConstants.BUNDLE_TEST
         );
-        caseData = CaseData.builder()
-                .documentForDisclosure(toElementArrayList(uploadEvidenceDocumentType))
-                .documentForDisclosureApp2(toElementArrayList(uploadEvidenceDocumentType))
-                .documentForDisclosureRes(toElementArrayList(uploadEvidenceDocumentType))
-                .documentForDisclosureRes2(toElementArrayList(uploadEvidenceDocumentType))
-                .build();
+        caseData = CaseDataBuilder.builder().build();
+        caseData.setDocumentForDisclosure(toElementArrayList(uploadEvidenceDocumentType));
+        caseData.setDocumentForDisclosureApp2(toElementArrayList(uploadEvidenceDocumentType));
+        caseData.setDocumentForDisclosureRes(toElementArrayList(uploadEvidenceDocumentType));
+        caseData.setDocumentForDisclosureRes2(toElementArrayList(uploadEvidenceDocumentType));
 
-        caseDataBefore = CaseData.builder()
-                .documentForDisclosure(new ArrayList<>())
-                .build();
+        caseDataBefore = CaseDataBuilder.builder().build();
+        caseDataBefore.setDocumentForDisclosure(new ArrayList<>());
     }
 
     protected void setUpDocumentForDisclosureList() {
         uploadEvidenceDocumentType = createDocumentType(DomainConstants.BUNDLE_DISCLOSURE_LIST, null);
-        caseData = CaseData.builder()
-                .documentDisclosureList(toElementArrayList(uploadEvidenceDocumentType))
-                .documentDisclosureListApp2(toElementArrayList(uploadEvidenceDocumentType))
-                .documentDisclosureListRes(toElementArrayList(uploadEvidenceDocumentType))
-                .documentDisclosureListRes2(toElementArrayList(uploadEvidenceDocumentType))
-                .build();
+        caseData = CaseDataBuilder.builder().build();
+        caseData.setDocumentDisclosureList(toElementArrayList(uploadEvidenceDocumentType));
+        caseData.setDocumentDisclosureListApp2(toElementArrayList(uploadEvidenceDocumentType));
+        caseData.setDocumentDisclosureListRes(toElementArrayList(uploadEvidenceDocumentType));
+        caseData.setDocumentDisclosureListRes2(toElementArrayList(uploadEvidenceDocumentType));
 
-        caseDataBefore = CaseData.builder()
-                .documentDisclosureList(new ArrayList<>())
-                .build();
+        caseDataBefore = CaseDataBuilder.builder().build();
+        caseDataBefore.setDocumentDisclosureList(new ArrayList<>());
     }
 
     protected void setUpDocumentAnswers() {
-        uploadEvidenceExpert = createExpert("ExpertOptionNameTest").toBuilder()
-                .expertOptionOtherParty("ExpertOptionOtherPartyTest")
-                .expertDocumentAnswer("ExpertDocumentAnswerTest")
-                .build();
+        uploadEvidenceExpert = createExpert("ExpertOptionNameTest");
+        uploadEvidenceExpert.setExpertOptionOtherParty("ExpertOptionOtherPartyTest");
+        uploadEvidenceExpert.setExpertDocumentAnswer("ExpertDocumentAnswerTest");
 
-        caseData = CaseData.builder()
-                .documentAnswers(toElementArrayList(uploadEvidenceExpert))
-                .documentAnswersApp2(toElementArrayList(uploadEvidenceExpert))
-                .documentAnswersRes(toElementArrayList(uploadEvidenceExpert))
-                .documentAnswersRes2(toElementArrayList(uploadEvidenceExpert))
-                .build();
+        caseData = CaseDataBuilder.builder().build();
+        caseData.setDocumentAnswers(toElementArrayList(uploadEvidenceExpert));
+        caseData.setDocumentAnswersApp2(toElementArrayList(uploadEvidenceExpert));
+        caseData.setDocumentAnswersRes(toElementArrayList(uploadEvidenceExpert));
+        caseData.setDocumentAnswersRes2(toElementArrayList(uploadEvidenceExpert));
 
-        caseDataBefore = CaseData.builder()
-                .documentAnswers(new ArrayList<>())
-                .build();
+        caseDataBefore = CaseDataBuilder.builder().build();
+        caseDataBefore.setDocumentAnswers(new ArrayList<>());
     }
 
     protected void setUpDocumentJointStatement() {
-        uploadEvidenceExpert = createExpert(DomainConstants.BUNDLE_TEST).toBuilder()
-                .expertOptionExpertises("expertises")
-                .build();
+        uploadEvidenceExpert = createExpert(DomainConstants.BUNDLE_TEST);
+        uploadEvidenceExpert.setExpertOptionExpertises("expertises");
 
-        caseData = CaseData.builder()
-                .documentJointStatement(toElementArrayList(uploadEvidenceExpert))
-                .documentJointStatementApp2(toElementArrayList(uploadEvidenceExpert))
-                .documentJointStatementRes(toElementArrayList(uploadEvidenceExpert))
-                .documentJointStatementRes2(toElementArrayList(uploadEvidenceExpert))
-                .build();
+        caseData = CaseDataBuilder.builder().build();
+        caseData.setDocumentJointStatement(toElementArrayList(uploadEvidenceExpert));
+        caseData.setDocumentJointStatementApp2(toElementArrayList(uploadEvidenceExpert));
+        caseData.setDocumentJointStatementRes(toElementArrayList(uploadEvidenceExpert));
+        caseData.setDocumentJointStatementRes2(toElementArrayList(uploadEvidenceExpert));
 
-        caseDataBefore = CaseData.builder()
-                .documentJointStatement(new ArrayList<>())
-                .build();
+        caseDataBefore = CaseDataBuilder.builder().build();
+        caseDataBefore.setDocumentJointStatement(new ArrayList<>());
     }
 
     protected void setUpDocumentQuestions() {
-        uploadEvidenceExpert = createExpert(DomainConstants.BUNDLE_TEST).toBuilder()
-                .expertDocumentQuestion("Document Question")
-                .expertOptionOtherParty("Other Party")
-                .build();
+        uploadEvidenceExpert = createExpert(DomainConstants.BUNDLE_TEST);
+        uploadEvidenceExpert.setExpertDocumentQuestion("Document Question");
+        uploadEvidenceExpert.setExpertOptionOtherParty("Other Party");
 
-        caseData = CaseData.builder()
-                .documentQuestions(toElementArrayList(uploadEvidenceExpert))
-                .documentQuestionsApp2(toElementArrayList(uploadEvidenceExpert))
-                .documentQuestionsRes(toElementArrayList(uploadEvidenceExpert))
-                .documentQuestionsRes2(toElementArrayList(uploadEvidenceExpert))
-                .build();
+        caseData = CaseDataBuilder.builder().build();
+        caseData.setDocumentQuestions(toElementArrayList(uploadEvidenceExpert));
+        caseData.setDocumentQuestionsApp2(toElementArrayList(uploadEvidenceExpert));
+        caseData.setDocumentQuestionsRes(toElementArrayList(uploadEvidenceExpert));
+        caseData.setDocumentQuestionsRes2(toElementArrayList(uploadEvidenceExpert));
 
-        caseDataBefore = CaseData.builder()
-                .documentQuestions(new ArrayList<>())
-                .build();
+        caseDataBefore = CaseDataBuilder.builder().build();
+        caseDataBefore.setDocumentQuestions(new ArrayList<>());
     }
 
     protected void setUpDocumentExpertReport() {
-        uploadEvidenceExpert = createExpert(DomainConstants.BUNDLE_TEST).toBuilder()
-                .expertOptionExpertise("expertise")
-                .build();
+        uploadEvidenceExpert = createExpert(DomainConstants.BUNDLE_TEST);
+        uploadEvidenceExpert.setExpertOptionExpertise("expertise");
 
-        caseData = CaseData.builder()
-                .documentExpertReport(toElementArrayList(uploadEvidenceExpert))
-                .documentExpertReportApp2(toElementArrayList(uploadEvidenceExpert))
-                .documentExpertReportRes(toElementArrayList(uploadEvidenceExpert))
-                .documentExpertReportRes2(toElementArrayList(uploadEvidenceExpert))
-                .build();
+        caseData = CaseDataBuilder.builder().build();
+        caseData.setDocumentExpertReport(toElementArrayList(uploadEvidenceExpert));
+        caseData.setDocumentExpertReportApp2(toElementArrayList(uploadEvidenceExpert));
+        caseData.setDocumentExpertReportRes(toElementArrayList(uploadEvidenceExpert));
+        caseData.setDocumentExpertReportRes2(toElementArrayList(uploadEvidenceExpert));
 
-        caseDataBefore = CaseData.builder()
-                .documentExpertReport(new ArrayList<>())
-                .build();
+        caseDataBefore = CaseDataBuilder.builder().build();
+        caseDataBefore.setDocumentExpertReport(new ArrayList<>());
     }
 
     protected void setUpDocumentCaseSummary() {
         uploadEvidenceDocumentType = createDocumentType(DomainConstants.BUNDLE_PRE_TRIAL_SUMMARY, null);
-        caseData = CaseData.builder()
-                .documentCaseSummary(toElementArrayList(uploadEvidenceDocumentType))
-                .documentCaseSummaryApp2(toElementArrayList(uploadEvidenceDocumentType))
-                .documentCaseSummaryRes(toElementArrayList(uploadEvidenceDocumentType))
-                .documentCaseSummaryRes2(toElementArrayList(uploadEvidenceDocumentType))
-                .build();
+        caseData = CaseDataBuilder.builder().build();
+        caseData.setDocumentCaseSummary(toElementArrayList(uploadEvidenceDocumentType));
+        caseData.setDocumentCaseSummaryApp2(toElementArrayList(uploadEvidenceDocumentType));
+        caseData.setDocumentCaseSummaryRes(toElementArrayList(uploadEvidenceDocumentType));
+        caseData.setDocumentCaseSummaryRes2(toElementArrayList(uploadEvidenceDocumentType));
 
-        caseDataBefore = CaseData.builder()
-                .documentCaseSummary(new ArrayList<>())
-                .build();
+        caseDataBefore = CaseDataBuilder.builder().build();
+        caseDataBefore.setDocumentCaseSummary(new ArrayList<>());
     }
 
     protected void setUpDocumentCosts() {
         uploadEvidenceDocumentType = createDocumentType(DomainConstants.BUNDLE_SCHEDULE_OF_COSTS, null);
-        caseData = CaseData.builder()
-                .documentCosts(toElementArrayList(uploadEvidenceDocumentType))
-                .documentCostsApp2(toElementArrayList(uploadEvidenceDocumentType))
-                .documentCostsRes(toElementArrayList(uploadEvidenceDocumentType))
-                .documentCostsRes2(toElementArrayList(uploadEvidenceDocumentType))
-                .build();
+        caseData = CaseDataBuilder.builder().build();
+        caseData.setDocumentCosts(toElementArrayList(uploadEvidenceDocumentType));
+        caseData.setDocumentCostsApp2(toElementArrayList(uploadEvidenceDocumentType));
+        caseData.setDocumentCostsRes(toElementArrayList(uploadEvidenceDocumentType));
+        caseData.setDocumentCostsRes2(toElementArrayList(uploadEvidenceDocumentType));
 
-        caseDataBefore = CaseData.builder()
-                .documentCosts(new ArrayList<>())
-                .build();
+        caseDataBefore = CaseDataBuilder.builder().build();
+        caseDataBefore.setDocumentCosts(new ArrayList<>());
     }
 
     protected void setUpDocumentEvidenceForTrial() {
@@ -306,91 +284,78 @@ public abstract class BaseDocumentHandlerTest {
                 DomainConstants.BUNDLE_TRIAL_CORRESPONDENCE,
                 DomainConstants.TYPE_OF_DOCUMENT
         );
-        caseData = CaseData.builder()
-                .documentEvidenceForTrial(toElementArrayList(uploadEvidenceDocumentType))
-                .documentEvidenceForTrialApp2(toElementArrayList(uploadEvidenceDocumentType))
-                .documentEvidenceForTrialRes(toElementArrayList(uploadEvidenceDocumentType))
-                .documentEvidenceForTrialRes2(toElementArrayList(uploadEvidenceDocumentType))
-                .build();
+        caseData = CaseDataBuilder.builder().build();
+        caseData.setDocumentEvidenceForTrial(toElementArrayList(uploadEvidenceDocumentType));
+        caseData.setDocumentEvidenceForTrialApp2(toElementArrayList(uploadEvidenceDocumentType));
+        caseData.setDocumentEvidenceForTrialRes(toElementArrayList(uploadEvidenceDocumentType));
+        caseData.setDocumentEvidenceForTrialRes2(toElementArrayList(uploadEvidenceDocumentType));
 
-        caseDataBefore = CaseData.builder()
-                .documentEvidenceForTrial(new ArrayList<>())
-                .build();
+        caseDataBefore = CaseDataBuilder.builder().build();
+        caseDataBefore.setDocumentEvidenceForTrial(new ArrayList<>());
     }
 
     protected void setUpDocumentSkeletonArgument() {
         uploadEvidenceDocumentType = createDocumentType(DomainConstants.BUNDLE_TRIAL_SKELETON, null);
-        caseData = CaseData.builder()
-                .documentSkeletonArgument(toElementArrayList(uploadEvidenceDocumentType))
-                .documentSkeletonArgumentApp2(toElementArrayList(uploadEvidenceDocumentType))
-                .documentSkeletonArgumentRes(toElementArrayList(uploadEvidenceDocumentType))
-                .documentSkeletonArgumentRes2(toElementArrayList(uploadEvidenceDocumentType))
-                .build();
+        caseData = CaseDataBuilder.builder().build();
+        caseData.setDocumentSkeletonArgument(toElementArrayList(uploadEvidenceDocumentType));
+        caseData.setDocumentSkeletonArgumentApp2(toElementArrayList(uploadEvidenceDocumentType));
+        caseData.setDocumentSkeletonArgumentRes(toElementArrayList(uploadEvidenceDocumentType));
+        caseData.setDocumentSkeletonArgumentRes2(toElementArrayList(uploadEvidenceDocumentType));
 
-        caseDataBefore = CaseData.builder()
-                .documentSkeletonArgument(new ArrayList<>())
-                .build();
+        caseDataBefore = CaseDataBuilder.builder().build();
+        caseDataBefore.setDocumentSkeletonArgument(new ArrayList<>());
     }
 
     protected void setUpDocumentHearsayNotice() {
         uploadEvidenceWitness = createWitness(DomainConstants.WITNESS_HEARSAY_BUNDLE);
-        caseData = CaseData.builder()
-                .documentHearsayNotice(toElementArrayList(uploadEvidenceWitness))
-                .documentHearsayNoticeApp2(toElementArrayList(uploadEvidenceWitness))
-                .documentHearsayNoticeRes(toElementArrayList(uploadEvidenceWitness))
-                .documentHearsayNoticeRes2(toElementArrayList(uploadEvidenceWitness))
-                .build();
+        caseData = CaseDataBuilder.builder().build();
+        caseData.setDocumentHearsayNotice(toElementArrayList(uploadEvidenceWitness));
+        caseData.setDocumentHearsayNoticeApp2(toElementArrayList(uploadEvidenceWitness));
+        caseData.setDocumentHearsayNoticeRes(toElementArrayList(uploadEvidenceWitness));
+        caseData.setDocumentHearsayNoticeRes2(toElementArrayList(uploadEvidenceWitness));
 
-        caseDataBefore = CaseData.builder()
-                .documentHearsayNotice(new ArrayList<>())
-                .build();
+        caseDataBefore = CaseDataBuilder.builder().build();
+        caseDataBefore.setDocumentHearsayNotice(new ArrayList<>());
     }
 
     protected void setUpDocumentReferredInStatement() {
-        uploadEvidenceDocumentType = UploadEvidenceDocumentType.builder()
-                .witnessOptionName(DomainConstants.WITNESS_NAME)
-                .typeOfDocument(DomainConstants.TYPE_OF_DOCUMENT)
-                .documentIssuedDate(DomainConstants.ISSUE_DATE)
-                .documentUpload(document)
-                .build();
+        uploadEvidenceDocumentType = new UploadEvidenceDocumentType()
+                .setWitnessOptionName(DomainConstants.WITNESS_NAME)
+                .setTypeOfDocument(DomainConstants.TYPE_OF_DOCUMENT)
+                .setDocumentIssuedDate(DomainConstants.ISSUE_DATE)
+                .setDocumentUpload(document);
 
-        caseData = CaseData.builder()
-                .documentReferredInStatement(toElementArrayList(uploadEvidenceDocumentType))
-                .documentReferredInStatementApp2(toElementArrayList(uploadEvidenceDocumentType))
-                .documentReferredInStatementRes(toElementArrayList(uploadEvidenceDocumentType))
-                .documentReferredInStatementRes2(toElementArrayList(uploadEvidenceDocumentType))
-                .build();
+        caseData = CaseDataBuilder.builder().build();
+        caseData.setDocumentReferredInStatement(toElementArrayList(uploadEvidenceDocumentType));
+        caseData.setDocumentReferredInStatementApp2(toElementArrayList(uploadEvidenceDocumentType));
+        caseData.setDocumentReferredInStatementRes(toElementArrayList(uploadEvidenceDocumentType));
+        caseData.setDocumentReferredInStatementRes2(toElementArrayList(uploadEvidenceDocumentType));
 
-        caseDataBefore = CaseData.builder()
-                .documentReferredInStatement(new ArrayList<>())
-                .build();
+        caseDataBefore = CaseDataBuilder.builder().build();
+        caseDataBefore.setDocumentReferredInStatement(new ArrayList<>());
     }
 
     protected void setUpDocumentWitnessStatement() {
         uploadEvidenceWitness = createWitness(DomainConstants.WITNESS_NAME);
-        caseData = CaseData.builder()
-                .documentWitnessStatement(toElementArrayList(uploadEvidenceWitness))
-                .documentWitnessStatementApp2(toElementArrayList(uploadEvidenceWitness))
-                .documentWitnessStatementRes(toElementArrayList(uploadEvidenceWitness))
-                .documentWitnessStatementRes2(toElementArrayList(uploadEvidenceWitness))
-                .build();
+        caseData = CaseDataBuilder.builder().build();
+        caseData.setDocumentWitnessStatement(toElementArrayList(uploadEvidenceWitness));
+        caseData.setDocumentWitnessStatementApp2(toElementArrayList(uploadEvidenceWitness));
+        caseData.setDocumentWitnessStatementRes(toElementArrayList(uploadEvidenceWitness));
+        caseData.setDocumentWitnessStatementRes2(toElementArrayList(uploadEvidenceWitness));
 
-        caseDataBefore = CaseData.builder()
-                .documentWitnessStatement(new ArrayList<>())
-                .build();
+        caseDataBefore = CaseDataBuilder.builder().build();
+        caseDataBefore.setDocumentWitnessStatement(new ArrayList<>());
     }
 
     protected void setUpDocumentWitnessSummary() {
         uploadEvidenceWitness = createWitness(DomainConstants.WITNESS_NAME);
-        caseData = CaseData.builder()
-                .documentWitnessSummary(toElementArrayList(uploadEvidenceWitness))
-                .documentWitnessSummaryApp2(toElementArrayList(uploadEvidenceWitness))
-                .documentWitnessSummaryRes(toElementArrayList(uploadEvidenceWitness))
-                .documentWitnessSummaryRes2(toElementArrayList(uploadEvidenceWitness))
-                .build();
+        caseData = CaseDataBuilder.builder().build();
+        caseData.setDocumentWitnessSummary(toElementArrayList(uploadEvidenceWitness));
+        caseData.setDocumentWitnessSummaryApp2(toElementArrayList(uploadEvidenceWitness));
+        caseData.setDocumentWitnessSummaryRes(toElementArrayList(uploadEvidenceWitness));
+        caseData.setDocumentWitnessSummaryRes2(toElementArrayList(uploadEvidenceWitness));
 
-        caseDataBefore = CaseData.builder()
-                .documentWitnessSummary(new ArrayList<>())
-                .build();
+        caseDataBefore = CaseDataBuilder.builder().build();
+        caseDataBefore.setDocumentWitnessSummary(new ArrayList<>());
     }
 }

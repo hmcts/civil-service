@@ -4,5 +4,5 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 
 public interface HandleAdmitPartOfClaimCaseUpdater {
 
-    void update(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData);
+    void update(CaseData caseData);
 }

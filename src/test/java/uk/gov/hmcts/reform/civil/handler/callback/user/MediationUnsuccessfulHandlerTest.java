@@ -75,12 +75,8 @@ class MediationUnsuccessfulHandlerTest extends BaseCallbackHandlerTest {
         void shouldCallSubmitSuccessfulMediationUponAboutToSubmit() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStatePendingClaimIssued()
-                .build()
-                .toBuilder()
-                .mediation(Mediation
-                               .builder()
-                               .unsuccessfulMediationReason("PARTY_WITHDRAWS")
-                               .build())
+                .mediation(new Mediation()
+                               .setUnsuccessfulMediationReason("PARTY_WITHDRAWS"))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 

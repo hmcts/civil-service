@@ -76,6 +76,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         } else {
             templateId = getDocmosisTemplate(caseData);
         }
+        log.info("{} {}", caseData.getCcdCaseReference(), templateId);
         return templateId;
     }
 

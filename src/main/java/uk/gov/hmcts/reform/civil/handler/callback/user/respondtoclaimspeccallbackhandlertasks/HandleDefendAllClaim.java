@@ -60,22 +60,21 @@ public class HandleDefendAllClaim implements CaseTask {
             return buildErrorResponse(errors);
         }
 
-        CaseData.CaseDataBuilder<?, ?> updatedCase = caseData.toBuilder();
-        updatedCase.showConditionFlags(whoDisputesFullDefence(caseData));
+        caseData.setShowConditionFlags(whoDisputesFullDefence(caseData));
 
         if (isDefendantResponseSpec(callbackParams)) {
             log.info("Handling defendant response spec for caseId: {}", caseData.getCcdCaseReference());
-            handleDefendantResponseSpec(caseData, updatedCase);
+            handleDefendantResponseSpec(caseData);
         }
 
         log.info("Callback execution completed for caseId: {}", caseData.getCcdCaseReference());
-        return buildSuccessResponse(updatedCase.build());
+        return buildSuccessResponse(caseData);
     }
 
     private List<String> validatePaymentDate(CaseData caseData) {
         log.info("Validating payment date for caseId: {}", caseData.getCcdCaseReference());
         return paymentDateValidator.validate(Optional.ofNullable(caseData.getRespondToClaim())
-                .orElseGet(() -> RespondToClaim.builder().build()));
+                .orElseGet(() -> new RespondToClaim()));
     }
 
     private CallbackResponse buildErrorResponse(List<String> errors) {
@@ -91,23 +90,23 @@ public class HandleDefendAllClaim implements CaseTask {
         return SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId());
     }
 
-    private void handleDefendantResponseSpec(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCase) {
+    private void handleDefendantResponseSpec(CaseData caseData) {
         log.info("Handling defendant response spec for caseId: {}", caseData.getCcdCaseReference());
-        populateRespondentResponseTypeSpecPaidStatus(caseData, updatedCase);
-        updateSpecPaidLessAmountOrDisputesOrPartAdmission(caseData, updatedCase);
-        updateSpecDisputesOrPartAdmission(caseData, updatedCase);
-        updatedCase.responseClaimTrack(getAllocatedTrack(caseData).name());
+        populateRespondentResponseTypeSpecPaidStatus(caseData);
+        updateSpecPaidLessAmountOrDisputesOrPartAdmission(caseData);
+        updateSpecDisputesOrPartAdmission(caseData);
+        caseData.setResponseClaimTrack(getAllocatedTrack(caseData).name());
     }
 
-    private void updateSpecPaidLessAmountOrDisputesOrPartAdmission(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCase) {
+    private void updateSpecPaidLessAmountOrDisputesOrPartAdmission(CaseData caseData) {
         log.info("Updating specPaidLessAmountOrDisputesOrPartAdmission for caseId: {}", caseData.getCcdCaseReference());
 
         if (isPaidLessOrDisputesOrPartAdmission(caseData)) {
             log.info("CaseId {}: specPaidLessAmountOrDisputesOrPartAdmission set to YES", caseData.getCcdCaseReference());
-            updatedCase.specPaidLessAmountOrDisputesOrPartAdmission(YES);
+            caseData.setSpecPaidLessAmountOrDisputesOrPartAdmission(YES);
         } else {
             log.info("CaseId {}: specPaidLessAmountOrDisputesOrPartAdmission set to NO", caseData.getCcdCaseReference());
-            updatedCase.specPaidLessAmountOrDisputesOrPartAdmission(NO);
+            caseData.setSpecPaidLessAmountOrDisputesOrPartAdmission(NO);
         }
     }
 
@@ -120,24 +119,24 @@ public class HandleDefendAllClaim implements CaseTask {
                 || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION;
     }
 
-    private void updateSpecDisputesOrPartAdmission(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCase) {
+    private void updateSpecDisputesOrPartAdmission(CaseData caseData) {
         log.info("Updating specDisputesOrPartAdmission for caseId: {}", caseData.getCcdCaseReference());
 
         if (YES.equals(caseData.getIsRespondent2())) {
             if (isRespondent2DisputesOrPartAdmission(caseData)) {
                 log.info("CaseId {}: specDisputesOrPartAdmission set to YES for Respondent2", caseData.getCcdCaseReference());
-                updatedCase.specDisputesOrPartAdmission(YES);
+                caseData.setSpecDisputesOrPartAdmission(YES);
             } else {
                 log.info("CaseId {}: specDisputesOrPartAdmission set to NO for Respondent2", caseData.getCcdCaseReference());
-                updatedCase.specDisputesOrPartAdmission(NO);
+                caseData.setSpecDisputesOrPartAdmission(NO);
             }
         } else {
             if (isRespondent1DisputesOrPartAdmission(caseData)) {
                 log.info("CaseId {}: specDisputesOrPartAdmission set to YES for Respondent1", caseData.getCcdCaseReference());
-                updatedCase.specDisputesOrPartAdmission(YES);
+                caseData.setSpecDisputesOrPartAdmission(YES);
             } else {
                 log.info("CaseId {}: specDisputesOrPartAdmission set to NO for Respondent1", caseData.getCcdCaseReference());
-                updatedCase.specDisputesOrPartAdmission(NO);
+                caseData.setSpecDisputesOrPartAdmission(NO);
             }
         }
     }
@@ -363,17 +362,17 @@ public class HandleDefendAllClaim implements CaseTask {
         }
     }
 
-    private void populateRespondentResponseTypeSpecPaidStatus(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updated) {
+    private void populateRespondentResponseTypeSpecPaidStatus(CaseData caseData) {
         log.info("Populating RespondentResponseTypeSpecPaidStatus for caseId: {}", caseData.getCcdCaseReference());
-        updateRespondent1PaymentStatus(caseData, updated);
+        updateRespondent1PaymentStatus(caseData);
 
         if (YES.equals(caseData.getIsRespondent2())) {
             log.info("CaseId {}: Respondent2 is present, updating payment status", caseData.getCcdCaseReference());
-            updateRespondent2PaymentStatus(caseData, updated);
+            updateRespondent2PaymentStatus(caseData);
         }
     }
 
-    private void updateRespondent1PaymentStatus(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updated) {
+    private void updateRespondent1PaymentStatus(CaseData caseData) {
         log.info("Updating Respondent1 payment status for caseId: {}", caseData.getCcdCaseReference());
 
         if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired())
@@ -382,20 +381,20 @@ public class HandleDefendAllClaim implements CaseTask {
                     .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount())));
             if (comparison < 0) {
                 log.info("CaseId {}: Respondent1 paid less than claimed amount", caseData.getCcdCaseReference());
-                updated.respondent1ClaimResponsePaymentAdmissionForSpec(
-                        RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT).build();
+                caseData.setRespondent1ClaimResponsePaymentAdmissionForSpec(
+                        RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT);
             } else {
                 log.info("CaseId {}: Respondent1 paid full or more than claimed amount", caseData.getCcdCaseReference());
-                updated.respondent1ClaimResponsePaymentAdmissionForSpec(
-                        RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
+                caseData.setRespondent1ClaimResponsePaymentAdmissionForSpec(
+                        RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT);
             }
         } else {
             log.info("CaseId {}: Respondent1 did not pay", caseData.getCcdCaseReference());
-            updated.respondent1ClaimResponsePaymentAdmissionForSpec(RespondentResponseTypeSpecPaidStatus.DID_NOT_PAY).build();
+            caseData.setRespondent1ClaimResponsePaymentAdmissionForSpec(RespondentResponseTypeSpecPaidStatus.DID_NOT_PAY);
         }
     }
 
-    private void updateRespondent2PaymentStatus(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updated) {
+    private void updateRespondent2PaymentStatus(CaseData caseData) {
         log.info("Updating Respondent2 payment status for caseId: {}", caseData.getCcdCaseReference());
 
         if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired2())
@@ -404,16 +403,16 @@ public class HandleDefendAllClaim implements CaseTask {
                     .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount())));
             if (comparison < 0) {
                 log.info("CaseId {}: Respondent2 paid less than claimed amount", caseData.getCcdCaseReference());
-                updated.respondent1ClaimResponsePaymentAdmissionForSpec(
-                        RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT).build();
+                caseData.setRespondent1ClaimResponsePaymentAdmissionForSpec(
+                        RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT);
             } else {
                 log.info("CaseId {}: Respondent2 paid full or more than claimed amount", caseData.getCcdCaseReference());
-                updated.respondent1ClaimResponsePaymentAdmissionForSpec(
-                        RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
+                caseData.setRespondent1ClaimResponsePaymentAdmissionForSpec(
+                        RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT);
             }
         } else {
             log.info("CaseId {}: Respondent2 did not pay", caseData.getCcdCaseReference());
-            updated.respondent1ClaimResponsePaymentAdmissionForSpec(null).build();
+            caseData.setRespondent1ClaimResponsePaymentAdmissionForSpec(null);
         }
     }
 
