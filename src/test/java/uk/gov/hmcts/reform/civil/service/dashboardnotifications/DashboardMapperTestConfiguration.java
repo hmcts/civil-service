@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.dashboardnotifications;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
