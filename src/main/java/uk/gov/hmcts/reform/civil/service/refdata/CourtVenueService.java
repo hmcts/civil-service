@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.service.refdata;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.model.referencedata.LocationRefData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import java.util.List;
 import java.util.function.Predicate;
