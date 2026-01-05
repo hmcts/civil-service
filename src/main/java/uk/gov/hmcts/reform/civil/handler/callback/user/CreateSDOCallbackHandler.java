@@ -411,10 +411,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         FastTrackJudgesRecital tempFastTrackJudgesRecital = new FastTrackJudgesRecital();
         tempFastTrackJudgesRecital.setInput("Upon considering the statements of case and the information provided by the parties,");
 
-        if (SdoHelper.isSmallClaimsTrack(caseData)) {
-            caseData.setSmallClaimsPenalNotice(DEFAULT_PENAL_NOTICE);
-        }
-
         caseData.setFastTrackJudgesRecital(tempFastTrackJudgesRecital);
 
         FastTrackDisclosureOfDocuments tempFastTrackDisclosureOfDocuments = new FastTrackDisclosureOfDocuments();
@@ -1227,6 +1223,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             caseData.setSetSmallClaimsFlag(YES);
+            caseData.setSmallClaimsPenalNotice(DEFAULT_PENAL_NOTICE);
             if (SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
                 caseData.setIsSdoR2NewScreen(YES);
             }
