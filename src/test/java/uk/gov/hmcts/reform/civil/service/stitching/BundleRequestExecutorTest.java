@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.exceptions.RetryableStitchingException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BundleRequest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.nio.charset.Charset;
 import java.util.Optional;
@@ -53,7 +54,7 @@ class BundleRequestExecutorTest {
     void whenPostIsCalledAndEndpointWorks_thenTheCallSucceeds() {
         // Given
         String endpoint = "some url";
-        CaseData expectedCaseData = CaseData.builder().build();
+        CaseData expectedCaseData = CaseDataBuilder.builder().build();
         CaseDetails responseCaseDetails = CaseDetails.builder().build();
         ResponseEntity<CaseDetails> responseEntity = new ResponseEntity<>(responseCaseDetails, HttpStatus.OK);
         given(caseDetailsConverter.toCaseData(responseCaseDetails)).willReturn(expectedCaseData);

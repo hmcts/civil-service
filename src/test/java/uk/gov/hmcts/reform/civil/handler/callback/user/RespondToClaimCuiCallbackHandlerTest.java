@@ -127,11 +127,14 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateBusinessProcessAndClaimStatus_whenDefendantResponseLangIsEnglish() {
+            RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
+            respondentLiPResponse.setRespondent1ResponseLanguage("ENGLISH");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .totalClaimAmount(BigDecimal.valueOf(5000))
-                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(
-                    "ENGLISH").build()).build())
+                .caseDataLip(caseDataLiP)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -152,12 +155,14 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldUpdateBusinessProcessAndClaimStatus_when_is_multi_track() {
             when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-
+            RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
+            respondentLiPResponse.setRespondent1ResponseLanguage("ENGLISH");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .totalClaimAmount(BigDecimal.valueOf(150000))
-                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(
-                    "ENGLISH").build()).build())
+                .caseDataLip(caseDataLiP)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -183,11 +188,14 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(36, LocalDate.now()))
                 .thenReturn(LocalDateTime.now().plusMonths(36));
 
+            RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
+            respondentLiPResponse.setRespondent1ResponseLanguage("ENGLISH");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .totalClaimAmount(BigDecimal.valueOf(150000))
-                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(
-                    "ENGLISH").build()).build())
+                .caseDataLip(caseDataLiP)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -204,29 +212,30 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateRespondentWithUnavailabilityDates() {
+            RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
+            respondentLiPResponse.setRespondent1ResponseLanguage("ENGLISH");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
+            UnavailableDate unavailableDate = new UnavailableDate();
+            unavailableDate.setDate(LocalDate.of(2024, 2, 1));
+            unavailableDate.setDateAdded(LocalDate.of(
+                    2024,
+                    1,
+                    1
+                ));
+            unavailableDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
+            Hearing hearing = new Hearing();
+            hearing.setHearingLength(ONE_DAY);
+            hearing.setUnavailableDatesRequired(YES);
+            hearing.setUnavailableDates(wrapElements(List.of(unavailableDate)));
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQHearing(hearing);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .totalClaimAmount(BigDecimal.valueOf(5000))
-                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(
-                    "ENGLISH").build()).build())
+                .caseDataLip(caseDataLiP)
                 .build();
-            caseData.setRespondent1DQ(Respondent1DQ.builder()
-                                                       .respondent1DQHearing(Hearing.builder()
-                                                                                 .hearingLength(ONE_DAY)
-                                                                                 .unavailableDatesRequired(YES)
-                                                                                 .unavailableDates(wrapElements(List.of(
-                                                                                     UnavailableDate.builder()
-                                                                                         .date(LocalDate.of(2024, 2, 1))
-                                                                                         .dateAdded(LocalDate.of(
-                                                                                             2024,
-                                                                                             1,
-                                                                                             1
-                                                                                         ))
-                                                                                         .unavailableDateType(
-                                                                                             UnavailableDateType.SINGLE_DATE)
-                                                                                         .build())))
-                                                                                 .build())
-                                                       .build());
+            caseData.setRespondent1DQ(respondent1DQ);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -237,23 +246,26 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             }
 
+            UnavailableDate unavailableDate1 = new UnavailableDate();
+            unavailableDate1.setEventAdded("Defendant Response Event");
+            unavailableDate1.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
+            unavailableDate1.setDateAdded(now.toLocalDate());
+            unavailableDate1.setDate(LocalDate.of(2024, 2, 1));
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getRespondent1().getUnavailableDates()).isEqualTo(
-                wrapElements(List.of(UnavailableDate.builder()
-                                         .eventAdded("Defendant Response Event")
-                                         .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                         .dateAdded(now.toLocalDate())
-                                         .date(LocalDate.of(2024, 2, 1))
-                                         .build())));
+                wrapElements(List.of(unavailableDate1)));
         }
 
         @Test
         void shouldOnlyUpdateClaimStatus_whenDefendantResponseLangIsBilingual() {
+            RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
+            respondentLiPResponse.setRespondent1ResponseLanguage("BOTH");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .totalClaimAmount(BigDecimal.valueOf(5000))
-                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(
-                    "BOTH").build()).build())
+                .caseDataLip(caseDataLiP)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -276,33 +288,31 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAddTheCaseFlagIntialiazerForDefendant() {
+            Party party = new Party();
+            party.setType(Party.Type.INDIVIDUAL);
+            party.setPartyName("CLAIMANT_NAME");
+            Expert expert = new Expert();
+            expert.setName("John Smith");
+            expert.setFirstName("Jane");
+            expert.setLastName("Smith");
+            Experts experts = new Experts();
+            experts.setExpertRequired(YES);
+            experts.setDetails(wrapElements(expert));
+            Witness witness = new Witness();
+            witness.setName("John Smith");
+            witness.setFirstName("Jane");
+            witness.setLastName("Smith");
+            Witnesses witnesses = new Witnesses();
+            witnesses.setWitnessesToAppear(YES);
+            witnesses.setDetails(wrapElements(witness));
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQExperts(experts);
+            respondent1DQ.setRespondent1DQWitnesses(witnesses);
             CaseData caseData = CaseDataBuilder.builder()
                 .totalClaimAmount(BigDecimal.valueOf(1000))
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
-                .respondent1(Party.builder()
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName("CLAIMANT_NAME")
-                                 .build())
-                .respondent1DQ(Respondent1DQ.builder()
-                                   .respondent1DQExperts(Experts.builder()
-                                                             .expertRequired(YES)
-                                                             .details(wrapElements(Expert.builder()
-                                                                                       .name(
-                                                                                           "John Smith")
-                                                                                       .firstName("Jane")
-                                                                                       .lastName("Smith")
-
-                                                                                       .build()))
-                                                             .build())
-                                   .respondent1DQWitnesses(Witnesses.builder().witnessesToAppear(YES)
-                                                               .details(wrapElements(Witness.builder()
-                                                                                         .name(
-                                                                                             "John Smith")
-                                                                                         .firstName("Jane")
-                                                                                         .lastName("Smith")
-
-                                                                                         .build())).build())
-                                   .build())
+                .applicant1(party)
+                .respondent1(party)
+                .respondent1DQ(respondent1DQ)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -315,45 +325,43 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAddEventAndDateAddedToRespondentExpertsAndWitnesses() {
+            Party party = new Party();
+            party.setType(Party.Type.INDIVIDUAL);
+            party.setPartyName("CLAIMANT_NAME");
+            Expert expert = new Expert();
+            expert.setName("John Smith");
+            expert.setFirstName("Jane");
+            expert.setLastName("Smith");
+            Experts experts = new Experts();
+            experts.setExpertRequired(YES);
+            experts.setDetails(wrapElements(expert));
+            Witness witness = new Witness();
+            witness.setName("John Smith");
+            witness.setFirstName("Jane");
+            witness.setLastName("Smith");
+            Witnesses witnesses = new Witnesses();
+            witnesses.setWitnessesToAppear(YES);
+            witnesses.setDetails(wrapElements(witness));
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQExperts(experts);
+            respondent1DQ.setRespondent1DQWitnesses(witnesses);
             CaseData caseData = CaseDataBuilder.builder()
                 .totalClaimAmount(BigDecimal.valueOf(1000))
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
-                .respondent1(Party.builder()
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName("CLAIMANT_NAME")
-                                 .build())
-                .respondent1DQ(Respondent1DQ.builder()
-                                   .respondent1DQExperts(Experts.builder()
-                                                             .expertRequired(YES)
-                                                             .details(wrapElements(Expert.builder()
-                                                                                       .name(
-                                                                                           "John Smith")
-                                                                                       .firstName("Jane")
-                                                                                       .lastName("Smith")
-
-                                                                                       .build()))
-                                                             .build())
-                                   .respondent1DQWitnesses(Witnesses.builder().witnessesToAppear(YES)
-                                                               .details(wrapElements(Witness.builder()
-                                                                                         .name(
-                                                                                             "John Smith")
-                                                                                         .firstName("Jane")
-                                                                                         .lastName("Smith")
-
-                                                                                         .build())).build())
-                                   .build())
+                .applicant1(party)
+                .respondent1(party)
+                .respondent1DQ(respondent1DQ)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedCaseData = getCaseData(response);
-            Expert expert = updatedCaseData.getRespondent1DQ().getRespondent1DQExperts().getDetails().get(0).getValue();
-            Witness witness = updatedCaseData.getRespondent1DQ().getRespondent1DQWitnesses().getDetails().get(0).getValue();
+            Expert expert1 = updatedCaseData.getRespondent1DQ().getRespondent1DQExperts().getDetails().get(0).getValue();
+            Witness witness1 = updatedCaseData.getRespondent1DQ().getRespondent1DQWitnesses().getDetails().get(0).getValue();
 
-            assertThat(expert.getDateAdded()).isEqualTo(LocalDateTime.now().toLocalDate());
-            assertThat(expert.getEventAdded()).isEqualTo(DEFENDANT_RESPONSE_EVENT.getValue());
-            assertThat(witness.getDateAdded()).isEqualTo(LocalDateTime.now().toLocalDate());
-            assertThat(witness.getEventAdded()).isEqualTo(DEFENDANT_RESPONSE_EVENT.getValue());
+            assertThat(expert1.getDateAdded()).isEqualTo(LocalDateTime.now().toLocalDate());
+            assertThat(expert1.getEventAdded()).isEqualTo(DEFENDANT_RESPONSE_EVENT.getValue());
+            assertThat(witness1.getDateAdded()).isEqualTo(LocalDateTime.now().toLocalDate());
+            assertThat(witness1.getEventAdded()).isEqualTo(DEFENDANT_RESPONSE_EVENT.getValue());
             assertThat(updatedCaseData.getNextDeadline()).isEqualTo(respondToDeadline.toLocalDate());
         }
 
@@ -377,19 +385,19 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                                           boolean toggleEnabled,
                                                                           boolean changeState) {
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(toggleEnabled);
+            RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
+            respondentLiPResponse.setRespondent1ResponseLanguage(defendantBilingualPreference);
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
+            WelshLanguageRequirements welshLanguageRequirements = new WelshLanguageRequirements();
+            welshLanguageRequirements.setDocuments(Language.valueOf(defendantDocumentLanguage));
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQLanguage(welshLanguageRequirements);
             CaseData caseData = CaseDataBuilder.builder()
                 .totalClaimAmount(BigDecimal.valueOf(1000))
                 .claimantBilingualLanguagePreference(claimantBilingualPreference)
-                .caseDataLip(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                             .respondent1ResponseLanguage(defendantBilingualPreference)
-                                                             .build())
-                                 .build())
-                .respondent1DQ(Respondent1DQ.builder()
-                                   .respondent1DQLanguage(WelshLanguageRequirements.builder()
-                                                              .documents(Language.valueOf(defendantDocumentLanguage))
-                                                              .build())
-                                   .build())
+                .caseDataLip(caseDataLiP)
+                .respondent1DQ(respondent1DQ)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -434,9 +442,13 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetDefendantResponseLanguageDisplayToWelshIfSpecified() {
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+            RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
+            respondentLiPResponse.setRespondent1ResponseLanguage("WELSH");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
             CaseData caseData = CaseDataBuilder.builder()
                 .totalClaimAmount(BigDecimal.valueOf(1000))
-                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("WELSH").build()).build())
+                .caseDataLip(caseDataLiP)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -449,10 +461,18 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldUpdateLanguagePreferenceIfWelshDocsSpecified() {
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+            RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
+            respondentLiPResponse.setRespondent1ResponseLanguage("ENGLISH");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
+            WelshLanguageRequirements welshLanguageRequirements = new WelshLanguageRequirements();
+            welshLanguageRequirements.setDocuments(Language.WELSH);
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQLanguage(welshLanguageRequirements);
             CaseData caseData = CaseDataBuilder.builder()
                 .totalClaimAmount(BigDecimal.valueOf(1000))
-                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("ENGLISH").build()).build())
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQLanguage(WelshLanguageRequirements.builder().documents(Language.WELSH).build()).build())
+                .caseDataLip(caseDataLiP)
+                .respondent1DQ(respondent1DQ)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

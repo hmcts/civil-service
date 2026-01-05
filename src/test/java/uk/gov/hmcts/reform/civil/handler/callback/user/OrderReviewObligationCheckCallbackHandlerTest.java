@@ -56,16 +56,14 @@ class OrderReviewObligationCheckCallbackHandlerTest extends BaseCallbackHandlerT
         @ParameterizedTest
         @MethodSource("provideObligationData")
         void shouldHandleObligationWATaskRaised(LocalDate obligationDate, YesOrNo initialTaskRaised, YesOrNo expectedTaskRaised) {
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build().builder()
-                .storedObligationData(List.of(
-                    Element.<StoredObligationData>builder()
-                        .value(StoredObligationData.builder()
-                                   .obligationDate(obligationDate)
-                                   .obligationWATaskRaised(initialTaskRaised)
-                                   .obligationReason(ObligationReason.UNLESS_ORDER)
-                                   .build())
-                        .build()))
-                .build();
+            StoredObligationData storedObligationData1 = new StoredObligationData();
+            storedObligationData1.setObligationDate(obligationDate);
+            storedObligationData1.setObligationWATaskRaised(initialTaskRaised);
+            storedObligationData1.setObligationReason(ObligationReason.UNLESS_ORDER);
+            Element<StoredObligationData> element = new Element<>();
+            element.setValue(storedObligationData1);
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+            caseData.setStoredObligationData(List.of(element));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -91,15 +89,14 @@ class OrderReviewObligationCheckCallbackHandlerTest extends BaseCallbackHandlerT
 
         @Test
         void shouldHandleEmptyObligationDataList() {
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build()
-                .builder().storedObligationData(List.of(
-                Element.<StoredObligationData>builder()
-                    .value(StoredObligationData.builder()
-                               .obligationDate(LocalDate.now().minusDays(1))
-                               .obligationWATaskRaised(YesOrNo.NO)
-                               .obligationReason(ObligationReason.UNLESS_ORDER)
-                               .build())
-                    .build())).build();
+            StoredObligationData storedObligationData = new StoredObligationData();
+            storedObligationData.setObligationDate(LocalDate.now().minusDays(1));
+            storedObligationData.setObligationWATaskRaised(YesOrNo.NO);
+            storedObligationData.setObligationReason(ObligationReason.UNLESS_ORDER);
+            Element<StoredObligationData> element = new Element<>();
+            element.setValue(storedObligationData);
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+            caseData.setStoredObligationData(List.of(element));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -109,15 +106,13 @@ class OrderReviewObligationCheckCallbackHandlerTest extends BaseCallbackHandlerT
 
         @Test
         void shouldNotSetObligationWAFlagWhenNoMatchingDataFound() {
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build().builder()
-                .storedObligationData(List.of(
-                    Element.<StoredObligationData>builder()
-                        .value(StoredObligationData.builder()
-                                   .obligationDate(LocalDate.now().plusDays(1))
-                                   .obligationWATaskRaised(YesOrNo.NO)
-                                   .build())
-                        .build()))
-                .build();
+            StoredObligationData storedObligationData = new StoredObligationData();
+            storedObligationData.setObligationDate(LocalDate.now().plusDays(1));
+            storedObligationData.setObligationWATaskRaised(YesOrNo.NO);
+            Element<StoredObligationData> element = new Element<>();
+            element.setValue(storedObligationData);
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+            caseData.setStoredObligationData(List.of(element));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -134,18 +129,16 @@ class OrderReviewObligationCheckCallbackHandlerTest extends BaseCallbackHandlerT
         @MethodSource("provideObligationDataForAllScenarios")
         void shouldHandleAllIfScenarios(LocalDate obligationDate, YesOrNo initialTaskRaised, ObligationReason obligationReason,
                                         CaseState caseState, String manageStayOption, YesOrNo expectedTaskRaised, ObligationWAFlag expectedFlag) {
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build().builder()
-                .manageStayOption(manageStayOption)
-                .storedObligationData(List.of(
-                    Element.<StoredObligationData>builder()
-                        .value(StoredObligationData.builder()
-                                   .obligationDate(obligationDate)
-                                   .obligationWATaskRaised(initialTaskRaised)
-                                   .obligationReason(obligationReason)
-                                   .build())
-                        .build()))
-                .ccdState(caseState)
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+            caseData.setManageStayOption(manageStayOption);
+            StoredObligationData storedObligationData1 = new StoredObligationData();
+            storedObligationData1.setObligationDate(obligationDate);
+            storedObligationData1.setObligationWATaskRaised(initialTaskRaised);
+            storedObligationData1.setObligationReason(obligationReason);
+            Element<StoredObligationData> element = new Element<>();
+            element.setValue(storedObligationData1);
+            caseData.setStoredObligationData(List.of(element));
+            caseData.setCcdState(caseState);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -168,6 +161,14 @@ class OrderReviewObligationCheckCallbackHandlerTest extends BaseCallbackHandlerT
             assertThat(obligationWAFlag).isEqualTo(expectedFlag);
         }
 
+        private static ObligationWAFlag createObligationWAFlag(String currentDate, String obligationReason, String obligationReasonDisplayValue) {
+            ObligationWAFlag flag = new ObligationWAFlag();
+            flag.setCurrentDate(currentDate);
+            flag.setObligationReason(obligationReason);
+            flag.setObligationReasonDisplayValue(obligationReasonDisplayValue);
+            return flag;
+        }
+
         private static Stream<Arguments> provideObligationDataForAllScenarios() {
             LocalDate currentDate = LocalDate.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
@@ -175,18 +176,10 @@ class OrderReviewObligationCheckCallbackHandlerTest extends BaseCallbackHandlerT
             return Stream.of(
                 // Case 1: Obligation date is before current date, task not raised, reason is LIFT_A_STAY, case state is CASE_STAYED
                 arguments(currentDate.minusDays(1), YesOrNo.NO, ObligationReason.LIFT_A_STAY, CaseState.CASE_STAYED, null, YesOrNo.YES,
-                          ObligationWAFlag.builder()
-                              .currentDate(currentDate.format(formatter))
-                              .obligationReason(ObligationReason.LIFT_A_STAY.name())
-                              .obligationReasonDisplayValue(ObligationReason.LIFT_A_STAY.getDisplayedValue())
-                              .build()),
+                          createObligationWAFlag(currentDate.format(formatter), ObligationReason.LIFT_A_STAY.name(), ObligationReason.LIFT_A_STAY.getDisplayedValue())),
 
                 arguments(currentDate.minusDays(1), YesOrNo.NO, ObligationReason.LIFT_A_STAY, CaseState.CASE_STAYED, "REQUEST_UPDATE", YesOrNo.YES,
-                          ObligationWAFlag.builder()
-                              .currentDate(null)
-                              .obligationReason(null)
-                              .obligationReasonDisplayValue(null)
-                              .build()),
+                          createObligationWAFlag(null, null, null)),
 
                 // Case 2: Obligation date is after current date, task not raised, reason is DISMISS_CASE, case state is CASE_DISMISSED
                 arguments(currentDate.plusDays(1), YesOrNo.NO, ObligationReason.DISMISS_CASE, CaseState.CASE_DISMISSED, null, YesOrNo.NO, null),
@@ -196,23 +189,11 @@ class OrderReviewObligationCheckCallbackHandlerTest extends BaseCallbackHandlerT
 
                 // Case 4: Obligation date is before current date, task not raised, reason is UNLESS_ORDER, case state is CASE_DISMISSED
                 arguments(currentDate.minusDays(1), YesOrNo.NO, ObligationReason.UNLESS_ORDER, CaseState.CASE_DISMISSED, null, YesOrNo.YES,
-                          ObligationWAFlag.builder()
-                              .currentDate(currentDate.format(formatter))
-                              .obligationReason(ObligationReason.UNLESS_ORDER.name())
-                              .obligationReasonDisplayValue(ObligationReason.UNLESS_ORDER.getDisplayedValue())
-                              .build()),
+                          createObligationWAFlag(currentDate.format(formatter), ObligationReason.UNLESS_ORDER.name(), ObligationReason.UNLESS_ORDER.getDisplayedValue())),
                 arguments(currentDate.minusDays(1), YesOrNo.NO, ObligationReason.STAY_A_CASE, CaseState.CASE_STAYED, null, YesOrNo.YES,
-                          ObligationWAFlag.builder()
-                              .currentDate(null)
-                              .obligationReason(null)
-                              .obligationReasonDisplayValue(null)
-                              .build()),
+                          createObligationWAFlag(null, null, null)),
                 arguments(currentDate.minusDays(1), YesOrNo.NO, ObligationReason.STAY_A_CASE, CaseState.JUDICIAL_REFERRAL, null, YesOrNo.YES,
-                          ObligationWAFlag.builder()
-                              .currentDate(currentDate.format(formatter))
-                              .obligationReason(ObligationReason.STAY_A_CASE.name())
-                              .obligationReasonDisplayValue(ObligationReason.STAY_A_CASE.getDisplayedValue())
-                              .build())
+                          createObligationWAFlag(currentDate.format(formatter), ObligationReason.STAY_A_CASE.name(), ObligationReason.STAY_A_CASE.getDisplayedValue()))
             );
         }
     }

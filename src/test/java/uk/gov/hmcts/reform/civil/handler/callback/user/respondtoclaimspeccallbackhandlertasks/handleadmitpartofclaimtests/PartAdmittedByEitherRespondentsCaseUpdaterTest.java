@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.handleadmitpartofclaim.PartAdmittedByEitherRespondentsCaseUpdater;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -18,49 +19,40 @@ class PartAdmittedByEitherRespondentsCaseUpdaterTest {
     @InjectMocks
     private PartAdmittedByEitherRespondentsCaseUpdater updater;
 
-    private CaseData.CaseDataBuilder<?, ?> caseDataBuilder;
-
     @BeforeEach
     void setUp() {
-        caseDataBuilder = CaseData.builder();
     }
 
     @Test
     void shouldSetPartAdmittedByEitherRespondentsToYesForRespondent2() {
-        CaseData caseData = CaseData.builder()
-                .isRespondent2(YES)
-                .specDefenceAdmitted2Required(YES)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setIsRespondent2(YES);
+        caseData.setSpecDefenceAdmitted2Required(YES);
 
-        updater.update(caseData, caseDataBuilder);
+        updater.update(caseData);
 
-        CaseData updatedCaseData = caseDataBuilder.build();
-        assertThat(updatedCaseData.getPartAdmittedByEitherRespondents()).isEqualTo(YES);
+        assertThat(caseData.getPartAdmittedByEitherRespondents()).isEqualTo(YES);
     }
 
     @Test
     void shouldSetPartAdmittedByEitherRespondentsToYesForRespondent1() {
-        CaseData caseData = CaseData.builder()
-                .isRespondent1(YES)
-                .specDefenceAdmittedRequired(YES)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setIsRespondent1(YES);
+        caseData.setSpecDefenceAdmittedRequired(YES);
 
-        updater.update(caseData, caseDataBuilder);
+        updater.update(caseData);
 
-        CaseData updatedCaseData = caseDataBuilder.build();
-        assertThat(updatedCaseData.getPartAdmittedByEitherRespondents()).isEqualTo(YES);
+        assertThat(caseData.getPartAdmittedByEitherRespondents()).isEqualTo(YES);
     }
 
     @Test
     void shouldSetPartAdmittedByEitherRespondentsToNoWhenConditionsAreNotMet() {
-        CaseData caseData = CaseData.builder()
-                .isRespondent1(NO)
-                .isRespondent2(NO)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setIsRespondent1(NO);
+        caseData.setIsRespondent2(NO);
 
-        updater.update(caseData, caseDataBuilder);
+        updater.update(caseData);
 
-        CaseData updatedCaseData = caseDataBuilder.build();
-        assertThat(updatedCaseData.getPartAdmittedByEitherRespondents()).isEqualTo(NO);
+        assertThat(caseData.getPartAdmittedByEitherRespondents()).isEqualTo(NO);
     }
 }

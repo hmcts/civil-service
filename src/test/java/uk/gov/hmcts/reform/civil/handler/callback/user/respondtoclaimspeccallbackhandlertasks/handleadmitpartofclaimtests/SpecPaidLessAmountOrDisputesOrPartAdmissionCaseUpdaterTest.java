@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDate;
@@ -30,36 +31,31 @@ class SpecPaidLessAmountOrDisputesOrPartAdmissionCaseUpdaterTest {
     @InjectMocks
     private SpecPaidLessAmountOrDisputesOrPartAdmissionCaseUpdater updater;
 
-    private CaseData.CaseDataBuilder<?, ?> caseDataBuilder;
-
     @BeforeEach
     void setUp() {
-        caseDataBuilder = CaseData.builder();
     }
 
     @Test
     void shouldSetSpecPaidLessAmountOrDisputesOrPartAdmissionToYes_whenConditionsAreMet() {
-        List<Element<UnavailableDate>> dates = Stream.of(
-                UnavailableDate.builder()
-                        .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                        .date(LocalDate.now().plusDays(4))
-                        .build()
+        UnavailableDate unavailableDate = new UnavailableDate();
+        unavailableDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
+        unavailableDate.setDate(LocalDate.now().plusDays(4));
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondent1ClaimResponsePaymentAdmissionForSpec(RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT);
+        caseData.setDefenceRouteRequired(DISPUTES_THE_CLAIM);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+        SmallClaimHearing smallClaimHearing = new SmallClaimHearing();
+        smallClaimHearing.setUnavailableDatesRequired(YES);
+        List<Element<UnavailableDate>> dates = Stream.of(unavailableDate
         ).map(ElementUtils::element).toList();
+        smallClaimHearing.setSmallClaimUnavailableDate(dates);
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQHearingSmallClaim(smallClaimHearing);
+        caseData.setRespondent1DQ(respondent1DQ);
 
-        CaseData caseData = CaseData.builder()
-                .respondent1ClaimResponsePaymentAdmissionForSpec(RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT)
-                .defenceRouteRequired(DISPUTES_THE_CLAIM)
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .respondent1DQ(Respondent1DQ.builder()
-                        .respondent1DQHearingSmallClaim(SmallClaimHearing.builder()
-                                .unavailableDatesRequired(YES)
-                                .smallClaimUnavailableDate(dates)
-                                .build())
-                        .build())
-                .build();
+        updater.update(caseData);
 
-        updater.update(caseData, caseDataBuilder);
-
-        assertThat(caseDataBuilder.build().getSpecPaidLessAmountOrDisputesOrPartAdmission()).isEqualTo(YES);
+        assertThat(caseData.getSpecPaidLessAmountOrDisputesOrPartAdmission()).isEqualTo(YES);
     }
 }

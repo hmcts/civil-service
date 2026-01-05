@@ -62,23 +62,23 @@ public class BundleCreationTriggerEventHandler {
     }
 
     public IdValue<Bundle> prepareNewBundle(uk.gov.hmcts.reform.civil.model.bundle.Bundle bundle, CaseData caseData) {
-        Bundle result = Bundle.builder()
-            .bundleHearingDate(Optional.of(caseData.getHearingDate()))
-            .stitchedDocument(Optional.ofNullable(bundle.getValue().getStitchedDocument()))
-            .fileName(bundle.getValue().getFileName())
-            .title(bundle.getValue().getTitle())
-            .description(null != bundle.getValue().getDescription()
+        Bundle result = new Bundle()
+            .setBundleHearingDate(Optional.of(caseData.getHearingDate()))
+            .setStitchedDocument(Optional.ofNullable(bundle.getValue().getStitchedDocument()))
+            .setFileName(bundle.getValue().getFileName())
+            .setTitle(bundle.getValue().getTitle())
+            .setDescription(null != bundle.getValue().getDescription()
                              ? Optional.of(bundle.getValue().getDescription()).get() : "")
-            .stitchStatus(Optional.ofNullable(bundle.getValue().getStitchStatus()))
-            .createdOn(Optional.of(LocalDateTime.now(ZoneId.of("Europe/London"))))
-            .id(bundle.getValue().getId()).build();
+            .setStitchStatus(Optional.ofNullable(bundle.getValue().getStitchStatus()))
+            .setCreatedOn(Optional.of(LocalDateTime.now(ZoneId.of("Europe/London"))))
+            .setId(bundle.getValue().getId());
         return new IdValue<>(result.getId(), result);
     }
 
     CaseDataContent prepareCaseContent(List<IdValue<Bundle>> caseBundles, StartEventResponse startEventResponse) {
         Map<String, Object> data = startEventResponse.getCaseDetails().getData();
         List<Element<UploadEvidenceDocumentType>> evidenceUploadedAfterBundle = new ArrayList<>();
-        evidenceUploadedAfterBundle.add(ElementUtils.element(UploadEvidenceDocumentType.builder().build()));
+        evidenceUploadedAfterBundle.add(ElementUtils.element(new UploadEvidenceDocumentType()));
         data.put("caseBundles", caseBundles);
         data.put("applicantDocsUploadedAfterBundle", evidenceUploadedAfterBundle);
         data.put("respondentDocsUploadedAfterBundle", evidenceUploadedAfterBundle);

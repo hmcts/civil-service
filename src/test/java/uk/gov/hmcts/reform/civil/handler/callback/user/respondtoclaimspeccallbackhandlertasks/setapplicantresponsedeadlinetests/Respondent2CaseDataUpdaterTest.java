@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbac
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDateTime;
@@ -36,15 +37,19 @@ class Respondent2CaseDataUpdaterTest {
 
     @BeforeEach
     void setUp() {
-        caseData = CaseData.builder()
-                .respondent2(Party.builder().type(Party.Type.INDIVIDUAL).partyName("RESPONDENT_INDIVIDUAL").build())
-                .respondent2Copy(Party.builder().partyName("Party 2").primaryAddress(Address.builder()
-                                .addressLine1("Triple street")
-                                .postCode("Postcode")
-                                .build())
-                        .build())
-                .respondentResponseIsSame(YesOrNo.YES)
-                .build();
+        caseData = CaseDataBuilder.builder().build();
+        Party individual = new Party();
+        individual.setType(Party.Type.INDIVIDUAL);
+        individual.setPartyName("RESPONDENT_INDIVIDUAL");
+        caseData.setRespondent2(individual);
+        Party party = new Party();
+        party.setPartyName("Party 2");
+        Address address = new Address();
+        address.setAddressLine1("Triple street");
+        address.setPostCode("Postcode");
+        party.setPrimaryAddress(address);
+        caseData.setRespondent2Copy(party);
+        caseData.setRespondentResponseIsSame(YesOrNo.YES);
     }
 
     @Test

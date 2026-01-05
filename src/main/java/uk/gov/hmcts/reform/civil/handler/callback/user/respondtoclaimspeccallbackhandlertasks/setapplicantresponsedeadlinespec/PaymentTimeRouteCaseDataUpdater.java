@@ -32,9 +32,8 @@ public class PaymentTimeRouteCaseDataUpdater implements SetApplicantResponseDead
             LocalDate whenBePaid = deadlineCalculatorService.calculateExtendedDeadline(
                     ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDateTime(),
                     RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
-            RespondToClaimAdmitPartLRspec admitPartLRspec = RespondToClaimAdmitPartLRspec.builder()
-                    .whenWillThisAmountBePaid(whenBePaid)
-                    .build();
+            RespondToClaimAdmitPartLRspec admitPartLRspec = new RespondToClaimAdmitPartLRspec();
+            admitPartLRspec.setWhenWillThisAmountBePaid(whenBePaid);
             caseData.setRespondToClaimAdmitPartLRspec(admitPartLRspec);
         } else {
             log.info("Defence admit part payment time route is not IMMEDIATELY for caseId: {}", caseData.getCcdCaseReference());

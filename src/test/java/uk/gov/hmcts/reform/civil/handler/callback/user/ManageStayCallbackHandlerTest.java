@@ -70,7 +70,7 @@ public class ManageStayCallbackHandlerTest {
         @Test
         void shouldSetManageStayOptionToNull_WhenAboutToStartIsInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build();
-            caseData.toBuilder().manageStayOption("LIFT_STAY").build();
+            caseData.setManageStayOption("LIFT_STAY");
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -97,9 +97,10 @@ public class ManageStayCallbackHandlerTest {
         @Test
         void shouldReturnNoError_WhenAboutToSubmitIsInvokedToggleTrue() {
             CaseState preStayState = CaseState.JUDICIAL_REFERRAL;
-            CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build()
-                .toBuilder().manageStayOption("LIFT_STAY").ccdState(preStayState)
-                .preStayState(preStayState.name()).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build();
+            caseData.setManageStayOption("LIFT_STAY");
+            caseData.setCcdState(preStayState);
+            caseData.setPreStayState(preStayState.name());
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -118,9 +119,10 @@ public class ManageStayCallbackHandlerTest {
         @ParameterizedTest
         @MethodSource("provideCaseStatesForLiftStay")
         void shouldSetCorrectCaseState_WhenManageStayOptionIsLiftStay(CaseState preStayState, CaseState expectedState) {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .manageStayOption("LIFT_STAY").ccdState(preStayState)
-                .preStayState(preStayState.name()).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setManageStayOption("LIFT_STAY");
+            caseData.setCcdState(preStayState);
+            caseData.setPreStayState(preStayState.name());
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -132,8 +134,9 @@ public class ManageStayCallbackHandlerTest {
         @Test
         void shouldNotChangeCaseState_WhenManageStayOptionIsNotLiftStay() {
 
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .manageStayOption("REQUEST_UPDATE").ccdState(CASE_STAYED).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setManageStayOption("REQUEST_UPDATE");
+            caseData.setCcdState(CASE_STAYED);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -165,8 +168,8 @@ public class ManageStayCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvokedWithLiftStay() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .manageStayOption("LIFT_STAY").build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setManageStayOption("LIFT_STAY");
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
@@ -179,8 +182,8 @@ public class ManageStayCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvokedWithRequestUpdate() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .manageStayOption("REQUEST_UPDATE").build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            caseData.setManageStayOption("REQUEST_UPDATE");
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
