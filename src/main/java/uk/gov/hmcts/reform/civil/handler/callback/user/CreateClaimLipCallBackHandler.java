@@ -100,9 +100,9 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
         if (Optional.ofNullable(callbackParams.getRequest()).map(CallbackRequest::getEventId).isPresent()) {
             caseData.setLegacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
             caseData.setBusinessProcess(BusinessProcess.ready(CREATE_LIP_CLAIM));
-            Party party = caseData.getRespondent1();
-            party.setFlags(null);
-            caseData.setRespondent1DetailsForClaimDetailsTab(party);
+            Party respondent1Clone = objectMapper.convertValue(caseData.getRespondent1(), Party.class);
+            respondent1Clone.setFlags(null);
+            caseData.setRespondent1DetailsForClaimDetailsTab(respondent1Clone);
 
             caseFlagsInitialiser.initialiseCaseFlags(CREATE_LIP_CLAIM, caseData);
             populateWithPartyIds(caseData);
