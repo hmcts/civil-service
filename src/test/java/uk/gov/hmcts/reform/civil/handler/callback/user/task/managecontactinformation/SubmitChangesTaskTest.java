@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_ID;
 
 @ExtendWith(MockitoExtension.class)
-public class SubmitChangesTaskTest {
+class SubmitChangesTaskTest {
 
     @InjectMocks
     private SubmitChangesTask handler;
@@ -75,6 +75,11 @@ public class SubmitChangesTaskTest {
         Party applicant1 = PartyBuilder.builder().company().build();
         applicant1.setFlags(applicant1Flags);
         Party respondent1 = PartyBuilder.builder().company().build();
+        Flags respondent1Flags = new Flags();
+        respondent1Flags.setPartyName("respondent1name");
+        respondent1Flags.setRoleOnCase("Defendant 1");
+        respondent1.setFlags(respondent1Flags);
+
         uk.gov.hmcts.reform.ccd.client.model.CaseDetails caseDetails = CaseDetails.builder().build();
         CaseData oldCaseData = CaseDataBuilder.builder().applicant1(applicant1).respondent1(respondent1).build();
         CaseData caseData = CaseDataBuilder.builder()
@@ -86,8 +91,12 @@ public class SubmitChangesTaskTest {
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(oldCaseData);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.submitChanges(caseData, caseDetails, "authToken");
-
+        CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(response.getErrors()).isNull();
+        assertThat(updatedCaseData.getRespondent1().getFlags()).isEqualTo(respondent1Flags);
+        Party respondent1DetailsForClaimDetailsTab = updatedCaseData.getRespondent1DetailsForClaimDetailsTab();
+        assertThat(respondent1DetailsForClaimDetailsTab).isNotNull();
+        assertThat(respondent1DetailsForClaimDetailsTab.getFlags()).isNull();
     }
 
     @Test
