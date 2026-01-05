@@ -65,14 +65,12 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
 
     private CallbackResponse submitNotSuitableSDO(CallbackParams callbackParams) {
         CaseData caseData = getSharedData(callbackParams);
-        OtherDetails tempOtherDetails = OtherDetails.builder()
-                .notSuitableForSDO(YesOrNo.YES)
-                .build();
+        OtherDetails tempOtherDetails = new OtherDetails();
+        tempOtherDetails.setNotSuitableForSDO(YesOrNo.YES);
         if (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION) {
             caseData.setNotSuitableSdoOptions(NotSuitableSdoOptions.CHANGE_LOCATION);
-            TransferCaseDetails transferCaseDetails = TransferCaseDetails.builder()
-                    .reasonForTransferCaseTxt(callbackParams.getCaseData().getTocTransferCaseReason().getReasonForCaseTransferJudgeTxt())
-                    .build();
+            TransferCaseDetails transferCaseDetails = new TransferCaseDetails();
+            transferCaseDetails.setReasonForTransferCaseTxt(callbackParams.getCaseData().getTocTransferCaseReason().getReasonForCaseTransferJudgeTxt());
             caseData.setTransferCaseDetails(transferCaseDetails);
         } else {
             caseData.setNotSuitableSdoOptions(NotSuitableSdoOptions.OTHER_REASONS);

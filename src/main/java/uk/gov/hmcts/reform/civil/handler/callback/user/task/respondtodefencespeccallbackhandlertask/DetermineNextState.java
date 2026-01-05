@@ -87,10 +87,9 @@ public class DetermineNextState extends CallbackHandler {
 
     private CallbackResponse updateClaimStatePostTranslation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String nextState = determineNextStatePostTranslation(caseData, callbackParams);
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .state(nextState)
             .build();
     }

@@ -111,17 +111,15 @@ class ConversionToBundleRequestDocsTest {
             .categoryID("SomeCategoryID")
             .build();
 
-        UploadEvidenceDocumentType uploadEvidenceDocumentType1 = UploadEvidenceDocumentType.builder()
-            .documentIssuedDate(LocalDate.of(2023, 4, 24))
-            .bundleName("BundleName")
-            .documentUpload(document)
-            .build();
+        UploadEvidenceDocumentType uploadEvidenceDocumentType1 = new UploadEvidenceDocumentType()
+            .setDocumentIssuedDate(LocalDate.of(2023, 4, 24))
+            .setBundleName("BundleName")
+            .setDocumentUpload(document);
 
-        UploadEvidenceDocumentType uploadEvidenceDocumentType2 = UploadEvidenceDocumentType.builder()
-            .documentIssuedDate(LocalDate.of(2024, 4, 24))
-            .documentUpload(document)
-            .bundleName("BundleName")
-            .build();
+        UploadEvidenceDocumentType uploadEvidenceDocumentType2 = new UploadEvidenceDocumentType()
+            .setDocumentIssuedDate(LocalDate.of(2024, 4, 24))
+            .setDocumentUpload(document)
+            .setBundleName("BundleName");
 
         List<Element<UploadEvidenceDocumentType>> listOfUploadDocumentType =
             List.of(

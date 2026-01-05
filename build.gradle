@@ -30,7 +30,7 @@ def versions = [
   jackson           : '2.19.2',
   testcontainers    : '1.21.3',
   pdfbox            : '3.0.5',
-  tika              : '2.9.4'
+  tika              : '3.2.2'
 ]
 
 allprojects {
@@ -351,7 +351,6 @@ dependencies {
   def withoutJunit4 = {
     exclude group: 'junit', module: 'junit'
   }
-  implementation 'com.github.hmcts:civil-commons:1.1.12'
   implementation project(':dashboard-notifications')
   implementation group: 'org.springframework.data', name: 'spring-data-jpa'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'

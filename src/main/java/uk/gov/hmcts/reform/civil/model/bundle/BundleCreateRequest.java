@@ -11,12 +11,12 @@ import lombok.Value;
 public class BundleCreateRequest {
 
     @JsonProperty("caseTypeId")
-    private String caseTypeId;
+    String caseTypeId;
     @JsonProperty("jurisdictionId")
-    private String jurisdictionId;
+    String jurisdictionId;
     @JsonProperty("case_details")
-    private BundlingCaseDetails caseDetails;
+    BundlingCaseDetails caseDetails;
     @JsonProperty("event_id")
-    private String eventId;
+    String eventId;
 
 }

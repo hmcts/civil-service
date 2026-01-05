@@ -35,9 +35,9 @@ public class BuildConfirmationTask implements CaseTask {
         log.info("Executing SubmittedCallbackResponse for Case : {} ", caseData.getCcdCaseReference());
 
         if (!AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
-            caseData.toBuilder().ccdState(CaseState.JUDICIAL_REFERRAL).build();
+            caseData.setCcdState(CaseState.JUDICIAL_REFERRAL);
         } else if (isDefendantFullAdmitPayImmediately(caseData)) {
-            caseData.toBuilder().ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM).build();
+            caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
         }
 
         SubmittedCallbackResponse.SubmittedCallbackResponseBuilder responseBuilder =

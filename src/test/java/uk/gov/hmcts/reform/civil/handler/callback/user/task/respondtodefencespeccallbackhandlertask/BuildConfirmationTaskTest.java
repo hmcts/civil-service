@@ -23,6 +23,7 @@ import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -96,10 +97,10 @@ class BuildConfirmationTaskTest {
     @Test
     void shouldGenerateConfirmationTextAndHeaderWhenAllFinalOrderIssued() {
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudmentOnlineCaseDataWithPaymentByInstalment().toBuilder()
-            .applicant1ProceedWithClaim(YesOrNo.NO)
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-            .build();
+            .buildJudmentOnlineCaseDataWithPaymentByInstalment()
+            .setAllocatedTrack(MULTI_CLAIM)
+            .setApplicant1ProceedWithClaim(YesOrNo.NO)
+            .setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
 
         SubmittedCallbackResponse response = buildConfirmationTask.execute(callbackParams(caseData), featureToggleService);
 
