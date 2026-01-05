@@ -55,16 +55,16 @@ public class SetSettlementAgreementDeadlineCallbackHandlerTest extends BaseCallb
         @Test
         void shouldSetSettlementAgreementDeadline() {
             // Given
-            LocalDateTime expectedDateTime = LocalDateTime.parse("2024-01-22T13:12:34");
             CaseData caseData = CaseDataBuilder.builder()
                 .build();
-            caseData.setCaseDataLiP(CaseDataLiP.builder()
-                    .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                        .applicant1SignedSettlementAgreement(YesOrNo.YES).build()
-                    )
-                    .build());
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+            claimantLiPResponse.setApplicant1SignedSettlementAgreement(YesOrNo.YES);
+            caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+            caseData.setCaseDataLiP(caseDataLiP);
             caseData.setClaimantBilingualLanguagePreference(Language.BOTH.toString());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            LocalDateTime expectedDateTime = LocalDateTime.parse("2024-01-22T13:12:34");
             when(deadlinesCalculator.getRespondToSettlementAgreementDeadline(any())).thenReturn(expectedDateTime);
 
             // When
@@ -80,11 +80,11 @@ public class SetSettlementAgreementDeadlineCallbackHandlerTest extends BaseCallb
             // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .build();
-            caseData.setCaseDataLiP(CaseDataLiP.builder()
-                    .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                        .applicant1SignedSettlementAgreement(YesOrNo.YES).build()
-                    )
-                    .build());
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+            claimantLiPResponse.setApplicant1SignedSettlementAgreement(YesOrNo.YES);
+            caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+            caseData.setCaseDataLiP(caseDataLiP);
             caseData.setClaimantBilingualLanguagePreference(Language.ENGLISH.toString());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -115,19 +115,17 @@ public class SetSettlementAgreementDeadlineCallbackHandlerTest extends BaseCallb
         @Test
         void shouldSetSettlementAgreementDeadline_WhenCourtDecisionInFavourClaimantImmediateRepayment() {
             // Given
-            final LocalDateTime expectedDateTime = LocalDateTime.parse("2024-05-20T13:12:34");
-            CaseData caseData = CaseDataBuilder.builder()
-                    .build();
-            caseData.setCaseDataLiP(CaseDataLiP.builder()
-                            .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                    .applicant1SignedSettlementAgreement(YesOrNo.YES)
-                                    .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                                    .build()
-                            )
-                            .build());
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+            claimantLiPResponse.setApplicant1SignedSettlementAgreement(YesOrNo.YES);
+            claimantLiPResponse.setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
+            caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseDataLiP(caseDataLiP);
             caseData.setClaimantBilingualLanguagePreference(Language.BOTH.toString());
             caseData.setApplicant1RepaymentOptionForDefendantSpec(PaymentType.IMMEDIATELY);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            final LocalDateTime expectedDateTime = LocalDateTime.parse("2024-05-20T13:12:34");
             when(deadlinesCalculator.getRespondentToImmediateSettlementAgreement(any())).thenReturn(expectedDateTime);
 
             // When

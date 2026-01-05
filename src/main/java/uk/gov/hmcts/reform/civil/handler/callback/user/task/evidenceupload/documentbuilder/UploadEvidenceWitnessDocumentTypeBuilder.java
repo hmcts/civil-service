@@ -9,18 +9,17 @@ public class UploadEvidenceWitnessDocumentTypeBuilder implements DocumentTypeBui
 
     @Override
     public UploadEvidenceWitness buildElementTypeWithDocumentCopy(UploadEvidenceWitness fromValue, String categoryID) {
-        Document newDoc = Document.builder()
-            .categoryID(categoryID)
-            .documentBinaryUrl(fromValue.getWitnessOptionDocument().getDocumentBinaryUrl())
-            .documentFileName(fromValue.getWitnessOptionDocument().getDocumentFileName())
-            .documentHash(fromValue.getWitnessOptionDocument().getDocumentHash())
-            .documentUrl(fromValue.getWitnessOptionDocument().getDocumentUrl())
-            .build();
-        return UploadEvidenceWitness.builder()
-            .witnessOptionUploadDate(fromValue.getWitnessOptionUploadDate())
-            .witnessOptionName(fromValue.getWitnessOptionName())
-            .createdDatetime(fromValue.getCreatedDatetime())
-            .witnessOptionDocument(newDoc)
-            .build();
+        Document newDoc = new Document();
+        newDoc.setCategoryID(categoryID)
+            .setDocumentBinaryUrl(fromValue.getWitnessOptionDocument().getDocumentBinaryUrl())
+            .setDocumentFileName(fromValue.getWitnessOptionDocument().getDocumentFileName())
+            .setDocumentHash(fromValue.getWitnessOptionDocument().getDocumentHash())
+            .setDocumentUrl(fromValue.getWitnessOptionDocument().getDocumentUrl());
+        UploadEvidenceWitness uploadEvidenceWitness = new UploadEvidenceWitness();
+        uploadEvidenceWitness.setWitnessOptionUploadDate(fromValue.getWitnessOptionUploadDate());
+        uploadEvidenceWitness.setWitnessOptionName(fromValue.getWitnessOptionName());
+        uploadEvidenceWitness.setCreatedDatetime(fromValue.getCreatedDatetime());
+        uploadEvidenceWitness.setWitnessOptionDocument(newDoc);
+        return uploadEvidenceWitness;
     }
 }

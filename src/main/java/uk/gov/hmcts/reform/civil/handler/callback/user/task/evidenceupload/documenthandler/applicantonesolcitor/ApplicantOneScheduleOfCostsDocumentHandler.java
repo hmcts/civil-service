@@ -38,8 +38,8 @@ public class ApplicantOneScheduleOfCostsDocumentHandler extends
     }
 
     @Override
-    protected void addDocumentsToCopyToCaseData(CaseData.CaseDataBuilder<?, ?> builder, List<Element<UploadEvidenceDocumentType>> evidenceDocsToAdd) {
-        builder.documentCostsApp2(evidenceDocsToAdd);
+    protected void addDocumentsToCopyToCaseData(CaseData caseData, List<Element<UploadEvidenceDocumentType>> evidenceDocsToAdd) {
+        caseData.setDocumentCostsApp2(evidenceDocsToAdd);
 
     }
 

@@ -146,21 +146,17 @@ class SetApplicantResponseDeadlineSpecTest {
                 .calculateApplicantResponseDeadlineSpec(any(LocalDateTime.class));
 
         Address address = buildAddress("123 Test Street", "AB12 3CD");
+        Party respondent2Copy = new Party();
+        respondent2Copy.setPrimaryAddress(address);
+        respondent2Copy.setFlags(new Flags());
 
-        Party respondent1 = Party.builder()
-                .primaryAddress(buildAddress("Old Address", ""))
-                .type(Party.Type.INDIVIDUAL)
-                .build();
+        Party respondent1 = new Party();
+        respondent1.setPrimaryAddress(buildAddress("Old Address", ""));
+        respondent1.setType(Party.Type.INDIVIDUAL);
 
-        Party respondent2 = Party.builder()
-                .primaryAddress(buildAddress("Old Address", ""))
-                .type(Party.Type.INDIVIDUAL)
-                .build();
-
-        Party respondent2Copy = Party.builder()
-                .primaryAddress(address)
-                .flags(new Flags())
-                .build();
+        Party respondent2 = new Party();
+        respondent2.setPrimaryAddress(buildAddress("Old Address", ""));
+        respondent2.setType(Party.Type.INDIVIDUAL);
 
         CaseData caseData = buildCaseData(
                 CaseDataBuilder.builder()
@@ -193,22 +189,21 @@ class SetApplicantResponseDeadlineSpecTest {
                 .when(deadlinesCalculator)
                 .calculateApplicantResponseDeadlineSpec(any(LocalDateTime.class));
 
+        Party respondent1 = new Party();
+        respondent1.setPrimaryAddress(buildAddress("Old Address", ""));
+        respondent1.setType(Party.Type.INDIVIDUAL);
+        respondent1.setFlags(new Flags());
+        Party respondent2 = new Party();
+
         Address address = buildAddress("123 Test Street", "AB12 3CD");
-
-        Party respondent1 = Party.builder()
-                .primaryAddress(buildAddress("Old Address", ""))
-                .type(Party.Type.INDIVIDUAL)
-                .build();
-
-        Party respondent2 = Party.builder()
-                .primaryAddress(address)
-                .type(Party.Type.INDIVIDUAL)
-                .flags(new Flags())
-                .build();
+        respondent2.setPrimaryAddress(address);
+        respondent2.setType(Party.Type.INDIVIDUAL);
+        respondent2.setFlags(new Flags());
 
         CaseData caseData = buildCaseData(
                 CaseDataBuilder.builder()
                         .atStateClaimDetailsNotified()
+                        .respondent1(respondent1)
                         .respondent1Copy(respondent1)
                         .respondent1DQ(new Respondent1DQ())
                         .respondent2(respondent2)
@@ -220,6 +215,7 @@ class SetApplicantResponseDeadlineSpecTest {
 
         CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
+        assertThat(updatedCaseData.getRespondent1().getFlags()).isEqualTo(new Flags());
         assertThat(updatedCaseData.getRespondent2().getPrimaryAddress()).isEqualTo(address);
         assertThat(updatedCaseData.getRespondent2().getFlags()).isEqualTo(new Flags());
         assertNull(updatedCaseData.getRespondent2Copy());
@@ -238,28 +234,25 @@ class SetApplicantResponseDeadlineSpecTest {
 
         Address expectedAddress = buildAddress("123 Test Street", "AB1 2CD");
 
-        Party respondent1 = Party.builder()
-                .primaryAddress(buildAddress("Old Address", ""))
-                .type(Party.Type.INDIVIDUAL)
-                .build();
+        Party respondent1 = new Party();
+        respondent1.setPrimaryAddress(buildAddress("Old Address", ""));
+        respondent1.setType(Party.Type.INDIVIDUAL);
 
-        Party respondent2 = Party.builder()
-                .primaryAddress(expectedAddress)
-                .type(Party.Type.INDIVIDUAL)
-                .flags(new Flags())
-                .build();
+        Party respondent2 = new Party();
+        respondent2.setPrimaryAddress(expectedAddress);
+        respondent2.setType(Party.Type.INDIVIDUAL);
+        respondent2.setFlags(new Flags());
 
-        CaseData caseData = CaseData.builder()
-                .specAoSRespondent2HomeAddressRequired(NO)
-                .specAoSRespondent2HomeAddressDetails(expectedAddress)
-                .respondent1(respondent1)
-                .respondent1Copy(respondent1)
-                .respondent1DQ(new Respondent1DQ())
-                .respondent1ResponseDeadline(LocalDateTime.now())
-                .respondent2(respondent2)
-                .respondent2Copy(respondent2)
-                .ccdCaseReference(1234L)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setSpecAoSRespondent2HomeAddressRequired(NO);
+        caseData.setSpecAoSRespondent2HomeAddressDetails(expectedAddress);
+        caseData.setRespondent1(respondent1);
+        caseData.setRespondent1Copy(respondent1);
+        caseData.setRespondent1DQ(new Respondent1DQ());
+        caseData.setRespondent1ResponseDeadline(LocalDateTime.now());
+        caseData.setRespondent2(respondent2);
+        caseData.setRespondent2Copy(respondent2);
+        caseData.setCcdCaseReference(1234L);
 
         CallbackParams callbackParams = buildCallbackParams(caseData);
 
@@ -272,26 +265,23 @@ class SetApplicantResponseDeadlineSpecTest {
 
     @Test
     void shouldSetDefenceAdmitPartPaymentTimeRouteRequiredToNullWhenSolicitorTwoAndFullDefence() {
-        Party respondent1 = Party.builder()
-                .primaryAddress(buildAddress("Old Address", ""))
-                .type(Party.Type.INDIVIDUAL)
-                .build();
+        Party respondent1 = new Party();
+        respondent1.setPrimaryAddress(buildAddress("Old Address", ""));
+        respondent1.setType(Party.Type.INDIVIDUAL);
 
-        Party respondent2 = Party.builder()
-                .primaryAddress(buildAddress("123 Test Street", "AB12 3CD"))
-                .type(Party.Type.INDIVIDUAL)
-                .build();
+        Party respondent2 = new Party();
+        respondent2.setPrimaryAddress(buildAddress("123 Test Street", "AB12 3CD"));
+        respondent2.setType(Party.Type.INDIVIDUAL);
 
-        CaseData caseData = CaseData.builder()
-                .respondent2ClaimResponseTypeForSpec(FULL_DEFENCE)
-                .respondent1(respondent1)
-                .respondent1Copy(respondent1)
-                .respondent1DQ(new Respondent1DQ())
-                .respondent2(respondent2)
-                .respondent2Copy(respondent2)
-                .respondent2DQ(new Respondent2DQ())
-                .ccdCaseReference(1234L)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondent2ClaimResponseTypeForSpec(FULL_DEFENCE);
+        caseData.setRespondent1(respondent1);
+        caseData.setRespondent1Copy(respondent1);
+        caseData.setRespondent1DQ(new Respondent1DQ());
+        caseData.setRespondent2(respondent2);
+        caseData.setRespondent2Copy(respondent2);
+        caseData.setRespondent2DQ(new Respondent2DQ());
+        caseData.setCcdCaseReference(1234L);
 
         CallbackParams callbackParams = buildCallbackParams(caseData);
 
@@ -312,25 +302,23 @@ class SetApplicantResponseDeadlineSpecTest {
                 .when(deadlinesCalculator)
                 .calculateApplicantResponseDeadlineSpec(any(LocalDateTime.class));
 
-        Witnesses respondent1Witnesses = Witnesses.builder().build();
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondToClaimExperts(new ExpertDetails());
 
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondToClaimExperts(ExpertDetails.builder().build()).build();
+        Party respondent1 = new Party();
+        respondent1.setPrimaryAddress(buildAddress("Old Address", ""));
+        respondent1.setType(Party.Type.INDIVIDUAL);
 
-        Party respondent1 = Party.builder()
-                .primaryAddress(buildAddress("Old Address", ""))
-                .type(Party.Type.INDIVIDUAL)
-                .build();
-
-        CaseData caseData = CaseData.builder()
-                .responseClaimExpertSpecRequired(YES)
-                .applicant1ResponseDeadline(LocalDateTime.now())
-                .respondent1DQ(respondent1DQ)
-                .respondent1(respondent1)
-                .respondent1Copy(respondent1)
-                .respondent1DQWitnessesSmallClaim(respondent1Witnesses)
-                .respondent1ResponseDeadline(LocalDateTime.now())
-                .ccdCaseReference(1234L)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setResponseClaimExpertSpecRequired(YES);
+        caseData.setApplicant1ResponseDeadline(LocalDateTime.now());
+        caseData.setRespondent1DQ(respondent1DQ);
+        caseData.setRespondent1(respondent1);
+        caseData.setRespondent1Copy(respondent1);
+        Witnesses respondent1Witnesses = new Witnesses();
+        caseData.setRespondent1DQWitnessesSmallClaim(respondent1Witnesses);
+        caseData.setRespondent1ResponseDeadline(LocalDateTime.now());
+        caseData.setCcdCaseReference(1234L);
 
         CallbackParams callbackParams = buildCallbackParams(caseData);
 
@@ -362,19 +350,17 @@ class SetApplicantResponseDeadlineSpecTest {
                 .when(deadlinesCalculator)
                 .calculateApplicantResponseDeadlineSpec(any(LocalDateTime.class));
 
-        Party respondent1 = Party.builder()
-                .primaryAddress(buildAddress("Old Address", ""))
-                .type(Party.Type.INDIVIDUAL)
-                .build();
+        Party respondent1 = new Party();
+        respondent1.setPrimaryAddress(buildAddress("Old Address", ""));
+        respondent1.setType(Party.Type.INDIVIDUAL);
 
-        CaseData caseData = CaseData.builder()
-                .specAoSRespondentCorrespondenceAddressRequired(NO)
-                .respondent1(respondent1)
-                .respondent1Copy(respondent1)
-                .respondent1DQ(new Respondent1DQ())
-                .respondent1ResponseDeadline(LocalDateTime.now())
-                .ccdCaseReference(1234L)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setSpecAoSRespondentCorrespondenceAddressRequired(NO);
+        caseData.setRespondent1(respondent1);
+        caseData.setRespondent1Copy(respondent1);
+        caseData.setRespondent1DQ(new Respondent1DQ());
+        caseData.setRespondent1ResponseDeadline(LocalDateTime.now());
+        caseData.setCcdCaseReference(1234L);
 
         CallbackParams callbackParams = buildCallbackParams(caseData);
 
@@ -383,7 +369,7 @@ class SetApplicantResponseDeadlineSpecTest {
         CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
         assertThat(updatedCaseData.getSpecAoSRespondentCorrespondenceAddressdetails()).isNotNull();
-        assertThat(updatedCaseData.getSpecAoSRespondentCorrespondenceAddressdetails()).isEqualTo(Address.builder().build());
+        assertThat(updatedCaseData.getSpecAoSRespondentCorrespondenceAddressdetails()).isEqualTo(new Address());
     }
 
     @Test
@@ -395,19 +381,17 @@ class SetApplicantResponseDeadlineSpecTest {
         )).thenReturn(false);
         when(coreCaseUserService.userHasCaseRole(eq("1234"), anyString(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
 
-        Party respondent1 = Party.builder()
-                .primaryAddress(buildAddress("Old Address", ""))
-                .type(Party.Type.INDIVIDUAL)
-                .build();
+        Party respondent1 = new Party();
+        respondent1.setPrimaryAddress(buildAddress("Old Address", ""));
+        respondent1.setType(Party.Type.INDIVIDUAL);
 
-        CaseData caseData = CaseData.builder()
-                .specAoSRespondent2CorrespondenceAddressRequired(NO)
-                .respondent1(respondent1)
-                .respondent1Copy(respondent1)
-                .respondent1DQ(new Respondent1DQ())
-                .respondent2DQ(new Respondent2DQ())
-                .ccdCaseReference(1234L)
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setSpecAoSRespondent2CorrespondenceAddressRequired(NO);
+        caseData.setRespondent1(respondent1);
+        caseData.setRespondent1Copy(respondent1);
+        caseData.setRespondent1DQ(new Respondent1DQ());
+        caseData.setRespondent2DQ(new Respondent2DQ());
+        caseData.setCcdCaseReference(1234L);
 
         CallbackParams callbackParams = buildCallbackParams(caseData);
 
@@ -416,7 +400,7 @@ class SetApplicantResponseDeadlineSpecTest {
         CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
         assertThat(updatedCaseData.getSpecAoSRespondent2CorrespondenceAddressdetails()).isNotNull();
-        assertThat(updatedCaseData.getSpecAoSRespondent2CorrespondenceAddressdetails()).isEqualTo(Address.builder().build());
+        assertThat(updatedCaseData.getSpecAoSRespondent2CorrespondenceAddressdetails()).isEqualTo(new Address());
     }
 
     @Test
@@ -428,24 +412,21 @@ class SetApplicantResponseDeadlineSpecTest {
                 .when(deadlinesCalculator)
                 .calculateApplicantResponseDeadlineSpec(any(LocalDateTime.class));
 
-        Witnesses respondent1Witnesses = Witnesses.builder().build();
+        Party respondent1 = new Party();
+        respondent1.setPrimaryAddress(buildAddress("Old Address", ""));
+        respondent1.setType(Party.Type.INDIVIDUAL);
 
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setResponseClaimExpertSpecRequired(YES);
 
-        Party respondent1 = Party.builder()
-                .primaryAddress(buildAddress("Old Address", ""))
-                .type(Party.Type.INDIVIDUAL)
-                .build();
-
-        CaseData caseData = CaseData.builder()
-                .responseClaimExpertSpecRequired(YES)
-                .respondent1DQ(respondent1DQ)
-                .respondent1(respondent1)
-                .respondent1Copy(respondent1)
-                .respondent1DQWitnessesSmallClaim(respondent1Witnesses)
-                .respondent1ResponseDeadline(LocalDateTime.now())
-                .ccdCaseReference(1234L)
-                .build();
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        caseData.setRespondent1DQ(respondent1DQ);
+        caseData.setRespondent1(respondent1);
+        caseData.setRespondent1Copy(respondent1);
+        Witnesses respondent1Witnesses = new Witnesses();
+        caseData.setRespondent1DQWitnessesSmallClaim(respondent1Witnesses);
+        caseData.setRespondent1ResponseDeadline(LocalDateTime.now());
+        caseData.setCcdCaseReference(1234L);
 
         CallbackParams callbackParams = buildCallbackParams(caseData);
 
@@ -477,35 +458,31 @@ class SetApplicantResponseDeadlineSpecTest {
                 .when(deadlinesCalculator)
                 .calculateApplicantResponseDeadlineSpec(any(LocalDateTime.class));
 
-        Party respondent1 = Party.builder()
-                .primaryAddress(buildAddress("Old Address", ""))
-                .type(Party.Type.INDIVIDUAL)
-                .build();
+        Party respondent1 = new Party();
+        respondent1.setPrimaryAddress(buildAddress("Old Address", ""));
+        respondent1.setType(Party.Type.INDIVIDUAL);
 
-        ResponseDocument testDocument = ResponseDocument.builder()
-                .file(Document.builder()
-                        .documentUrl("fake-url")
-                        .documentFileName("file-name")
-                        .documentBinaryUrl("binary-url")
-                        .build())
-                .build();
+        Document document = new Document();
+        document.setDocumentUrl("fake-url");
+        document.setDocumentFileName("file-name");
+        document.setDocumentBinaryUrl("binary-url");
+        ResponseDocument testDocument = new ResponseDocument();
+        testDocument.setFile(document);
 
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setSpecAoSRespondentCorrespondenceAddressRequired(NO);
+        caseData.setRespondent1(respondent1);
+        caseData.setRespondent1Copy(respondent1);
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondToCourtLocation(new RequestedCourt());
+        caseData.setRespondent1DQ(respondent1DQ);
+        caseData.setRespondent1ResponseDeadline(LocalDateTime.now());
+        caseData.setCcdCaseReference(1234L);
         List<Element<CaseDocument>> defendantUploads = new ArrayList<>();
-
-        CaseData caseData = CaseData.builder()
-                .specAoSRespondentCorrespondenceAddressRequired(NO)
-                .respondent1(respondent1)
-                .respondent1Copy(respondent1)
-                .respondent1DQ(Respondent1DQ.builder()
-                        .respondToCourtLocation(RequestedCourt.builder().build())
-                        .build())
-                .respondent1ResponseDeadline(LocalDateTime.now())
-                .ccdCaseReference(1234L)
-                .defendantResponseDocuments(defendantUploads)
-                .courtLocation(CourtLocation.builder().build())
-                .respondent1SpecDefenceResponseDocument(testDocument)
-                .respondent2SpecDefenceResponseDocument(testDocument)
-                .build();
+        caseData.setDefendantResponseDocuments(defendantUploads);
+        caseData.setCourtLocation(new CourtLocation());
+        caseData.setRespondent1SpecDefenceResponseDocument(testDocument);
+        caseData.setRespondent2SpecDefenceResponseDocument(testDocument);
 
         CallbackParams callbackParams = buildCallbackParams(caseData);
 
@@ -518,15 +495,15 @@ class SetApplicantResponseDeadlineSpecTest {
             CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedCaseData.getSpecAoSRespondentCorrespondenceAddressdetails()).isNotNull();
-            assertThat(updatedCaseData.getSpecAoSRespondentCorrespondenceAddressdetails()).isEqualTo(Address.builder().build());
+            assertThat(updatedCaseData.getSpecAoSRespondentCorrespondenceAddressdetails()).isEqualTo(new Address());
         }
     }
 
     private Address buildAddress(String line1, String postCode) {
-        return Address.builder()
-                .addressLine1(line1)
-                .postCode(postCode)
-                .build();
+        Address address = new Address();
+        address.setAddressLine1(line1);
+        address.setPostCode(postCode);
+        return address;
     }
 
     private CaseData buildCaseData(CaseDataBuilder builder) {

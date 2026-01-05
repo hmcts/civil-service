@@ -5,10 +5,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.SpecValidateClaimTimelineDateTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -25,10 +25,13 @@ class SpecValidateClaimTimelineDateTaskTest {
     @Test
     void shouldValidateClaimTimelineDate_whenPopulated() {
         List<TimelineOfEvents> timelineOfEvents = new ArrayList<>();
-        timelineOfEvents.add(
-            TimelineOfEvents.builder().value(TimelineOfEventDetails.builder().timelineDate(LocalDate.now().minusDays(1)).build()).build());
-        CaseData caseData = CaseData.builder().timelineOfEvents(timelineOfEvents)
-            .build();
+        TimelineOfEventDetails timelineOfEventDetails = new TimelineOfEventDetails();
+        timelineOfEventDetails.setTimelineDate(LocalDate.now().minusDays(1));
+        TimelineOfEvents timelineOfEvents1 = new TimelineOfEvents();
+        timelineOfEvents1.setValue(timelineOfEventDetails);
+        timelineOfEvents.add(timelineOfEvents1);
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setTimelineOfEvents(timelineOfEvents);
 
         var response = (AboutToStartOrSubmitCallbackResponse) specValidateClaimTimelineDateTask.specValidateClaimTimelineDateTask(caseData);
 
@@ -38,10 +41,13 @@ class SpecValidateClaimTimelineDateTaskTest {
     @Test
     void shouldReturnErrorWhenTimelineDatePopulatedWithFutureDate() {
         List<TimelineOfEvents> timelineOfEvents = new ArrayList<>();
-        timelineOfEvents.add(
-            TimelineOfEvents.builder().value(TimelineOfEventDetails.builder().timelineDate(LocalDate.now().plusDays(1)).build()).build());
-        CaseData caseData = CaseData.builder().timelineOfEvents(timelineOfEvents)
-            .build();
+        TimelineOfEventDetails timelineOfEventDetails = new TimelineOfEventDetails();
+        timelineOfEventDetails.setTimelineDate(LocalDate.now().plusDays(1));
+        TimelineOfEvents timelineOfEvents1 = new TimelineOfEvents();
+        timelineOfEvents1.setValue(timelineOfEventDetails);
+        timelineOfEvents.add(timelineOfEvents1);
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setTimelineOfEvents(timelineOfEvents);
 
         var response = (AboutToStartOrSubmitCallbackResponse) specValidateClaimTimelineDateTask.specValidateClaimTimelineDateTask(caseData);
 
