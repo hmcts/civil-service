@@ -37,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORM
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_GA_CASE_DATA;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.PopulateRespondentTabDetails.updateDataForClaimDetailsTab;
 import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseName;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_EXPERTS_ID;
@@ -118,7 +119,7 @@ public class SubmitChangesTask {
         caseData.setUpdateDetailsForm(updateDetailsForm);
 
         // update claim details tab
-        updateClaimDetailsTab(caseData);
+        updateDataForClaimDetailsTab(caseData, objectMapper, false);
 
         CaseData current = caseDetailsConverter.toCaseData(caseDetailsBefore);
         ContactDetailsUpdatedEvent changesEvent = partyDetailsChangedUtil.buildChangesEvent(current, caseData);
@@ -338,16 +339,6 @@ public class SubmitChangesTask {
             || CLAIMANT_TWO_LITIGATION_FRIEND_ID.equals(partyChosen)
             || DEFENDANT_ONE_LITIGATION_FRIEND_ID.equals(partyChosen)
             || DEFENDANT_TWO_LITIGATION_FRIEND_ID.equals(partyChosen);
-    }
-
-    private void updateClaimDetailsTab(CaseData caseData) {
-        caseData.getRespondent1().setFlags(null);
-        caseData.setRespondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
-
-        if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            caseData.getRespondent2().setFlags(null);
-            caseData.setRespondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
-        }
     }
 
     private Experts buildExperts(Experts experts, List<Element<Expert>> mappedExperts) {
