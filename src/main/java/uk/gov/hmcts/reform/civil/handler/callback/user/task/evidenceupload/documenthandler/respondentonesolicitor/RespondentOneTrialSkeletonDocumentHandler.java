@@ -39,8 +39,8 @@ public class RespondentOneTrialSkeletonDocumentHandler extends
     }
 
     @Override
-    protected void addDocumentsToCopyToCaseData(CaseData.CaseDataBuilder<?, ?> builder, List<Element<UploadEvidenceDocumentType>> evidenceDocsToAdd) {
-        builder.documentSkeletonArgumentRes2(evidenceDocsToAdd);
+    protected void addDocumentsToCopyToCaseData(CaseData caseData, List<Element<UploadEvidenceDocumentType>> evidenceDocsToAdd) {
+        caseData.setDocumentSkeletonArgumentRes2(evidenceDocsToAdd);
     }
 
     @Override

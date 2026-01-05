@@ -162,10 +162,10 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
     private Consumer<Organisation> setRespondentSolicitorDetails(CaseData caseData) {
         return organisation -> {
             List<ContactInformation> contactInformation = organisation.getContactInformation();
-            caseData.setRespondentSolicitorDetails(RespondentSolicitorDetails.builder()
-                                                           .orgName(organisation.getName())
-                                                           .address(Address.fromContactInformation(
-                                                               contactInformation.get(0))).build());
+            RespondentSolicitorDetails respondentSolicitorDetails = new RespondentSolicitorDetails();
+            respondentSolicitorDetails.setOrgName(organisation.getName());
+            respondentSolicitorDetails.setAddress(Address.fromContactInformation(contactInformation.get(0)));
+            caseData.setRespondentSolicitorDetails(respondentSolicitorDetails);
         };
     }
 
@@ -318,12 +318,10 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         }
 
         if (addedSolicitorDetails != null) {
-            caseData.setApplicantSolicitor1UserDetails(
-                IdamUserDetails.builder()
-                    .id(addedSolicitorDetails.getId())
-                    .email(addedSolicitorDetails.getEmail())
-                    .build()
-            );
+            IdamUserDetails idamUserDetails = new IdamUserDetails();
+            idamUserDetails.setId(addedSolicitorDetails.getId());
+            idamUserDetails.setEmail(addedSolicitorDetails.getEmail());
+            caseData.setApplicantSolicitor1UserDetails(idamUserDetails);
         } else {
             caseData.setApplicantSolicitor1UserDetails(null);
         }
@@ -341,11 +339,10 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             String respondent2Reference = replacedCaseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
                 ? null : solicitorReferences.getRespondentSolicitor2Reference();
 
-            SolicitorReferences updatedSolicitorReferences = SolicitorReferences.builder()
-                .applicantSolicitor1Reference(applicantReference)
-                .respondentSolicitor1Reference(respondent1Reference)
-                .respondentSolicitor2Reference(respondent2Reference)
-                .build();
+            SolicitorReferences updatedSolicitorReferences = new SolicitorReferences();
+            updatedSolicitorReferences.setApplicantSolicitor1Reference(applicantReference);
+            updatedSolicitorReferences.setRespondentSolicitor1Reference(respondent1Reference);
+            updatedSolicitorReferences.setRespondentSolicitor2Reference(respondent2Reference);
 
             caseData.setSolicitorReferences(updatedSolicitorReferences);
 
