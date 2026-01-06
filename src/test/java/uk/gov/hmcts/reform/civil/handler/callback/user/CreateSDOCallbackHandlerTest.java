@@ -2408,25 +2408,15 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldSetSmallClaimsPenalNotice_whenSmallClaimsTrack() {
+        void shouldSetSmallClaimsPenalNoticeWhenSmallClaimsTrack() {
             CaseData caseData = CaseDataBuilder.builder()
-                .setClaimTypeToSpecClaim()
                 .atStateClaimDraft()
-                .totalClaimAmount(BigDecimal.valueOf(15000))
-                .applicant1DQWithLocation().build();
+                .build();
             caseData.setDrawDirectionsOrderRequired(YES);
             caseData.setDrawDirectionsOrderSmallClaims(YES);
             caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
-            given(locationRefDataService.getHearingCourtLocations(any()))
-                .willReturn(getSampleCourLocationsRefObjectToSort());
-            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
-                "Y").build();
-            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
-            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
-                categorySearchResult));
-            given(featureToggleService.isCarmEnabledForCase(any())).willReturn(false);
 
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(caseData, MID, "order-details-navigation");
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
@@ -2435,25 +2425,15 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotSetSmallClaimsPenalNotice_whenFastTrack() {
+        void shouldNotSetSmallClaimsPenalNoticeWhenFastTrack() {
             CaseData caseData = CaseDataBuilder.builder()
-                .setClaimTypeToSpecClaim()
                 .atStateClaimDraft()
-                .totalClaimAmount(BigDecimal.valueOf(15000))
-                .applicant1DQWithLocation().build();
+                .build();
             caseData.setDrawDirectionsOrderRequired(NO);
             caseData.setClaimsTrack(ClaimsTrack.fastTrack);
             caseData.setFastClaims(List.of(FastTrack.fastClaimBuildingDispute));
-            given(locationRefDataService.getHearingCourtLocations(any()))
-                .willReturn(getSampleCourLocationsRefObjectToSort());
-            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
-                "Y").build();
-            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
-            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
-                categorySearchResult));
-            given(featureToggleService.isCarmEnabledForCase(any())).willReturn(false);
 
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(caseData, MID, "order-details-navigation");
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
