@@ -351,10 +351,9 @@ class PaymentRequestUpdateCallbackServiceTest {
         ));
         when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
 
-        CardPaymentStatusResponse response = CardPaymentStatusResponse.builder()
-                .paymentReference(REFERENCE)
-                .status("Success")
-                .build();
+        CardPaymentStatusResponse response = new CardPaymentStatusResponse()
+                .setPaymentReference(REFERENCE)
+                .setStatus("Success");
 
         paymentRequestUpdateCallbackService.updatePaymentStatus(FeeType.HEARING, CASE_ID.toString(), response);
 
@@ -367,9 +366,8 @@ class PaymentRequestUpdateCallbackServiceTest {
     }
 
     private CardPaymentStatusResponse getCardPaymentStatusResponse() {
-        return CardPaymentStatusResponse.builder()
-                .paymentReference("1234")
-                .status(PaymentStatus.SUCCESS.name())
-                .build();
+        return new CardPaymentStatusResponse()
+                .setPaymentReference("1234")
+                .setStatus(PaymentStatus.SUCCESS.name());
     }
 }
