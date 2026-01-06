@@ -2,9 +2,10 @@ package uk.gov.hmcts.reform.civil.config;
 
 import feign.Client;
 import feign.httpclient.ApacheHttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.util.Timeout;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,29 +33,28 @@ public class HttpClientConfiguration {
         return restTemplate;
     }
 
-    private CloseableHttpClient getRestTemplateHttpClient() {
+    private HttpClient getRestTemplateHttpClient() {
         RequestConfig config = RequestConfig.custom()
-            .setConnectTimeout(readTimeout)
-            .setConnectionRequestTimeout(readTimeout)
-            .setSocketTimeout(readTimeout)
+            .setConnectTimeout(Timeout.ofMilliseconds(readTimeout))
+            .setConnectionRequestTimeout(Timeout.ofMilliseconds(readTimeout))
+            .setResponseTimeout(Timeout.ofMilliseconds(readTimeout))
             .build();
 
-        return HttpClientBuilder
-            .create()
+        return HttpClients.custom()
             .useSystemProperties()
             .setDefaultRequestConfig(config)
             .build();
     }
 
-    private CloseableHttpClient getHttpClient() {
+    private org.apache.http.impl.client.CloseableHttpClient getHttpClient() {
         int timeout = 10000;
-        RequestConfig config = RequestConfig.custom()
+        org.apache.http.client.config.RequestConfig config = org.apache.http.client.config.RequestConfig.custom()
             .setConnectTimeout(timeout)
             .setConnectionRequestTimeout(timeout)
             .setSocketTimeout(timeout)
             .build();
 
-        return HttpClientBuilder
+        return org.apache.http.impl.client.HttpClientBuilder
             .create()
             .useSystemProperties()
             .setDefaultRequestConfig(config)
