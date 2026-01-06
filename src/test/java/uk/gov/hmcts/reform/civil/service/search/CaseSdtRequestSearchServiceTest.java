@@ -38,7 +38,7 @@ class CaseSdtRequestSearchServiceTest {
 
         given(authTokenGenerator.generate()).willReturn("some random token");
         List<CaseDetails> result = caseSdtRequestSearchService
-            .searchCaseForSdtRequest(CaseWorkerSearchCaseParams.builder().build());
+            .searchCaseForSdtRequest(new CaseWorkerSearchCaseParams());
 
         assertThat(result).isNotNull();
 
@@ -53,7 +53,7 @@ class CaseSdtRequestSearchServiceTest {
 
         given(authTokenGenerator.generate()).willReturn("some random token");
         List<CaseDetails> result = caseSdtRequestSearchService
-            .searchCaseForSdtRequest(CaseWorkerSearchCaseParams.builder().build());
+            .searchCaseForSdtRequest(new CaseWorkerSearchCaseParams());
 
         assertThat(result.isEmpty());
 
