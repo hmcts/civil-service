@@ -35,6 +35,36 @@ Each image links to an SVG whose source (`docs/*.mmd`) is produced by `python3 s
 Generated business rules from flowstate predicates in
 - Composed & Atomic predicate rules: [business-rules.md](docs/business-rules.md)
 
+## Email notification catalogue
+
+Every Camunda notifier, the parties it contacts, the Gov.Notify templates it uses, and the BPMN/CCD entry points are tracked in [`docs/email-notifications.md`](docs/email-notifications.md). The table is generated automatically by `scripts/generate_email_notifications_table.py`, which walks the notifier/aggregator/generator hierarchy, reads template IDs from `src/main/resources/application.yaml`, and links the referencing BPMN files from the neighbouring [`civil-camunda-bpmn-definition`](https://github.com/hmcts/civil-camunda-bpmn-definition) repository.
+
+The same data is published via GitHub Pages at https://hmcts.github.io/civil-service/email-notifications.html, so after commits land on `master` the interactive table is available to anyone with repo access.
+
+<details>
+<summary>How to regenerate `docs/email-notifications.md`</summary>
+
+```bash
+scripts/generate_email_notifications_table.py --bpmn-root ../civil-camunda-bpmn-definition
+```
+
+Need to focus on a single CCD event (or a handful)? Pass one or more `--ccd-event` filters to keep only rows whose
+CCD event column contains the provided substring, e.g.
+
+```bash
+scripts/generate_email_notifications_table.py \
+  --bpmn-root ../civil-camunda-bpmn-definition \
+  --ccd-event DEFENDANT_RESPONSE_SPEC
+```
+
+Every run also emits `docs/email-notifications.html`, which mirrors the markdown but adds a CCD event dropdown so you can
+filter interactively in a browser. Use `--html-output /path/to/file.html` to change the destination or `--html-output ""`
+to skip generating it.
+
+The `Verify email notification documentation` GitHub Action executes the same script on every push to `master` and fails if the committed markdown is out of date, so commits should always include any changes produced by the command above.
+
+</details>
+
 ## Building and deploying the application
 
 ### Dependencies
