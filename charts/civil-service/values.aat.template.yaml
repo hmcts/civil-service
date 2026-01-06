@@ -99,7 +99,7 @@ java:
           alias: mediation.emails.jsonRecipient
         - name: hmc-servicebus-shared-access-key-tf
           alias: HMC_HEARINGS_TOPIC_ACCESS_KEY
-        - name: appinsights-instrumentation-key
+        - name: AppInsightsInstrumentationKey
           alias: azure.application-insights.instrumentation-key
   postgresql:
     enabled: true
