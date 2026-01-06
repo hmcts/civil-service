@@ -27,6 +27,7 @@
       <option value='add_defendant_litigation_friend'>ADD_DEFENDANT_LITIGATION_FRIEND</option>
       <option value='amend_restitch_bundle'>AMEND_RESTITCH_BUNDLE</option>
       <option value='applicant_trial_ready_notify_others'>APPLICANT_TRIAL_READY_NOTIFY_OTHERS</option>
+      <option value='apply_help_with_hearing_fee'>APPLY_HELP_WITH_HEARING_FEE</option>
       <option value='apply_noc_decision'>APPLY_NOC_DECISION</option>
       <option value='apply_noc_decision_defendant_lip'>APPLY_NOC_DECISION_DEFENDANT_LIP</option>
       <option value='apply_noc_decision_lip'>APPLY_NOC_DECISION_LIP</option>
@@ -34,8 +35,10 @@
       <option value='case_proceeds_in_caseman'>CASE_PROCEEDS_IN_CASEMAN</option>
       <option value='case_proceeds_in_caseman_spec'>CASE_PROCEEDS_IN_CASEMAN_SPEC</option>
       <option value='claimant_response'>CLAIMANT_RESPONSE</option>
+      <option value='claimant_response_cui'>CLAIMANT_RESPONSE_CUI</option>
       <option value='claimant_response_spec'>CLAIMANT_RESPONSE_SPEC</option>
       <option value='court_officer_order'>COURT_OFFICER_ORDER</option>
+      <option value='create_claim_after_payment'>CREATE_CLAIM_AFTER_PAYMENT</option>
       <option value='create_claim_spec_after_payment'>CREATE_CLAIM_SPEC_AFTER_PAYMENT</option>
       <option value='create_lip_claim'>CREATE_LIP_CLAIM</option>
       <option value='create_sdo'>CREATE_SDO</option>
@@ -45,7 +48,9 @@
       <option value='defendant_response_spec'>DEFENDANT_RESPONSE_SPEC</option>
       <option value='defendant_sign_settlement_agreement'>DEFENDANT_SIGN_SETTLEMENT_AGREEMENT</option>
       <option value='discontinue_claim_claimant'>DISCONTINUE_CLAIM_CLAIMANT</option>
+      <option value='dismiss_case'>DISMISS_CASE</option>
       <option value='dismiss_claim'>DISMISS_CLAIM</option>
+      <option value='extend_response_deadline'>EXTEND_RESPONSE_DEADLINE</option>
       <option value='generate_order_notification'>GENERATE_ORDER_NOTIFICATION</option>
       <option value='hearing_fee_unpaid'>HEARING_FEE_UNPAID</option>
       <option value='hearing_scheduled'>HEARING_SCHEDULED</option>
@@ -56,8 +61,10 @@
       <option value='notify_lip_claimant_hwf_outcome'>NOTIFY_LIP_CLAIMANT_HWF_OUTCOME</option>
       <option value='respondent1_trial_ready_notify_others'>RESPONDENT1_TRIAL_READY_NOTIFY_OTHERS</option>
       <option value='respondent2_trial_ready_notify_others'>RESPONDENT2_TRIAL_READY_NOTIFY_OTHERS</option>
+      <option value='take_case_offline'>TAKE_CASE_OFFLINE</option>
       <option value='upload_translated_defendant_sealed_form'>UPLOAD_TRANSLATED_DEFENDANT_SEALED_FORM</option>
       <option value='upload_translated_discontinuance_doc'>UPLOAD_TRANSLATED_DISCONTINUANCE_DOC</option>
+      <option value='upload_translated_document_claimant_intention'>UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_INTENTION</option>
       <option value='upload_translated_document_claimant_lr_intention'>UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_LR_INTENTION</option>
       <option value='upload_translated_document_claim_issue'>UPLOAD_TRANSLATED_DOCUMENT_CLAIM_ISSUE</option>
       <option value='upload_translated_document_hearing_notice'>UPLOAD_TRANSLATED_DOCUMENT_HEARING_NOTICE</option>
@@ -403,86 +410,6 @@
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/case_proceeds_in_caseman.bpmn<br>../civil-camunda-bpmn-definition/src/main/resources/camunda/case_proceeds_in_caseman_spec.bpmn</td>
         <td>Case proceeds in caseman (CASE_PROCEEDS_IN_CASEMAN)<br>Case proceeds in caseman spec (CASE_PROCEEDS_IN_CASEMAN_SPEC)</td>
       </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
-        <td><code>CaseTakenOfflineNotifier</code></td>
-        <td><code>CaseTakenOfflineAllPartiesEmailGenerator</code></td>
-        <td>Applicant solicitor (LR)</td>
-        <td><code>CaseTakenOfflineAppSolOneEmailDTOGenerator</code></td>
-        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/0928c6fa-f9b1-45f9-9fd2-57b0bed7d79b'>0928c6fa-f9b1-45f9-9fd2-57b0bed7d79b</a></td>
-        <td>—</td>
-        <td>—</td>
-      </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
-        <td><code>CaseTakenOfflineNotifier</code></td>
-        <td><code>CaseTakenOfflineAllPartiesEmailGenerator</code></td>
-        <td>Applicant solicitor (LR)</td>
-        <td><code>CaseTakenOfflineAppSolOneEmailDTOGenerator</code></td>
-        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/e3bdb33f-2437-434b-8c64-74a2f73739df'>e3bdb33f-2437-434b-8c64-74a2f73739df</a></td>
-        <td>—</td>
-        <td>—</td>
-      </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
-        <td><code>CaseTakenOfflineNotifier</code></td>
-        <td><code>CaseTakenOfflineAllPartiesEmailGenerator</code></td>
-        <td>Respondent 1 solicitor (LR)</td>
-        <td><code>CaseTakenOfflineRespSolOneEmailDTOGenerator</code></td>
-        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/0928c6fa-f9b1-45f9-9fd2-57b0bed7d79b'>0928c6fa-f9b1-45f9-9fd2-57b0bed7d79b</a></td>
-        <td>—</td>
-        <td>—</td>
-      </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
-        <td><code>CaseTakenOfflineNotifier</code></td>
-        <td><code>CaseTakenOfflineAllPartiesEmailGenerator</code></td>
-        <td>Respondent 2 solicitor (LR)</td>
-        <td><code>CaseTakenOfflineRespSolTwoEmailDTOGenerator</code></td>
-        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/0928c6fa-f9b1-45f9-9fd2-57b0bed7d79b'>0928c6fa-f9b1-45f9-9fd2-57b0bed7d79b</a></td>
-        <td>—</td>
-        <td>—</td>
-      </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
-        <td><code>CaseTakenOfflineNotifier</code></td>
-        <td><code>CaseTakenOfflineAllPartiesEmailGenerator</code></td>
-        <td>Claimant (LiP)</td>
-        <td><code>CaseTakenOfflineAppLipSolOneEmailDTOGenerator</code></td>
-        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/0948a7ae-f389-4dc7-aaa5-c67768922813'>0948a7ae-f389-4dc7-aaa5-c67768922813</a></td>
-        <td>—</td>
-        <td>—</td>
-      </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
-        <td><code>CaseTakenOfflineNotifier</code></td>
-        <td><code>CaseTakenOfflineAllPartiesEmailGenerator</code></td>
-        <td>Claimant (LiP)</td>
-        <td><code>CaseTakenOfflineAppLipSolOneEmailDTOGenerator</code></td>
-        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/331c63d8-e319-4460-b05e-b235ac35100b'>331c63d8-e319-4460-b05e-b235ac35100b</a></td>
-        <td>—</td>
-        <td>—</td>
-      </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
-        <td><code>CaseTakenOfflineNotifier</code></td>
-        <td><code>CaseTakenOfflineAllPartiesEmailGenerator</code></td>
-        <td>Defendant 1 (LiP)</td>
-        <td><code>CaseTakenOfflineRespLipSolOneEmailDTOGenerator</code></td>
-        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/fa8af4ba-ceef-46fb-ab83-d4a110eb3c57'>fa8af4ba-ceef-46fb-ab83-d4a110eb3c57</a></td>
-        <td>—</td>
-        <td>—</td>
-      </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
-        <td><code>CaseTakenOfflineNotifier</code></td>
-        <td><code>CaseTakenOfflineAllPartiesEmailGenerator</code></td>
-        <td>Defendant 1 (LiP)</td>
-        <td><code>CaseTakenOfflineRespLipSolOneEmailDTOGenerator</code></td>
-        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/0a7a3178-695b-42a7-833e-a260509bc79f'>0a7a3178-695b-42a7-833e-a260509bc79f</a></td>
-        <td>—</td>
-        <td>—</td>
-      </tr>
       <tr data-ccd-events='apply_noc_decision'>
         <td><code>ChangeOfRepresentationNotifyParties</code></td>
         <td><code>ChangeOfRepresentationNotifier</code></td>
@@ -703,6 +630,86 @@
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/create_lip_claim.bpmn</td>
         <td>Create lip claim process (CREATE_LIP_CLAIM)</td>
       </tr>
+      <tr data-ccd-events='claimant_response_cui upload_translated_document_claimant_intention'>
+        <td><code>ClaimantConfirmProceedNotifyParties</code></td>
+        <td><code>ClaimantResponseCuiConfirmProceedNotifier</code></td>
+        <td><code>ClaimantConfirmProceedAllPartiesEmailGenerator</code></td>
+        <td>Claimant (LiP)</td>
+        <td><code>ClaimantConfirmProceedClaimantEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/0948a7ae-f389-4dc7-aaa5-c67768922813'>0948a7ae-f389-4dc7-aaa5-c67768922813</a></td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/claimant_response_cui.bpmn<br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_claimant_intention_document_notify.bpmn</td>
+        <td>Claimant response cui process (CLAIMANT_RESPONSE_CUI)<br>Upload translated document claimant intention (UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_INTENTION)</td>
+      </tr>
+      <tr data-ccd-events='claimant_response_cui upload_translated_document_claimant_intention'>
+        <td><code>ClaimantConfirmProceedNotifyParties</code></td>
+        <td><code>ClaimantResponseCuiConfirmProceedNotifier</code></td>
+        <td><code>ClaimantConfirmProceedAllPartiesEmailGenerator</code></td>
+        <td>Claimant (LiP)</td>
+        <td><code>ClaimantConfirmProceedClaimantEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/331c63d8-e319-4460-b05e-b235ac35100b'>331c63d8-e319-4460-b05e-b235ac35100b</a></td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/claimant_response_cui.bpmn<br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_claimant_intention_document_notify.bpmn</td>
+        <td>Claimant response cui process (CLAIMANT_RESPONSE_CUI)<br>Upload translated document claimant intention (UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_INTENTION)</td>
+      </tr>
+      <tr data-ccd-events='claimant_response_cui upload_translated_document_claimant_intention'>
+        <td><code>ClaimantConfirmProceedNotifyParties</code></td>
+        <td><code>ClaimantResponseCuiConfirmProceedNotifier</code></td>
+        <td><code>ClaimantConfirmProceedAllPartiesEmailGenerator</code></td>
+        <td>Defendant 1 (LiP)</td>
+        <td><code>ClaimantConfirmProceedDefendantEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/fa8af4ba-ceef-46fb-ab83-d4a110eb3c57'>fa8af4ba-ceef-46fb-ab83-d4a110eb3c57</a></td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/claimant_response_cui.bpmn<br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_claimant_intention_document_notify.bpmn</td>
+        <td>Claimant response cui process (CLAIMANT_RESPONSE_CUI)<br>Upload translated document claimant intention (UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_INTENTION)</td>
+      </tr>
+      <tr data-ccd-events='claimant_response_cui upload_translated_document_claimant_intention'>
+        <td><code>ClaimantConfirmProceedNotifyParties</code></td>
+        <td><code>ClaimantResponseCuiConfirmProceedNotifier</code></td>
+        <td><code>ClaimantConfirmProceedAllPartiesEmailGenerator</code></td>
+        <td>Defendant 1 (LiP)</td>
+        <td><code>ClaimantConfirmProceedDefendantEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/0a7a3178-695b-42a7-833e-a260509bc79f'>0a7a3178-695b-42a7-833e-a260509bc79f</a></td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/claimant_response_cui.bpmn<br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_claimant_intention_document_notify.bpmn</td>
+        <td>Claimant response cui process (CLAIMANT_RESPONSE_CUI)<br>Upload translated document claimant intention (UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_INTENTION)</td>
+      </tr>
+      <tr data-ccd-events='claimant_response_cui upload_translated_document_claimant_intention'>
+        <td><code>ClaimantConfirmProceedNotifyParties</code></td>
+        <td><code>ClaimantResponseCuiConfirmProceedNotifier</code></td>
+        <td><code>ClaimantConfirmProceedAllPartiesEmailGenerator</code></td>
+        <td>Respondent 1 solicitor (LR)</td>
+        <td><code>ClaimantConfirmProceedRespSolOneEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/26412851-6fa7-439d-bec2-a07677e8684c'>26412851-6fa7-439d-bec2-a07677e8684c</a></td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/claimant_response_cui.bpmn<br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_claimant_intention_document_notify.bpmn</td>
+        <td>Claimant response cui process (CLAIMANT_RESPONSE_CUI)<br>Upload translated document claimant intention (UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_INTENTION)</td>
+      </tr>
+      <tr data-ccd-events='claimant_response_cui upload_translated_document_claimant_intention'>
+        <td><code>ClaimantConfirmProceedNotifyParties</code></td>
+        <td><code>ClaimantResponseCuiConfirmProceedNotifier</code></td>
+        <td><code>ClaimantConfirmProceedAllPartiesEmailGenerator</code></td>
+        <td>Respondent 1 solicitor (LR)</td>
+        <td><code>ClaimantConfirmProceedRespSolOneEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/69ae7c84-3814-48d9-a69a-0e0d5bf0ca73'>69ae7c84-3814-48d9-a69a-0e0d5bf0ca73</a></td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/claimant_response_cui.bpmn<br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_claimant_intention_document_notify.bpmn</td>
+        <td>Claimant response cui process (CLAIMANT_RESPONSE_CUI)<br>Upload translated document claimant intention (UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_INTENTION)</td>
+      </tr>
+      <tr data-ccd-events='claimant_response_cui upload_translated_document_claimant_intention'>
+        <td><code>ClaimantConfirmProceedNotifyParties</code></td>
+        <td><code>ClaimantResponseCuiConfirmProceedNotifier</code></td>
+        <td><code>ClaimantConfirmProceedAllPartiesEmailGenerator</code></td>
+        <td>Respondent 1 solicitor (LR)</td>
+        <td><code>ClaimantConfirmProceedRespSolOneEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/26412851-6fa7-439d-bec2-a07677e8684c'>26412851-6fa7-439d-bec2-a07677e8684c</a></td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/claimant_response_cui.bpmn<br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_claimant_intention_document_notify.bpmn</td>
+        <td>Claimant response cui process (CLAIMANT_RESPONSE_CUI)<br>Upload translated document claimant intention (UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_INTENTION)</td>
+      </tr>
+      <tr data-ccd-events='claimant_response_cui upload_translated_document_claimant_intention'>
+        <td><code>ClaimantConfirmProceedNotifyParties</code></td>
+        <td><code>ClaimantResponseCuiConfirmProceedNotifier</code></td>
+        <td><code>ClaimantConfirmProceedAllPartiesEmailGenerator</code></td>
+        <td>Respondent 1 solicitor (LR)</td>
+        <td><code>ClaimantConfirmProceedRespSolOneEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/c07ca382-1fd2-402e-ae16-5b67936bcde0'>c07ca382-1fd2-402e-ae16-5b67936bcde0</a></td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/claimant_response_cui.bpmn<br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_claimant_intention_document_notify.bpmn</td>
+        <td>Claimant response cui process (CLAIMANT_RESPONSE_CUI)<br>Upload translated document claimant intention (UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_INTENTION)</td>
+      </tr>
       <tr data-ccd-events='claimant_response_spec upload_translated_document_claimant_lr_intention'>
         <td><code>ClaimantDefendantAgreedMediationNotify</code></td>
         <td><code>ClaimantDefendantAgreedMediationNotifier</code></td>
@@ -773,25 +780,25 @@
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/claimant_response_spec.bpmn<br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_lr_claimant_intention.bpmn</td>
         <td>Claimant response process spec (CLAIMANT_RESPONSE_SPEC)<br>upload translated document claimant lr intention (UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_LR_INTENTION)</td>
       </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
+      <tr data-ccd-events='apply_help_with_hearing_fee'>
+        <td><code>ClaimantLipHelpWithFeesNotifier</code></td>
         <td><code>ClaimantLipHelpWithFeesNotifier</code></td>
         <td><code>ClaimantLipHelpWithFeesAllPartiesEmailGenerator</code></td>
         <td>Claimant (LiP)</td>
         <td><code>ClaimantLipHelpWithFeesClaimantEmailDTOGenerator</code></td>
         <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/2b058ec6-0b52-402a-894c-6853b9ea72c4'>2b058ec6-0b52-402a-894c-6853b9ea72c4</a></td>
-        <td>—</td>
-        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/apply_help_with_hearing_fee.bpmn</td>
+        <td>Apply help with hearing fee (APPLY_HELP_WITH_HEARING_FEE)</td>
       </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
+      <tr data-ccd-events='apply_help_with_hearing_fee'>
+        <td><code>ClaimantLipHelpWithFeesNotifier</code></td>
         <td><code>ClaimantLipHelpWithFeesNotifier</code></td>
         <td><code>ClaimantLipHelpWithFeesAllPartiesEmailGenerator</code></td>
         <td>Claimant (LiP)</td>
         <td><code>ClaimantLipHelpWithFeesClaimantEmailDTOGenerator</code></td>
         <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/deecff58-4b24-4d67-994d-329c10117aad'>deecff58-4b24-4d67-994d-329c10117aad</a></td>
-        <td>—</td>
-        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/apply_help_with_hearing_fee.bpmn</td>
+        <td>Apply help with hearing fee (APPLY_HELP_WITH_HEARING_FEE)</td>
       </tr>
       <tr data-ccd-events='apply_noc_decision_lip'>
         <td><code>ClaimantLipRepresentedWithNoCNotifier</code></td>
@@ -1023,136 +1030,6 @@
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/claimant_response.bpmn<br>../civil-camunda-bpmn-definition/src/main/resources/camunda/claimant_response_spec.bpmn</td>
         <td>Claimant Response Process (CLAIMANT_RESPONSE)<br>Claimant response process spec (CLAIMANT_RESPONSE_SPEC)</td>
       </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
-        <td><code>ClaimantResponseCuiConfirmProceedNotifier</code></td>
-        <td><code>ClaimantConfirmProceedAllPartiesEmailGenerator</code></td>
-        <td>Claimant (LiP)</td>
-        <td><code>ClaimantConfirmProceedClaimantEmailDTOGenerator</code></td>
-        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/0948a7ae-f389-4dc7-aaa5-c67768922813'>0948a7ae-f389-4dc7-aaa5-c67768922813</a></td>
-        <td>—</td>
-        <td>—</td>
-      </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
-        <td><code>ClaimantResponseCuiConfirmProceedNotifier</code></td>
-        <td><code>ClaimantConfirmProceedAllPartiesEmailGenerator</code></td>
-        <td>Claimant (LiP)</td>
-        <td><code>ClaimantConfirmProceedClaimantEmailDTOGenerator</code></td>
-        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/331c63d8-e319-4460-b05e-b235ac35100b'>331c63d8-e319-4460-b05e-b235ac35100b</a></td>
-        <td>—</td>
-        <td>—</td>
-      </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
-        <td><code>ClaimantResponseCuiConfirmProceedNotifier</code></td>
-        <td><code>ClaimantConfirmProceedAllPartiesEmailGenerator</code></td>
-        <td>Defendant 1 (LiP)</td>
-        <td><code>ClaimantConfirmProceedDefendantEmailDTOGenerator</code></td>
-        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/fa8af4ba-ceef-46fb-ab83-d4a110eb3c57'>fa8af4ba-ceef-46fb-ab83-d4a110eb3c57</a></td>
-        <td>—</td>
-        <td>—</td>
-      </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
-        <td><code>ClaimantResponseCuiConfirmProceedNotifier</code></td>
-        <td><code>ClaimantConfirmProceedAllPartiesEmailGenerator</code></td>
-        <td>Defendant 1 (LiP)</td>
-        <td><code>ClaimantConfirmProceedDefendantEmailDTOGenerator</code></td>
-        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/0a7a3178-695b-42a7-833e-a260509bc79f'>0a7a3178-695b-42a7-833e-a260509bc79f</a></td>
-        <td>—</td>
-        <td>—</td>
-      </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
-        <td><code>ClaimantResponseCuiConfirmProceedNotifier</code></td>
-        <td><code>ClaimantConfirmProceedAllPartiesEmailGenerator</code></td>
-        <td>Respondent 1 solicitor (LR)</td>
-        <td><code>ClaimantConfirmProceedRespSolOneEmailDTOGenerator</code></td>
-        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/26412851-6fa7-439d-bec2-a07677e8684c'>26412851-6fa7-439d-bec2-a07677e8684c</a></td>
-        <td>—</td>
-        <td>—</td>
-      </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
-        <td><code>ClaimantResponseCuiConfirmProceedNotifier</code></td>
-        <td><code>ClaimantConfirmProceedAllPartiesEmailGenerator</code></td>
-        <td>Respondent 1 solicitor (LR)</td>
-        <td><code>ClaimantConfirmProceedRespSolOneEmailDTOGenerator</code></td>
-        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/69ae7c84-3814-48d9-a69a-0e0d5bf0ca73'>69ae7c84-3814-48d9-a69a-0e0d5bf0ca73</a></td>
-        <td>—</td>
-        <td>—</td>
-      </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
-        <td><code>ClaimantResponseCuiConfirmProceedNotifier</code></td>
-        <td><code>ClaimantConfirmProceedAllPartiesEmailGenerator</code></td>
-        <td>Respondent 1 solicitor (LR)</td>
-        <td><code>ClaimantConfirmProceedRespSolOneEmailDTOGenerator</code></td>
-        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/26412851-6fa7-439d-bec2-a07677e8684c'>26412851-6fa7-439d-bec2-a07677e8684c</a></td>
-        <td>—</td>
-        <td>—</td>
-      </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
-        <td><code>ClaimantResponseCuiConfirmProceedNotifier</code></td>
-        <td><code>ClaimantConfirmProceedAllPartiesEmailGenerator</code></td>
-        <td>Respondent 1 solicitor (LR)</td>
-        <td><code>ClaimantConfirmProceedRespSolOneEmailDTOGenerator</code></td>
-        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/c07ca382-1fd2-402e-ae16-5b67936bcde0'>c07ca382-1fd2-402e-ae16-5b67936bcde0</a></td>
-        <td>—</td>
-        <td>—</td>
-      </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
-        <td><code>ClaimantResponseCuiRejectPaymentNotifier</code></td>
-        <td><code>ClaimantResponseCuiRejectPayAllPartiesEmailGenerator</code></td>
-        <td>Claimant (LiP)</td>
-        <td><code>ClaimantResponseCuiRejectPayClaimantEmailDTOGenerator</code></td>
-        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/16046f1d-2443-47b2-980b-ecc1d6842fb7'>16046f1d-2443-47b2-980b-ecc1d6842fb7</a></td>
-        <td>—</td>
-        <td>—</td>
-      </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
-        <td><code>ClaimantResponseCuiRejectPaymentNotifier</code></td>
-        <td><code>ClaimantResponseCuiRejectPayAllPartiesEmailGenerator</code></td>
-        <td>Defendant 1 (LiP)</td>
-        <td><code>ClaimantResponseCuiRejectPayRespLipEmailDTOGenerator</code></td>
-        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/f2521805-bfec-42b9-99f5-9fda3dfb6a99'>f2521805-bfec-42b9-99f5-9fda3dfb6a99</a></td>
-        <td>—</td>
-        <td>—</td>
-      </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
-        <td><code>ClaimantResponseCuiRejectPaymentNotifier</code></td>
-        <td><code>ClaimantResponseCuiRejectPayAllPartiesEmailGenerator</code></td>
-        <td>Defendant 1 (LiP)</td>
-        <td><code>ClaimantResponseCuiRejectPayRespLipEmailDTOGenerator</code></td>
-        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/cafe1ef5-8511-43df-b40b-24cd001060db'>cafe1ef5-8511-43df-b40b-24cd001060db</a></td>
-        <td>—</td>
-        <td>—</td>
-      </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
-        <td><code>ClaimantResponseCuiRejectPaymentNotifier</code></td>
-        <td><code>ClaimantResponseCuiRejectPayAllPartiesEmailGenerator</code></td>
-        <td>Respondent 1 solicitor (LR)</td>
-        <td><code>ClaimantResponseCuiRejectPayRespSol1EmailDTOGenerator</code></td>
-        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/651ac972-fb4b-49cb-aace-9317ccd069f1'>651ac972-fb4b-49cb-aace-9317ccd069f1</a></td>
-        <td>—</td>
-        <td>—</td>
-      </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
-        <td><code>ClaimantResponseCuiRejectPaymentNotifier</code></td>
-        <td><code>ClaimantResponseCuiRejectPayAllPartiesEmailGenerator</code></td>
-        <td>Applicant solicitor (LR)</td>
-        <td><code>ClaimantResponseCuiRejectPayAppSolOneEmailDTOGenerator</code></td>
-        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/cee63486-8f75-42ea-baca-5e602e248ab6'>cee63486-8f75-42ea-baca-5e602e248ab6</a></td>
-        <td>—</td>
-        <td>—</td>
-      </tr>
       <tr data-ccd-events='claimant_response_spec'>
         <td><code>ClaimantResponseNotAgreedRepaymentNotify</code></td>
         <td><code>ClaimantResponseNotAgreedRepaymentNotifier</code></td>
@@ -1273,45 +1150,45 @@
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/create_claim_spec_after_payment.bpmn<br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_document_claim_issue_notify.bpmn</td>
         <td>Create claim process after payment spec (CREATE_CLAIM_SPEC_AFTER_PAYMENT)<br>Upload translated document lip (UPLOAD_TRANSLATED_DOCUMENT_CLAIM_ISSUE)</td>
       </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
-        <td><code>CreateClaimAfterPaymentContinuingOnlineNotifier</code></td>
-        <td><code>CreateClaimAfterPaymentContinuingOnlineAllPartiesEmailGenerator</code></td>
-        <td>Applicant solicitor (LR)</td>
-        <td><code>CreateClaimAfterPaymentContinuingOnlineAppSolOneEmailDTOGenerator</code></td>
-        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/07de3877-f293-41be-b6d2-24869dadbe97'>07de3877-f293-41be-b6d2-24869dadbe97</a></td>
-        <td>—</td>
-        <td>—</td>
-      </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
+      <tr data-ccd-events='create_claim_after_payment'>
+        <td><code>CreateClaimAfterPaymentContinuingOfflineNotifier</code></td>
         <td><code>CreateClaimAfterPaymentOfflineNotifier</code></td>
         <td><code>CreateClaimAfterPaymentOfflineAllPartiesEmailGenerator</code></td>
         <td>Applicant solicitor (LR)</td>
         <td><code>CreateClaimAfterPaymentOfflineAppSolOneEmailDTOGenerator</code></td>
         <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/0928c6fa-f9b1-45f9-9fd2-57b0bed7d79b'>0928c6fa-f9b1-45f9-9fd2-57b0bed7d79b</a></td>
-        <td>—</td>
-        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/create_claim_after_payment.bpmn</td>
+        <td>Create claim after payment process (CREATE_CLAIM_AFTER_PAYMENT)</td>
       </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
+      <tr data-ccd-events='create_claim_after_payment'>
+        <td><code>CreateClaimAfterPaymentContinuingOfflineNotifier</code></td>
         <td><code>CreateClaimAfterPaymentOfflineNotifier</code></td>
         <td><code>CreateClaimAfterPaymentOfflineAllPartiesEmailGenerator</code></td>
         <td>Claimant (LiP)</td>
         <td><code>CreateClaimAfterPaymentOfflineClaimantEmailDTOGenerator</code></td>
         <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/0948a7ae-f389-4dc7-aaa5-c67768922813'>0948a7ae-f389-4dc7-aaa5-c67768922813</a></td>
-        <td>—</td>
-        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/create_claim_after_payment.bpmn</td>
+        <td>Create claim after payment process (CREATE_CLAIM_AFTER_PAYMENT)</td>
       </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
+      <tr data-ccd-events='create_claim_after_payment'>
+        <td><code>CreateClaimAfterPaymentContinuingOfflineNotifier</code></td>
         <td><code>CreateClaimAfterPaymentOfflineNotifier</code></td>
         <td><code>CreateClaimAfterPaymentOfflineAllPartiesEmailGenerator</code></td>
         <td>Claimant (LiP)</td>
         <td><code>CreateClaimAfterPaymentOfflineClaimantEmailDTOGenerator</code></td>
         <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/331c63d8-e319-4460-b05e-b235ac35100b'>331c63d8-e319-4460-b05e-b235ac35100b</a></td>
-        <td>—</td>
-        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/create_claim_after_payment.bpmn</td>
+        <td>Create claim after payment process (CREATE_CLAIM_AFTER_PAYMENT)</td>
+      </tr>
+      <tr data-ccd-events='create_claim_after_payment'>
+        <td><code>CreateClaimAfterPaymentContinuingOnlineNotifier</code></td>
+        <td><code>CreateClaimAfterPaymentContinuingOnlineNotifier</code></td>
+        <td><code>CreateClaimAfterPaymentContinuingOnlineAllPartiesEmailGenerator</code></td>
+        <td>Applicant solicitor (LR)</td>
+        <td><code>CreateClaimAfterPaymentContinuingOnlineAppSolOneEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/07de3877-f293-41be-b6d2-24869dadbe97'>07de3877-f293-41be-b6d2-24869dadbe97</a></td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/create_claim_after_payment.bpmn</td>
+        <td>Create claim after payment process (CREATE_CLAIM_AFTER_PAYMENT)</td>
       </tr>
       <tr data-ccd-events='create_sdo upload_translated_document_sdo'>
         <td><code>CreateSDONotify</code></td>
@@ -2133,125 +2010,125 @@
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/discontinue_claim_claimant.bpmn<br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_discontinuance_doc.bpmn<br>../civil-camunda-bpmn-definition/src/main/resources/camunda/validate_discontinue_claim_claimant.bpmn</td>
         <td>Discontinue Claim Claimant  (DISCONTINUE_CLAIM_CLAIMANT)<br>Upload translated discontinuance doc (UPLOAD_TRANSLATED_DISCONTINUANCE_DOC)<br>Validate Discontinue Claim Claimant (VALIDATE_DISCONTINUE_CLAIM_CLAIMANT)</td>
       </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
+      <tr data-ccd-events='dismiss_case'>
+        <td><code>DismissCaseNotifier</code></td>
         <td><code>DismissCaseNotifier</code></td>
         <td><code>DismissCaseAllPartiesEmailGenerator</code></td>
         <td>Applicant solicitor (LR)</td>
         <td><code>DismissCaseAppSolOneEmailDTOGenerator</code></td>
         <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/0921a609-7024-4c15-ae59-66fae8a79b8c'>0921a609-7024-4c15-ae59-66fae8a79b8c</a></td>
-        <td>—</td>
-        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/dismiss_case.bpmn</td>
+        <td>Dismiss case (DISMISS_CASE)</td>
       </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
+      <tr data-ccd-events='dismiss_case'>
+        <td><code>DismissCaseNotifier</code></td>
         <td><code>DismissCaseNotifier</code></td>
         <td><code>DismissCaseAllPartiesEmailGenerator</code></td>
         <td>Respondent 1 solicitor (LR)</td>
         <td><code>DismissCaseRespSolOneEmailDTOGenerator</code></td>
         <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/0921a609-7024-4c15-ae59-66fae8a79b8c'>0921a609-7024-4c15-ae59-66fae8a79b8c</a></td>
-        <td>—</td>
-        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/dismiss_case.bpmn</td>
+        <td>Dismiss case (DISMISS_CASE)</td>
       </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
+      <tr data-ccd-events='dismiss_case'>
+        <td><code>DismissCaseNotifier</code></td>
         <td><code>DismissCaseNotifier</code></td>
         <td><code>DismissCaseAllPartiesEmailGenerator</code></td>
         <td>Respondent 2 solicitor (LR)</td>
         <td><code>DismissCaseRespSolTwoEmailDTOGenerator</code></td>
         <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/0921a609-7024-4c15-ae59-66fae8a79b8c'>0921a609-7024-4c15-ae59-66fae8a79b8c</a></td>
-        <td>—</td>
-        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/dismiss_case.bpmn</td>
+        <td>Dismiss case (DISMISS_CASE)</td>
       </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
+      <tr data-ccd-events='dismiss_case'>
+        <td><code>DismissCaseNotifier</code></td>
         <td><code>DismissCaseNotifier</code></td>
         <td><code>DismissCaseAllPartiesEmailGenerator</code></td>
         <td>Claimant (LiP)</td>
         <td><code>DismissCaseClaimantEmailDTOGenerator</code></td>
         <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf'>edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf</a></td>
-        <td>—</td>
-        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/dismiss_case.bpmn</td>
+        <td>Dismiss case (DISMISS_CASE)</td>
       </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
+      <tr data-ccd-events='dismiss_case'>
+        <td><code>DismissCaseNotifier</code></td>
         <td><code>DismissCaseNotifier</code></td>
         <td><code>DismissCaseAllPartiesEmailGenerator</code></td>
         <td>Claimant (LiP)</td>
         <td><code>DismissCaseClaimantEmailDTOGenerator</code></td>
         <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/730f4e11-3cb0-43a7-aeeb-8373a28fbc1d'>730f4e11-3cb0-43a7-aeeb-8373a28fbc1d</a></td>
-        <td>—</td>
-        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/dismiss_case.bpmn</td>
+        <td>Dismiss case (DISMISS_CASE)</td>
       </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
+      <tr data-ccd-events='dismiss_case'>
+        <td><code>DismissCaseNotifier</code></td>
         <td><code>DismissCaseNotifier</code></td>
         <td><code>DismissCaseAllPartiesEmailGenerator</code></td>
         <td>Defendant 1 (LiP)</td>
         <td><code>DismissCaseDefendantEmailDTOGenerator</code></td>
         <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf'>edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf</a></td>
-        <td>—</td>
-        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/dismiss_case.bpmn</td>
+        <td>Dismiss case (DISMISS_CASE)</td>
       </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
+      <tr data-ccd-events='dismiss_case'>
+        <td><code>DismissCaseNotifier</code></td>
         <td><code>DismissCaseNotifier</code></td>
         <td><code>DismissCaseAllPartiesEmailGenerator</code></td>
         <td>Defendant 1 (LiP)</td>
         <td><code>DismissCaseDefendantEmailDTOGenerator</code></td>
         <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/730f4e11-3cb0-43a7-aeeb-8373a28fbc1d'>730f4e11-3cb0-43a7-aeeb-8373a28fbc1d</a></td>
-        <td>—</td>
-        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/dismiss_case.bpmn</td>
+        <td>Dismiss case (DISMISS_CASE)</td>
       </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
+      <tr data-ccd-events='extend_response_deadline'>
+        <td><code>ExtendResponseDeadlineNotifier</code></td>
         <td><code>ExtendResponseDeadlineNotifier</code></td>
         <td><code>ExtendResponseDeadlineAllPartiesEmailGenerator</code></td>
         <td>Applicant solicitor (LR)</td>
         <td><code>ExtendResponseDeadlineAppSolOneEmailDTOGenerator</code></td>
         <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/205c3137-594e-4fe4-95f9-cfe52ef5083e'>205c3137-594e-4fe4-95f9-cfe52ef5083e</a></td>
-        <td>—</td>
-        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/extend_response_deadline.bpmn</td>
+        <td>Extend response deadline process (EXTEND_RESPONSE_DEADLINE)</td>
       </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
+      <tr data-ccd-events='extend_response_deadline'>
+        <td><code>ExtendResponseDeadlineNotifier</code></td>
         <td><code>ExtendResponseDeadlineNotifier</code></td>
         <td><code>ExtendResponseDeadlineAllPartiesEmailGenerator</code></td>
         <td>Claimant (LiP)</td>
         <td><code>ExtendResponseDeadlineClaimantEmailDTOGenerator</code></td>
         <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/fbab70da-b3f6-4b00-8a69-caca2b9919e3'>fbab70da-b3f6-4b00-8a69-caca2b9919e3</a></td>
-        <td>—</td>
-        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/extend_response_deadline.bpmn</td>
+        <td>Extend response deadline process (EXTEND_RESPONSE_DEADLINE)</td>
       </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
+      <tr data-ccd-events='extend_response_deadline'>
+        <td><code>ExtendResponseDeadlineNotifier</code></td>
         <td><code>ExtendResponseDeadlineNotifier</code></td>
         <td><code>ExtendResponseDeadlineAllPartiesEmailGenerator</code></td>
         <td>Claimant (LiP)</td>
         <td><code>ExtendResponseDeadlineClaimantEmailDTOGenerator</code></td>
         <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/72ee285f-4113-436e-b3fd-360882108c4c'>72ee285f-4113-436e-b3fd-360882108c4c</a></td>
-        <td>—</td>
-        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/extend_response_deadline.bpmn</td>
+        <td>Extend response deadline process (EXTEND_RESPONSE_DEADLINE)</td>
       </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
+      <tr data-ccd-events='extend_response_deadline'>
+        <td><code>ExtendResponseDeadlineNotifier</code></td>
         <td><code>ExtendResponseDeadlineNotifier</code></td>
         <td><code>ExtendResponseDeadlineAllPartiesEmailGenerator</code></td>
         <td>Defendant 1 (LiP)</td>
         <td><code>ExtendResponseDeadlineDefendantEmailDTOGenerator</code></td>
         <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/c78d2eb0-efcc-466b-a5cb-d34b3d0b012b'>c78d2eb0-efcc-466b-a5cb-d34b3d0b012b</a></td>
-        <td>—</td>
-        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/extend_response_deadline.bpmn</td>
+        <td>Extend response deadline process (EXTEND_RESPONSE_DEADLINE)</td>
       </tr>
-      <tr data-ccd-events=''>
-        <td><code>UNKNOWN</code></td>
+      <tr data-ccd-events='extend_response_deadline'>
+        <td><code>ExtendResponseDeadlineNotifier</code></td>
         <td><code>ExtendResponseDeadlineNotifier</code></td>
         <td><code>ExtendResponseDeadlineAllPartiesEmailGenerator</code></td>
         <td>Defendant 1 (LiP)</td>
         <td><code>ExtendResponseDeadlineDefendantEmailDTOGenerator</code></td>
         <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/74e7ad85-7f5c-44f8-9501-8f76ceafaad4'>74e7ad85-7f5c-44f8-9501-8f76ceafaad4</a></td>
-        <td>—</td>
-        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/extend_response_deadline.bpmn</td>
+        <td>Extend response deadline process (EXTEND_RESPONSE_DEADLINE)</td>
       </tr>
       <tr data-ccd-events='default_judgement'>
         <td><code>GenerateDJFormNotifyParties</code></td>
@@ -2863,6 +2740,56 @@
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/create_claim_spec_after_payment.bpmn</td>
         <td>Create claim process after payment spec (CREATE_CLAIM_SPEC_AFTER_PAYMENT)</td>
       </tr>
+      <tr data-ccd-events='claimant_response_cui'>
+        <td><code>RejectRepaymentPlanNotifyParties</code></td>
+        <td><code>ClaimantResponseCuiRejectPaymentNotifier</code></td>
+        <td><code>ClaimantResponseCuiRejectPayAllPartiesEmailGenerator</code></td>
+        <td>Claimant (LiP)</td>
+        <td><code>ClaimantResponseCuiRejectPayClaimantEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/16046f1d-2443-47b2-980b-ecc1d6842fb7'>16046f1d-2443-47b2-980b-ecc1d6842fb7</a></td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/claimant_response_cui.bpmn</td>
+        <td>Claimant response cui process (CLAIMANT_RESPONSE_CUI)</td>
+      </tr>
+      <tr data-ccd-events='claimant_response_cui'>
+        <td><code>RejectRepaymentPlanNotifyParties</code></td>
+        <td><code>ClaimantResponseCuiRejectPaymentNotifier</code></td>
+        <td><code>ClaimantResponseCuiRejectPayAllPartiesEmailGenerator</code></td>
+        <td>Defendant 1 (LiP)</td>
+        <td><code>ClaimantResponseCuiRejectPayRespLipEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/f2521805-bfec-42b9-99f5-9fda3dfb6a99'>f2521805-bfec-42b9-99f5-9fda3dfb6a99</a></td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/claimant_response_cui.bpmn</td>
+        <td>Claimant response cui process (CLAIMANT_RESPONSE_CUI)</td>
+      </tr>
+      <tr data-ccd-events='claimant_response_cui'>
+        <td><code>RejectRepaymentPlanNotifyParties</code></td>
+        <td><code>ClaimantResponseCuiRejectPaymentNotifier</code></td>
+        <td><code>ClaimantResponseCuiRejectPayAllPartiesEmailGenerator</code></td>
+        <td>Defendant 1 (LiP)</td>
+        <td><code>ClaimantResponseCuiRejectPayRespLipEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/cafe1ef5-8511-43df-b40b-24cd001060db'>cafe1ef5-8511-43df-b40b-24cd001060db</a></td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/claimant_response_cui.bpmn</td>
+        <td>Claimant response cui process (CLAIMANT_RESPONSE_CUI)</td>
+      </tr>
+      <tr data-ccd-events='claimant_response_cui'>
+        <td><code>RejectRepaymentPlanNotifyParties</code></td>
+        <td><code>ClaimantResponseCuiRejectPaymentNotifier</code></td>
+        <td><code>ClaimantResponseCuiRejectPayAllPartiesEmailGenerator</code></td>
+        <td>Respondent 1 solicitor (LR)</td>
+        <td><code>ClaimantResponseCuiRejectPayRespSol1EmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/651ac972-fb4b-49cb-aace-9317ccd069f1'>651ac972-fb4b-49cb-aace-9317ccd069f1</a></td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/claimant_response_cui.bpmn</td>
+        <td>Claimant response cui process (CLAIMANT_RESPONSE_CUI)</td>
+      </tr>
+      <tr data-ccd-events='claimant_response_cui'>
+        <td><code>RejectRepaymentPlanNotifyParties</code></td>
+        <td><code>ClaimantResponseCuiRejectPaymentNotifier</code></td>
+        <td><code>ClaimantResponseCuiRejectPayAllPartiesEmailGenerator</code></td>
+        <td>Applicant solicitor (LR)</td>
+        <td><code>ClaimantResponseCuiRejectPayAppSolOneEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/cee63486-8f75-42ea-baca-5e602e248ab6'>cee63486-8f75-42ea-baca-5e602e248ab6</a></td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/claimant_response_cui.bpmn</td>
+        <td>Claimant response cui process (CLAIMANT_RESPONSE_CUI)</td>
+      </tr>
       <tr data-ccd-events='respondent1_trial_ready_notify_others'>
         <td><code>Respondent1NotifyOthersTrialReady</code></td>
         <td><code>RespondentOneNotifyOthersTrialReadyNotifier</code></td>
@@ -3042,6 +2969,86 @@
         <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/730f4e11-3cb0-43a7-aeeb-8373a28fbc1d'>730f4e11-3cb0-43a7-aeeb-8373a28fbc1d</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/respondent2_trial_ready_notify_others.bpmn</td>
         <td>Respondent2 trial ready notify others (RESPONDENT2_TRIAL_READY_NOTIFY_OTHERS)</td>
+      </tr>
+      <tr data-ccd-events='take_case_offline'>
+        <td><code>TakeCaseOfflineNotifier</code></td>
+        <td><code>CaseTakenOfflineNotifier</code></td>
+        <td><code>CaseTakenOfflineAllPartiesEmailGenerator</code></td>
+        <td>Applicant solicitor (LR)</td>
+        <td><code>CaseTakenOfflineAppSolOneEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/0928c6fa-f9b1-45f9-9fd2-57b0bed7d79b'>0928c6fa-f9b1-45f9-9fd2-57b0bed7d79b</a></td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/take_case_offline.bpmn</td>
+        <td>Take case offline (TAKE_CASE_OFFLINE)</td>
+      </tr>
+      <tr data-ccd-events='take_case_offline'>
+        <td><code>TakeCaseOfflineNotifier</code></td>
+        <td><code>CaseTakenOfflineNotifier</code></td>
+        <td><code>CaseTakenOfflineAllPartiesEmailGenerator</code></td>
+        <td>Applicant solicitor (LR)</td>
+        <td><code>CaseTakenOfflineAppSolOneEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/e3bdb33f-2437-434b-8c64-74a2f73739df'>e3bdb33f-2437-434b-8c64-74a2f73739df</a></td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/take_case_offline.bpmn</td>
+        <td>Take case offline (TAKE_CASE_OFFLINE)</td>
+      </tr>
+      <tr data-ccd-events='take_case_offline'>
+        <td><code>TakeCaseOfflineNotifier</code></td>
+        <td><code>CaseTakenOfflineNotifier</code></td>
+        <td><code>CaseTakenOfflineAllPartiesEmailGenerator</code></td>
+        <td>Respondent 1 solicitor (LR)</td>
+        <td><code>CaseTakenOfflineRespSolOneEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/0928c6fa-f9b1-45f9-9fd2-57b0bed7d79b'>0928c6fa-f9b1-45f9-9fd2-57b0bed7d79b</a></td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/take_case_offline.bpmn</td>
+        <td>Take case offline (TAKE_CASE_OFFLINE)</td>
+      </tr>
+      <tr data-ccd-events='take_case_offline'>
+        <td><code>TakeCaseOfflineNotifier</code></td>
+        <td><code>CaseTakenOfflineNotifier</code></td>
+        <td><code>CaseTakenOfflineAllPartiesEmailGenerator</code></td>
+        <td>Respondent 2 solicitor (LR)</td>
+        <td><code>CaseTakenOfflineRespSolTwoEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/0928c6fa-f9b1-45f9-9fd2-57b0bed7d79b'>0928c6fa-f9b1-45f9-9fd2-57b0bed7d79b</a></td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/take_case_offline.bpmn</td>
+        <td>Take case offline (TAKE_CASE_OFFLINE)</td>
+      </tr>
+      <tr data-ccd-events='take_case_offline'>
+        <td><code>TakeCaseOfflineNotifier</code></td>
+        <td><code>CaseTakenOfflineNotifier</code></td>
+        <td><code>CaseTakenOfflineAllPartiesEmailGenerator</code></td>
+        <td>Claimant (LiP)</td>
+        <td><code>CaseTakenOfflineAppLipSolOneEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/0948a7ae-f389-4dc7-aaa5-c67768922813'>0948a7ae-f389-4dc7-aaa5-c67768922813</a></td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/take_case_offline.bpmn</td>
+        <td>Take case offline (TAKE_CASE_OFFLINE)</td>
+      </tr>
+      <tr data-ccd-events='take_case_offline'>
+        <td><code>TakeCaseOfflineNotifier</code></td>
+        <td><code>CaseTakenOfflineNotifier</code></td>
+        <td><code>CaseTakenOfflineAllPartiesEmailGenerator</code></td>
+        <td>Claimant (LiP)</td>
+        <td><code>CaseTakenOfflineAppLipSolOneEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/331c63d8-e319-4460-b05e-b235ac35100b'>331c63d8-e319-4460-b05e-b235ac35100b</a></td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/take_case_offline.bpmn</td>
+        <td>Take case offline (TAKE_CASE_OFFLINE)</td>
+      </tr>
+      <tr data-ccd-events='take_case_offline'>
+        <td><code>TakeCaseOfflineNotifier</code></td>
+        <td><code>CaseTakenOfflineNotifier</code></td>
+        <td><code>CaseTakenOfflineAllPartiesEmailGenerator</code></td>
+        <td>Defendant 1 (LiP)</td>
+        <td><code>CaseTakenOfflineRespLipSolOneEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/fa8af4ba-ceef-46fb-ab83-d4a110eb3c57'>fa8af4ba-ceef-46fb-ab83-d4a110eb3c57</a></td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/take_case_offline.bpmn</td>
+        <td>Take case offline (TAKE_CASE_OFFLINE)</td>
+      </tr>
+      <tr data-ccd-events='take_case_offline'>
+        <td><code>TakeCaseOfflineNotifier</code></td>
+        <td><code>CaseTakenOfflineNotifier</code></td>
+        <td><code>CaseTakenOfflineAllPartiesEmailGenerator</code></td>
+        <td>Defendant 1 (LiP)</td>
+        <td><code>CaseTakenOfflineRespLipSolOneEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/0a7a3178-695b-42a7-833e-a260509bc79f'>0a7a3178-695b-42a7-833e-a260509bc79f</a></td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/take_case_offline.bpmn</td>
+        <td>Take case offline (TAKE_CASE_OFFLINE)</td>
       </tr>
       <tr data-ccd-events='create_claim_spec_after_payment'>
         <td><code>TakenOfflineCaseForSpecNotifier</code></td>
