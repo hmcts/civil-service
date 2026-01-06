@@ -1527,9 +1527,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 // Applicant flags should be preserved
                 assertThat(responseCaseData.getApplicant1().getFlags()).isEqualTo(applicant1Flags);
                 assertThat(responseCaseData.getApplicant2().getFlags()).isEqualTo(applicant2Flags);
-                // Respondent flags are cleared in claim-details parties when updating the tab
-                assertThat(responseCaseData.getRespondent1().getFlags()).isNull();
-                assertThat(responseCaseData.getRespondent2().getFlags()).isNull();
+                assertThat(responseCaseData.getRespondent1().getFlags()).isEqualTo(respondent1Flags);
+                assertThat(responseCaseData.getRespondent2().getFlags()).isEqualTo(respondent2Flags);
             }
 
             @ParameterizedTest
@@ -1577,9 +1576,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 // Applicant flags should be preserved
                 assertThat(responseCaseData.getApplicant1().getFlags()).isEqualTo(applicant1Flags);
                 assertThat(responseCaseData.getApplicant2().getFlags()).isEqualTo(applicant2Flags);
-                // Respondent flags are cleared in claim-details parties when updating the tab
-                assertThat(responseCaseData.getRespondent1().getFlags()).isNull();
-                assertThat(responseCaseData.getRespondent2().getFlags()).isNull();
+                assertThat(responseCaseData.getRespondent1().getFlags()).isEqualTo(respondent1Flags);
+                assertThat(responseCaseData.getRespondent2().getFlags()).isEqualTo(respondent2Flags);
             }
 
             @Test
