@@ -42,6 +42,7 @@ public interface NotificationData {
 
     String DEFENDANT_NAME = "DefendantName";
     String BOTH_DEFENDANTS = "Both Defendants";
+    String NOTIFY_BOTH = "Both";
     String CLAIM_NUMBER_INTERIM = "Claim number";
     String LEGAL_ORG_DEF = "Defendant LegalOrg Name";
     String DEFENDANT_NAME_INTERIM = "Defendant Name";
