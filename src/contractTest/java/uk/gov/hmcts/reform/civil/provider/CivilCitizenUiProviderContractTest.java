@@ -107,13 +107,12 @@ class CivilCitizenUiProviderContractTest {
             CASE_REFERENCE,
             AUTH_HEADER
         )).thenReturn(
-            CardPaymentStatusResponse.builder()
-                .externalReference("2023-1701090705688")
-                .paymentReference(PAYMENT_REFERENCE)
-                .status("Initiated")
-                .nextUrl("https://card.payments.service.gov.uk/secure/7b0716b2-40c4-413e-b62e-72c599c91960")
-                .dateCreated(OffsetDateTime.parse("2023-11-27T13:15:06.313+00:00"))
-                .build()
+            new CardPaymentStatusResponse()
+                .setExternalReference("2023-1701090705688")
+                .setPaymentReference(PAYMENT_REFERENCE)
+                .setStatus("Initiated")
+                .setNextUrl("https://card.payments.service.gov.uk/secure/7b0716b2-40c4-413e-b62e-72c599c91960")
+                .setDateCreated(OffsetDateTime.parse("2023-11-27T13:15:06.313+00:00"))
         );
     }
 
@@ -125,13 +124,12 @@ class CivilCitizenUiProviderContractTest {
             PAYMENT_REFERENCE,
             AUTH_HEADER
         )).thenReturn(
-            CardPaymentStatusResponse.builder()
-                .externalReference("2023-1701090705688")
-                .paymentReference(PAYMENT_REFERENCE)
-                .status("Success")
-                .paymentFor("claimissued")
-                .paymentAmount(new BigDecimal("200"))
-                .build()
+            new CardPaymentStatusResponse()
+                .setExternalReference("2023-1701090705688")
+                .setPaymentReference(PAYMENT_REFERENCE)
+                .setStatus("Success")
+                .setPaymentFor("claimissued")
+                .setPaymentAmount(new BigDecimal("200"))
         );
     }
 

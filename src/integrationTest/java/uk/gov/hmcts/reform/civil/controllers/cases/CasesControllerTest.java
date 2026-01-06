@@ -85,21 +85,20 @@ public class CasesControllerTest extends BaseIntegrationTest {
     private static final String GA_CASE_APP_URL = "/cases/{caseId}/ga/applications";
 
     private static final List<DashboardClaimInfo> claimResults =
-        singletonList(DashboardClaimInfo.builder()
-                                      .claimAmount(new BigDecimal(
+        singletonList(new DashboardClaimInfo()
+                                      .setClaimAmount(new BigDecimal(
                                           "1000"))
-                                      .claimNumber("4786")
-                                      .claimantName(
+                                      .setClaimNumber("4786")
+                                      .setClaimantName(
                                           "Mr. James Bond")
-                                      .defendantName(
+                                      .setDefendantName(
                                           "Mr. Roger Moore")
-                                      .responseDeadline(
+                                      .setResponseDeadline(
                                           LocalDate.of(
                                               2022,
                                               1,
                                               1
-                                          ))
-                                      .build());
+                                          )));
     private static final String EVENT_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOi";
 
     @MockBean
