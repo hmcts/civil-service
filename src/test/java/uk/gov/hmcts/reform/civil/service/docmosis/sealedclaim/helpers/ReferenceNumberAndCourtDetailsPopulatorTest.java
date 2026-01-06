@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
 import java.util.Collections;
@@ -39,30 +40,31 @@ public class ReferenceNumberAndCourtDetailsPopulatorTest {
 
     @Test
     void testPopulateDetails_Respondent1() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQRequestedCourt(
-                RequestedCourt.builder()
-                    .responseCourtCode("121")
-                    .reasonForHearingAtSpecificCourt("test")
-                    .caseLocation(CaseLocationCivil.builder()
-                                      .region("2")
-                                      .baseLocation("000000")
-                                      .build())
-                    .build())
-            .build();
-        CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder()
-                            .type(Party.Type.INDIVIDUAL)
-                            .partyName("Applicant Name")
-                            .build())
-            .respondent1(Party.builder()
-                            .type(Party.Type.INDIVIDUAL)
-                             .partyName("Respondent Name")
-                            .build())
+        CaseLocationCivil caseLocation = new CaseLocationCivil();
+        caseLocation.setRegion("2");
+        caseLocation.setBaseLocation("000000");
+        RequestedCourt requestedCourt = new RequestedCourt();
+        requestedCourt.setResponseCourtCode("121");
+        requestedCourt.setReasonForHearingAtSpecificCourt("test");
+        requestedCourt.setCaseLocation(caseLocation);
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt);
+        
+        Party applicant1 = new Party();
+        applicant1.setType(Party.Type.INDIVIDUAL);
+        applicant1.setPartyName("Applicant Name");
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+        respondent1.setPartyName("Respondent Name");
+        
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1(applicant1)
+            .respondent1(respondent1)
             .respondent1DQ(respondent1DQ)
             .legacyCaseReference("12345")
             .ccdCaseReference(1234567890123456L)
-            .detailsOfWhyDoesYouDisputeTheClaim("Dispute details")
             .build();
+        caseData.setDetailsOfWhyDoesYouDisputeTheClaim("Dispute details");
 
         given(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).willReturn(LOCATIONS);
 
@@ -78,44 +80,45 @@ public class ReferenceNumberAndCourtDetailsPopulatorTest {
 
     @Test
     void testPopulateDetails_Respondent2() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQRequestedCourt(
-                RequestedCourt.builder()
-                    .responseCourtCode("121")
-                    .reasonForHearingAtSpecificCourt("test")
-                    .caseLocation(CaseLocationCivil.builder()
-                                      .region("2")
-                                      .baseLocation("000000")
-                                      .build())
-                    .build())
-            .build();
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQRequestedCourt(
-                RequestedCourt.builder()
-                    .responseCourtCode("121")
-                    .reasonForHearingAtSpecificCourt("test")
-                    .caseLocation(CaseLocationCivil.builder()
-                                      .region("2")
-                                      .baseLocation("000000")
-                                      .build())
-                    .build())
-            .build();
-        CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder()
-                            .type(Party.Type.INDIVIDUAL)
-                            .partyName("Applicant Name")
-                            .build())
-            .respondent1(Party.builder()
-                             .type(Party.Type.INDIVIDUAL)
-                             .partyName("Respondent One")
-                             .build())
-            .respondent2(Party.builder()
-                             .type(Party.Type.INDIVIDUAL)
-                             .partyName("Respondent Two")
-                             .build())
+        CaseLocationCivil caseLocation1 = new CaseLocationCivil();
+        caseLocation1.setRegion("2");
+        caseLocation1.setBaseLocation("000000");
+        RequestedCourt requestedCourt1 = new RequestedCourt();
+        requestedCourt1.setResponseCourtCode("121");
+        requestedCourt1.setReasonForHearingAtSpecificCourt("test");
+        requestedCourt1.setCaseLocation(caseLocation1);
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt1);
+        
+        CaseLocationCivil caseLocation2 = new CaseLocationCivil();
+        caseLocation2.setRegion("2");
+        caseLocation2.setBaseLocation("000000");
+        RequestedCourt requestedCourt2 = new RequestedCourt();
+        requestedCourt2.setResponseCourtCode("121");
+        requestedCourt2.setReasonForHearingAtSpecificCourt("test");
+        requestedCourt2.setCaseLocation(caseLocation2);
+        Respondent2DQ respondent2DQ = new Respondent2DQ();
+        respondent2DQ.setRespondent2DQRequestedCourt(requestedCourt2);
+        
+        Party applicant1 = new Party();
+        applicant1.setType(Party.Type.INDIVIDUAL);
+        applicant1.setPartyName("Applicant Name");
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+        respondent1.setPartyName("Respondent One");
+        Party respondent2 = new Party();
+        respondent2.setType(Party.Type.INDIVIDUAL);
+        respondent2.setPartyName("Respondent Two");
+        
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1(applicant1)
+            .respondent1(respondent1)
+            .respondent2(respondent2)
             .respondent1DQ(respondent1DQ)
             .respondent2DQ(respondent2DQ)
             .legacyCaseReference("12345")
-            .detailsOfWhyDoesYouDisputeTheClaim("Dispute details")
             .build();
+        caseData.setDetailsOfWhyDoesYouDisputeTheClaim("Dispute details");
 
         given(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).willReturn(LOCATIONS);
 
@@ -130,29 +133,30 @@ public class ReferenceNumberAndCourtDetailsPopulatorTest {
 
     @Test
     void testPopulateDetails_NoCourtLocation() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQRequestedCourt(
-                RequestedCourt.builder()
-                    .responseCourtCode("121")
-                    .reasonForHearingAtSpecificCourt("test")
-                    .caseLocation(CaseLocationCivil.builder()
-                                      .region("2")
-                                      .baseLocation("000000")
-                                      .build())
-                    .build())
-            .build();
-        CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder()
-                            .type(Party.Type.INDIVIDUAL)
-                            .partyName("Applicant Name")
-                            .build())
-            .respondent1(Party.builder()
-                             .type(Party.Type.INDIVIDUAL)
-                             .partyName("Respondent One")
-                             .build())
+        CaseLocationCivil caseLocation = new CaseLocationCivil();
+        caseLocation.setRegion("2");
+        caseLocation.setBaseLocation("000000");
+        RequestedCourt requestedCourt = new RequestedCourt();
+        requestedCourt.setResponseCourtCode("121");
+        requestedCourt.setReasonForHearingAtSpecificCourt("test");
+        requestedCourt.setCaseLocation(caseLocation);
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt);
+        
+        Party applicant1 = new Party();
+        applicant1.setType(Party.Type.INDIVIDUAL);
+        applicant1.setPartyName("Applicant Name");
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+        respondent1.setPartyName("Respondent One");
+        
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1(applicant1)
+            .respondent1(respondent1)
             .respondent1DQ(respondent1DQ)
             .legacyCaseReference("12345")
-            .detailsOfWhyDoesYouDisputeTheClaim("Dispute details")
             .build();
+        caseData.setDetailsOfWhyDoesYouDisputeTheClaim("Dispute details");
 
         given(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).willReturn(Collections.emptyList());
 
@@ -165,29 +169,30 @@ public class ReferenceNumberAndCourtDetailsPopulatorTest {
 
     @Test
     void testPopulateDetails_NeitherRespondentCourt() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQRequestedCourt(
-                RequestedCourt.builder()
-                    .responseCourtCode("121")
-                    .reasonForHearingAtSpecificCourt("test")
-                    .caseLocation(CaseLocationCivil.builder()
-                                      .region("2")
-                                      .baseLocation("000000")
-                                      .build())
-                    .build())
-            .build();
-        CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder()
-                            .type(Party.Type.INDIVIDUAL)
-                            .partyName("Applicant Name")
-                            .build())
-            .respondent1(Party.builder()
-                             .type(Party.Type.INDIVIDUAL)
-                             .partyName("Respondent One")
-                             .build())
+        CaseLocationCivil caseLocation = new CaseLocationCivil();
+        caseLocation.setRegion("2");
+        caseLocation.setBaseLocation("000000");
+        RequestedCourt requestedCourt = new RequestedCourt();
+        requestedCourt.setResponseCourtCode("121");
+        requestedCourt.setReasonForHearingAtSpecificCourt("test");
+        requestedCourt.setCaseLocation(caseLocation);
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt);
+        
+        Party applicant1 = new Party();
+        applicant1.setType(Party.Type.INDIVIDUAL);
+        applicant1.setPartyName("Applicant Name");
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+        respondent1.setPartyName("Respondent One");
+        
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1(applicant1)
+            .respondent1(respondent1)
             .respondent1DQ(respondent1DQ)
             .legacyCaseReference("12345")
-            .detailsOfWhyDoesYouDisputeTheClaim("Dispute details")
             .build();
+        caseData.setDetailsOfWhyDoesYouDisputeTheClaim("Dispute details");
 
         SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder = SealedClaimResponseFormForSpec.builder();
         referenceNumberPopulator.populateReferenceNumberDetails(builder, caseData, "authorisation");
