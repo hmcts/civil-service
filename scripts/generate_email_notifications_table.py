@@ -21,7 +21,8 @@ APPLICATION_YAML = RESOURCE_ROOT / "application.yaml"
 # Regex helpers
 CLASS_DEF_RE = re.compile(r"class\s+(?P<name>[A-Za-z0-9_]+)")
 BASE_CLASS_RE = re.compile(r"class\s+(?P<name>[A-Za-z0-9_]+)\s+extends\s+(?P<base>[A-Za-z0-9_]+)")
-NOTIFIER_EVENT_RE = re.compile(r"return\s+([A-Za-z0-9_]+)\.toString\s*\(", re.MULTILINE)
+NOTIFIER_EVENT_RE = re.compile(r"return\s+(?:[A-Za-z0-9_]+\.)?([A-Za-z0-9_]+)\.toString\s*\(", re.MULTILINE)
+NOTIFIER_EVENT_NAME_RE = re.compile(r"return\s+(?:[A-Za-z0-9_]+\.)?([A-Za-z0-9_]+)\.name\s*\(", re.MULTILINE)
 CONST_ASSIGN_RE = re.compile(
     r"private\s+static\s+final\s+String\s+(?P<const>[A-Za-z0-9_]+)\s*=\s*(?P<value>[A-Za-z0-9_.]+)\.toString\s*\(\s*\)\s*;"
 )
@@ -126,6 +127,9 @@ def resolve_notifier_event(java_class: JavaClass) -> Optional[str]:
     direct_match = NOTIFIER_EVENT_RE.search(java_class.text)
     if direct_match:
         return direct_match.group(1)
+    name_match = NOTIFIER_EVENT_NAME_RE.search(java_class.text)
+    if name_match:
+        return name_match.group(1)
 
     const_map = {
         match.group('const'): match.group('value').split('.')[-1]
