@@ -13,15 +13,10 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
-import uk.gov.hmcts.reform.civil.utils.HmcDataUtils;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotified;
-import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedServiceData;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
 
@@ -36,15 +31,14 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 @RequiredArgsConstructor
 public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
 
+    private ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+
     private static final List<CaseEvent> EVENTS = List.of(
         CaseEvent.UPDATE_PARTIES_NOTIFIED_HMC
     );
 
-    private ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
     private final HearingNoticeCamundaService camundaService;
     private final HearingsService hearingsService;
-    private final UserService userService;
-    private final SystemUpdateUserConfiguration userConfig;
 
     private static final String TASK_ID = "UpdatePartiesNotifiedHmc";
 
@@ -78,11 +72,6 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
         Long ccdCaseReference = caseData.getCcdCaseReference();
         String hearingId = camundaVariables.getHearingId();
 
-        PartiesNotifiedResponse latestPartiesNotifiedResponse = getLatestPartiesNotifiedResponse(hearingId);
-        if (latestPartiesNotifiedResponse != null && latestPartiesNotifiedResponse.getResponseReceivedDateTime() != null) {
-            return AboutToStartOrSubmitCallbackResponse.builder().build();
-        }
-
         try {
             log.info("Request payload {}, for caseId {} and hearingId {}",
                      mapper.writeValueAsString(partiesNotified), ccdCaseReference, hearingId);
@@ -111,15 +100,4 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    private PartiesNotifiedResponse getLatestPartiesNotifiedResponse(String hearingId) {
-        var partiesNotified = hearingsService.getPartiesNotifiedResponses(
-            getSystemUpdateUser().getUserToken(), hearingId);
-        return HmcDataUtils.getLatestHearingNoticeDetails(partiesNotified);
-    }
-
-    private UserAuthContent getSystemUpdateUser() {
-        String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
-        String userId = userService.getUserInfo(userToken).getUid();
-        return new UserAuthContent().setUserToken(userToken).setUserId(userId);
-    }
 }
