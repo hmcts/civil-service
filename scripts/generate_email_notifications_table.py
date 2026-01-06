@@ -9,7 +9,7 @@ import re
 import sys
 import textwrap
 import xml.etree.ElementTree as ET
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from pathlib import Path
 from typing import Dict, List, Optional, Set
 
@@ -21,7 +21,12 @@ APPLICATION_YAML = RESOURCE_ROOT / "application.yaml"
 # Regex helpers
 CLASS_DEF_RE = re.compile(r"class\s+(?P<name>[A-Za-z0-9_]+)")
 BASE_CLASS_RE = re.compile(r"class\s+(?P<name>[A-Za-z0-9_]+)\s+extends\s+(?P<base>[A-Za-z0-9_]+)")
-NOTIFIER_EVENT_RE = re.compile(r"return\s+([A-Za-z0-9_]+)\.toString\s*\(", re.MULTILINE)
+NOTIFIER_EVENT_RE = re.compile(r"return\s+(?:[A-Za-z0-9_]+\.)?([A-Za-z0-9_]+)\.toString\s*\(", re.MULTILINE)
+NOTIFIER_EVENT_NAME_RE = re.compile(r"return\s+(?:[A-Za-z0-9_]+\.)?([A-Za-z0-9_]+)\.name\s*\(", re.MULTILINE)
+CONST_ASSIGN_RE = re.compile(
+    r"private\s+static\s+final\s+String\s+(?P<const>[A-Za-z0-9_]+)\s*=\s*(?P<value>[A-Za-z0-9_.]+)\.toString\s*\(\s*\)\s*;"
+)
+RETURN_CONST_RE = re.compile(r"return\s+(?P<const>[A-Za-z0-9_]+)\s*;", re.MULTILINE)
 CALL_HELPER_RE = re.compile(r"(\w+)\.(get[A-Za-z0-9_]+)\s*\(")
 NOTIFICATION_GETTER_RE = re.compile(r"notificationsProperties\s*\.\s*get([A-Za-z0-9_]+)")
 FIELD_DEF_RE = re.compile(r"(?:private|protected|public)\s+final\s+([A-Za-z0-9_<>]+)\s+(\w+)\s*;")
@@ -101,8 +106,7 @@ def find_notifiers(index: SourceIndex) -> List[Dict[str, Optional[str]]]:
     for class_name, java_class in index.classes.items():
         if "extends Notifier" not in java_class.text:
             continue
-        event_match = NOTIFIER_EVENT_RE.search(java_class.text)
-        event = event_match.group(1) if event_match else None
+        event = resolve_notifier_event(java_class)
         aggregator = None
         for param in java_class.constructor_params(class_name):
             param_type = parse_param_type(param)
@@ -117,6 +121,25 @@ def find_notifiers(index: SourceIndex) -> List[Dict[str, Optional[str]]]:
             "path": str(java_class.path.relative_to(REPO_ROOT))
         })
     return notifiers
+
+
+def resolve_notifier_event(java_class: JavaClass) -> Optional[str]:
+    direct_match = NOTIFIER_EVENT_RE.search(java_class.text)
+    if direct_match:
+        return direct_match.group(1)
+    name_match = NOTIFIER_EVENT_NAME_RE.search(java_class.text)
+    if name_match:
+        return name_match.group(1)
+
+    const_map = {
+        match.group('const'): match.group('value').split('.')[-1]
+        for match in CONST_ASSIGN_RE.finditer(java_class.text)
+    }
+    for return_match in RETURN_CONST_RE.finditer(java_class.text):
+        const_name = return_match.group('const')
+        if const_name in const_map:
+            return const_map[const_name]
+    return None
 
 
 def is_parties_generator(text: str) -> bool:
@@ -251,10 +274,10 @@ def filter_rows_by_ccd_event(rows: List[Dict[str, str]], filters: Optional[List[
         return rows
     filtered_rows = []
     for row in rows:
-        ccd_events = [event for event in row['ccd_events'] if event != '—']
-        if not ccd_events:
+        ids = [event for event in row.get('ccd_event_ids', []) if event not in ('—', '')]
+        if not ids:
             continue
-        event_names = [event.lower() for event in ccd_events]
+        event_names = [event.lower() for event in ids]
         if any(any(flt in event for event in event_names) for flt in lowered_filters):
             filtered_rows.append(row)
     return filtered_rows
@@ -276,37 +299,54 @@ def index_bpmn(bpmn_root: Path):
     ns = {'bpmn': 'http://www.omg.org/spec/BPMN/20100524/MODEL'}
     service_map = defaultdict(list)
     ccd_events = {}
+    ccd_event_labels = {}
     for bpmn_file in sorted(bpmn_root.glob('*.bpmn')):
         try:
             tree = ET.parse(bpmn_file)
         except ET.ParseError:
             continue
         root = tree.getroot()
+        parent_map = {child: parent for parent in root.iter() for child in parent}
         messages = {}
         for msg in root.findall('.//bpmn:message', ns):
             messages[msg.attrib['id']] = msg.attrib.get('name')
-        start_events = set()
+        start_events = []
+        start_labels = {}
         for start in root.findall('.//bpmn:startEvent', ns):
             for msg_def in start.findall('bpmn:messageEventDefinition', ns):
                 ref = msg_def.attrib.get('messageRef')
                 if ref and messages.get(ref):
-                    start_events.add(messages[ref])
-        ccd_events[bpmn_file] = sorted(start_events)
+                    event_name = messages[ref]
+                    start_events.append(event_name)
+                    parent = parent_map.get(start)
+                    while parent is not None and not parent.tag.endswith('process'):
+                        parent = parent_map.get(parent)
+                    process_name = parent.attrib.get('name') if parent is not None else None
+                    display = f"{process_name} ({event_name})" if process_name else event_name
+                    start_labels[event_name] = display
+        ccd_events[bpmn_file] = sorted(set(start_events))
+        ccd_event_labels[bpmn_file] = start_labels
         for task in root.findall('.//bpmn:serviceTask', ns):
             service_map[task.attrib.get('id')].append(bpmn_file)
-    return service_map, ccd_events
+    return service_map, ccd_events, ccd_event_labels
 
 
 def build_table_rows(index: SourceIndex, notifications: Dict[str, str], bpmn_root: Path):
     notifiers = find_notifiers(index)
     aggregator_map = map_aggregators_to_generators(index, {n['aggregator'] for n in notifiers})
-    service_tasks, start_events = index_bpmn(bpmn_root)
+    service_tasks, start_events, start_event_labels = index_bpmn(bpmn_root)
     rows = []
     for notifier in sorted(notifiers, key=lambda n: (n['event'] or n['class'])):
         event = notifier['event'] or 'UNKNOWN'
         generators = aggregator_map.get(notifier['aggregator'] or '', [])
         bpmn_files = service_tasks.get(event, [])
-        ccd_names = sorted({name for file in bpmn_files for name in start_events.get(file, [])})
+        event_label_map = OrderedDict()
+        for file in bpmn_files:
+            labels = start_event_labels.get(file, {})
+            for event_name in start_events.get(file, []):
+                event_label_map[event_name] = labels.get(event_name, event_name)
+        ccd_ids = list(event_label_map.keys())
+        ccd_display = list(event_label_map.values())
         for generator in generators:
             templates = collect_templates(index, generator, notifications)
             if not templates:
@@ -320,7 +360,8 @@ def build_table_rows(index: SourceIndex, notifications: Dict[str, str], bpmn_roo
                     "generator": generator,
                     "template_id": tpl['id'] or '—',
                     "bpmn_files": [os.path.relpath(path, REPO_ROOT) for path in bpmn_files] or ['—'],
-                    "ccd_events": ccd_names or ['—']
+                    "ccd_events": ccd_display or ['—'],
+                    "ccd_event_ids": ccd_ids
                 })
     return rows
 
@@ -338,7 +379,7 @@ def render_markdown(rows: List[Dict[str, str]], notify_service_id: Optional[str]
     ]
     lines = ["# Email notification matrix", "", textwrap.dedent("""
         The table below lists every Camunda notification task handled by `NotificationHandler`, the parties contacted, and the exact Gov.Notify templates configured in `src/main/resources/application.yaml`.
-        It also links each task to the BPMN model (from `civil-camunda-bpmn-definition`) and the CCD events (message start names) that kick off those BPMN flows.
+        It also links each task to the BPMN model (from `civil-camunda-bpmn-definition`) and shows the CCD events that start those BPMN flows, combining the process name with the CCD event ID.
     """).strip(), ""]
     lines.append('|' + '|'.join(header) + '|')
     lines.append('|' + '|'.join(['---'] * len(header)) + '|')
@@ -374,7 +415,7 @@ def render_html(rows: List[Dict[str, str]], notify_service_id: Optional[str]) ->
         "BPMN file(s)",
         "CCD event(s)"
     ]
-    unique_events = sorted({event for row in rows for event in row['ccd_events'] if event != '—'})
+    unique_events = sorted({event for row in rows for event in row.get('ccd_event_ids', []) if event not in ('—', '')})
     lines = [
         "<!DOCTYPE html>",
         "<html lang='en'>",
@@ -397,7 +438,7 @@ def render_html(rows: List[Dict[str, str]], notify_service_id: Optional[str]) ->
         "<body>",
         "  <h1>Email notification matrix</h1>",
         "  <p>The table mirrors <code>docs/email-notifications.md</code> but adds an interactive filter on the CCD event column."
-        " Use the dropdown below to focus on a single event.</p>",
+        " Use the dropdown below to focus on a single event. Each CCD entry shows the process name followed by the CCD event ID.</p>",
         "  <div class='filter-panel'>",
         "    <label for='ccd-filter'>CCD event:</label>",
         "    <select id='ccd-filter'>",
@@ -422,7 +463,7 @@ def render_html(rows: List[Dict[str, str]], notify_service_id: Optional[str]) ->
         "    <tbody>",
     ])
     for row in rows:
-        ccd_attr = ' '.join(event.lower() for event in row['ccd_events'] if event != '—')
+        ccd_attr = ' '.join(event.lower() for event in row.get('ccd_event_ids', []) if event not in ('—', ''))
         template_id_cell = html.escape(row['template_id'])
         if notify_service_id and row['template_id'] not in ('—', ''):
             template_id_cell = (
