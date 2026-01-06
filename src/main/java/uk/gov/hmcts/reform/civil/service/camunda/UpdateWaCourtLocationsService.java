@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-
 import uk.gov.hmcts.reform.civil.model.dmnacourttasklocation.DmnListingLocations;
 import uk.gov.hmcts.reform.civil.model.dmnacourttasklocation.TaskManagementLocationTab;
 import uk.gov.hmcts.reform.civil.model.dmnacourttasklocation.TaskManagementLocationTypes;
@@ -30,8 +29,10 @@ public class UpdateWaCourtLocationsService {
     private final CamundaRuntimeClient camundaRuntimeClient;
     private final ObjectMapper objectMapper;
     private final LocationReferenceDataService locationRefDataService;
-    @Value("${court-location.specified-claim.epimms-id}") private String cnbcEpimmId;
-    @Value("${court-location.unspecified-claim.epimms-id}") private String ccmccEpimmId;
+    @Value("${court-location.specified-claim.epimms-id}")
+    private String cnbcEpimmId;
+    @Value("${court-location.unspecified-claim.epimms-id}")
+    private String ccmccEpimmId;
 
     public void updateCourtListingWALocations(String authorisation, CaseData caseData) {
         List<LocationRefData> locationRefDataList = locationRefDataService.getHearingCourtLocations(authorisation);
@@ -40,56 +41,64 @@ public class UpdateWaCourtLocationsService {
         if ("FAST_CLAIM".equals(claimTrack) || "SMALL_CLAIM".equals(claimTrack)) {
             // when track is small or fast do not evaluate DMN, and also if claim was changed to small or fast
             // remove any previously evaluated and populate locations from taskManagementLocations
-            LocationRefData caseManagementLocationName = courtLocationDetails(locationRefDataList,
-                                                                              caseData.getCaseManagementLocation().getBaseLocation(),
-                                                                              "CML location");
-            caseData.setCaseManagementLocationTab(TaskManagementLocationTab.builder()
-                                                          .caseManagementLocation(caseManagementLocationName.getSiteName())
-                                                          .build());
+            LocationRefData caseManagementLocationName = courtLocationDetails(
+                locationRefDataList,
+                caseData.getCaseManagementLocation().getBaseLocation(),
+                "CML location"
+            );
+            caseData.setCaseManagementLocationTab(new TaskManagementLocationTab()
+                                                      .setCaseManagementLocation(caseManagementLocationName.getSiteName()));
             caseData.setTaskManagementLocations(null);
             return;
         }
 
         Map<String, Object> evaluatedCourtMap = camundaRuntimeClient
             .getEvaluatedDmnCourtLocations(caseData.getCaseManagementLocation().getBaseLocation(), claimTrack);
-        DmnListingLocations dmnListingLocations = objectMapper.convertValue(evaluatedCourtMap, DmnListingLocations.class);
+        DmnListingLocations dmnListingLocations = objectMapper.convertValue(
+            evaluatedCourtMap,
+            DmnListingLocations.class
+        );
 
         try {
-            LocationRefData cmcListing = courtLocationDetails(locationRefDataList,
-                                                              dmnListingLocations.getCmcListingLocation().getValue(), "Cmc Listing");
-            LocationRefData ccmcListing = courtLocationDetails(locationRefDataList,
-                                                               dmnListingLocations.getCcmcListingLocation().getValue(), "Ccmc Listing");
-            LocationRefData preTrialListing = courtLocationDetails(locationRefDataList,
-                                                                   dmnListingLocations.getPtrListingLocation().getValue(), "Pre trial Listing");
-            LocationRefData trialListing = courtLocationDetails(locationRefDataList,
-                                                                dmnListingLocations.getTrialListingLocation().getValue(), "Trial Listing");
+            LocationRefData cmcListing = courtLocationDetails(
+                locationRefDataList,
+                dmnListingLocations.getCmcListingLocation().getValue(), "Cmc Listing"
+            );
+            LocationRefData ccmcListing = courtLocationDetails(
+                locationRefDataList,
+                dmnListingLocations.getCcmcListingLocation().getValue(), "Ccmc Listing"
+            );
+            LocationRefData preTrialListing = courtLocationDetails(
+                locationRefDataList,
+                dmnListingLocations.getPtrListingLocation().getValue(), "Pre trial Listing"
+            );
+            LocationRefData trialListing = courtLocationDetails(
+                locationRefDataList,
+                dmnListingLocations.getTrialListingLocation().getValue(), "Trial Listing"
+            );
 
-            caseData.setTaskManagementLocations(TaskManagementLocationTypes.builder()
-                                                        .cmcListingLocation(TaskManagementLocationsModel.builder()
-                                                                                .region(cmcListing.getRegionId())
-                                                                                .regionName(cmcListing.getRegion())
-                                                                                .location(cmcListing.getEpimmsId())
-                                                                                .locationName(cmcListing.getSiteName())
-                                                                                .build())
-                                                        .ccmcListingLocation(TaskManagementLocationsModel.builder()
-                                                                                 .region(ccmcListing.getRegionId())
-                                                                                 .regionName(ccmcListing.getRegion())
-                                                                                 .location(ccmcListing.getEpimmsId())
-                                                                                 .locationName(ccmcListing.getSiteName())
-                                                                                 .build())
-                                                        .ptrListingLocation(TaskManagementLocationsModel.builder()
-                                                                                .region(preTrialListing.getRegionId())
-                                                                                .regionName(preTrialListing.getRegion())
-                                                                                .location(preTrialListing.getEpimmsId())
-                                                                                .locationName(preTrialListing.getSiteName())
-                                                                                .build())
-                                                        .trialListingLocation(TaskManagementLocationsModel.builder()
-                                                                                  .region(trialListing.getRegionId())
-                                                                                  .regionName(trialListing.getRegion())
-                                                                                  .location(trialListing.getEpimmsId())
-                                                                                  .locationName(trialListing.getSiteName())
-                                                                                  .build())
-                                                        .build());
+            caseData.setTaskManagementLocations(new TaskManagementLocationTypes()
+                                                    .setCmcListingLocation(new TaskManagementLocationsModel()
+                                                                               .setRegion(cmcListing.getRegionId())
+                                                                               .setRegionName(cmcListing.getRegion())
+                                                                               .setLocation(cmcListing.getEpimmsId())
+                                                                               .setLocationName(cmcListing.getSiteName()))
+                                                    .setCcmcListingLocation(new TaskManagementLocationsModel()
+                                                                                .setRegion(ccmcListing.getRegionId())
+                                                                                .setRegionName(ccmcListing.getRegion())
+                                                                                .setLocation(ccmcListing.getEpimmsId())
+                                                                                .setLocationName(ccmcListing.getSiteName()))
+                                                    .setPtrListingLocation(new TaskManagementLocationsModel()
+                                                                               .setRegion(preTrialListing.getRegionId())
+                                                                               .setRegionName(preTrialListing.getRegion())
+                                                                               .setLocation(preTrialListing.getEpimmsId())
+                                                                               .setLocationName(preTrialListing.getSiteName()))
+                                                    .setTrialListingLocation(new TaskManagementLocationsModel()
+                                                                                 .setRegion(trialListing.getRegionId())
+                                                                                 .setRegionName(trialListing.getRegion())
+                                                                                 .setLocation(trialListing.getEpimmsId())
+                                                                                 .setLocationName(trialListing.getSiteName())
+                                                    ));
 
             populateSummaryTab(caseData, locationRefDataList);
 
@@ -100,24 +109,24 @@ public class UpdateWaCourtLocationsService {
 
     private void populateSummaryTab(CaseData caseData, List<LocationRefData> locationRefDataList) {
 
-        TaskManagementLocationTab tabContent = TaskManagementLocationTab.builder()
-            .cmcListingLocation(caseData.getTaskManagementLocations().getCmcListingLocation().getLocationName())
-            .ptrListingLocation(caseData.getTaskManagementLocations().getPtrListingLocation().getLocationName())
-            .trialListingLocation(caseData.getTaskManagementLocations().getTrialListingLocation().getLocationName())
-            .build();
+        TaskManagementLocationTab tabContent = new TaskManagementLocationTab()
+            .setCmcListingLocation(caseData.getTaskManagementLocations().getCmcListingLocation().getLocationName())
+            .setPtrListingLocation(caseData.getTaskManagementLocations().getPtrListingLocation().getLocationName())
+            .setTrialListingLocation(caseData.getTaskManagementLocations().getTrialListingLocation().getLocationName());
 
         String claimTrack = getClaimTrack(caseData);
         if ("MULTI_CLAIM".equals(claimTrack)) {
             tabContent.setCcmcListingLocation(caseData.getTaskManagementLocations().getCcmcListingLocation().getLocationName());
         }
 
-        LocationRefData caseManagementLocationName = courtLocationDetails(locationRefDataList,
-                                                                          caseData.getCaseManagementLocation().getBaseLocation(),
-                                                                          "CML location");
+        LocationRefData caseManagementLocationName = courtLocationDetails(
+            locationRefDataList,
+            caseData.getCaseManagementLocation().getBaseLocation(),
+            "CML location"
+        );
 
-        caseData.setCaseManagementLocationTab(TaskManagementLocationTab.builder()
-                                                      .caseManagementLocation(caseManagementLocationName.getSiteName())
-                                                      .build());
+        caseData.setCaseManagementLocationTab(new TaskManagementLocationTab()
+                                                  .setCaseManagementLocation(caseManagementLocationName.getSiteName()));
 
         caseData.setTaskManagementLocationsTab(tabContent);
     }
@@ -140,7 +149,10 @@ public class UpdateWaCourtLocationsService {
             courtTypeLocationDetails = foundLocations.get(0);
         } else {
             throw new IllegalArgumentException(
-                "Court Location not found, in location data for court type %s epimms_id %s".formatted(courtType, court));
+                "Court Location not found, in location data for court type %s epimms_id %s".formatted(
+                    courtType,
+                    court
+                ));
         }
         return courtTypeLocationDetails;
     }
