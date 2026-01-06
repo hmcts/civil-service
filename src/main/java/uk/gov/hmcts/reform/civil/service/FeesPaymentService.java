@@ -77,23 +77,23 @@ public class FeesPaymentService {
         log.info("Checking payment status for {} of fee type {}", paymentReference, feeType);
         PaymentDto cardPaymentDetails = paymentStatusService.getCardPaymentDetails(paymentReference, authorization);
         String paymentStatus = cardPaymentDetails.getStatus();
-        CardPaymentStatusResponse.CardPaymentStatusResponseBuilder response = CardPaymentStatusResponse.builder()
-                .status(paymentStatus)
-                .paymentReference(cardPaymentDetails.getReference())
-                .externalReference(cardPaymentDetails.getPaymentGroupReference())
-                .paymentFor(feeType.name().toLowerCase())
-                .paymentAmount(cardPaymentDetails.getAmount());
+        CardPaymentStatusResponse response = new CardPaymentStatusResponse()
+                .setStatus(paymentStatus)
+                .setPaymentReference(cardPaymentDetails.getReference())
+                .setExternalReference(cardPaymentDetails.getPaymentGroupReference())
+                .setPaymentFor(feeType.name().toLowerCase())
+                .setPaymentAmount(cardPaymentDetails.getAmount());
 
         if (paymentStatus.equals("Failed")) {
             Arrays.stream(cardPaymentDetails.getStatusHistories())
                     .filter(h -> h.getStatus().equals(paymentStatus))
                     .findFirst()
                     .ifPresent(h -> response
-                        .errorCode(h.getErrorCode())
-                        .errorDescription(h.getErrorMessage()));
+                        .setErrorCode(h.getErrorCode())
+                        .setErrorDescription(h.getErrorMessage()));
         }
 
-        CardPaymentStatusResponse builtResponse = response.build();
+        CardPaymentStatusResponse builtResponse = response;
         try {
             paymentRequestUpdateCallbackService.updatePaymentStatus(feeType, caseReference, builtResponse);
 
