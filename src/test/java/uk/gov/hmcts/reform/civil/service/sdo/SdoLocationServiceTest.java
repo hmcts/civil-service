@@ -212,9 +212,9 @@ class SdoLocationServiceTest {
     @Test
     void shouldClearWaMetadataFieldsOnBuilder() {
         CaseData caseData = CaseData.builder()
-            .taskManagementLocations(TaskManagementLocationTypes.builder().build())
-            .taskManagementLocationsTab(TaskManagementLocationTab.builder().build())
-            .caseManagementLocationTab(TaskManagementLocationTab.builder().build())
+            .taskManagementLocations(new TaskManagementLocationTypes())
+            .taskManagementLocationsTab(new TaskManagementLocationTab())
+            .caseManagementLocationTab(new TaskManagementLocationTab())
             .build();
 
         service.clearWaLocationMetadata(caseData);
