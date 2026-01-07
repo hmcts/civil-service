@@ -17,6 +17,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 JAVA_ROOT = REPO_ROOT / "src" / "main" / "java"
 RESOURCE_ROOT = REPO_ROOT / "src" / "main" / "resources"
 APPLICATION_YAML = RESOURCE_ROOT / "application.yaml"
+DIAGRAM_BASE_URL = "https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/"
 
 # Regex helpers
 CLASS_DEF_RE = re.compile(r"class\s+(?P<name>[A-Za-z0-9_]+)")
@@ -390,6 +391,13 @@ def render_markdown(rows: List[Dict[str, str]], notify_service_id: Optional[str]
                 f"[`{row['template_id']}`](https://www.notifications.service.gov.uk/"
                 f"services/{notify_service_id}/templates/{row['template_id']})"
             )
+        formatted_bpmn = []
+        for path in row['bpmn_files']:
+            if path == '—':
+                formatted_bpmn.append('—')
+            else:
+                name = Path(path).stem
+                formatted_bpmn.append(f"{path} ([diagram]({DIAGRAM_BASE_URL}{name}.png))")
         lines.append('|' + '|'.join([
             f"`{row['event']}`",
             f"`{row['handler']}`",
@@ -397,7 +405,7 @@ def render_markdown(rows: List[Dict[str, str]], notify_service_id: Optional[str]
             row['party'],
             f"`{row['generator']}`",
             template_id_cell,
-            '<br>'.join(row['bpmn_files']),
+            '<br>'.join(formatted_bpmn),
             '<br>'.join(row['ccd_events'])
         ]) + '|')
     lines.append('')
@@ -470,6 +478,13 @@ def render_html(rows: List[Dict[str, str]], notify_service_id: Optional[str]) ->
                 f"<a href='https://www.notifications.service.gov.uk/services/{notify_service_id}/templates/"
                 f"{html.escape(row['template_id'])}'>{html.escape(row['template_id'])}</a>"
             )
+        formatted_bpmn = []
+        for path in row['bpmn_files']:
+            if path == '—':
+                formatted_bpmn.append('—')
+            else:
+                name = Path(path).stem
+                formatted_bpmn.append(f"{html.escape(path)}<br><a href='{DIAGRAM_BASE_URL}{name}.png'>diagram</a>")
         lines.extend([
             f"      <tr data-ccd-events='{ccd_attr}'>",
             f"        <td><code>{html.escape(row['event'])}</code></td>",
@@ -478,7 +493,7 @@ def render_html(rows: List[Dict[str, str]], notify_service_id: Optional[str]) ->
             f"        <td>{html.escape(row['party'])}</td>",
             f"        <td><code>{html.escape(row['generator'])}</code></td>",
             f"        <td>{template_id_cell}</td>",
-            f"        <td>{'<br>'.join(html.escape(path) for path in row['bpmn_files'])}</td>",
+            f"        <td>{'<br>'.join(formatted_bpmn)}</td>",
             f"        <td>{'<br>'.join(html.escape(event) for event in row['ccd_events'])}</td>",
             "      </tr>",
         ])
