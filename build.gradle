@@ -384,6 +384,7 @@ dependencies {
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
 
+  implementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '10.22.0'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-openfeign-core'
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.2'
