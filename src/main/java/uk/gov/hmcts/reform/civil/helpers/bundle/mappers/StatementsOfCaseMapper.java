@@ -93,7 +93,8 @@ public class StatementsOfCaseMapper implements ManageDocMapper {
             } else if ("Defendant 2".equalsIgnoreCase(caseDocumentElement.getValue().getCreatedBy())) {
                 party = PartyType.DEFENDANT2.getDisplayName();
             } else {
-                party = "";
+                party = DocumentType.DEFENDANT_DEFENCE.equals(caseDocumentElement.getValue().getDocumentType())
+                    ? "Defendant" : "CL's";
             }
             String docName = generateDocName(docType, party, null,
                 caseDocumentElement.getValue().getCreatedDatetime().toLocalDate());
