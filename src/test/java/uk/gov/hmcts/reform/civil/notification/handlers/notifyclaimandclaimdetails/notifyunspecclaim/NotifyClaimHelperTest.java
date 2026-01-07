@@ -65,7 +65,7 @@ class NotifyClaimHelperTest {
         DynamicList list = DynamicList.builder().value(selected).build();
 
         CaseData caseData = CaseData.builder()
-            .defendantDetails(list)
+            .defendantSolicitorNotifyClaimOptions(list)
             .build();
 
         boolean result = notifyClaimHelper.checkIfThisDefendantToBeNotified(caseData, targetDefendant);
@@ -75,11 +75,11 @@ class NotifyClaimHelperTest {
 
     @Test
     void shouldReturnTrueWhenBothDefendantsSelected() {
-        DynamicListElement selected = DynamicListElement.builder().label("Both Defendants").build();
+        DynamicListElement selected = DynamicListElement.builder().label("Both").build();
         DynamicList list = DynamicList.builder().value(selected).build();
 
         CaseData caseData = CaseData.builder()
-            .defendantDetails(list)
+            .defendantSolicitorNotifyClaimOptions(list)
             .build();
 
         boolean result = notifyClaimHelper.checkIfThisDefendantToBeNotified(caseData, "Any Name");

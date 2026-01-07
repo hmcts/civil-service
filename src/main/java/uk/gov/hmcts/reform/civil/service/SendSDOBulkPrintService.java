@@ -71,9 +71,8 @@ public class SendSDOBulkPrintService {
     }
 
     private Party getPartyDetails(uk.gov.hmcts.reform.civil.model.Party party) {
-        return Party.builder()
-            .name(party.getPartyName())
-            .primaryAddress(party.getPrimaryAddress())
-            .build();
+        return new Party()
+            .setName(party.getPartyName())
+            .setPrimaryAddress(party.getPrimaryAddress());
     }
 }

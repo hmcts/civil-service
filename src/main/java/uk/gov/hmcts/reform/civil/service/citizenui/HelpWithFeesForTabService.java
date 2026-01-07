@@ -26,34 +26,32 @@ public class HelpWithFeesForTabService {
     }
 
     private HelpWithFeesForTab setUpHearingHelpWithFeeTab(CaseData caseData) {
-        return HelpWithFeesForTab.builder()
-            .remissionAmount(Optional.ofNullable(caseData.getHearingHwfDetails())
+        return new HelpWithFeesForTab()
+            .setRemissionAmount(Optional.ofNullable(caseData.getHearingHwfDetails())
                                  .map(HelpWithFeesDetails::getRemissionAmount).isPresent()
                                  ? MonetaryConversions.penniesToPounds(caseData.getHearingHwfDetails().getRemissionAmount())
                                  : null)
-            .applicantMustPay(Optional.ofNullable(caseData.getHearingHwfDetails())
+            .setApplicantMustPay(Optional.ofNullable(caseData.getHearingHwfDetails())
                                   .map(HelpWithFeesDetails::getOutstandingFeeInPounds)
                                   .orElse(null))
-            .claimFee(MonetaryConversions.penniesToPounds(caseData.getCalculatedHearingFeeInPence()))
-            .feeCode(caseData.getHearingFee().getCode())
-            .hwfType(hearingFee)
-            .hwfReferenceNumber(caseData.getHearingHelpFeesReferenceNumber())
-            .build();
+            .setClaimFee(MonetaryConversions.penniesToPounds(caseData.getCalculatedHearingFeeInPence()))
+            .setFeeCode(caseData.getHearingFee().getCode())
+            .setHwfType(hearingFee)
+            .setHwfReferenceNumber(caseData.getHearingHelpFeesReferenceNumber());
     }
 
     private HelpWithFeesForTab setUpClaimIssuedHelpWithFeeTab(CaseData caseData) {
-        return HelpWithFeesForTab.builder()
-            .remissionAmount(Optional.ofNullable(caseData.getClaimIssuedHwfDetails())
+        return new HelpWithFeesForTab()
+            .setRemissionAmount(Optional.ofNullable(caseData.getClaimIssuedHwfDetails())
                                  .map(HelpWithFeesDetails::getRemissionAmount).isPresent()
                                  ? MonetaryConversions.penniesToPounds(caseData.getClaimIssuedHwfDetails().getRemissionAmount())
                                  : null)
-            .applicantMustPay(Optional.ofNullable(caseData.getClaimIssuedHwfDetails())
+            .setApplicantMustPay(Optional.ofNullable(caseData.getClaimIssuedHwfDetails())
                                   .map(HelpWithFeesDetails::getOutstandingFeeInPounds)
                                   .orElse(null))
-            .claimFee(MonetaryConversions.penniesToPounds(caseData.getCalculatedClaimFeeInPence()))
-            .feeCode(caseData.getClaimFee().getCode())
-            .hwfType(claimIssuedFee)
-            .hwfReferenceNumber(caseData.getHelpWithFeesReferenceNumber())
-            .build();
+            .setClaimFee(MonetaryConversions.penniesToPounds(caseData.getCalculatedClaimFeeInPence()))
+            .setFeeCode(caseData.getClaimFee().getCode())
+            .setHwfType(claimIssuedFee)
+            .setHwfReferenceNumber(caseData.getHelpWithFeesReferenceNumber());
     }
 }
