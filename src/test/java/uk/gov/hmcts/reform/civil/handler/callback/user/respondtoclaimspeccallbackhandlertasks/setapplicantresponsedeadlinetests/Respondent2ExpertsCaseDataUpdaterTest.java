@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,17 +25,15 @@ class Respondent2ExpertsCaseDataUpdaterTest {
 
     @BeforeEach
     void setUp() {
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder()
-                .respondToClaimExperts2(ExpertDetails.builder()
-                        .expertName("Expert Name")
-                        .fieldofExpertise("Field")
-                        .build())
-                .build();
+        Respondent2DQ respondent2DQ = new Respondent2DQ();
+        ExpertDetails  expertDetails = new ExpertDetails();
+        expertDetails.setExpertName("Expert Name");
+        expertDetails.setFieldofExpertise("Field");
+        respondent2DQ.setRespondToClaimExperts2(expertDetails);
 
-        caseData = CaseData.builder()
-                .respondent2DQ(respondent2DQ)
-                .responseClaimExpertSpecRequired2(YesOrNo.YES)
-                .build();
+        caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondent2DQ(respondent2DQ);
+        caseData.setResponseClaimExpertSpecRequired2(YesOrNo.YES);
     }
 
     @Test
@@ -56,11 +55,10 @@ class Respondent2ExpertsCaseDataUpdaterTest {
 
     @Test
     void shouldHandleNoExpertsRequired() {
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder().build();
-        CaseData testCaseData = CaseData.builder()
-                .respondent2DQ(respondent2DQ)
-                .responseClaimExpertSpecRequired2(YesOrNo.NO)
-                .build();
+        Respondent2DQ respondent2DQ = new Respondent2DQ();
+        CaseData testCaseData = CaseDataBuilder.builder().build();
+        testCaseData.setRespondent2DQ(respondent2DQ);
+        testCaseData.setResponseClaimExpertSpecRequired2(YesOrNo.NO);
 
         CaseData result = updater.update(testCaseData);
 

@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 
 import java.util.Collections;
@@ -34,8 +35,9 @@ class ValidateRespondentPaymentDateTest {
 
     @BeforeEach
     void setUp() {
-        respondToClaimAdmitPartLRspec = RespondToClaimAdmitPartLRspec.builder().build();
-        CaseData caseData = CaseData.builder().respondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec).build();
+        respondToClaimAdmitPartLRspec = new RespondToClaimAdmitPartLRspec();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec);
         when(callbackParams.getCaseData()).thenReturn(caseData);
     }
 

@@ -14,12 +14,6 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 @Builder(toBuilder = true)
 public class RequestedCourt {
 
-    /**
-     * Was used to say if the party chose a preferred court.
-     *
-     * @deprecated location is mandatory for all parties now
-     */
-    @Deprecated(forRemoval = true)
     private YesOrNo requestHearingAtSpecificCourt;
     private String otherPartyPreferredSite;
     private String responseCourtCode;

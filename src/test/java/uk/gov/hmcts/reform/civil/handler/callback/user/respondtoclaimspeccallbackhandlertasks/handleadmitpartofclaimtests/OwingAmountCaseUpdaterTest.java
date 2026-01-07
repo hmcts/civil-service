@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.handleadmitpartofclaim.OwingAmountCaseUpdater;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
@@ -19,35 +20,30 @@ class OwingAmountCaseUpdaterTest {
     @InjectMocks
     private OwingAmountCaseUpdater updater;
 
-    private CaseData.CaseDataBuilder<?, ?> caseDataBuilder;
-
     @BeforeEach
     void setUp() {
-        caseDataBuilder = CaseData.builder();
+
     }
 
     @Test
     void shouldUpdateOwingAmountInPounds() {
-        CaseData caseData = CaseData.builder()
-                .respondToAdmittedClaimOwingAmount(BigDecimal.valueOf(1000L))
-                .respondToAdmittedClaimOwingAmount2(BigDecimal.valueOf(2000L))
-                .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondToAdmittedClaimOwingAmount(BigDecimal.valueOf(1000L));
+        caseData.setRespondToAdmittedClaimOwingAmount2(BigDecimal.valueOf(2000L));
 
-        updater.update(caseData, caseDataBuilder);
+        updater.update(caseData);
 
-        CaseData updatedCaseData = caseDataBuilder.build();
-        assertThat(updatedCaseData.getRespondToAdmittedClaimOwingAmountPounds()).isEqualTo(MonetaryConversions.penniesToPounds(BigDecimal.valueOf(1000L)));
-        assertThat(updatedCaseData.getRespondToAdmittedClaimOwingAmountPounds2()).isEqualTo(MonetaryConversions.penniesToPounds(BigDecimal.valueOf(2000L)));
+        assertThat(caseData.getRespondToAdmittedClaimOwingAmountPounds()).isEqualTo(MonetaryConversions.penniesToPounds(BigDecimal.valueOf(1000L)));
+        assertThat(caseData.getRespondToAdmittedClaimOwingAmountPounds2()).isEqualTo(MonetaryConversions.penniesToPounds(BigDecimal.valueOf(2000L)));
     }
 
     @Test
     void shouldNotUpdateOwingAmountWhenNull() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
-        updater.update(caseData, caseDataBuilder);
+        updater.update(caseData);
 
-        CaseData updatedCaseData = caseDataBuilder.build();
-        assertThat(updatedCaseData.getRespondToAdmittedClaimOwingAmountPounds()).isNull();
-        assertThat(updatedCaseData.getRespondToAdmittedClaimOwingAmountPounds2()).isNull();
+        assertThat(caseData.getRespondToAdmittedClaimOwingAmountPounds()).isNull();
+        assertThat(caseData.getRespondToAdmittedClaimOwingAmountPounds2()).isNull();
     }
 }

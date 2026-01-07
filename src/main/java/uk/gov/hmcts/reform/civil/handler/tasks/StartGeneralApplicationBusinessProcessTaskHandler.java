@@ -46,7 +46,7 @@ public class StartGeneralApplicationBusinessProcessTaskHandler extends BaseExter
         var stateFlow = stateFlowEngine.getStateFlow(caseData);
         variables.putValue(FLOW_STATE, stateFlow.getState().getName());
         variables.putValue(FLOW_FLAGS, stateFlow.getFlags());
-        return ExternalTaskData.builder().variables(variables).build();
+        return new ExternalTaskData().setVariables(variables);
     }
 
     @Override

@@ -90,7 +90,7 @@ public class GenerateJsonAndTransferTaskHandler extends GenerateMediationFileAnd
         } catch (Exception e) {
             log.error(e.getMessage());
         }
-        return ExternalTaskData.builder().build();
+        return new ExternalTaskData();
     }
 
     private Optional<EmailData> prepareEmail(MediationDTO mediationDTO) {

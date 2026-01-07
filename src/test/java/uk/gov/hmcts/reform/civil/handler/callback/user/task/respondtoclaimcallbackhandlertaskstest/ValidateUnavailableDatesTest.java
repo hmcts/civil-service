@@ -59,16 +59,16 @@ class ValidateUnavailableDatesTest {
 
     @Test
     void shouldReturnNoError_whenUnavailableDateIsInTheFuture() {
-        Hearing hearing = Hearing.builder()
-            .unavailableDatesRequired(YES)
-            .unavailableDates(wrapElements(UnavailableDate.builder()
-                                               .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                               .date(LocalDate.now().plusDays(5))
-                                               .build()))
-            .build();
+        Hearing hearing = new Hearing();
+        hearing.setUnavailableDatesRequired(YES);
+        UnavailableDate unavailableDate = new UnavailableDate();
+        unavailableDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
+        unavailableDate.setDate(LocalDate.now().plusDays(5));
+        hearing.setUnavailableDates(wrapElements(unavailableDate));
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQHearing(hearing);
         CaseData caseData = CaseDataBuilder.builder()
-            .respondent1DQ(Respondent1DQ.builder()
-                               .respondent1DQHearing(hearing).build()).build();
+            .respondent1DQ(respondent1DQ).build();
 
         CallbackParams callbackParams = CallbackParams.builder()
             .caseData(caseData)
@@ -83,16 +83,16 @@ class ValidateUnavailableDatesTest {
 
     @Test
     void shouldReturnNoError_whenUnavailableDateIsInThePast() {
-        Hearing hearing = Hearing.builder()
-            .unavailableDatesRequired(YES)
-            .unavailableDates(wrapElements(UnavailableDate.builder()
-                                               .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                               .date(LocalDate.now().minusYears(5))
-                                               .build()))
-            .build();
+        Hearing hearing = new Hearing();
+        hearing.setUnavailableDatesRequired(YES);
+        UnavailableDate unavailableDate = new UnavailableDate();
+        unavailableDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
+        unavailableDate.setDate(LocalDate.now().minusYears(5));
+        hearing.setUnavailableDates(wrapElements(unavailableDate));
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQHearing(hearing);
         CaseData caseData = CaseDataBuilder.builder()
-            .respondent1DQ(Respondent1DQ.builder()
-                               .respondent1DQHearing(hearing).build()).build();
+            .respondent1DQ(respondent1DQ).build();
 
         CallbackParams callbackParams = CallbackParams.builder()
             .caseData(caseData)
@@ -110,21 +110,20 @@ class ValidateUnavailableDatesTest {
 
     @Test
     void shouldValidateRespondent2Hearing_whenSolicitorRepresentsOnlyRespondentTwo() {
-        Hearing respondent2Hearing = Hearing.builder()
-            .unavailableDatesRequired(YES)
-            .unavailableDates(wrapElements(UnavailableDate.builder()
-                                               .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                               .date(LocalDate.now().plusDays(7))
-                                               .build()))
-            .build();
+        Hearing respondent2Hearing = new Hearing();
+        respondent2Hearing.setUnavailableDatesRequired(YES);
+        UnavailableDate unavailableDate = new UnavailableDate();
+        unavailableDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
+        unavailableDate.setDate(LocalDate.now().plusDays(7));
+        respondent2Hearing.setUnavailableDates(wrapElements(unavailableDate));
 
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQHearing(respondent2Hearing);
         CaseData caseData = CaseDataBuilder.builder()
             .multiPartyClaimTwoDefendantSolicitors()
-            .respondent1DQ(Respondent1DQ.builder()
-                               .respondent1DQHearing(respondent2Hearing)
-                               .build())
-            .build().toBuilder().ccdCaseReference(1234L)
+            .respondent1DQ(respondent1DQ)
             .build();
+        caseData.setCcdCaseReference(1234L);
 
         CallbackParams callbackParams = CallbackParams.builder()
             .caseData(caseData)
@@ -146,34 +145,32 @@ class ValidateUnavailableDatesTest {
 
     @Test
     void shouldValidateRespondent1Hearing_whenMultiPartyScenarioIsOneVOne() {
-        Hearing respondent1Hearing = Hearing.builder()
-            .unavailableDatesRequired(YES)
-            .unavailableDates(wrapElements(UnavailableDate.builder()
-                                               .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                               .date(LocalDate.now().plusDays(7))
-                                               .build()))
-            .build();
+        Hearing respondent1Hearing = new Hearing();
+        respondent1Hearing.setUnavailableDatesRequired(YES);
+        UnavailableDate unavailableDate = new UnavailableDate();
+        unavailableDate.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
+        unavailableDate.setDate(LocalDate.now().plusDays(7));
+        respondent1Hearing.setUnavailableDates(wrapElements(unavailableDate));
 
-        Hearing respondent2Hearing = Hearing.builder()
-            .unavailableDatesRequired(YES)
-            .unavailableDates(wrapElements(UnavailableDate.builder()
-                                               .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                               .date(LocalDate.now().plusDays(3))
-                                               .build()))
-            .build();
+        Hearing respondent2Hearing = new Hearing();
+        respondent2Hearing.setUnavailableDatesRequired(YES);
+        UnavailableDate unavailableDate2 = new UnavailableDate();
+        unavailableDate2.setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
+        unavailableDate2.setDate(LocalDate.now().plusDays(3));
+        respondent2Hearing.setUnavailableDates(wrapElements(unavailableDate2));
 
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQHearing(respondent1Hearing);
+        Respondent2DQ respondent2DQ = new Respondent2DQ();
+        respondent2DQ.setRespondent2DQHearing(respondent2Hearing);
         CaseData caseData = CaseDataBuilder.builder()
             .multiPartyClaimOneDefendantSolicitor()
-            .respondent1DQ(Respondent1DQ.builder()
-                               .respondent1DQHearing(respondent1Hearing)
-                               .build())
-            .respondent2DQ(Respondent2DQ.builder()
-                               .respondent2DQHearing(respondent2Hearing)
-                               .build())
-            .build().toBuilder().ccdCaseReference(1234L)
-            .respondent2SameLegalRepresentative(YES)
-            .respondentResponseIsSame(NO)
+            .respondent1DQ(respondent1DQ)
+            .respondent2DQ(respondent2DQ)
             .build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent2SameLegalRepresentative(YES);
+        caseData.setRespondentResponseIsSame(NO);
 
         CallbackParams callbackParams = CallbackParams.builder()
             .caseData(caseData)

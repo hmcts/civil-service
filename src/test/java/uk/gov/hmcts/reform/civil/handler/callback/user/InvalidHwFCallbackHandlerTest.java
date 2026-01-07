@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -39,7 +40,7 @@ public class InvalidHwFCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldHandleInvalidRefNumberSuccessfully_FeeType_ClaimIssued() {
             //Given
             HelpWithFeesDetails claimIssuedHwfDetails = new HelpWithFeesDetails();
-            CaseData caseData = CaseData.builder().build();
+            CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setClaimIssuedHwfDetails(claimIssuedHwfDetails);
             caseData.setHwfFeeType(FeeType.CLAIMISSUED);
 
@@ -55,7 +56,7 @@ public class InvalidHwFCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldHandleInvalidRefNumberSuccessfully_FeeType_Hearing() {
             //Given
-            CaseData caseData = CaseData.builder().build();
+            CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setHwfFeeType(FeeType.HEARING);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

@@ -1524,9 +1524,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .handle(params);
 
                 CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+                // Applicant flags should be preserved
                 assertThat(responseCaseData.getApplicant1().getFlags()).isEqualTo(applicant1Flags);
                 assertThat(responseCaseData.getApplicant2().getFlags()).isEqualTo(applicant2Flags);
-                // Also verify respondent flags are preserved
                 assertThat(responseCaseData.getRespondent1().getFlags()).isEqualTo(respondent1Flags);
                 assertThat(responseCaseData.getRespondent2().getFlags()).isEqualTo(respondent2Flags);
             }
@@ -1573,7 +1573,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .handle(params);
 
                 CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
-                // Also verify applicant flags are preserved
+                // Applicant flags should be preserved
                 assertThat(responseCaseData.getApplicant1().getFlags()).isEqualTo(applicant1Flags);
                 assertThat(responseCaseData.getApplicant2().getFlags()).isEqualTo(applicant2Flags);
                 assertThat(responseCaseData.getRespondent1().getFlags()).isEqualTo(respondent1Flags);

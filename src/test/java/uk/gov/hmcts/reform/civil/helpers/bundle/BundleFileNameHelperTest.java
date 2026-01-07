@@ -129,13 +129,11 @@ public class BundleFileNameHelperTest {
 
     private List<Element<UploadEvidenceDocumentType>> getOtherDocs() {
         List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = new ArrayList<>();
-        otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
-                                                       .builder()
-                                                       .documentUpload(Document.builder().documentBinaryUrl("Test")
+        otherEvidenceDocs.add(ElementUtils.element(new UploadEvidenceDocumentType()
+                                                       .setDocumentUpload(Document.builder().documentBinaryUrl("Test")
                                                                            .documentFileName("Test").build())
-                                                       .typeOfDocument(TypeOfDocDocumentaryEvidenceOfTrial.CHRONOLOGY.getDisplayNames().get(0))
-                                                       .documentIssuedDate(LocalDate.of(2023, 1, 12))
-                                                       .build()));
+                                                       .setTypeOfDocument(TypeOfDocDocumentaryEvidenceOfTrial.CHRONOLOGY.getDisplayNames().get(0))
+                                                       .setDocumentIssuedDate(LocalDate.of(2023, 1, 12))));
         return otherEvidenceDocs;
     }
 

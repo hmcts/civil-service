@@ -36,14 +36,13 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
-    @SuppressWarnings("unchecked")
     public ExternalTaskData handleTask(ExternalTask externalTask) {
 
         HearingNoticeSchedulerVars schedulerVars = mapper.convertValue(externalTask.getAllVariables(), HearingNoticeSchedulerVars.class);
         List<String> dispatchedHearingIds = getDispatchedHearingIds(schedulerVars);
         UnNotifiedHearingResponse unnotifiedHearings = getUnnotifiedHearings(schedulerVars.getServiceId());
 
-        log.info("Found [{}] unnotified hearings", unnotifiedHearings.getTotalFound());
+        log.info("Found [{}] unnotified hearings, {}", unnotifiedHearings.getTotalFound(), unnotifiedHearings.getHearingIds());
 
         unnotifiedHearings.getHearingIds()
             .stream()
@@ -55,12 +54,13 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
 
         runtimeService.setVariables(
             externalTask.getProcessInstanceId(),
-            HearingNoticeSchedulerVars.builder()
-                .dispatchedHearingIds(dispatchedHearingIds)
-                .totalNumberOfUnnotifiedHearings(unnotifiedHearings.getTotalFound().intValue())
-                .build().toMap(mapper)
+            new HearingNoticeSchedulerVars()
+                .setDispatchedHearingIds(dispatchedHearingIds)
+                .setTotalNumberOfUnnotifiedHearings(unnotifiedHearings.getTotalFound().intValue())
+                .toMap(mapper)
         );
-        return ExternalTaskData.builder().build();
+
+        return new ExternalTaskData();
     }
 
     @Override
@@ -100,7 +100,7 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
     private UserAuthContent getSystemUpdateUser() {
         String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         String userId = userService.getUserInfo(userToken).getUid();
-        return UserAuthContent.builder().userToken(userToken).userId(userId).build();
+        return new UserAuthContent().setUserToken(userToken).setUserId(userId);
     }
 
     private boolean hearingNoticeDispatched(String hearingId, List<String> dispatchedHearingIds) {

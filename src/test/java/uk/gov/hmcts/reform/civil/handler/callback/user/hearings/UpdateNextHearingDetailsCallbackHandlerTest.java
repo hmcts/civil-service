@@ -116,9 +116,9 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
 
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
-                NextHearingDetails expected = NextHearingDetails.builder()
-                    .hearingID(hearingId)
-                    .hearingDateTime(hearingStartTime).build();
+                NextHearingDetails expected = new NextHearingDetails();
+                expected.setHearingID(hearingId);
+                expected.setHearingDateTime(hearingStartTime);
 
                 assertEquals(expected, updatedData.getNextHearingDetails());
             }
@@ -158,9 +158,9 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
 
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
-                NextHearingDetails expected = NextHearingDetails.builder()
-                    .hearingID(hearingId)
-                    .hearingDateTime(hearingStartTime).build();
+                NextHearingDetails expected = new NextHearingDetails();
+                expected.setHearingID(hearingId);
+                expected.setHearingDateTime(hearingStartTime);
 
                 assertEquals(expected, updatedData.getNextHearingDetails());
             }
@@ -205,9 +205,9 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
 
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
-                NextHearingDetails expected = NextHearingDetails.builder()
-                    .hearingID(hearingId)
-                    .hearingDateTime(hearingStartTime).build();
+                NextHearingDetails expected = new NextHearingDetails();
+                expected.setHearingID(hearingId);
+                expected.setHearingDateTime(hearingStartTime);
 
                 assertEquals(expected, updatedData.getNextHearingDetails());
             }
@@ -325,9 +325,9 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
 
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
-                NextHearingDetails expected = NextHearingDetails.builder()
-                    .hearingID(hearingId)
-                    .hearingDateTime(hearingStartTime).build();
+                NextHearingDetails expected = new NextHearingDetails();
+                expected.setHearingID(hearingId);
+                expected.setHearingDateTime(hearingStartTime);
 
                 assertEquals(expected, updatedData.getNextHearingDetails());
             }
@@ -367,9 +367,9 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
 
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
-                NextHearingDetails expected = NextHearingDetails.builder()
-                    .hearingID(hearingId)
-                    .hearingDateTime(hearingStartTime).build();
+                NextHearingDetails expected = new NextHearingDetails();
+                expected.setHearingID(hearingId);
+                expected.setHearingDateTime(hearingStartTime);
 
                 assertEquals(expected, updatedData.getNextHearingDetails());
             }
@@ -414,9 +414,9 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
 
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
-                NextHearingDetails expected = NextHearingDetails.builder()
-                    .hearingID(hearingId)
-                    .hearingDateTime(hearingStartTime).build();
+                NextHearingDetails expected = new NextHearingDetails();
+                expected.setHearingID(hearingId);
+                expected.setHearingDateTime(hearingStartTime);
 
                 assertEquals(expected, updatedData.getNextHearingDetails());
             }

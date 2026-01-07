@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.setapplicantresponsedeadlinespec.PaymentTimeRouteCaseDataUpdater;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 
 import java.time.LocalDate;
@@ -31,7 +32,7 @@ class PaymentTimeRouteCaseDataUpdaterTest {
     @Test
     void shouldNotUpdateCaseDataWhenPartPaymentPaidImmediately() {
         // Given
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY);
         caseData.setRespondent1ClaimResponseTypeForSpec(PART_ADMISSION);
 
@@ -46,7 +47,7 @@ class PaymentTimeRouteCaseDataUpdaterTest {
     @Test
     void shouldNotUpdateWhenRespondent2IsPartAdmission() {
         // Given
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY);
         caseData.setRespondent2ClaimResponseTypeForSpec(PART_ADMISSION);
 
@@ -69,7 +70,7 @@ class PaymentTimeRouteCaseDataUpdaterTest {
             anyInt()
         )).thenReturn(expectedDate);
 
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY);
         caseData.setRespondent1ClaimResponseTypeForSpec(
             uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION
@@ -95,7 +96,7 @@ class PaymentTimeRouteCaseDataUpdaterTest {
             anyInt()
         )).thenReturn(expectedDate);
 
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY);
         caseData.setRespondent2ClaimResponseTypeForSpec(
             uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION
@@ -113,7 +114,7 @@ class PaymentTimeRouteCaseDataUpdaterTest {
     @Test
     void shouldNotUpdateWhenNeitherIsAdmission() {
         // Given
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY);
         caseData.setRespondent1ClaimResponseTypeForSpec(null);
         caseData.setRespondent2ClaimResponseTypeForSpec(null);

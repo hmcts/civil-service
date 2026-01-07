@@ -2,8 +2,9 @@ package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -15,8 +16,9 @@ import java.util.Optional;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-@Builder(toBuilder = true)
 @AllArgsConstructor
+@NoArgsConstructor
+@Accessors(chain = true)
 public class Bundle implements MappableObject {
 
     private String id;
@@ -35,10 +37,6 @@ public class Bundle implements MappableObject {
     private Optional<LocalDateTime> createdOn;
     private Optional<LocalDate> bundleHearingDate;
     private Optional<String> stitchingFailureMessage;
-
-    private Bundle() {
-        // noop -- for deserializer
-    }
 
     public Bundle(
         String id,
@@ -87,44 +85,12 @@ public class Bundle implements MappableObject {
 
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getEligibleForStitching() {
-        return eligibleForStitching;
-    }
-
-    public List<IdValue<BundleDocument>> getDocuments() {
-        return documents;
-    }
-
     public Optional<String> getStitchStatus() {
         return checkIsOptional(stitchStatus);
     }
 
     public Optional<Document> getStitchedDocument() {
         return checkIsOptional(stitchedDocument);
-    }
-
-    public YesOrNo getHasCoversheets() {
-        return hasCoversheets;
-    }
-
-    public YesOrNo getHasTableOfContents() {
-        return hasTableOfContents;
-    }
-
-    public String getFileName() {
-        return fileName;
     }
 
     public Optional<LocalDateTime> getCreatedOn() {
