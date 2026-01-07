@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.util.Optional;
 
@@ -13,6 +14,7 @@ import java.util.Optional;
 @Data
 @NoArgsConstructor
 @Builder(toBuilder = true)
+@Accessors(chain = true)
 public class GASolicitorDetailsGAspec {
 
     private String email;

@@ -130,15 +130,15 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
     protected RequestedCourt getRequestedCourt(DQ dq, String authorisation) {
         RequestedCourt rc = dq.getRequestedCourt();
         if (rc != null && null != rc.getCaseLocation()) {
-            return RequestedCourt.builder()
-                .requestHearingAtSpecificCourt(YES)
-                .reasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt())
-                .responseCourtName(rc.getCaseLocation().getBaseLocation())
-                .build();
+            RequestedCourt requestedCourt = new RequestedCourt();
+            requestedCourt.setRequestHearingAtSpecificCourt(YES);
+            requestedCourt.setReasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt());
+            requestedCourt.setResponseCourtName(rc.getCaseLocation().getBaseLocation());
+            return requestedCourt;
         } else {
-            return RequestedCourt.builder()
-                .requestHearingAtSpecificCourt(NO)
-                .build();
+            RequestedCourt requestedCourt = new RequestedCourt();
+            requestedCourt.setRequestHearingAtSpecificCourt(NO);
+            return requestedCourt;
         }
     }
 

@@ -336,18 +336,18 @@ class FeesPaymentServiceTest {
     }
 
     private CardPaymentStatusResponse expectedResponse(String status) {
-        CardPaymentStatusResponse.CardPaymentStatusResponseBuilder builder = CardPaymentStatusResponse.builder()
-            .paymentReference("RC-1701-0909-0602-0418")
-            .status(status)
-            .paymentAmount(new BigDecimal(200))
-            .paymentFor("hearing");
+        CardPaymentStatusResponse response = new CardPaymentStatusResponse()
+            .setPaymentReference("RC-1701-0909-0602-0418")
+            .setStatus(status)
+            .setPaymentAmount(new BigDecimal(200))
+            .setPaymentFor("hearing");
 
         if (status.equals("Failed")) {
-            builder.errorCode("P0030");
-            builder.errorDescription("Payment was cancelled by the user");
+            response.setErrorCode("P0030");
+            response.setErrorDescription("Payment was cancelled by the user");
         }
 
-        return builder.build();
+        return response;
     }
 
     private CardPaymentServiceRequestResponse buildServiceRequestResponse() {
