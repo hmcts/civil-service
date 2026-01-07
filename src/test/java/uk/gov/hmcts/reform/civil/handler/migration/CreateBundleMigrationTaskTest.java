@@ -58,10 +58,8 @@ class CreateBundleMigrationTaskTest {
         CaseReference caseReference = mock(CaseReference.class);
         when(caseReference.getCaseReference()).thenReturn("1234567890123456");
 
-        // Act
         CaseData result = task.migrateCaseData(caseData, caseReference);
 
-        // Assert
         verify(bundleCreationService)
             .createBundle(1234567890123456L);
 
