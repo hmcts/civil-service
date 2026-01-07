@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -20,8 +19,6 @@ import java.util.Optional;
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_DEFENDANT;
@@ -56,38 +53,59 @@ public class ClaimantResponseDefendantDashboardService extends AbstractClaimantR
 
     @Override
     protected String getScenario(CaseData caseData) {
-        if (isMintiApplicable(caseData) && isCaseStateAwaitingApplicantIntention(caseData)) {
-            return SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_DEFENDANT.getScenario();
-        } else if (caseData.getCcdState() == CASE_SETTLED) {
+        String scenario = resolveMintiScenario(caseData, SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_DEFENDANT.getScenario());
+        if (scenario != null) {
+            return scenario;
+        }
+        if (caseData.getCcdState() == CASE_SETTLED) {
             return getCaseSettledScenarios(caseData);
-        } else if (caseData.isPartAdmitImmediatePaymentClaimSettled() || isLrvLipFullAdmitImmediatePayClaimSettled(caseData)) {
+        }
+        if (caseData.isPartAdmitImmediatePaymentClaimSettled() || isLrvLipFullAdmitImmediatePayClaimSettled(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT.getScenario();
-        } else if (isCourtDecisionRejected(caseData)) {
+        }
+        if (hasClaimantRejectedCourtDecision(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_CCJ_CLAIMANT_REJECTS_DEF_PLAN_CLAIMANT_DISAGREES_COURT_PLAN_DEFENDANT
                 .getScenario();
-        } else if (caseData.hasApplicant1CourtDecisionInFavourOfDefendant()) {
+        }
+        if (caseData.hasApplicant1CourtDecisionInFavourOfDefendant()) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_COURT_AGREE_DEFENDANT_DEFENDANT.getScenario();
-        } else if (caseData.hasApplicant1SignedSettlementAgreement() && caseData.hasApplicant1CourtDecisionInFavourOfClaimant()) {
+        }
+        if (caseData.hasApplicant1SignedSettlementAgreement() && caseData.hasApplicant1CourtDecisionInFavourOfClaimant()) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_REJECTS_COURT_AGREES_WITH_CLAIMANT_DEFENDANT
                 .getScenario();
-        } else if (caseData.hasApplicantAcceptedRepaymentPlan() && caseData.hasApplicant1SignedSettlementAgreement()) {
-            return SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_ACCEPTS_DEFENDANT.getScenario();
-        } else if (isCaseStateJudicialReferral(caseData)) {
-            return getJudicialReferralScenarios(caseData);
-        } else if (isCaseStateInMediation(caseData)) {
-            return isCarmApplicableForMediation(caseData)
-                ? SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT_CARM.getScenario()
-                : SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT.getScenario();
-        } else if (isClaimantRejectRepaymentPlan(caseData)) {
-            return SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT.getScenario();
-        } else if (isLrvLipPartFullAdmitAndPayByPlan(caseData)) {
-            return SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT.getScenario();
-        } else if (isLrvLipFullDefenceNotProceed(caseData)) {
-            return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario();
-        } else if (caseData.getCcdState() == CASE_STAYED && caseData.isClaimantDontWantToProceedWithFulLDefenceFD()) {
-            return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_DEFENDANT.getScenario();
         }
-        return null;
+        if (caseData.hasApplicantAcceptedRepaymentPlan() && caseData.hasApplicant1SignedSettlementAgreement()) {
+            return SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_ACCEPTS_DEFENDANT.getScenario();
+        }
+        if (isCaseStateJudicialReferral(caseData)) {
+            return getJudicialReferralScenarios(caseData);
+        }
+        scenario = resolveMediationScenario(caseData,
+            SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT_CARM.getScenario(),
+            SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT.getScenario());
+        if (scenario != null) {
+            return scenario;
+        }
+        scenario = resolveRejectRepaymentScenario(
+            caseData,
+            true,
+            SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT.getScenario(),
+            null
+        );
+        if (scenario != null) {
+            return scenario;
+        }
+        if (isLrvLipPartFullAdmitAndPayByPlan(caseData)) {
+            return SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT.getScenario();
+        }
+        if (isLrvLipFullDefenceNotProceed(caseData)) {
+            return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario();
+        }
+        scenario = resolveClaimantEndsClaimScenario(
+            caseData,
+            SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_DEFENDANT.getScenario()
+        );
+        return scenario;
     }
 
     @Override
@@ -152,10 +170,6 @@ public class ClaimantResponseDefendantDashboardService extends AbstractClaimantR
         return caseData.getCcdState() == JUDICIAL_REFERRAL;
     }
 
-    private static boolean isCaseStateInMediation(CaseData caseData) {
-        return caseData.getCcdState() == IN_MEDIATION;
-    }
-
     private RespondToClaim getRespondToClaim(CaseData caseData) {
         RespondToClaim respondToClaim = null;
         if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE) {
@@ -172,20 +186,6 @@ public class ClaimantResponseDefendantDashboardService extends AbstractClaimantR
             && (isNull(caseDataLiP.getApplicant1ClaimMediationSpecRequiredLip())
             || (caseDataLiP.getApplicant1ClaimMediationSpecRequiredLip()
             .getHasAgreedFreeMediation().equals(MediationDecision.No)))).isPresent();
-    }
-
-    private boolean isCourtDecisionRejected(CaseData caseData) {
-        ClaimantLiPResponse applicant1Response = Optional.ofNullable(caseData.getCaseDataLiP())
-            .map(CaseDataLiP::getApplicant1LiPResponse)
-            .orElse(null);
-        return applicant1Response != null
-            && applicant1Response.hasClaimantRejectedCourtDecision();
-    }
-
-    private boolean isClaimantRejectRepaymentPlan(CaseData caseData) {
-        return ((caseData.isPayBySetDate() || caseData.isPayByInstallment())
-                && (caseData.isLRvLipOneVOne() || caseData.getRespondent1().isCompanyOROrganisation())
-                && caseData.hasApplicantRejectedRepaymentPlan());
     }
 
     private boolean isLrvLipPartFullAdmitAndPayByPlan(CaseData caseData) {

@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.service.dashboardnotifications.claimantrespons
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
@@ -10,6 +12,8 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
+
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
@@ -68,6 +72,56 @@ public abstract class AbstractClaimantResponseDashboardService extends Dashboard
         return featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
             && (AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
             || AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack()));
+    }
+
+    protected String resolveMintiScenario(CaseData caseData, String scenario) {
+        if (scenario == null) {
+            return null;
+        }
+        return isMintiApplicable(caseData) && isCaseStateAwaitingApplicantIntention(caseData) ? scenario : null;
+    }
+
+    protected String resolveMediationScenario(CaseData caseData, String carmScenario, String nonCarmScenario) {
+        if (caseData.getCcdState() != CaseState.IN_MEDIATION) {
+            return null;
+        }
+        return isCarmApplicableForMediation(caseData) ? carmScenario : nonCarmScenario;
+    }
+
+    protected String resolveClaimantEndsClaimScenario(CaseData caseData, String scenario) {
+        if (caseData.getCcdState() == CaseState.CASE_STAYED
+            && caseData.isClaimantDontWantToProceedWithFulLDefenceFD()) {
+            return scenario;
+        }
+        return null;
+    }
+
+    protected String resolveRejectRepaymentScenario(CaseData caseData,
+                                                    boolean includeLrVLip,
+                                                    String scenarioNonJo,
+                                                    String scenarioJo) {
+        if (!isClaimantRejectRepaymentPlan(caseData, includeLrVLip)) {
+            return null;
+        }
+        if (scenarioJo == null) {
+            return scenarioNonJo;
+        }
+        return featureToggleService.isJudgmentOnlineLive() ? scenarioJo : scenarioNonJo;
+    }
+
+    protected boolean isClaimantRejectRepaymentPlan(CaseData caseData, boolean includeLrVLip) {
+        return (caseData.isPayBySetDate() || caseData.isPayByInstallment())
+            && (caseData.getRespondent1().isCompanyOROrganisation()
+            || (includeLrVLip && caseData.isLRvLipOneVOne()))
+            && caseData.hasApplicantRejectedRepaymentPlan();
+    }
+
+    protected boolean hasClaimantRejectedCourtDecision(CaseData caseData) {
+        return Optional.ofNullable(caseData)
+            .map(CaseData::getCaseDataLiP)
+            .map(CaseDataLiP::getApplicant1LiPResponse)
+            .filter(ClaimantLiPResponse::hasClaimantRejectedCourtDecision)
+            .isPresent();
     }
 
     protected abstract String citizenRole();
