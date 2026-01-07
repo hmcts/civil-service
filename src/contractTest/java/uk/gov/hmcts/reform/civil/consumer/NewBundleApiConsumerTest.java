@@ -82,10 +82,10 @@ public class NewBundleApiConsumerTest extends BaseContractTest {
 
     private BundleCreateRequest getBundleCreateRequest() {
 
-        return BundleCreateRequest.builder()
-            .caseTypeId("caseTypeId")
-            .jurisdictionId("jurisdictionId")
-            .caseDetails(BundlingCaseDetails.builder()
+        return new BundleCreateRequest()
+            .setCaseTypeId("caseTypeId")
+            .setJurisdictionId("jurisdictionId")
+            .setCaseDetails(BundlingCaseDetails.builder()
                              .caseData(BundlingCaseData.builder()
                                            .bundleConfiguration("bundleConfiguration")
                                            .id(666)

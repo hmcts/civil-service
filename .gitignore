@@ -47,3 +47,5 @@ infrastructure/override.tf
 .aat-env
 /java_pid*.hprof
 /pacts/
+dashboard-notifications/bin
+.vscode

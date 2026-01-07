@@ -2,12 +2,15 @@ package uk.gov.hmcts.reform.civil.model.bundle;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Value;
+import lombok.experimental.Accessors;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Value
-@Builder(toBuilder = true)
+@Data
+@NoArgsConstructor
+@Accessors(chain = true)
 public class BundleCreateRequest {
 
     @JsonProperty("caseTypeId")

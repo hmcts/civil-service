@@ -21,15 +21,21 @@ public class BundleUtils {
     }
 
     public static String generateDocName(String fileName, String strParam, String strParam2, LocalDate date) {
-        log.info("Generating doc name fileName: {} strParam: {} strParam2: {} date: {}", fileName, strParam, strParam2, date);
+        log.info(
+            "Generating doc name fileName: {} strParam: {} strParam2: {} date: {}",
+            fileName,
+            strParam,
+            strParam2,
+            date
+        );
         String formatLocalDate = DateFormatHelper.formatLocalDate(date, DATE_FORMAT);
         String formattedTitle;
         if (StringUtils.isBlank(strParam)) {
             formattedTitle = String.format(fileName, formatLocalDate);
         } else if (StringUtils.isBlank(strParam2)) {
-            formattedTitle =  String.format(fileName, strParam, formatLocalDate);
+            formattedTitle = String.format(fileName, strParam, formatLocalDate);
         } else {
-            formattedTitle =  String.format(fileName, strParam, strParam2, formatLocalDate);
+            formattedTitle = String.format(fileName, strParam, strParam2, formatLocalDate);
         }
 
         if (formattedTitle.length() > MAX_DOC_TITLE_LENGTH) {
@@ -40,13 +46,12 @@ public class BundleUtils {
     }
 
     public static BundlingRequestDocument buildBundlingRequestDoc(String docName, Document document, String docType) {
-        return BundlingRequestDocument.builder()
-            .documentFileName(docName)
-            .documentType(docType)
-            .documentLink(DocumentLink.builder()
-                              .documentUrl(document.getDocumentUrl())
-                              .documentBinaryUrl(document.getDocumentBinaryUrl())
-                              .documentFilename(document.getDocumentFileName()).build())
-            .build();
+        return new BundlingRequestDocument()
+            .setDocumentFileName(docName)
+            .setDocumentType(docType)
+            .setDocumentLink(new DocumentLink()
+                                 .setDocumentUrl(document.getDocumentUrl())
+                                 .setDocumentBinaryUrl(document.getDocumentBinaryUrl())
+                                 .setDocumentFilename(document.getDocumentFileName()));
     }
 }
