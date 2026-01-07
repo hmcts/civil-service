@@ -3,18 +3,18 @@ package uk.gov.hmcts.reform.civil.handler.migration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
+import uk.gov.hmcts.reform.civil.bulkupdate.csv.ExcelCaseReference;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.bundle.BundleCreationService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class CreateBundleMigrationTaskTest {
@@ -22,16 +22,48 @@ class CreateBundleMigrationTaskTest {
     @Mock
     private BundleCreationService bundleCreationService;
 
+    @InjectMocks
     private CreateBundleMigrationTask task;
+
+    private CaseData caseData;
+    private ExcelCaseReference caseReference;
 
     @BeforeEach
     void setUp() {
-        task = new CreateBundleMigrationTask(bundleCreationService);
+        caseData = CaseData.builder().build();
+        caseReference = ExcelCaseReference.builder()
+            .caseReference("1234567890123456")
+            .build();
     }
 
     @Test
-    void shouldReturnCorrectTaskName() {
-        assertEquals("CreateBundleMigrationTask", task.getTaskName());
+    void shouldCreateBundleAndReturnSameCaseData() {
+        CaseData result = task.migrateCaseData(caseData, caseReference);
+
+        assertSame(caseData, result);
+        verify(bundleCreationService).createBundle(1234567890123456L);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenCaseDataIsNull() {
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> task.migrateCaseData(null, caseReference)
+        );
+
+        assertEquals("CaseData and CaseReference must not be null", exception.getMessage());
+        verifyNoInteractions(bundleCreationService);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenCaseReferenceIsNull() {
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> task.migrateCaseData(caseData, null)
+        );
+
+        assertEquals("CaseData and CaseReference must not be null", exception.getMessage());
+        verifyNoInteractions(bundleCreationService);
     }
 
     @Test
@@ -51,48 +83,10 @@ class CreateBundleMigrationTaskTest {
     }
 
     @Test
-    void shouldCreateBundleAndReturnSameCaseData() {
-        // Arrange
-        CaseData caseData = CaseData.builder().build();
-
-        CaseReference caseReference = mock(CaseReference.class);
-        when(caseReference.getCaseReference()).thenReturn("1234567890123456");
-
-        CaseData result = task.migrateCaseData(caseData, caseReference);
-
-        verify(bundleCreationService)
-            .createBundle(1234567890123456L);
-
-        assertSame(caseData, result);
-    }
-
-    @Test
-    void shouldThrowExceptionWhenCaseDataIsNull() {
-        CaseReference caseReference = mock(CaseReference.class);
-
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
-            () -> task.migrateCaseData(null, caseReference)
-        );
-
+    void shouldReturnCorrectTaskName() {
         assertEquals(
-            "CaseData and CaseReference must not be null",
-            exception.getMessage()
-        );
-    }
-
-    @Test
-    void shouldThrowExceptionWhenCaseReferenceIsNull() {
-        CaseData caseData = CaseData.builder().build();
-
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
-            () -> task.migrateCaseData(caseData, null)
-        );
-
-        assertEquals(
-            "CaseData and CaseReference must not be null",
-            exception.getMessage()
+            "CreateBundleMigrationTask",
+            task.getTaskName()
         );
     }
 }
