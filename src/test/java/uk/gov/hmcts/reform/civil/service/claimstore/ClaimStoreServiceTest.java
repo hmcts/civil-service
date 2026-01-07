@@ -50,19 +50,18 @@ public class ClaimStoreServiceTest {
     private static final LocalDate CREATE_DATE = LocalDate.of(2023, 1, 22);
     private static final LocalDateTime CREATE_DATETIME = CREATE_DATE.atTime(0, 0);
     private static final List<DashboardClaimInfo> EXPECTED_CLAIM_RESULT
-        = Arrays.asList(DashboardClaimInfo.builder()
-                            .claimNumber(
+        = Arrays.asList(new DashboardClaimInfo()
+                            .setClaimNumber(
                                 REFERENCE_NUMBER)
-                            .claimAmount(TOTAL_AMOUNT)
-                            .claimantName(CLAIMANT_NAME)
-                            .defendantName(
+                            .setClaimAmount(TOTAL_AMOUNT)
+                            .setClaimantName(CLAIMANT_NAME)
+                            .setDefendantName(
                                 DEFENDANT_NAME)
-                            .responseDeadline(
+                            .setResponseDeadline(
                                 RESPONSE_DEADLINE)
-                            .responseDeadlineTime(RESPONSE_DEADLINE.atStartOfDay())
-                            .ocmc(true)
-                            .createdDate(CREATE_DATETIME)
-                            .build());
+                            .setResponseDeadlineTime(RESPONSE_DEADLINE.atStartOfDay())
+                            .setOcmc(true)
+                            .setCreatedDate(CREATE_DATETIME));
 
     @BeforeEach
     void setUp() {

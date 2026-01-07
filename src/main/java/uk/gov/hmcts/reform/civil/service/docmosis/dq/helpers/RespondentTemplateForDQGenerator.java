@@ -250,19 +250,20 @@ public class RespondentTemplateForDQGenerator {
                 .getCourtLocationsByEpimmsIdAndCourtType(authorisation,
                                                          rc.getCaseLocation().getBaseLocation()
                 ));
-            RequestedCourt.RequestedCourtBuilder builder = RequestedCourt.builder()
-                .requestHearingAtSpecificCourt(YES)
-                .reasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt());
+            RequestedCourt requestedCourt = new RequestedCourt();
+            requestedCourt.setRequestHearingAtSpecificCourt(YES);
+            requestedCourt.setReasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt());
             courtLocations.stream()
                 .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
-                .findFirst().ifPresent(court -> builder
-                    .responseCourtCode(court.getCourtLocationCode())
-                    .responseCourtName(court.getCourtName()));
-            return builder.build();
+                .findFirst().ifPresent(court -> {
+                    requestedCourt.setResponseCourtCode(court.getCourtLocationCode());
+                    requestedCourt.setResponseCourtName(court.getCourtName());
+                });
+            return requestedCourt;
         } else {
-            return RequestedCourt.builder()
-                .requestHearingAtSpecificCourt(NO)
-                .build();
+            RequestedCourt requestedCourt = new RequestedCourt();
+            requestedCourt.setRequestHearingAtSpecificCourt(NO);
+            return requestedCourt;
         }
     }
 
