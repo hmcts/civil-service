@@ -1,12 +1,18 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.common;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 
 @Data
 @Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
 public class Party {
 
     private String type;
@@ -24,12 +30,11 @@ public class Party {
     private String legalRepHeading;
 
     public static Party toLipParty(uk.gov.hmcts.reform.civil.model.Party party) {
-        return Party.builder()
-            .name(party.getPartyName())
-            .emailAddress(party.getPartyEmail())
-            .type(party.getType().getDisplayValue())
-            .phoneNumber(party.getPartyPhone())
-            .primaryAddress(party.getPrimaryAddress())
-            .build();
+        return new Party()
+            .setName(party.getPartyName())
+            .setEmailAddress(party.getPartyEmail())
+            .setType(party.getType().getDisplayValue())
+            .setPhoneNumber(party.getPartyPhone())
+            .setPrimaryAddress(party.getPrimaryAddress());
     }
 }

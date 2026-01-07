@@ -24,10 +24,9 @@ public class FlightControllerTest extends BaseIntegrationTest {
     void shouldReturnAirlineList() {
         List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>();
 
-        AirlineEpimsId airlineEpimsID = AirlineEpimsId.builder()
-            .airline("test")
-            .epimsID("123")
-            .build();
+        AirlineEpimsId airlineEpimsID = new AirlineEpimsId()
+            .setAirline("test")
+            .setEpimsID("123");
         airlineEpimsIDList.add(airlineEpimsID);
 
         when(airlineEpimsDataLoader.getAirlineEpimsIDList()).thenReturn(airlineEpimsIDList);
