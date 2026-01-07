@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.dashboardnotifications.claimantresponse;
 
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -12,10 +10,8 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
-import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
-import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.Objects;
@@ -23,7 +19,6 @@ import java.util.Optional;
 
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
@@ -49,32 +44,21 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_DEFENDANT;
 
 @Service
-public class ClaimantResponseDefendantDashboardService extends DashboardScenarioService {
-
-    private final DashboardNotificationService dashboardNotificationService;
-    private final TaskListService taskListService;
-    private final FeatureToggleService featureToggleService;
+public class ClaimantResponseDefendantDashboardService extends AbstractClaimantResponseDashboardService {
 
     public ClaimantResponseDefendantDashboardService(DashboardScenariosService dashboardScenariosService,
                                                      DashboardNotificationsParamsMapper mapper,
                                                      FeatureToggleService featureToggleService,
                                                      DashboardNotificationService dashboardNotificationService,
                                                      TaskListService taskListService) {
-        super(dashboardScenariosService, mapper);
-        this.featureToggleService = featureToggleService;
-        this.dashboardNotificationService = dashboardNotificationService;
-        this.taskListService = taskListService;
-    }
-
-    public void notifyClaimantResponse(CaseData caseData, String authToken) {
-        recordScenario(caseData, authToken);
+        super(dashboardScenariosService, mapper, featureToggleService, dashboardNotificationService, taskListService);
     }
 
     @Override
     protected String getScenario(CaseData caseData) {
         if (isMintiApplicable(caseData) && isCaseStateAwaitingApplicantIntention(caseData)) {
             return SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_DEFENDANT.getScenario();
-        } else if (isCaseStateSettled(caseData)) {
+        } else if (caseData.getCcdState() == CASE_SETTLED) {
             return getCaseSettledScenarios(caseData);
         } else if (caseData.isPartAdmitImmediatePaymentClaimSettled() || isLrvLipFullAdmitImmediatePayClaimSettled(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT.getScenario();
@@ -112,22 +96,13 @@ public class ClaimantResponseDefendantDashboardService extends DashboardScenario
     }
 
     @Override
-    protected void beforeRecordScenario(CaseData caseData, String authToken) {
-        String caseId = String.valueOf(caseData.getCcdCaseReference());
-        if (isCaseStateSettled(caseData)) {
-            dashboardNotificationService.deleteByReferenceAndCitizenRole(caseId, DEFENDANT_ROLE);
-            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(caseId, DEFENDANT_ROLE);
-        }
-        if (caseData.getCcdState() == CaseState.PROCEEDS_IN_HERITAGE_SYSTEM) {
-            ScenarioRequestParams scenarioParams = ScenarioRequestParams.builder()
-                .params(mapper.mapCaseDataToParams(caseData))
-                .build();
-            dashboardScenariosService.recordScenarios(
-                authToken,
-                SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario(),
-                caseId,
-                scenarioParams);
-        }
+    protected String citizenRole() {
+        return DEFENDANT_ROLE;
+    }
+
+    @Override
+    protected String generalApplicationInactiveScenario() {
+        return SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario();
     }
 
     private String getCaseSettledScenarios(CaseData caseData) {
@@ -173,20 +148,12 @@ public class ClaimantResponseDefendantDashboardService extends DashboardScenario
         return null;
     }
 
-    private static boolean isCaseStateSettled(CaseData caseData) {
-        return caseData.getCcdState() == CASE_SETTLED;
-    }
-
     private static boolean isCaseStateJudicialReferral(CaseData caseData) {
         return caseData.getCcdState() == JUDICIAL_REFERRAL;
     }
 
     private static boolean isCaseStateInMediation(CaseData caseData) {
         return caseData.getCcdState() == IN_MEDIATION;
-    }
-
-    private static boolean isCaseStateAwaitingApplicantIntention(CaseData caseData) {
-        return caseData.getCcdState() == AWAITING_APPLICANT_INTENTION;
     }
 
     private RespondToClaim getRespondToClaim(CaseData caseData) {
@@ -219,16 +186,6 @@ public class ClaimantResponseDefendantDashboardService extends DashboardScenario
         return ((caseData.isPayBySetDate() || caseData.isPayByInstallment())
                 && (caseData.isLRvLipOneVOne() || caseData.getRespondent1().isCompanyOROrganisation())
                 && caseData.hasApplicantRejectedRepaymentPlan());
-    }
-
-    private boolean isCarmApplicableForMediation(CaseData caseData) {
-        return featureToggleService.isCarmEnabledForCase(caseData);
-    }
-
-    private boolean isMintiApplicable(CaseData caseData) {
-        return featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
-            && (AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
-            || AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack()));
     }
 
     private boolean isLrvLipPartFullAdmitAndPayByPlan(CaseData caseData) {
