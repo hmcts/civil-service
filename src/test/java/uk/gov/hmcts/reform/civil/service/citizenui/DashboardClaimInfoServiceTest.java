@@ -82,10 +82,9 @@ public class DashboardClaimInfoServiceTest {
     private static final LocalDateTime DATE_IN_2022 = LocalDateTime.of(2022, 2, 20, 0, 0);
     private static final LocalDateTime DATE_IN_2025 = LocalDateTime.of(2025, 2, 20, 0, 0);
     private static final List<DashboardClaimInfo> CLAIM_STORE_SERVICE_RESULTS =
-            Collections.singletonList(DashboardClaimInfo.builder()
-                    .ocmc(true)
-                    .createdDate(DATE_IN_2025)
-                    .build());
+            Collections.singletonList(new DashboardClaimInfo()
+                    .setOcmc(true)
+                    .setCreatedDate(DATE_IN_2025));
     private static final CaseDetails CASE_DETAILS = CaseDetails.builder()
         .id(1L)
         .createdDate(DATE_IN_2021)
@@ -97,14 +96,12 @@ public class DashboardClaimInfoServiceTest {
     private static final int CURRENT_PAGE_NO = 1;
     private static final List<DashboardClaimInfo> ORDERED_CASES =
         Arrays.asList(
-            DashboardClaimInfo.builder()
-                .ocmc(true)
-                .createdDate(DATE_IN_2021)
-                .build(),
-            DashboardClaimInfo.builder()
-                .ocmc(true)
-                .createdDate(DATE_IN_2022)
-                .build()
+            new DashboardClaimInfo()
+                .setOcmc(true)
+                .setCreatedDate(DATE_IN_2021),
+            new DashboardClaimInfo()
+                .setOcmc(true)
+                .setCreatedDate(DATE_IN_2022)
         );
 
     @BeforeEach

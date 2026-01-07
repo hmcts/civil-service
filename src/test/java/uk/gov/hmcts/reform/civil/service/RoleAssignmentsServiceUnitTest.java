@@ -54,7 +54,7 @@ class RoleAssignmentsServiceUnitTest {
 
     @Test
     void shouldDelegateGetRoleAssignments() {
-        RoleAssignmentServiceResponse response = RoleAssignmentServiceResponse.builder().build();
+        RoleAssignmentServiceResponse response = new RoleAssignmentServiceResponse();
         when(roleAssignmentsApi.getRoleAssignments(AUTH, "service-token", ACTOR_ID)).thenReturn(response);
 
         assertThat(service.getRoleAssignments(ACTOR_ID, AUTH)).isEqualTo(response);
@@ -62,7 +62,7 @@ class RoleAssignmentsServiceUnitTest {
 
     @Test
     void shouldDelegateQueryByCaseIdAndRole() {
-        RoleAssignmentServiceResponse response = RoleAssignmentServiceResponse.builder().build();
+        RoleAssignmentServiceResponse response = new RoleAssignmentServiceResponse();
         List<String> roles = List.of("judge");
         when(roleAssignmentsApi.getRoleAssignments(
             eq(AUTH),
@@ -94,7 +94,7 @@ class RoleAssignmentsServiceUnitTest {
 
     @Test
     void shouldGetRoleAssignmentsWithLabels() {
-        RoleAssignmentServiceResponse response = RoleAssignmentServiceResponse.builder().build();
+        RoleAssignmentServiceResponse response = new RoleAssignmentServiceResponse();
         List<String> roleNames = List.of("judge");
         when(roleAssignmentsApi.getRoleAssignments(
             eq(AUTH),

@@ -34,10 +34,9 @@ class FlightControllerTest {
     void shouldReturnAirlines() {
         // Given
         List<AirlineEpimsId> airlineEpimsIDs = new ArrayList<>();
-        AirlineEpimsId airlineEpimsID = AirlineEpimsId.builder()
-            .airline("test")
-            .epimsID("123")
-            .build();
+        AirlineEpimsId airlineEpimsID = new AirlineEpimsId()
+            .setAirline("test")
+            .setEpimsID("123");
         airlineEpimsIDs.add(airlineEpimsID);
         when(airlineEpimsDataLoader.getAirlineEpimsIDList()).thenReturn(airlineEpimsIDs);
 
