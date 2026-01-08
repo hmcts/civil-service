@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.CASEWORKER_QUERY_DOCUMENT_ATTACHMENTS;
 import static java.util.Objects.nonNull;
@@ -39,6 +40,7 @@ public class CaseQueriesUtil {
 
     public static List<String> getUserRoleForQuery(CaseData caseData,
                                                    CoreCaseUserService coreCaseUserService, String queryId) {
+        migrateAllQueries(caseData);
         String createdBy = unwrapElements(caseData.getQueries().getCaseMessages()).stream()
             .filter(m -> m.getId().equals(queryId)).findFirst()
             .orElseThrow(() -> new IllegalArgumentException("No query found for queryId " + queryId))
@@ -194,7 +196,7 @@ public class CaseQueriesUtil {
     public static void migrateQueries(CaseQueriesCollection collectionToMigrate, CaseData caseData) {
         if (nonNull(collectionToMigrate) && nonNull(collectionToMigrate.getCaseMessages())) {
             log.info(
-                "Started to migrate [{}] queries",
+                "Started to migrate [{}] queries for case reference [{}]",
                 collectionToMigrate.getPartyName(),
                 caseData.getCcdCaseReference()
             );
@@ -214,14 +216,14 @@ public class CaseQueriesUtil {
 
     public static void logMigrationSuccess(CaseData caseDataBefore) {
         if (hasOldQueries(caseDataBefore)) {
-            Arrays.asList(
+            Stream.of(
                     caseDataBefore.getQmApplicantSolicitorQueries(),
                     caseDataBefore.getQmRespondentSolicitor1Queries(),
                     caseDataBefore.getQmRespondentSolicitor2Queries()
-                ).stream().filter(Objects::nonNull)
+                ).filter(Objects::nonNull)
                 .forEach(collection ->
                              log.info(
-                                 "Successfully migrated [{}] queries",
+                                 "Successfully migrated [{}] queries {}",
                                  collection.getPartyName(), caseDataBefore.getCcdCaseReference()
                              ));
         }
