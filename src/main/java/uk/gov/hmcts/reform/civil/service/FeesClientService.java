@@ -49,7 +49,7 @@ public class FeesClientService {
     }
 
     public FeeLookupResponseDto lookupFee(String channel, String event, BigDecimal amount) {
-        log.info("Fee lookup called from client for the claim amount  {}", amount);
+        log.info("Fee lookup called from client for the claim amount  {}, channel {}, event {}", amount, channel, event);
         if (featureToggleService.isFeatureEnabled("fee-keywords-enable")) {
             String keyword;
             String jurisdiction2;
@@ -78,7 +78,8 @@ public class FeesClientService {
                 throw new IllegalStateException("Fee lookup returned null response");
             }
 
-            log.info("Fee obtained from client for the claim amount  {} is {}", amount, feeLookupResponseDto.getFeeAmount());
+            log.info("Fee obtained from client for the  channel {}, event {} and claim amount  {} is {}",
+                     channel, event, amount, feeLookupResponseDto.getFeeAmount());
 
             return feeLookupResponseDto;
 
