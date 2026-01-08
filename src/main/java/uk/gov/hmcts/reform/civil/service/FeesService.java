@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.FeesConfiguration;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
@@ -15,6 +16,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class FeesService {
 
@@ -24,7 +26,11 @@ public class FeesService {
 
     public Fee getFeeDataByClaimValue(ClaimValue claimValue) {
         FeeLookupResponseDto feeLookupResponseDto = lookupFee(claimValue);
+        if (feeLookupResponseDto == null) {
+            throw new IllegalStateException("Fee lookup returned null response");
+        }
 
+        log.info("Fee obtained from client for the claim amount  {} is {}", claimValue, feeLookupResponseDto.getFeeAmount());
         return buildFeeDto(feeLookupResponseDto);
     }
 
