@@ -29,6 +29,8 @@ import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
 import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -46,6 +48,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -719,6 +722,70 @@ public class CreateApplicationTaskHandlerTest {
 
             verify(coreCaseDataService).createGeneralAppCase(map);
 
+        }
+
+        @Test
+        void shouldRemoveGeneralAppFeeToPayInText() {
+            GeneralApplication generalApplication = getGeneralApplication();
+            GAPbaDetails gaPbaDetails = new GAPbaDetails();
+            gaPbaDetails.setGeneralAppPayInformationText("£123.00");
+            gaPbaDetails.setFee(new Fee().setCalculatedAmountInPence(new BigDecimal("12300")));
+            generalApplication.setGeneralAppPBADetails(gaPbaDetails);
+
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
+                .generalApplications(getGeneralApplications(generalApplication))
+                .build();
+
+            VariableMap variables = Variables.createVariables();
+            variables.putValue(uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_STATE, "MAIN.DRAFT");
+            variables.putValue(FLOW_FLAGS, Map.of());
+            variables.putValue("generalApplicationCaseId", GA_ID);
+
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+            StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
+            CaseDataContent caseDataContent = CaseDataContent.builder().build();
+            when(coreCaseDataService.startUpdate(CASE_ID, CREATE_GENERAL_APPLICATION_CASE))
+                .thenReturn(startEventResponse);
+
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any()))
+                .thenReturn(caseData);
+
+            when(coreCaseDataService.caseDataContentFromStartEventResponse(
+                any(StartEventResponse.class),
+                anyMap()
+            )).thenReturn(caseDataContent);
+
+            when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
+
+            Map<String, Object> map = generalApplication.toMap(objectMapper);
+            map.put(
+                "generalAppNotificationDeadlineDate",
+                generalApplication
+                    .getGeneralAppDateDeadline()
+            );
+            map.put(
+                "isDocumentVisible",
+                generalApplication
+                    .getIsDocumentVisibleGA()
+            );
+            map.put("parentCaseReference", CASE_ID);
+            map.put("applicationTypes", GA_CASE_TYPES);
+
+            when(coreCaseDataService.createGeneralAppCase(anyMap())).thenReturn(caseData);
+
+            when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
+
+            createApplicationTaskHandler.execute(mockTask, externalTaskService);
+
+            verify(coreCaseDataService).createGeneralAppCase(removeGeneralAppFeeToPayInText(map));
+
+        }
+
+        private Map<String, Object> removeGeneralAppFeeToPayInText(Map<String, Object> map) {
+            if (map.get("generalAppPBADetails") instanceof Map<?, ?> generalAppPBADetailsMap) {
+                generalAppPBADetailsMap.remove("generalAppFeeToPayInText");
+            }
+            return map;
         }
 
         private GeneralApplication getGeneralApplication() {
