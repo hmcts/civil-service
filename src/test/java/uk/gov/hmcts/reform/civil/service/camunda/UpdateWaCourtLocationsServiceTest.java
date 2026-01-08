@@ -59,80 +59,82 @@ class UpdateWaCourtLocationsServiceTest {
 
     String cnbcEpimmId = "420219";
     String ccmccEpimmId = "420219";
-    private final TaskManagementLocationTypes testTaskManagementLocations = TaskManagementLocationTypes.builder()
-        .cmcListingLocation(TaskManagementLocationsModel.builder()
-                                .locationName("london somewhere")
-                                .location("123456")
-                                .region("1")
-                                .regionName("south")
-                                .build())
-        .ccmcListingLocation(TaskManagementLocationsModel.builder()
-                                 .locationName("london somewhere")
-                                 .location("123456")
-                                 .region("1")
-                                 .regionName("south")
-                                 .build())
-        .ptrListingLocation(TaskManagementLocationsModel.builder()
-                                .locationName("liverpool somewhere")
-                                .location("654321")
-                                .region("2")
-                                .regionName("north")
-                                .build())
-        .trialListingLocation(TaskManagementLocationsModel.builder()
-                                  .locationName("stoke somewhere")
-                                  .location("789654")
-                                  .region("3")
-                                  .regionName("west")
-                                  .build())
-        .build();
+    private final TaskManagementLocationTypes testTaskManagementLocations = new TaskManagementLocationTypes()
+        .setCmcListingLocation(new TaskManagementLocationsModel()
+                                   .setLocationName("london somewhere")
+                                   .setLocation("123456")
+                                   .setRegion("1")
+                                   .setRegionName("south"))
+        .setCcmcListingLocation(new TaskManagementLocationsModel()
+                                    .setLocationName("london somewhere")
+                                    .setLocation("123456")
+                                    .setRegion("1")
+                                    .setRegionName("south"))
+        .setPtrListingLocation(new TaskManagementLocationsModel()
+                                   .setLocationName("liverpool somewhere")
+                                   .setLocation("654321")
+                                   .setRegion("2")
+                                   .setRegionName("north"))
+        .setTrialListingLocation(new TaskManagementLocationsModel()
+                                     .setLocationName("stoke somewhere")
+                                     .setLocation("789654")
+                                     .setRegion("3")
+                                     .setRegionName("west"));
 
-    private final TaskManagementLocationTypes testCnbcOrCcmcTaskManagementLocations = TaskManagementLocationTypes.builder()
-        .cmcListingLocation(TaskManagementLocationsModel.builder()
-                                    .locationName("Civil National Business Centre")
-                                    .location(cnbcEpimmId)
-                                    .region("2")
-                                    .regionName("Midlands")
-                                    .build())
-        .ccmcListingLocation(TaskManagementLocationsModel.builder()
-                                     .locationName("Civil National Business Centre")
-                                     .location(cnbcEpimmId)
-                                     .region("2")
-                                     .regionName("Midlands")
-                                     .build())
-        .ptrListingLocation(TaskManagementLocationsModel.builder()
-                                    .locationName("Civil National Business Centre")
-                                    .location(cnbcEpimmId)
-                                    .region("2")
-                                    .regionName("Midlands")
-                                    .build())
-        .trialListingLocation(TaskManagementLocationsModel.builder()
-                                      .locationName("Civil National Business Centre")
-                                      .location(cnbcEpimmId)
-                                      .region("2")
-                                      .regionName("Midlands")
-                                      .build())
-        .build();
+    private final TaskManagementLocationTypes testCnbcOrCcmcTaskManagementLocations = new TaskManagementLocationTypes()
+        .setCmcListingLocation(new TaskManagementLocationsModel()
+                                   .setLocationName("Civil National Business Centre")
+                                   .setLocation(cnbcEpimmId)
+                                   .setRegion("2")
+                                   .setRegionName("Midlands"))
+        .setCcmcListingLocation(new TaskManagementLocationsModel()
+                                    .setLocationName("Civil National Business Centre")
+                                    .setLocation(cnbcEpimmId)
+                                    .setRegion("2")
+                                    .setRegionName("Midlands"))
+        .setPtrListingLocation(new TaskManagementLocationsModel()
+                                   .setLocationName("Civil National Business Centre")
+                                   .setLocation(cnbcEpimmId)
+                                   .setRegion("2")
+                                   .setRegionName("Midlands"))
+        .setTrialListingLocation(new TaskManagementLocationsModel()
+                                     .setLocationName("Civil National Business Centre")
+                                     .setLocation(cnbcEpimmId)
+                                     .setRegion("2")
+                                     .setRegionName("Midlands"));
 
     @BeforeEach
-    void setUp()  throws Exception {
+    void setUp() throws Exception {
 
         Map<String, Object> testMap = new HashMap<>();
-        testMap.put("Trial", Map.of(
-            "type", "String",
-            "value", "123456",
-            "valueInfo", Map.of()));
-        testMap.put("CMC", Map.of(
-            "type", "String",
-            "value", "123456",
-            "valueInfo", Map.of()));
-        testMap.put("CCMC", Map.of(
-            "type", "String",
-            "value", "123456",
-            "valueInfo", Map.of()));
-        testMap.put("PTR", Map.of(
-            "type", "String",
-            "value", "123456",
-            "valueInfo", Map.of()));
+        testMap.put(
+            "Trial", Map.of(
+                "type", "String",
+                "value", "123456",
+                "valueInfo", Map.of()
+            )
+        );
+        testMap.put(
+            "CMC", Map.of(
+                "type", "String",
+                "value", "123456",
+                "valueInfo", Map.of()
+            )
+        );
+        testMap.put(
+            "CCMC", Map.of(
+                "type", "String",
+                "value", "123456",
+                "valueInfo", Map.of()
+            )
+        );
+        testMap.put(
+            "PTR", Map.of(
+                "type", "String",
+                "value", "123456",
+                "valueInfo", Map.of()
+            )
+        );
 
         List<LocationRefData> locations = List.of(
             LocationRefData.builder().epimmsId("123456").region("south").regionId("1").siteName("london somewhere").build(),
@@ -207,8 +209,10 @@ class UpdateWaCourtLocationsServiceTest {
             .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
             .build();
 
-        assertThrows(IllegalArgumentException.class, () -> updateWaCourtLocationsService
-            .updateCourtListingWALocations("auth", caseData));
+        assertThrows(
+            IllegalArgumentException.class, () -> updateWaCourtLocationsService
+                .updateCourtListingWALocations("auth", caseData)
+        );
     }
 
     @Test
@@ -244,22 +248,34 @@ class UpdateWaCourtLocationsServiceTest {
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
         Map<String, Object> testCnbcMap = new HashMap<>();
-        testCnbcMap.put("Trial", Map.of(
-            "type", "String",
-            "value", cnbcEpimmId,
-            "valueInfo", Map.of()));
-        testCnbcMap.put("CMC", Map.of(
-            "type", "String",
-            "value", cnbcEpimmId,
-            "valueInfo", Map.of()));
-        testCnbcMap.put("CCMC", Map.of(
-            "type", "String",
-            "value", cnbcEpimmId,
-            "valueInfo", Map.of()));
-        testCnbcMap.put("PTR", Map.of(
-            "type", "String",
-            "value", cnbcEpimmId,
-            "valueInfo", Map.of()));
+        testCnbcMap.put(
+            "Trial", Map.of(
+                "type", "String",
+                "value", cnbcEpimmId,
+                "valueInfo", Map.of()
+            )
+        );
+        testCnbcMap.put(
+            "CMC", Map.of(
+                "type", "String",
+                "value", cnbcEpimmId,
+                "valueInfo", Map.of()
+            )
+        );
+        testCnbcMap.put(
+            "CCMC", Map.of(
+                "type", "String",
+                "value", cnbcEpimmId,
+                "valueInfo", Map.of()
+            )
+        );
+        testCnbcMap.put(
+            "PTR", Map.of(
+                "type", "String",
+                "value", cnbcEpimmId,
+                "valueInfo", Map.of()
+            )
+        );
 
         List<LocationRefData> locations = List.of(
             LocationRefData.builder().epimmsId("123456").region("south").regionId("1").siteName("london somewhere").build(),
@@ -293,22 +309,34 @@ class UpdateWaCourtLocationsServiceTest {
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
         Map<String, Object> testCnbcMap = new HashMap<>();
-        testCnbcMap.put("Trial", Map.of(
-            "type", "String",
-            "value", ccmccEpimmId,
-            "valueInfo", Map.of()));
-        testCnbcMap.put("CMC", Map.of(
-            "type", "String",
-            "value", ccmccEpimmId,
-            "valueInfo", Map.of()));
-        testCnbcMap.put("CCMC", Map.of(
-            "type", "String",
-            "value", ccmccEpimmId,
-            "valueInfo", Map.of()));
-        testCnbcMap.put("PTR", Map.of(
-            "type", "String",
-            "value", ccmccEpimmId,
-            "valueInfo", Map.of()));
+        testCnbcMap.put(
+            "Trial", Map.of(
+                "type", "String",
+                "value", ccmccEpimmId,
+                "valueInfo", Map.of()
+            )
+        );
+        testCnbcMap.put(
+            "CMC", Map.of(
+                "type", "String",
+                "value", ccmccEpimmId,
+                "valueInfo", Map.of()
+            )
+        );
+        testCnbcMap.put(
+            "CCMC", Map.of(
+                "type", "String",
+                "value", ccmccEpimmId,
+                "valueInfo", Map.of()
+            )
+        );
+        testCnbcMap.put(
+            "PTR", Map.of(
+                "type", "String",
+                "value", ccmccEpimmId,
+                "valueInfo", Map.of()
+            )
+        );
 
         List<LocationRefData> locations = List.of(
             LocationRefData.builder().epimmsId("123456").region("south").regionId("1").siteName("london somewhere").build(),
