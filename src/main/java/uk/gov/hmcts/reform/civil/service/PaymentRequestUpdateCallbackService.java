@@ -132,10 +132,9 @@ public class PaymentRequestUpdateCallbackService {
     }
 
     private CardPaymentStatusResponse buildPaymentStatusResponse(ServiceRequestUpdateDto dto) {
-        return CardPaymentStatusResponse.builder()
-                .paymentReference(dto.getPayment().getPaymentReference())
-                .status(PaymentStatus.SUCCESS.name())
-                .build();
+        return new CardPaymentStatusResponse()
+                .setPaymentReference(dto.getPayment().getPaymentReference())
+                .setStatus(PaymentStatus.SUCCESS.name());
     }
 
     private void submitUpdatePaymentEvent(CaseData caseData, Long caseId, FeeType feeType) {
