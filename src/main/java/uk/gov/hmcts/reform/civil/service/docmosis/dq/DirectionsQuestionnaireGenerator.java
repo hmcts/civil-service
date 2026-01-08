@@ -76,6 +76,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         } else {
             templateId = getDocmosisTemplate(caseData);
         }
+        log.info("{} {}", caseData.getCcdCaseReference(), templateId);
         return templateId;
     }
 
@@ -169,7 +170,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         );
 
         log.info("Uploaded new 1v2 different-solicitor DQ for caseId {} respondent {} responseDate {}", caseData.getCcdCaseReference(), respondent, responseDate);
-        return Optional.of(document.toBuilder().createdDatetime(responseDate).build());
+        document.setCreatedDatetime(responseDate);
+        return Optional.of(document);
     }
 
     private DirectionsQuestionnaireForm getDirectionsQuestionnaireForm(CaseData caseData, String authorisation, String respondent) {

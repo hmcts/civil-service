@@ -50,13 +50,13 @@ public class NoRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
         @Test
         void shouldUpdateNoRemissionDataForClaimFee() {
-            HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-                .hwfCaseEvent(NO_REMISSION_HWF)
-                .noRemissionDetails("no remission")
-                .noRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET).build();
+            HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails();
+            hwfeeDetails.setHwfCaseEvent(NO_REMISSION_HWF);
+            hwfeeDetails.setNoRemissionDetails("no remission");
+            hwfeeDetails.setNoRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET);
 
             CaseData caseData = CaseDataBuilder.builder().build();
-            caseData.setClaimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build());
+            caseData.setClaimFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10000)).setCode("OOOCM002"));
             caseData.setClaimIssuedHwfDetails(hwfeeDetails);
             caseData.setHwfFeeType(FeeType.CLAIMISSUED);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
@@ -70,14 +70,14 @@ public class NoRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateNoRemissionDataForHearingFee() {
-            HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-                .hwfCaseEvent(NO_REMISSION_HWF)
-                .noRemissionDetails("no remission")
-                .noRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET).build();
+            HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails();
+            hwfeeDetails.setHwfCaseEvent(NO_REMISSION_HWF);
+            hwfeeDetails.setNoRemissionDetails("no remission");
+            hwfeeDetails.setNoRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET);
 
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setHearingHwfDetails(hwfeeDetails);
-            caseData.setHearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build());
+            caseData.setHearingFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(30000)));
             caseData.setHwfFeeType(FeeType.HEARING);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             //When

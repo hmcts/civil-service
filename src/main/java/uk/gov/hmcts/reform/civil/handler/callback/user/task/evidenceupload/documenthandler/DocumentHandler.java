@@ -165,7 +165,7 @@ public abstract class DocumentHandler<T> {
         renameUploadEvidenceDocumentType(documentUploads, evidenceUploadType.getDocumentTypeDisplayName());
     }
 
-    public void addUploadDocList(CaseData.CaseDataBuilder caseDataBuilder, CaseData caseData) {
+    public void addUploadDocList(CaseData caseData) {
 
         if (getDocumentList(caseData) == null || getDocumentList(caseData).isEmpty()) {
             return;
@@ -181,12 +181,11 @@ public abstract class DocumentHandler<T> {
         }
         populateBundleCollection(
             caseData,
-            caseDataBuilder,
             trialBundleDate
         );
     }
 
-    private <T> void populateBundleCollection(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
+    private <T> void populateBundleCollection(CaseData caseData,
                                               LocalDateTime trialBundleDate) {
         //List<Element<UploadEvidenceDocumentType>> additionalBundleDocs = null;
         // If either claimant or respondent additional bundle doc collection exists, we add to that
@@ -221,7 +220,7 @@ public abstract class DocumentHandler<T> {
                         .setCreatedDatetime(documentCreatedDateTime)
                         .setDocumentUpload(documentToAdd);
                     finalAdditionalBundleDocs.add(element(newDocument));
-                    applyDocumentUpdateToCollection(caseDataBuilder, finalAdditionalBundleDocs);
+                    applyDocumentUpdateToCollection(caseData, finalAdditionalBundleDocs);
                 }
             }
         });
@@ -231,6 +230,6 @@ public abstract class DocumentHandler<T> {
 
     protected abstract List<Element<UploadEvidenceDocumentType>> getDocsUploadedAfterBundle(CaseData caseData);
 
-    protected abstract void applyDocumentUpdateToCollection(CaseData.CaseDataBuilder<?, ?> caseDetailsBuilder,
+    protected abstract void applyDocumentUpdateToCollection(CaseData caseData,
                                                             List<Element<UploadEvidenceDocumentType>> finalAdditionalBundleDoc);
 }

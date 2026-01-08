@@ -161,7 +161,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnErrors_whenParticularsOfClaimFieldsAreInErrorState() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            caseData.setServedDocumentFiles(ServedDocumentFiles.builder().build());
+            caseData.setServedDocumentFiles(new ServedDocumentFiles());
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -172,7 +172,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnErrors_whenParticularsOfClaimFieldsAreInErrorStateBackwardsCompatible() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            caseData.setServedDocumentFiles(ServedDocumentFiles.builder().build());
+            caseData.setServedDocumentFiles(new ServedDocumentFiles());
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -183,9 +183,9 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoErrors_whenParticularOfClaimsFieldsAreValid() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            caseData.setServedDocumentFiles(ServedDocumentFiles.builder()
-                .particularsOfClaimText("Some string")
-                .build());
+            ServedDocumentFiles servedDocs = new ServedDocumentFiles();
+            servedDocs.setParticularsOfClaimText("Some string");
+            caseData.setServedDocumentFiles(servedDocs);
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -196,9 +196,9 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoErrors_whenParticularOfClaimsFieldsAreValidBackwardsCompatible() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            caseData.setServedDocumentFiles(ServedDocumentFiles.builder()
-                .particularsOfClaimText("Some string")
-                .build());
+            ServedDocumentFiles servedDocs = new ServedDocumentFiles();
+            servedDocs.setParticularsOfClaimText("Some string");
+            caseData.setServedDocumentFiles(servedDocs);
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -383,26 +383,24 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         static Stream<Arguments> caseDataStream() {
-            DocumentWithRegex documentRegex = new DocumentWithRegex(Document.builder()
-                                                                        .documentUrl("fake-url")
-                                                                        .documentFileName("file-name")
-                                                                        .documentBinaryUrl("binary-url")
-                                                                        .build());
+            DocumentWithRegex documentRegex = new DocumentWithRegex(new Document()
+                                                                        .setDocumentUrl("fake-url")
+                                                                        .setDocumentFileName("file-name")
+                                                                        .setDocumentBinaryUrl("binary-url"));
             List<Element<DocumentWithRegex>> documentList = new ArrayList<>();
             List<Element<Document>> documentList2 = new ArrayList<>();
             documentList.add(element(documentRegex));
-            documentList2.add(element(Document.builder()
-                                          .documentUrl("fake-url")
-                                          .documentFileName("file-name")
-                                          .documentBinaryUrl("binary-url")
-                                          .build()));
+            documentList2.add(element(new Document()
+                                          .setDocumentUrl("fake-url")
+                                          .setDocumentFileName("file-name")
+                                          .setDocumentBinaryUrl("binary-url")));
 
-            var documentToUpload = ServedDocumentFiles.builder()
-                .particularsOfClaimDocument(documentList2)
-                .medicalReport(documentList)
-                .scheduleOfLoss(documentList)
-                .certificateOfSuitability(documentList)
-                .other(documentList).build();
+            ServedDocumentFiles documentToUpload = new ServedDocumentFiles();
+            documentToUpload.setParticularsOfClaimDocument(documentList2);
+            documentToUpload.setMedicalReport(documentList);
+            documentToUpload.setScheduleOfLoss(documentList);
+            documentToUpload.setCertificateOfSuitability(documentList);
+            documentToUpload.setOther(documentList);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             caseData.setUploadParticularsOfClaim(YES);

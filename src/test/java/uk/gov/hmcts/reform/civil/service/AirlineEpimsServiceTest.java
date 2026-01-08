@@ -25,8 +25,8 @@ class AirlineEpimsServiceTest {
     @BeforeEach
     void setup() {
         List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>();
-        airlineEpimsIDList.add(AirlineEpimsId.builder().airline("Gulf Air").epimsID("36791").build());
-        airlineEpimsIDList.add(AirlineEpimsId.builder().airline("NoLocationAirline").build());
+        airlineEpimsIDList.add(new AirlineEpimsId().setAirline("Gulf Air").setEpimsID("36791"));
+        airlineEpimsIDList.add(new AirlineEpimsId().setAirline("NoLocationAirline"));
 
         given(airlineEpimsDataLoader.getAirlineEpimsIDList())
             .willReturn(airlineEpimsIDList);

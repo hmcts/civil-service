@@ -27,10 +27,9 @@ public class HWFFeePaymentOutcomeService {
             && caseData.getFeePaymentOutcomeDetails().getHwfNumberAvailable() == YesOrNo.YES) {
             if (caseData.isHWFTypeClaimIssued()) {
                 var caseDataLip = caseData.getCaseDataLiP();
-                HelpWithFees helpWithFees = HelpWithFees.builder()
-                    .helpWithFee(YesOrNo.YES)
-                    .helpWithFeesReferenceNumber(caseData.getFeePaymentOutcomeDetails().getHwfNumberForFeePaymentOutcome())
-                    .build();
+                HelpWithFees helpWithFees = new HelpWithFees()
+                    .setHelpWithFee(YesOrNo.YES)
+                    .setHelpWithFeesReferenceNumber(caseData.getFeePaymentOutcomeDetails().getHwfNumberForFeePaymentOutcome());
                 caseData.setCaseDataLiP(caseDataLip.toBuilder().helpWithFees(helpWithFees).build());
                 helpWithFeesForTabService.setUpHelpWithFeeTab(caseData);
             }
