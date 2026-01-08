@@ -14,8 +14,8 @@ import uk.gov.hmcts.reform.civil.config.GeneralAppFeesConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.ga.service.JudicialDecisionHelper;
 
@@ -66,7 +66,7 @@ public class AdditionalFeeValueCallbackHandler extends CallbackHandler implement
                 .map(details -> details.getFee())
                 .map(fee -> fee.getCalculatedAmountInPence())
                 .orElse(null);
-            GAPbaDetails generalAppPBADetails = caseData.getGeneralAppPBADetails()
+            GeneralApplicationPbaDetails generalAppPBADetails = caseData.getGeneralAppPBADetails()
                 .toBuilder().fee(feeForGA).build();
             GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder = caseData.toBuilder();
             builder.generalAppPBADetails(generalAppPBADetails);

@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.enums.dq.GAHearingType;
 import uk.gov.hmcts.reform.civil.ga.enums.welshenhancements.PreTranslationGaDocumentType;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -128,7 +129,7 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, NO, YES);
         caseData = caseData.toBuilder()
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .paymentDetails(PaymentDetails.builder()
                                                           .status(PaymentStatus.SUCCESS).build())
                                       .fee(Fee.builder().code("NotFree").build()).build()).build();
@@ -161,7 +162,7 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, YES, YES);
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
         caseData = caseData.toBuilder()
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .paymentDetails(PaymentDetails.builder()
                                                           .status(PaymentStatus.SUCCESS).build())
                                       .fee(Fee.builder().code("NotFree").build()).build()).build();
@@ -186,7 +187,7 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, NO, NO);
         caseData = caseData.toBuilder()
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .paymentDetails(PaymentDetails.builder()
                                                           .status(PaymentStatus.SUCCESS).build())
                                       .fee(Fee.builder().code("NotFree").build()).build()).build();
@@ -214,7 +215,7 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         caseData = caseData.toBuilder()
             .applicantBilingualLanguagePreference(YES)
             .isGaApplicantLip(YES)
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .paymentDetails(PaymentDetails.builder()
                                                           .status(PaymentStatus.SUCCESS).build())
                                       .fee(Fee.builder().code("NotFree").build()).build()).build();
@@ -239,7 +240,7 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
             .respondentBilingualLanguagePreference(YES)
             .ccdState(CaseState.AWAITING_APPLICATION_PAYMENT)
             .isGaRespondentOneLip(YES)
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .paymentDetails(PaymentDetails.builder()
                                                           .status(PaymentStatus.SUCCESS).build())
                                       .fee(Fee.builder().code("NotFree").build()).build()).build();
@@ -264,7 +265,7 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
             .ccdState(CaseState.AWAITING_RESPONDENT_RESPONSE)
             .respondentBilingualLanguagePreference(YES)
             .isGaRespondentOneLip(YES)
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .paymentDetails(PaymentDetails.builder()
                                                           .status(PaymentStatus.SUCCESS).build())
                                       .fee(Fee.builder().code("NotFree").build()).build()).build();
@@ -290,7 +291,7 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
             .ccdState(CaseState.AWAITING_RESPONDENT_RESPONSE)
             .respondentBilingualLanguagePreference(YES)
             .isGaRespondentOneLip(YES)
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .paymentDetails(PaymentDetails.builder()
                                                           .status(PaymentStatus.SUCCESS).build())
                                       .fee(Fee.builder().code("NotFree").build()).build()).build();
@@ -311,7 +312,7 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, NO, YES);
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
         caseData = caseData.toBuilder()
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .paymentDetails(PaymentDetails.builder()
                                                           .status(PaymentStatus.SUCCESS).build())
                                       .fee(Fee.builder().code("FREE").build()).build()).build();
@@ -348,7 +349,7 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, YES, YES);
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
         caseData = caseData.toBuilder()
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .fee(Fee.builder().code("NotFree").build()).build()).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
@@ -363,7 +364,7 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseDataLip(YES, YES, YES);
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
         caseData = caseData.toBuilder()
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .paymentDetails(PaymentDetails.builder()
                                                           .status(PaymentStatus.SUCCESS).build())
                                       .fee(Fee.builder().code("NotFree").build()).build()).build();
@@ -389,7 +390,7 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
         caseData = caseData.toBuilder()
             .gaDraftDocument(null)
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .paymentDetails(PaymentDetails.builder()
                                                           .status(PaymentStatus.SUCCESS).build())
                                       .fee(Fee.builder().code("NotFree").build()).build()).build();
@@ -415,7 +416,7 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
         when(generalAppFeesService.isFreeApplication(any())).thenReturn(true);
         caseData = caseData.toBuilder()
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .paymentDetails(PaymentDetails.builder()
                                                           .status(PaymentStatus.SUCCESS).build())
                                       .fee(Fee.builder().code("Free").build()).build()).build();
@@ -441,7 +442,7 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
         when(generalAppFeesService.isFreeApplication(any())).thenReturn(false);
         caseData = caseData.toBuilder()
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .fee(Fee.builder().code("Free").build()).build()).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))

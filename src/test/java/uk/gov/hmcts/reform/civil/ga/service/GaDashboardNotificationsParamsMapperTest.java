@@ -15,12 +15,12 @@ import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeWrittenRepresentationsOption
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialRequestMoreInfo;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialWrittenRepresentations;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 
 import java.math.BigDecimal;
@@ -61,7 +61,7 @@ public class GaDashboardNotificationsParamsMapperTest {
             .generalAppNotificationDeadlineDate(deadline)
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .generalAppPBADetails(
-                GAPbaDetails.builder()
+                GeneralApplicationPbaDetails.builder()
                     .fee(
                         Fee.builder()
                             .code("FE203")

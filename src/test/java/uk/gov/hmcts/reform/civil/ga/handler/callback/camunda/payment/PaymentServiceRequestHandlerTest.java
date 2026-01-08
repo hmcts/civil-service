@@ -15,12 +15,12 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
@@ -78,7 +78,7 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
         when(time.now()).thenReturn(LocalDateTime.of(2020, 1, 1, 12, 0, 0));
     }
 
-    private GAPbaDetails extractPaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
+    private GeneralApplicationPbaDetails extractPaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
         GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
         return responseCaseData.getGeneralAppPBADetails();
     }
@@ -201,7 +201,7 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
         @Test
         void shouldReturnFreeLipGa_True() {
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
-            caseData = caseData.toBuilder().generalAppPBADetails(GAPbaDetails.builder()
+            caseData = caseData.toBuilder().generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                                                      .fee(Fee.builder().code("FREE").build()).build()).build();
             assertThat(handler.isFreeGaLip(caseData)).isTrue();
         }
@@ -216,7 +216,7 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
         @Test
         void shouldReturnFreeLipGa_whenFeeDetailsAreNull_false() {
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
-            caseData = caseData.toBuilder().generalAppPBADetails(GAPbaDetails.builder()
+            caseData = caseData.toBuilder().generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                                                   .build()).build();
             assertThat(handler.isFreeGaLip(caseData)).isFalse();
         }
@@ -224,7 +224,7 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
         @Test
         void shouldReturnFreeLipGa_whenFeeCodeIsNotFree_false() {
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
-            caseData = caseData.toBuilder().generalAppPBADetails(GAPbaDetails.builder()
+            caseData = caseData.toBuilder().generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                                                      .fee(Fee.builder().code("1").build()).build())
                                                                      .build();
             assertThat(handler.isFreeGaLip(caseData)).isFalse();

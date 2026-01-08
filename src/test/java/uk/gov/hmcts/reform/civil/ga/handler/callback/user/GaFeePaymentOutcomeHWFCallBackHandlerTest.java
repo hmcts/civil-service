@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.ga.service.GaPaymentRequestUpdateCallbackService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -26,7 +27,6 @@ import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.ga.service.HwfNotificationService;
 
 import java.math.BigDecimal;
@@ -81,7 +81,7 @@ public class GaFeePaymentOutcomeHWFCallBackHandlerTest extends GeneralApplicatio
                 .ccdState(CaseState.APPLICATION_ADD_PAYMENT)
                 .generalAppHelpWithFees(HelpWithFees.builder().build())
                 .hwfFeeType(FeeType.ADDITIONAL)
-                .generalAppPBADetails(GAPbaDetails.builder().fee(
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
                     Fee.builder()
                         .calculatedAmountInPence(BigDecimal.valueOf(180))
                         .code("FEE123").build()).build())
@@ -122,7 +122,7 @@ public class GaFeePaymentOutcomeHWFCallBackHandlerTest extends GeneralApplicatio
                 .ccdState(CaseState.AWAITING_RESPONDENT_RESPONSE)
                 .hwfFeeType(FeeType.APPLICATION)
                 .generalAppHelpWithFees(HelpWithFees.builder().build())
-                .generalAppPBADetails(GAPbaDetails.builder().fee(
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
                     Fee.builder()
                         .calculatedAmountInPence(BigDecimal.valueOf(180))
                         .code("FEE123").build()).build())
@@ -207,7 +207,7 @@ public class GaFeePaymentOutcomeHWFCallBackHandlerTest extends GeneralApplicatio
         void shouldTrigger_after_payment_GaFee() {
             List<GeneralApplicationTypes> types = Arrays.asList(STRIKE_OUT);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                    .generalAppPBADetails(GAPbaDetails.builder().fee(
+                    .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
                                     Fee.builder()
                                             .calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
                             .build())
@@ -235,7 +235,7 @@ public class GaFeePaymentOutcomeHWFCallBackHandlerTest extends GeneralApplicatio
                     .generalAppType(GAApplicationType.builder()
                                         .types(List.of(GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID))
                                         .build())
-                    .generalAppPBADetails(GAPbaDetails.builder().fee(
+                    .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
                                     Fee.builder()
                                             .calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
                             .build())
@@ -259,7 +259,7 @@ public class GaFeePaymentOutcomeHWFCallBackHandlerTest extends GeneralApplicatio
         @Test
         void shouldTrigger_modify_state_additioanlFee() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                    .generalAppPBADetails(GAPbaDetails.builder().fee(
+                    .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
                                     Fee.builder()
                                             .calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
                             .build())

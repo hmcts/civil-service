@@ -8,10 +8,10 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.utils.HearingFeeUtils;
@@ -112,7 +112,7 @@ public class PaymentsService {
 
     public void validateRequestGa(GeneralApplicationCaseData caseData) {
         String error = null;
-        GAPbaDetails generalAppPBADetails = caseData.getGeneralAppPBADetails();
+        GeneralApplicationPbaDetails generalAppPBADetails = caseData.getGeneralAppPBADetails();
         if (generalAppPBADetails == null) {
             error = "PBA details not received.";
         } else if (generalAppPBADetails.getFee() == null
@@ -232,7 +232,7 @@ public class PaymentsService {
     }
 
     private CreateServiceRequestDTO buildServiceRequest(GeneralApplicationCaseData caseData) {
-        GAPbaDetails generalAppPBADetails = caseData.getGeneralAppPBADetails();
+        GeneralApplicationPbaDetails generalAppPBADetails = caseData.getGeneralAppPBADetails();
         FeeDto feeResponse = generalAppPBADetails.getFee().toFeeDto();
         String siteId = caseData.getGeneralAppSuperClaimType().equals(SPEC_CLAIM.name())
             ? paymentsConfiguration.getSpecSiteId() : paymentsConfiguration.getSiteId();

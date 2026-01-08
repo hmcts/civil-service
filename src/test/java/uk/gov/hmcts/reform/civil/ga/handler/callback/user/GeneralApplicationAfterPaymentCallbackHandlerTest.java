@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
@@ -146,9 +147,9 @@ public class GeneralApplicationAfterPaymentCallbackHandlerTest extends GeneralAp
     }
 
     private GeneralApplicationCaseData addPaymentStatusToGAPbaDetails(GeneralApplicationCaseData caseData, PaymentStatus status) {
-        GAPbaDetails pbaDetails = caseData.getGeneralAppPBADetails();
-        GAPbaDetails.GAPbaDetailsBuilder pbaDetailsBuilder;
-        pbaDetailsBuilder = pbaDetails == null ? GAPbaDetails.builder() : pbaDetails.toBuilder();
+        GeneralApplicationPbaDetails pbaDetails = caseData.getGeneralAppPBADetails();
+        GeneralApplicationPbaDetails.GeneralApplicationPbaDetailsBuilder pbaDetailsBuilder;
+        pbaDetailsBuilder = pbaDetails == null ? GeneralApplicationPbaDetails.builder() : pbaDetails.toBuilder();
 
         PaymentDetails paymentDetails = PaymentDetails.builder()
             .status(status)

@@ -11,6 +11,7 @@ import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.NotificationDataGA;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -25,7 +26,6 @@ import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
@@ -129,7 +129,7 @@ public class HwfNotificationServiceTest {
             .defendant1PartyName(DEFENDANT)
             .generalAppHelpWithFees(HelpWithFees.builder().helpWithFeesReferenceNumber(
                     HWF_REFERENCE).build())
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                     .fee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(100000)).build())
                     .build())
             .hwfFeeType(FeeType.APPLICATION)
@@ -149,7 +149,7 @@ public class HwfNotificationServiceTest {
             .defendant1PartyName(DEFENDANT)
             .generalAppHelpWithFees(HelpWithFees.builder().helpWithFeesReferenceNumber(
                     HWF_REFERENCE).build())
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                     .fee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(100000)).build())
                     .build())
             .hwfFeeType(FeeType.ADDITIONAL)

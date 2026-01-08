@@ -10,12 +10,12 @@ import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.notify.NotificationException;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
@@ -121,7 +121,7 @@ public class GaPaymentRequestUpdateCallbackService {
 
     private GeneralApplicationCaseData updateCaseDataWithPaymentDetails(ServiceRequestUpdateDto serviceRequestUpdateDto,
                                                       GeneralApplicationCaseData caseData) {
-        GAPbaDetails pbaDetails = caseData.getGeneralAppPBADetails();
+        GeneralApplicationPbaDetails pbaDetails = caseData.getGeneralAppPBADetails();
         String paymentReference = ofNullable(serviceRequestUpdateDto.getPayment())
             .map(PaymentDto::getCustomerReference)
             .orElse(pbaDetails.getServiceReqReference());
@@ -147,7 +147,7 @@ public class GaPaymentRequestUpdateCallbackService {
 
     private GeneralApplicationCaseData updateCaseDataWithStateAndPaymentDetails(ServiceRequestUpdateDto serviceRequestUpdateDto,
                                                               GeneralApplicationCaseData caseData) {
-        GAPbaDetails pbaDetails = caseData.getGeneralAppPBADetails();
+        GeneralApplicationPbaDetails pbaDetails = caseData.getGeneralAppPBADetails();
         String customerReference = ofNullable(serviceRequestUpdateDto.getPayment())
             .map(PaymentDto::getCustomerReference)
             .orElse(pbaDetails.getAdditionalPaymentServiceRef());

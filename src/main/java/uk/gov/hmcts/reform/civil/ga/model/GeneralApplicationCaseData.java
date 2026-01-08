@@ -53,7 +53,7 @@ import uk.gov.hmcts.reform.civil.ga.model.genapplication.finalorder.AssistedOrde
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.finalorder.BeSpokeCostDetailText;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.finalorder.DetailText;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.finalorder.DetailTextWithDate;
-import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAPbaDetails;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.model.BaseCaseData;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -118,7 +118,7 @@ public class GeneralApplicationCaseData extends BaseCaseData implements Mappable
     private GAApplicationType generalAppType;
     private GARespondentOrderAgreement generalAppRespondentAgreement;
     private YesOrNo generalAppConsentOrder;
-    private GAPbaDetails generalAppPBADetails;
+    private GeneralApplicationPbaDetails generalAppPBADetails;
     private String generalAppDetailsOfOrder;
     private List<Element<String>> generalAppDetailsOfOrderColl;
     private String generalAppReasonsOfOrder;

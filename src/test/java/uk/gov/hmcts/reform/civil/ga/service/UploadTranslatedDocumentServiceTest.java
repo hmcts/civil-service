@@ -8,6 +8,7 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GaFinalOrderSelection;
 import uk.gov.hmcts.reform.civil.ga.enums.welshenhancements.PreTranslationGaDocumentType;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
@@ -16,7 +17,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
@@ -569,7 +569,7 @@ public class UploadTranslatedDocumentServiceTest {
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .translatedDocuments(translatedDocuments)
-            .generalAppPBADetails(GAPbaDetails.builder().fee(Fee.builder().code("F1234").build()).build())
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("F1234").build()).build())
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.APPLICATION_SUMMARY_DOC)
             .build();
         // When
@@ -588,7 +588,7 @@ public class UploadTranslatedDocumentServiceTest {
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .translatedDocuments(translatedDocuments)
-            .generalAppPBADetails(GAPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.APPLICATION_SUMMARY_DOC)
             .build();
         // When

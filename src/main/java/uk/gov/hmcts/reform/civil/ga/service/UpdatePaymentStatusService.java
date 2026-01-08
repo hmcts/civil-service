@@ -14,10 +14,10 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 
 import java.util.Map;
 
@@ -83,9 +83,9 @@ public class UpdatePaymentStatusService {
                                                                                 GeneralApplicationCaseData caseData) {
         log.info("Updating CaseData with new payment status for caseReference: {}", caseData.getCcdCaseReference());
 
-        GAPbaDetails pbaDetails = caseData.getGeneralAppPBADetails();
-        GAPbaDetails.GAPbaDetailsBuilder pbaDetailsBuilder;
-        pbaDetailsBuilder = pbaDetails == null ? GAPbaDetails.builder() : pbaDetails.toBuilder();
+        GeneralApplicationPbaDetails pbaDetails = caseData.getGeneralAppPBADetails();
+        GeneralApplicationPbaDetails.GeneralApplicationPbaDetailsBuilder pbaDetailsBuilder;
+        pbaDetailsBuilder = pbaDetails == null ? GeneralApplicationPbaDetails.builder() : pbaDetails.toBuilder();
 
         PaymentDetails paymentDetails = PaymentDetails.builder()
             .status(PaymentStatus.valueOf(cardPaymentStatusResponse.getStatus().toUpperCase()))

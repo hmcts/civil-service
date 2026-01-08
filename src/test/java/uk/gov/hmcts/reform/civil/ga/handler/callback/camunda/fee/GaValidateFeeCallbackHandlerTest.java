@@ -9,9 +9,9 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 
 import java.math.BigDecimal;
@@ -54,7 +54,8 @@ class GaValidateFeeCallbackHandlerTest extends GeneralApplicationBaseCallbackHan
 
         @Test
         void shouldReturnNoErrors() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().gaPbaDetails(GAPbaDetails.builder().build()).build();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().gaPbaDetails(
+                GeneralApplicationPbaDetails.builder().build()).build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

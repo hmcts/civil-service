@@ -16,8 +16,8 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.HelpWithFeesDetails;
 
 import java.math.BigDecimal;
@@ -54,7 +54,7 @@ public class GaPartialRemissionHWFCallbackHandlerTest extends GeneralApplication
         @Test
         void shouldCallPartialRemissionHwfEventWhenFeeTypeIsGa() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                    .generalAppPBADetails(GAPbaDetails.builder().fee(
+                    .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
                                     Fee.builder()
                                             .calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
                             .build())
@@ -80,7 +80,7 @@ public class GaPartialRemissionHWFCallbackHandlerTest extends GeneralApplication
         @Test
         void shouldCallPartialRemissionHwfEventWhenFeeTypeIsHearing() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                    .generalAppPBADetails(GAPbaDetails.builder().fee(
+                    .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
                                     Fee.builder()
                                             .calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
                             .build())
@@ -107,7 +107,7 @@ public class GaPartialRemissionHWFCallbackHandlerTest extends GeneralApplication
     void shouldPopulateErrorWhenApplicationRemissionAmountIsNegative() {
         //Given
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .generalAppPBADetails(GAPbaDetails.builder().fee(
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
                                 Fee.builder()
                                         .calculatedAmountInPence(BigDecimal.valueOf(30000))
                                         .code("OOOCM002").build())
@@ -131,7 +131,7 @@ public class GaPartialRemissionHWFCallbackHandlerTest extends GeneralApplication
     void shouldPopulateErrorWhenAdditionalRemissionAmountIsNegative() {
         //Given
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .generalAppPBADetails(GAPbaDetails.builder().fee(
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
                                 Fee.builder()
                                         .calculatedAmountInPence(BigDecimal.valueOf(30000))
                                         .code("OOOCM002").build())
@@ -156,7 +156,7 @@ public class GaPartialRemissionHWFCallbackHandlerTest extends GeneralApplication
     void shouldPopulateErrorWhenRemissionAmountIsNotValidForDifferentFeeTypes(FeeType feeType, String errMsg) {
         //Given
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .generalAppPBADetails(GAPbaDetails.builder().fee(
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
                                 Fee.builder()
                                         .calculatedAmountInPence(BigDecimal.valueOf(30000))
                                         .code("OOOCM002").build())

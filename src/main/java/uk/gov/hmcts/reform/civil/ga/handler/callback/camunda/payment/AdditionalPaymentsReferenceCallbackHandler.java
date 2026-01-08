@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.ga.service.JudicialDecisionHelper;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
@@ -71,9 +71,9 @@ public class AdditionalPaymentsReferenceCallbackHandler extends CallbackHandler 
                         caseData,
                         authToken
                     ).getServiceRequestReference();
-                GAPbaDetails paymentDetails = ofNullable(caseData.getGeneralAppPBADetails())
-                    .map(GAPbaDetails::toBuilder)
-                    .orElse(GAPbaDetails.builder())
+                GeneralApplicationPbaDetails paymentDetails = ofNullable(caseData.getGeneralAppPBADetails())
+                    .map(GeneralApplicationPbaDetails::toBuilder)
+                    .orElse(GeneralApplicationPbaDetails.builder())
                     .additionalPaymentServiceRef(paymentServiceRequest)
                     .build();
                 caseData = caseData.toBuilder().generalAppPBADetails(paymentDetails).build();

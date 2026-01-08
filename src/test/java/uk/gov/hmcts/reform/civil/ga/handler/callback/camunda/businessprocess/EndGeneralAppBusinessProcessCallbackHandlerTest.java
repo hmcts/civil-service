@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GaFinalOrderSelection;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
@@ -156,7 +157,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
                 .ccdState(PENDING_APPLICATION_ISSUED)
-                .generalAppPBADetails(GAPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
                 .ccdCaseReference(1234L)
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("0000").build())
                 .build();
@@ -208,7 +209,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .ccdState(AWAITING_APPLICATION_PAYMENT)
                 .ccdCaseReference(1234L)
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("0000").build())
-                .generalAppPBADetails(GAPbaDetails.builder().fee(Fee.builder().code("PAY").build()).build())
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("PAY").build()).build())
                 .build();
 
             GeneralApplicationsDetails judgeCollection = GeneralApplicationsDetails.builder()
@@ -259,7 +260,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .ccdState(AWAITING_APPLICATION_PAYMENT)
                 .ccdCaseReference(1234L)
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("0000").build())
-                .generalAppPBADetails(GAPbaDetails.builder().fee(Fee.builder().code("PAY").build()).build())
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("PAY").build()).build())
                 .build();
 
             GeneralApplicationsDetails judgeCollection = GeneralApplicationsDetails.builder()
@@ -311,7 +312,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .ccdCaseReference(1234L)
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("0000").build())
                 .generalAppType(GAApplicationType.builder().types(types).build())
-                .generalAppPBADetails(GAPbaDetails.builder()
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                           .fee(Fee.builder().code("PAY").build())
                                           .paymentDetails(PaymentDetails.builder().build())
                                           .build())
@@ -364,7 +365,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .ccdCaseReference(1234L)
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("0000").build())
                 .generalAppType(GAApplicationType.builder().types(types).build())
-                .generalAppPBADetails(GAPbaDetails.builder()
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                           .fee(Fee.builder().code("PAY").build())
                                           .paymentDetails(PaymentDetails.builder().build())
                                           .build())
@@ -413,7 +414,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
                 .ccdState(PENDING_APPLICATION_ISSUED)
-                .generalAppPBADetails(GAPbaDetails.builder()
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                           .fee(Fee.builder().code("PAY").build()).build())
                 .ccdCaseReference(1234L)
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("0000").build())
@@ -1621,7 +1622,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .ccdState(PENDING_APPLICATION_ISSUED)
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                               .caseReference(PARENT_CCD_REF.toString()).build())
-                .generalAppPBADetails(GAPbaDetails.builder().paymentDetails(PaymentDetails.builder()
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().paymentDetails(PaymentDetails.builder()
                                                                                 .customerReference("1336546")
                                                                                 .build()).build())
                 .generalAppRespondentSolicitors(respondentSols)
@@ -1657,7 +1658,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .ccdState(PENDING_APPLICATION_ISSUED)
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                               .caseReference(PARENT_CCD_REF.toString()).build())
-                .generalAppPBADetails(GAPbaDetails.builder().paymentDetails(PaymentDetails.builder()
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().paymentDetails(PaymentDetails.builder()
                                                                                 .customerReference("1336546")
                                                                                 .build()).build())
                 .generalAppRespondentSolicitors(respondentSols)

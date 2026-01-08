@@ -13,11 +13,11 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -55,7 +55,7 @@ class UpdatePaymentStatusServiceTest {
                                  .status(BusinessProcessStatus.READY)
                                  .camundaEvent(BUSINESS_PROCESS)
                                  .build())
-            .generalAppPBADetails(GAPbaDetails.builder().paymentDetails(PaymentDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().paymentDetails(PaymentDetails.builder()
                     .customerReference("RC-1604-0739-2145-4711")
                     .build()).build())
             .build();
@@ -86,7 +86,7 @@ class UpdatePaymentStatusServiceTest {
                                  .status(BusinessProcessStatus.READY)
                                  .camundaEvent(BUSINESS_PROCESS)
                                  .build())
-            .generalAppPBADetails(GAPbaDetails.builder().additionalPaymentDetails(PaymentDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().additionalPaymentDetails(PaymentDetails.builder()
                                                                             .customerReference("RC-1604-0739-2145-4711")
                                                                             .build())
                                       .additionalPaymentServiceRef("2023-1701090705600").build())

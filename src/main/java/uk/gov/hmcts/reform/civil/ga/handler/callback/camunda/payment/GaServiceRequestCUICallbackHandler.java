@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 
 import java.util.ArrayList;
@@ -64,7 +64,7 @@ public class GaServiceRequestCUICallbackHandler extends CallbackHandler implemen
             if (isServiceRequestNotRequested(caseData)) {
                 log.info("Calling payment service request (application fee) for case {}", caseData.getCcdCaseReference());
                 String serviceRequestReference = getServiceRequestReference(caseData, authToken);
-                caseData = caseData.toBuilder().generalAppPBADetails(GAPbaDetails.builder()
+                caseData = caseData.toBuilder().generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                 .serviceReqReference(serviceRequestReference)
                                 .fee(caseData.getGeneralAppPBADetails().getFee())
                                 .build())
