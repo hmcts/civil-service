@@ -12,14 +12,12 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import static uk.gov.hmcts.reform.civil.enums.DocCategory.CASEWORKER_QUERY_DOCUMENT_ATTACHMENTS;
 import static java.util.Objects.nonNull;
-
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.CASEWORKER_QUERY_DOCUMENT_ATTACHMENTS;
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS;
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
