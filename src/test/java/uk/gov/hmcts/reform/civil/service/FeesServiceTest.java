@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.FlatAmountDto;
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -54,6 +55,18 @@ class FeesServiceTest {
         given(feesConfiguration.getChannel()).willReturn(CHANNEL);
         given(feesConfiguration.getEvent()).willReturn(EVENT);
         given(feesConfiguration.getHearingEvent()).willReturn(HEARING_EVENT);
+    }
+
+    @Test
+    void shouldThrowException_whenFeeLookupReturnsNull() {
+        given(feesClient.lookupFee(any(), any(), any())).willReturn(null);
+
+        ClaimValue claimValue = new ClaimValue();
+        claimValue.setStatementOfValueInPennies(BigDecimal.valueOf(1000));
+
+        assertThatThrownBy(() -> feesService.getFeeDataByClaimValue(claimValue))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("Fee lookup returned null response");
     }
 
     @Test
