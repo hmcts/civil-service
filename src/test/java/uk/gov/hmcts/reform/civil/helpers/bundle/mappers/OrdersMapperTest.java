@@ -33,7 +33,9 @@ class OrdersMapperTest {
 
     @Test
     void testMapperWhenIncludesDefaultJudgmentSdoAndGeneralDismissalOrders() {
-        BundlingRequestDocument doc = BundlingRequestDocument.builder().documentFileName("f").documentType("t").build();
+        BundlingRequestDocument doc = new BundlingRequestDocument()
+            .setDocumentFileName("f")
+            .setDocumentType("t");
         when(systemGeneratedDocMapper.mapSystemGeneratedCaseDocument(any(), eq(BundleFileNameList.DIRECTIONS_ORDER.getDisplayName())))
             .thenReturn(singletonList(doc));
         when(systemGeneratedDocMapper.mapSystemGeneratedCaseDocument(any(), eq(BundleFileNameList.ORDER.getDisplayName())))

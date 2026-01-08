@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.civil.model.account;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 import javax.validation.constraints.NotNull;
@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
+@Accessors(chain = true)
 public class AccountSimple {
 
     /**
