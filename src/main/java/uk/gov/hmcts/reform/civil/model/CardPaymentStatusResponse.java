@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.payments.response.CardPaymentServiceRequestResponse;
 
 import java.math.BigDecimal;
@@ -13,6 +14,7 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Accessors(chain = true)
 public class CardPaymentStatusResponse {
 
     private String externalReference;
@@ -26,12 +28,11 @@ public class CardPaymentStatusResponse {
     private BigDecimal paymentAmount;
 
     public static CardPaymentStatusResponse from(CardPaymentServiceRequestResponse cardPaymentServiceRequestResponse) {
-        return CardPaymentStatusResponse.builder()
-            .paymentReference(cardPaymentServiceRequestResponse.getPaymentReference())
-            .externalReference(cardPaymentServiceRequestResponse.getExternalReference())
-            .status(cardPaymentServiceRequestResponse.getStatus())
-            .nextUrl(cardPaymentServiceRequestResponse.getNextUrl())
-            .dateCreated(cardPaymentServiceRequestResponse.getDateCreated())
-            .build();
+        return new CardPaymentStatusResponse()
+            .setPaymentReference(cardPaymentServiceRequestResponse.getPaymentReference())
+            .setExternalReference(cardPaymentServiceRequestResponse.getExternalReference())
+            .setStatus(cardPaymentServiceRequestResponse.getStatus())
+            .setNextUrl(cardPaymentServiceRequestResponse.getNextUrl())
+            .setDateCreated(cardPaymentServiceRequestResponse.getDateCreated());
     }
 }

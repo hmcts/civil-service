@@ -2,21 +2,23 @@ package uk.gov.hmcts.reform.civil.model.bundle;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Value;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Value
-@Builder(toBuilder = true)
+@Data
+@NoArgsConstructor
+@Accessors(chain = true)
 public class BundleCreateRequest {
 
     @JsonProperty("caseTypeId")
-    private String caseTypeId;
+    String caseTypeId;
     @JsonProperty("jurisdictionId")
-    private String jurisdictionId;
+    String jurisdictionId;
     @JsonProperty("case_details")
-    private BundlingCaseDetails caseDetails;
+    BundlingCaseDetails caseDetails;
     @JsonProperty("event_id")
-    private String eventId;
+    String eventId;
 
 }

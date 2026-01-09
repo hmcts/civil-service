@@ -27,12 +27,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.PopulateRespondentTabDetails.updateDataForClaimDetailsTab;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 
 @Component
@@ -67,7 +67,7 @@ public class PopulateRespondentCopyObjects implements CaseTask {
 
     public CallbackResponse execute(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        log.info("Populating respondent copy objects", caseData.getCcdCaseReference());
+        log.info("Populating respondent copy objects {}", caseData.getCcdCaseReference());
         LocalDateTime dateTime = LocalDateTime.now();
 
         CallbackResponse errorResponse = getErrorResponse(callbackParams, caseData, dateTime);
@@ -81,10 +81,10 @@ public class PopulateRespondentCopyObjects implements CaseTask {
 
         RequestedCourt requestedCourt1 = createRequestedCourt(locations, caseData);
 
-        CaseData.CaseDataBuilder<?, ?> updatedCaseData = updateCaseData(caseData, isRespondent1, requestedCourt1);
+        updateCaseData(caseData, isRespondent1, requestedCourt1);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
@@ -116,37 +116,25 @@ public class PopulateRespondentCopyObjects implements CaseTask {
             .build();
     }
 
-    private CaseData.CaseDataBuilder<?, ?> updateCaseData(CaseData caseData, YesOrNo isRespondent1, RequestedCourt requestedCourt1) {
-        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder()
-            .respondent1Copy(caseData.getRespondent1())
-            .isRespondent1(isRespondent1)
-            .respondent1DQ(Respondent1DQ.builder()
-                               .respondent1DQRequestedCourt(
-                                   requestedCourt1)
-                               .build());
+    private void updateCaseData(CaseData caseData, YesOrNo isRespondent1, RequestedCourt requestedCourt1) {
+        caseData.setRespondent1Copy(caseData.getRespondent1());
+        caseData.setIsRespondent1(isRespondent1);
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt1);
+        caseData.setRespondent1DQ(respondent1DQ);
 
         if (caseData.getRespondent2() != null) {
-            updatedCaseData.respondent2DQ(
-                Respondent2DQ.builder()
-                    .respondent2DQRequestedCourt(requestedCourt1).build());
+            Respondent2DQ respondent2DQ = new Respondent2DQ();
+            respondent2DQ.setRespondent2DQRequestedCourt(requestedCourt1);
+            caseData.setRespondent2DQ(respondent2DQ);
         }
-
-        updatedCaseData.respondent1DetailsForClaimDetailsTab(updatedCaseData.build().getRespondent1()
-                                                                 .toBuilder().flags(null).build());
-
-        if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            updatedCaseData
-                .respondent2Copy(caseData.getRespondent2())
-                .respondent2DetailsForClaimDetailsTab(updatedCaseData.build().getRespondent2()
-                                                          .toBuilder().flags(null).build());
-        }
-        return updatedCaseData;
+        updateDataForClaimDetailsTab(caseData, objectMapper, true);
     }
 
     private RequestedCourt createRequestedCourt(List<LocationRefData> locations, CaseData caseData) {
         DynamicList courtLocationList = courtLocationUtils.getLocationsFromList(locations);
-        RequestedCourt.RequestedCourtBuilder requestedCourt = RequestedCourt.builder();
-        requestedCourt.responseCourtLocations(courtLocationList);
+        RequestedCourt requestedCourt = new RequestedCourt();
+        requestedCourt.setResponseCourtLocations(courtLocationList);
 
         Optional.ofNullable(caseData.getCourtLocation())
             .map(CourtLocation::getApplicantPreferredCourt)
@@ -154,9 +142,9 @@ public class PopulateRespondentCopyObjects implements CaseTask {
                 .filter(locationRefData -> applicantCourt.equals(locationRefData.getCourtLocationCode()))
                 .findFirst())
             .ifPresent(locationRefData -> requestedCourt
-                .otherPartyPreferredSite(locationRefData.getCourtLocationCode()
+                .setOtherPartyPreferredSite(locationRefData.getCourtLocationCode()
                                              + " " + locationRefData.getSiteName()));
-        return requestedCourt.build();
+        return requestedCourt;
     }
 
     private boolean isSubmissionForDefendantAlreadySubmitted(CallbackParams callbackParams, CaseData caseData) {

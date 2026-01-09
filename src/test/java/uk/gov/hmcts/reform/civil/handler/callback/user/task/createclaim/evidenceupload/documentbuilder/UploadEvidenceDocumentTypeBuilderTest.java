@@ -21,13 +21,12 @@ class UploadEvidenceDocumentTypeBuilderTest {
 
     @Test
     void shouldBuildElementTypeWithDocumentCopy() {
-        Document originalDocument = Document.builder()
-                .categoryID("originalCategory")
-                .documentBinaryUrl("originalBinaryUrl")
-                .documentFileName("originalFileName.pdf")
-                .documentHash("originalHash")
-                .documentUrl("originalUrl")
-                .build();
+        Document originalDocument = new Document();
+        originalDocument.setCategoryID("originalCategory")
+                .setDocumentBinaryUrl("originalBinaryUrl")
+                .setDocumentFileName("originalFileName.pdf")
+                .setDocumentHash("originalHash")
+                .setDocumentUrl("originalUrl");
 
         UploadEvidenceDocumentType originalType = new UploadEvidenceDocumentType()
                 .setWitnessOptionName("Witness Name")

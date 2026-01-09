@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,12 +14,16 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
-import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
+import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.AirlineEpimsService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
@@ -26,10 +31,9 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
-import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
-import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
-import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.math.BigDecimal;
@@ -37,6 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -86,9 +91,13 @@ class SubmitClaimTaskTest {
     @InjectMocks
     private SubmitClaimTask submitClaimTask;
 
+    private ObjectMapper objectMapper;
+
     @BeforeEach
-    public void setUp() {
-        submitClaimTask = new SubmitClaimTask(featureToggleService, new ObjectMapper(), defendantPinToPostLRspecService, interestCalculator,
+    void setUp() {
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        submitClaimTask = new SubmitClaimTask(featureToggleService, objectMapper, defendantPinToPostLRspecService, interestCalculator,
                                               toggleConfiguration, caseFlagInitialiser, feesService, userService, time, specReferenceNumberRepository,
                                               organisationService, airlineEpimsService, locationRefDataService);
     }
@@ -96,28 +105,39 @@ class SubmitClaimTaskTest {
     @Test
     void shouldSubmitClaimSuccessfully() {
 
-        CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder()
-                            .individualFirstName("Clay")
-                            .individualLastName("Mint")
-                            .partyName("Clay Mint")
-                            .type(Party.Type.INDIVIDUAL)
-                            .build())
+        Party party = new Party();
+        party.setIndividualFirstName("Clay");
+        party.setIndividualLastName("Mint");
+        party.setPartyName("Clay Mint");
+        party.setType(Party.Type.INDIVIDUAL);
+        IdamUserDetails idamUserDetails = new IdamUserDetails();
+        idamUserDetails.setEmail("test@gmail.com");
+        Party partyDetails = new Party();
+        partyDetails.setCompanyName("Defendant Inc.");
+        partyDetails.setType(Party.Type.COMPANY);
+        partyDetails.setPartyName("Defendant Inc.");
+        Flags respFlag = Flags.builder().partyName("Defendant").roleOnCase("Defendant 1").build();
+        partyDetails.setFlags(respFlag);
+        SolicitorReferences solicitorRef = new SolicitorReferences();
+        solicitorRef.setRespondentSolicitor1Reference("1234");
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1(party)
             .totalClaimAmount(new BigDecimal("1000"))
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("test@gmail.com").build())
+            .applicantSolicitor1UserDetails(idamUserDetails)
             .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
-            .respondent1(Party.builder().companyName("Defendant Inc.").type(Party.Type.COMPANY).build())
-            .solicitorReferences(SolicitorReferences.builder().respondentSolicitor1Reference("1234").build())
-            .build();
+            .respondent1(partyDetails).build();
+        caseData.setSolicitorReferences(solicitorRef);
 
         when(userService.getUserDetails("authToken")).thenReturn(UserDetails.builder().id("userId").build());
         when(specReferenceNumberRepository.getSpecReferenceNumber()).thenReturn("12345");
 
-        FlightDelayDetails flightDelayDetails = FlightDelayDetails.builder()
-            .airlineList(
-                DynamicList.builder()
-                    .value(DynamicListElement.builder().code("OTHER").label("OTHER")
-                               .build()).build()).build();
+        DynamicListElement dynamicListElement = new DynamicListElement();
+        dynamicListElement.setCode("OTHER");
+        dynamicListElement.setLabel("OTHER");
+        DynamicList dynamicList = new DynamicList();
+        dynamicList.setValue(dynamicListElement);
+        FlightDelayDetails flightDelayDetails = new FlightDelayDetails();
+        flightDelayDetails.setAirlineList(dynamicList);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) submitClaimTask.submitClaim(
             caseData,
@@ -126,48 +146,57 @@ class SubmitClaimTaskTest {
             YES,
             flightDelayDetails
         );
-
-        assertThat(response.getData()).isNotNull();
+        CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+        assertThat(updatedCaseData).isNotNull();
         assertThat(response.getErrors()).isEmpty();
-        assertThat(response.getData()).containsEntry("interestClaimUntil", "UNTIL_SETTLED_OR_JUDGEMENT_MADE");
-        assertThat(response.getData().get("anyRepresented")).isEqualTo("Yes");
-        assertThat(response.getData().get("allPartyNames")).isEqualTo("Clay Mint V Defendant Inc.");
-        assertThat(response.getData().get("caseListDisplayDefendantSolicitorReferences"))
-            .isEqualTo("1234");
+        assertEquals(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE, updatedCaseData.getInterestClaimUntil());
+        assertEquals(YES, updatedCaseData.getAnyRepresented());
+        assertEquals("Clay Mint V Defendant Inc.", updatedCaseData.getAllPartyNames());
+        assertEquals("1234", updatedCaseData.getCaseListDisplayDefendantSolicitorReferences());
+        assertThat(updatedCaseData.getRespondent1().getFlags()).isEqualTo(respFlag);
     }
 
     @Test
     void shouldSubmitClaimSuccessfully1Vs2DS() {
-
-        CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder()
-                            .individualFirstName("Clay")
-                            .individualLastName("Mint")
-                            .partyName("Clay Mint")
-                            .type(Party.Type.INDIVIDUAL)
-                            .build())
+        Party party = new Party();
+        party.setIndividualFirstName("Clay");
+        party.setIndividualLastName("Mint");
+        party.setPartyName("Clay Mint");
+        party.setType(Party.Type.INDIVIDUAL);
+        IdamUserDetails idamUserDetails = new IdamUserDetails();
+        idamUserDetails.setEmail("test@gmail.com");
+        Party party1 = new Party();
+        party1.setCompanyName("Defendant Inc.");
+        party1.setType(Party.Type.COMPANY);
+        Party party2 = new Party();
+        party2.setIndividualFirstName("Dave");
+        party2.setIndividualLastName("Indentoo");
+        party2.setType(Party.Type.INDIVIDUAL);
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1(party)
             .totalClaimAmount(new BigDecimal("1000"))
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("test@gmail.com").build())
+            .applicantSolicitor1UserDetails(idamUserDetails)
             .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
-            .respondent1(Party.builder().companyName("Defendant Inc.").type(Party.Type.COMPANY).build())
-            .respondent2(Party.builder().individualFirstName("Dave").individualLastName("Indentoo").type(Party.Type.INDIVIDUAL).build())
+            .respondent1(party1)
+            .respondent2(party2)
             .respondent2Represented(YES)
             .addRespondent2(YES)
-            .respondent2SameLegalRepresentative(NO)
-            .solicitorReferences(SolicitorReferences.builder()
-                                     .respondentSolicitor1Reference("1234")
-                                     .respondentSolicitor2Reference("5678")
-                                     .build())
-            .build();
+            .respondent2SameLegalRepresentative(NO).build();
+        SolicitorReferences solicitorRef = new SolicitorReferences();
+        solicitorRef.setRespondentSolicitor1Reference("1234");
+        solicitorRef.setRespondentSolicitor2Reference("5678");
+        caseData.setSolicitorReferences(solicitorRef);
 
         when(userService.getUserDetails("authToken")).thenReturn(UserDetails.builder().id("userId").build());
         when(specReferenceNumberRepository.getSpecReferenceNumber()).thenReturn("12345");
 
-        FlightDelayDetails flightDelayDetails = FlightDelayDetails.builder()
-            .airlineList(
-                DynamicList.builder()
-                    .value(DynamicListElement.builder().code("OTHER").label("OTHER")
-                               .build()).build()).build();
+        DynamicListElement dynamicListElement = new DynamicListElement();
+        dynamicListElement.setCode("OTHER");
+        dynamicListElement.setLabel("OTHER");
+        DynamicList dynamicList = new DynamicList();
+        dynamicList.setValue(dynamicListElement);
+        FlightDelayDetails flightDelayDetails = new FlightDelayDetails();
+        flightDelayDetails.setAirlineList(dynamicList);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) submitClaimTask.submitClaim(
             caseData,
@@ -192,28 +221,36 @@ class SubmitClaimTaskTest {
         locations.add(LocationRefData.builder().courtName("Court Name").regionId("2").epimmsId("420219")
                           .siteName("Civil National Business Centre").build());
         when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(locations);
-        CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder()
-                            .individualFirstName("Clay")
-                            .individualLastName("Mint")
-                            .partyName("Clay Mint")
-                            .type(Party.Type.INDIVIDUAL)
-                            .build())
+        Party party = new Party();
+        party.setIndividualFirstName("Clay");
+        party.setIndividualLastName("Mint");
+        party.setPartyName("Clay Mint");
+        party.setType(Party.Type.INDIVIDUAL);
+        IdamUserDetails idamUserDetails = new IdamUserDetails();
+        idamUserDetails.setEmail("test@gmail.com");
+        Party party1 = new Party();
+        party1.setCompanyName("Defendant Inc.");
+        party1.setType(Party.Type.COMPANY);
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1(party)
             .totalClaimAmount(new BigDecimal("1000"))
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("test@gmail.com").build())
+            .applicantSolicitor1UserDetails(idamUserDetails)
             .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
-            .respondent1(Party.builder().companyName("Defendant Inc.").type(Party.Type.COMPANY).build())
-            .solicitorReferences(SolicitorReferences.builder().respondentSolicitor1Reference("1234").build())
-            .build();
+            .respondent1(party1).build();
+        SolicitorReferences solicitorRef = new SolicitorReferences();
+        solicitorRef.setRespondentSolicitor1Reference("1234");
+        caseData.setSolicitorReferences(solicitorRef);
 
         when(userService.getUserDetails("authToken")).thenReturn(UserDetails.builder().id("userId").build());
         when(specReferenceNumberRepository.getSpecReferenceNumber()).thenReturn("12345");
 
-        FlightDelayDetails flightDelayDetails = FlightDelayDetails.builder()
-            .airlineList(
-                DynamicList.builder()
-                    .value(DynamicListElement.builder().code("OTHER").label("OTHER")
-                               .build()).build()).build();
+        DynamicListElement dynamicListElement = new DynamicListElement();
+        dynamicListElement.setCode("OTHER");
+        dynamicListElement.setLabel("OTHER");
+        DynamicList dynamicList = new DynamicList();
+        dynamicList.setValue(dynamicListElement);
+        FlightDelayDetails flightDelayDetails = new FlightDelayDetails();
+        flightDelayDetails.setAirlineList(dynamicList);
 
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) submitClaimTask.submitClaim(
@@ -229,30 +266,34 @@ class SubmitClaimTaskTest {
     @Test
     void shouldCallPinToPostOnlyIfCaseMatched() {
         // Given
-        final CaseData matchedCase = CaseData.builder()
-            .applicant1(Party.builder()
-                            .individualFirstName("Clay")
-                            .individualLastName("Mint")
-                            .partyName("Clay Mint")
-                            .type(Party.Type.INDIVIDUAL)
-                            .build())
-            .respondent1(Party.builder()
-                             .individualFirstName("John")
-                             .individualLastName("Doe")
-                             .partyName("John Doe")
-                             .type(Party.Type.INDIVIDUAL)
-                             .build())
+        Party party = new Party();
+        party.setIndividualFirstName("Clay");
+        party.setIndividualLastName("Mint");
+        party.setPartyName("Clay Mint");
+        party.setType(Party.Type.INDIVIDUAL);
+        Party party1 = new Party();
+        party1.setIndividualFirstName("John");
+        party1.setIndividualLastName("Doe");
+        party1.setPartyName("John Doe");
+        party1.setType(Party.Type.INDIVIDUAL);
+        IdamUserDetails idamUserDetails = new IdamUserDetails();
+        idamUserDetails.setEmail("test@gmail.com");
+        final CaseData matchedCase = CaseDataBuilder.builder()
+            .applicant1(party)
+            .respondent1(party1)
             .specRespondent1Represented(NO)
             .addRespondent2(NO)
             .addApplicant2(NO)
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("test@gmail.com").build())
+            .applicantSolicitor1UserDetails(idamUserDetails)
             .build();
 
         // When
         when(userService.getUserDetails("authToken")).thenReturn(UserDetails.builder().id("userId").build());
         when(specReferenceNumberRepository.getSpecReferenceNumber()).thenReturn("12345");
+        DefendantPinToPostLRspec defendantPinToPostLRspec = new DefendantPinToPostLRspec();
+        defendantPinToPostLRspec.setAccessCode("12345");
         when(defendantPinToPostLRspecService.buildDefendantPinToPost())
-            .thenReturn(DefendantPinToPostLRspec.builder().accessCode("12345").build());
+            .thenReturn(defendantPinToPostLRspec);
 
         submitClaimTask.submitClaim(matchedCase, "eventId", "authToken", NO, null);
 
@@ -263,22 +304,24 @@ class SubmitClaimTaskTest {
     @Test
     void shouldNotCallPinToPostIfCaseNotMatched() {
         // Given
-        final CaseData notMatchedCase = CaseData.builder()
-            .applicant1(Party.builder()
-                            .individualFirstName("Clay")
-                            .individualLastName("Mint")
-                            .partyName("Clay Mint")
-                            .type(Party.Type.INDIVIDUAL)
-                            .build())
-            .respondent1(Party.builder()
-                             .companyName("Defendant Ltd.")
-                             .partyName("Defendant Ltd.")
-                             .type(Party.Type.COMPANY)
-                             .build())
+        Party party = new Party();
+        party.setIndividualFirstName("Clay");
+        party.setIndividualLastName("Mint");
+        party.setPartyName("Clay Mint");
+        party.setType(Party.Type.INDIVIDUAL);
+        Party party1 = new Party();
+        party1.setCompanyName("Defendant Ltd.");
+        party1.setPartyName("Defendant Ltd.");
+        party1.setType(Party.Type.COMPANY);
+        IdamUserDetails idamUserDetails = new IdamUserDetails();
+        idamUserDetails.setEmail("test@gmail.com");
+        final CaseData notMatchedCase = CaseDataBuilder.builder()
+            .applicant1(party)
+            .respondent1(party1)
             .respondent1Represented(YES)
             .addRespondent2(NO)
             .addApplicant2(NO)
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("test@gmail.com").build())
+            .applicantSolicitor1UserDetails(idamUserDetails)
             .build();
 
         // When

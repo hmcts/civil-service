@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.CalculateSpecFeeTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
@@ -16,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestType;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -58,12 +58,16 @@ class CalculateSpecFeeTaskTest extends BaseCallbackHandlerTest {
     @Test
     void shouldCalculateSpecFee_whenPopulated() {
         List<TimelineOfEvents> timelineOfEvents = new ArrayList<>();
-        timelineOfEvents.add(
-            TimelineOfEvents.builder().value(TimelineOfEventDetails.builder().timelineDate(LocalDate.now().minusDays(1)).build()).build());
-        CaseData caseData = CaseData.builder().claimInterest(YES)
+        TimelineOfEvents timelineOfEvents1 = new TimelineOfEvents();
+        TimelineOfEventDetails timelineOfEventsDetails = new TimelineOfEventDetails();
+        timelineOfEventsDetails.setTimelineDate(LocalDate.now().minusDays(1));
+        timelineOfEvents1.setValue(timelineOfEventsDetails);
+        timelineOfEvents.add(timelineOfEvents1);
+        SameRateInterestSelection sameRateInterestSelection = new SameRateInterestSelection();
+        sameRateInterestSelection.setSameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC);
+        CaseData caseData = CaseDataBuilder.builder().claimInterest(YES)
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
-            .sameRateInterestSelection(SameRateInterestSelection.builder()
-                                           .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_8_PC).build())
+            .sameRateInterestSelection(sameRateInterestSelection)
             .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
             .totalClaimAmount(new BigDecimal(1000))
             .build();

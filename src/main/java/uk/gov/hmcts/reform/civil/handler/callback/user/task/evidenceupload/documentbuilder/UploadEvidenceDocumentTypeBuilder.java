@@ -9,13 +9,12 @@ public class UploadEvidenceDocumentTypeBuilder implements DocumentTypeBuilder<Up
 
     @Override
     public UploadEvidenceDocumentType buildElementTypeWithDocumentCopy(UploadEvidenceDocumentType fromValue, String categoryId) {
-        Document newDoc = Document.builder()
-            .categoryID(categoryId)
-            .documentBinaryUrl(fromValue.getDocumentUpload().getDocumentBinaryUrl())
-            .documentFileName(fromValue.getDocumentUpload().getDocumentFileName())
-            .documentHash(fromValue.getDocumentUpload().getDocumentHash())
-            .documentUrl(fromValue.getDocumentUpload().getDocumentUrl())
-            .build();
+        Document newDoc = new Document();
+        newDoc.setCategoryID(categoryId);
+        newDoc.setDocumentBinaryUrl(fromValue.getDocumentUpload().getDocumentBinaryUrl());
+        newDoc.setDocumentFileName(fromValue.getDocumentUpload().getDocumentFileName());
+        newDoc.setDocumentHash(fromValue.getDocumentUpload().getDocumentHash());
+        newDoc.setDocumentUrl(fromValue.getDocumentUpload().getDocumentUrl());
         return new UploadEvidenceDocumentType()
             .setWitnessOptionName(fromValue.getWitnessOptionName())
             .setDocumentIssuedDate(fromValue.getDocumentIssuedDate())

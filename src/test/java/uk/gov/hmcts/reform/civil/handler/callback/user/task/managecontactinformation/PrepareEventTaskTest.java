@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -57,7 +58,8 @@ public class PrepareEventTaskTest {
     @Test
     void shouldReturnErrorWhenNonAdminCaseBeforeAwaitingApplicantIntention() {
         // Case state is before Awaiting Applicant Intention for non-admin user
-        CaseData caseData = CaseData.builder().ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT).build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
         when(userService.getUserInfo(anyString())).thenReturn(SOLICITOR_USER);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.prepareEvent(caseData, "authToken");
@@ -70,7 +72,9 @@ public class PrepareEventTaskTest {
         // Admin user with case before Awaiting Applicant Intention
         Party applicant1 = PartyBuilder.builder().company().build();
         Party respondent1 = PartyBuilder.builder().company().build();
-        CaseData caseData = CaseData.builder().applicant1(applicant1).respondent1(respondent1).ccdState(AWAITING_APPLICANT_INTENTION).ccdCaseReference(123456789L).build();
+        CaseData caseData = CaseDataBuilder.builder().applicant1(applicant1).respondent1(respondent1).build();
+        caseData.setCcdState(AWAITING_APPLICANT_INTENTION);
+        caseData.setCcdCaseReference(123456789L);
         when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.prepareEvent(caseData, "authToken");
