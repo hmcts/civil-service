@@ -33,11 +33,7 @@ public class HttpClientConfiguration {
     }
 
     private CloseableHttpClient getRestTemplateHttpClient() {
-        RequestConfig config = RequestConfig.custom()
-            .setConnectTimeout(readTimeout)
-            .setConnectionRequestTimeout(readTimeout)
-            .setSocketTimeout(readTimeout)
-            .build();
+        final RequestConfig config = getRequestConfig();
 
         return HttpClientBuilder
             .create()
@@ -47,16 +43,20 @@ public class HttpClientConfiguration {
     }
 
     private CloseableHttpClient getHttpClient() {
-        RequestConfig config = RequestConfig.custom()
-            .setConnectTimeout(readTimeout)
-            .setConnectionRequestTimeout(readTimeout)
-            .setSocketTimeout(readTimeout)
-            .build();
+        final RequestConfig config = getRequestConfig();
 
         return HttpClientBuilder
             .create()
             .useSystemProperties()
             .setDefaultRequestConfig(config)
+            .build();
+    }
+
+    private RequestConfig getRequestConfig() {
+        return RequestConfig.custom()
+            .setConnectTimeout(readTimeout)
+            .setConnectionRequestTimeout(readTimeout)
+            .setSocketTimeout(readTimeout)
             .build();
     }
 
