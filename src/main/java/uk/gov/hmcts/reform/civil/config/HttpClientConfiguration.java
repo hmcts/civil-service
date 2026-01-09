@@ -28,18 +28,8 @@ public class HttpClientConfiguration {
     @Bean
     public RestTemplate restTemplate() {
         RestTemplate restTemplate = new RestTemplate();
-        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(getRestTemplateHttpClient()));
+        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(getHttpClient()));
         return restTemplate;
-    }
-
-    private CloseableHttpClient getRestTemplateHttpClient() {
-        final RequestConfig config = getRequestConfig();
-
-        return HttpClientBuilder
-            .create()
-            .useSystemProperties()
-            .setDefaultRequestConfig(config)
-            .build();
     }
 
     private CloseableHttpClient getHttpClient() {
