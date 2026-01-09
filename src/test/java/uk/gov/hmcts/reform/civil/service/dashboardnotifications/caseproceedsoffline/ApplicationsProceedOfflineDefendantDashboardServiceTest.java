@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
@@ -41,6 +42,8 @@ class ApplicationsProceedOfflineDefendantDashboardServiceTest {
     private DashboardNotificationService dashboardNotificationService;
     @Mock(lenient = true)
     private DashboardNotificationsParamsMapper mapper;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private ApplicationsProceedOfflineDefendantDashboardService service;
@@ -48,6 +51,7 @@ class ApplicationsProceedOfflineDefendantDashboardServiceTest {
     @BeforeEach
     void setup() {
         when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
     }
 
     @Test
@@ -118,6 +122,21 @@ class ApplicationsProceedOfflineDefendantDashboardServiceTest {
             .ccdCaseReference(5555L)
             .respondent1Represented(uk.gov.hmcts.reform.civil.enums.YesOrNo.YES)
             .build();
+
+        service.notify(caseData, AUTH_TOKEN);
+
+        verify(dashboardNotificationService, never()).deleteByReferenceAndCitizenRole(any(), any());
+        verify(dashboardScenariosService, never()).recordScenarios(any(), any(), any(), any());
+    }
+
+    @Test
+    void shouldNotRecordWhenFeatureDisabled() {
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+            .ccdCaseReference(5555L)
+            .respondent1Represented(uk.gov.hmcts.reform.civil.enums.YesOrNo.NO)
+            .build();
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
 
         service.notify(caseData, AUTH_TOKEN);
 
