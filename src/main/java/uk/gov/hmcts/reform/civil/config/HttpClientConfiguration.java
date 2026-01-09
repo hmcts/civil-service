@@ -47,11 +47,10 @@ public class HttpClientConfiguration {
     }
 
     private CloseableHttpClient getHttpClient() {
-        int timeout = 10000;
         RequestConfig config = RequestConfig.custom()
-            .setConnectTimeout(timeout)
-            .setConnectionRequestTimeout(timeout)
-            .setSocketTimeout(timeout)
+            .setConnectTimeout(readTimeout)
+            .setConnectionRequestTimeout(readTimeout)
+            .setSocketTimeout(readTimeout)
             .build();
 
         return HttpClientBuilder
