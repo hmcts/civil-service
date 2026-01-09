@@ -38,7 +38,9 @@ class JointExpertsMapperTest {
 
         when(bundleDocumentsRetrieval.getAllExpertsNames(any(), eq(EvidenceUploadType.JOINT_STATEMENT), any()))
             .thenReturn(Set.of("j1"));
-        BundlingRequestDocument doc = BundlingRequestDocument.builder().documentFileName("f").documentType("t").build();
+        BundlingRequestDocument doc = new BundlingRequestDocument()
+            .setDocumentFileName("f")
+            .setDocumentType("t");
         when(bundleDocumentsRetrieval.getAllExpertReports(any(), eq(EvidenceUploadType.JOINT_STATEMENT), any(), eq(BundleFileNameList.JOINT_STATEMENTS_OF_EXPERTS), anySet()))
             .thenReturn(singletonList(doc));
         when(bundleDocumentsRetrieval.getAllOtherPartyQuestions(any(), any(), anySet()))

@@ -60,7 +60,7 @@ class DisclosedDocumentsMapperTest {
             eq(PartyType.CLAIMANT1)
         ))
             .thenReturn(singletonList(
-                BundlingRequestDocument.builder().documentFileName("f").documentType("t").build()
+                new BundlingRequestDocument().setDocumentFileName("f").setDocumentType("t")
             ));
 
         when(bundleDocumentsRetrieval.getDocumentaryEvidenceByType(
@@ -77,7 +77,7 @@ class DisclosedDocumentsMapperTest {
             eq(PartyType.CLAIMANT1)
         ))
             .thenReturn(singletonList(
-                BundlingRequestDocument.builder().documentFileName("f").documentType("t").build()
+                new BundlingRequestDocument().setDocumentFileName("f").setDocumentType("t")
             ));
 
         CaseData caseData = getCaseData();
