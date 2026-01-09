@@ -1,12 +1,13 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
-import com.vladmihalcea.hibernate.type.array.IntArrayType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.hibernate.annotations.Immutable;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -71,7 +72,8 @@ public class TaskItemTemplateEntity implements Serializable {
     @Schema(name = "created_at")
     private OffsetDateTime createdAt;
 
-    @Type(IntArrayType.class)
     @Schema(name = "task_status_sequence")
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Column(name = "task_status_sequence", columnDefinition = "integer[]")
     private int[] taskStatusSequence;
 }

@@ -1,10 +1,9 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
-import com.vladmihalcea.hibernate.type.array.StringArrayType;
-import com.vladmihalcea.hibernate.type.json.JsonType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.hibernate.annotations.Immutable;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
@@ -37,10 +36,11 @@ public class ScenarioEntity implements Serializable {
     private String name;
 
     @Schema(name = "notifications_to_delete")
-    @Type(StringArrayType.class)
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Column(name = "notifications_to_delete", columnDefinition = "text[]")
     private String[] notificationsToDelete;
 
-    @Type(JsonType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     @Schema(name = "notifications_to_create")
     private Map<String, String[]> notificationsToCreate;

@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
-import com.vladmihalcea.hibernate.type.json.JsonType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -76,7 +76,7 @@ public class TaskListEntity implements Serializable {
     @Schema(name = "updated_by")
     private String updatedBy;
 
-    @Type(JsonType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     @Schema(name = "message_params")
     private HashMap<String, Object> messageParams;
