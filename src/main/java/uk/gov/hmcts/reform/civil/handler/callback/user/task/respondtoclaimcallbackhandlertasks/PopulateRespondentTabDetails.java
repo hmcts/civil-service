@@ -22,7 +22,7 @@ public class PopulateRespondentTabDetails {
             respondent2Clone.setFlags(null);
             caseData.setRespondent2DetailsForClaimDetailsTab(respondent2Clone);
             if (respondent2CopyNeeded) {
-                caseData.setRespondent2Copy(respondent2Clone);
+                caseData.setRespondent2Copy(caseData.getRespondent2());
             }
         }
     }
