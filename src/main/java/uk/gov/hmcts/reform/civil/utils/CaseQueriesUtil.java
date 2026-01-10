@@ -12,9 +12,9 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.CASEWORKER_QUERY_DOCUMENT_ATTACHMENTS;
@@ -38,7 +38,6 @@ public class CaseQueriesUtil {
 
     public static List<String> getUserRoleForQuery(CaseData caseData,
                                                    CoreCaseUserService coreCaseUserService, String queryId) {
-        migrateAllQueries(caseData);
         String createdBy = unwrapElements(caseData.getQueries().getCaseMessages()).stream()
             .filter(m -> m.getId().equals(queryId)).findFirst()
             .orElseThrow(() -> new IllegalArgumentException("No query found for queryId " + queryId))
@@ -214,14 +213,14 @@ public class CaseQueriesUtil {
 
     public static void logMigrationSuccess(CaseData caseDataBefore) {
         if (hasOldQueries(caseDataBefore)) {
-            Stream.of(
+            Arrays.asList(
                     caseDataBefore.getQmApplicantSolicitorQueries(),
                     caseDataBefore.getQmRespondentSolicitor1Queries(),
                     caseDataBefore.getQmRespondentSolicitor2Queries()
-                ).filter(Objects::nonNull)
+                ).stream().filter(Objects::nonNull)
                 .forEach(collection ->
                              log.info(
-                                 "Successfully migrated [{}] queries {}",
+                                 "Successfully migrated [{}] queries [{}]",
                                  collection.getPartyName(), caseDataBefore.getCcdCaseReference()
                              ));
         }

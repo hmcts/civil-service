@@ -25,6 +25,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RAISED_QUERY;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserRoleForQuery;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.migrateAllQueries;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getEmail;
@@ -68,6 +69,7 @@ public class RaiseQuerySolicitorNotificationHandler extends CallbackHandler impl
         if (queryId == null) {
             queryId = caseData.getQmLatestQuery().getQueryId();
         }
+        migrateAllQueries(caseData);
         List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, queryId);
         String email = getEmail(caseData, roles);
         Map<String, String> properties = getProperties(caseData, roles, addProperties(caseData),
