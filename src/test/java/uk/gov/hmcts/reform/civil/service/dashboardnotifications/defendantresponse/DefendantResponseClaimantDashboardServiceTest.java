@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -24,9 +25,11 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -34,6 +37,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_ADMIT_PAY_IMMEDIATELY_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_BILINGUAL_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_BILINGUAL_WELSH_ENABLED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_ENGLISH_DEFENDANT_RESPONSE_BILINGUAL_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_CLAIMANT;
@@ -42,6 +46,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULLDISPUTE_MULTI_INT_FAST_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_ALREADY_PAID_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEF_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_REFUSED_MEDIATION_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_NOTICE_AAA6_DEF_LR_RESPONSE_FULL_DEFENCE_COUNTERCLAIM_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -65,7 +70,7 @@ class DefendantResponseClaimantDashboardServiceTest {
 
     @BeforeEach
     void setUp() {
-        when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
+        lenient().when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
     }
 
     private CaseData mockBaseCaseData(long caseId) {
@@ -154,6 +159,43 @@ class DefendantResponseClaimantDashboardServiceTest {
     }
 
     @Test
+    void shouldRecordBilingualScenarioWhenWelshDisabled() {
+        CaseData caseData = CaseData.builder()
+            .ccdCaseReference(4322L)
+            .applicant1Represented(YesOrNo.NO)
+            .caseDataLiP(CaseDataLiP.builder()
+                .respondent1LiPResponse(RespondentLiPResponse.builder()
+                    .respondent1ResponseLanguage(Language.WELSH.toString()).build())
+                .build())
+            .build();
+
+        service.notifyDefendantResponse(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_DEFENDANT_RESPONSE_BILINGUAL_CLAIMANT.getScenario()),
+            eq("4322"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
+    void shouldNotRecordBilingualScenarioWhenClaimantNotLip() {
+        CaseData caseData = CaseData.builder()
+            .ccdCaseReference(4323L)
+            .applicant1Represented(YesOrNo.YES)
+            .caseDataLiP(CaseDataLiP.builder()
+                .respondent1LiPResponse(RespondentLiPResponse.builder()
+                    .respondent1ResponseLanguage(Language.BOTH.toString()).build())
+                .build())
+            .build();
+
+        service.notifyDefendantResponse(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService);
+    }
+
+    @Test
     void shouldRecordGeneralApplicationScenariosForCounterClaimLipCase() {
         CaseData caseData = CaseData.builder()
             .ccdCaseReference(9012L)
@@ -177,6 +219,22 @@ class DefendantResponseClaimantDashboardServiceTest {
             any(ScenarioRequestParams.class)
         );
         verify(dashboardNotificationService, never()).deleteByNameAndReferenceAndCitizenRole(any(), any(), any());
+    }
+
+    @Test
+    void shouldReturnOfflineScenarioForFullAdmissionWhenNoc() {
+        CaseData caseData = mockBaseCaseData(3010L);
+        when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_ADMISSION);
+        when(caseData.nocApplyForLiPDefendant()).thenReturn(true);
+
+        service.notifyDefendantResponse(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT.getScenario()),
+            eq("3010"),
+            any(ScenarioRequestParams.class)
+        );
     }
 
     @Test
@@ -211,6 +269,43 @@ class DefendantResponseClaimantDashboardServiceTest {
             eq("3002"),
             any(ScenarioRequestParams.class)
         );
+    }
+
+    @Test
+    void shouldSkipAdditionalScenariosWhenBilingual() {
+        CaseData caseData = mock(CaseData.class);
+        when(caseData.isRespondentResponseBilingual()).thenReturn(true);
+        Map<String, Boolean> scenarios = ReflectionTestUtils.invokeMethod(service, "getScenarios", caseData);
+        assertThat(scenarios).isEmpty();
+    }
+
+    @Test
+    void shouldRequireLipForBilingualScenario() {
+        CaseData caseData = CaseData.builder()
+            .applicant1Represented(YesOrNo.NO)
+            .caseDataLiP(CaseDataLiP.builder()
+                .respondent1LiPResponse(RespondentLiPResponse.builder()
+                    .respondent1ResponseLanguage(Language.BOTH.toString()).build())
+                .build())
+            .build();
+        boolean result = ReflectionTestUtils.invokeMethod(service, "shouldRecordScenario", caseData);
+        assertThat(result).isTrue();
+
+        CaseData representedCase = caseData.toBuilder()
+            .applicant1Represented(YesOrNo.YES)
+            .build();
+        result = ReflectionTestUtils.invokeMethod(service, "shouldRecordScenario", representedCase);
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    void shouldNotCleanupDjNotificationWhenNotBilingual() {
+        CaseData caseData = CaseData.builder()
+            .applicant1Represented(YesOrNo.NO)
+            .claimantBilingualLanguagePreference(Language.ENGLISH.toString())
+            .build();
+        ReflectionTestUtils.invokeMethod(service, "beforeRecordScenario", caseData, AUTH_TOKEN);
+        verifyNoInteractions(dashboardNotificationService);
     }
 
     @Test
