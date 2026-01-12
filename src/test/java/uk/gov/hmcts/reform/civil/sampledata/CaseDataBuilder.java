@@ -4417,101 +4417,109 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder addEnterBreathingSpace() {
-        this.enter = BreathingSpaceEnterInfo.builder()
-            .type(BreathingSpaceType.STANDARD)
-            .reference("12345")
-            .start(LocalDate.now())
-            .build();
+        this.enter = new BreathingSpaceEnterInfo()
+            .setType(BreathingSpaceType.STANDARD)
+            .setReference("12345")
+            .setStart(LocalDate.now());
 
-        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).build();
+        this.breathing = new BreathingSpaceInfo()
+            .setEnter(this.enter);
 
         return this;
     }
 
     public CaseDataBuilder addEnterMentalHealthBreathingSpace() {
-        this.enter = BreathingSpaceEnterInfo.builder()
-            .type(BreathingSpaceType.MENTAL_HEALTH)
-            .reference("12345")
-            .start(LocalDate.now())
-            .build();
+        this.enter = new BreathingSpaceEnterInfo()
+            .setType(BreathingSpaceType.MENTAL_HEALTH)
+            .setReference("12345")
+            .setStart(LocalDate.now());
 
-        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).build();
+        this.breathing = new BreathingSpaceInfo()
+            .setEnter(this.enter);
 
         return this;
     }
 
     public CaseDataBuilder addEnterMentalHealthBreathingSpaceNoOptionalData() {
-        this.enter = BreathingSpaceEnterInfo.builder()
-            .type(BreathingSpaceType.MENTAL_HEALTH)
-            .reference(null)
-            .start(null)
-            .build();
+        this.enter = new BreathingSpaceEnterInfo()
+            .setType(BreathingSpaceType.MENTAL_HEALTH)
+            .setReference(null)
+            .setStart(null);
 
-        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).build();
+        this.breathing = new BreathingSpaceInfo()
+            .setEnter(this.enter);
 
         return this;
     }
 
     public CaseDataBuilder addLiftBreathingSpace() {
-        this.enter = BreathingSpaceEnterInfo.builder()
-            .type(BreathingSpaceType.STANDARD)
-            .reference("12345")
-            .start(LocalDate.now())
-            .build();
-        this.lift = BreathingSpaceLiftInfo.builder().expectedEnd(LocalDate.now()).build();
+        this.enter = new BreathingSpaceEnterInfo()
+            .setType(BreathingSpaceType.STANDARD)
+            .setReference("12345")
+            .setStart(LocalDate.now());
+        this.lift = new BreathingSpaceLiftInfo()
+            .setExpectedEnd(LocalDate.now());
 
-        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).lift(this.lift).build();
+        this.breathing = new BreathingSpaceInfo()
+            .setEnter(this.enter)
+            .setLift(this.lift);
 
         return this;
     }
 
     public CaseDataBuilder addLiftBreathingSpaceWithoutOptionalData() {
-        this.enter = BreathingSpaceEnterInfo.builder()
-            .type(BreathingSpaceType.STANDARD)
-            .reference(null)
-            .start(null)
-            .build();
-        this.lift = BreathingSpaceLiftInfo.builder().expectedEnd(null).build();
+        this.enter = new BreathingSpaceEnterInfo()
+            .setType(BreathingSpaceType.STANDARD)
+            .setReference(null)
+            .setStart(null);
+        this.lift = new BreathingSpaceLiftInfo()
+            .setExpectedEnd(null);
 
-        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).lift(this.lift).build();
+        this.breathing = new BreathingSpaceInfo()
+            .setEnter(this.enter)
+            .setLift(this.lift);
 
         return this;
     }
 
     public CaseDataBuilder addLiftMentalBreathingSpace() {
-        this.enter = BreathingSpaceEnterInfo.builder()
-            .type(BreathingSpaceType.MENTAL_HEALTH)
-            .reference("12345")
-            .start(LocalDate.now())
-            .build();
-        this.lift = BreathingSpaceLiftInfo.builder().expectedEnd(LocalDate.now()).build();
+        this.enter = new BreathingSpaceEnterInfo()
+            .setType(BreathingSpaceType.MENTAL_HEALTH)
+            .setReference("12345")
+            .setStart(LocalDate.now());
+        this.lift = new BreathingSpaceLiftInfo()
+            .setExpectedEnd(LocalDate.now());
 
-        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).lift(this.lift).build();
+        this.breathing = new BreathingSpaceInfo()
+            .setEnter(this.enter)
+            .setLift(this.lift);
 
         return this;
     }
 
     public CaseDataBuilder addLiftMentalBreathingSpaceNoOptionalData() {
-        this.enter = BreathingSpaceEnterInfo.builder()
-            .type(BreathingSpaceType.MENTAL_HEALTH)
-            .reference(null)
-            .start(null)
-            .build();
-        this.lift = BreathingSpaceLiftInfo.builder().expectedEnd(null).build();
+        this.enter = new BreathingSpaceEnterInfo()
+            .setType(BreathingSpaceType.MENTAL_HEALTH)
+            .setReference(null)
+            .setStart(null);
+        this.lift = new BreathingSpaceLiftInfo()
+            .setExpectedEnd(null);
 
-        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).lift(this.lift).build();
+        this.breathing = new BreathingSpaceInfo()
+            .setEnter(this.enter)
+            .setLift(this.lift);
 
         return this;
     }
 
     public CaseDataBuilder addEnterBreathingSpaceWithoutOptionalData() {
-        this.enter = BreathingSpaceEnterInfo.builder()
-            .type(BreathingSpaceType.STANDARD)
-            .reference(null)
-            .start(null)
-            .build();
+        this.enter = new BreathingSpaceEnterInfo()
+            .setType(BreathingSpaceType.STANDARD)
+            .setReference(null)
+            .setStart(null);
 
-        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).build();
+        this.breathing = new BreathingSpaceInfo()
+            .setEnter(this.enter);
 
         return this;
     }
@@ -4527,13 +4535,13 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder addEnterBreathingSpaceWithOnlyReferenceInfo() {
-        this.enter = BreathingSpaceEnterInfo.builder()
-            .type(BreathingSpaceType.STANDARD)
-            .reference("12345")
-            .start(null)
-            .build();
+        this.enter = new BreathingSpaceEnterInfo()
+            .setType(BreathingSpaceType.STANDARD)
+            .setReference("12345")
+            .setStart(null);
 
-        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).build();
+        this.breathing = new BreathingSpaceInfo()
+            .setEnter(this.enter);
 
         return this;
     }
