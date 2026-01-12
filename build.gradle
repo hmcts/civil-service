@@ -392,8 +392,7 @@ dependencies {
   implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.6'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
-  implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.9'
-  implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: '6.1.9'
+  implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '7.0.0'
 
   implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
   implementation group: 'com.github.hmcts', name: 'core-case-data-store-client', version: '5.1.1'
@@ -634,13 +633,26 @@ tasks.register('runProviderPactVerification') {
 }
 
 tasks.withType(Test).configureEach { t ->
+  useJUnitPlatform()
+
+  // Pipeline-stable settings with JaCoCo enabled
+  maxParallelForks = 1
+  forkEvery = 50
+
+  // Keep within typical Jenkins container limits
+  minHeapSize = "256m"
+  maxHeapSize = "1536m"
+  jvmArgs "-XX:MaxMetaspaceSize=512m"
+  // Temurin 21.0.7 occasionally crashes in C2 (BoolNode::Ideal SIGSEGV); stay on C1 until upstream fix.
+  jvmArgs "-XX:TieredStopAtLevel=1"
+
   testLogging {
     exceptionFormat = 'full'
     showCauses = true
     showExceptions = true
     showStackTraces = true
-    showStandardStreams = true
-    events "passed", "skipped", "failed", "standard_out", "standard_error"
+    showStandardStreams = false
+    events "failed", "skipped"
   }
 
   if (project.hasProperty('pact.verifier.publishResults')) {
