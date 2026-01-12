@@ -69,7 +69,9 @@ public class RaiseQuerySolicitorNotificationHandler extends CallbackHandler impl
         if (queryId == null) {
             queryId = caseData.getQmLatestQuery().getQueryId();
         }
-        migrateAllQueries(caseData);
+        if (caseData.getQueries() == null) {
+            migrateAllQueries(caseData);
+        }
         List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, queryId);
         String email = getEmail(caseData, roles);
         Map<String, String> properties = getProperties(caseData, roles, addProperties(caseData),
