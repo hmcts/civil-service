@@ -59,10 +59,6 @@ public class DefendantResponseClaimantDashboardService extends DashboardScenario
             return getBilingualScenario(caseData);
         }
 
-        if (caseData.getRespondent1ClaimResponseTypeForSpec() == null) {
-            return null;
-        }
-
         return switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
             case FULL_DEFENCE -> getFullDefenceScenario(caseData);
             case FULL_ADMISSION -> getFullAdmissionScenario(caseData);
