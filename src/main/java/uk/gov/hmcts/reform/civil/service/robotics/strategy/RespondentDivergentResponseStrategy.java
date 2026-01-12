@@ -86,13 +86,27 @@ public class RespondentDivergentResponseStrategy implements EventHistoryStrategy
 
     @Override
     public void contribute(EventHistory.EventHistoryBuilder builder, CaseData caseData, String authToken) {
+        FlowState.Main flowState = null;
+        if (caseData != null) {
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+            flowState = (FlowState.Main) FlowState.fromFullName(stateFlow.getState().getName());
+        }
+        contribute(builder, caseData, authToken, flowState);
+    }
+
+    @Override
+    public void contribute(EventHistory.EventHistoryBuilder builder,
+                           CaseData caseData,
+                           String authToken,
+                           FlowState.Main flowState) {
         if (!supports(caseData)) {
             return;
         }
         log.info("Building respondent divergent response robotics events for caseId {}", caseData.getCcdCaseReference());
 
-        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-        boolean goingOffline = OFFLINE_STATES.contains(stateFlow.getState().getName());
+        boolean goingOffline = flowState != null
+            ? OFFLINE_STATES.contains(flowState.fullName())
+            : OFFLINE_STATES.contains(stateFlowEngine.evaluate(caseData).getState().getName());
 
         LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
         LocalDateTime respondent2ResponseDate = respondentResponseSupport.resolveRespondent2ResponseDate(caseData);

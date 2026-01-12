@@ -87,7 +87,7 @@ public class RespondentFullDefenceStrategy implements EventHistoryStrategy {
     private EventBuckets initialiseBuckets(EventHistory history) {
         List<Event> defenceEvents = sanitise(history.getDefenceFiled());
         List<Event> statesPaidEvents = sanitise(history.getStatesPaid());
-        List<Event> directionsQuestionnaireEvents = sanitise(history.getDirectionsQuestionnaireFiled());
+        List<Event> directionsQuestionnaireEvents = new ArrayList<>();
         List<Event> counterClaimEvents = sanitise(history.getDefenceAndCounterClaim());
         return new EventBuckets(defenceEvents, statesPaidEvents, directionsQuestionnaireEvents, counterClaimEvents);
     }

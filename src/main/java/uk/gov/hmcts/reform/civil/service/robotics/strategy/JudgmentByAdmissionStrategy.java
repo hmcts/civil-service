@@ -137,7 +137,7 @@ public class JudgmentByAdmissionStrategy implements EventHistoryStrategy {
             .orElse(ZERO);
         BigDecimal interest = caseData.isLipvLipOneVOne() && !caseData.isPartAdmitClaimSpec()
             ? ccjPaymentDetails.map(CCJPaymentDetails::getCcjJudgmentLipInterest).orElse(ZERO)
-            : ZERO;
+            : ofNullable(caseData.getTotalInterest()).orElse(ZERO);
         return base.add(interest).setScale(2);
     }
 

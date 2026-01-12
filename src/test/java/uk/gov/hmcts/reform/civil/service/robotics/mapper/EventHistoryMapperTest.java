@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
@@ -138,7 +137,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
@@ -236,9 +234,6 @@ class EventHistoryMapperTest {
 
     @Autowired
     List<EventHistoryStrategy> strategies;
-
-    @Autowired
-    JudgmentByAdmissionStrategy judgmentByAdmissionStrategy;
 
     @MockBean
     private Time time;
@@ -8656,6 +8651,9 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("judgmentByAdmission").asInstanceOf(list(Object.class))
                 .extracting("eventDetails").asInstanceOf(list(Object.class))
                 .extracting("installmentAmount").asString().contains("null");
+            assertThat(eventHistory).extracting("judgmentByAdmission").asInstanceOf(list(Object.class))
+                .extracting("eventDetails").asInstanceOf(list(Object.class))
+                .extracting("amountOfJudgment").contains(BigDecimal.valueOf(1500).setScale(2));
             assertThat(eventHistory).extracting("miscellaneous").asInstanceOf(list(Object.class))
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asInstanceOf(list(Object.class))
@@ -9194,53 +9192,6 @@ class EventHistoryMapperTest {
                     .asInstanceOf(list(Object.class)).containsExactly(expectedEvent);
             }
         }
-    }
-
-    @Test
-    void shouldCalculateAmountOfJudgmentForAdmission_WithInterest() {
-        CaseData caseData = mock(CaseData.class);
-        CCJPaymentDetails ccjPaymentDetails = mock(CCJPaymentDetails.class);
-        when(caseData.getCcjPaymentDetails()).thenReturn(ccjPaymentDetails);
-        when(ccjPaymentDetails.getCcjJudgmentAmountClaimAmount()).thenReturn(BigDecimal.valueOf(1000));
-        when(caseData.getTotalInterest()).thenReturn(BigDecimal.valueOf(200));
-        when(caseData.isLipvLipOneVOne()).thenReturn(false);
-
-        BigDecimal result = ReflectionTestUtils.invokeMethod(
-            judgmentByAdmissionStrategy, "resolveJudgmentAmount", caseData);
-
-        assertEquals(BigDecimal.valueOf(1200).setScale(2), result);
-    }
-
-    @Test
-    void shouldCalculateAmountOfJudgmentForAdmission_LipVLipScenario() {
-        CaseData caseData = mock(CaseData.class);
-        CCJPaymentDetails ccjPaymentDetails = mock(CCJPaymentDetails.class);
-        when(caseData.getCcjPaymentDetails()).thenReturn(ccjPaymentDetails);
-        when(ccjPaymentDetails.getCcjJudgmentAmountClaimAmount()).thenReturn(BigDecimal.valueOf(1000));
-        when(ccjPaymentDetails.getCcjJudgmentLipInterest()).thenReturn(BigDecimal.valueOf(150));
-        when(caseData.isLipvLipOneVOne()).thenReturn(true);
-        when(caseData.isPartAdmitClaimSpec()).thenReturn(false);
-
-        BigDecimal result = ReflectionTestUtils.invokeMethod(
-            judgmentByAdmissionStrategy, "resolveJudgmentAmount", caseData);
-
-        assertEquals(BigDecimal.valueOf(1150).setScale(2), result);
-    }
-
-    @Test
-    void shouldCalculateAmountOfJudgmentWithoutInterestForPartAdmission_LipVLipScenario() {
-        CaseData caseData = mock(CaseData.class);
-        CCJPaymentDetails ccjPaymentDetails = mock(CCJPaymentDetails.class);
-        when(caseData.getCcjPaymentDetails()).thenReturn(ccjPaymentDetails);
-        when(ccjPaymentDetails.getCcjJudgmentAmountClaimAmount()).thenReturn(BigDecimal.valueOf(1000));
-        when(ccjPaymentDetails.getCcjJudgmentLipInterest()).thenReturn(BigDecimal.valueOf(150));
-        when(caseData.isLipvLipOneVOne()).thenReturn(true);
-        when(caseData.isPartAdmitClaimSpec()).thenReturn(true);
-
-        BigDecimal result = ReflectionTestUtils.invokeMethod(
-            judgmentByAdmissionStrategy, "resolveJudgmentAmount", caseData);
-
-        assertEquals(BigDecimal.valueOf(1000).setScale(2), result);
     }
 
     @Nested

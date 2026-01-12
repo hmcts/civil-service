@@ -19,8 +19,6 @@ import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -72,14 +70,7 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
         }
         log.info("Building respondent part admission robotics events for caseId {}", caseData.getCcdCaseReference());
 
-        EventHistory existingHistory = builder.build();
-        List<Event> directions = Optional.ofNullable(existingHistory.getDirectionsQuestionnaireFiled())
-            .orElse(List.of())
-            .stream()
-            .filter(event -> event.getEventCode() != null)
-            .toList();
         builder.clearDirectionsQuestionnaireFiled();
-        directions.forEach(builder::directionsQuestionnaire);
 
         if (defendant1ResponseExists.test(caseData)) {
             addLipVsLrMisc(builder, caseData);

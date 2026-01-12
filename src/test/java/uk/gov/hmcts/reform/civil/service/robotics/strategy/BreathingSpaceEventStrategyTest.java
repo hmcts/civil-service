@@ -46,7 +46,7 @@ class BreathingSpaceEventStrategyTest {
     @Test
     void supportsReturnsTrueWhenBreathingPresent() {
         CaseData caseData = CaseData.builder()
-            .breathing(BreathingSpaceInfo.builder().build())
+            .breathing(new BreathingSpaceInfo())
             .build();
         assertThat(strategy.supports(caseData)).isTrue();
     }
@@ -66,13 +66,11 @@ class BreathingSpaceEventStrategyTest {
         when(sequenceGenerator.nextSequence(any())).thenReturn(1);
 
         CaseData caseData = CaseData.builder()
-            .breathing(BreathingSpaceInfo.builder()
-                .enter(BreathingSpaceEnterInfo.builder()
-                    .type(BreathingSpaceType.STANDARD)
-                    .reference("REF-123")
-                    .start(start)
-                    .build())
-                .build())
+            .breathing(new BreathingSpaceInfo()
+                .setEnter(new BreathingSpaceEnterInfo()
+                    .setType(BreathingSpaceType.STANDARD)
+                    .setReference("REF-123")
+                    .setStart(start)))
             .build();
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
@@ -99,16 +97,13 @@ class BreathingSpaceEventStrategyTest {
         when(sequenceGenerator.nextSequence(any())).thenReturn(5, 6);
 
         CaseData caseData = CaseData.builder()
-            .breathing(BreathingSpaceInfo.builder()
-                .enter(BreathingSpaceEnterInfo.builder()
-                    .type(BreathingSpaceType.STANDARD)
-                    .reference("REF-99")
-                    .start(start)
-                    .build())
-                .lift(BreathingSpaceLiftInfo.builder()
-                    .expectedEnd(end)
-                    .build())
-                .build())
+            .breathing(new BreathingSpaceInfo()
+                .setEnter(new BreathingSpaceEnterInfo()
+                    .setType(BreathingSpaceType.STANDARD)
+                    .setReference("REF-99")
+                    .setStart(start))
+                .setLift(new BreathingSpaceLiftInfo()
+                    .setExpectedEnd(end)))
             .build();
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
@@ -139,12 +134,10 @@ class BreathingSpaceEventStrategyTest {
         when(sequenceGenerator.nextSequence(any())).thenReturn(7);
 
         CaseData caseData = CaseData.builder()
-            .breathing(BreathingSpaceInfo.builder()
-                .enter(BreathingSpaceEnterInfo.builder()
-                    .type(BreathingSpaceType.MENTAL_HEALTH)
-                    .reference("REF-200")
-                    .build())
-                .build())
+            .breathing(new BreathingSpaceInfo()
+                .setEnter(new BreathingSpaceEnterInfo()
+                    .setType(BreathingSpaceType.MENTAL_HEALTH)
+                    .setReference("REF-200")))
             .build();
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
@@ -168,16 +161,13 @@ class BreathingSpaceEventStrategyTest {
         when(sequenceGenerator.nextSequence(any())).thenReturn(11, 12);
 
         CaseData caseData = CaseData.builder()
-            .breathing(BreathingSpaceInfo.builder()
-                .enter(BreathingSpaceEnterInfo.builder()
-                    .type(BreathingSpaceType.MENTAL_HEALTH)
-                    .reference("MH-REF")
-                    .start(start)
-                    .build())
-                .lift(BreathingSpaceLiftInfo.builder()
-                    .expectedEnd(end)
-                    .build())
-                .build())
+            .breathing(new BreathingSpaceInfo()
+                .setEnter(new BreathingSpaceEnterInfo()
+                    .setType(BreathingSpaceType.MENTAL_HEALTH)
+                    .setReference("MH-REF")
+                    .setStart(start))
+                .setLift(new BreathingSpaceLiftInfo()
+                    .setExpectedEnd(end)))
             .build();
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
@@ -199,14 +189,12 @@ class BreathingSpaceEventStrategyTest {
         when(sequenceGenerator.nextSequence(any())).thenReturn(14, 15);
 
         CaseData caseData = CaseData.builder()
-            .breathing(BreathingSpaceInfo.builder()
-                .enter(BreathingSpaceEnterInfo.builder()
-                    .type(BreathingSpaceType.STANDARD)
-                    .reference("REF-NO-END")
-                    .start(start)
-                    .build())
-                .lift(BreathingSpaceLiftInfo.builder().build())
-                .build())
+            .breathing(new BreathingSpaceInfo()
+                .setEnter(new BreathingSpaceEnterInfo()
+                    .setType(BreathingSpaceType.STANDARD)
+                    .setReference("REF-NO-END")
+                    .setStart(start))
+                .setLift(new BreathingSpaceLiftInfo()))
             .build();
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();

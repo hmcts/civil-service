@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.aop.support.AopUtils;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
@@ -140,7 +141,7 @@ public class EventHistoryMapper {
             if (strategy == null) {
                 continue;
             }
-            strategy.contribute(builder, caseData, authToken);
+            strategy.contribute(builder, caseData, authToken, flowState);
             invoked.add(strategyClass);
         }
     }
@@ -160,7 +161,10 @@ public class EventHistoryMapper {
                                      Set<Class<? extends EventHistoryStrategy>> invoked) {
         for (Class<? extends EventHistoryStrategy> strategyClass : GLOBAL_STRATEGIES_ORDER) {
             EventHistoryStrategy strategy = registry.get(strategyClass);
-            if (strategy == null || invoked.contains(strategyClass) || !strategy.supports(caseData)) {
+            boolean allowDuplicate = caseData != null
+                && CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                && ConsentExtensionEventStrategy.class.equals(strategyClass);
+            if (strategy == null || (!allowDuplicate && invoked.contains(strategyClass)) || !strategy.supports(caseData)) {
                 continue;
             }
             strategy.contribute(builder, caseData, authToken);

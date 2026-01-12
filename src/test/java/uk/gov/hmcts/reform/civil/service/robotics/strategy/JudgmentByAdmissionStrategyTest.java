@@ -7,6 +7,7 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
@@ -113,6 +114,95 @@ class JudgmentByAdmissionStrategyTest {
             .isEqualByComparingTo(BigDecimal.valueOf(1000).setScale(2));
         assertThat(history.getJudgmentByAdmission().get(0).getEventDetails().getAmountOfCosts())
             .isEqualByComparingTo(BigDecimal.valueOf(150).setScale(2));
+    }
+
+    @Test
+    void contributeCalculatesJudgmentAmountWithInterest() {
+        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(1, 2);
+        LocalDateTime responseDate = LocalDateTime.of(2024, 1, 1, 10, 0);
+        when(timelineHelper.ensurePresentOrNow(any(LocalDateTime.class))).thenReturn(responseDate);
+
+        CaseData caseData = CaseData.builder()
+            .ccjPaymentDetails(CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeOption(YesOrNo.YES)
+                .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(1000))
+                .ccjPaymentPaidSomeAmountInPounds(BigDecimal.ZERO)
+                .build())
+            .totalInterest(BigDecimal.valueOf(200))
+            .applicant1Represented(YesOrNo.YES)
+            .respondent1Represented(YesOrNo.YES)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .applicant1ResponseDate(responseDate)
+            .build();
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventHistory history = builder.build();
+        assertThat(history.getJudgmentByAdmission()).hasSize(1);
+        assertThat(history.getJudgmentByAdmission().get(0).getEventDetails().getAmountOfJudgment())
+            .isEqualByComparingTo("1200.00");
+    }
+
+    @Test
+    void contributeCalculatesJudgmentAmountForLipVLip() {
+        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(3, 4);
+        LocalDateTime responseDate = LocalDateTime.of(2024, 1, 2, 10, 0);
+        when(timelineHelper.ensurePresentOrNow(any(LocalDateTime.class))).thenReturn(responseDate);
+
+        CaseData caseData = CaseData.builder()
+            .ccjPaymentDetails(CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeOption(YesOrNo.YES)
+                .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(1000))
+                .ccjJudgmentLipInterest(BigDecimal.valueOf(150))
+                .ccjPaymentPaidSomeAmountInPounds(BigDecimal.ZERO)
+                .build())
+            .totalInterest(BigDecimal.valueOf(200))
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .applicant1ResponseDate(responseDate)
+            .build();
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventHistory history = builder.build();
+        assertThat(history.getJudgmentByAdmission()).hasSize(1);
+        assertThat(history.getJudgmentByAdmission().get(0).getEventDetails().getAmountOfJudgment())
+            .isEqualByComparingTo("1150.00");
+    }
+
+    @Test
+    void contributeCalculatesJudgmentAmountForPartAdmitLipVLipWithoutLipInterest() {
+        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(5, 6);
+        LocalDateTime responseDate = LocalDateTime.of(2024, 1, 3, 10, 0);
+        when(timelineHelper.ensurePresentOrNow(any(LocalDateTime.class))).thenReturn(responseDate);
+
+        CaseData caseData = CaseData.builder()
+            .ccjPaymentDetails(CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeOption(YesOrNo.YES)
+                .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(1000))
+                .ccjJudgmentLipInterest(BigDecimal.valueOf(150))
+                .ccjPaymentPaidSomeAmountInPounds(BigDecimal.ZERO)
+                .build())
+            .totalInterest(BigDecimal.ZERO)
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .applicant1ResponseDate(responseDate)
+            .build();
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventHistory history = builder.build();
+        assertThat(history.getJudgmentByAdmission()).hasSize(1);
+        assertThat(history.getJudgmentByAdmission().get(0).getEventDetails().getAmountOfJudgment())
+            .isEqualByComparingTo("1000.00");
     }
 
     @Test
@@ -238,7 +328,7 @@ class JudgmentByAdmissionStrategyTest {
     }
 
     @Test
-    void excludesInterestWhenLrAdmissionBulkEnabled() {
+    void includesInterestForLrClaims() {
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(61, 62);
@@ -266,7 +356,7 @@ class JudgmentByAdmissionStrategyTest {
         EventHistory history = builder.build();
         assertThat(history.getJudgmentByAdmission()).hasSize(1);
         BigDecimal amount = history.getJudgmentByAdmission().get(0).getEventDetails().getAmountOfJudgment();
-        assertThat(amount).isEqualByComparingTo(new BigDecimal("1000.00"));
+        assertThat(amount).isEqualByComparingTo(new BigDecimal("1250.00"));
     }
 
     @Test

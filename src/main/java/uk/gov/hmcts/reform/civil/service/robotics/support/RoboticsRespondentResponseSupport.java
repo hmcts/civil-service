@@ -124,7 +124,7 @@ public class RoboticsRespondentResponseSupport {
             "%sDefendant: %s has responded: %s; preferredCourtCode: %s; stayClaim: %s",
             paginatedMessage,
             respondent.getPartyName(),
-            resolveResponseLabel(caseData, respondent, isRespondent1),
+            resolveResponseLabel(caseData, respondent),
             getPreferredCourtCode(dq),
             isStayClaim(dq)
         );
@@ -162,28 +162,12 @@ public class RoboticsRespondentResponseSupport {
             : caseData.getRespondent1ResponseDate();
     }
 
-    private String resolveResponseLabel(CaseData caseData, Party respondent, boolean isRespondent1) {
+    private String resolveResponseLabel(CaseData caseData, Party respondent) {
         if (caseData == null || respondent == null) {
             return null;
         }
         RespondentResponseType responseType = getResponseTypeForRespondent(caseData, respondent);
-        if (responseType != null) {
-            return responseType.name();
-        }
-        if (!SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            return null;
-        }
-        RespondentResponseTypeSpec specResponse;
-        if (isRespondent1) {
-            specResponse = resolveSpecResponseType(caseData);
-            if (specResponse == null) {
-                specResponse = Optional.ofNullable(caseData.getClaimant1ClaimResponseTypeForSpec())
-                    .orElse(caseData.getClaimant2ClaimResponseTypeForSpec());
-            }
-        } else {
-            specResponse = caseData.getRespondent2ClaimResponseTypeForSpec();
-        }
-        return specResponse != null ? specResponse.name() : null;
+        return responseType != null ? responseType.name() : null;
     }
 
     public LocalDateTime resolveRespondent2ActualOrFallbackDate(CaseData caseData) {
