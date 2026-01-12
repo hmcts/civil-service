@@ -34,11 +34,11 @@ class CaseTaskTrackingServiceTest {
     @Test
     @SuppressWarnings("unchecked")
     void trackCaseTask_withNullAdditionalProperties_shouldOnlyAddCaseAndEventProperties() {
+        Map<String, String> additionalProperties = null;
+        org.mockito.Mockito.when(telemetryClientProvider.getIfAvailable()).thenReturn(telemetryClient);
         final String caseId = "111";
         final String eventType = "serviceBusMessage";
         final String eventName = "NotifyRobotics";
-        Map<String, String> additionalProperties = null;
-        org.mockito.Mockito.when(telemetryClientProvider.getIfAvailable()).thenReturn(telemetryClient);
         caseTaskTrackingService.trackCaseTask(caseId, eventType, eventName, additionalProperties);
 
         ArgumentCaptor<Map<String, String>> propertiesCaptor = ArgumentCaptor.forClass(Map.class);
@@ -53,9 +53,9 @@ class CaseTaskTrackingServiceTest {
     @Test
     @SuppressWarnings("unchecked")
     void trackCaseTask_withAdditionalProperties_shouldMergeAllProperties() {
-        String caseId = "222";
-        String eventType = "update";
-        String eventName = "CaseUpdated";
+        final String caseId = "222";
+        final String eventType = "update";
+        final String eventName = "CaseUpdated";
         Map<String, String> additionalProperties = new HashMap<>();
         additionalProperties.put("someKey", "someValue");
         additionalProperties.put("anotherKey", "anotherValue");
@@ -82,11 +82,11 @@ class CaseTaskTrackingServiceTest {
         additionalProperties.put("caseId", "OVERRIDDEN");
         additionalProperties.put("eventType", "OVERRIDE_TYPE");
         additionalProperties.put("extra", "x");
+        org.mockito.Mockito.when(telemetryClientProvider.getIfAvailable()).thenReturn(telemetryClient);
 
-        String caseId = "333";
         String eventType = "originalType";
         String eventName = "EventWithOverrides";
-        org.mockito.Mockito.when(telemetryClientProvider.getIfAvailable()).thenReturn(telemetryClient);
+        String caseId = "333";
         caseTaskTrackingService.trackCaseTask(caseId, eventType, eventName, additionalProperties);
 
         ArgumentCaptor<Map<String, String>> propertiesCaptor = ArgumentCaptor.forClass(Map.class);
