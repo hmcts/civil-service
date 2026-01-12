@@ -42,66 +42,65 @@ public class BundleRequestMapper {
                                                                 String caseTypeId) {
         log.info("Mapping case data to BundleCreateRequest for case ID: {}", caseData.getCcdCaseReference());
         String fileNameIdentifier = filenameGenerator.generateBundleFilenamePrefix(caseData);
-        return BundleCreateRequest.builder()
-            .caseDetails(BundlingCaseDetails.builder()
-                             .caseData(mapCaseData(
-                                 caseData,
-                                 bundleConfigFileName
-                             ))
-                             .filenamePrefix(fileNameIdentifier)
-                             .build()
+        return new BundleCreateRequest()
+            .setCaseDetails(new BundlingCaseDetails()
+                                .setCaseData(mapCaseData(
+                                    caseData,
+                                    bundleConfigFileName
+                                ))
+                                .setFilenamePrefix(fileNameIdentifier)
             )
-            .caseTypeId(caseTypeId)
-            .jurisdictionId(jurisdiction).build();
+            .setCaseTypeId(caseTypeId)
+            .setJurisdictionId(jurisdiction);
     }
 
     private BundlingCaseData mapCaseData(CaseData caseData, String bundleConfigFileName) {
 
         BundlingCaseData bundlingCaseData =
-            BundlingCaseData.builder().id(caseData.getCcdCaseReference()).bundleConfiguration(
-                    bundleConfigFileName)
-                .trialDocuments(trialDocumentsMapper.map(caseData))
-                .statementsOfCaseDocuments(statementsOfCaseMapper.map(caseData))
-                .directionsQuestionnaires(dqMapper.map(caseData))
-                .ordersDocuments(ordersMapper.map(caseData))
-                .claimant1WitnessStatements(witnessStatementsMapper.map(caseData, PartyType.CLAIMANT1))
-                .claimant2WitnessStatements(witnessStatementsMapper.map(caseData, PartyType.CLAIMANT2))
-                .defendant1WitnessStatements(witnessStatementsMapper.map(caseData, PartyType.DEFENDANT1))
-                .defendant2WitnessStatements(witnessStatementsMapper.map(caseData, PartyType.DEFENDANT2))
-                .claimant1ExpertEvidence(expertEvidenceMapper.map(caseData, PartyType.CLAIMANT1))
-                .claimant2ExpertEvidence(expertEvidenceMapper.map(caseData, PartyType.CLAIMANT2))
-                .defendant1ExpertEvidence(expertEvidenceMapper.map(caseData, PartyType.DEFENDANT1))
-                .defendant2ExpertEvidence(expertEvidenceMapper.map(caseData, PartyType.DEFENDANT2))
-                .jointStatementOfExperts(jointExpertsMapper.map(caseData))
-                .claimant1DisclosedDocuments(disclosedDocumentsMapper.map(caseData, PartyType.CLAIMANT1))
-                .claimant2DisclosedDocuments(disclosedDocumentsMapper.map(caseData, PartyType.CLAIMANT2))
-                .defendant1DisclosedDocuments(disclosedDocumentsMapper.map(caseData, PartyType.DEFENDANT1))
-                .defendant2DisclosedDocuments(disclosedDocumentsMapper.map(caseData, PartyType.DEFENDANT2))
-                .claimant1CostsBudgets(costsBudgetsMapper.map(caseData, PartyType.CLAIMANT1))
-                .claimant2CostsBudgets(costsBudgetsMapper.map(caseData, PartyType.CLAIMANT2))
-                .defendant1CostsBudgets(costsBudgetsMapper.map(caseData, PartyType.DEFENDANT1))
-                .defendant2CostsBudgets(costsBudgetsMapper.map(caseData, PartyType.DEFENDANT2))
-                .applicant1(caseData.getApplicant1())
-                .respondent1(caseData.getRespondent1())
-                .hearingDate(null != caseData.getHearingDate()
-                                 ? DateFormatHelper.formatLocalDate(caseData.getHearingDate(), "dd-MM-yyyy") : null)
-                .ccdCaseReference(caseData.getCcdCaseReference())
-                .build();
+            new BundlingCaseData()
+                .setId(caseData.getCcdCaseReference())
+                .setBundleConfiguration(bundleConfigFileName)
+                .setTrialDocuments(trialDocumentsMapper.map(caseData))
+                .setStatementsOfCaseDocuments(statementsOfCaseMapper.map(caseData))
+                .setDirectionsQuestionnaires(dqMapper.map(caseData))
+                .setOrdersDocuments(ordersMapper.map(caseData))
+                .setClaimant1WitnessStatements(witnessStatementsMapper.map(caseData, PartyType.CLAIMANT1))
+                .setClaimant2WitnessStatements(witnessStatementsMapper.map(caseData, PartyType.CLAIMANT2))
+                .setDefendant1WitnessStatements(witnessStatementsMapper.map(caseData, PartyType.DEFENDANT1))
+                .setDefendant2WitnessStatements(witnessStatementsMapper.map(caseData, PartyType.DEFENDANT2))
+                .setClaimant1ExpertEvidence(expertEvidenceMapper.map(caseData, PartyType.CLAIMANT1))
+                .setClaimant2ExpertEvidence(expertEvidenceMapper.map(caseData, PartyType.CLAIMANT2))
+                .setDefendant1ExpertEvidence(expertEvidenceMapper.map(caseData, PartyType.DEFENDANT1))
+                .setDefendant2ExpertEvidence(expertEvidenceMapper.map(caseData, PartyType.DEFENDANT2))
+                .setJointStatementOfExperts(jointExpertsMapper.map(caseData))
+                .setClaimant1DisclosedDocuments(disclosedDocumentsMapper.map(caseData, PartyType.CLAIMANT1))
+                .setClaimant2DisclosedDocuments(disclosedDocumentsMapper.map(caseData, PartyType.CLAIMANT2))
+                .setDefendant1DisclosedDocuments(disclosedDocumentsMapper.map(caseData, PartyType.DEFENDANT1))
+                .setDefendant2DisclosedDocuments(disclosedDocumentsMapper.map(caseData, PartyType.DEFENDANT2))
+                .setClaimant1CostsBudgets(costsBudgetsMapper.map(caseData, PartyType.CLAIMANT1))
+                .setClaimant2CostsBudgets(costsBudgetsMapper.map(caseData, PartyType.CLAIMANT2))
+                .setDefendant1CostsBudgets(costsBudgetsMapper.map(caseData, PartyType.DEFENDANT1))
+                .setDefendant2CostsBudgets(costsBudgetsMapper.map(caseData, PartyType.DEFENDANT2))
+                .setApplicant1(caseData.getApplicant1())
+                .setRespondent1(caseData.getRespondent1())
+                .setHearingDate(null != caseData.getHearingDate()
+                                    ? DateFormatHelper.formatLocalDate(caseData.getHearingDate(), "dd-MM-yyyy") : null)
+                .setCcdCaseReference(caseData.getCcdCaseReference());
         return mapRespondent2Applicant2Details(bundlingCaseData, caseData);
     }
 
     private BundlingCaseData mapRespondent2Applicant2Details(BundlingCaseData bundlingCaseData, CaseData caseData) {
         if (null != caseData.getAddApplicant2() && YesOrNo.YES.equals(caseData.getAddApplicant2())) {
-            bundlingCaseData.toBuilder().hasApplicant2(true);
+            bundlingCaseData.setHasApplicant2(true);
         }
         if (null != caseData.getAddRespondent2() && YesOrNo.YES.equals(caseData.getAddRespondent2())) {
-            bundlingCaseData.toBuilder().hasRespondant2(true);
+            bundlingCaseData.setHasRespondant2(true);
         }
         if (null != caseData.getApplicant2()) {
-            bundlingCaseData.toBuilder().applicant2(caseData.getApplicant2());
+            bundlingCaseData.setApplicant2(caseData.getApplicant2());
         }
         if (null != caseData.getRespondent2()) {
-            bundlingCaseData.toBuilder().respondent2(caseData.getRespondent2());
+            bundlingCaseData.setRespondent2(caseData.getRespondent2());
         }
         return bundlingCaseData;
     }
