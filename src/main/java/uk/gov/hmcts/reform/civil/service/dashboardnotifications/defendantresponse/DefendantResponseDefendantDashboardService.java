@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotific
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
+import static uk.gov.hmcts.reform.civil.service.dashboardnotifications.defendantresponse.DefendantResponseScenarioHelper.isCarmApplicable;
+import static uk.gov.hmcts.reform.civil.service.dashboardnotifications.defendantresponse.DefendantResponseScenarioHelper.scenarioForRespondentPartyType;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_BY_SET_DATE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_IMMEDIATELY_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALLMENTS_DEFENDANT;
@@ -37,15 +39,16 @@ public class DefendantResponseDefendantDashboardService extends DashboardScenari
     @Override
     public String getScenario(CaseData caseData) {
 
-        if (isCarmApplicable(caseData) && isFullDefenceFullDispute(caseData)) {
+        if (isCarmApplicable(featureToggleService, caseData) && isFullDefenceFullDispute(caseData)) {
             return SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_DEFENDANT_CARM.getScenario();
         }
 
         if (caseData.isPayBySetDate()) {
-            if (caseData.getRespondent1().isCompanyOROrganisation()) {
-                return SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_DEFENDANT.getScenario();
-            }
-            return SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_BY_SET_DATE_DEFENDANT.getScenario();
+            return scenarioForRespondentPartyType(
+                caseData,
+                SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_DEFENDANT.getScenario(),
+                SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_BY_SET_DATE_DEFENDANT.getScenario()
+            );
         }
 
         if ((caseData.isRespondentResponseFullDefence() && caseData.hasDefendantPaidTheAmountClaimed())
@@ -67,11 +70,11 @@ public class DefendantResponseDefendantDashboardService extends DashboardScenari
         }
         if ((caseData.isPartAdmitClaimSpec() || caseData.isFullAdmitClaimSpec())
             && caseData.isPayByInstallment()) {
-            if (caseData.getRespondent1().isCompanyOROrganisation()) {
-                return SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALMENT_COMPANY_ORGANISATION_DEFENDANT.getScenario();
-            } else {
-                return SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALLMENTS_DEFENDANT.getScenario();
-            }
+            return scenarioForRespondentPartyType(
+                caseData,
+                SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALMENT_COMPANY_ORGANISATION_DEFENDANT.getScenario(),
+                SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALLMENTS_DEFENDANT.getScenario()
+            );
         }
         if (caseData.isRespondentResponseFullDefence() && caseData.isClaimBeingDisputed()
             && caseData.hasDefendantAgreedToFreeMediation()) {
@@ -89,10 +92,5 @@ public class DefendantResponseDefendantDashboardService extends DashboardScenari
     private boolean isFullDefenceFullDispute(CaseData caseData) {
         return caseData.isRespondentResponseFullDefence()
             && caseData.isClaimBeingDisputed();
-    }
-
-    private boolean isCarmApplicable(CaseData caseData) {
-        return featureToggleService.isCarmEnabledForCase(caseData)
-            && caseData.isSmallClaim();
     }
 }
