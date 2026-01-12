@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import feign.FeignException;
 import feign.Request;
 import feign.Response;
 import org.apache.http.HttpStatus;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.cmc.model.DefendantLinkStatus;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -219,20 +221,20 @@ class DefendantPinToPostLRspecServiceTest {
         private CaseData createCaseDataWithPin(String accessCode, int daysToExpiry) {
             return new CaseDataBuilder().atStateClaimSubmitted()
                 .addRespondent1PinToPostLRspec(createPinToPost(accessCode, LocalDate.now().plusDays(daysToExpiry)))
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                 .build();
         }
 
         private CaseData createCaseDataWithExpiry(int daysToExpiry) {
             return new CaseDataBuilder().atStateClaimSubmitted()
-                .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().expiryDate(LocalDate.now().plusDays(daysToExpiry)).build())
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .addRespondent1PinToPostLRspec(createPinWithExpiry(LocalDate.now().plusDays(daysToExpiry)))
+                .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                 .build();
         }
 
         private CaseData createCaseData() {
             return new CaseDataBuilder().atStateClaimSubmitted()
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                 .build();
         }
 
@@ -241,11 +243,20 @@ class DefendantPinToPostLRspecServiceTest {
         }
 
         private DefendantPinToPostLRspec createPinInPostData(int daysToExpiry) {
-            return DefendantPinToPostLRspec.builder().expiryDate(LocalDate.now().plusDays(daysToExpiry)).build();
+            return createPinWithExpiry(LocalDate.now().plusDays(daysToExpiry));
         }
 
         private DefendantPinToPostLRspec createPinToPost(String accessCode, LocalDate expiryDate) {
-            return DefendantPinToPostLRspec.builder().accessCode(accessCode).expiryDate(expiryDate).build();
+            DefendantPinToPostLRspec pin = new DefendantPinToPostLRspec();
+            pin.setAccessCode(accessCode);
+            pin.setExpiryDate(expiryDate);
+            return pin;
+        }
+
+        private DefendantPinToPostLRspec createPinWithExpiry(LocalDate expiryDate) {
+            DefendantPinToPostLRspec pin = new DefendantPinToPostLRspec();
+            pin.setExpiryDate(expiryDate);
+            return pin;
         }
 
         private Response createResponse(int status) {
@@ -260,6 +271,32 @@ class DefendantPinToPostLRspecServiceTest {
 
         private DefendantLinkStatus createDefendantLinkStatus(boolean linked) {
             return DefendantLinkStatus.builder().linked(linked).build();
+        }
+
+        @Test
+        void shouldHandleFeignExceptionWhenRemovePinInPostDataFails() {
+            CaseData caseData = createCaseDataWithPin("TEST1234", 180);
+            CaseDetails caseDetails = createCaseDetails(caseData);
+            FeignException feignException = new FeignException.BadRequest("Bad request", Request.create(Request.HttpMethod.GET, "url", Map.of(), null, null, null), null, null);
+
+            when(caseDetailsConverter.toCaseData(caseDetails)).thenThrow(feignException);
+
+            assertThrows(FeignException.class, () -> defendantPinToPostLRspecService.removePinInPostData(caseDetails));
+        }
+
+        @Test
+        void shouldHandleMissingLocationHeaderWhenValidateOcmcPin() {
+            Map<String, Collection<String>> headers = new HashMap<>();
+            headers.put("Location", Collections.emptyList());
+            Response response = Response.builder()
+                .request(Request.create(Request.HttpMethod.GET, "url", Map.of(), null, null, null))
+                .status(HttpStatus.SC_MOVED_TEMPORARILY)
+                .headers(headers)
+                .build();
+
+            when(cuiIdamClientService.authenticatePinUser("TEST1234", "620MC123")).thenReturn(response);
+
+            assertThrows(IllegalArgumentException.class, () -> defendantPinToPostLRspecService.validateOcmcPin("TEST1234", "620MC123"));
         }
     }
 }
