@@ -53,7 +53,7 @@ class CostsBudgetsMapperTest {
 
         when(conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(any(), any(), eq(EvidenceUploadType.COSTS.name()), eq(PartyType.CLAIMANT1)))
             .thenReturn(java.util.Collections.singletonList(
-                BundlingRequestDocument.builder().documentFileName("f").documentType("t").build()
+                new BundlingRequestDocument().setDocumentFileName("f").setDocumentType("t")
             ));
 
         List<Element<BundlingRequestDocument>> resultApplicant1 = mapper.map(caseData, PartyType.CLAIMANT1);

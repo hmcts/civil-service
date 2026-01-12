@@ -41,7 +41,9 @@ class DQMapperTest {
     void testMapperWhenIncludesAllDQVariantsAndNoCategory() {
         CaseData caseData = getCaseData();
 
-        BundlingRequestDocument bundlingRequestDocument = BundlingRequestDocument.builder().documentFileName("f").documentType("t").build();
+        BundlingRequestDocument bundlingRequestDocument = new BundlingRequestDocument()
+            .setDocumentFileName("f")
+            .setDocumentType("t");
         when(bundleDocumentsRetrieval.getDqByCategoryId(caseData, DocCategory.APP1_DQ.getValue(), PartyType.CLAIMANT1))
             .thenReturn(singletonList(bundlingRequestDocument));
         when(bundleDocumentsRetrieval.getDqByCategoryId(caseData, DocCategory.DEF1_DEFENSE_DQ.getValue(), PartyType.DEFENDANT1))
