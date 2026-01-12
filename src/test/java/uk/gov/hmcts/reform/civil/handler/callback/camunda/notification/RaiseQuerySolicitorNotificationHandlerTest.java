@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -7,7 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -35,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,15 +49,15 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_OPENING_HOURS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
@@ -77,6 +82,9 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
     @Mock
     private NotificationsSignatureConfiguration configuration;
 
+    @Spy
+    private ObjectMapper mapper;
+
     @InjectMocks
     private RaiseQuerySolicitorNotificationHandler handler;
 
@@ -85,8 +93,10 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
 
     @Nested
     class AboutToSubmitCallback {
+
         @BeforeEach
         void setUp() {
+            mapper.registerModule(new JavaTimeModule());
             when(organisationService.findOrganisationById(any()))
                 .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
             when(notificationsProperties.getQueryRaised()).thenReturn(TEMPLATE_ID);
@@ -113,6 +123,35 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "applicant@email.com",
+                TEMPLATE_ID,
+                getNotificationDataMap(caseData),
+                "query-raised-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicantLR_whenApplicantRaisedLatestQueryAndMigrateAllQueriesIfUsingOldQueriesCollection() {
+            when(runtimeService.getProcessVariables(any()))
+                .thenReturn(QueryManagementVariables.builder()
+                                .queryId("1")
+                                .build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.toString()));
+            CaseData caseData = createCaseDataWithQueries();
+            caseData.setQueries(null);
+            caseData.setQmApplicantSolicitorQueries(getCaseQueriesCollection());
+            caseData.setQmRespondentSolicitor1Queries(getCaseQueriesCollection());
+            caseData.setQmRespondentSolicitor2Queries(getCaseQueriesCollection());
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseQueriesCollection queriesCollection =  mapper.convertValue(response.getData().get("queries"), CaseQueriesCollection.class);
+            assertEquals(15, queriesCollection.getCaseMessages().size());
 
             verify(notificationService).sendMail(
                 "applicant@email.com",
@@ -167,6 +206,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
     class AboutToSubmitForLip {
         @BeforeEach
         void setup() {
+            mapper.registerModule(new JavaTimeModule());
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
             when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
@@ -284,8 +324,8 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
 
     }
 
-    private CaseData createCaseDataWithQueries() {
-        CaseQueriesCollection publicQueries = CaseQueriesCollection.builder()
+    private CaseQueriesCollection getCaseQueriesCollection() {
+        return CaseQueriesCollection.builder()
             .caseMessages(wrapElements(
                 CaseMessage.builder()
                     .id("1")
@@ -304,7 +344,9 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
                     .build()
             ))
             .build();
+    }
 
+    private CaseData createCaseDataWithQueries() {
         return CaseDataBuilder.builder().atStateClaimIssued().build()
             .toBuilder()
             .applicantSolicitor1UserDetails(IdamUserDetails.builder()
@@ -312,7 +354,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
                                                 .build())
             .respondentSolicitor1EmailAddress("respondent1@email.com")
             .respondentSolicitor2EmailAddress("respondent2@email.com")
-            .queries(publicQueries)
+            .queries(getCaseQueriesCollection())
             .businessProcess(BusinessProcess.builder()
                                  .processInstanceId("123")
                                  .build())
@@ -366,5 +408,4 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
         }
         return expectedProperties;
     }
-
 }

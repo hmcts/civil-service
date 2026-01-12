@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -48,6 +49,7 @@ public class RaiseQuerySolicitorNotificationHandler extends CallbackHandler impl
     private final CoreCaseUserService coreCaseUserService;
     private final QueryManagementCamundaService runtimeService;
     private final NotificationsSignatureConfiguration configuration;
+    private final ObjectMapper objectMapper;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -84,7 +86,9 @@ public class RaiseQuerySolicitorNotificationHandler extends CallbackHandler impl
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
 
-        return AboutToStartOrSubmitCallbackResponse.builder().build();
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseData.toMap(objectMapper))
+            .build();
     }
 
     private String getEmailTemplate(CaseData caseData, List<String> roles) {
