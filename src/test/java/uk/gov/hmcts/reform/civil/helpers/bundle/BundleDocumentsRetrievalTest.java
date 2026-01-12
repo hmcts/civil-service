@@ -84,9 +84,8 @@ class BundleDocumentsRetrievalTest {
         listOfDocs.add(Element.<UploadEvidenceExpert>builder().value(uploadEvidenceExpert).build());
 
         List<BundlingRequestDocument> expectedConvertedDocs = List.of(
-            BundlingRequestDocument.builder()
-                .documentFileName("Name")
-                .build()
+            new BundlingRequestDocument()
+                .setDocumentFileName("Name")
         );
 
         try (MockedStatic<BundleFileNameHelper> bundleFileNameHelper = mockStatic(BundleFileNameHelper.class)) {
@@ -129,9 +128,8 @@ class BundleDocumentsRetrievalTest {
         expectedGroupedDocuments.put("Expert1", listOfDocs);
 
         List<BundlingRequestDocument> expectedBundlingRequestDocs = List.of(
-            BundlingRequestDocument.builder()
-                .documentFileName("Name")
-                .build()
+            new BundlingRequestDocument()
+                .setDocumentFileName("Name")
         );
 
         CaseData caseData = CaseData.builder()
@@ -175,9 +173,8 @@ class BundleDocumentsRetrievalTest {
         expectedGroupedDocuments.put("Expert1", listOfDocs);
 
         List<BundlingRequestDocument> expectedBundlingRequestDocs = List.of(
-            BundlingRequestDocument.builder()
-                .documentFileName("Name1")
-                .build()
+            new BundlingRequestDocument()
+                .setDocumentFileName("Name1")
         );
 
         PartyType partyType = PartyType.CLAIMANT1;
