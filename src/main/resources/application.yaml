@@ -639,7 +639,7 @@ azure:
     application-insights:
       instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:00000000-0000-0000-0000-000000000000}
 
-appinsights-connection-string: ${APPLICATIONINSIGHTS_CONNECTION_STRING:dummy}
+appinsights-connection-string: ${APPLICATIONINSIGHTS_CONNECTION_STRING:}
 
 async:
   handler:
