@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -152,6 +153,10 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
 
             CaseQueriesCollection queriesCollection =  mapper.convertValue(response.getData().get("queries"), CaseQueriesCollection.class);
             assertEquals(15, queriesCollection.getCaseMessages().size());
+
+            assertNull(mapper.convertValue(response.getData().get("qmApplicantSolicitorQueries"), CaseQueriesCollection.class));
+            assertNull(mapper.convertValue(response.getData().get("qmRespondentSolicitor1Queries"), CaseQueriesCollection.class));
+            assertNull(mapper.convertValue(response.getData().get("qmRespondentSolicitor2Queries"), CaseQueriesCollection.class));
 
             verify(notificationService).sendMail(
                 "applicant@email.com",
