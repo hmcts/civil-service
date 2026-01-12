@@ -27,12 +27,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.PopulateRespondentTabDetails.updateDataForClaimDetailsTab;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 
 @Component
@@ -67,7 +67,7 @@ public class PopulateRespondentCopyObjects implements CaseTask {
 
     public CallbackResponse execute(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        log.info("Populating respondent copy objects", caseData.getCcdCaseReference());
+        log.info("Populating respondent copy objects {}", caseData.getCcdCaseReference());
         LocalDateTime dateTime = LocalDateTime.now();
 
         CallbackResponse errorResponse = getErrorResponse(callbackParams, caseData, dateTime);
@@ -116,7 +116,7 @@ public class PopulateRespondentCopyObjects implements CaseTask {
             .build();
     }
 
-    private CaseData updateCaseData(CaseData caseData, YesOrNo isRespondent1, RequestedCourt requestedCourt1) {
+    private void updateCaseData(CaseData caseData, YesOrNo isRespondent1, RequestedCourt requestedCourt1) {
         caseData.setRespondent1Copy(caseData.getRespondent1());
         caseData.setIsRespondent1(isRespondent1);
         Respondent1DQ respondent1DQ = new Respondent1DQ();
@@ -128,16 +128,7 @@ public class PopulateRespondentCopyObjects implements CaseTask {
             respondent2DQ.setRespondent2DQRequestedCourt(requestedCourt1);
             caseData.setRespondent2DQ(respondent2DQ);
         }
-
-        caseData.getRespondent1().setFlags(null);
-        caseData.setRespondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
-
-        if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            caseData.setRespondent2Copy(caseData.getRespondent2());
-            caseData.getRespondent2().setFlags(null);
-            caseData.setRespondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
-        }
-        return caseData;
+        updateDataForClaimDetailsTab(caseData, objectMapper, true);
     }
 
     private RequestedCourt createRequestedCourt(List<LocationRefData> locations, CaseData caseData) {

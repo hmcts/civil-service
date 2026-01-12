@@ -83,21 +83,18 @@ class IncomeCalculatorTest {
     private static List<Element<AccountSimple>> createBankAccountsWithPositiveAndNegativeBalance() {
         List<Element<AccountSimple>> bankAccountElements =
             wrapElements(
-                AccountSimple.builder()
-                    .balance(new BigDecimal(1000.55))
-                    .jointAccount(YesOrNo.YES)
-                    .accountType(CURRENT)
-                    .build(),
-                AccountSimple.builder()
-                    .balance(new BigDecimal(-789))
-                    .jointAccount(YesOrNo.NO)
-                    .accountType(CURRENT)
-                    .build(),
-                AccountSimple.builder()
-                    .balance(new BigDecimal(500))
-                    .jointAccount(YesOrNo.YES)
-                    .accountType(CURRENT)
-                    .build()
+                new AccountSimple()
+                    .setBalance(new BigDecimal(1000.55))
+                    .setJointAccount(YesOrNo.YES)
+                    .setAccountType(CURRENT),
+                new AccountSimple()
+                    .setBalance(new BigDecimal(-789))
+                    .setJointAccount(YesOrNo.NO)
+                    .setAccountType(CURRENT),
+                new AccountSimple()
+                    .setBalance(new BigDecimal(500))
+                    .setJointAccount(YesOrNo.YES)
+                    .setAccountType(CURRENT)
             );
         return bankAccountElements;
     }

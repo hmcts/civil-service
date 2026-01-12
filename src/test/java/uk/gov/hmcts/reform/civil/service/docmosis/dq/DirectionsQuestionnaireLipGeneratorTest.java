@@ -345,4 +345,35 @@ class DirectionsQuestionnaireLipGeneratorTest {
         assertNotNull(template);
         assertThat(template).isNotEqualTo(DocmosisTemplates.DQ_LR_V_LIP_RESPONSE);
     }
+
+    @Test
+    void shouldReturnRequestedCourtWithNoWhenCaseLocationIsNull() {
+        uk.gov.hmcts.reform.civil.model.dq.RequestedCourt requestedCourt = new uk.gov.hmcts.reform.civil.model.dq.RequestedCourt();
+        requestedCourt.setCaseLocation(null);
+        uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ respondent1DQ = new uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ();
+        respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt);
+
+        uk.gov.hmcts.reform.civil.model.dq.RequestedCourt result = generator.getRequestedCourt(respondent1DQ, BEARER_TOKEN);
+
+        assertNotNull(result);
+        assertThat(result.getRequestHearingAtSpecificCourt()).isEqualTo(YesOrNo.NO);
+    }
+
+    @Test
+    void shouldReturnRequestedCourtWithYesWhenCaseLocationExists() {
+        uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil caseLocation = new uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil();
+        caseLocation.setBaseLocation("12345");
+        uk.gov.hmcts.reform.civil.model.dq.RequestedCourt requestedCourt = new uk.gov.hmcts.reform.civil.model.dq.RequestedCourt();
+        requestedCourt.setCaseLocation(caseLocation);
+        requestedCourt.setReasonForHearingAtSpecificCourt("Test reason");
+        uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ respondent1DQ = new uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ();
+        respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt);
+
+        uk.gov.hmcts.reform.civil.model.dq.RequestedCourt result = generator.getRequestedCourt(respondent1DQ, BEARER_TOKEN);
+
+        assertNotNull(result);
+        assertThat(result.getRequestHearingAtSpecificCourt()).isEqualTo(YesOrNo.YES);
+        assertThat(result.getResponseCourtName()).isEqualTo("12345");
+        assertThat(result.getReasonForHearingAtSpecificCourt()).isEqualTo("Test reason");
+    }
 }

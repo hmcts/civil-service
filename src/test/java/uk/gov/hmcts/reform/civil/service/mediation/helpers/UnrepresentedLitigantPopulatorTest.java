@@ -33,12 +33,11 @@ class UnrepresentedLitigantPopulatorTest {
 
     @Test
     void shouldPopulateLitigantWhereMediationLipCarmIsNull() {
-        Party party = Party.builder()
-            .type(Party.Type.INDIVIDUAL)
-            .partyName("John Doe")
-            .partyEmail("party@email.com")
-            .partyPhone("123456789")
-            .build();
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        party.setPartyName("John Doe");
+        party.setPartyEmail("party@email.com");
+        party.setPartyPhone("123456789");
 
         MediationLitigant.MediationLitigantBuilder builder = MediationLitigant.builder();
         MediationLitigant litigant = unrepresentedLitigantPopulator.populator(
@@ -70,12 +69,11 @@ class UnrepresentedLitigantPopulatorTest {
         Element<UnavailableDate> elementUnavailableDate = ElementUtils.element(unavailableDate);
         when(mediationLiPCarm.getUnavailableDatesForMediation()).thenReturn(List.of(elementUnavailableDate));
 
-        Party party = Party.builder()
-            .type(Party.Type.INDIVIDUAL)
-            .partyName("John Doe")
-            .partyEmail("party@email.com")
-            .partyPhone("123456789")
-            .build();
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        party.setPartyName("John Doe");
+        party.setPartyEmail("party@email.com");
+        party.setPartyPhone("123456789");
 
         MediationLitigant.MediationLitigantBuilder builder = MediationLitigant.builder();
         MediationLitigant litigant = unrepresentedLitigantPopulator.populator(
@@ -94,12 +92,11 @@ class UnrepresentedLitigantPopulatorTest {
 
     @Test
     void shouldPopulateLitigantWithAlternativeMediationInfo_whenEmailAndPhoneIncorrect() {
-        Party party = Party.builder()
-            .type(Party.Type.INDIVIDUAL)
-            .partyName("John Doe")
-            .partyEmail("party@email.com")
-            .partyPhone("123456789")
-            .build();
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        party.setPartyName("John Doe");
+        party.setPartyEmail("party@email.com");
+        party.setPartyPhone("123456789");
 
         when(mediationLiPCarm.getIsMediationEmailCorrect()).thenReturn(NO);
         when(mediationLiPCarm.getIsMediationPhoneCorrect()).thenReturn(NO);
@@ -125,12 +122,11 @@ class UnrepresentedLitigantPopulatorTest {
 
     @Test
     void shouldHandleNoUnavailabilityForMediation() {
-        Party party = Party.builder()
-            .type(Party.Type.INDIVIDUAL)
-            .partyName("John Doe")
-            .partyEmail("party@email.com")
-            .partyPhone("123456789")
-            .build();
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        party.setPartyName("John Doe");
+        party.setPartyEmail("party@email.com");
+        party.setPartyPhone("123456789");
 
         when(mediationLiPCarm.getIsMediationEmailCorrect()).thenReturn(YES);
         when(mediationLiPCarm.getIsMediationPhoneCorrect()).thenReturn(YES);
@@ -152,12 +148,11 @@ class UnrepresentedLitigantPopulatorTest {
 
     @Test
     void shouldUseOriginalMediationContactForNonIndividual() {
-        Party party = Party.builder()
-            .type(Party.Type.ORGANISATION)
-            .partyName("Doe Inc.")
-            .partyEmail("corp@email.com")
-            .partyPhone("123456789")
-            .build();
+        Party party = new Party();
+        party.setType(Party.Type.ORGANISATION);
+        party.setPartyName("Doe Inc.");
+        party.setPartyEmail("corp@email.com");
+        party.setPartyPhone("123456789");
 
         when(mediationLiPCarm.getIsMediationContactNameCorrect()).thenReturn(YES);
         when(mediationLiPCarm.getIsMediationEmailCorrect()).thenReturn(YES);
@@ -179,13 +174,12 @@ class UnrepresentedLitigantPopulatorTest {
 
     @Test
     void shouldUseAlternativeMediationContactName_whenIncorrect() {
-        Party party = Party.builder()
-            .type(Type.ORGANISATION)
-            .individualFirstName("John")
-            .individualLastName("Doe")
-            .partyEmail("party@email.com")
-            .partyPhone("123456789")
-            .build();
+        Party party = new Party();
+        party.setType(Type.ORGANISATION);
+        party.setIndividualFirstName("John");
+        party.setIndividualLastName("Doe");
+        party.setPartyEmail("party@email.com");
+        party.setPartyPhone("123456789");
 
         when(mediationLiPCarm.getIsMediationContactNameCorrect()).thenReturn(NO);
         when(mediationLiPCarm.getAlternativeMediationContactPerson()).thenReturn("Alternative Contact");
