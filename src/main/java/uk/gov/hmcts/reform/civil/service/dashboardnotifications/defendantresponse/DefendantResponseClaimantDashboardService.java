@@ -31,6 +31,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEF_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_REFUSED_MEDIATION_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_NOTICE_AAA6_DEF_LR_RESPONSE_FULL_DEFENCE_COUNTERCLAIM_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.service.dashboardnotifications.defendantresponse.DefendantResponseScenarioHelper.isCarmApplicable;
+import static uk.gov.hmcts.reform.civil.service.dashboardnotifications.defendantresponse.DefendantResponseScenarioHelper.scenarioForRespondentPartyType;
 
 @Service
 public class DefendantResponseClaimantDashboardService extends DashboardScenarioService {
@@ -136,9 +138,17 @@ public class DefendantResponseClaimantDashboardService extends DashboardScenario
         if (caseData.nocApplyForLiPDefendant()) {
             return SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT.getScenario();
         } else if (caseData.isPayByInstallment()) {
-            return getScenarioForPayByInstallmentBasedOnRespondentPartyType(caseData);
+            return scenarioForRespondentPartyType(
+                caseData,
+                SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALLMENTS_ORG_COM_CLAIMANT.getScenario(),
+                SCENARIO_AA6_DEFENDANT_RESPONSE_PAY_BY_INSTALLMENTS_CLAIMANT.getScenario()
+            );
         } else if (caseData.isPayBySetDate()) {
-            return getScenarioForPayBySetDateBasedOnRespondentPartyType(caseData);
+            return scenarioForRespondentPartyType(
+                caseData,
+                SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT.getScenario(),
+                SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT.getScenario()
+            );
         } else if (caseData.isPayImmediately()) {
             return SCENARIO_AAA6_DEFENDANT_PART_ADMIT_PAY_IMMEDIATELY_CLAIMANT.getScenario();
         }
@@ -149,16 +159,24 @@ public class DefendantResponseClaimantDashboardService extends DashboardScenario
         if (caseData.nocApplyForLiPDefendant()) {
             return SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT.getScenario();
         } else if (caseData.isPayByInstallment()) {
-            return getScenarioForPayByInstallmentBasedOnRespondentPartyType(caseData);
+            return scenarioForRespondentPartyType(
+                caseData,
+                SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALLMENTS_ORG_COM_CLAIMANT.getScenario(),
+                SCENARIO_AA6_DEFENDANT_RESPONSE_PAY_BY_INSTALLMENTS_CLAIMANT.getScenario()
+            );
         } else if (caseData.isPayBySetDate()) {
-            return getScenarioForPayBySetDateBasedOnRespondentPartyType(caseData);
+            return scenarioForRespondentPartyType(
+                caseData,
+                SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT.getScenario(),
+                SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT.getScenario()
+            );
         }
         return SCENARIO_AAA6_DEFENDANT_FULL_ADMIT_PAY_IMMEDIATELY_CLAIMANT.getScenario();
     }
 
     private String getFullDefenceScenario(CaseData caseData) {
         if (caseData.isClaimBeingDisputed()) {
-            if (isCarmApplicable(caseData)) {
+            if (isCarmApplicable(featureToggleService, caseData)) {
                 return SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_CLAIMANT_CARM.getScenario();
             } else if (caseData.hasDefendantAgreedToFreeMediation() && caseData.isSmallClaim()) {
                 return SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_MEDIATION_CLAIMANT.getScenario();
@@ -172,27 +190,10 @@ public class DefendantResponseClaimantDashboardService extends DashboardScenario
         return defendantResponseStatesPaid(caseData);
     }
 
-    private boolean isCarmApplicable(CaseData caseData) {
-        return featureToggleService.isCarmEnabledForCase(caseData)
-            && caseData.isSmallClaim();
-    }
-
     private String defendantResponseStatesPaid(CaseData caseData) {
         return caseData.isPaidFullAmount()
             ? SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_ALREADY_PAID_CLAIMANT.getScenario()
             : SCENARIO_AAA6_DEFENDANT_ADMIT_AND_PAID_PARTIAL_ALREADY_CLAIMANT.getScenario();
-    }
-
-    private String getScenarioForPayByInstallmentBasedOnRespondentPartyType(CaseData caseData) {
-        return caseData.getRespondent1().isCompanyOROrganisation()
-            ? SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALLMENTS_ORG_COM_CLAIMANT.getScenario()
-            : SCENARIO_AA6_DEFENDANT_RESPONSE_PAY_BY_INSTALLMENTS_CLAIMANT.getScenario();
-    }
-
-    private String getScenarioForPayBySetDateBasedOnRespondentPartyType(CaseData caseData) {
-        return caseData.getRespondent1().isCompanyOROrganisation()
-            ? SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT.getScenario()
-            : SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT.getScenario();
     }
 
     private boolean hasGeneralApplications(CaseData caseData) {
