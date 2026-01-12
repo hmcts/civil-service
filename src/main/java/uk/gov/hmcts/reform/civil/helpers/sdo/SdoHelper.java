@@ -417,6 +417,8 @@ public class SdoHelper {
                 return caseData.getSmallClaimsMediationSectionStatement() != null;
             case "sdoR2SmallClaimsUseOfWelshToggle":
                 return caseData.getSdoR2SmallClaimsUseOfWelshToggle() != null;
+            case "smallClaimsPenalNoticeToggle":
+                return caseData.getSmallClaimsPenalNoticeToggle() != null;
             default:
                 return false;
         }

@@ -93,6 +93,8 @@ public class SdoDocumentFormSmall implements MappableObject {
     private String smallClaimMediationSectionInput;
     private boolean smallClaimsWelshLanguageToggle;
     private String caseAccessCategory;
+    private boolean showPenalNotice;
+    private String penalNoticeText;
 
     @SuppressWarnings("unused")
     public boolean getSmallClaimsMethodToggle() {
