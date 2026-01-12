@@ -80,7 +80,9 @@ class WitnessStatementsMapperTest {
         when(bundleDocumentsRetrieval.getSelfStatement(anyMap(), any(Party.class)))
             .thenReturn(Collections.emptyList());
 
-        BundlingRequestDocument doc = BundlingRequestDocument.builder().documentFileName("f").documentType("t").build();
+        BundlingRequestDocument doc = new BundlingRequestDocument()
+            .setDocumentFileName("f")
+            .setDocumentType("t");
         when(conversionToBundleRequestDocs.covertWitnessEvidenceToBundleRequestDocs(
             any(),
             eq(BundleFileNameList.WITNESS_STATEMENT_DISPLAY_NAME.getDisplayName()),

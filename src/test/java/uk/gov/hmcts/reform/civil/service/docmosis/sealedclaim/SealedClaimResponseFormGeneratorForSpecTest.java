@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.PaymentMethod;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
@@ -77,59 +78,88 @@ class SealedClaimResponseFormGeneratorForSpecTest {
 
     @BeforeEach
     void init() {
-        base1v1 = CaseData.builder()
+        Party applicant1 = new Party();
+        applicant1.setType(Party.Type.COMPANY);
+        applicant1.setCompanyName("Applicant Ltd");
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.COMPANY);
+        respondent1.setCompanyName("Resp1 Ltd");
+        StatementOfTruth statementOfTruth1 = new StatementOfTruth();
+        statementOfTruth1.setName("sot1");
+        statementOfTruth1.setRole("role1");
+        uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ respondent1DQ = new uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ();
+        respondent1DQ.setRespondent1DQStatementOfTruth(statementOfTruth1);
+
+        base1v1 = CaseDataBuilder.builder()
             .legacyCaseReference("LEG-123")
             .ccdCaseReference(1234567890123456L)
-            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant Ltd").build())
-            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Resp1 Ltd").build())
-            .detailsOfWhyDoesYouDisputeTheClaim("why-1v1")
-            .respondent1DQ(uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ.builder()
-                               .respondent1DQStatementOfTruth(
-                                   StatementOfTruth.builder().name("sot1").role("role1").build()
-                               ).build())
+            .applicant1(applicant1)
+            .respondent1(respondent1)
+            .respondent1DQ(respondent1DQ)
             .respondent1ResponseDate(LocalDateTime.now())
             .build();
+        base1v1.setDetailsOfWhyDoesYouDisputeTheClaim("why-1v1");
 
-        base1v2LatestIsResp2 = CaseData.builder()
+        Party applicantOne1v2 = new Party();
+        applicantOne1v2.setType(Party.Type.COMPANY);
+        applicantOne1v2.setCompanyName("Applicant Ltd");
+        Party respondentOne1v2 = new Party();
+        respondentOne1v2.setType(Party.Type.COMPANY);
+        respondentOne1v2.setCompanyName("Resp1 Ltd");
+        Party respondentTwo1v2 = new Party();
+        respondentTwo1v2.setType(Party.Type.COMPANY);
+        respondentTwo1v2.setCompanyName("Resp2 Ltd");
+        StatementOfTruth statementOfTruthOne1v2 = new StatementOfTruth();
+        statementOfTruthOne1v2.setName("sot1");
+        statementOfTruthOne1v2.setRole("role1");
+        uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ respondent1DQ1v2 = new uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ();
+        respondent1DQ1v2.setRespondent1DQStatementOfTruth(statementOfTruthOne1v2);
+        StatementOfTruth statementOfTruthTwo1v2 = new StatementOfTruth();
+        statementOfTruthTwo1v2.setName("sot2");
+        statementOfTruthTwo1v2.setRole("role2");
+        uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ respondent2DQ1v2 = new uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ();
+        respondent2DQ1v2.setRespondent2DQStatementOfTruth(statementOfTruthTwo1v2);
+        ResponseDocument resp1DefDoc = new ResponseDocument();
+        Document resp1DefFile = new Document();
+        resp1DefFile.setDocumentFileName("resp1-def.pdf");
+        resp1DefDoc.setFile(resp1DefFile);
+        ResponseDocument resp2DefDoc = new ResponseDocument();
+        Document resp2DefFile = new Document();
+        resp2DefFile.setDocumentFileName("resp2-def.pdf");
+        resp2DefDoc.setFile(resp2DefFile);
+        TimelineOfEventDetails timelineDetails1 = new TimelineOfEventDetails();
+        timelineDetails1.setTimelineDate(LocalDate.now().minusDays(3));
+        timelineDetails1.setTimelineDescription("r1-timeline");
+        TimelineOfEvents timeline1 = new TimelineOfEvents();
+        timeline1.setValue(timelineDetails1);
+        TimelineOfEventDetails timelineDetails2 = new TimelineOfEventDetails();
+        timelineDetails2.setTimelineDate(LocalDate.now().minusDays(1));
+        timelineDetails2.setTimelineDescription("r2-timeline");
+        TimelineOfEvents timeline2 = new TimelineOfEvents();
+        timeline2.setValue(timelineDetails2);
+        RespondToClaim respondToAdmittedClaim = new RespondToClaim();
+        respondToAdmittedClaim.setHowMuchWasPaid(new BigDecimal("1000")); // £10.00
+        respondToAdmittedClaim.setHowWasThisAmountPaid(PaymentMethod.CREDIT_CARD);
+        respondToAdmittedClaim.setWhenWasThisAmountPaid(LocalDate.now().minusDays(1));
+
+        base1v2LatestIsResp2 = CaseDataBuilder.builder()
             .legacyCaseReference("LEG-999")
             .ccdCaseReference(9999999999999999L)
-            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant Ltd").build())
-            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Resp1 Ltd").build())
-            .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Resp2 Ltd").build())
-            .detailsOfWhyDoesYouDisputeTheClaim("why-1v2-r1")
-            .detailsOfWhyDoesYouDisputeTheClaim2("why-1v2-r2")
-            .respondent1DQ(uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ.builder()
-                               .respondent1DQStatementOfTruth(
-                                   StatementOfTruth.builder().name("sot1").role("role1").build()
-                               ).build())
-            .respondent2DQ(uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ.builder()
-                               .respondent2DQStatementOfTruth(
-                                   StatementOfTruth.builder().name("sot2").role("role2").build()
-                               ).build())
+            .applicant1(applicantOne1v2)
+            .respondent1(respondentOne1v2)
+            .respondent2(respondentTwo1v2)
+            .respondent1DQ(respondent1DQ1v2)
+            .respondent2DQ(respondent2DQ1v2)
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent2ResponseDate(LocalDateTime.now().plusDays(2)) // respondent2 answered last
-            .respondent1SpecDefenceResponseDocument(ResponseDocument.builder()
-                                                        .file(Document.builder().documentFileName("resp1-def.pdf").build()).build())
-            .respondent2SpecDefenceResponseDocument(ResponseDocument.builder()
-                                                        .file(Document.builder().documentFileName("resp2-def.pdf").build()).build())
-            .specResponseTimelineOfEvents(List.of(
-                TimelineOfEvents.builder()
-                    .value(TimelineOfEventDetails.builder()
-                               .timelineDate(LocalDate.now().minusDays(3))
-                               .timelineDescription("r1-timeline").build())
-                    .build()))
-            .specResponseTimelineOfEvents2(List.of(
-                TimelineOfEvents.builder()
-                    .value(TimelineOfEventDetails.builder()
-                               .timelineDate(LocalDate.now().minusDays(1))
-                               .timelineDescription("r2-timeline").build())
-                    .build()))
-            .respondToAdmittedClaim(RespondToClaim.builder()
-                                        .howMuchWasPaid(new BigDecimal("1000")) // £10.00
-                                        .howWasThisAmountPaid(PaymentMethod.CREDIT_CARD)
-                                        .whenWasThisAmountPaid(LocalDate.now().minusDays(1))
-                                        .build())
             .build();
+        base1v2LatestIsResp2.setDetailsOfWhyDoesYouDisputeTheClaim("why-1v2-r1");
+        base1v2LatestIsResp2.setDetailsOfWhyDoesYouDisputeTheClaim2("why-1v2-r2");
+        base1v2LatestIsResp2.setRespondent1SpecDefenceResponseDocument(resp1DefDoc);
+        base1v2LatestIsResp2.setRespondent2SpecDefenceResponseDocument(resp2DefDoc);
+        base1v2LatestIsResp2.setSpecResponseTimelineOfEvents(List.of(timeline1));
+        base1v2LatestIsResp2.setSpecResponseTimelineOfEvents2(List.of(timeline2));
+        base1v2LatestIsResp2.setRespondToAdmittedClaim(respondToAdmittedClaim);
 
         // Minimal stubs for the two "populator" collaborators to keep this unit test atomic
         lenient().doAnswer(inv -> {
@@ -196,9 +226,8 @@ class SealedClaimResponseFormGeneratorForSpecTest {
 
     @Test
     void getTemplateData_1v2_latestIsRespondent1_switches_to_resp1_fields_doc_and_timeline1() {
-        CaseData resp1Latest = base1v2LatestIsResp2.toBuilder()
-            .respondent2ResponseDate(LocalDateTime.now().minusDays(5)) // now respondent1 is latest
-            .build();
+        CaseData resp1Latest = base1v2LatestIsResp2;
+        resp1Latest.setRespondent2ResponseDate(LocalDateTime.now().minusDays(5)); // now respondent1 is latest
 
         SealedClaimResponseFormForSpec dto = generator.getTemplateData(resp1Latest, AUTH);
 
@@ -212,9 +241,10 @@ class SealedClaimResponseFormGeneratorForSpecTest {
 
     @Test
     void getTemplateData_timelineUploaded_branch_sets_flag_and_filename() {
-        CaseData uploaded = base1v1.toBuilder()
-            .specResponseTimelineDocumentFiles(Document.builder().documentFileName("timeline.pdf").build())
-            .build();
+        Document timelineDoc = new Document();
+        timelineDoc.setDocumentFileName("timeline.pdf");
+        CaseData uploaded = base1v1;
+        uploaded.setSpecResponseTimelineDocumentFiles(timelineDoc);
 
         SealedClaimResponseFormForSpec dto = generator.getTemplateData(uploaded, AUTH);
 
@@ -225,14 +255,13 @@ class SealedClaimResponseFormGeneratorForSpecTest {
 
     @Test
     void getTemplateData_paymentMethod_Other_uses_custom_text() {
-        CaseData withOther = base1v1.toBuilder()
-            .respondToClaim(RespondToClaim.builder()
-                                .howMuchWasPaid(new BigDecimal("250")) // £2.50
-                                .howWasThisAmountPaid(PaymentMethod.OTHER)
-                                .howWasThisAmountPaidOther("Gift card")
-                                .whenWasThisAmountPaid(LocalDate.now().minusDays(3))
-                                .build())
-            .build();
+        RespondToClaim respondToClaim = new RespondToClaim();
+        respondToClaim.setHowMuchWasPaid(new BigDecimal("250")); // £2.50
+        respondToClaim.setHowWasThisAmountPaid(PaymentMethod.OTHER);
+        respondToClaim.setHowWasThisAmountPaidOther("Gift card");
+        respondToClaim.setWhenWasThisAmountPaid(LocalDate.now().minusDays(3));
+        CaseData withOther = base1v1;
+        withOther.setRespondToClaim(respondToClaim);
 
         SealedClaimResponseFormForSpec dto = generator.getTemplateData(withOther, AUTH);
 
@@ -269,10 +298,12 @@ class SealedClaimResponseFormGeneratorForSpecTest {
 
     @Test
     void generate_1v2_sameResponses_uses_1v2_lr_admission_bulk_template() {
-        CaseData multipartySame = base1v1.toBuilder()
-            .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Resp2 Ltd").build())
-            .respondentResponseIsSame(YesOrNo.YES)
-            .build();
+        Party respondent2 = new Party();
+        respondent2.setType(Party.Type.COMPANY);
+        respondent2.setCompanyName("Resp2 Ltd");
+        CaseData multipartySame = base1v1;
+        multipartySame.setRespondent2(respondent2);
+        multipartySame.setRespondentResponseIsSame(YesOrNo.YES);
 
         when(documentGeneratorService.generateDocmosisDocument(any(), any()))
             .thenReturn(DocmosisDocument.builder().bytes(new byte[]{9}).build());

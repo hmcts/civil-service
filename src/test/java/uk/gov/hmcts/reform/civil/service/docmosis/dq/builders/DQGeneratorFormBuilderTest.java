@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq.builders;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -227,7 +228,24 @@ class DQGeneratorFormBuilderTest {
         });
 
         String actualMessage = exception.getMessage();
+        Assertions.assertTrue(actualMessage.contains(ERROR_FLOW_STATE_PAST_DEADLINE));
+    }
 
-        assertTrue(actualMessage.contains(ERROR_FLOW_STATE_PAST_DEADLINE));
+    @Test
+    void shouldNotSetStatementOfTruthTextWhenSpecClaim() {
+        Witnesses mockWitnesses = mock(Witnesses.class);
+        when(respondentTemplateForDQGenerator.getWitnesses(any())).thenReturn(mockWitnesses);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentFullDefence()
+            .respondent1DQ()
+            .build().toBuilder()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .build();
+
+        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder result =
+            dqGeneratorFormBuilder.getDirectionsQuestionnaireFormBuilder(caseData, DEFENDANT);
+
+        assertNotNull(result);
+        assertNull(result.build().getStatementOfTruthText());
     }
 }

@@ -49,10 +49,10 @@ public class DefendantPinToPostLRspecService {
         try {
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
             DefendantPinToPostLRspec pinInPostData = caseData.getRespondent1PinToPostLRspec();
-            DefendantPinToPostLRspec updatePinInPostData = DefendantPinToPostLRspec.builder()
-                .citizenCaseRole(pinInPostData.getCitizenCaseRole())
-                .respondentCaseRole(pinInPostData.getRespondentCaseRole())
-                .expiryDate(pinInPostData.getExpiryDate()).build();
+            DefendantPinToPostLRspec updatePinInPostData = new DefendantPinToPostLRspec();
+            updatePinInPostData.setCitizenCaseRole(pinInPostData.getCitizenCaseRole());
+            updatePinInPostData.setRespondentCaseRole(pinInPostData.getRespondentCaseRole());
+            updatePinInPostData.setExpiryDate(pinInPostData.getExpiryDate());
 
             Map<String, Object> data = new HashMap<>();
             data.put("respondent1PinToPostLRspec", updatePinInPostData);
@@ -65,21 +65,21 @@ public class DefendantPinToPostLRspecService {
 
     public DefendantPinToPostLRspec buildDefendantPinToPost() {
         LocalDate expiryDate = LocalDate.now().plusDays(EXPIRY_PERIOD);
-        return DefendantPinToPostLRspec.builder()
-            .accessCode(AccessCodeGenerator.generateAccessCode())
-            .respondentCaseRole(
-                CaseRole.DEFENDANT.getFormattedName())
-            .expiryDate(expiryDate)
-            .build();
+        DefendantPinToPostLRspec pinToPost = new DefendantPinToPostLRspec();
+        pinToPost.setAccessCode(AccessCodeGenerator.generateAccessCode());
+        pinToPost.setRespondentCaseRole(CaseRole.DEFENDANT.getFormattedName());
+        pinToPost.setExpiryDate(expiryDate);
+        return pinToPost;
     }
 
     public DefendantPinToPostLRspec resetPinExpiryDate(DefendantPinToPostLRspec pinInPostData) {
         LocalDate expiryDate = LocalDate.now().plusDays(EXPIRY_PERIOD);
-        return DefendantPinToPostLRspec.builder()
-            .expiryDate(expiryDate)
-            .citizenCaseRole(pinInPostData.getCitizenCaseRole())
-            .respondentCaseRole(pinInPostData.getRespondentCaseRole())
-            .accessCode(pinInPostData.getAccessCode()).build();
+        DefendantPinToPostLRspec updatedPin = new DefendantPinToPostLRspec();
+        updatedPin.setExpiryDate(expiryDate);
+        updatedPin.setCitizenCaseRole(pinInPostData.getCitizenCaseRole());
+        updatedPin.setRespondentCaseRole(pinInPostData.getRespondentCaseRole());
+        updatedPin.setAccessCode(pinInPostData.getAccessCode());
+        return updatedPin;
     }
 
     public String validateOcmcPin(String pin, String caseReference) {
