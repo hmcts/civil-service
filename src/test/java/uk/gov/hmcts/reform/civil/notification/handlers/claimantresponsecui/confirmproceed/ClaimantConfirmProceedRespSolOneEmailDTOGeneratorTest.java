@@ -53,7 +53,7 @@ class ClaimantConfirmProceedRespSolOneEmailDTOGeneratorTest {
         CaseData caseData = CaseData.builder().respondent1Represented(YesOrNo.YES)
             .applicant1Represented(YesOrNo.NO)
             .applicant1ProceedWithClaim(YesOrNo.YES)
-            .caseDataLiP(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.NO).build())
+            .caseDataLiP(new CaseDataLiP().setApplicant1SettleClaim(YesOrNo.NO))
             .defenceRouteRequired(HAS_PAID_THE_AMOUNT_CLAIMED)
             .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
             .responseClaimTrack(SMALL_CLAIM).build();
@@ -73,7 +73,7 @@ class ClaimantConfirmProceedRespSolOneEmailDTOGeneratorTest {
             .applicant1Represented(YesOrNo.NO)
             .applicant1ProceedWithClaim(YesOrNo.NO)
             .responseClaimTrack(FAST_CLAIM.name())
-            .caseDataLiP(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES).build())
+            .caseDataLiP(new CaseDataLiP().setApplicant1SettleClaim(YesOrNo.YES))
             .defenceRouteRequired(HAS_PAID_THE_AMOUNT_CLAIMED)
             .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
             .build();

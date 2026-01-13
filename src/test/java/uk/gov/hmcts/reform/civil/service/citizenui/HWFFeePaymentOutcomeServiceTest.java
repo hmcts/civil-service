@@ -36,12 +36,12 @@ public class HWFFeePaymentOutcomeServiceTest {
     @Test
     void whenHWFRefNumberProvidedForClaimIssue() {
         CaseData caseData = CaseDataBuilder.builder()
-            .caseDataLip(CaseDataLiP.builder()
-                             .helpWithFees(HelpWithFees.builder()
-                                               .helpWithFee(YesOrNo.NO).build()).build())
-            .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder().hwfNumberAvailable(YesOrNo.YES)
-                                          .hwfNumberForFeePaymentOutcome("HWF-1C4-E34")
-                                          .hwfFullRemissionGrantedForClaimIssue(YesOrNo.YES).build())
+            .caseDataLip(new CaseDataLiP()
+                             .setHelpWithFees(new HelpWithFees()
+                                               .setHelpWithFee(YesOrNo.NO)))
+            .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails().setHwfNumberAvailable(YesOrNo.YES)
+                                          .setHwfNumberForFeePaymentOutcome("HWF-1C4-E34")
+                                          .setHwfFullRemissionGrantedForClaimIssue(YesOrNo.YES))
             .hwfFeeType(FeeType.CLAIMISSUED)
             .build();
 
@@ -52,9 +52,9 @@ public class HWFFeePaymentOutcomeServiceTest {
     @Test
     void whenHWFRefNumberProvidedForHearingFee() {
         CaseData caseData = CaseData.builder()
-            .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder().hwfNumberAvailable(YesOrNo.YES)
-                                          .hwfNumberForFeePaymentOutcome("HWF-1C4-E34")
-                                          .hwfFullRemissionGrantedForHearingFee(YesOrNo.YES).build())
+            .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails().setHwfNumberAvailable(YesOrNo.YES)
+                                          .setHwfNumberForFeePaymentOutcome("HWF-1C4-E34")
+                                          .setHwfFullRemissionGrantedForHearingFee(YesOrNo.YES))
             .hwfFeeType(FeeType.HEARING)
             .build();
 
@@ -67,9 +67,8 @@ public class HWFFeePaymentOutcomeServiceTest {
     void whenItsPartRemissionUpdateOutstandingAmountForClaimIssue() {
         CaseData caseData = CaseData.builder()
             .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
-            .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
-                                       .remissionAmount(BigDecimal.valueOf(1000))
-                                       .build())
+            .claimIssuedHwfDetails(new HelpWithFeesDetails()
+                                       .setRemissionAmount(BigDecimal.valueOf(1000)))
             .hwfFeeType(FeeType.CLAIMISSUED)
             .build();
 
@@ -82,9 +81,8 @@ public class HWFFeePaymentOutcomeServiceTest {
         CaseData caseData = CaseData.builder()
             .hearingReferenceNumber("000HN001")
             .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
-            .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                   .remissionAmount(BigDecimal.valueOf(1000))
-                                   .build())
+            .hearingHwfDetails(new HelpWithFeesDetails()
+                                   .setRemissionAmount(BigDecimal.valueOf(1000)))
             .hwfFeeType(FeeType.HEARING)
             .build();
 

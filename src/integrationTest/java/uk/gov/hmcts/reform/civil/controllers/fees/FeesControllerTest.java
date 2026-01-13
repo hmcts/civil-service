@@ -82,8 +82,8 @@ public class FeesControllerTest extends BaseIntegrationTest {
         when(gaFeesService.getFeeForGALiP(List.of(GeneralApplicationTypes.EXTEND_TIME), true, false, null)).thenReturn(
             response);
         GeneralApplicationFeeRequest feeRequest =
-            GeneralApplicationFeeRequest.builder().applicationTypes((List.of(GeneralApplicationTypes.EXTEND_TIME)))
-                .withConsent(true).withNotice(false).build();
+            new GeneralApplicationFeeRequest().setApplicationTypes((List.of(GeneralApplicationTypes.EXTEND_TIME)))
+                .setWithConsent(true).setWithNotice(false);
         mockMvc.perform(
                 MockMvcRequestBuilders.post(FEES_GA_URL)
                     .header(HttpHeaders.AUTHORIZATION, BEARER_TOKEN)
