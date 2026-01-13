@@ -28,8 +28,6 @@ public class ClaimDismissedPastDeadlineStrategy implements EventHistoryStrategy 
     @Override
     public boolean supports(CaseData caseData) {
         return caseData != null
-            && caseData.getClaimDismissedDate() != null
-            && hasRequiredHistory(caseData)
             && isDismissedPastDeadline(caseData);
     }
 
@@ -47,19 +45,13 @@ public class ClaimDismissedPastDeadlineStrategy implements EventHistoryStrategy 
             case NOTIFICATION_ACKNOWLEDGED,
                 NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION,
                 CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION,
-                PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA,
-                PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA ->
+                PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA ->
                 textFormatter.claimDismissedNoUserActionForSixMonths();
             default ->
                 throw new IllegalStateException("Unexpected flow state " + previous.fullName());
         };
 
         builder.miscellaneous(buildMiscEvent(builder, sequenceGenerator, message, caseData.getClaimDismissedDate()));
-    }
-
-    private boolean hasRequiredHistory(CaseData caseData) {
-        List<State> history = stateFlowEngine.evaluate(caseData).getStateHistory();
-        return history.size() > 1;
     }
 
     private boolean isDismissedPastDeadline(CaseData caseData) {

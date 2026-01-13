@@ -78,13 +78,13 @@ class RespondentFullAdmissionStrategyTest {
     }
 
     @Test
-    void supportsReturnsFalseWhenNoResponsesPresent() {
+    void supportsReturnsTrueWhenCaseDataPresent() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentFullAdmission()
             .respondent1ResponseDate(null)
             .build();
 
-        assertThat(strategy.supports(caseData)).isFalse();
+        assertThat(strategy.supports(caseData)).isTrue();
     }
 
     @Test
@@ -207,9 +207,13 @@ class RespondentFullAdmissionStrategyTest {
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11, 12);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        LocalDateTime before = LocalDateTime.now();
         strategy.contribute(builder, caseData, null);
+        LocalDateTime after = LocalDateTime.now();
 
         EventHistory history = builder.build();
+        assertThat(history.getMiscellaneous().get(1).getDateReceived()).isAfterOrEqualTo(before);
+        assertThat(history.getMiscellaneous().get(1).getDateReceived()).isBeforeOrEqualTo(after);
         assertThat(history.getMiscellaneous()).hasSize(2);
         assertThat(history.getMiscellaneous())
             .extracting(Event::getEventDetailsText)
@@ -217,6 +221,5 @@ class RespondentFullAdmissionStrategyTest {
                 respondentResponseSupport.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true),
                 formatter.lipVsLrFullOrPartAdmissionReceived()
             );
-        assertThat(history.getMiscellaneous().get(1).getDateReceived()).isEqualTo(NOW);
     }
 }

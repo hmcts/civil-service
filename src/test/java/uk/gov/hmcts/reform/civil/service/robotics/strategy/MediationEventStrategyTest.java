@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
@@ -47,12 +46,12 @@ class MediationEventStrategyTest {
     @Mock
     private StateFlow stateFlow;
 
-    @InjectMocks
     private MediationEventStrategy strategy;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        strategy = new MediationEventStrategy(timelineHelper, sequenceGenerator, textFormatter, stateFlowEngine);
         when(textFormatter.inMediation()).thenReturn("IN MEDIATION");
         when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
         when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.IN_MEDIATION.fullName())));
@@ -84,7 +83,7 @@ class MediationEventStrategyTest {
 
     @Test
     void addsDirectionsQuestionnaireAndMiscEventForSpecClaims() {
-        LocalDateTime responseDate = LocalDateTime.of(2024, 1, 15, 10, 0);
+        LocalDateTime responseDate = LocalDateTime.now().plusDays(1);
         CaseData caseData = baseCaseData(CaseCategory.SPEC_CLAIM).toBuilder()
             .applicant1ResponseDate(responseDate)
             .applicant1DQ(Applicant1DQ.builder()
@@ -98,7 +97,6 @@ class MediationEventStrategyTest {
             .build();
 
         when(sequenceGenerator.nextSequence(any())).thenReturn(11, 12);
-        when(timelineHelper.ensurePresentOrNow(any())).thenReturn(responseDate);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);
@@ -122,13 +120,12 @@ class MediationEventStrategyTest {
 
     @Test
     void addsOnlyMiscEventWhenClaimIsUnspec() {
-        LocalDateTime responseDate = LocalDateTime.of(2024, 2, 1, 9, 30);
+        LocalDateTime responseDate = LocalDateTime.now().plusDays(1);
         CaseData caseData = baseCaseData(CaseCategory.UNSPEC_CLAIM).toBuilder()
             .applicant1ResponseDate(responseDate)
             .build();
 
         when(sequenceGenerator.nextSequence(any())).thenReturn(5);
-        when(timelineHelper.ensurePresentOrNow(any())).thenReturn(responseDate);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);

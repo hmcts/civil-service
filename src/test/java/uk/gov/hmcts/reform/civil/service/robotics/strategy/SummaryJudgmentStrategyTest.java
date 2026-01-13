@@ -32,8 +32,6 @@ class SummaryJudgmentStrategyTest {
 
     private SummaryJudgmentStrategy strategy;
 
-    private LocalDateTime now;
-
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -41,8 +39,6 @@ class SummaryJudgmentStrategyTest {
         strategy = new SummaryJudgmentStrategy(sequenceGenerator, formatter, timelineHelper);
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(42);
-        now = LocalDateTime.of(2024, 5, 1, 9, 30);
-        when(timelineHelper.now()).thenReturn(now);
     }
 
     @Test
@@ -62,13 +58,16 @@ class SummaryJudgmentStrategyTest {
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
 
+        LocalDateTime before = LocalDateTime.now();
         strategy.contribute(builder, caseData, null);
+        LocalDateTime after = LocalDateTime.now();
 
         EventHistory history = builder.build();
+        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isAfterOrEqualTo(before);
+        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isBeforeOrEqualTo(after);
         assertThat(history.getMiscellaneous()).hasSize(1);
         assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(42);
         assertThat(history.getMiscellaneous().get(0).getEventCode()).isEqualTo(EventType.MISCELLANEOUS.getCode());
-        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isEqualTo(now);
         String expectedMessage = formatter.summaryJudgmentGranted();
         assertThat(history.getMiscellaneous().get(0).getEventDetailsText()).isEqualTo(expectedMessage);
     }

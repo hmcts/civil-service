@@ -13,6 +13,8 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
+import java.time.LocalDateTime;
+
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 
 @Slf4j
@@ -44,8 +46,17 @@ public class SpecRejectRepaymentPlanStrategy implements EventHistoryStrategy {
             builder,
             sequenceGenerator,
             message,
-            timelineHelper.ensurePresentOrNow(caseData.getApplicant1ResponseDate())
+            resolveApplicant1ResponseDate(caseData)
         ));
+    }
+
+    private LocalDateTime resolveApplicant1ResponseDate(CaseData caseData) {
+        LocalDateTime applicant1ResponseDate = caseData.getApplicant1ResponseDate();
+        LocalDateTime now = LocalDateTime.now();
+        if (applicant1ResponseDate == null || applicant1ResponseDate.isBefore(now)) {
+            return now;
+        }
+        return applicant1ResponseDate;
     }
 
     private boolean hasRepaymentRejectionState(CaseData caseData) {

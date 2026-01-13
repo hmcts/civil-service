@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
@@ -86,11 +87,10 @@ public class DefaultJudgmentEventStrategy implements EventHistoryStrategy {
         BigDecimal totalInterest = caseData.getTotalInterest() != null ? caseData.getTotalInterest() : ZERO;
         BigDecimal amountClaimedWithInterest = caseData.getTotalClaimAmount().add(totalInterest);
 
-        BigDecimal partialPaymentPounds = Optional.ofNullable(caseData.getPartialPaymentAmount())
-            .filter(value -> !value.isBlank())
-            .map(BigDecimal::new)
-            .map(MonetaryConversions::penniesToPounds)
-            .orElse(null);
+        String partialPaymentAmount = caseData.getPartialPaymentAmount();
+        BigDecimal partialPaymentPounds = StringUtils.isNotEmpty(partialPaymentAmount)
+            ? MonetaryConversions.penniesToPounds(new BigDecimal(partialPaymentAmount))
+            : null;
 
         DJPaymentTypeSelection paymentType = caseData.getPaymentTypeSelection();
         boolean immediate = DJPaymentTypeSelection.IMMEDIATELY.equals(paymentType);
@@ -147,7 +147,7 @@ public class DefaultJudgmentEventStrategy implements EventHistoryStrategy {
                 ? Optional.ofNullable(caseData.getApplicant1SuggestPayImmediatelyPaymentDateForDefendantSpec())
                 .map(LocalDate::atStartOfDay)
                 .orElse(null)
-                : timelineHelper.now();
+                : LocalDateTime.now();
         }
 
         if (paymentTypeSelection == DJPaymentTypeSelection.SET_DATE) {
@@ -164,7 +164,7 @@ public class DefaultJudgmentEventStrategy implements EventHistoryStrategy {
 
     private BigDecimal getInstallmentAmountFromRepaymentSuggestion(CaseData caseData) {
         String suggestion = caseData.getRepaymentSuggestion();
-        return MonetaryConversions.penniesToPounds(new BigDecimal(suggestion));
+        return MonetaryConversions.penniesToPounds(new BigDecimal(suggestion)).setScale(2);
     }
 
     private String getInstallmentPeriod(CaseData data) {
@@ -193,6 +193,6 @@ public class DefaultJudgmentEventStrategy implements EventHistoryStrategy {
     private LocalDateTime getDateOfDjCreated(CaseData caseData) {
         return featureToggleService.isJOLiveFeedActive() && Objects.nonNull(caseData.getJoDJCreatedDate())
             ? caseData.getJoDJCreatedDate()
-            : timelineHelper.now();
+            : LocalDateTime.now();
     }
 }

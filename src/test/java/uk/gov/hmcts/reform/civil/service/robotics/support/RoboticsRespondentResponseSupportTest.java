@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class RoboticsRespondentResponseSupportTest {
 
@@ -57,8 +58,8 @@ class RoboticsRespondentResponseSupportTest {
             .respondent1ClaimResponseTypeForSpec(null)
             .build();
 
-        String message = support.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
-        assertThat(message).isEmpty();
+        assertThatThrownBy(() -> support.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true))
+            .isInstanceOf(NullPointerException.class);
     }
 
     @Test

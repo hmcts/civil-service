@@ -27,7 +27,6 @@ public class TakenOfflineAfterClaimNotifiedStrategy implements EventHistoryStrat
     @Override
     public boolean supports(CaseData caseData) {
         return caseData != null
-            && caseData.getSubmittedDate() != null
             && hasTakenOfflineAfterClaimNotifiedState(caseData);
     }
 

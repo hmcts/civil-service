@@ -240,7 +240,7 @@ public class RoboticsDataMapperForUnspec extends BaseRoboticsDataMapper {
                 APPLICANT_SOLICITOR_ID,
                 caseData.isLipvLipOneVOne()
                     ? null
-                    : caseDataSupport.organisationId(caseData.getApplicant1OrganisationPolicy()).orElse(null),
+                    : caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID(),
                 ofNullable(defaultDateTime).map(LocalDateTime::toLocalDate).orElse(null)
             ),
             caseDataSupport.buildLitigiousParty(
@@ -261,7 +261,9 @@ public class RoboticsDataMapperForUnspec extends BaseRoboticsDataMapper {
                 "Claimant",
                 APPLICANT2_ID,
                 APPLICANT_SOLICITOR_ID,
-                caseDataSupport.organisationId(caseData.getApplicant2OrganisationPolicy()).orElse(null),
+                caseData.getApplicant2OrganisationPolicy() != null
+                    ? caseData.getApplicant2OrganisationPolicy().getOrganisation().getOrganisationID()
+                    : null,
                 ofNullable(defaultDateTime).map(LocalDateTime::toLocalDate).orElse(null)
             ));
         }

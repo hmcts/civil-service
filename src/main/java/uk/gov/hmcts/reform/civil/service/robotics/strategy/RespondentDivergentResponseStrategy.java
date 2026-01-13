@@ -77,11 +77,7 @@ public class RespondentDivergentResponseStrategy implements EventHistoryStrategy
             .map(State::getName)
             .anyMatch(SUPPORTED_STATES::contains);
 
-        if (!hasState) {
-            return false;
-        }
-
-        return defendant1ResponseExists.test(caseData) || defendant2DivergentResponseExists.test(caseData);
+        return hasState;
     }
 
     @Override
@@ -109,7 +105,9 @@ public class RespondentDivergentResponseStrategy implements EventHistoryStrategy
             : OFFLINE_STATES.contains(stateFlowEngine.evaluate(caseData).getState().getName());
 
         LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
-        LocalDateTime respondent2ResponseDate = respondentResponseSupport.resolveRespondent2ResponseDate(caseData);
+        LocalDateTime respondent2ResponseDate = ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+            ? caseData.getRespondent1ResponseDate()
+            : caseData.getRespondent2ResponseDate();
 
         if (defendant1ResponseExists.test(caseData)) {
             if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
@@ -170,10 +168,6 @@ public class RespondentDivergentResponseStrategy implements EventHistoryStrategy
                                        LocalDateTime responseDate,
                                        String respondentId,
                                        boolean isRespondent1) {
-        if (responseType == null) {
-            return;
-        }
-
         switch (responseType) {
             case FULL_DEFENCE:
                 addFullDefenceEvent(builder, caseData, responseDate, respondentId, isRespondent1);
@@ -195,10 +189,6 @@ public class RespondentDivergentResponseStrategy implements EventHistoryStrategy
                                          LocalDateTime responseDate,
                                          String respondentId,
                                          boolean isRespondent1) {
-        if (responseType == null) {
-            return;
-        }
-
         switch (responseType) {
             case FULL_DEFENCE:
                 addFullDefenceEvent(builder, caseData, responseDate, respondentId, isRespondent1);
@@ -238,17 +228,15 @@ public class RespondentDivergentResponseStrategy implements EventHistoryStrategy
 
         DQ respondentDQ = isRespondent1 ? getRespondent1DQOrDefault(caseData) : getRespondent2DQOrDefault(caseData);
         Party respondent = isRespondent1 ? caseData.getRespondent1() : caseData.getRespondent2();
-        if (respondent != null) {
-            builder.directionsQuestionnaire(createDirectionsQuestionnaireEvent(
-                builder,
-                caseData,
-                responseDate,
-                respondentId,
-                respondentDQ,
-                respondent,
-                isRespondent1
-            ));
-        }
+        builder.directionsQuestionnaire(createDirectionsQuestionnaireEvent(
+            builder,
+            caseData,
+            responseDate,
+            respondentId,
+            respondentDQ,
+            respondent,
+            isRespondent1
+        ));
     }
 
     private RespondToClaim resolveRespondToClaim(CaseData caseData, String respondentId) {

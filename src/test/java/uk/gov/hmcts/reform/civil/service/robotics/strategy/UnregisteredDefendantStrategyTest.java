@@ -58,8 +58,8 @@ class UnregisteredDefendantStrategyTest {
     }
 
     @Test
-    void supportsReturnsFalseWhenNoSubmittedDate() {
-        assertThat(strategy.supports(CaseData.builder().build())).isFalse();
+    void supportsReturnsTrueWhenStatePresentEvenIfSubmittedDateMissing() {
+        assertThat(strategy.supports(CaseData.builder().build())).isTrue();
     }
 
     @Test
@@ -88,7 +88,7 @@ class UnregisteredDefendantStrategyTest {
     }
 
     @Test
-    void supportsReturnsFalseWhenOrganisationIsRegistered() {
+    void supportsReturnsTrueWhenStatePresentEvenIfOrganisationRegistered() {
         CaseData caseData = CaseData.builder()
             .submittedDate(LocalDateTime.now())
             .respondent1(Party.builder().companyName("Def One").type(Party.Type.COMPANY).build())
@@ -99,7 +99,7 @@ class UnregisteredDefendantStrategyTest {
             ).build())
             .build();
 
-        assertThat(strategy.supports(caseData)).isFalse();
+        assertThat(strategy.supports(caseData)).isTrue();
     }
 
     @Test

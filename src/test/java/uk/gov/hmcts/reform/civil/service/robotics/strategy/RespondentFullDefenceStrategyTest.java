@@ -51,7 +51,7 @@ class RespondentFullDefenceStrategyTest {
     }
 
     @Test
-    void supportsReturnsFalseWhenNoResponsesPresent() {
+    void supportsReturnsTrueWhenCaseDataPresent() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentFullDefence()
             .build()
@@ -60,7 +60,7 @@ class RespondentFullDefenceStrategyTest {
             .respondent2ResponseDate(null)
             .build();
 
-        assertThat(strategy.supports(caseData)).isFalse();
+        assertThat(strategy.supports(caseData)).isTrue();
     }
 
     @Test
@@ -113,13 +113,15 @@ class RespondentFullDefenceStrategyTest {
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
             .build();
 
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11);
+
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);
 
         EventHistory history = builder.build();
         assertThat(history.getMiscellaneous()).isNullOrEmpty();
-        assertThat(history.getDefenceFiled()).isNullOrEmpty();
-        assertThat(history.getDirectionsQuestionnaireFiled()).isNullOrEmpty();
+        assertThat(history.getDefenceFiled()).hasSize(1);
+        assertThat(history.getDirectionsQuestionnaireFiled()).hasSize(1);
         assertThat(history.getDefenceAndCounterClaim()).isNullOrEmpty();
     }
 

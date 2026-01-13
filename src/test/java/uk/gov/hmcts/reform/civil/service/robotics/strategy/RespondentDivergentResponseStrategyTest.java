@@ -75,14 +75,14 @@ class RespondentDivergentResponseStrategyTest {
     }
 
     @Test
-    void supportsReturnsFalseWhenNoResponses() {
+    void supportsReturnsTrueWhenStatePresentEvenIfResponsesMissing() {
         when(stateFlow.getStateHistory()).thenReturn(List.of(
             State.from(FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName())
         ));
 
         CaseData caseData = CaseDataBuilder.builder().build();
 
-        assertThat(strategy.supports(caseData)).isFalse();
+        assertThat(strategy.supports(caseData)).isTrue();
     }
 
     @Test

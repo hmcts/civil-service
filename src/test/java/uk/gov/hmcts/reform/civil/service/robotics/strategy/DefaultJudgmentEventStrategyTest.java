@@ -140,8 +140,6 @@ class DefaultJudgmentEventStrategyTest {
 
     @Test
     void createsDefaultJudgmentEventsForBothRespondentsWhenBothSelected() {
-        LocalDateTime now = LocalDate.of(2024, 2, 10).atTime(15, 30);
-        when(timelineHelper.now()).thenReturn(now);
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
         lenient().when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(1, 2, 3);
         when(partyLookup.respondentId(0)).thenReturn("002");
@@ -156,13 +154,18 @@ class DefaultJudgmentEventStrategyTest {
             .build();
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        LocalDateTime before = LocalDateTime.now();
         strategy.contribute(builder, caseData, null);
+        LocalDateTime after = LocalDateTime.now();
 
         EventHistory history = builder.build();
+        history.getDefaultJudgment().forEach(event -> {
+            assertThat(event.getDateReceived()).isAfterOrEqualTo(before);
+            assertThat(event.getDateReceived()).isBeforeOrEqualTo(after);
+        });
         assertThat(history.getDefaultJudgment()).hasSize(2);
         assertThat(history.getDefaultJudgment().get(0).getLitigiousPartyID()).isEqualTo("002");
         assertThat(history.getDefaultJudgment().get(1).getLitigiousPartyID()).isEqualTo("003");
-        history.getDefaultJudgment().forEach(event -> assertThat(event.getDateReceived()).isEqualTo(now));
         assertThat(history.getMiscellaneous())
             .singleElement()
             .satisfies(event ->

@@ -44,11 +44,6 @@ public class AcknowledgementOfServiceStrategy implements EventHistoryStrategy {
         if (caseData == null) {
             return false;
         }
-        boolean respondent1Ack = PredicateUtils.defendant1AckExists.test(caseData);
-        boolean respondent2Ack = PredicateUtils.defendant2AckExists.test(caseData);
-        if (!respondent1Ack && !respondent2Ack) {
-            return false;
-        }
         return hasRelevantState(stateFlowEngine.evaluate(caseData));
     }
 
@@ -66,7 +61,9 @@ public class AcknowledgementOfServiceStrategy implements EventHistoryStrategy {
             default -> buildSingleDefendantEvents(builder, caseData);
         };
 
-        if (!events.isEmpty()) {
+        if (scenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
+            builder.acknowledgementOfServiceReceived(events);
+        } else if (!events.isEmpty()) {
             builder.acknowledgementOfServiceReceived(events);
         }
     }
@@ -83,7 +80,7 @@ public class AcknowledgementOfServiceStrategy implements EventHistoryStrategy {
             events.add(buildAosEvent(builder, caseData, false,
                 String.format("Defendant: %s has acknowledged: %s",
                     caseData.getRespondent2().getPartyName(),
-                    evaluateRespondent2IntentionType(caseData))));
+                    caseData.getRespondent2ClaimResponseIntentionType().getLabel())));
         }
         return events;
     }

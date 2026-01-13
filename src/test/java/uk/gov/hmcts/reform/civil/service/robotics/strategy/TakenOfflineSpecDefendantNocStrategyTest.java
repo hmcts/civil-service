@@ -54,9 +54,9 @@ class TakenOfflineSpecDefendantNocStrategyTest {
     }
 
     @Test
-    void supportsReturnsFalseWhenNoTakenOfflineDate() {
+    void supportsReturnsTrueWhenStatePresentEvenIfTakenOfflineDateMissing() {
         CaseData caseData = CaseDataBuilder.builder().build();
-        assertThat(strategy.supports(caseData)).isFalse();
+        assertThat(strategy.supports(caseData)).isTrue();
     }
 
     @Test

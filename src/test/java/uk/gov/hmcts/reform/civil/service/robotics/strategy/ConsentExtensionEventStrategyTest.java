@@ -142,4 +142,18 @@ class ConsentExtensionEventStrategyTest {
         assertThat(history.getConsentExtensionFilingDefence().get(1).getEventDetailsText())
             .isEqualTo("Defendant(s) have agreed extension: 29 03 2024");
     }
+
+    @Test
+    void contributeAddsEmptyListForSpecWhenAgreedDeadlinePresentWithoutTimeExtension() {
+        CaseData caseData = CaseData.builder()
+            .caseAccessCategory(uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM)
+            .respondentSolicitor1AgreedDeadlineExtension(LocalDate.of(2024, 3, 30))
+            .build();
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventHistory history = builder.build();
+        assertThat(history.getConsentExtensionFilingDefence()).isEmpty();
+    }
 }

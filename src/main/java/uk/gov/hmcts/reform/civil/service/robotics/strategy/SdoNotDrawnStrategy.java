@@ -29,9 +29,6 @@ public class SdoNotDrawnStrategy implements EventHistoryStrategy {
     @Override
     public boolean supports(CaseData caseData) {
         return caseData != null
-            && caseData.getUnsuitableSDODate() != null
-            && caseData.getReasonNotSuitableSDO() != null
-            && caseData.getReasonNotSuitableSDO().getInput() != null
             && hasSdoNotDrawnState(caseData);
     }
 

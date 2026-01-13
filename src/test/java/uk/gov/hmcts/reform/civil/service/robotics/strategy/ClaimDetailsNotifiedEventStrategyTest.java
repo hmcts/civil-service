@@ -42,9 +42,9 @@ class ClaimDetailsNotifiedEventStrategyTest {
     }
 
     @Test
-    void supportsReturnsFalseWhenDateMissing() {
+    void supportsReturnsTrueWhenStatePresentEvenIfDateMissing() {
         CaseData caseData = CaseData.builder().build();
-        assertThat(strategy.supports(caseData)).isFalse();
+        assertThat(strategy.supports(caseData)).isTrue();
     }
 
     @Test

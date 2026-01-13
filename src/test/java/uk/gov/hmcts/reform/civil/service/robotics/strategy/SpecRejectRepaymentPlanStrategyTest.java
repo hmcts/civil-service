@@ -103,14 +103,17 @@ class SpecRejectRepaymentPlanStrategyTest {
             .build();
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        LocalDateTime before = LocalDateTime.now();
         strategy.contribute(builder, base, null);
+        LocalDateTime after = LocalDateTime.now();
 
         EventHistory history = builder.build();
+        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isAfterOrEqualTo(before);
+        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isBeforeOrEqualTo(after);
         assertThat(history.getMiscellaneous()).hasSize(1);
         assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(25);
         assertThat(history.getMiscellaneous().get(0).getEventCode()).isEqualTo(EventType.MISCELLANEOUS.getCode());
         assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
             .isEqualTo(formatter.manualDeterminationRequired());
-        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isEqualTo(NOW);
     }
 }

@@ -26,7 +26,6 @@ public class TakenOfflineSpecDefendantNocStrategy implements EventHistoryStrateg
     @Override
     public boolean supports(CaseData caseData) {
         return caseData != null
-            && caseData.getTakenOfflineDate() != null
             && hasSpecDefendantNocState(caseData);
     }
 

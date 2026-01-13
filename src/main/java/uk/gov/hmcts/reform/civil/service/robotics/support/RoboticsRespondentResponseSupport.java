@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service.robotics.support;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -13,8 +12,6 @@ import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
-
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
@@ -35,8 +32,38 @@ public class RoboticsRespondentResponseSupport {
 
     public String prepareRespondentResponseText(CaseData caseData, Party respondent, boolean isRespondent1) {
         MultiPartyScenario scenario = getMultiPartyScenario(caseData);
+        String defaultText = "";
         if (scenario.equals(ONE_V_ONE) || scenario.equals(TWO_V_ONE)) {
-            return buildSingleOrTwoVOneResponseText(caseData);
+            if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+                switch (resolveSpecResponseType(caseData)) {
+                    case COUNTER_CLAIM:
+                        defaultText = textFormatter.defendantRejectsAndCounterClaims();
+                        break;
+                    case FULL_ADMISSION:
+                        defaultText = textFormatter.defendantFullyAdmits();
+                        break;
+                    case PART_ADMISSION:
+                        defaultText = textFormatter.defendantPartialAdmission();
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                switch (caseData.getRespondent1ClaimResponseType()) {
+                    case COUNTER_CLAIM:
+                        defaultText = textFormatter.defendantRejectsAndCounterClaims();
+                        break;
+                    case FULL_ADMISSION:
+                        defaultText = textFormatter.defendantFullyAdmits();
+                        break;
+                    case PART_ADMISSION:
+                        defaultText = textFormatter.defendantPartialAdmission();
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return defaultText;
         }
 
         String paginatedMessage = scenario.equals(ONE_V_TWO_ONE_LEGAL_REP)
@@ -50,53 +77,6 @@ public class RoboticsRespondentResponseSupport {
             SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                 ? getResponseTypeForRespondentSpec(caseData, respondent)
                 : getResponseTypeForRespondent(caseData, respondent)
-        );
-    }
-
-    private String buildSingleOrTwoVOneResponseText(CaseData caseData) {
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            RespondentResponseTypeSpec responseType = resolveSpecResponseType(caseData);
-            if (responseType != null) {
-                return switch (responseType) {
-                    case COUNTER_CLAIM -> textFormatter.defendantRejectsAndCounterClaims();
-                    case FULL_ADMISSION -> textFormatter.defendantFullyAdmits();
-                    case PART_ADMISSION -> textFormatter.defendantPartialAdmission();
-                    case FULL_DEFENCE -> formatFullDefenceResponseText(caseData, true);
-                    default -> "";
-                };
-            }
-        }
-
-        if (caseData.getRespondent1ClaimResponseType() == null) {
-            return "";
-        }
-
-        return switch (caseData.getRespondent1ClaimResponseType()) {
-            case COUNTER_CLAIM -> textFormatter.defendantRejectsAndCounterClaims();
-            case FULL_ADMISSION -> textFormatter.defendantFullyAdmits();
-            case PART_ADMISSION -> textFormatter.defendantPartialAdmission();
-            case FULL_DEFENCE -> formatFullDefenceResponseText(caseData, false);
-            default -> "";
-        };
-    }
-
-    private String formatFullDefenceResponseText(CaseData caseData, boolean isSpec) {
-        Party respondent = caseData.getRespondent1();
-        String respondentName = respondent != null ? respondent.getPartyName() : "Defendant";
-        String responseLabel = isSpec
-            ? Optional.ofNullable(respondent)
-                .map(value -> getResponseTypeForRespondentSpec(caseData, value))
-                .map(Enum::name)
-                .orElse(RespondentResponseTypeSpec.FULL_DEFENCE.name())
-            : Optional.ofNullable(respondent)
-                .map(value -> getResponseTypeForRespondent(caseData, value))
-                .map(Enum::name)
-                .orElse(RespondentResponseType.FULL_DEFENCE.name());
-
-        return textFormatter.formatRpa(
-            "Defendant: %s has responded: %s",
-            respondentName,
-            responseLabel
         );
     }
 
@@ -185,13 +165,7 @@ public class RoboticsRespondentResponseSupport {
                                        Party respondent,
                                        boolean isRespondent1,
                                        LocalDateTime dateReceived) {
-        if (caseData == null || respondent == null) {
-            return;
-        }
         String message = prepareRespondentResponseText(caseData, respondent, isRespondent1);
-        if (!StringUtils.hasText(message)) {
-            return;
-        }
         RoboticsEventSupport.addRespondentMiscEvent(builder, sequenceGenerator, message, dateReceived);
     }
 

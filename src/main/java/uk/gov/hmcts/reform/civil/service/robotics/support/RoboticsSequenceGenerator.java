@@ -10,9 +10,6 @@ import java.util.List;
 public class RoboticsSequenceGenerator {
 
     public int nextSequence(EventHistory history) {
-        if (history == null) {
-            return 1;
-        }
         int currentSequence = 0;
         currentSequence = maxSequence(history.getMiscellaneous(), currentSequence);
         currentSequence = maxSequence(history.getAcknowledgementOfServiceReceived(), currentSequence);
@@ -35,11 +32,8 @@ public class RoboticsSequenceGenerator {
     }
 
     private int maxSequence(List<Event> events, int currentSequence) {
-        if (events == null) {
-            return currentSequence;
-        }
         for (Event event : events) {
-            if (event != null && event.getEventSequence() != null && event.getEventSequence() > currentSequence) {
+            if (event.getEventSequence() != null && event.getEventSequence() > currentSequence) {
                 currentSequence = event.getEventSequence();
             }
         }

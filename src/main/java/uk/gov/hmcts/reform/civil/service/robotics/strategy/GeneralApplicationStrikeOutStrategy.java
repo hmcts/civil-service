@@ -107,10 +107,7 @@ public class GeneralApplicationStrikeOutStrategy implements EventHistoryStrategy
     }
 
     private boolean matchesStrikeOutDecision(GeneralApplicationsDetails details, GeneralApplication application) {
-        return STRIKE_OUT.getDisplayedValue().equals(details.getGeneralApplicationType())
-            && details.getCaseLink() != null
-            && application.getCaseLink() != null
-            && Objects.equals(details.getCaseLink().getCaseReference(),
+        return Objects.equals(details.getCaseLink().getCaseReference(),
             application.getCaseLink().getCaseReference())
             && PROCEEDS_IN_HERITAGE.getDisplayedValue().equals(details.getCaseState());
     }

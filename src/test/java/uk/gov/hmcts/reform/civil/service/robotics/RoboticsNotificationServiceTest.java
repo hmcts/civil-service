@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
@@ -25,8 +27,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
-import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
-import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
 import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -57,10 +57,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.lenient;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
@@ -83,11 +81,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
         RoboticsAddressMapper.class,
         AddressLinesMapper.class,
         OrganisationService.class,
-        uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsRespondentResponseSupport.class,
-        uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter.class,
-        uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper.class,
-        uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsCaseDataSupport.class,
-        uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup.class
+        RoboticsNotificationServiceTest.RoboticsStrategyTestConfiguration.class
     },
     properties = {
         "sendgrid.api-key:some-key",
@@ -100,11 +94,20 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 )
 class RoboticsNotificationServiceTest {
 
+    @Configuration
+    @ComponentScan(basePackages = {
+        "uk.gov.hmcts.reform.civil.service.robotics.strategy",
+        "uk.gov.hmcts.reform.civil.service.robotics.support"
+    })
+    static class RoboticsStrategyTestConfiguration {
+        // Test-only configuration to register strategy/support beans for EventHistoryMapper.
+    }
+
     @Autowired
     RoboticsNotificationService service;
     @Autowired
     RoboticsEmailConfiguration emailConfiguration;
-    @MockBean
+    @Autowired
     RoboticsDataMapperForUnspec roboticsDataMapper;
     @MockBean
     FeatureToggleService featureToggleService;
@@ -137,24 +140,6 @@ class RoboticsNotificationServiceTest {
     void setup() {
         localDateTime = LocalDateTime.of(2020, 8, 1, 12, 0, 0);
         when(time.now()).thenReturn(localDateTime);
-        lenient().when(roboticsDataMapper.toRoboticsCaseData(any(CaseData.class), any()))
-            .thenAnswer(invocation -> roboticsCaseDataWithEvents("RPA Reason: Claim issued in CCD."));
-    }
-
-    private RoboticsCaseData roboticsCaseDataWithEvents(String... eventTexts) {
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
-        LocalDateTime eventDate = localDateTime != null ? localDateTime : LocalDateTime.now();
-        for (String text : eventTexts) {
-            builder.miscellaneous(Event.builder()
-                .eventCode("999")
-                .dateReceived(eventDate)
-                .eventDetails(EventDetails.builder().miscText(text).build())
-                .eventDetailsText(text)
-                .build());
-        }
-        return RoboticsCaseData.builder()
-            .events(builder.build())
-            .build();
     }
 
     @Test
@@ -166,9 +151,6 @@ class RoboticsNotificationServiceTest {
             && caseData.getRespondent2Represented() == null) {
             caseData.setRespondent2Represented(YES);
         }
-
-        when(roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN))
-            .thenReturn(roboticsCaseDataWithEvents("RPA Reason: Claim issued in CCD."));
 
         // When
         service.notifyRobotics(caseData, false, BEARER_TOKEN);
@@ -202,10 +184,6 @@ class RoboticsNotificationServiceTest {
             && caseData.getRespondent2Represented() == null) {
             caseData.setRespondent2Represented(YES);
         }
-
-        String latestEventText = "Claim details notified.";
-        when(roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN))
-            .thenReturn(roboticsCaseDataWithEvents(latestEventText));
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder()
@@ -258,11 +236,6 @@ class RoboticsNotificationServiceTest {
             caseData.setRespondent2Represented(YES);
         }
 
-        String latestEventText = "[1 of 2 - 2020-08-01] Defendant: Mr. John Rambo has responded: "
-            + "FULL_DEFENCE; preferredCourtCode: ; stayClaim: false";
-        when(roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN))
-            .thenReturn(roboticsCaseDataWithEvents(latestEventText));
-
         // When
         service.notifyRobotics(caseData, isMultiPartyScenario(caseData), BEARER_TOKEN);
 
@@ -275,7 +248,7 @@ class RoboticsNotificationServiceTest {
             "Multiparty claim data for %s - %s", reference, caseData.getCcdState()
         );
         String subject = format("Multiparty claim data for %s - %s - %s", reference, caseData.getCcdState(),
-            latestEventText);
+            "Claim details notified.");
 
         // Then
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
@@ -344,11 +317,6 @@ class RoboticsNotificationServiceTest {
             caseData.setRespondent2Represented(YES);
         }
 
-        String latestEventText = "[1 of 2 - 2020-08-01] Defendant: Mr. John Rambo has responded: "
-            + "FULL_DEFENCE; preferredCourtCode: ; stayClaim: false";
-        when(roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN))
-            .thenReturn(roboticsCaseDataWithEvents(latestEventText));
-
         // When
         service.notifyRobotics(caseData, isMultiPartyScenario(caseData), BEARER_TOKEN);
 
@@ -361,7 +329,8 @@ class RoboticsNotificationServiceTest {
             "Multiparty claim data for %s - %s", reference, caseData.getCcdState()
         );
         String subject = format("Multiparty claim data for %s - %s - %s", reference, caseData.getCcdState(),
-            latestEventText);
+            "[1 of 2 - 2020-08-01] Defendant: Mr. John Rambo has responded: "
+                + "FULL_DEFENCE; preferredCourtCode: ; stayClaim: false");
 
         // Then
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);

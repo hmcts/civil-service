@@ -42,8 +42,8 @@ class ClaimNotifiedEventStrategyTest {
     }
 
     @Test
-    void supportsReturnsFalseWhenNotificationDateMissing() {
-        assertThat(strategy.supports(CaseData.builder().build())).isFalse();
+    void supportsReturnsTrueWhenStatePresentEvenIfNotificationDateMissing() {
+        assertThat(strategy.supports(CaseData.builder().build())).isTrue();
     }
 
     @Test

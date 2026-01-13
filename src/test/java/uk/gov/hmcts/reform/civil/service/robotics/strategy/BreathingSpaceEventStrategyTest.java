@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -14,10 +13,10 @@ import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
-import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -26,16 +25,14 @@ import static org.mockito.Mockito.when;
 class BreathingSpaceEventStrategyTest {
 
     @Mock
-    private RoboticsTimelineHelper timelineHelper;
-    @Mock
     private RoboticsSequenceGenerator sequenceGenerator;
 
-    @InjectMocks
     private BreathingSpaceEventStrategy strategy;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        strategy = new BreathingSpaceEventStrategy(sequenceGenerator);
     }
 
     @Test
@@ -61,8 +58,6 @@ class BreathingSpaceEventStrategyTest {
     @Test
     void addsStandardBreathingSpaceEnterEvent() {
         LocalDate start = LocalDate.of(2024, 1, 15);
-        LocalDateTime fallback = LocalDateTime.of(2024, 1, 15, 10, 30);
-        when(timelineHelper.now()).thenReturn(fallback);
         when(sequenceGenerator.nextSequence(any())).thenReturn(1);
 
         CaseData caseData = CaseData.builder()
@@ -74,14 +69,18 @@ class BreathingSpaceEventStrategyTest {
             .build();
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        LocalTime before = LocalTime.now();
         strategy.contribute(builder, caseData, null);
+        LocalTime after = LocalTime.now();
 
         EventHistory history = builder.build();
+        assertThat(history.getBreathingSpaceEntered().get(0).getDateReceived().toLocalTime()).isAfterOrEqualTo(before);
+        assertThat(history.getBreathingSpaceEntered().get(0).getDateReceived().toLocalTime()).isBeforeOrEqualTo(after);
         assertThat(history.getBreathingSpaceEntered()).hasSize(1);
         Event event = history.getBreathingSpaceEntered().get(0);
         assertThat(event.getEventSequence()).isEqualTo(1);
         assertThat(event.getEventCode()).isEqualTo(EventType.BREATHING_SPACE_ENTERED.getCode());
-        assertThat(event.getDateReceived()).isEqualTo(start.atTime(fallback.toLocalTime()));
+        assertThat(event.getDateReceived().toLocalDate()).isEqualTo(start);
         assertThat(event.getEventDetailsText())
             .isEqualTo("Breathing space reference REF-123, actual start date " + start);
         assertThat(history.getBreathingSpaceLifted()).isNullOrEmpty();
@@ -91,9 +90,6 @@ class BreathingSpaceEventStrategyTest {
     void addsEnterAndLiftWhenLiftInformationPresent() {
         LocalDate start = LocalDate.of(2024, 2, 1);
         LocalDate end = LocalDate.of(2024, 3, 1);
-        LocalDateTime fallbackEnter = LocalDateTime.of(2024, 2, 1, 9, 0);
-        LocalDateTime fallbackLift = LocalDateTime.of(2024, 3, 1, 9, 0);
-        when(timelineHelper.now()).thenReturn(fallbackEnter, fallbackLift);
         when(sequenceGenerator.nextSequence(any())).thenReturn(5, 6);
 
         CaseData caseData = CaseData.builder()
@@ -107,9 +103,15 @@ class BreathingSpaceEventStrategyTest {
             .build();
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        LocalTime before = LocalTime.now();
         strategy.contribute(builder, caseData, null);
+        LocalTime after = LocalTime.now();
 
         EventHistory history = builder.build();
+        assertThat(history.getBreathingSpaceEntered().get(0).getDateReceived().toLocalTime()).isAfterOrEqualTo(before);
+        assertThat(history.getBreathingSpaceEntered().get(0).getDateReceived().toLocalTime()).isBeforeOrEqualTo(after);
+        assertThat(history.getBreathingSpaceLifted().get(0).getDateReceived().toLocalTime()).isAfterOrEqualTo(before);
+        assertThat(history.getBreathingSpaceLifted().get(0).getDateReceived().toLocalTime()).isBeforeOrEqualTo(after);
         assertThat(history.getBreathingSpaceEntered()).hasSize(1);
         assertThat(history.getBreathingSpaceLifted()).hasSize(1);
 
@@ -118,19 +120,17 @@ class BreathingSpaceEventStrategyTest {
 
         assertThat(enterEvent.getEventSequence()).isEqualTo(5);
         assertThat(enterEvent.getEventCode()).isEqualTo(EventType.BREATHING_SPACE_ENTERED.getCode());
-        assertThat(enterEvent.getDateReceived()).isEqualTo(start.atTime(fallbackEnter.toLocalTime()));
+        assertThat(enterEvent.getDateReceived().toLocalDate()).isEqualTo(start);
 
         assertThat(liftEvent.getEventSequence()).isEqualTo(6);
         assertThat(liftEvent.getEventCode()).isEqualTo(EventType.BREATHING_SPACE_LIFTED.getCode());
-        assertThat(liftEvent.getDateReceived()).isEqualTo(end.atTime(fallbackLift.toLocalTime()));
+        assertThat(liftEvent.getDateReceived().toLocalDate()).isEqualTo(end);
         assertThat(liftEvent.getEventDetailsText())
             .isEqualTo("Breathing space reference REF-99, actual end date " + end);
     }
 
     @Test
     void usesFallbackWhenStartDateMissing() {
-        LocalDateTime fallback = LocalDateTime.of(2024, 4, 5, 13, 15);
-        when(timelineHelper.now()).thenReturn(fallback);
         when(sequenceGenerator.nextSequence(any())).thenReturn(7);
 
         CaseData caseData = CaseData.builder()
@@ -141,23 +141,25 @@ class BreathingSpaceEventStrategyTest {
             .build();
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        LocalDateTime before = LocalDateTime.now();
         strategy.contribute(builder, caseData, null);
+        LocalDateTime after = LocalDateTime.now();
 
         Event event = builder.build().getBreathingSpaceMentalHealthEntered().get(0);
+        assertThat(event.getDateReceived()).isAfterOrEqualTo(before);
+        assertThat(event.getDateReceived()).isBeforeOrEqualTo(after);
         assertThat(event.getEventSequence()).isEqualTo(7);
         assertThat(event.getEventCode()).isEqualTo(EventType.MENTAL_HEALTH_BREATHING_SPACE_ENTERED.getCode());
-        assertThat(event.getDateReceived()).isEqualTo(fallback);
-        assertThat(event.getEventDetailsText())
-            .isEqualTo("Breathing space reference REF-200, actual start date " + fallback);
+        String prefix = "Breathing space reference REF-200, actual start date ";
+        LocalDateTime detailsTimestamp = extractTimestamp(event.getEventDetailsText(), prefix);
+        assertThat(detailsTimestamp).isAfterOrEqualTo(before);
+        assertThat(detailsTimestamp).isBeforeOrEqualTo(after);
     }
 
     @Test
     void addsMentalHealthEnterAndLiftWhenLiftPresent() {
         LocalDate start = LocalDate.of(2024, 6, 1);
         LocalDate end = LocalDate.of(2024, 6, 30);
-        LocalDateTime fallbackEnter = LocalDateTime.of(2024, 6, 1, 8, 0);
-        LocalDateTime fallbackLift = LocalDateTime.of(2024, 6, 30, 8, 0);
-        when(timelineHelper.now()).thenReturn(fallbackEnter, fallbackLift);
         when(sequenceGenerator.nextSequence(any())).thenReturn(11, 12);
 
         CaseData caseData = CaseData.builder()
@@ -171,9 +173,17 @@ class BreathingSpaceEventStrategyTest {
             .build();
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        LocalTime before = LocalTime.now();
         strategy.contribute(builder, caseData, null);
+        LocalTime after = LocalTime.now();
 
         EventHistory history = builder.build();
+        assertThat(history.getBreathingSpaceMentalHealthEntered().get(0).getDateReceived().toLocalTime())
+            .isAfterOrEqualTo(before)
+            .isBeforeOrEqualTo(after);
+        assertThat(history.getBreathingSpaceMentalHealthLifted().get(0).getDateReceived().toLocalTime())
+            .isAfterOrEqualTo(before)
+            .isBeforeOrEqualTo(after);
         assertThat(history.getBreathingSpaceMentalHealthEntered()).hasSize(1);
         assertThat(history.getBreathingSpaceMentalHealthLifted()).hasSize(1);
         assertThat(history.getBreathingSpaceMentalHealthLifted().get(0).getEventDetailsText())
@@ -183,9 +193,6 @@ class BreathingSpaceEventStrategyTest {
     @Test
     void usesFallbackWhenEndDateMissing() {
         LocalDate start = LocalDate.of(2024, 7, 10);
-        LocalDateTime fallbackEnter = LocalDateTime.of(2024, 7, 10, 9, 0);
-        LocalDateTime fallbackLift = LocalDateTime.of(2024, 7, 10, 9, 0);
-        when(timelineHelper.now()).thenReturn(fallbackEnter, fallbackLift);
         when(sequenceGenerator.nextSequence(any())).thenReturn(14, 15);
 
         CaseData caseData = CaseData.builder()
@@ -198,12 +205,21 @@ class BreathingSpaceEventStrategyTest {
             .build();
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        LocalDateTime before = LocalDateTime.now();
         strategy.contribute(builder, caseData, null);
+        LocalDateTime after = LocalDateTime.now();
 
         EventHistory history = builder.build();
+        assertThat(history.getBreathingSpaceLifted().get(0).getDateReceived()).isAfterOrEqualTo(before);
+        assertThat(history.getBreathingSpaceLifted().get(0).getDateReceived()).isBeforeOrEqualTo(after);
         assertThat(history.getBreathingSpaceEntered()).hasSize(1);
         assertThat(history.getBreathingSpaceLifted()).hasSize(1);
         assertThat(history.getBreathingSpaceLifted().get(0).getEventDetailsText())
             .isEqualTo("Breathing space reference REF-NO-END, ");
+    }
+
+    private LocalDateTime extractTimestamp(String details, String prefix) {
+        assertThat(details).startsWith(prefix);
+        return LocalDateTime.parse(details.substring(prefix.length()));
     }
 }

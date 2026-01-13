@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -15,16 +14,12 @@ import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
-import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
 import uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil;
 
 import java.time.LocalDateTime;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -35,36 +30,18 @@ class InterlocutoryJudgmentStrategyTest {
     @Mock
     private RoboticsSequenceGenerator sequenceGenerator;
 
-    @Mock
-    private RoboticsTimelineHelper timelineHelper;
-
-    @Mock
-    private IStateFlowEngine stateFlowEngine;
-
-    @Mock
-    private StateFlow stateFlow;
-
     private final RoboticsPartyLookup partyLookup = new RoboticsPartyLookup();
 
     private InterlocutoryJudgmentStrategy strategy;
-
-    private LocalDateTime now;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         strategy = new InterlocutoryJudgmentStrategy(
             sequenceGenerator,
-            timelineHelper,
             partyLookup,
-            new RoboticsEventTextFormatter(),
-            stateFlowEngine
+            new RoboticsEventTextFormatter()
         );
-
-        now = LocalDateTime.of(2024, 6, 1, 12, 0);
-        when(timelineHelper.now()).thenReturn(now);
-        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
-        when(stateFlow.getStateHistory()).thenReturn(List.of());
     }
 
     @Test
@@ -106,6 +83,25 @@ class InterlocutoryJudgmentStrategyTest {
     }
 
     @Test
+    void contributeAddsMiscEventWhenOnlyDefendantDetailsProvided() {
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(15);
+
+        CaseData caseData = CaseData.builder()
+            .defendantDetails(DynamicList.builder()
+                .value(DynamicListElement.builder().label("Both defendants").build())
+                .build())
+            .build();
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventHistory history = builder.build();
+        assertThat(history.getMiscellaneous()).hasSize(1);
+        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+            .isEqualTo(new RoboticsEventTextFormatter().summaryJudgmentGranted());
+    }
+
+    @Test
     void contributeAddsSingleEventWhenOnlyOneRespondent() {
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10);
 
@@ -115,16 +111,19 @@ class InterlocutoryJudgmentStrategyTest {
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
 
+        LocalDateTime before = LocalDateTime.now();
         strategy.contribute(builder, caseData, null);
+        LocalDateTime after = LocalDateTime.now();
 
         EventHistory history = builder.build();
+        assertThat(history.getInterlocutoryJudgment().get(0).getDateReceived()).isAfterOrEqualTo(before);
+        assertThat(history.getInterlocutoryJudgment().get(0).getDateReceived()).isBeforeOrEqualTo(after);
         assertThat(history.getInterlocutoryJudgment()).hasSize(1);
         assertThat(history.getInterlocutoryJudgment().get(0).getEventSequence()).isEqualTo(10);
         assertThat(history.getInterlocutoryJudgment().get(0).getEventCode())
             .isEqualTo(EventType.INTERLOCUTORY_JUDGMENT_GRANTED.getCode());
         assertThat(history.getInterlocutoryJudgment().get(0).getLitigiousPartyID())
             .isEqualTo(RoboticsDataUtil.RESPONDENT_ID);
-        assertThat(history.getInterlocutoryJudgment().get(0).getDateReceived()).isEqualTo(now);
         assertThat(history.getMiscellaneous()).isNullOrEmpty();
     }
 
@@ -150,9 +149,15 @@ class InterlocutoryJudgmentStrategyTest {
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
 
+        LocalDateTime before = LocalDateTime.now();
         strategy.contribute(builder, caseData, null);
+        LocalDateTime after = LocalDateTime.now();
 
         EventHistory history = builder.build();
+        assertThat(history.getInterlocutoryJudgment().get(0).getDateReceived()).isAfterOrEqualTo(before);
+        assertThat(history.getInterlocutoryJudgment().get(0).getDateReceived()).isBeforeOrEqualTo(after);
+        assertThat(history.getInterlocutoryJudgment().get(1).getDateReceived()).isAfterOrEqualTo(before);
+        assertThat(history.getInterlocutoryJudgment().get(1).getDateReceived()).isBeforeOrEqualTo(after);
         assertThat(history.getInterlocutoryJudgment()).hasSize(2);
         assertThat(history.getInterlocutoryJudgment().get(0).getEventSequence()).isEqualTo(21);
         assertThat(history.getInterlocutoryJudgment().get(0).getLitigiousPartyID())
@@ -160,7 +165,6 @@ class InterlocutoryJudgmentStrategyTest {
         assertThat(history.getInterlocutoryJudgment().get(1).getEventSequence()).isEqualTo(22);
         assertThat(history.getInterlocutoryJudgment().get(1).getLitigiousPartyID())
             .isEqualTo(RoboticsDataUtil.RESPONDENT2_ID);
-        assertThat(history.getInterlocutoryJudgment().get(1).getDateReceived()).isEqualTo(now);
         assertThat(history.getMiscellaneous()).hasSize(1);
         assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
             .isEqualTo(new RoboticsEventTextFormatter().summaryJudgmentGranted());

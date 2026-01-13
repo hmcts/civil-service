@@ -24,7 +24,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -60,7 +59,7 @@ public class ClaimantResponseStrategy implements EventHistoryStrategy {
 
     @Override
     public boolean supports(CaseData caseData) {
-        if (caseData == null || caseData.getApplicant1ResponseDate() == null) {
+        if (caseData == null) {
             return false;
         }
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -320,7 +319,7 @@ public class ClaimantResponseStrategy implements EventHistoryStrategy {
     }
 
     private LocalDateTime resolveApplicantResponseDate(CaseData caseData) {
-        return Optional.ofNullable(caseData.getApplicant1ResponseDate()).orElseGet(timelineHelper::now);
+        return caseData.getApplicant1ResponseDate();
     }
 
     private boolean hasState(StateFlow stateFlow, FlowState.Main state) {

@@ -28,16 +28,12 @@ public class RoboticsManualOfflineSupport {
         if (CaseCategory.UNSPEC_CLAIM.equals(category)) {
             ClaimProceedsInCaseman unspecDetails = requireNonNull(caseData.getClaimProceedsInCaseman(),
                 "claimProceedsInCaseman must not be null");
-            requireNonNull(unspecDetails.getReason(), OFFLINE_REASON_REQUIRED);
-            requireNonNull(unspecDetails.getDate(), OFFLINE_DATE_REQUIRED);
             return buildDetails(resolveReason(unspecDetails.getReason(), unspecDetails.getOther()),
                                 unspecDetails.getDate());
         }
 
         ClaimProceedsInCasemanLR specDetails = requireNonNull(caseData.getClaimProceedsInCasemanLR(),
             "claimProceedsInCasemanLR must not be null");
-        requireNonNull(specDetails.getReason(), OFFLINE_REASON_REQUIRED);
-        requireNonNull(specDetails.getDate(), OFFLINE_DATE_REQUIRED);
         return buildDetails(resolveReason(specDetails.getReason(), specDetails.getOther()), specDetails.getDate());
     }
 
@@ -45,15 +41,15 @@ public class RoboticsManualOfflineSupport {
         String formatted = textFormatter.formatRpa(
             "Manually moved offline for reason %s on date %s.",
             reason,
-            requireNonNull(date, OFFLINE_DATE_REQUIRED).format(ISO_DATE)
+            date.format(ISO_DATE)
         );
         return left(formatted, 250);
     }
 
     private String resolveReason(ReasonForProceedingOnPaper reason, String other) {
         if (reason == ReasonForProceedingOnPaper.OTHER) {
-            return requireNonNull(other, OFFLINE_REASON_REQUIRED);
+            return other;
         }
-        return requireNonNull(reason, OFFLINE_REASON_REQUIRED).name();
+        return reason.name();
     }
 }

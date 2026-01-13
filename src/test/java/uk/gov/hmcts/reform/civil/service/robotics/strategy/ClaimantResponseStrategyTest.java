@@ -12,6 +12,9 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.EventType;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
@@ -107,6 +110,34 @@ class ClaimantResponseStrategyTest {
 
         assertThat(history.getMiscellaneous()).extracting(Event::getEventDetailsText)
             .contains("Claimant proceeds.", "RPA Reason:Multitrack Unspec going offline.");
+    }
+
+    @Test
+    void keepsNullPreferredCourtCodeWhenLocationOverrideMissing() {
+        when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.FULL_DEFENCE_PROCEED.fullName())));
+        when(locationRefDataUtil.getPreferredCourtData(any(), any(), any(Boolean.class))).thenReturn(null);
+
+        Applicant1DQ applicant1DQ = Applicant1DQ.builder()
+            .applicant1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
+                                                         .oneMonthStayRequested(YesOrNo.YES)
+                                                         .build())
+            .applicant1DQRequestedCourt(RequestedCourt.builder().responseCourtCode("123").build())
+            .build();
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed(ONE_V_ONE)
+            .build()
+            .toBuilder()
+            .applicant1ResponseDate(LocalDateTime.of(2024, 3, 18, 9, 0))
+            .applicant1DQ(applicant1DQ)
+            .build();
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, "auth-token");
+
+        Event dqEvent = builder.build().getDirectionsQuestionnaireFiled().get(0);
+        assertThat(dqEvent.getEventDetails().getPreferredCourtCode()).isNull();
+        assertThat(dqEvent.getEventDetailsText()).isEqualTo("preferredCourtCode: null; stayClaim: true");
     }
 
     @Test

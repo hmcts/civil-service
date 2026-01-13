@@ -26,7 +26,6 @@ public class ClaimNotifiedEventStrategy implements EventHistoryStrategy {
     @Override
     public boolean supports(CaseData caseData) {
         return caseData != null
-            && caseData.getClaimNotificationDate() != null
             && hasClaimNotifiedState(caseData);
     }
 

@@ -26,7 +26,6 @@ public class ClaimIssuedEventStrategy implements EventHistoryStrategy {
     @Override
     public boolean supports(CaseData caseData) {
         return caseData != null
-            && caseData.getIssueDate() != null
             && hasClaimIssuedState(caseData);
     }
 

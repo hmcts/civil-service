@@ -41,9 +41,7 @@ public class RespondentFullAdmissionStrategy implements EventHistoryStrategy {
     @Override
     public boolean supports(CaseData caseData) {
         return caseData != null
-            && hasFullAdmissionState(caseData)
-            && (defendant1ResponseExists.test(caseData) || defendant2ResponseExists.test(caseData)
-            || defendant1v2SameSolicitorSameResponse.test(caseData));
+            && hasFullAdmissionState(caseData);
     }
 
     @Override

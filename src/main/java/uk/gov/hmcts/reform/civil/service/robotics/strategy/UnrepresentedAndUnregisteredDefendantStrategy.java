@@ -37,10 +37,7 @@ public class UnrepresentedAndUnregisteredDefendantStrategy implements EventHisto
     @Override
     public boolean supports(CaseData caseData) {
         return caseData != null
-            && caseData.getSubmittedDate() != null
-            && hasState(caseData)
-            && !getDefendantNames(UNREPRESENTED, caseData).isEmpty()
-            && !getDefendantNames(UNREGISTERED, caseData).isEmpty();
+            && hasState(caseData);
     }
 
     @Override

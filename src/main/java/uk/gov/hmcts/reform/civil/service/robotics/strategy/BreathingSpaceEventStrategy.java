@@ -11,9 +11,9 @@ import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
-import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE_ENTERED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE_LIFTED;
@@ -30,7 +30,6 @@ public class BreathingSpaceEventStrategy implements EventHistoryStrategy {
     private static final String BS_END_DATE = "actual end date";
     private static final String LITIGIOUS_PARTY_ID = "001";
 
-    private final RoboticsTimelineHelper timelineHelper;
     private final RoboticsSequenceGenerator sequenceGenerator;
 
     @Override
@@ -64,9 +63,9 @@ public class BreathingSpaceEventStrategy implements EventHistoryStrategy {
 
     private void buildEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData,
                              EventType eventType, BreathingStatus status) {
-        LocalDateTime now = timelineHelper.now();
-        String details = buildEventDetails(caseData, status, now);
-        LocalDateTime dateReceived = resolveEventDate(caseData, eventType, now);
+        LocalTime timeNow = LocalTime.now();
+        String details = buildEventDetails(caseData, status);
+        LocalDateTime dateReceived = resolveEventDate(caseData, eventType, timeNow);
         Event event = Event.builder()
             .eventSequence(sequenceGenerator.nextSequence(builder.build()))
             .eventCode(eventType.getCode())
@@ -85,21 +84,23 @@ public class BreathingSpaceEventStrategy implements EventHistoryStrategy {
         }
     }
 
-    private LocalDateTime resolveEventDate(CaseData caseData, EventType eventType, LocalDateTime fallback) {
+    private LocalDateTime resolveEventDate(CaseData caseData,
+                                           EventType eventType,
+                                           LocalTime timeNow) {
         return switch (eventType) {
             case BREATHING_SPACE_ENTERED, MENTAL_HEALTH_BREATHING_SPACE_ENTERED ->
                 caseData.getBreathing().getEnter().getStart() != null
-                    ? caseData.getBreathing().getEnter().getStart().atTime(fallback.toLocalTime())
-                    : fallback;
+                    ? caseData.getBreathing().getEnter().getStart().atTime(timeNow)
+                    : LocalDateTime.now();
             case BREATHING_SPACE_LIFTED, MENTAL_HEALTH_BREATHING_SPACE_LIFTED ->
                 caseData.getBreathing().getLift().getExpectedEnd() != null
-                    ? caseData.getBreathing().getLift().getExpectedEnd().atTime(fallback.toLocalTime())
-                    : fallback;
-            default -> fallback;
+                    ? caseData.getBreathing().getLift().getExpectedEnd().atTime(timeNow)
+                    : LocalDateTime.now();
+            default -> LocalDateTime.now();
         };
     }
 
-    private String buildEventDetails(CaseData caseData, BreathingStatus status, LocalDateTime fallback) {
+    private String buildEventDetails(CaseData caseData, BreathingStatus status) {
         String details = null;
         if (caseData.getBreathing().getEnter().getReference() != null) {
             details = BS_REF + " " + caseData.getBreathing().getEnter().getReference() + ", ";
@@ -110,7 +111,7 @@ public class BreathingSpaceEventStrategy implements EventHistoryStrategy {
                 details = append(details, BS_START_DT,
                     caseData.getBreathing().getEnter().getStart().toString());
             } else {
-                details = append(details, BS_START_DT, fallback.toString());
+                details = append(details, BS_START_DT, LocalDateTime.now().toString());
             }
         } else if (caseData.getBreathing().getLift() != null
             && caseData.getBreathing().getLift().getExpectedEnd() != null) {

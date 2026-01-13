@@ -52,7 +52,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.strategy.RespondentPartAdmissi
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.SdoNotDrawnStrategy;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.SetAsideJudgmentStrategy;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.SpecRejectRepaymentPlanStrategy;
-import uk.gov.hmcts.reform.civil.service.robotics.strategy.SummaryJudgmentStrategy;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineAfterClaimDetailsNotifiedStrategy;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineAfterClaimNotifiedStrategy;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineByStaffEventStrategy;
@@ -161,9 +160,10 @@ public class EventHistoryMapper {
                                      Set<Class<? extends EventHistoryStrategy>> invoked) {
         for (Class<? extends EventHistoryStrategy> strategyClass : GLOBAL_STRATEGIES_ORDER) {
             EventHistoryStrategy strategy = registry.get(strategyClass);
-            boolean allowDuplicate = caseData != null
-                && CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-                && ConsentExtensionEventStrategy.class.equals(strategyClass);
+            boolean allowDuplicate = CaseProceedsInCasemanStrategy.class.equals(strategyClass)
+                || (caseData != null
+                    && CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                    && ConsentExtensionEventStrategy.class.equals(strategyClass));
             if (strategy == null || (!allowDuplicate && invoked.contains(strategyClass)) || !strategy.supports(caseData)) {
                 continue;
             }
@@ -212,14 +212,14 @@ public class EventHistoryMapper {
                       List.of(TakenOfflinePastApplicantResponseStrategy.class)),
             Map.entry(Main.TAKEN_OFFLINE_SDO_NOT_DRAWN, List.of(SdoNotDrawnStrategy.class)),
             Map.entry(Main.TAKEN_OFFLINE_AFTER_SDO,
-                      List.of(CaseProceedsInCasemanStrategy.class, SummaryJudgmentStrategy.class)),
+                      List.of(CaseProceedsInCasemanStrategy.class)),
             Map.entry(Main.PART_ADMIT_REJECT_REPAYMENT, List.of(SpecRejectRepaymentPlanStrategy.class)),
             Map.entry(Main.FULL_ADMIT_REJECT_REPAYMENT, List.of(SpecRejectRepaymentPlanStrategy.class)),
             Map.entry(Main.IN_MEDIATION, List.of(MediationEventStrategy.class)),
             Map.entry(Main.TAKEN_OFFLINE_SPEC_DEFENDANT_NOC,
-                      List.of(TakenOfflineSpecDefendantNocStrategy.class, DefendantNoCDeadlineStrategy.class)),
+                      List.of(TakenOfflineSpecDefendantNocStrategy.class)),
             Map.entry(Main.TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA,
-                      List.of(TakenOfflineSpecDefendantNocStrategy.class, DefendantNoCDeadlineStrategy.class))
+                      List.of(TakenOfflineSpecDefendantNocStrategy.class))
         );
 
     private static final List<Class<? extends EventHistoryStrategy>> GLOBAL_STRATEGIES_ORDER = List.of(
@@ -229,10 +229,10 @@ public class EventHistoryMapper {
         InterlocutoryJudgmentStrategy.class,
         DefaultJudgmentEventStrategy.class,
         ConsentExtensionEventStrategy.class,
+        CaseProceedsInCasemanStrategy.class,
         JudgmentByAdmissionStrategy.class,
         SetAsideJudgmentStrategy.class,
         CertificateOfSatisfactionOrCancellationStrategy.class,
-        CaseProceedsInCasemanStrategy.class,
         DefendantNoCDeadlineStrategy.class,
         CaseQueriesStrategy.class
     );

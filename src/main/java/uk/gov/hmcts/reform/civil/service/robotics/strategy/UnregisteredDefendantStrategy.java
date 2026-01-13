@@ -35,9 +35,7 @@ public class UnregisteredDefendantStrategy implements EventHistoryStrategy {
     @Override
     public boolean supports(CaseData caseData) {
         return caseData != null
-            && caseData.getSubmittedDate() != null
-            && hasState(caseData)
-            && !getDefendantNames(UNREGISTERED, caseData).isEmpty();
+            && hasState(caseData);
     }
 
     @Override

@@ -48,8 +48,12 @@ class ClaimDismissedPastDeadlineStrategyTest {
     }
 
     @Test
-    void supportsReturnsFalseWhenDismissedDateMissing() {
-        assertThat(strategy.supports(CaseData.builder().build())).isFalse();
+    void supportsReturnsTrueWhenHistoryPresentEvenIfDateMissing() {
+        when(stateFlow.getStateHistory()).thenReturn(List.of(
+            State.from(FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()),
+            State.from(FlowState.Main.CLAIM_NOTIFIED.fullName())
+        ));
+        assertThat(strategy.supports(CaseData.builder().build())).isTrue();
     }
 
     @Test
@@ -86,10 +90,11 @@ class ClaimDismissedPastDeadlineStrategyTest {
     }
 
     @Test
-    void contributeThrowsWhenUnexpectedState() {
+    void contributeThrowsWhenPreviousStateIsPastClaimNotificationAwaitingCamunda() {
         when(stateFlow.getStateHistory()).thenReturn(List.of(
-            State.from(FlowState.Main.FULL_ADMISSION.fullName()),
-            State.from(FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName())
+            State.from(FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()),
+            State.from(FlowState.Main.PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName()),
+            State.from(FlowState.Main.DRAFT.fullName())
         ));
 
         CaseData caseData = CaseData.builder()

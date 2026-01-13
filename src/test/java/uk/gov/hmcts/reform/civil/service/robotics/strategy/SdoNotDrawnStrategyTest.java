@@ -52,9 +52,9 @@ class SdoNotDrawnStrategyTest {
     }
 
     @Test
-    void supportsReturnsFalseWhenMissingData() {
+    void supportsReturnsTrueWhenStatePresentEvenIfDetailsMissing() {
         CaseData caseData = CaseDataBuilder.builder().build();
-        assertThat(strategy.supports(caseData)).isFalse();
+        assertThat(strategy.supports(caseData)).isTrue();
     }
 
     @Test

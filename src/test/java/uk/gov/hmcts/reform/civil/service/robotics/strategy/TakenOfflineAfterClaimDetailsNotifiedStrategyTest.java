@@ -46,8 +46,8 @@ class TakenOfflineAfterClaimDetailsNotifiedStrategyTest {
     }
 
     @Test
-    void supportsReturnsFalseWhenSubmittedDateMissing() {
-        assertThat(strategy.supports(CaseData.builder().build())).isFalse();
+    void supportsReturnsTrueWhenStatePresentEvenIfSubmittedDateMissing() {
+        assertThat(strategy.supports(CaseData.builder().build())).isTrue();
     }
 
     @Test

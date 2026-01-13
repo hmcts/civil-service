@@ -78,10 +78,10 @@ class RespondentPartAdmissionStrategyTest {
     }
 
     @Test
-    void supportsReturnsFalseWhenNoResponsesPresent() {
+    void supportsReturnsTrueWhenCaseDataPresent() {
         CaseData caseData = CaseDataBuilder.builder().build();
 
-        assertThat(strategy.supports(caseData)).isFalse();
+        assertThat(strategy.supports(caseData)).isTrue();
     }
 
     @Test
@@ -191,14 +191,17 @@ class RespondentPartAdmissionStrategyTest {
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11, 12, 13);
 
         EventHistory.EventHistoryBuilder historyBuilder = EventHistory.builder();
+        LocalDateTime before = LocalDateTime.now();
         strategy.contribute(historyBuilder, caseData, null);
+        LocalDateTime after = LocalDateTime.now();
 
         EventHistory history = historyBuilder.build();
+        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isAfterOrEqualTo(before);
+        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isBeforeOrEqualTo(after);
         assertThat(history.getMiscellaneous()).hasSize(2);
         assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(10);
         assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
             .isEqualTo(formatter.lipVsLrFullOrPartAdmissionReceived());
-        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isEqualTo(NOW);
 
         assertThat(history.getMiscellaneous().get(1).getEventDetailsText())
             .isEqualTo(respondentResponseSupport.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true));

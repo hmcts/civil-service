@@ -10,14 +10,11 @@ import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.EventType;
-import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
-import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
-import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
-import uk.gov.hmcts.reform.civil.stateflow.model.State;
+
+import java.time.LocalDateTime;
 
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 
@@ -27,10 +24,8 @@ import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSu
 public class InterlocutoryJudgmentStrategy implements EventHistoryStrategy {
 
     private final RoboticsSequenceGenerator sequenceGenerator;
-    private final RoboticsTimelineHelper timelineHelper;
     private final RoboticsPartyLookup partyLookup;
     private final RoboticsEventTextFormatter textFormatter;
-    private final IStateFlowEngine stateFlowEngine;
 
     @Override
     public boolean supports(CaseData caseData) {
@@ -65,12 +60,12 @@ public class InterlocutoryJudgmentStrategy implements EventHistoryStrategy {
             }
         }
 
-        if (caseData.getDefendantDetails() != null && !isTakenOfflineAfterSdo(caseData)) {
+        if (caseData.getDefendantDetails() != null) {
             builder.miscellaneous(buildMiscEvent(
                 builder,
                 sequenceGenerator,
                 resolveMiscMessage(grantedForSingleRespondent),
-                timelineHelper.now()
+                LocalDateTime.now()
             ));
         }
     }
@@ -81,18 +76,11 @@ public class InterlocutoryJudgmentStrategy implements EventHistoryStrategy {
             : textFormatter.summaryJudgmentGranted();
     }
 
-    private boolean isTakenOfflineAfterSdo(CaseData caseData) {
-        StateFlow flow = stateFlowEngine.evaluate(caseData);
-        return flow.getStateHistory().stream()
-            .map(State::getName)
-            .anyMatch(FlowState.Main.TAKEN_OFFLINE_AFTER_SDO.fullName()::equals);
-    }
-
     private Event buildEvent(EventHistory.EventHistoryBuilder builder, int respondentIndex) {
         return Event.builder()
             .eventSequence(sequenceGenerator.nextSequence(builder.build()))
             .eventCode(EventType.INTERLOCUTORY_JUDGMENT_GRANTED.getCode())
-            .dateReceived(timelineHelper.now())
+            .dateReceived(LocalDateTime.now())
             .litigiousPartyID(partyLookup.respondentId(respondentIndex))
             .eventDetailsText("")
             .eventDetails(EventDetails.builder().miscText("").build())

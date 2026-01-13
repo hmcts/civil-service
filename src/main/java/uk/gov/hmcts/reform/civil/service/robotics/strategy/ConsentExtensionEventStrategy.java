@@ -49,11 +49,13 @@ public class ConsentExtensionEventStrategy implements EventHistoryStrategy {
             return false;
         }
         boolean hasExtensionData = defendant1ExtensionExists.test(caseData) || defendant2ExtensionExists.test(caseData);
+        boolean hasAgreedDeadline = caseData.getRespondentSolicitor1AgreedDeadlineExtension() != null
+            || caseData.getRespondentSolicitor2AgreedDeadlineExtension() != null;
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return hasAgreedDeadline || hasExtensionData;
+        }
         if (!hasExtensionData) {
             return false;
-        }
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            return true;
         }
 
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -78,9 +80,7 @@ public class ConsentExtensionEventStrategy implements EventHistoryStrategy {
             events.add(buildConsentExtensionEvent(builder, PartyUtils.respondent2Data(caseData), scenario));
         }
 
-        if (!events.isEmpty()) {
-            builder.consentExtensionFilingDefence(events);
-        }
+        builder.consentExtensionFilingDefence(events);
     }
 
     private Event buildConsentExtensionEvent(EventHistory.EventHistoryBuilder builder,

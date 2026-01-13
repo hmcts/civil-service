@@ -58,8 +58,8 @@ class UnrepresentedDefendantStrategyTest {
     }
 
     @Test
-    void supportsReturnsFalseWhenSubmittedDateMissing() {
-        assertThat(strategy.supports(CaseData.builder().build())).isFalse();
+    void supportsReturnsTrueWhenStatePresentEvenIfSubmittedDateMissing() {
+        assertThat(strategy.supports(CaseData.builder().build())).isTrue();
     }
 
     @Test
@@ -111,7 +111,7 @@ class UnrepresentedDefendantStrategyTest {
     }
 
     @Test
-    void supportsReturnsFalseWhenNoUnrepresentedDefendants() {
+    void supportsReturnsTrueWhenStatePresentEvenIfNoUnrepresentedDefendants() {
         CaseData caseData = CaseData.builder()
             .submittedDate(LocalDateTime.now())
             .respondent1(Party.builder().individualFirstName("Resp").individualLastName("One")
@@ -119,7 +119,7 @@ class UnrepresentedDefendantStrategyTest {
             .respondent1Represented(YesOrNo.YES)
             .build();
 
-        assertThat(strategy.supports(caseData)).isFalse();
+        assertThat(strategy.supports(caseData)).isTrue();
     }
 
     @Test

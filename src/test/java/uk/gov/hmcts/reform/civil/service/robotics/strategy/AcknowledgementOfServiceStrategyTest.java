@@ -50,9 +50,9 @@ class AcknowledgementOfServiceStrategyTest {
     }
 
     @Test
-    void supportsReturnsFalseWhenNoAckDate() {
+    void supportsReturnsTrueWhenStatePresentEvenIfAckMissing() {
         CaseData caseData = CaseData.builder().build();
-        assertThat(strategy.supports(caseData)).isFalse();
+        assertThat(strategy.supports(caseData)).isTrue();
     }
 
     @Test

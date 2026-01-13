@@ -39,7 +39,7 @@ class RoboticsEventSupportTest {
     }
 
     @Test
-    void buildDirectionsQuestionnaireEvent_usesDqPreferredCourtCodeWhenOverrideMissing() {
+    void buildDirectionsQuestionnaireEvent_keepsNullPreferredCourtOverride() {
         FileDirectionsQuestionnaire fdq = FileDirectionsQuestionnaire.builder()
             .oneMonthStayRequested(YesOrNo.YES)
             .build();
@@ -57,7 +57,7 @@ class RoboticsEventSupportTest {
 
         assertThat(event.getEventSequence()).isEqualTo(1);
         assertThat(event.getEventCode()).isEqualTo("197");
-        assertThat(event.getEventDetails().getPreferredCourtCode()).isEqualTo("123");
+        assertThat(event.getEventDetails().getPreferredCourtCode()).isNull();
         assertThat(event.getEventDetails().getStayClaim()).isTrue();
         assertThat(event.getEventDetailsText()).isEqualTo("details");
     }

@@ -35,9 +35,7 @@ public class UnrepresentedDefendantStrategy implements EventHistoryStrategy {
     @Override
     public boolean supports(CaseData caseData) {
         return caseData != null
-            && caseData.getSubmittedDate() != null
-            && hasState(caseData)
-            && !getDefendantNames(UNREPRESENTED, caseData).isEmpty();
+            && hasState(caseData);
     }
 
     @Override

@@ -42,11 +42,6 @@ class ClaimIssuedEventStrategyTest {
     }
 
     @Test
-    void supportsReturnsFalseWhenIssueDateMissing() {
-        assertThat(strategy.supports(CaseData.builder().build())).isFalse();
-    }
-
-    @Test
     void supportsReturnsFalseWhenStateNotPresent() {
         when(stateFlow.getStateHistory()).thenReturn(
             List.of(State.from(FlowState.Main.CLAIM_NOTIFIED.fullName()))
@@ -60,9 +55,7 @@ class ClaimIssuedEventStrategyTest {
 
     @Test
     void supportsReturnsTrueWhenStatePresent() {
-        CaseData caseData = CaseData.builder()
-            .issueDate(LocalDate.of(2024, 1, 10))
-            .build();
+        CaseData caseData = CaseData.builder().build();
 
         assertThat(strategy.supports(caseData)).isTrue();
     }

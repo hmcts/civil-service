@@ -83,7 +83,12 @@ public class MediationEventStrategy implements EventHistoryStrategy {
     }
 
     private LocalDateTime resolveApplicantResponseDate(CaseData caseData) {
-        return timelineHelper.ensurePresentOrNow(caseData.getApplicant1ResponseDate());
+        LocalDateTime applicant1ResponseDate = caseData.getApplicant1ResponseDate();
+        LocalDateTime now = LocalDateTime.now();
+        if (applicant1ResponseDate == null || applicant1ResponseDate.isBefore(now)) {
+            return now;
+        }
+        return applicant1ResponseDate;
     }
 
     private boolean hasMediationState(CaseData caseData) {

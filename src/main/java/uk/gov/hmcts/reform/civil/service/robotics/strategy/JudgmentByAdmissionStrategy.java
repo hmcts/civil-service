@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.ClaimFeeUtility;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -144,7 +143,7 @@ public class JudgmentByAdmissionStrategy implements EventHistoryStrategy {
     private LocalDateTime resolveJudgmentDate(CaseData caseData) {
         return featureToggleService.isJOLiveFeedActive()
             ? caseData.getJoJudgementByAdmissionIssueDate()
-            : timelineHelper.ensurePresentOrNow(caseData.getApplicant1ResponseDate());
+            : resolveApplicant1ResponseDate(caseData);
     }
 
     private LocalDateTime resolvePaymentInFullDate(CaseData caseData) {
@@ -182,8 +181,17 @@ public class JudgmentByAdmissionStrategy implements EventHistoryStrategy {
                 .orElse(ZERO);
 
         return MonetaryConversions.penniesToPounds(
-            ofNullable(repaymentAmount).map(amount -> amount.setScale(2, RoundingMode.HALF_UP)).orElse(ZERO)
+            ofNullable(repaymentAmount).map(amount -> amount.setScale(2)).orElse(ZERO)
         );
+    }
+
+    private LocalDateTime resolveApplicant1ResponseDate(CaseData caseData) {
+        LocalDateTime applicant1ResponseDate = caseData.getApplicant1ResponseDate();
+        LocalDateTime now = LocalDateTime.now();
+        if (applicant1ResponseDate == null || applicant1ResponseDate.isBefore(now)) {
+            return now;
+        }
+        return applicant1ResponseDate;
     }
 
     private LocalDate resolveFirstInstallmentDate(CaseData caseData) {

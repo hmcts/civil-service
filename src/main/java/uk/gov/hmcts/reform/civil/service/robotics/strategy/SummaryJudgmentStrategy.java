@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextForma
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
 
+import java.time.LocalDateTime;
+
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 
 @Slf4j
@@ -37,7 +39,7 @@ public class SummaryJudgmentStrategy implements EventHistoryStrategy {
         log.info("Building summary judgment robotics event for caseId {}", caseData.getCcdCaseReference());
 
         String message = resolveMessage(caseData);
-        builder.miscellaneous(buildMiscEvent(builder, sequenceGenerator, message, timelineHelper.now()));
+        builder.miscellaneous(buildMiscEvent(builder, sequenceGenerator, message, LocalDateTime.now()));
     }
 
     private String resolveMessage(CaseData caseData) {

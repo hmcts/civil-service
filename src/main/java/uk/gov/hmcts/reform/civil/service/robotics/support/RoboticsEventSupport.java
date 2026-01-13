@@ -39,9 +39,6 @@ public final class RoboticsEventSupport {
                                                           DQ dq,
                                                           String preferredCourtCode,
                                                           String eventDetailsText) {
-        String courtCode = preferredCourtCode != null
-            ? preferredCourtCode
-            : RoboticsDirectionsQuestionnaireSupport.getPreferredCourtCode(dq);
         return Event.builder()
             .eventSequence(sequenceGenerator.nextSequence(builder.build()))
             .eventCode(EventType.DIRECTIONS_QUESTIONNAIRE_FILED.getCode())
@@ -50,7 +47,7 @@ public final class RoboticsEventSupport {
             .eventDetailsText(eventDetailsText)
             .eventDetails(EventDetails.builder()
                               .stayClaim(RoboticsDirectionsQuestionnaireSupport.isStayClaim(dq))
-                              .preferredCourtCode(courtCode)
+                              .preferredCourtCode(preferredCourtCode)
                               .preferredCourtName("")
                               .build())
             .build();
@@ -127,7 +124,7 @@ public final class RoboticsEventSupport {
             builder,
             sequenceGenerator,
             textFormatter.lipVsLrFullOrPartAdmissionReceived(),
-            timelineHelper.now()
+            LocalDateTime.now()
         );
     }
 
