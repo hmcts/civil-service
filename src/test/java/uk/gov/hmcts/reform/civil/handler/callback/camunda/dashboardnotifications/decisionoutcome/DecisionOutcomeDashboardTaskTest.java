@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskContext;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.decisionoutcome.DecisionOutcomeClaimantDashboardService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.decisionoutcome.DecisionOutcomeDefendantDashboardService;
 
@@ -25,7 +26,7 @@ class DecisionOutcomeDashboardTaskTest {
     @Mock
     private DashboardTaskContext context;
 
-    private final CaseData caseData = CaseData.builder().ccdCaseReference(1L).build();
+    private final CaseData caseData = new CaseDataBuilder().caseReference(1L).build();
 
     @BeforeEach
     void setupContext() {
