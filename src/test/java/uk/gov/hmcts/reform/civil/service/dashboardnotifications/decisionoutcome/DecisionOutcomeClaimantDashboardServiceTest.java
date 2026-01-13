@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -48,10 +47,10 @@ class DecisionOutcomeClaimantDashboardServiceTest {
 
     @Test
     void shouldNotifyClaimantWhenEligibleWithStandardScenario() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = new CaseDataBuilder()
             .applicant1Represented(YesOrNo.NO)
-            .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
-            .ccdCaseReference(1234L)
+            .setFastTrackClaim()
+            .caseReference(1234L)
             .build();
 
         service.notifyDecisionOutcome(caseData, AUTH_TOKEN);
@@ -68,10 +67,10 @@ class DecisionOutcomeClaimantDashboardServiceTest {
 
     @Test
     void shouldUseTrialReadyScenarioWhenSmallClaim() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = new CaseDataBuilder()
             .applicant1Represented(YesOrNo.NO)
-            .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-            .ccdCaseReference(5678L)
+            .setSmallTrackClaim()
+            .atStateTrialReadyApplicant()
             .build();
 
         service.notifyDecisionOutcome(caseData, AUTH_TOKEN);
@@ -79,18 +78,18 @@ class DecisionOutcomeClaimantDashboardServiceTest {
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_CLAIMANT_TRIAL_READY_DECISION_OUTCOME.getScenario(),
-            "5678",
+            "1594901956117591",
             ScenarioRequestParams.builder().params(new HashMap<>()).build()
         );
     }
 
     @Test
     void shouldUseTrialReadyScenarioWhenApplicantMarkedTrialReady() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = new CaseDataBuilder()
             .applicant1Represented(YesOrNo.NO)
-            .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
-            .trialReadyApplicant(YesOrNo.YES)
-            .ccdCaseReference(9012L)
+            .setFastTrackClaim()
+            .atStateTrialReadyApplicant()
+            .caseReference(9012L)
             .build();
 
         service.notifyDecisionOutcome(caseData, AUTH_TOKEN);

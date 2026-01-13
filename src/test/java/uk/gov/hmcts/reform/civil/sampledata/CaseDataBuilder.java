@@ -4995,6 +4995,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder setFastTrackClaim() {
+        allocatedTrack = FAST_CLAIM;
+        return this;
+    }
+
+    public CaseDataBuilder setSmallTrackClaim() {
+        allocatedTrack = SMALL_CLAIM;
+        return this;
+    }
+
     public CaseDataBuilder atStateApplicantRespondToDefenceAndProceedVsDefendant1Only_1v2() {
         atStateRespondentFullDefenceAfterNotificationAcknowledgement();
         applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2 = YES;
