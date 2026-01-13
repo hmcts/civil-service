@@ -342,6 +342,10 @@ configurations.all {
         details.because('CVE-2025-25193, CVE-2025-67735')
       }
     }
+    if (details.requested.group == 'org.apache.logging.log4j') {
+      details.useVersion('2.25.3')
+      details.because('CVE-2025-68161 vendor recommended version')
+    }
   }
   exclude group: 'org.springframework.security', module: 'spring-security-rsa'
   exclude group: 'org.projectlombok', module: 'lombok-mapstruct-binding'
