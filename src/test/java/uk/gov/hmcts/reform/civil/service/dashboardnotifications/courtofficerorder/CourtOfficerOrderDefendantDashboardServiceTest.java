@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -42,8 +41,8 @@ class CourtOfficerOrderDefendantDashboardServiceTest {
 
     @Test
     void shouldRecordScenarioForLipDefendant() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .ccdCaseReference(4567L)
+        CaseData caseData = new CaseDataBuilder()
+            .caseReference(4567L)
             .respondent1Represented(YesOrNo.NO)
             .build();
 
@@ -59,10 +58,10 @@ class CourtOfficerOrderDefendantDashboardServiceTest {
 
     @Test
     void shouldRecordExtraScenarioForFastTrackDefendantWithoutTrialReadiness() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .ccdCaseReference(5678L)
+        CaseData caseData = new CaseDataBuilder()
+            .caseReference(5678L)
             .respondent1Represented(YesOrNo.NO)
-            .allocatedTrack(AllocatedTrack.FAST_CLAIM)
+            .setFastTrackClaim()
             .build();
 
         service.notifyCourtOfficerOrder(caseData, AUTH_TOKEN);
