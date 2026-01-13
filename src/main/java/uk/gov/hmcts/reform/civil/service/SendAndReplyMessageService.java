@@ -115,10 +115,9 @@ public class SendAndReplyMessageService {
         String senderName = String.format("%s, %s", details.getFullName(), role.getRoleLabel());
         Map<String, RolePool> supportRoleMap = buildSupportedRolesMap();
 
-        return Message.builder()
-            .senderName(senderName)
-            .senderRoleType(supportRoleMap.get(role.getRoleName()))
-            .build();
+        return new Message()
+            .setSenderName(senderName)
+            .setSenderRoleType(supportRoleMap.get(role.getRoleName()));
     }
 
     public List<Element<Message>> addReplyToMessage(List<Element<Message>> messages, String messageId, MessageReply messageReply,
@@ -149,7 +148,7 @@ public class SendAndReplyMessageService {
         RoleAssignmentResponse roleAssignment = roleAssignments.getRoleAssignmentResponse().stream()
             .filter(userRole -> supportedRolesList.contains(userRole.getRoleName()))
             .min(Comparator.comparingInt(userRole -> supportedRolesList.indexOf(userRole.getRoleName())))
-            .orElse(RoleAssignmentResponse.builder().roleLabel("").roleCategory("").build());
+            .orElse(new RoleAssignmentResponse().setRoleLabel("").setRoleCategory(""));
         return roleAssignment;
     }
 
@@ -201,15 +200,14 @@ public class SendAndReplyMessageService {
     }
 
     public MessageReply buildReplyOutOfMessage(Message message) {
-        return MessageReply.builder()
-            .sentTime(message.getUpdatedTime())
-            .isUrgent(message.getIsUrgent())
-            .senderName(message.getSenderName())
-            .senderRoleType(message.getSenderRoleType())
-            .messageContent(message.getMessageContent())
-            .recipientRoleType(message.getRecipientRoleType())
-            .subject(message.getSubject())
-            .subjectType(message.getSubjectType())
-            .build();
+        return new MessageReply()
+            .setSentTime(message.getUpdatedTime())
+            .setIsUrgent(message.getIsUrgent())
+            .setSenderName(message.getSenderName())
+            .setSenderRoleType(message.getSenderRoleType())
+            .setMessageContent(message.getMessageContent())
+            .setRecipientRoleType(message.getRecipientRoleType())
+            .setSubject(message.getSubject())
+            .setSubjectType(message.getSubjectType());
     }
 }

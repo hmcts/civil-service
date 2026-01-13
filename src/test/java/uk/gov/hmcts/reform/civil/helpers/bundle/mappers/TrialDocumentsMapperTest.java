@@ -62,7 +62,7 @@ class TrialDocumentsMapperTest {
 
         when(conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(any(), any(), any(), any()))
             .thenReturn(java.util.Collections.singletonList(
-                BundlingRequestDocument.builder().documentFileName("f").documentType("t").build()
+                new BundlingRequestDocument().setDocumentFileName("f").setDocumentType("t")
             ));
 
         CaseData caseData = getCaseData();
