@@ -67,7 +67,7 @@ class StatementsOfCaseMapperTest {
     void testMapperWhenIncludesClaimFormParticularsResponsesAndDocEvidences() {
         when(systemGeneratedDocMapper.mapSystemGeneratedCaseDocument(any(), eq(BundleFileNameList.CLAIM_FORM.getDisplayName())))
             .thenReturn(java.util.Collections.singletonList(
-                BundlingRequestDocument.builder().documentFileName("f").documentType("t").build()
+                new BundlingRequestDocument().setDocumentFileName("f").setDocumentType("t")
             ));
 
         when(bundleDocumentsRetrieval.getParticularsOfClaimName(any(), any()))
@@ -83,7 +83,7 @@ class StatementsOfCaseMapperTest {
 
         when(conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(any(), any(), any(), any(PartyType.class)))
             .thenReturn(java.util.Collections.singletonList(
-                BundlingRequestDocument.builder().documentFileName("f").documentType("t").build()
+                new BundlingRequestDocument().setDocumentFileName("f").setDocumentType("t")
             ));
 
         CaseData caseData = getCaseData();

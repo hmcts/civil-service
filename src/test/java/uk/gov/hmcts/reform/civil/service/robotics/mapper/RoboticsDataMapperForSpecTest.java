@@ -57,14 +57,11 @@ class RoboticsDataMapperForSpecTest {
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build())
             .build();
         caseData.setSubmittedDate(LocalDateTime.now().minusDays(14));
-        caseData.setBreathing(BreathingSpaceInfo.builder()
-            .enter(BreathingSpaceEnterInfo.builder()
-                .type(BreathingSpaceType.STANDARD)
-                .build())
-            .lift(BreathingSpaceLiftInfo.builder()
-                .expectedEnd(LocalDate.now())
-                .build())
-            .build());
+        caseData.setBreathing(new BreathingSpaceInfo()
+            .setEnter(new BreathingSpaceEnterInfo()
+                .setType(BreathingSpaceType.STANDARD))
+            .setLift(new BreathingSpaceLiftInfo()
+                .setExpectedEnd(LocalDate.now())));
 
         RoboticsCaseDataSpec mapped = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
@@ -87,14 +84,11 @@ class RoboticsDataMapperForSpecTest {
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build())
             .build();
         caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
-        caseData.setBreathing(BreathingSpaceInfo.builder()
-            .enter(BreathingSpaceEnterInfo.builder()
-                .type(BreathingSpaceType.STANDARD)
-                .build())
-            .lift(BreathingSpaceLiftInfo.builder()
-                .expectedEnd(LocalDate.now())
-                .build())
-            .build());
+        caseData.setBreathing(new BreathingSpaceInfo()
+            .setEnter(new BreathingSpaceEnterInfo()
+                .setType(BreathingSpaceType.STANDARD))
+            .setLift(new BreathingSpaceLiftInfo()
+                .setExpectedEnd(LocalDate.now())));
         caseData.setSubmittedDate(LocalDateTime.now().minusDays(14));
         var app1NocDate = LocalDateTime.parse("2022-01-01T12:00:00.000550439");
         OrganisationPolicy app1OrgPolicy = new OrganisationPolicy();
@@ -135,14 +129,11 @@ class RoboticsDataMapperForSpecTest {
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build())
             .build();
         caseData.setSubmittedDate(LocalDateTime.now().minusDays(14));
-        caseData.setBreathing(BreathingSpaceInfo.builder()
-            .enter(BreathingSpaceEnterInfo.builder()
-                .type(BreathingSpaceType.STANDARD)
-                .build())
-            .lift(BreathingSpaceLiftInfo.builder()
-                .expectedEnd(LocalDate.now())
-                .build())
-            .build());
+        caseData.setBreathing(new BreathingSpaceInfo()
+            .setEnter(new BreathingSpaceEnterInfo()
+                .setType(BreathingSpaceType.STANDARD))
+            .setLift(new BreathingSpaceLiftInfo()
+                .setExpectedEnd(LocalDate.now())));
         caseData.setCcdState(CaseState.CASE_DISMISSED);
 
         var app1NocDate = LocalDateTime.parse("2022-01-01T12:00:00.000550439");
@@ -183,14 +174,11 @@ class RoboticsDataMapperForSpecTest {
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build())
             .build();
         caseData.setSubmittedDate(LocalDateTime.now().minusDays(14));
-        caseData.setBreathing(BreathingSpaceInfo.builder()
-            .enter(BreathingSpaceEnterInfo.builder()
-                .type(BreathingSpaceType.STANDARD)
-                .build())
-            .lift(BreathingSpaceLiftInfo.builder()
-                .expectedEnd(LocalDate.now())
-                .build())
-            .build());
+        caseData.setBreathing(new BreathingSpaceInfo()
+            .setEnter(new BreathingSpaceEnterInfo()
+                .setType(BreathingSpaceType.STANDARD))
+            .setLift(new BreathingSpaceLiftInfo()
+                .setExpectedEnd(LocalDate.now())));
         caseData.setCcdState(CaseState.CASE_ISSUED);
 
         RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
