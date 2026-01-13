@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -24,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Component
+@Slf4j
 public class CalculateFeeTask {
 
     private final FeesService feesService;
@@ -83,6 +85,7 @@ public class CalculateFeeTask {
     }
 
     private void setClaimFee(CaseData caseData) {
+        log.info("Calculating fees for claim value {} ", caseData.getClaimValue());
         caseData.setClaimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()));
     }
 

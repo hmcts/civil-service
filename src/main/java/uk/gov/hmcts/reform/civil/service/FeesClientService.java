@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -13,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.FeeLookupResponseDto;
 import java.math.BigDecimal;
 
 @Service
+@Slf4j
 @ConditionalOnProperty(prefix = "fees.api", name = "url")
 
 public class FeesClientService {
@@ -48,6 +50,7 @@ public class FeesClientService {
     }
 
     public FeeLookupResponseDto lookupFee(String channel, String event, BigDecimal amount) {
+        log.info("Fee lookup called from client for the claim amount  {}, channel {}, event {}", amount, channel, event);
         if (featureToggleService.isFeatureEnabled("fee-keywords-enable")) {
             String keyword;
             String jurisdiction2;
@@ -62,7 +65,7 @@ public class FeesClientService {
                 jurisdiction2 = this.jurisdiction2;
             }
 
-            return feesApiClient.lookupFeeWithAmount(
+            FeeLookupResponseDto feeLookupResponseDto = feesApiClient.lookupFeeWithAmount(
                 service,
                 jurisdiction1,
                 jurisdiction2,
@@ -71,6 +74,15 @@ public class FeesClientService {
                 keyword,
                 amount
             );
+
+            if (feeLookupResponseDto == null) {
+                throw new IllegalStateException("Fee lookup returned null response");
+            }
+
+            log.info("Fee obtained from client for the  channel {}, event {} and claim amount  {} is {}",
+                     channel, event, amount, feeLookupResponseDto.getFeeAmount());
+
+            return feeLookupResponseDto;
 
         } else {
             return feesApiClient.lookupFeeWithoutKeyword(service, jurisdiction1, jurisdiction2, channel, event, amount);

@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.FeeLookupResponseDto;
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -52,6 +53,20 @@ class FeeClientTest {
             "jurisdiction2",
             "jurisdictionFastTrackClaim"
         );
+    }
+
+    @Test
+    void shouldThrowException_whenLookupFeeWithKeywordReturnsNull() {
+        when(featureToggleService.isFeatureEnabled("fee-keywords-enable")).thenReturn(true);
+
+        given(feesApiClient.lookupFeeWithAmount(any(), any(), any(), any(), any(), any(), any()))
+            .willReturn(null);
+
+        assertThatThrownBy(() ->
+                               feesClient.lookupFee(CHANNEL, EVENT_ISSUE, new BigDecimal("50.00"))
+        )
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("Fee lookup returned null response");
     }
 
     @Test
