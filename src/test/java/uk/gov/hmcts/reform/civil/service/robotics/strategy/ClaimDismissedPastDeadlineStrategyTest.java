@@ -64,8 +64,9 @@ class ClaimDismissedPastDeadlineStrategyTest {
     @Test
     void contributeUsesPreviousStateToChooseMessage() {
         when(stateFlow.getStateHistory()).thenReturn(List.of(
+            State.from(FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()),
             State.from(FlowState.Main.CLAIM_NOTIFIED.fullName()),
-            State.from(FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName())
+            State.from(FlowState.Main.DRAFT.fullName())
         ));
 
         LocalDateTime dismissed = LocalDateTime.of(2024, 2, 10, 9, 0);

@@ -63,13 +63,9 @@ public class ClaimDismissedPastDeadlineStrategy implements EventHistoryStrategy 
     }
 
     private boolean isDismissedPastDeadline(CaseData caseData) {
-        List<State> history = stateFlowEngine.evaluate(caseData).getStateHistory();
-        if (history.isEmpty()) {
-            return false;
-        }
-        State last = history.get(history.size() - 1);
-        FlowState.Main current = (FlowState.Main) FlowState.fromFullName(last.getName());
-        return current == FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE;
+        return stateFlowEngine.evaluate(caseData).getStateHistory().stream()
+            .map(State::getName)
+            .anyMatch(name -> FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName().equals(name));
     }
 
     private FlowState.Main determinePreviousState(CaseData caseData) {
