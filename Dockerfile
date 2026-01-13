@@ -9,6 +9,7 @@ FROM hmctspublic.azurecr.io/base/java:21-distroless
 USER hmcts
 
 COPY lib/applicationinsights.json /opt/app/
+COPY lib/appinsights-connection-string /mnt/secrets/civil/appinsights-connection-string
 COPY build/libs/civil-service.jar /opt/app/
 
 EXPOSE 4000
