@@ -146,7 +146,9 @@ public class CaseFlagsHearingsUtils {
     private static void findNonEmptyFlags(List<PartyFlags> nonEmptyFlags, Flags flags, String partyId) {
         if (flags != null
             && flags.getDetails() != null) {
-            nonEmptyFlags.add(PartyFlags.from(flags).toBuilder().partyId(partyId).build());
+            PartyFlags partyFlags = PartyFlags.from(flags);
+            partyFlags.setPartyId(partyId);
+            nonEmptyFlags.add(partyFlags);
         }
     }
 
