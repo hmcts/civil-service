@@ -31,8 +31,8 @@ class CreateCaseFlagsHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldUpdateUrgentFlagWhenActiveAndCodeMatches() {
-        FlagDetail flagDetail = FlagDetail.builder().flagCode("CF0007").status("Active").build();
-        Flags flags = Flags.builder().details(ElementUtils.wrapElements(flagDetail)).build();
+        FlagDetail flagDetail = new FlagDetail().setFlagCode("CF0007").setStatus("Active");
+        Flags flags = new Flags().setDetails(ElementUtils.wrapElements(flagDetail));
         CaseData caseData = CaseData.builder().caseFlags(flags).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         // When
@@ -42,8 +42,8 @@ class CreateCaseFlagsHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldNotUpdateUrgentFlagWhenActiveAndCodeMatches() {
-        FlagDetail flagDetail = FlagDetail.builder().flagCode("CF0008").status("Active").build();
-        Flags flags = Flags.builder().details(ElementUtils.wrapElements(flagDetail)).build();
+        FlagDetail flagDetail = new FlagDetail().setFlagCode("CF0008").setStatus("Active");
+        Flags flags = new Flags().setDetails(ElementUtils.wrapElements(flagDetail));
         CaseData caseData = CaseData.builder().caseFlags(flags).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         // When
