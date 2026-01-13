@@ -1229,6 +1229,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             }
         } else if (SdoHelper.isFastTrack(caseData)) {
             caseData.setSetFastTrackFlag(YES);
+            caseData.setFastTrackPenalNotice(DEFAULT_PENAL_NOTICE);
             if (SdoHelper.isNihlFastTrack(caseData)) {
                 caseData.setIsSdoR2NewScreen(YES);
             }
