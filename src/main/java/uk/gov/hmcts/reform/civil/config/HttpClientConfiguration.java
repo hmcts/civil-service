@@ -28,16 +28,12 @@ public class HttpClientConfiguration {
     @Bean
     public RestTemplate restTemplate() {
         RestTemplate restTemplate = new RestTemplate();
-        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(getRestTemplateHttpClient()));
+        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(getHttpClient()));
         return restTemplate;
     }
 
-    private CloseableHttpClient getRestTemplateHttpClient() {
-        RequestConfig config = RequestConfig.custom()
-            .setConnectTimeout(readTimeout)
-            .setConnectionRequestTimeout(readTimeout)
-            .setSocketTimeout(readTimeout)
-            .build();
+    private CloseableHttpClient getHttpClient() {
+        final RequestConfig config = getRequestConfig();
 
         return HttpClientBuilder
             .create()
@@ -46,18 +42,11 @@ public class HttpClientConfiguration {
             .build();
     }
 
-    private CloseableHttpClient getHttpClient() {
-        int timeout = 10000;
-        RequestConfig config = RequestConfig.custom()
-            .setConnectTimeout(timeout)
-            .setConnectionRequestTimeout(timeout)
-            .setSocketTimeout(timeout)
-            .build();
-
-        return HttpClientBuilder
-            .create()
-            .useSystemProperties()
-            .setDefaultRequestConfig(config)
+    private RequestConfig getRequestConfig() {
+        return RequestConfig.custom()
+            .setConnectTimeout(readTimeout)
+            .setConnectionRequestTimeout(readTimeout)
+            .setSocketTimeout(readTimeout)
             .build();
     }
 
