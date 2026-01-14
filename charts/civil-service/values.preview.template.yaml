@@ -111,13 +111,6 @@ java:
       username: ${POSTGRES_USER}
       password: ${POSTGRES_PASSWORD}
 
-idam-pr:
-  releaseNameOverride: ${SERVICE_NAME}-xui-idam-pr
-  enabled: true
-  redirect_uris:
-    XUI:
-      - https://xui-${SERVICE_NAME}.preview.platform.hmcts.net/oauth2/callback
-
 xui-webapp:
   enabled: true
   nodejs:
