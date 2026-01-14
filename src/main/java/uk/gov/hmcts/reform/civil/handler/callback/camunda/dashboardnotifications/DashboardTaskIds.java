@@ -13,4 +13,6 @@ public final class DashboardTaskIds {
         "GenerateDashboardNotificationsTrialArrangementsNotifyParty";
     public static final String BUNDLE_CREATION = "GenerateDashboardNotificationsBundleCreation";
     public static final String CLAIM_SETTLED = "GenerateDashboardNotificationsClaimSettled";
+    public static final String EVIDENCE_UPLOADED = "GenerateDashboardNotificationsEvidenceUploaded";
+
 }
