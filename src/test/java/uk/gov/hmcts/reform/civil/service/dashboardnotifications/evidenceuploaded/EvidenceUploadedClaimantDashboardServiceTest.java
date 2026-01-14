@@ -48,11 +48,10 @@ class EvidenceUploadedClaimantDashboardServiceTest {
 
     @Test
     void shouldNotifyClaimantWhenEvidenceUploadedWithDocumentDate() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .applicant1Represented(YesOrNo.NO)
-            .caseDocumentUploadDate(LocalDateTime.now())
-            .ccdCaseReference(1234L)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setCaseDocumentUploadDate(LocalDateTime.now());
+        caseData.setCcdCaseReference(1234L);
 
         service.notifyEvidenceUploaded(caseData, AUTH_TOKEN);
 
@@ -68,11 +67,10 @@ class EvidenceUploadedClaimantDashboardServiceTest {
 
     @Test
     void shouldNotifyClaimantWhenEvidenceNotUploadedWithoutDocumentDate() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .applicant1Represented(YesOrNo.NO)
-            .caseDocumentUploadDate(null)
-            .ccdCaseReference(5678L)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setCaseDocumentUploadDate(null);
+        caseData.setCcdCaseReference(5678L);
 
         service.notifyEvidenceUploaded(caseData, AUTH_TOKEN);
 
@@ -88,11 +86,10 @@ class EvidenceUploadedClaimantDashboardServiceTest {
 
     @Test
     void shouldUseUploadedScenarioWhenDocumentDatePresent() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .applicant1Represented(YesOrNo.NO)
-            .caseDocumentUploadDate(LocalDateTime.of(2024, 1, 15, 10, 30))
-            .ccdCaseReference(9012L)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setCaseDocumentUploadDate(LocalDateTime.of(2024, 1, 15, 10, 30));
+        caseData.setCcdCaseReference(9012L);
 
         service.notifyEvidenceUploaded(caseData, AUTH_TOKEN);
 
