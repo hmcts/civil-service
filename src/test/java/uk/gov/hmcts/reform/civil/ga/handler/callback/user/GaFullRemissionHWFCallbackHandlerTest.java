@@ -12,8 +12,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.HelpWithFeesDetails;
 
 import java.math.BigDecimal;
@@ -44,7 +44,7 @@ public class GaFullRemissionHWFCallbackHandlerTest extends GeneralApplicationBas
         @Test
         void shouldUpdateFullRemissionData_GaFee() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .generalAppPBADetails(GAPbaDetails.builder().fee(
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
                         Fee.builder()
                             .calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
                         .build())
@@ -63,7 +63,7 @@ public class GaFullRemissionHWFCallbackHandlerTest extends GeneralApplicationBas
         @Test
         void shouldUpdateFullRemissionDataWithDetailsNull_GaFee() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .generalAppPBADetails(GAPbaDetails.builder().fee(
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
                     Fee.builder()
                         .calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
                     .build())
@@ -82,7 +82,7 @@ public class GaFullRemissionHWFCallbackHandlerTest extends GeneralApplicationBas
         @Test
         void shouldUpdateFullRemissionData_Additional() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                    .generalAppPBADetails(GAPbaDetails.builder().fee(
+                    .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
                                     Fee.builder()
                                             .calculatedAmountInPence(BigDecimal.valueOf(30000))
                                             .code("OOOCM002").build())
@@ -102,7 +102,7 @@ public class GaFullRemissionHWFCallbackHandlerTest extends GeneralApplicationBas
         @Test
         void shouldUpdateFullRemissionDataWithDetailsNull_AdditionalFee() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                    .generalAppPBADetails(GAPbaDetails.builder().fee(
+                    .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
                                     Fee.builder()
                                             .calculatedAmountInPence(BigDecimal.valueOf(30000))
                                             .code("OOOCM002").build())
@@ -121,7 +121,7 @@ public class GaFullRemissionHWFCallbackHandlerTest extends GeneralApplicationBas
         @Test
         void shouldNotUpdateFullRemissionData_ifGaFeeIsZero() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                    .generalAppPBADetails(GAPbaDetails.builder().fee(
+                    .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
                                     Fee.builder()
                                             .calculatedAmountInPence(BigDecimal.ZERO)
                                             .code("FREE").build())
@@ -140,7 +140,7 @@ public class GaFullRemissionHWFCallbackHandlerTest extends GeneralApplicationBas
         @Test
         void shouldNotUpdateFullRemissionData_ifAdditionalFeeIsZero() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .generalAppPBADetails(GAPbaDetails.builder().fee(
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
                                 Fee.builder()
                                         .calculatedAmountInPence(BigDecimal.ZERO)
                                         .code("FREE").build())

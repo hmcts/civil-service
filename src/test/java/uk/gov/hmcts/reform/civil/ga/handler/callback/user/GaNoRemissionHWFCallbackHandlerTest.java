@@ -13,10 +13,10 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.HelpWithFeesDetails;
 
 import java.math.BigDecimal;
@@ -48,7 +48,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_RESP
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .ccdState(AWAITING_RESPONDENT_RESPONSE)
             .hwfFeeType(FeeType.APPLICATION)
-            .generalAppPBADetails(GAPbaDetails.builder().fee(
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
                     Fee.builder()
                         .calculatedAmountInPence(BigDecimal.valueOf(500)).code("FEE205").build())
                                       .build())

@@ -15,10 +15,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.exceptions.PaymentsApiException;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.service.PaymentStatusService;
 import uk.gov.hmcts.reform.payments.client.PaymentsClient;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
@@ -86,7 +86,7 @@ class GaFeesPaymentServiceTest {
     @BeforeEach
     void before() {
         caseData = GeneralApplicationCaseData.builder().ccdCaseReference(2801090368574910L)
-            .generalAppPBADetails(GAPbaDetails.builder().serviceReqReference("2023-1701090705688")
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().serviceReqReference("2023-1701090705688")
                                        .fee(Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build())
                                        .build())
             .parentCaseReference("1701090368574910")
@@ -139,7 +139,7 @@ class GaFeesPaymentServiceTest {
     @SneakyThrows
     void shouldNotCreateGovPayPaymentUrlForMissingPbaDetails() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().ccdCaseReference(1701090368574910L)
-                .generalAppPBADetails(GAPbaDetails.builder()
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                         .fee(Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build())
                         .build())
             .build();
@@ -160,7 +160,7 @@ class GaFeesPaymentServiceTest {
     @SneakyThrows
     void shouldNotCreateGovPayPaymentUrlForMissingServiceRequest() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().ccdCaseReference(1701090368574910L)
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .fee(Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build())
                                       .build())
             .build();

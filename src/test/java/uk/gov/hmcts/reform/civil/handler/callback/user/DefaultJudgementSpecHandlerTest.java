@@ -197,7 +197,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             CaseDataLiP caseDataLiP = new CaseDataLiP();
             caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-            caseData.setBreathing(BreathingSpaceInfo.builder().lift(null).build());
+            caseData.setBreathing(new BreathingSpaceInfo().setLift(null));
             caseData.setCaseDataLiP(caseDataLiP);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();

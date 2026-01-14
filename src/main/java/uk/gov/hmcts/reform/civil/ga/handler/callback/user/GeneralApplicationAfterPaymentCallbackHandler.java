@@ -14,10 +14,10 @@ import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 
 import java.util.List;
 import java.util.Map;
@@ -55,7 +55,7 @@ public class GeneralApplicationAfterPaymentCallbackHandler extends CallbackHandl
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         PaymentStatus paymentStatus = Optional.of(caseData).map(GeneralApplicationCaseData::getGeneralAppPBADetails).map(
-                GAPbaDetails::getPaymentDetails)
+                GeneralApplicationPbaDetails::getPaymentDetails)
             .map(PaymentDetails::getStatus).orElse(null);
 
         // No need to initiate the business process if payment status is failed

@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.ga.enums.dq.GaFinalOrderSelection;
 import uk.gov.hmcts.reform.civil.ga.enums.hearing.HearingApplicationDetails;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationParty;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
@@ -134,7 +135,7 @@ public class GeneralApplicationCaseDataBuilder {
     protected GARespondentOrderAgreement gaRespondentOrderAgreement;
     protected String respondentSolicitor1EmailAddress;
     protected String respondentSolicitor2EmailAddress;
-    protected GAPbaDetails gaPbaDetails;
+    protected GeneralApplicationPbaDetails gaPbaDetails;
     protected OrganisationPolicy applicant1OrganisationPolicy;
     protected IdamUserDetails applicantSolicitor1UserDetails;
     protected OrganisationPolicy respondent1OrganisationPolicy;
@@ -330,7 +331,7 @@ public class GeneralApplicationCaseDataBuilder {
         return this;
     }
 
-    public GeneralApplicationCaseDataBuilder gaPbaDetails(GAPbaDetails gaPbaDetails) {
+    public GeneralApplicationCaseDataBuilder gaPbaDetails(GeneralApplicationPbaDetails gaPbaDetails) {
         this.gaPbaDetails = gaPbaDetails;
         return this;
     }
@@ -459,7 +460,7 @@ public class GeneralApplicationCaseDataBuilder {
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
             .generalAppPBADetails(
-                GAPbaDetails.builder()
+                GeneralApplicationPbaDetails.builder()
                     .fee(
                         Fee.builder()
                             .code("FE203")
@@ -487,7 +488,7 @@ public class GeneralApplicationCaseDataBuilder {
                                                .hasAgreed(YES).build())
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
             .generalAppPBADetails(
-                GAPbaDetails.builder()
+                GeneralApplicationPbaDetails.builder()
                     .paymentDetails(PaymentDetails.builder()
                                         .status(PaymentStatus.FAILED)
                                         .reference("RC-1658-4258-2679-9795")
@@ -520,7 +521,7 @@ public class GeneralApplicationCaseDataBuilder {
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
                                                .hasAgreed(YES).build())
             .generalAppPBADetails(
-                GAPbaDetails.builder()
+                GeneralApplicationPbaDetails.builder()
                     .paymentSuccessfulDate(LocalDateTime.of(LocalDate.of(2020, 1, 1),
                                                             LocalTime.of(12, 0, 0)))
                     .paymentDetails(PaymentDetails.builder()
@@ -554,7 +555,7 @@ public class GeneralApplicationCaseDataBuilder {
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
                                                .hasAgreed(NO).build())
             .generalAppPBADetails(
-                GAPbaDetails.builder()
+                GeneralApplicationPbaDetails.builder()
                     .paymentSuccessfulDate(LocalDateTime.of(LocalDate.of(2020, 1, 1),
                                                             LocalTime.of(12, 0, 0)))
                     .paymentDetails(PaymentDetails.builder()
@@ -607,7 +608,7 @@ public class GeneralApplicationCaseDataBuilder {
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
                                                .hasAgreed(YES).build())
             .generalAppPBADetails(
-                GAPbaDetails.builder()
+                GeneralApplicationPbaDetails.builder()
                     .paymentSuccessfulDate(LocalDateTime.of(LocalDate.of(2020, 1, 1),
                                                             LocalTime.of(12, 0, 0)))
                     .paymentDetails(PaymentDetails.builder()
@@ -637,7 +638,7 @@ public class GeneralApplicationCaseDataBuilder {
             .legacyCaseReference("000DC001")
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
             .generalAppPBADetails(
-                GAPbaDetails.builder()
+                GeneralApplicationPbaDetails.builder()
                     .paymentSuccessfulDate(LocalDateTime.of(LocalDate.of(2020, 1, 1),
                                                             LocalTime.of(12, 0, 0)))
                     .paymentDetails(PaymentDetails.builder()
@@ -664,7 +665,7 @@ public class GeneralApplicationCaseDataBuilder {
             .caseLink(application.getCaseLink())
             .generalAppRespondentAgreement(application.getGeneralAppRespondentAgreement())
             .generalAppInformOtherParty(application.getGeneralAppInformOtherParty())
-            .generalAppPBADetails(application.getGeneralAppPBADetails())
+            .generalAppPBADetails(convert(application.getGeneralAppPBADetails()))
             .generalAppDetailsOfOrder(application.getGeneralAppDetailsOfOrder())
             .generalAppReasonsOfOrder(application.getGeneralAppReasonsOfOrder())
             .generalAppNotificationDeadlineDate(application.getGeneralAppDateDeadline())
@@ -688,7 +689,7 @@ public class GeneralApplicationCaseDataBuilder {
             .caseLink(application.getCaseLink())
             .generalAppRespondentAgreement(application.getGeneralAppRespondentAgreement())
             .generalAppInformOtherParty(application.getGeneralAppInformOtherParty())
-            .generalAppPBADetails(application.getGeneralAppPBADetails())
+            .generalAppPBADetails(convert(application.getGeneralAppPBADetails()))
             .generalAppDetailsOfOrder(application.getGeneralAppDetailsOfOrder())
             .generalAppReasonsOfOrder(application.getGeneralAppReasonsOfOrder())
             .generalAppNotificationDeadlineDate(application.getGeneralAppDateDeadline())
@@ -712,7 +713,7 @@ public class GeneralApplicationCaseDataBuilder {
             .caseLink(application.getCaseLink())
             .generalAppRespondentAgreement(application.getGeneralAppRespondentAgreement())
             .generalAppInformOtherParty(application.getGeneralAppInformOtherParty())
-            .generalAppPBADetails(application.getGeneralAppPBADetails())
+            .generalAppPBADetails(convert(application.getGeneralAppPBADetails()))
             .generalAppDetailsOfOrder(application.getGeneralAppDetailsOfOrder())
             .generalAppReasonsOfOrder(application.getGeneralAppReasonsOfOrder())
             .generalAppNotificationDeadlineDate(application.getGeneralAppDateDeadline())
@@ -727,6 +728,17 @@ public class GeneralApplicationCaseDataBuilder {
             .isCcmccLocation(application.getIsCcmccLocation())
             .caseManagementLocation(application.getCaseManagementLocation())
             .build();
+    }
+
+    private GeneralApplicationPbaDetails convert(GAPbaDetails gaPbaDetails) {
+        final GeneralApplicationPbaDetails generalApplicationPBADetails = new GeneralApplicationPbaDetails();
+        generalApplicationPBADetails.setPaymentSuccessfulDate(gaPbaDetails.getPaymentSuccessfulDate());
+        generalApplicationPBADetails.setPaymentDetails(gaPbaDetails.getPaymentDetails());
+        generalApplicationPBADetails.setFee(gaPbaDetails.getFee());
+        generalApplicationPBADetails.setServiceReqReference(gaPbaDetails.getServiceReqReference());
+        generalApplicationPBADetails.setAdditionalPaymentServiceRef(gaPbaDetails.getAdditionalPaymentServiceRef());
+        generalApplicationPBADetails.setAdditionalPaymentDetails(gaPbaDetails.getAdditionalPaymentDetails());
+        return generalApplicationPBADetails;
     }
 
     public GeneralApplicationCaseData buildFeeValidationCaseData(Fee fee, boolean isConsented, boolean isWithNotice) {
@@ -749,7 +761,7 @@ public class GeneralApplicationCaseDataBuilder {
                                                .hasAgreed(isConsented ? YES : NO).build())
             .generalAppInformOtherParty(gaInformOtherParty)
             .generalAppPBADetails(
-                GAPbaDetails.builder()
+                GeneralApplicationPbaDetails.builder()
                     .fee(fee)
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
@@ -1083,7 +1095,7 @@ public class GeneralApplicationCaseDataBuilder {
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY)
                                  .camundaEvent(HEARING_SCHEDULED).build())
             .generalAppPBADetails(
-                GAPbaDetails.builder()
+                GeneralApplicationPbaDetails.builder()
                     .fee(FEE108)
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .createdDate(LocalDateTime.now())
@@ -1246,7 +1258,7 @@ public class GeneralApplicationCaseDataBuilder {
             .applicantPartyName("Test Applicant Name")
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
             .generalAppPBADetails(
-                GAPbaDetails.builder()
+                GeneralApplicationPbaDetails.builder()
                     .fee(FEE275)
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .createdDate(LocalDateTime.now())
@@ -1277,7 +1289,7 @@ public class GeneralApplicationCaseDataBuilder {
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY)
                                  .camundaEvent(JUDGES_DECISION).build())
             .generalAppPBADetails(
-                GAPbaDetails.builder()
+                GeneralApplicationPbaDetails.builder()
                     .fee(FEE108)
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .createdDate(LocalDateTime.now())
@@ -1314,7 +1326,7 @@ public class GeneralApplicationCaseDataBuilder {
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY)
                                  .camundaEvent(JUDGES_DECISION).build())
             .generalAppPBADetails(
-                GAPbaDetails.builder()
+                GeneralApplicationPbaDetails.builder()
                     .fee(FEE108)
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .createdDate(LocalDateTime.now())
@@ -1351,7 +1363,7 @@ public class GeneralApplicationCaseDataBuilder {
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY)
                                  .build())
             .generalAppPBADetails(
-                GAPbaDetails.builder()
+                GeneralApplicationPbaDetails.builder()
                     .fee(FEE108)
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .createdDate(LocalDateTime.now())
@@ -1373,7 +1385,7 @@ public class GeneralApplicationCaseDataBuilder {
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY)
                                  .build())
             .generalAppPBADetails(
-                GAPbaDetails.builder()
+                GeneralApplicationPbaDetails.builder()
                     .fee(FEE14)
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .createdDate(LocalDateTime.now())

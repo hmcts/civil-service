@@ -205,13 +205,12 @@ public class CasesController {
         @RequestBody CaseworkerSubmitEventDTo submitEventDto
     ) {
         try {
-            CaseworkerEventSubmissionParams params = CaseworkerEventSubmissionParams
-                .builder()
-                .authorisation(authorization)
-                .userId(userId)
-                .event(submitEventDto.getEvent())
-                .updates(submitEventDto.getData())
-                .build();
+            CaseworkerEventSubmissionParams params = new CaseworkerEventSubmissionParams()
+                .setAuthorisation(authorization)
+                .setUserId(userId)
+                .setEvent(submitEventDto.getEvent())
+                .setUpdates(submitEventDto.getData());
+
             CaseDetails caseDetails = caseworkerCaseEventService.submitEventForNewClaimCaseWorker(params);
             return new ResponseEntity<>(caseDetails, HttpStatus.CREATED);
         } catch (Exception ex) {
@@ -229,10 +228,10 @@ public class CasesController {
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
         @RequestParam(name = "sdtRequestId") String searchParam
     ) {
-        CaseWorkerSearchCaseParams params = CaseWorkerSearchCaseParams.builder()
-            .authorisation(authorization)
-            .userId(userId)
-            .searchCriteria(Map.of("case.sdtRequestIdFromSdt", searchParam)).build();
+        CaseWorkerSearchCaseParams params = new CaseWorkerSearchCaseParams()
+            .setAuthorisation(authorization)
+            .setUserId(userId)
+            .setSearchCriteria(Map.of("case.sdtRequestIdFromSdt", searchParam));
         List<CaseDetails> caseDetails = caseSdtRequestSearchService.searchCaseForSdtRequest(params);
 
         return caseDetails.isEmpty();

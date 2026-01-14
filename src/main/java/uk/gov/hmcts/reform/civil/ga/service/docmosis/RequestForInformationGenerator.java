@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeRequestMoreInfoOption;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -13,7 +14,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialRequestMoreInfo;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
@@ -160,7 +160,7 @@ public class RequestForInformationGenerator implements TemplateDataGenerator<Jud
 
     private String getAdditionalApplicationFee(GeneralApplicationCaseData caseData) {
         return Optional.ofNullable(caseData.getGeneralAppPBADetails()).map(
-            GAPbaDetails::getFee).map(Fee::getCalculatedAmountInPence)
+                GeneralApplicationPbaDetails::getFee).map(Fee::getCalculatedAmountInPence)
             .map(MonetaryConversions::penniesToPounds)
             .map(amount -> amount.setScale(2))
             .map(BigDecimal::toPlainString)

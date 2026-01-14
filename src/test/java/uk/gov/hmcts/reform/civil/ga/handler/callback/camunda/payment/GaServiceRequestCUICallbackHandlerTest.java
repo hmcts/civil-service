@@ -13,9 +13,9 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
@@ -55,7 +55,7 @@ public class GaServiceRequestCUICallbackHandlerTest extends GeneralApplicationBa
     public void setup() {
         caseData = GeneralApplicationCaseData.builder()
              .ccdCaseReference(1644495739087775L)
-                .generalAppPBADetails(GAPbaDetails.builder()
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                         .fee(Fee.builder()
                                 .calculatedAmountInPence(BigDecimal.valueOf(100))
                                 .code("CODE").build()).build())
@@ -90,7 +90,7 @@ public class GaServiceRequestCUICallbackHandlerTest extends GeneralApplicationBa
         void shouldNotMakeAnyServiceRequest_whenServiceRequestHasBeenInvokedPreviously() {
             //GIVEN
             caseData = caseData.toBuilder()
-                    .generalAppPBADetails(GAPbaDetails.builder()
+                    .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                             .serviceReqReference(GeneralApplicationCaseDataBuilder.CUSTOMER_REFERENCE).build())
                 .build();
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_CUI_GENERAL_APP, ABOUT_TO_SUBMIT);

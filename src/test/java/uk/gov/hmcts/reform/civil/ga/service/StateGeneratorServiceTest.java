@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration;
 import uk.gov.hmcts.reform.civil.enums.dq.GAHearingType;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -22,7 +23,6 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialDecision;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialMakeAnOrder;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialRequestMoreInfo;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GARespondentResponse;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
@@ -273,7 +273,7 @@ public class StateGeneratorServiceTest {
      void shouldRequestMoreInformation_WhenJudgeUncloakTheApplication_AdditionalPaymentIsMadeSuccessfully() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .judicialDecisionWithUncloakRequestForInformationApplication(SEND_APP_TO_OTHER_PARTY, NO, YesOrNo.NO)
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .additionalPaymentDetails(PaymentDetails.builder()
                                                                     .reference("123456")
                                                                     .status(PaymentStatus.SUCCESS)
@@ -291,7 +291,7 @@ public class StateGeneratorServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .generalAppRespondentSolicitors(getRespondentSolicitors())
             .judicialDecisionWithUncloakRequestForInformationApplication(SEND_APP_TO_OTHER_PARTY, NO, YesOrNo.NO)
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .additionalPaymentDetails(PaymentDetails.builder()
                                                                     .reference("123456")
                                                                     .status(PaymentStatus.SUCCESS)
@@ -312,7 +312,7 @@ public class StateGeneratorServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .generalAppRespondentSolicitors(getRespondentSolicitors())
             .judicialDecisionWithUncloakRequestForInformationApplication(SEND_APP_TO_OTHER_PARTY, NO, YesOrNo.NO)
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .additionalPaymentDetails(PaymentDetails.builder()
                                                                     .reference("123456")
                                                                     .status(PaymentStatus.SUCCESS)
@@ -332,7 +332,7 @@ public class StateGeneratorServiceTest {
     void shouldRespondentResponse_WhenAdditionalPaymentReceived_ConsentOrder_withoutRespondentResponse() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .judicialDecisionWithUncloakRequestForInformationApplication(SEND_APP_TO_OTHER_PARTY, NO, YesOrNo.NO)
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .additionalPaymentDetails(PaymentDetails.builder()
                                                                     .reference("123456")
                                                                     .status(PaymentStatus.SUCCESS)

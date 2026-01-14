@@ -15,12 +15,12 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.notify.NotificationException;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -134,7 +134,7 @@ class GaPaymentRequestUpdateCallbackServiceTest {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().judicialOrderMadeWithUncloakApplication(YesOrNo.NO).build();
         caseData = caseData.toBuilder().ccdState(APPLICATION_ADD_PAYMENT)
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .additionalPaymentDetails(PaymentDetails.builder()
                                                                     .status(FAILED)
                                                                     .customerReference(null)
@@ -165,7 +165,7 @@ class GaPaymentRequestUpdateCallbackServiceTest {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().judicialOrderMadeWithUncloakApplication(YesOrNo.NO).build();
         caseData = caseData.toBuilder().ccdState(APPLICATION_ADD_PAYMENT)
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .additionalPaymentDetails(PaymentDetails.builder()
                                                                     .status(FAILED)
                                                                     .customerReference(null)
@@ -198,7 +198,7 @@ class GaPaymentRequestUpdateCallbackServiceTest {
     public void shouldNotSendEmailToRespondent_When_ConsentOrder() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().judicialOrderMadeWithUncloakApplication(YesOrNo.NO).build();
         caseData = caseData.toBuilder().ccdState(APPLICATION_ADD_PAYMENT)
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .additionalPaymentDetails(PaymentDetails.builder()
                                                                     .status(SUCCESS)
                                                                     .customerReference(null)
@@ -317,7 +317,7 @@ class GaPaymentRequestUpdateCallbackServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .ccdState(AWAITING_APPLICATION_PAYMENT)
                 .ccdCaseReference(1L)
-                .generalAppPBADetails(GAPbaDetails.builder()
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                         .fee(Fee.builder().calculatedAmountInPence(BigDecimal.ONE).build()).build())
                 .generalAppHelpWithFees(HelpWithFees.builder()
                         .helpWithFeesReferenceNumber("ref").build())
@@ -332,7 +332,7 @@ class GaPaymentRequestUpdateCallbackServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .ccdState(PENDING_APPLICATION_ISSUED)
                 .ccdCaseReference(1L)
-                .generalAppPBADetails(GAPbaDetails.builder()
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                         .fee(Fee.builder().calculatedAmountInPence(BigDecimal.ONE).build()).build())
                 .generalAppHelpWithFees(HelpWithFees.builder()
                         .helpWithFeesReferenceNumber("ref").build())

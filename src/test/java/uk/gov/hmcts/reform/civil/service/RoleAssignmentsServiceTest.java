@@ -71,16 +71,15 @@ class RoleAssignmentsServiceTest {
 
     @Test
     void getRoleAssignmentsWithLabels_shouldReturnExpectAssignments() {
-        RoleAssignmentServiceResponse expected = RoleAssignmentServiceResponse.builder()
-            .roleAssignmentResponse(
+        RoleAssignmentServiceResponse expected = new RoleAssignmentServiceResponse()
+            .setRoleAssignmentResponse(
                 List.of(RoleAssignmentResponse
                             .builder()
                             .actorId(ACTORID)
                             .roleLabel("Role Label")
                             .build()
                 )
-            )
-            .build();
+            );
         when(roleAssignmentApi.getRoleAssignments(
             eq(USER_AUTH_TOKEN),
             eq(SERVICE_TOKEN),
@@ -100,16 +99,15 @@ class RoleAssignmentsServiceTest {
 
     @Test
     void getRoleAssignmentsByCaseIdAndRole_shouldReturnExpectAssignments() {
-        RoleAssignmentServiceResponse expected = RoleAssignmentServiceResponse.builder()
-            .roleAssignmentResponse(
+        RoleAssignmentServiceResponse expected = new RoleAssignmentServiceResponse()
+            .setRoleAssignmentResponse(
                 List.of(RoleAssignmentResponse
                             .builder()
                             .actorId(ACTORID)
                             .roleLabel("Role Label")
                             .build()
                 )
-            )
-            .build();
+            );
 
         QueryRequest queryRequest = QueryRequest.builder()
             .roleType(ROLE_TYPE)

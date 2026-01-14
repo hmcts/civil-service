@@ -12,12 +12,12 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
@@ -244,7 +244,7 @@ class PaymentsServiceTest {
     @Test
     void validateRequestGaShouldThrowAnError_whenFeeDetailsNotProvided() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .generalAppPBADetails(GAPbaDetails.builder().build())
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().build())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
             .build();
 
@@ -258,7 +258,7 @@ class PaymentsServiceTest {
     @Test
     void validateRequestGaShouldThrowAnError_whenFeeDetailsDoNotHaveFeeCode() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .fee(Fee.builder()
                                                .calculatedAmountInPence(BigDecimal.valueOf(10800))
                                                .version("1")
@@ -277,7 +277,7 @@ class PaymentsServiceTest {
     @Test
     void validateRequestGaShouldThrowAnError_whenFeeDetailsDoNotHaveFeeVersion() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .fee(Fee.builder()
                                                .calculatedAmountInPence(BigDecimal.valueOf(10800))
                                                .code("FEE0442")
@@ -296,7 +296,7 @@ class PaymentsServiceTest {
     @Test
     void validateRequestGaShouldThrowAnError_whenFeeDetailsDoNotHaveFeeAmount() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .fee(Fee.builder()
                                                .code("FEE0442")
                                                .version("1")
@@ -315,7 +315,7 @@ class PaymentsServiceTest {
     @Test
     void validateRequestGaShouldThrowAnError_whenApplicantSolicitorDetailsAreNotSet() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .generalAppPBADetails(GAPbaDetails.builder().fee(Fee.builder().build()).build())
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().build()).build())
             .build();
 
         Exception exception = assertThrows(
@@ -328,7 +328,7 @@ class PaymentsServiceTest {
     @Test
     void validateRequestGaShouldThrowAnError_whenApplicantSolicitorOrgDetailsAreNotSet() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .generalAppPBADetails(GAPbaDetails.builder().fee(Fee.builder().build()).build())
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().build()).build())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().build())
             .build();
 
@@ -343,7 +343,7 @@ class PaymentsServiceTest {
     void validateRequestGaShouldNotThrowAnError_whenApplicantSolicitorOrgDetailsAreNotSetForLiPApplicant() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .isGaApplicantLip(YesOrNo.YES)
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .fee(Fee.builder()
                                                .calculatedAmountInPence(BigDecimal.TEN)
                                                .version("version")

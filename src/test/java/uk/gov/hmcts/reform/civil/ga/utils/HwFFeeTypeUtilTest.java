@@ -5,10 +5,10 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.HelpWithFeesDetails;
 
 import java.math.BigDecimal;
@@ -23,7 +23,7 @@ public class HwFFeeTypeUtilTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .ccdState(CaseState.APPLICATION_ADD_PAYMENT)
                 .generalAppHelpWithFees(HelpWithFees.builder().helpWithFeesReferenceNumber("HWF-111-222").build())
-                .generalAppPBADetails(GAPbaDetails.builder().fee(Fee.builder()
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder()
                                                                      .calculatedAmountInPence(BigDecimal.valueOf(180))
                                                                      .code("FEE123").build()).build())
                 .build();
@@ -42,7 +42,7 @@ public class HwFFeeTypeUtilTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .ccdState(CaseState.AWAITING_RESPONDENT_RESPONSE)
                 .generalAppHelpWithFees(HelpWithFees.builder().build())
-                .generalAppPBADetails(GAPbaDetails.builder().fee(Fee.builder()
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder()
                                                                  .calculatedAmountInPence(BigDecimal.valueOf(180))
                                                                  .code("FEE123").build()).build())
             .generalAppHelpWithFees(HelpWithFees.builder().helpWithFeesReferenceNumber("HWF-111-222").build())
@@ -74,7 +74,7 @@ public class HwFFeeTypeUtilTest {
     void getCalculatedFeeInPence_shouldReturnFee_whenFeesIsNotNull() {
         // Arrange
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .generalAppPBADetails(GAPbaDetails.builder().fee(
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
                                 Fee.builder()
                                         .calculatedAmountInPence(BigDecimal.valueOf(30000))
                                         .code("OOOCM002").build())

@@ -49,11 +49,11 @@ properties([
                                                 ],
       description: 'The URL of civil service'),
     choice(name: 'AAC_API_URL', choices: [
-                                                  'http://civil-service-aat.service.core-compute-aat.internal',
-                                                  'http://civil-service-demo.service.core-compute-demo.internal',
-                                                  'https://civil-ccd-pr-{PR_NUMBER}.preview.platform.hmcts.net',
-                                                  'https://civil-service-pr-{PR_NUMBER}.preview.platform.hmcts.net',
-                                                  'https://civil-citizen-ui-pr-{PR_NUMBER}-civil-service.preview.platform.hmcts.net',
+                                            'http://aac-manage-case-assignment-aat.service.core-compute-aat.internal',
+                                            'http://aac-manage-case-assignment-demo.service.core-compute-demo.internal',
+                                            'https://manage-case-assignment-civil-ccd-pr-{PR_NUMBER}.preview.platform.hmcts.net',
+                                            'https://manage-case-assignment-civil-service-pr-{PR_NUMBER}.preview.platform.hmcts.net',
+                                            'https://manage-case-assignment-civil-citizen-ui-pr-{PR_NUMBER}.preview.platform.hmcts.net',
                                           ],
       description: 'The URL of case assignment service'),
     string(name: 'WAIT_FOR_TIMEOUT_MS',
@@ -135,6 +135,7 @@ withNightlyPipeline(type, product, component) {
   env.URL_FOR_SECURITY_SCAN = params.CIVIL_SERVICE_URL
   env.TESTS_FOR_ACCESSIBILITY = true
   env.NIGHTLY_RUN = true
+  env.FT_TYPE = "CIVIL_FT"
   env.AAC_API_URL = aacApiUrl
   overrideVaultEnvironments([
   'aat': params.ENVIRONMENT
@@ -159,7 +160,7 @@ withNightlyPipeline(type, product, component) {
   if(!forceGreenBuild) {
     afterAlways('DependencyCheckNightly') {
       sh """
-        ./bin/pull-latest-civil-ccd-files.sh ${ccdBranch} CIVIL_FT
+        ./bin/pull-latest-civil-ccd-files.sh ${ccdBranch}
       """
       yarnBuilder.yarn('install-dependencies')
     }

@@ -49,9 +49,8 @@ class HttpResponseHeadersServiceTest {
         when(headerSpyService.encodeClientContext(any(ClientContextWrapper.class)))
             .thenReturn(expectedEncodedContext);
 
-        TaskCompletionSubmittedCallbackResponse callbackResponse = TaskCompletionSubmittedCallbackResponse.builder()
-            .clientContext(buildClientContext().getClientContext())
-            .build();
+        TaskCompletionSubmittedCallbackResponse callbackResponse = new TaskCompletionSubmittedCallbackResponse()
+            .setClientContext(buildClientContext().getClientContext());
 
         headerSpyService.addClientContextHeader(callbackResponse, mockedResponse);
 

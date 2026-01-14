@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeMakeAnOrderOption;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeRequestMoreInfoOption;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
@@ -15,7 +16,6 @@ import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudgesHearingListGAsp
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialDecision;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialMakeAnOrder;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialRequestMoreInfo;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 
 import java.util.Collections;
 
@@ -151,7 +151,7 @@ public class GaFlowPredicateTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .isGaApplicantLip(YesOrNo.YES)
             .generalAppType(GAApplicationType.builder().types(Collections.singletonList(GeneralApplicationTypes.ADJOURN_HEARING)).build())
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                         .paymentDetails(PaymentDetails.builder()
                                                             .status(PaymentStatus.SUCCESS).build())
                                         .fee(Fee.builder().code("FREE").build()).build())
@@ -167,7 +167,7 @@ public class GaFlowPredicateTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .isGaApplicantLip(YesOrNo.YES)
             .generalAppType(GAApplicationType.builder().types(Collections.singletonList(GeneralApplicationTypes.ADJOURN_HEARING)).build())
-            .generalAppPBADetails(GAPbaDetails.builder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .paymentDetails(PaymentDetails.builder()
                                                           .status(PaymentStatus.SUCCESS).build())
                                       .fee(Fee.builder().code("Not_Free").build()).build())

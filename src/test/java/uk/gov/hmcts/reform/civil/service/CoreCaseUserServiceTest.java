@@ -115,16 +115,14 @@ class CoreCaseUserServiceTest {
 
         private AddCaseAssignedUserRolesRequest getAddCaseAssignedUserRolesRequest(CaseRole caseRole) {
             CaseAssignedUserRoleWithOrganisation caseAssignedUserRoleWithOrganisation
-                = CaseAssignedUserRoleWithOrganisation.builder()
-                .caseDataId(CASE_ID)
-                .userId(USER_ID)
-                .caseRole(caseRole.getFormattedName())
-                .organisationId(ORG_ID)
-                .build();
+                = new CaseAssignedUserRoleWithOrganisation()
+                .setCaseDataId(CASE_ID)
+                .setUserId(USER_ID)
+                .setCaseRole(caseRole.getFormattedName())
+                .setOrganisationId(ORG_ID);
 
-            return AddCaseAssignedUserRolesRequest.builder()
-                .caseAssignedUserRoles(List.of(caseAssignedUserRoleWithOrganisation))
-                .build();
+            return new AddCaseAssignedUserRolesRequest()
+                .setCaseAssignedUserRoles(List.of(caseAssignedUserRoleWithOrganisation));
         }
 
     }
@@ -204,16 +202,14 @@ class CoreCaseUserServiceTest {
 
         private CaseAssignedUserRolesRequest getCaseAssignedUserRolesRequest(CaseRole caseRole) {
             CaseAssignedUserRoleWithOrganisation caseAssignedUserRoleWithOrganisation
-                = CaseAssignedUserRoleWithOrganisation.builder()
-                .caseDataId(CASE_ID)
-                .userId(USER_ID)
-                .caseRole(caseRole.getFormattedName())
-                .organisationId(ORG_ID)
-                .build();
+                = new CaseAssignedUserRoleWithOrganisation()
+                .setCaseDataId(CASE_ID)
+                .setUserId(USER_ID)
+                .setCaseRole(caseRole.getFormattedName())
+                .setOrganisationId(ORG_ID);
 
-            return CaseAssignedUserRolesRequest.builder()
-                .caseAssignedUserRoles(List.of(caseAssignedUserRoleWithOrganisation))
-                .build();
+            return new CaseAssignedUserRolesRequest()
+                .setCaseAssignedUserRoles(List.of(caseAssignedUserRoleWithOrganisation));
         }
     }
 

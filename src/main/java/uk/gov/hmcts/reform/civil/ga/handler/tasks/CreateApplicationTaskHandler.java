@@ -280,7 +280,15 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
                 map.put("applicantBilingualLanguagePreference", YES);
             }
         }
-        return coreCaseDataService.createGeneralAppCase(map);
+
+        return coreCaseDataService.createGeneralAppCase(removeGeneralAppFeeToPayInTextField(map));
+    }
+
+    private Map<String, Object> removeGeneralAppFeeToPayInTextField(Map<String, Object> map) {
+        if (map.get("generalAppPBADetails") instanceof Map<?, ?> generalAppPBADetailsMap) {
+            generalAppPBADetailsMap.remove("generalAppFeeToPayInText");
+        }
+        return map;
     }
 
     private String getTypesString(final GeneralApplication generalApplication) {

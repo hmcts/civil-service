@@ -50,12 +50,11 @@ public class CoreCaseUserService {
     public void unassignCase(String caseId, String userId, String organisationId, CaseRole caseRole) {
         String caaAccessToken = getCaaAccessToken();
         if (userWithCaseRoleExistsOnCase(caseId, caaAccessToken, caseRole)) {
-            CaseAssignedUserRoleWithOrganisation caseAssignedUserRoleWithOrganisation = CaseAssignedUserRoleWithOrganisation.builder()
-                .caseDataId(caseId)
-                .userId(userId)
-                .caseRole(caseRole.getFormattedName())
-                .organisationId(organisationId)
-                .build();
+            CaseAssignedUserRoleWithOrganisation caseAssignedUserRoleWithOrganisation = new CaseAssignedUserRoleWithOrganisation()
+                .setCaseDataId(caseId)
+                .setUserId(userId)
+                .setCaseRole(caseRole.getFormattedName())
+                .setOrganisationId(organisationId);
             removeAccessFromRole(caseAssignedUserRoleWithOrganisation, caaAccessToken);
         }
     }
@@ -94,30 +93,27 @@ public class CoreCaseUserService {
     private void assignUserToCaseForRole(String caseId, String userId, String organisationId,
                                          CaseRole caseRole, String caaAccessToken) {
         CaseAssignedUserRoleWithOrganisation caseAssignedUserRoleWithOrganisation
-            = CaseAssignedUserRoleWithOrganisation.builder()
-            .caseDataId(caseId)
-            .userId(userId)
-            .caseRole(caseRole.getFormattedName())
-            .organisationId(organisationId)
-            .build();
+            = new CaseAssignedUserRoleWithOrganisation()
+            .setCaseDataId(caseId)
+            .setUserId(userId)
+            .setCaseRole(caseRole.getFormattedName())
+            .setOrganisationId(organisationId);
 
         caseAccessDataStoreApi.addCaseUserRoles(
             caaAccessToken,
             authTokenGenerator.generate(),
-            AddCaseAssignedUserRolesRequest.builder()
-                .caseAssignedUserRoles(List.of(caseAssignedUserRoleWithOrganisation))
-                .build()
+            new AddCaseAssignedUserRolesRequest()
+                .setCaseAssignedUserRoles(List.of(caseAssignedUserRoleWithOrganisation))
         );
     }
 
     private void removeCreatorAccess(String caseId, String userId, String organisationId, String caaAccessToken) {
         CaseAssignedUserRoleWithOrganisation caseAssignedUserRoleWithOrganisation
-            = CaseAssignedUserRoleWithOrganisation.builder()
-            .caseDataId(caseId)
-            .userId(userId)
-            .caseRole(CaseRole.CREATOR.getFormattedName())
-            .organisationId(organisationId)
-            .build();
+            = new CaseAssignedUserRoleWithOrganisation()
+            .setCaseDataId(caseId)
+            .setUserId(userId)
+            .setCaseRole(CaseRole.CREATOR.getFormattedName())
+            .setOrganisationId(organisationId);
 
         removeAccessFromRole(caseAssignedUserRoleWithOrganisation, caaAccessToken);
     }
@@ -126,9 +122,8 @@ public class CoreCaseUserService {
         caseAccessDataStoreApi.removeCaseUserRoles(
             caaAccessToken,
             authTokenGenerator.generate(),
-            CaseAssignedUserRolesRequest.builder()
-                .caseAssignedUserRoles(List.of(caseAssignedUserRoleWithOrganisation))
-                .build()
+            new CaseAssignedUserRolesRequest()
+                .setCaseAssignedUserRoles(List.of(caseAssignedUserRoleWithOrganisation))
         );
     }
 

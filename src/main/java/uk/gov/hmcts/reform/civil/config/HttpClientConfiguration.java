@@ -34,7 +34,7 @@ public class HttpClientConfiguration {
     }
 
     private HttpClient getRestTemplateHttpClient() {
-        RequestConfig config = RequestConfig.custom()
+       final RequestConfig config = RequestConfig.custom()
             .setConnectTimeout(Timeout.ofMilliseconds(readTimeout))
             .setConnectionRequestTimeout(Timeout.ofMilliseconds(readTimeout))
             .setResponseTimeout(Timeout.ofMilliseconds(readTimeout))
@@ -60,5 +60,4 @@ public class HttpClientConfiguration {
             .setDefaultRequestConfig(config)
             .build();
     }
-
 }

@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.service.PaymentStatusService;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.request.CardPaymentServiceRequestDTO;
@@ -37,7 +37,7 @@ public class GaFeesPaymentService {
         CaseDetails caseDetails = gaCoreCaseDataService.getCase(Long.valueOf(caseReference));
         GeneralApplicationCaseData caseData = caseDetailsConverter.toGeneralApplicationCaseData(caseDetails);
         String parentCaseRef = caseData.getParentCaseReference();
-        GAPbaDetails generalAppPbaDetails = caseData.getGeneralAppPBADetails();
+        GeneralApplicationPbaDetails generalAppPbaDetails = caseData.getGeneralAppPBADetails();
 
         requireNonNull(generalAppPbaDetails, "Fee Payment details cannot be null");
         requireNonNull(generalAppPbaDetails.getServiceReqReference(), "Fee Payment service request cannot be null");

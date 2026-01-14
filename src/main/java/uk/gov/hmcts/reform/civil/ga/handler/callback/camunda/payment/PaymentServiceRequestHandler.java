@@ -14,8 +14,8 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
@@ -83,8 +83,8 @@ public class PaymentServiceRequestHandler extends CallbackHandler implements Gen
                         .getServiceRequestReference();
             }
             log.info("after calling payment service request for case {}", caseData.getCcdCaseReference());
-            GAPbaDetails pbaDetails = caseData.getGeneralAppPBADetails();
-            GAPbaDetails.GAPbaDetailsBuilder pbaDetailsBuilder = pbaDetails.toBuilder();
+            GeneralApplicationPbaDetails pbaDetails = caseData.getGeneralAppPBADetails();
+            GeneralApplicationPbaDetails.GeneralApplicationPbaDetailsBuilder pbaDetailsBuilder = pbaDetails.toBuilder();
             pbaDetailsBuilder
                     .fee(caseData.getGeneralAppPBADetails().getFee())
                     .serviceReqReference(serviceRequestReference);

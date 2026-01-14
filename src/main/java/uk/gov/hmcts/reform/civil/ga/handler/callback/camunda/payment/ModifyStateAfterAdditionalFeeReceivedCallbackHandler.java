@@ -16,12 +16,12 @@ import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.ga.service.AssignCaseToRespondentSolHelper;
 import uk.gov.hmcts.reform.civil.ga.service.GaDashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
@@ -182,7 +182,7 @@ public class ModifyStateAfterAdditionalFeeReceivedCallbackHandler extends Callba
     private PaymentStatus getPaymentStatus(GeneralApplicationCaseData caseData) {
         return Optional.of(caseData)
             .map(GeneralApplicationCaseData::getGeneralAppPBADetails)
-            .map(GAPbaDetails::getAdditionalPaymentDetails)
+            .map(GeneralApplicationPbaDetails::getAdditionalPaymentDetails)
             .map(PaymentDetails::getStatus).orElse(null);
     }
 

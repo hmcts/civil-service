@@ -10,6 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.NotificationDataGA;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -32,7 +33,6 @@ import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialDecision;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialMakeAnOrder;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialRequestMoreInfo;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialWrittenRepresentations;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
@@ -658,7 +658,7 @@ class JudicialApplicantNotificationServiceTest {
                                               .caseReference(CASE_REFERENCE.toString()).build())
                 .generalAppType(GAApplicationType.builder()
                                     .types(applicationTypeToStayTheClaim()).build())
-                .generalAppPBADetails(GAPbaDetails.builder().build())
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().build())
                 .build();
 
         }
@@ -721,7 +721,7 @@ class JudicialApplicantNotificationServiceTest {
                                               .caseReference(CASE_REFERENCE.toString()).build())
                 .generalAppType(GAApplicationType.builder()
                                     .types(applicationTypeSummeryJudgement()).build())
-                .generalAppPBADetails(GAPbaDetails.builder().build())
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().build())
                 .isMultiParty(NO)
                 .build();
         }
@@ -750,7 +750,7 @@ class JudicialApplicantNotificationServiceTest {
                                               .caseReference(CASE_REFERENCE.toString()).build())
                 .generalAppType(GAApplicationType.builder()
                                     .types(applicationTypeSummeryJudgement()).build())
-                .generalAppPBADetails(GAPbaDetails.builder().build())
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().build())
                 .isMultiParty(NO)
                 .build();
         }
@@ -1113,14 +1113,14 @@ class JudicialApplicantNotificationServiceTest {
 
             when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
                 .thenReturn(caseDataForJudicialDirectionOrderOfApplication(NO, NO).toBuilder().generalAppPBADetails(
-                        GAPbaDetails.builder()
+                        GeneralApplicationPbaDetails.builder()
                             .additionalPaymentDetails(buildAdditionalPaymentSuccessData())
                             .build())
                                 .build());
 
             judicialNotificationService.sendNotification(
                 caseDataForJudicialApprovalOfApplication(NO, NO).toBuilder()
-                    .generalAppPBADetails(GAPbaDetails.builder()
+                    .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                               .additionalPaymentDetails(buildAdditionalPaymentSuccessData())
                                               .build())
                     .build(), APPLICANT);
@@ -1319,7 +1319,7 @@ class JudicialApplicantNotificationServiceTest {
             when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
                 .thenReturn(
                     caseDataForApplicationsApprovedWhenRespondentsAreInList(NO, NO)
-                        .toBuilder().generalAppPBADetails(GAPbaDetails.builder()
+                        .toBuilder().generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                                               .additionalPaymentDetails(
                                                                   buildAdditionalPaymentSuccessData())
                                                               .build())
@@ -1327,7 +1327,7 @@ class JudicialApplicantNotificationServiceTest {
 
             GeneralApplicationCaseData caseData = caseDataForApplicationsApprovedWhenRespondentsAreInList(NO, NO)
                 .toBuilder().generalAppPBADetails(
-                    GAPbaDetails.builder()
+                    GeneralApplicationPbaDetails.builder()
                         .additionalPaymentDetails(buildAdditionalPaymentSuccessData())
                         .build())
                 .build();
@@ -1504,7 +1504,7 @@ class JudicialApplicantNotificationServiceTest {
             when(solicitorEmailValidation.validateSolicitorEmail(any(), any()))
                 .thenReturn(
                     caseDataForCaseDismissedByJudgeRespondentsAreInList(NO, NO, YES).toBuilder()
-                        .generalAppPBADetails(GAPbaDetails.builder()
+                        .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                                   .additionalPaymentDetails(buildAdditionalPaymentSuccessData())
                                                   .build())
                         .build()
@@ -1512,7 +1512,7 @@ class JudicialApplicantNotificationServiceTest {
 
             GeneralApplicationCaseData caseData = caseDataForCaseDismissedByJudgeRespondentsAreInList(NO, NO, YES)
                 .toBuilder().generalAppPBADetails(
-                    GAPbaDetails.builder()
+                    GeneralApplicationPbaDetails.builder()
                         .additionalPaymentDetails(buildAdditionalPaymentSuccessData())
                         .build())
                 .build();
@@ -1717,7 +1717,7 @@ class JudicialApplicantNotificationServiceTest {
                                               .caseReference(CASE_REFERENCE.toString()).build())
                 .generalAppType(GAApplicationType.builder()
                                     .types(applicationTypeToStrikeOut()).build())
-                .generalAppPBADetails(GAPbaDetails.builder().build())
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().build())
                 .isMultiParty(NO)
                 .build();
         }
@@ -1847,7 +1847,7 @@ class JudicialApplicantNotificationServiceTest {
                                               .caseReference(CASE_REFERENCE.toString()).build())
                 .generalAppType(GAApplicationType.builder()
                                     .types(applicationTypeToAmendStatmentOfClaim()).build())
-                .generalAppPBADetails(GAPbaDetails.builder().build())
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().build())
                 .build();
         }
 
@@ -1866,7 +1866,7 @@ class JudicialApplicantNotificationServiceTest {
                                               .caseReference(CASE_REFERENCE.toString()).build())
                 .generalAppType(GAApplicationType.builder()
                                     .types(applicationTypeToAmendStatmentOfClaim()).build())
-                .generalAppPBADetails(GAPbaDetails.builder().build())
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().build())
                 .isMultiParty(NO)
                 .build();
         }
@@ -1898,7 +1898,7 @@ class JudicialApplicantNotificationServiceTest {
                                               .caseReference(CASE_REFERENCE.toString()).build())
                 .generalAppType(GAApplicationType.builder()
                                     .types(applicationTypeToAmendStatmentOfClaim()).build())
-                .generalAppPBADetails(GAPbaDetails.builder().build())
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().build())
                 .isMultiParty(NO)
                 .build();
         }
@@ -1927,7 +1927,7 @@ class JudicialApplicantNotificationServiceTest {
                     .generalAppType(GAApplicationType.builder()
                                         .types(applicationTypeToStrikeOut()).build())
                     .judicialConcurrentDateText(DUMMY_DATE)
-                    .generalAppPBADetails(GAPbaDetails.builder().build())
+                    .generalAppPBADetails(GeneralApplicationPbaDetails.builder().build())
                     .build();
         }
 
@@ -1950,7 +1950,7 @@ class JudicialApplicantNotificationServiceTest {
                                         .types(applicationTypeSummeryJudgement()).build())
                     .judicialConcurrentDateText(DUMMY_DATE)
                     .isMultiParty(NO)
-                    .generalAppPBADetails(GAPbaDetails.builder().build())
+                    .generalAppPBADetails(GeneralApplicationPbaDetails.builder().build())
                     .build();
         }
 
@@ -1974,7 +1974,7 @@ class JudicialApplicantNotificationServiceTest {
                     .generalAppType(GAApplicationType.builder()
                                         .types(applicationTypeSummeryJudgement()).build())
                     .judicialConcurrentDateText(DUMMY_DATE)
-                    .generalAppPBADetails(GAPbaDetails.builder().build())
+                    .generalAppPBADetails(GeneralApplicationPbaDetails.builder().build())
                     .isMultiParty(NO)
                     .build();
         }
@@ -2022,7 +2022,7 @@ class JudicialApplicantNotificationServiceTest {
                     .generalAppType(GAApplicationType.builder()
                                         .types(applicationTypeSummeryJudgement()).build())
                     .judicialConcurrentDateText(DUMMY_DATE)
-                    .generalAppPBADetails(GAPbaDetails.builder().build())
+                    .generalAppPBADetails(GeneralApplicationPbaDetails.builder().build())
                     .isMultiParty(NO)
                     .build();
         }
@@ -2541,7 +2541,7 @@ class JudicialApplicantNotificationServiceTest {
                                           .caseReference(CASE_REFERENCE.toString()).build())
             .generalAppType(GAApplicationType.builder()
                                 .types(applicationTypeToStayTheClaim()).build())
-            .generalAppPBADetails(GAPbaDetails.builder().build())
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().build())
             .build();
 
     }

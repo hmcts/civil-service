@@ -27,10 +27,9 @@ public class AirlineEpimsDataLoader {
 
             List<String[]> linesList = reader.readAll();
             linesList.forEach(line -> {
-                AirlineEpimsId airlineEpimsID = AirlineEpimsId.builder()
-                    .airline(line[0])
-                    .epimsID(line[1])
-                    .build();
+                AirlineEpimsId airlineEpimsID = new AirlineEpimsId()
+                    .setAirline(line[0])
+                    .setEpimsID(line[1]);
                 airlineEpimsIDList.add(airlineEpimsID);
             });
         } catch (IOException | CsvException  e) {
