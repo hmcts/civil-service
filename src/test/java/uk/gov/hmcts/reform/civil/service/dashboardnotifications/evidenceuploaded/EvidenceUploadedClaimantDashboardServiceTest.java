@@ -20,6 +20,7 @@ import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_NOT_UPLOADED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOADED_CLAIMANT;
@@ -99,5 +100,19 @@ class EvidenceUploadedClaimantDashboardServiceTest {
             "9012",
             ScenarioRequestParams.builder().params(new HashMap<>()).build()
         );
+    }
+
+    @Test
+    void shouldNotNotifyClaimantWhenRepresentedYes() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setApplicant1Represented(YesOrNo.YES);
+        caseData.setCaseDocumentUploadDate(LocalDateTime.now());
+        caseData.setCcdCaseReference(3456L);
+
+        service.notifyEvidenceUploaded(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardNotificationService);
+        verifyNoInteractions(taskListService);
+        verifyNoInteractions(dashboardScenariosService);
     }
 }
