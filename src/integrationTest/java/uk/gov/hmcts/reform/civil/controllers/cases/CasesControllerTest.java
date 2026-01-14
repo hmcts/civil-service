@@ -272,7 +272,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
             .thenReturn(caseData);
         doPost(
             BEARER_TOKEN,
-            CaseworkerSubmitEventDTo.builder().event(CaseEvent.CREATE_CLAIM_SPEC).data(Map.of()).build(),
+            new CaseworkerSubmitEventDTo().setEvent(CaseEvent.CREATE_CLAIM_SPEC).setData(Map.of()),
             CASEWORKER_SUBMIT_EVENT_URL,
             "userId",
             "jurisdictionId",
@@ -290,7 +290,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
         doPost(
             "invalid token",
-            CaseworkerSubmitEventDTo.builder().event(CaseEvent.CREATE_CLAIM_SPEC).data(Map.of()).build(),
+            new CaseworkerSubmitEventDTo().setEvent(CaseEvent.CREATE_CLAIM_SPEC).setData(Map.of()),
             CASEWORKER_SUBMIT_EVENT_URL,
             "userId",
             "jurisdictionId",
@@ -307,7 +307,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
         doPost(
             BEARER_TOKEN,
-            CaseworkerSubmitEventDTo.builder().event(CaseEvent.CREATE_CLAIM_SPEC).data(Map.of()).build(),
+            new CaseworkerSubmitEventDTo().setEvent(CaseEvent.CREATE_CLAIM_SPEC).setData(Map.of()),
             CASEWORKER_SUBMIT_EVENT_URL,
             "userId",
             "jurisdictionId",

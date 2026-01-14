@@ -332,29 +332,35 @@ ext.libraries = [
   ]
 ]
 
-configurations.all {
-  resolutionStrategy.eachDependency { details ->
-    if (details.requested.group == 'org.projectlombok') {
-      details.useVersion versions.lombok
-    }
-    if (details.requested.group == 'io.netty') {
-      if (details.requested.name in [
-        'netty-buffer', 'netty-codec', 'netty-codec-dns',
-        'netty-codec-http', 'netty-codec-http2', 'netty-codec-socks',
-        'netty-common', 'netty-handler', 'netty-handler-proxy',
-        'netty-resolver', 'netty-resolver-dns', 'netty-resolver-dns-classes-macos',
-        'netty-resolver-dns-native-macos',
-        'netty-transport', 'netty-transport-classes-epoll',
-        'netty-transport-classes-kqueue', 'netty-transport-native-epoll',
-        'netty-transport-native-kqueue', 'netty-transport-native-unix-common'
-      ]) {
-        details.useVersion('4.1.129.Final')
-        details.because('CVE-2025-25193, CVE-2025-67735')
+allprojects {
+  configurations.all {
+    resolutionStrategy.eachDependency { details ->
+      if (details.requested.group == 'org.projectlombok') {
+        details.useVersion versions.lombok
+      }
+      if (details.requested.group == 'io.netty') {
+        if (details.requested.name in [
+          'netty-buffer', 'netty-codec', 'netty-codec-dns',
+          'netty-codec-http', 'netty-codec-http2', 'netty-codec-socks',
+          'netty-common', 'netty-handler', 'netty-handler-proxy',
+          'netty-resolver', 'netty-resolver-dns', 'netty-resolver-dns-classes-macos',
+          'netty-resolver-dns-native-macos',
+          'netty-transport', 'netty-transport-classes-epoll',
+          'netty-transport-classes-kqueue', 'netty-transport-native-epoll',
+          'netty-transport-native-kqueue', 'netty-transport-native-unix-common'
+        ]) {
+          details.useVersion('4.1.129.Final')
+          details.because('CVE-2025-25193, CVE-2025-67735')
+        }
+      }
+      if (details.requested.group == 'org.apache.logging.log4j') {
+        details.useVersion('2.25.3')
+        details.because('CVE-2025-68161 vendor recommended version')
       }
     }
+    exclude group: 'org.springframework.security', module: 'spring-security-rsa'
+    exclude group: 'org.projectlombok', module: 'lombok-mapstruct-binding'
   }
-  exclude group: 'org.springframework.security', module: 'spring-security-rsa'
-  exclude group: 'org.projectlombok', module: 'lombok-mapstruct-binding'
 }
 
 dependencies {
@@ -427,8 +433,13 @@ dependencies {
   implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.5'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.12.6'
   implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.2'
-  implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.1'
-  implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.25.1'
+  implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.3'
+  implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.25.3'
+  constraints {
+    implementation('org.apache.logging.log4j:log4j-core:2.25.3') {
+      because 'CVE-2025-68161 (upgrade to vendor recommended version)'
+    }
+  }
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.1'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.107'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.43'

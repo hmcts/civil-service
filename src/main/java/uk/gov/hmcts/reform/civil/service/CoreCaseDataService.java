@@ -59,7 +59,9 @@ public class CoreCaseDataService {
 
     public void triggerEvent(Long caseId, CaseEvent eventName, Map<String, Object> contentModified) {
         StartEventResponse startEventResponse = startUpdate(caseId.toString(), eventName);
-        submitUpdate(caseId.toString(), caseDataContentFromStartEventResponse(startEventResponse, contentModified));
+        CaseDataContent caseDataContent = caseDataContentFromStartEventResponse(startEventResponse, contentModified);
+
+        submitUpdate(caseId.toString(), caseDataContent);
     }
 
     public void triggerEvent(Long caseId, CaseEvent eventName, Map<String, Object> contentModified,

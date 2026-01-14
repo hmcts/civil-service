@@ -147,10 +147,10 @@ public class CaseEventServiceTest {
         ReflectionTestUtils.setField(caseEventService, "caseFlagsLoggingEnabled", true);
         CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
             .respondent1(Party.builder()
-                             .flags(Flags.builder()
-                                        .partyName("Mr test")
-                                        .roleOnCase("Defendant 1")
-                                        .details(List.of()).build())
+                             .flags(new Flags()
+                                        .setPartyName("Mr test")
+                                        .setRoleOnCase("Defendant 1")
+                                        .setDetails(List.of()))
                              .type(Party.Type.INDIVIDUAL)
                              .build())
             .build();

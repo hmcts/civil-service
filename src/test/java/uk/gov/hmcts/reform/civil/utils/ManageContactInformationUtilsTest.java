@@ -1108,9 +1108,8 @@ class ManageContactInformationUtilsTest {
             .lastName(prefix + "-lastname")
             .email(prefix + "-individual@example.com")
             .phone(prefix + "-07867654543")
-            .flags(Flags.builder()
-                       .roleOnCase(prefix + "-role")
-                       .build())
+            .flags(new Flags()
+                       .setRoleOnCase(prefix + "-role"))
             .build();
     }
 }
