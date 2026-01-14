@@ -55,6 +55,7 @@ repositories {
 
 tasks.withType(Test) {
   useJUnitPlatform()
+  jvmArgs '-Xshare:off'
 
   testLogging {
     exceptionFormat = 'full'
