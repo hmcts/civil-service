@@ -26,7 +26,6 @@ def versions = [
   springStatemachine: '4.0.0',
   lombok            : '1.18.38',
   camunda           : '7.20.0',
-  jackson           : '2.19.2',
   testcontainers    : '1.21.3',
   pdfbox            : '3.0.5',
   tika              : '3.2.2'
@@ -99,54 +98,14 @@ allprojects {
         entry 'guava'
       }
 
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.9.25'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.9.25'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.9.25'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.9.25'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.9.25'
-
       dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '5.2.1'
-
-      //Solves CVE-2023-34034
-      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.5.2'
-
-      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
-      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
-      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: versions.jackson
-      dependency group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: versions.jackson
 
       // To prevent other libraries using conflicting versions
       dependency group: 'org.slf4j', name: 'slf4j-nop', version: '2.0.17'
 
-      // solves CVE-2022-25857
-      dependencySet(
-        group: 'org.yaml',
-        version: '2.4'
-      ) {
-        entry 'snakeyaml'
-      }
-
-      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.43') {
-        entry 'tomcat-embed-core'
-        entry 'tomcat-embed-el'
-        entry 'tomcat-embed-websocket'
-      }
-
-      //Solves CVE-2023-6481
-      dependencySet(group: 'ch.qos.logback', version: '1.5.12') {
-        entry 'logback-core'
-        entry 'logback-classic'
-      }
-
       dependencySet(group: 'org.apache.httpcomponents.core5', version: '5.3.6') {
         entry 'httpcore5'
         entry 'httpcore5-h2'
-      }
-
-      dependencySet(group: 'org.apache.logging.log4j', version: '2.25.1') {
-        entry 'log4j-api'
-        entry 'log4j-core'
-        entry 'log4j-to-slf4j'
       }
 
     }
@@ -456,9 +415,9 @@ dependencies {
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.29'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.8'
 
-  implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: versions.jackson
-  implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
-  implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-csv', version: versions.jacksonDatabind
+  implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin'
+  implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310'
+  implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-csv'
 
   implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: versions.camunda
   implementation group: 'org.camunda.community.rest', name: 'camunda-platform-7-rest-client-spring-boot-starter', version: versions.camunda
