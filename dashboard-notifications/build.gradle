@@ -41,6 +41,7 @@ dependencies {
   annotationProcessor 'org.projectlombok:lombok'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation libraries.junit5
+  testRuntimeOnly "org.junit.platform:junit-platform-launcher:${versions.junitPlatform}"
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
 }

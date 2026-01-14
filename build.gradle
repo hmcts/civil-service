@@ -446,6 +446,9 @@ dependencies {
   // JAX-B dependencies for JDK 9+
   implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.2'
   implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.5'
+  implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+  runtimeOnly group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.8'
+  runtimeOnly group: 'com.sun.activation', name: 'javax.activation', version: '1.2.0'
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
@@ -473,6 +476,7 @@ dependencies {
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
   testImplementation libraries.junit5
+  testRuntimeOnly "org.junit.platform:junit-platform-launcher:${versions.junitPlatform}"
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
   testImplementation group: 'io.rest-assured', name: 'rest-assured'
