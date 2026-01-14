@@ -117,6 +117,8 @@ public class SdoDocumentFormFast implements MappableObject {
     private String fastTrackAllocation;
     private String welshLanguageDescription;
     private boolean showBundleInfo;
+    private boolean showPenalNotice;
+    private String penalNoticeText;
 
     @SuppressWarnings("unused")
     public boolean getFastTrackMethodToggle() {
