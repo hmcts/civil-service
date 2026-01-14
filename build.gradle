@@ -138,6 +138,11 @@ allprojects {
         entry 'logback-classic'
       }
 
+      dependencySet(group: 'org.apache.httpcomponents.core5', version: '5.3.6') {
+        entry 'httpcore5'
+        entry 'httpcore5-h2'
+      }
+
       dependencySet(group: 'org.apache.logging.log4j', version: '2.25.1') {
         entry 'log4j-api'
         entry 'log4j-core'
@@ -382,7 +387,7 @@ dependencies {
 
   // CVE-2025-48734 force update of commons-beanutils.
   implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'
-  implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.8.6'
+  implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.6.0'
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.7'
   implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.1.0'
 
