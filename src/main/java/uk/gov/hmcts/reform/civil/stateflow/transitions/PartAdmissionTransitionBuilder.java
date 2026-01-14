@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.stateflow.transitions;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
@@ -124,6 +126,15 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
         .and(isCarmApplicableCase.or(isCarmApplicableLipCase))
         .and(not(takenOfflineByStaff));
 
-    public static final Predicate<CaseData> partAdmitProceed =  not(carmMediation).and(fullDefenceProceed);
+    public static final Predicate<CaseData> isNotPartAdmissionPaymentState = caseData ->
+        Optional.ofNullable(caseData)
+            .filter(data -> data.getShowResponseOneVOneFlag() != ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_INSTALMENT)
+            .filter(data -> data.getShowResponseOneVOneFlag() != ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_BY_SET_DATE)
+            .filter(data -> data.getShowResponseOneVOneFlag() != ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
+            .filter(data -> data.getShowResponseOneVOneFlag() != ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_HAS_PAID)
+            .isPresent();
+
+    public static final Predicate<CaseData> partAdmitProceed =  not(carmMediation).and(fullDefenceProceed).and(
+        isNotPartAdmissionPaymentState);
 
 }

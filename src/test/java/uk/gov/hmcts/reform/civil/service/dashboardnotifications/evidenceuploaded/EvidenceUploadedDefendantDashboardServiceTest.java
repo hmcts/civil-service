@@ -20,6 +20,7 @@ import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_NOT_UPLOADED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOADED_DEFENDANT;
@@ -48,11 +49,10 @@ class EvidenceUploadedDefendantDashboardServiceTest {
 
     @Test
     void shouldNotifyDefendantWhenEvidenceUploadedWithDocumentDate() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .respondent1Represented(YesOrNo.NO)
-            .caseDocumentUploadDateRes(LocalDateTime.now())
-            .ccdCaseReference(1234L)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setCaseDocumentUploadDateRes(LocalDateTime.now());
+        caseData.setCcdCaseReference(1234L);
 
         service.notifyCaseEvidenceUploaded(caseData, AUTH_TOKEN);
 
@@ -68,11 +68,10 @@ class EvidenceUploadedDefendantDashboardServiceTest {
 
     @Test
     void shouldNotifyDefendantWhenEvidenceNotUploadedWithoutDocumentDate() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .respondent1Represented(YesOrNo.NO)
-            .caseDocumentUploadDateRes(null)
-            .ccdCaseReference(5678L)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setCaseDocumentUploadDateRes(null);
+        caseData.setCcdCaseReference(5678L);
 
         service.notifyCaseEvidenceUploaded(caseData, AUTH_TOKEN);
 
@@ -88,11 +87,10 @@ class EvidenceUploadedDefendantDashboardServiceTest {
 
     @Test
     void shouldUseUploadedScenarioWhenDocumentDatePresent() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .respondent1Represented(YesOrNo.NO)
-            .caseDocumentUploadDateRes(LocalDateTime.of(2024, 1, 15, 10, 30))
-            .ccdCaseReference(9012L)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setCaseDocumentUploadDateRes(LocalDateTime.of(2024, 1, 15, 10, 30));
+        caseData.setCcdCaseReference(9012L);
 
         service.notifyCaseEvidenceUploaded(caseData, AUTH_TOKEN);
 
@@ -102,5 +100,19 @@ class EvidenceUploadedDefendantDashboardServiceTest {
             "9012",
             ScenarioRequestParams.builder().params(new HashMap<>()).build()
         );
+    }
+
+    @Test
+    void shouldNotNotifyDefendantWhenRepresentedYes() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondent1Represented(YesOrNo.YES);
+        caseData.setCaseDocumentUploadDateRes(LocalDateTime.now());
+        caseData.setCcdCaseReference(3456L);
+
+        service.notifyCaseEvidenceUploaded(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardNotificationService);
+        verifyNoInteractions(taskListService);
+        verifyNoInteractions(dashboardScenariosService);
     }
 }
