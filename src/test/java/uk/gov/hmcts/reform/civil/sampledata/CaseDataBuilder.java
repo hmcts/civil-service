@@ -6863,17 +6863,14 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder withCaseLevelFlags() {
-        this.caseFlags = Flags.builder()
-            .details(wrapElements(List.of(
-                FlagDetail.builder()
-                    .flagCode("123")
-                    .status("Active")
-                    .build(),
-                FlagDetail.builder()
-                    .flagCode("456")
-                    .status("Inactive")
-                    .build())))
-            .build();
+        this.caseFlags = new Flags()
+            .setDetails(wrapElements(List.of(
+                new FlagDetail()
+                    .setFlagCode("123")
+                    .setStatus("Active"),
+                new FlagDetail()
+                    .setFlagCode("456")
+                    .setStatus("Inactive"))));
         return this;
     }
 
@@ -6884,12 +6881,11 @@ public class CaseDataBuilder {
     public CaseDataBuilder withApplicant1Flags(List<Element<FlagDetail>> flags) {
         this.applicant1 = applicant1.toBuilder()
             .partyID("app-1-party-id")
-            .flags(Flags.builder()
-                .partyName(applicant1.getPartyName())
-                .roleOnCase("Claimant 1")
-                .details(flags)
-                .build())
-            .build();
+            .flags(new Flags()
+                .setPartyName(applicant1.getPartyName())
+                .setRoleOnCase("Claimant 1")
+                .setDetails(flags)
+                ).build();
         return this;
     }
 
@@ -6897,11 +6893,10 @@ public class CaseDataBuilder {
         this.applicantWitnesses = wrapElements(PartyFlagStructure.builder()
             .firstName("W first")
             .lastName("W last")
-            .flags(Flags.builder()
-                .partyName("W First W Last")
-                .roleOnCase("Claimant 1 Witness")
-                .details(flagDetails())
-                .build())
+            .flags(new Flags()
+                .setPartyName("W First W Last")
+                .setRoleOnCase("Claimant 1 Witness")
+                .setDetails(flagDetails()))
             .build());
         return this;
     }
@@ -6910,22 +6905,20 @@ public class CaseDataBuilder {
         this.applicantExperts = wrapElements(PartyFlagStructure.builder()
             .firstName("E first")
             .lastName("E last")
-            .flags(Flags.builder()
-                .partyName("E First E Last")
-                .roleOnCase("Claimant 1 Expert")
-                .details(flagDetails())
-                .build())
+            .flags(new Flags()
+                .setPartyName("E First E Last")
+                .setRoleOnCase("Claimant 1 Expert")
+                .setDetails(flagDetails()))
             .build());
         return this;
     }
 
     public CaseDataBuilder withApplicant1LitigationFriendFlags() {
         this.applicant1LitigationFriend = applicant1LitigationFriend.toBuilder()
-            .flags(Flags.builder()
-                .partyName(applicant1LitigationFriend.getFullName())
-                .roleOnCase("Claimant 1 Litigation Friend")
-                .details(flagDetails())
-                .build())
+            .flags(new Flags()
+                .setPartyName(applicant1LitigationFriend.getFullName())
+                .setRoleOnCase("Claimant 1 Litigation Friend")
+                .setDetails(flagDetails()))
             .build();
         return this;
     }
@@ -6933,12 +6926,12 @@ public class CaseDataBuilder {
     public CaseDataBuilder withApplicant2Flags() {
         this.applicant2 = applicant2.toBuilder()
             .partyID("app-2-party-id")
-            .flags(Flags.builder()
-                .partyName(applicant2.getPartyName())
-                .roleOnCase("Claimant 2")
-                .details(flagDetails())
-                .build())
+            .flags(new Flags()
+                .setPartyName(applicant2.getPartyName())
+                .setRoleOnCase("Claimant 2")
+                .setDetails(flagDetails()))
             .build();
+
         return this;
     }
 
@@ -6946,11 +6939,10 @@ public class CaseDataBuilder {
         this.applicantWitnesses = wrapElements(PartyFlagStructure.builder()
             .firstName("W first")
             .lastName("W last")
-            .flags(Flags.builder()
-                .partyName("W First W Last")
-                .roleOnCase("Claimant 2 Witness")
-                .details(flagDetails())
-                .build())
+            .flags(new Flags()
+                .setPartyName("W First W Last")
+                .setRoleOnCase("Claimant 2 Witness")
+                .setDetails(flagDetails()))
             .build());
         return this;
     }
@@ -6959,22 +6951,20 @@ public class CaseDataBuilder {
         this.applicantExperts = wrapElements(PartyFlagStructure.builder()
             .firstName("E first")
             .lastName("E last")
-            .flags(Flags.builder()
-                .partyName("E First E Last")
-                .roleOnCase("Claimant 2 Expert")
-                .details(flagDetails())
-                .build())
+            .flags(new Flags()
+                .setPartyName("E First E Last")
+                .setRoleOnCase("Claimant 2 Expert")
+                .setDetails(flagDetails()))
             .build());
         return this;
     }
 
     public CaseDataBuilder withApplicant2LitigationFriendFlags() {
         this.applicant2LitigationFriend = applicant2LitigationFriend.toBuilder()
-            .flags(Flags.builder()
-                .partyName(applicant2LitigationFriend.getFullName())
-                .roleOnCase("Claimant 2 Litigation Friend")
-                .details(flagDetails())
-                .build())
+            .flags(new Flags()
+                .setPartyName(applicant2LitigationFriend.getFullName())
+                .setRoleOnCase("Claimant 2 Litigation Friend")
+                .setDetails(flagDetails()))
             .build();
         return this;
     }
@@ -6986,11 +6976,10 @@ public class CaseDataBuilder {
     public CaseDataBuilder withRespondent1LitigationFriendFlags(List<Element<FlagDetail>> flags) {
         this.respondent1LitigationFriend = respondent1LitigationFriend.toBuilder()
             .partyID("res-1-litfriend-party-id")
-            .flags(Flags.builder()
-                .partyName(respondent1LitigationFriend.getFullName())
-                .roleOnCase("Defendant 1 Litigation Friend")
-                .details(flags)
-                .build())
+            .flags(new Flags()
+                .setPartyName(respondent1LitigationFriend.getFullName())
+                .setRoleOnCase("Defendant 1 Litigation Friend")
+                .setDetails(flags))
             .build();
         return this;
     }
@@ -7002,11 +6991,10 @@ public class CaseDataBuilder {
     public CaseDataBuilder withRespondent1Flags(List<Element<FlagDetail>> flags) {
         this.respondent1 = respondent1.toBuilder()
             .partyID("res-1-party-id")
-            .flags(Flags.builder()
-                .partyName(respondent1.getPartyName())
-                .roleOnCase("Defendant 1")
-                .details(flags)
-                .build())
+            .flags(new Flags()
+                .setPartyName(respondent1.getPartyName())
+                .setRoleOnCase("Defendant 1")
+                .setDetails(flags))
             .build();
         return this;
     }
@@ -7017,11 +7005,10 @@ public class CaseDataBuilder {
                 .partyID("res-1-witness-party-id")
                 .firstName("W first")
                 .lastName("W last")
-                .flags(Flags.builder()
-                    .partyName("W First W Last")
-                    .roleOnCase("Defendant 1 Witness")
-                    .details(flagDetails())
-                    .build())
+                .flags(new Flags()
+                    .setPartyName("W First W Last")
+                    .setRoleOnCase("Defendant 1 Witness")
+                    .setDetails(flagDetails()))
                 .build());
         return this;
     }
@@ -7032,11 +7019,10 @@ public class CaseDataBuilder {
                 .partyID("res-1-expert-party-id")
                 .firstName("E first")
                 .lastName("E last")
-                .flags(Flags.builder()
-                    .partyName("E First E Last")
-                    .roleOnCase("Defendant 1 Expert")
-                    .details(flagDetails())
-                    .build())
+                .flags(new Flags()
+                    .setPartyName("E First E Last")
+                    .setRoleOnCase("Defendant 1 Expert")
+                    .setDetails(flagDetails()))
                 .build());
         return this;
     }
@@ -7044,11 +7030,10 @@ public class CaseDataBuilder {
     public CaseDataBuilder withRespondent2Flags() {
         this.respondent2 = respondent2.toBuilder()
             .partyID("res-2-party-id")
-            .flags(Flags.builder()
-                .partyName(respondent2.getPartyName())
-                .roleOnCase("Defendant 2")
-                .details(flagDetails())
-                .build())
+            .flags(new Flags()
+                .setPartyName(respondent2.getPartyName())
+                .setRoleOnCase("Defendant 2")
+                .setDetails(flagDetails()))
             .build();
         return this;
     }
@@ -7057,11 +7042,10 @@ public class CaseDataBuilder {
         this.respondent2Experts = wrapElements(PartyFlagStructure.builder()
             .firstName("E first")
             .lastName("E last")
-            .flags(Flags.builder()
-                .partyName("E First E Last")
-                .roleOnCase("Defendant 2 Expert")
-                .details(flagDetails())
-                .build())
+            .flags(new Flags()
+                .setPartyName("E First E Last")
+                .setRoleOnCase("Defendant 2 Expert")
+                .setDetails(flagDetails()))
             .build());
         return this;
     }
@@ -7070,22 +7054,20 @@ public class CaseDataBuilder {
         this.respondent2Witnesses = wrapElements(PartyFlagStructure.builder()
             .firstName("W first")
             .lastName("W last")
-            .flags(Flags.builder()
-                .partyName("W First W Last")
-                .roleOnCase("Defendant 2 Witness")
-                .details(flagDetails())
-                .build())
+            .flags(new Flags()
+                .setPartyName("W First W Last")
+                .setRoleOnCase("Defendant 2 Witness")
+                .setDetails(flagDetails()))
             .build());
         return this;
     }
 
     public CaseDataBuilder withRespondent2LitigationFriendFlags() {
         this.respondent2LitigationFriend = respondent2LitigationFriend.toBuilder()
-            .flags(Flags.builder()
-                .partyName(respondent2LitigationFriend.getFullName())
-                .roleOnCase("Defendant 2 Litigation Friend")
-                .details(flagDetails())
-                .build())
+            .flags(new Flags()
+                .setPartyName(respondent2LitigationFriend.getFullName())
+                .setRoleOnCase("Defendant 2 Litigation Friend")
+                .setDetails(flagDetails()))
             .build();
         return this;
     }
@@ -7096,11 +7078,10 @@ public class CaseDataBuilder {
                 .partyID("app-1-lr-individual-party-id")
                 .firstName("First")
                 .lastName("Last")
-                .flags(Flags.builder()
-                    .partyName("First Last")
-                    .roleOnCase("App 1 Lr Individual")
-                    .details(flagDetails())
-                    .build())
+                .flags(new Flags()
+                    .setPartyName("First Last")
+                    .setRoleOnCase("App 1 Lr Individual")
+                    .setDetails(flagDetails()))
                 .build());
         return this;
     }
@@ -7111,11 +7092,10 @@ public class CaseDataBuilder {
                 .partyID("res-1-lr-individual-party-id")
                 .firstName("First")
                 .lastName("Last")
-                .flags(Flags.builder()
-                    .partyName("First Last")
-                    .roleOnCase("Res 1 Lr Individual")
-                    .details(flagDetails())
-                    .build())
+                .flags(new Flags()
+                    .setPartyName("First Last")
+                    .setRoleOnCase("Res 1 Lr Individual")
+                    .setDetails(flagDetails()))
                 .build());
         return this;
     }
@@ -7126,11 +7106,10 @@ public class CaseDataBuilder {
                 .partyID("res-2-lr-individual-party-id")
                 .firstName("First")
                 .lastName("Last")
-                .flags(Flags.builder()
-                    .partyName("First Last")
-                    .roleOnCase("Res 2 Lr Individual")
-                    .details(flagDetails())
-                    .build())
+                .flags(new Flags()
+                    .setPartyName("First Last")
+                    .setRoleOnCase("Res 2 Lr Individual")
+                    .setDetails(flagDetails()))
                 .build());
         return this;
     }
@@ -7141,11 +7120,10 @@ public class CaseDataBuilder {
                 .partyID("app-1-org-individual-party-id")
                 .firstName("First")
                 .lastName("Last")
-                .flags(Flags.builder()
-                    .partyName("First Last")
-                    .roleOnCase("App 1 Org Individual")
-                    .details(flagDetails())
-                    .build())
+                .flags(new Flags()
+                    .setPartyName("First Last")
+                    .setRoleOnCase("App 1 Org Individual")
+                    .setDetails(flagDetails()))
                 .build());
         return this;
     }
@@ -7156,11 +7134,10 @@ public class CaseDataBuilder {
                 .partyID("app-2-org-individual-party-id")
                 .firstName("First")
                 .lastName("Last")
-                .flags(Flags.builder()
-                    .partyName("First Last")
-                    .roleOnCase("App 2 Org Individual")
-                    .details(flagDetails())
-                    .build())
+                .flags(new Flags()
+                    .setPartyName("First Last")
+                    .setRoleOnCase("App 2 Org Individual")
+                    .setDetails(flagDetails()))
                 .build());
         return this;
     }
@@ -7171,11 +7148,10 @@ public class CaseDataBuilder {
                 .partyID("res-1-org-individual-party-id")
                 .firstName("First")
                 .lastName("Last")
-                .flags(Flags.builder()
-                    .partyName("First Last")
-                    .roleOnCase("Res 1 Org Individual")
-                    .details(flagDetails())
-                    .build())
+                .flags(new Flags()
+                    .setPartyName("First Last")
+                    .setRoleOnCase("Res 1 Org Individual")
+                    .setDetails(flagDetails()))
                 .build());
         return this;
     }
@@ -7186,55 +7162,50 @@ public class CaseDataBuilder {
                 .partyID("res-2-org-individual-party-id")
                 .firstName("First")
                 .lastName("Last")
-                .flags(Flags.builder()
-                    .partyName("First Last")
-                    .roleOnCase("Res 2 Org Individual")
-                    .details(flagDetails())
-                    .build())
+                .flags(new Flags()
+                    .setPartyName("First Last")
+                    .setRoleOnCase("Res 2 Org Individual")
+                    .setDetails(flagDetails()))
                 .build());
         return this;
     }
 
     public List<Element<FlagDetail>> flagDetails() {
-        FlagDetail details1 = FlagDetail.builder()
-            .name("Vulnerable user")
-            .flagComment("comment")
-            .flagCode("AB001")
-            .hearingRelevant(YES)
-            .status("Active")
-            .dateTimeCreated(LocalDateTime.of(2024, 1, 1, 9, 0, 0))
-            .dateTimeModified(LocalDateTime.of(2024, 2, 1, 12, 0, 0))
-            .build();
+        FlagDetail details1 = new FlagDetail()
+            .setName("Vulnerable user")
+            .setFlagComment("comment")
+            .setFlagCode("AB001")
+            .setHearingRelevant(YES)
+            .setStatus("Active")
+            .setDateTimeCreated(LocalDateTime.of(2024, 1, 1, 9, 0, 0))
+            .setDateTimeModified(LocalDateTime.of(2024, 2, 1, 12, 0, 0));
 
-        FlagDetail details2 = FlagDetail.builder()
-            .name("Flight risk")
-            .flagComment("comment")
-            .flagCode("SM001")
-            .hearingRelevant(YES)
-            .status("Active")
-            .dateTimeCreated(LocalDateTime.of(2024, 1, 1, 9, 0, 0))
-            .dateTimeModified(LocalDateTime.of(2024, 2, 1, 12, 0, 0))
-            .build();
+        FlagDetail details2 = new FlagDetail()
+            .setName("Flight risk")
+            .setFlagComment("comment")
+            .setFlagCode("SM001")
+            .setHearingRelevant(YES)
+            .setStatus("Active")
+            .setDateTimeCreated(LocalDateTime.of(2024, 1, 1, 9, 0, 0))
+            .setDateTimeModified(LocalDateTime.of(2024, 2, 1, 12, 0, 0));
 
-        FlagDetail details3 = FlagDetail.builder()
-            .name("Audio/Video evidence")
-            .flagComment("comment")
-            .flagCode("RA001")
-            .hearingRelevant(NO)
-            .status("Active")
-            .dateTimeCreated(LocalDateTime.of(2024, 1, 1, 9, 0, 0))
-            .dateTimeModified(LocalDateTime.of(2024, 2, 1, 12, 0, 0))
-            .build();
+        FlagDetail details3 = new FlagDetail()
+            .setName("Audio/Video evidence")
+            .setFlagComment("comment")
+            .setFlagCode("RA001")
+            .setHearingRelevant(NO)
+            .setStatus("Active")
+            .setDateTimeCreated(LocalDateTime.of(2024, 1, 1, 9, 0, 0))
+            .setDateTimeModified(LocalDateTime.of(2024, 2, 1, 12, 0, 0));
 
-        FlagDetail details4 = FlagDetail.builder()
-            .name("Other")
-            .flagComment("comment")
-            .flagCode("AB001")
-            .hearingRelevant(YES)
-            .status("Inactive")
-            .dateTimeCreated(LocalDateTime.of(2024, 1, 1, 9, 0, 0))
-            .dateTimeModified(LocalDateTime.of(2024, 2, 1, 12, 0, 0))
-            .build();
+        FlagDetail details4 = new FlagDetail()
+            .setName("Other")
+            .setFlagComment("comment")
+            .setFlagCode("AB001")
+            .setHearingRelevant(YES)
+            .setStatus("Inactive")
+            .setDateTimeCreated(LocalDateTime.of(2024, 1, 1, 9, 0, 0))
+            .setDateTimeModified(LocalDateTime.of(2024, 2, 1, 12, 0, 0));
 
         return wrapElements(details1, details2, details3, details4);
     }
