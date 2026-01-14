@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 
 import java.util.List;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -28,20 +29,17 @@ public class CaseFlagsToHearingValueMapperTest {
 
     @Test
     public void testHasVulnerableFlag() {
-        FlagDetail flagDetail1 = FlagDetail.builder()
-            .status("Active")
-            .flagCode("PF0002")
-            .build();
+        FlagDetail flagDetail1 = new FlagDetail()
+            .setStatus("Active")
+            .setFlagCode("PF0002");
 
-        FlagDetail flagDetail2 = FlagDetail.builder()
-            .status("Active")
-            .flagCode("RA0033")
-            .build();
+        FlagDetail flagDetail2 = new FlagDetail()
+            .setStatus("Active")
+            .setFlagCode("RA0033");
 
-        FlagDetail flagDetail3 = FlagDetail.builder()
-            .status("INACTIVE")
-            .flagCode("PF0002")
-            .build();
+        FlagDetail flagDetail3 = new FlagDetail()
+            .setStatus("INACTIVE")
+            .setFlagCode("PF0002");
 
         List<FlagDetail> flagDetails = List.of(flagDetail1, flagDetail2, flagDetail3);
 
@@ -50,20 +48,17 @@ public class CaseFlagsToHearingValueMapperTest {
 
     @Test
     public void testHasAdditionalSecurityFlag() {
-        FlagDetail flagDetail1 = FlagDetail.builder()
-            .status("Active")
-            .flagCode("PF0007")
-            .build();
+        FlagDetail flagDetail1 = new FlagDetail()
+            .setStatus("Active")
+            .setFlagCode("PF0007");
 
-        FlagDetail flagDetail2 = FlagDetail.builder()
-            .status("Active")
-            .flagCode("PF0007")
-            .build();
+        FlagDetail flagDetail2 = new FlagDetail()
+            .setStatus("Active")
+            .setFlagCode("PF0007");
 
-        FlagDetail flagDetail3 = FlagDetail.builder()
-            .status("INACTIVE")
-            .flagCode("PF0007")
-            .build();
+        FlagDetail flagDetail3 = new FlagDetail()
+            .setStatus("INACTIVE")
+            .setFlagCode("PF0007");
 
         List<FlagDetail> flagDetails = List.of(flagDetail1, flagDetail2, flagDetail3);
 
@@ -74,19 +69,17 @@ public class CaseFlagsToHearingValueMapperTest {
     class GetLanguageInterpreter {
         @Test
         public void shouldReturnLanguageInterpreterFlag() {
-            FlagDetail flagDetail1 = FlagDetail.builder()
-                .status("Active")
-                .hearingRelevant(YES)
-                .flagCode("PF0015")
-                .subTypeKey("fra")
-                .subTypeValue("French")
-                .build();
+            FlagDetail flagDetail1 = new FlagDetail()
+                .setStatus("Active")
+                .setHearingRelevant(YES)
+                .setFlagCode("PF0015")
+                .setSubTypeKey("fra")
+                .setSubTypeValue("French");
 
-            FlagDetail flagDetail2 = FlagDetail.builder()
-                .status("INACTIVE")
-                .hearingRelevant(YES)
-                .flagCode("PF0015")
-                .build();
+            FlagDetail flagDetail2 = new FlagDetail()
+                .setStatus("INACTIVE")
+                .setHearingRelevant(YES)
+                .setFlagCode("PF0015");
 
             List<FlagDetail> flagDetails = List.of(flagDetail1, flagDetail2);
 
@@ -95,25 +88,22 @@ public class CaseFlagsToHearingValueMapperTest {
 
         @Test
         public void shouldReturnNullWhenNoSubValueKey() {
-            FlagDetail flagDetail1 = FlagDetail.builder()
-                .status("Active")
-                .hearingRelevant(YES)
-                .flagCode("PF0015")
-                .subTypeValue("random")
-                .build();
+            FlagDetail flagDetail1 = new FlagDetail()
+                .setStatus("Active")
+                .setHearingRelevant(YES)
+                .setFlagCode("PF0015")
+                .setSubTypeValue("random");
 
-            FlagDetail flagDetail2 = FlagDetail.builder()
-                .status("INACTIVE")
-                .hearingRelevant(YES)
-                .flagCode("PF0015")
-                .build();
+            FlagDetail flagDetail2 = new FlagDetail()
+                .setStatus("INACTIVE")
+                .setHearingRelevant(YES)
+                .setFlagCode("PF0015");
 
-            FlagDetail flagDetail3 = FlagDetail.builder()
-                .status("Active")
-                .hearingRelevant(YES)
-                .subTypeValue("American Sign Language")
-                .flagCode("RA0042")
-                .build();
+            FlagDetail flagDetail3 = new FlagDetail()
+                .setStatus("Active")
+                .setHearingRelevant(YES)
+                .setSubTypeValue("American Sign Language")
+                .setFlagCode("RA0042");
 
             List<FlagDetail> flagDetails = List.of(flagDetail1, flagDetail2, flagDetail3);
 
@@ -129,26 +119,23 @@ public class CaseFlagsToHearingValueMapperTest {
 
         @Test
         public void shouldReturnSignLanguageKeyWhenNoSpokenLanguageKey() {
-            FlagDetail flagDetail1 = FlagDetail.builder()
-                .status("Active")
-                .hearingRelevant(YES)
-                .flagCode("PF0015")
-                .subTypeValue("random")
-                .build();
+            FlagDetail flagDetail1 = new FlagDetail()
+                .setStatus("Active")
+                .setHearingRelevant(YES)
+                .setFlagCode("PF0015")
+                .setSubTypeValue("random");
 
-            FlagDetail flagDetail2 = FlagDetail.builder()
-                .status("INACTIVE")
-                .hearingRelevant(YES)
-                .flagCode("PF0015")
-                .build();
+            FlagDetail flagDetail2 = new FlagDetail()
+                .setStatus("INACTIVE")
+                .setHearingRelevant(YES)
+                .setFlagCode("PF0015");
 
-            FlagDetail flagDetail3 = FlagDetail.builder()
-                .status("Active")
-                .hearingRelevant(YES)
-                .subTypeKey("sign-sse")
-                .subTypeValue("Speech Supported English (SSE)")
-                .flagCode("RA0042")
-                .build();
+            FlagDetail flagDetail3 = new FlagDetail()
+                .setStatus("Active")
+                .setHearingRelevant(YES)
+                .setSubTypeKey("sign-sse")
+                .setSubTypeValue("Speech Supported English (SSE)")
+                .setFlagCode("RA0042");
 
             List<FlagDetail> flagDetails = List.of(flagDetail1, flagDetail2, flagDetail3);
 
@@ -157,35 +144,31 @@ public class CaseFlagsToHearingValueMapperTest {
 
         @Test
         public void shouldReturnFirstSpokenLanguageInterpreterFlag() {
-            FlagDetail flagDetail1 = FlagDetail.builder()
-                .status("Active")
-                .hearingRelevant(YES)
-                .flagCode("PF0015")
-                .subTypeKey("fra")
-                .subTypeValue("French")
-                .build();
+            FlagDetail flagDetail1 = new FlagDetail()
+                .setStatus("Active")
+                .setHearingRelevant(YES)
+                .setFlagCode("PF0015")
+                .setSubTypeKey("fra")
+                .setSubTypeValue("French");
 
-            FlagDetail flagDetail2 = FlagDetail.builder()
-                .status("INACTIVE")
-                .hearingRelevant(YES)
-                .flagCode("PF0015")
-                .build();
+            FlagDetail flagDetail2 = new FlagDetail()
+                .setStatus("INACTIVE")
+                .setHearingRelevant(YES)
+                .setFlagCode("PF0015");
 
-            FlagDetail flagDetail3 = FlagDetail.builder()
-                .status("Active")
-                .hearingRelevant(YES)
-                .flagCode("PF0015")
-                .subTypeKey("wel")
-                .subTypeValue("WELSH")
-                .build();
+            FlagDetail flagDetail3 = new FlagDetail()
+                .setStatus("Active")
+                .setHearingRelevant(YES)
+                .setFlagCode("PF0015")
+                .setSubTypeKey("wel")
+                .setSubTypeValue("WELSH");
 
-            FlagDetail flagDetail4 = FlagDetail.builder()
-                .status("Active")
-                .hearingRelevant(YES)
-                .subTypeKey("sign-sse")
-                .subTypeValue("Speech Supported English (SSE)")
-                .flagCode("RA0042")
-                .build();
+            FlagDetail flagDetail4 = new FlagDetail()
+                .setStatus("Active")
+                .setHearingRelevant(YES)
+                .setSubTypeKey("sign-sse")
+                .setSubTypeValue("Speech Supported English (SSE)")
+                .setFlagCode("RA0042");
 
             List<FlagDetail> flagDetails = List.of(flagDetail1, flagDetail2, flagDetail3, flagDetail4);
 
@@ -194,27 +177,24 @@ public class CaseFlagsToHearingValueMapperTest {
 
         @Test
         public void shouldReturnFirstSignLanguageInterpreterFlag() {
-            FlagDetail flagDetail1 = FlagDetail.builder()
-                .status("Active")
-                .hearingRelevant(YES)
-                .subTypeKey("sign-sse")
-                .subTypeValue("Speech Supported English (SSE)")
-                .flagCode("RA0042")
-                .build();
+            FlagDetail flagDetail1 = new FlagDetail()
+                .setStatus("Active")
+                .setHearingRelevant(YES)
+                .setSubTypeKey("sign-sse")
+                .setSubTypeValue("Speech Supported English (SSE)")
+                .setFlagCode("RA0042");
 
-            FlagDetail flagDetail2 = FlagDetail.builder()
-                .status("INACTIVE")
-                .hearingRelevant(YES)
-                .flagCode("PF0015")
-                .build();
+            FlagDetail flagDetail2 = new FlagDetail()
+                .setStatus("INACTIVE")
+                .setHearingRelevant(YES)
+                .setFlagCode("PF0015");
 
-            FlagDetail flagDetail3 = FlagDetail.builder()
-                .status("Active")
-                .hearingRelevant(YES)
-                .subTypeKey("sign")
-                .subTypeValue("Some other sign")
-                .flagCode("RA0042")
-                .build();
+            FlagDetail flagDetail3 = new FlagDetail()
+                .setStatus("Active")
+                .setHearingRelevant(YES)
+                .setSubTypeKey("sign")
+                .setSubTypeValue("Some other sign")
+                .setFlagCode("RA0042");
 
             List<FlagDetail> flagDetails = List.of(flagDetail1, flagDetail2, flagDetail3);
 
@@ -225,65 +205,58 @@ public class CaseFlagsToHearingValueMapperTest {
 
     @Test
     public void shouldReturnCorrectFlagsForOtherReasonableAdjustmentDetails() {
-        FlagDetail flagNotRAorSM = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(YES)
-            .flagCode("PF0002")
-            .build();
+        FlagDetail flagNotRAorSM = new FlagDetail()
+            .setStatus("Active")
+            .setHearingRelevant(YES)
+            .setFlagCode("PF0002");
 
-        FlagDetail flagWithDetailsAndComments = FlagDetail.builder()
-            .status("Active")
-            .name("Flight risk")
-            .flagComment("comment")
-            .flagCode("SM001")
-            .hearingRelevant(YES)
-            .status("Active")
-            .build();
+        FlagDetail flagWithDetailsAndComments = new FlagDetail()
+            .setStatus("Active")
+            .setName("Flight risk")
+            .setFlagComment("comment")
+            .setFlagCode("SM001")
+            .setHearingRelevant(YES)
+            .setStatus("Active");
 
-        FlagDetail flagDetailsOnly = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(YES)
-            .flagCode("RA0019")
-            .name("Step free / wheelchair access")
-            .subTypeKey("whe")
-            .subTypeValue("WHEELCHAIR_ACCESS_FLAG")
-            .build();
+        FlagDetail flagDetailsOnly = new FlagDetail()
+            .setStatus("Active")
+            .setHearingRelevant(YES)
+            .setFlagCode("RA0019")
+            .setName("Step free / wheelchair access")
+            .setSubTypeKey("whe")
+            .setSubTypeValue("WHEELCHAIR_ACCESS_FLAG");
 
-        FlagDetail flagCommentsOnly = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(YES)
-            .flagCode("RA0026")
-            .flagComment("Support comment")
-            .subTypeKey("sup")
-            .subTypeValue("SUPPORT_WORKER_FLAG")
-            .build();
+        FlagDetail flagCommentsOnly = new FlagDetail()
+            .setStatus("Active")
+            .setHearingRelevant(YES)
+            .setFlagCode("RA0026")
+            .setFlagComment("Support comment")
+            .setSubTypeKey("sup")
+            .setSubTypeValue("SUPPORT_WORKER_FLAG");
 
-        FlagDetail flagLanguageManualEntry = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(YES)
-            .flagCode("PF0015")
-            .subTypeValue("Hokkien")
-            .name("Language Interpreter")
-            .flagComment("Local dialect")
-            .build();
+        FlagDetail flagLanguageManualEntry = new FlagDetail()
+            .setStatus("Active")
+            .setHearingRelevant(YES)
+            .setFlagCode("PF0015")
+            .setSubTypeValue("Hokkien")
+            .setName("Language Interpreter")
+            .setFlagComment("Local dialect");
 
-        FlagDetail flagSignLanguageManualEntry = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(YES)
-            .flagCode("RA0042")
-            .name("Sign Language Interpreter")
-            .subTypeValue("Hokkien")
-            .flagComment("Local dialect")
-            .build();
+        FlagDetail flagSignLanguageManualEntry = new FlagDetail()
+            .setStatus("Active")
+            .setHearingRelevant(YES)
+            .setFlagCode("RA0042")
+            .setName("Sign Language Interpreter")
+            .setSubTypeValue("Hokkien")
+            .setFlagComment("Local dialect");
 
-        FlagDetail flagSecondLanguage = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(YES)
-            .flagCode("PF0015")
-            .subTypeValue("French")
-            .name("Language Interpreter")
-            .flagComment("Comment - Waterloo accent")
-            .build();
+        FlagDetail flagSecondLanguage = new FlagDetail()
+            .setStatus("Active")
+            .setHearingRelevant(YES)
+            .setFlagCode("PF0015")
+            .setSubTypeValue("French")
+            .setName("Language Interpreter")
+            .setFlagComment("Comment - Waterloo accent");
 
         List<FlagDetail> flagDetails = List.of(
             flagNotRAorSM,
@@ -295,64 +268,58 @@ public class CaseFlagsToHearingValueMapperTest {
             flagSecondLanguage
         );
 
-        assertEquals("SM001: Flight risk: comment, RA0019: Step free / wheelchair access, "
-                         + "RA0026: Support comment, RA0042: Sign Language Interpreter: Local dialect: Hokkien, "
-                         + "PF0015: Language Interpreter: Local dialect: Hokkien, "
-                         + "PF0015: Language Interpreter: Comment - Waterloo accent: French",
-                     getOtherReasonableAdjustmentDetails(flagDetails));
+        assertEquals(
+            "SM001: Flight risk: comment, RA0019: Step free / wheelchair access, "
+                + "RA0026: Support comment, RA0042: Sign Language Interpreter: Local dialect: Hokkien, "
+                + "PF0015: Language Interpreter: Local dialect: Hokkien, "
+                + "PF0015: Language Interpreter: Comment - Waterloo accent: French",
+            getOtherReasonableAdjustmentDetails(flagDetails)
+        );
     }
 
     @Test
     public void testHasCaseInterpreterRequiredFlag() {
-        FlagDetail flagDetail1 = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(YES)
-            .flagCode("PF0015")
-            .subTypeValue("english")
-            .build();
+        FlagDetail flagDetail1 = new FlagDetail()
+            .setStatus("Active")
+            .setHearingRelevant(YES)
+            .setFlagCode("PF0015")
+            .setSubTypeValue("english");
 
-        FlagDetail flagDetail2 = FlagDetail.builder()
-            .status("INACTIVE")
-            .hearingRelevant(YES)
-            .flagCode("PF0015")
-            .build();
+        FlagDetail flagDetail2 = new FlagDetail()
+            .setStatus("INACTIVE")
+            .setHearingRelevant(YES)
+            .setFlagCode("PF0015");
 
-        FlagDetail flagDetail3 = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(YES)
-            .flagCode("RA0042")
-            .build();
+        FlagDetail flagDetail3 = new FlagDetail()
+            .setStatus("Active")
+            .setHearingRelevant(YES)
+            .setFlagCode("RA0042");
 
         CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().flags(Flags.builder()
-                                                  .details(wrapElements(flagDetail1))
-                                                  .build())
+            .applicant1(Party.builder().flags(new Flags()
+                                                  .setDetails(wrapElements(flagDetail1)))
                             .build())
-            .respondent1(Party.builder().flags(Flags.builder()
-                                                   .details(wrapElements(flagDetail2, flagDetail3))
-                                                   .build())
+            .respondent1(Party.builder().flags(new Flags()
+                                                   .setDetails(wrapElements(flagDetail2, flagDetail3)))
                              .build())
-            .build();
+                .build();
 
         assertTrue(hasCaseInterpreterRequiredFlag(caseData));
     }
 
     @Test
     public void testGetCustodyStatus() {
-        FlagDetail flagDetail1 = FlagDetail.builder()
-            .status("Active")
-            .flagCode("PF0019")
-            .build();
+        FlagDetail flagDetail1 = new FlagDetail()
+            .setStatus("Active")
+            .setFlagCode("PF0019");
 
-        FlagDetail flagDetail2 = FlagDetail.builder()
-            .status("Active")
-            .flagCode("PF0019")
-            .build();
+        FlagDetail flagDetail2 = new FlagDetail()
+            .setStatus("Active")
+            .setFlagCode("PF0019");
 
-        FlagDetail flagDetail3 = FlagDetail.builder()
-            .status("INACTIVE")
-            .flagCode("PF0019")
-            .build();
+        FlagDetail flagDetail3 = new FlagDetail()
+            .setStatus("INACTIVE")
+            .setFlagCode("PF0019");
 
         List<FlagDetail> flagDetails = List.of(flagDetail1, flagDetail2, flagDetail3);
 
@@ -361,36 +328,32 @@ public class CaseFlagsToHearingValueMapperTest {
 
     @Test
     public void testHasReasonableAdjustments() {
-        FlagDetail flagDetail1 = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(YES)
-            .flagCode("RA0033")
-            .name("Private waiting area")
-            .flagComment("this is a comment")
-            .build();
+        FlagDetail flagDetail1 = new FlagDetail()
+            .setStatus("Active")
+            .setHearingRelevant(YES)
+            .setFlagCode("RA0033")
+            .setName("Private waiting area")
+            .setFlagComment("this is a comment");
 
-        FlagDetail flagDetail2 = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(YES)
-            .flagCode("SM0002")
-            .name("Screening witness from accused")
-            .flagComment("this is a comment")
-            .build();
+        FlagDetail flagDetail2 = new FlagDetail()
+            .setStatus("Active")
+            .setHearingRelevant(YES)
+            .setFlagCode("SM0002")
+            .setName("Screening witness from accused")
+            .setFlagComment("this is a comment");
 
-        FlagDetail flagDetail3 = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(YES)
-            .flagCode("RA0026")
-            .name("Support worker or carer with me")
-            .build();
+        FlagDetail flagDetail3 = new FlagDetail()
+            .setStatus("Active")
+            .setHearingRelevant(YES)
+            .setFlagCode("RA0026")
+            .setName("Support worker or carer with me");
 
-        FlagDetail flagDetail4 = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(YES)
-            .flagCode("RA0042")
-            .name("Sign Language Interpreter")
-            .flagComment("a sign language comment")
-            .build();
+        FlagDetail flagDetail4 = new FlagDetail()
+            .setStatus("Active")
+            .setHearingRelevant(YES)
+            .setFlagCode("RA0042")
+            .setName("Sign Language Interpreter")
+            .setFlagComment("a sign language comment");
 
         List<String> expected = List.of(
             "RA0033",
@@ -405,58 +368,52 @@ public class CaseFlagsToHearingValueMapperTest {
                 flagDetail2,
                 flagDetail3,
                 flagDetail4
-        ));
+            ));
 
         assertEquals(expected, actualReasonableAdjustments);
     }
 
     @Test
     public void testDoesNotHaveReasonableAdjustments() {
-        FlagDetail flagDetail1 = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(NO)
-            .flagCode("SM0002")
-            .name("Screening witness from accused")
-            .flagComment("this is a comment")
-            .build();
+        FlagDetail flagDetail1 = new FlagDetail()
+            .setStatus("Active")
+            .setHearingRelevant(NO)
+            .setFlagCode("SM0002")
+            .setName("Screening witness from accused")
+            .setFlagComment("this is a comment");
 
-        FlagDetail flagDetail2 = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(YES)
-            .flagCode("SN0002")
-            .name("Screening witness from accused")
-            .flagComment("this is a comment")
-            .build();
+        FlagDetail flagDetail2 = new FlagDetail()
+            .setStatus("Active")
+            .setHearingRelevant(YES)
+            .setFlagCode("SN0002")
+            .setName("Screening witness from accused")
+            .setFlagComment("this is a comment");
 
-        FlagDetail flagDetail3 = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(YES)
-            .flagCode("00RA26")
-            .name("Support worker or carer with me")
-            .build();
+        FlagDetail flagDetail3 = new FlagDetail()
+            .setStatus("Active")
+            .setHearingRelevant(YES)
+            .setFlagCode("00RA26")
+            .setName("Support worker or carer with me");
 
-        FlagDetail flagDetail4 = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(YES)
-            .flagCode("OT0001")
-            .name("Other")
-            .build();
+        FlagDetail flagDetail4 = new FlagDetail()
+            .setStatus("Active")
+            .setHearingRelevant(YES)
+            .setFlagCode("OT0001")
+            .setName("Other");
 
-        FlagDetail flagDetail5 = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(YES)
-            .flagCode("R00A42")
-            .name("Sign Language Interpreter")
-            .flagComment("a sign language comment")
-            .build();
+        FlagDetail flagDetail5 = new FlagDetail()
+            .setStatus("Active")
+            .setHearingRelevant(YES)
+            .setFlagCode("R00A42")
+            .setName("Sign Language Interpreter")
+            .setFlagComment("a sign language comment");
 
-        FlagDetail flagDetail6 = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(NO)
-            .flagCode("RA0042")
-            .name("Sign Language Interpreter")
-            .flagComment("a sign language comment")
-            .build();
+        FlagDetail flagDetail6 = new FlagDetail()
+            .setStatus("Active")
+            .setHearingRelevant(NO)
+            .setFlagCode("RA0042")
+            .setName("Sign Language Interpreter")
+            .setFlagComment("a sign language comment");
 
         List<String> expected = List.of(
             "RA0033",
@@ -479,21 +436,19 @@ public class CaseFlagsToHearingValueMapperTest {
 
     @Test
     public void testWithNoHearingRelevant() {
-        FlagDetail flagDetail1 = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(NO)
-            .flagCode("RE0033")
-            .name("Private waiting area")
-            .flagComment("this is a comment")
-            .build();
+        FlagDetail flagDetail1 = new FlagDetail()
+            .setStatus("Active")
+            .setHearingRelevant(NO)
+            .setFlagCode("RE0033")
+            .setName("Private waiting area")
+            .setFlagComment("this is a comment");
 
-        FlagDetail flagDetail2 = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(NO)
-            .flagCode("RA0042")
-            .name("Sign Language Interpreter")
-            .flagComment("a sign language comment")
-            .build();
+        FlagDetail flagDetail2 = new FlagDetail()
+            .setStatus("Active")
+            .setHearingRelevant(NO)
+            .setFlagCode("RA0042")
+            .setName("Sign Language Interpreter")
+            .setFlagComment("a sign language comment");
 
         List<String> expected = List.of(
             "RA0033",
@@ -513,41 +468,37 @@ public class CaseFlagsToHearingValueMapperTest {
 
     @Test
     public void testGetVulnerabilityDetails() {
-        FlagDetail flagDetail1 = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(YES)
-            .flagCode("RA0033")
-            .name("Private waiting area")
-            .flagComment("this is a comment")
-            .build();
+        FlagDetail flagDetail1 = new FlagDetail()
+            .setStatus("Active")
+            .setHearingRelevant(YES)
+            .setFlagCode("RA0033")
+            .setName("Private waiting area")
+            .setFlagComment("this is a comment");
 
-        FlagDetail flagDetail2 = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(YES)
-            .flagCode("SM0002")
-            .name("Screening witness from accused")
-            .flagComment("this is a comment")
-            .build();
+        FlagDetail flagDetail2 = new FlagDetail()
+            .setStatus("Active")
+            .setHearingRelevant(YES)
+            .setFlagCode("SM0002")
+            .setName("Screening witness from accused")
+            .setFlagComment("this is a comment");
 
-        FlagDetail flagDetail3 = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(YES)
-            .flagCode("RA0026")
-            .name("Support worker or carer with me")
-            .build();
+        FlagDetail flagDetail3 = new FlagDetail()
+            .setStatus("Active")
+            .setHearingRelevant(YES)
+            .setFlagCode("RA0026")
+            .setName("Support worker or carer with me");
 
-        FlagDetail flagDetail4 = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(YES)
-            .flagCode("PF0002")
-            .name("Vulnerable user")
-            .flagComment("this is a comment")
-            .build();
+        FlagDetail flagDetail4 = new FlagDetail()
+            .setStatus("Active")
+            .setHearingRelevant(YES)
+            .setFlagCode("PF0002")
+            .setName("Vulnerable user")
+            .setFlagComment("this is a comment");
 
         String expected =
             "Private waiting area - this is a comment; " +
-            "Support worker or carer with me; " +
-            "Vulnerable user - this is a comment";
+                "Support worker or carer with me; " +
+                "Vulnerable user - this is a comment";
 
         String actualVulnerabilityDetails = getVulnerabilityDetails(
             List.of(
@@ -562,21 +513,19 @@ public class CaseFlagsToHearingValueMapperTest {
 
     @Test
     public void testNoVulnerabilityDetails() {
-        FlagDetail flagDetail1 = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(NO)
-            .flagCode("RE0033")
-            .name("Private waiting area")
-            .flagComment("this is a comment")
-            .build();
+        FlagDetail flagDetail1 = new FlagDetail()
+            .setStatus("Active")
+            .setHearingRelevant(NO)
+            .setFlagCode("RE0033")
+            .setName("Private waiting area")
+            .setFlagComment("this is a comment");
 
-        FlagDetail flagDetail2 = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(NO)
-            .flagCode("RA0042")
-            .name("Sign Language Interpreter")
-            .flagComment("a sign language comment")
-            .build();
+        FlagDetail flagDetail2 = new FlagDetail()
+            .setStatus("Active")
+            .setHearingRelevant(NO)
+            .setFlagCode("RA0042")
+            .setName("Sign Language Interpreter")
+            .setFlagComment("a sign language comment");
 
         String actualVulnerabilityDetails = getVulnerabilityDetails(
             List.of(
