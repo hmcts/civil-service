@@ -198,11 +198,10 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
             ClientContext clientContext = buildTaskCompletionContext(userAuth, caseData);
 
             if (nonNull(clientContext)) {
-                return TaskCompletionSubmittedCallbackResponse.builder()
-                    .confirmationHeader(REPLY_MESSAGE_CONFIRMATION_HEADER)
-                    .confirmationBody(REPLY_MESSAGE_BODY_CONFIRMATION)
-                    .clientContext(clientContext)
-                    .build();
+                return new TaskCompletionSubmittedCallbackResponse()
+                    .setConfirmationHeader(REPLY_MESSAGE_CONFIRMATION_HEADER)
+                    .setConfirmationBody(REPLY_MESSAGE_BODY_CONFIRMATION)
+                    .setClientContext(clientContext);
             }
             return SubmittedCallbackResponse.builder()
                 .confirmationHeader(REPLY_MESSAGE_CONFIRMATION_HEADER)

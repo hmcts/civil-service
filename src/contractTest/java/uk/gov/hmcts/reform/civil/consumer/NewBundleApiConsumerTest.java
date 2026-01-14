@@ -146,7 +146,7 @@ public class NewBundleApiConsumerTest extends BaseContractTest {
             .partyPhone("07070006066")
             .legalRepHeading("legalRep")
             .unavailableDates(getUnavailableTestDates())
-            .flags(Flags.builder().build())
+            .flags(new Flags())
             .build();
     }
 

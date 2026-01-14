@@ -29,7 +29,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.hearing.CategoryType;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
-import uk.gov.hmcts.reform.civil.exceptions.MissingFieldsUpdatedException;
 import uk.gov.hmcts.reform.civil.exceptions.NotEarlyAdopterCourtException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -235,7 +234,7 @@ public class HearingValuesServiceTest {
 
     @SneakyThrows
     @Test
-    void shouldTriggerEventAndThrowMissingFieldsUpdatedExceptionIfPartyIdMissingFromApplicant1() throws Exception {
+    void shouldTriggerEventIfPartyIdMissingFromApplicant1() throws Exception {
         Long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
@@ -268,16 +267,14 @@ public class HearingValuesServiceTest {
         given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
-        assertThrows(MissingFieldsUpdatedException.class, () -> {
-            hearingValuesService.getValues(caseId, "auth");
-        });
+        hearingValuesService.getValues(caseId, "auth");
 
         verify(caseDataService).triggerEvent(eq(caseId), eq(CaseEvent.UPDATE_MISSING_FIELDS), any());
     }
 
     @SneakyThrows
     @Test
-    void shouldTriggerEventAndThrowMissingFieldsUpdatedExceptionIfCaseFlagsMissingFromApplicant1() throws Exception {
+    void shouldTriggerEventIfCaseFlagsMissingFromApplicant1() throws Exception {
         Long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
@@ -306,16 +303,14 @@ public class HearingValuesServiceTest {
         given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
-        assertThrows(MissingFieldsUpdatedException.class, () -> {
-            hearingValuesService.getValues(caseId, "auth");
-        });
+        hearingValuesService.getValues(caseId, "auth");
 
         verify(caseDataService).triggerEvent(eq(caseId), eq(CaseEvent.UPDATE_MISSING_FIELDS), any());
     }
 
     @SneakyThrows
     @Test
-    void shouldTriggerEventAndThrowMissingFieldsUpdatedExceptionIfUnavailableDatesMissingFromApplicant1() throws Exception {
+    void shouldTriggerEventIfUnavailableDatesMissingFromApplicant1() throws Exception {
         Long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
@@ -345,9 +340,7 @@ public class HearingValuesServiceTest {
         given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
-        assertThrows(MissingFieldsUpdatedException.class, () -> {
-            hearingValuesService.getValues(caseId, "auth");
-        });
+        hearingValuesService.getValues(caseId, "auth");
 
         verify(caseDataService).triggerEvent(eq(caseId), eq(CaseEvent.UPDATE_MISSING_FIELDS), any());
     }

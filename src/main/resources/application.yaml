@@ -619,6 +619,7 @@ feign:
         loggerLevel: full
       core-case-data-api:
         loggerLevel: full
+        readTimeout: ${REST_TEMPLATE_TIMEOUT:30000}
       document-management-metadata-download-api:
         loggerLevel: full
 

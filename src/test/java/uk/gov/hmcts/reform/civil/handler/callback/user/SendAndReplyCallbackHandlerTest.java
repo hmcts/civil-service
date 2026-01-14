@@ -654,13 +654,12 @@ class SendAndReplyCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
             TaskCompletionSubmittedCallbackResponse response = (TaskCompletionSubmittedCallbackResponse) handler.handle(params);
             assertThat(response).usingRecursiveComparison().isEqualTo(
-                TaskCompletionSubmittedCallbackResponse.builder()
-                    .confirmationHeader(
+                new TaskCompletionSubmittedCallbackResponse()
+                    .setConfirmationHeader(
                         "# Reply sent")
-                    .confirmationBody(
+                    .setConfirmationBody(
                         "<br /><h2 class=\"govuk-heading-m\">What happens next</h2><br />A task has been created to review your reply.")
-                    .clientContext(clientContext)
-                    .build());
+                    .setClientContext(clientContext));
 
             verify(taskManagementService).claimTask(AUTH_TOKEN, TASK_ID);
         }
@@ -687,13 +686,12 @@ class SendAndReplyCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
             TaskCompletionSubmittedCallbackResponse response = (TaskCompletionSubmittedCallbackResponse) handler.handle(params);
             assertThat(response).usingRecursiveComparison().isEqualTo(
-                TaskCompletionSubmittedCallbackResponse.builder()
-                    .confirmationHeader(
+                new TaskCompletionSubmittedCallbackResponse()
+                    .setConfirmationHeader(
                         "# Reply sent")
-                    .confirmationBody(
+                    .setConfirmationBody(
                         "<br /><h2 class=\"govuk-heading-m\">What happens next</h2><br />A task has been created to review your reply.")
-                    .clientContext(clientContext2)
-                    .build());
+                    .setClientContext(clientContext2));
         }
     }
 }
