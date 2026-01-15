@@ -10,4 +10,5 @@ public final class DashboardTaskIds {
     public static final String DISMISS_CASE = "GenerateDashboardNotificationsDismissCase";
     public static final String APPLY_NOC_DECISION_DEFENDANT_LIP = "GenerateDashboardNotificationsApplyNocDecisionDefendantLip";
     public static final String GENERATE_DJ_FORM_SPEC = "GenerateDashboardNotificationsDjFormSpec";
+    public static final String EVIDENCE_UPLOADED = "GenerateDashboardNotificationsEvidenceUploaded";
 }

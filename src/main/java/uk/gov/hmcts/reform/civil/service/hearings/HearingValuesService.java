@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.ManageCaseBaseUrlConfiguration;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
-import uk.gov.hmcts.reform.civil.exceptions.MissingFieldsUpdatedException;
 import uk.gov.hmcts.reform.civil.exceptions.NotEarlyAdopterCourtException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -134,13 +133,13 @@ public class HearingValuesService {
 
         if (partyIdsUpdated || unavailableDatesUpdated || caseFlagsUpdated) {
             try {
+                log.info("Updating missing fields for {} ", caseId);
                 caseDataService.triggerEvent(
                     caseId, UPDATE_MISSING_FIELDS, caseData.toMap(mapper));
             } catch (FeignException e) {
-                log.error("Updating missing fields failed: {}", e);
+                log.error("Updating missing fields failed: {}", e.getMessage(), e);
                 throw e;
             }
-            throw new MissingFieldsUpdatedException();
         }
     }
 
@@ -151,8 +150,6 @@ public class HearingValuesService {
      * are missing partyIds to populate.
      *
      * @param caseData given case data.
-     * @throws MissingFieldsUpdatedException If party ids have been updated, to force the consumer to request
-     *                                  the hearing values endpoint again.
      * @throws FeignException If an error is returned from case data service when triggering the event.
      */
     private boolean populateMissingPartyIds(CaseData caseData) {
@@ -174,8 +171,6 @@ public class HearingValuesService {
      * First the unavailable dates fields are checked if date added exists before
      * overwriting with the event and date added fields
      *
-     * @throws MissingFieldsUpdatedException If unavailable dates have been updated, to force the consumer to request
-     *                                  the hearing values endpoint again.
      * @throws FeignException If an error is returned from case data service when triggering the event.
      */
     private boolean populateMissingUnavailableDatesFields(CaseData caseData) {
@@ -196,8 +191,6 @@ public class HearingValuesService {
      * First the applicant is checked for the flags field as it's the first one
      * to get initialised on claim creation
      *
-     * @throws MissingFieldsUpdatedException If case flags have been re-initialised, to force the consumer to request
-     *                                  the hearing values endpoint again.
      * @throws FeignException If an error is returned from case data service when triggering the event.
      */
     private boolean initialiseMissingCaseFlags(CaseData caseData) {
