@@ -16,11 +16,14 @@
 | **Claim** | `isUnspec` | Case is in the UNSPEC service based on case access category |
 | **Claim** | `issued` | Acknowledgement deadline exists - claim notification has been sent (State Flow: claim notified) |
 | **Claim** | `issuedRespondent1OrgNotRegistered` | Issue date is set where defendant is represented but their organisation is not registered |
-| **Claim** | `issuedRespondent1Unrepresented` | Issue date is set and respondent 1 is unrepresented |
+| **Claim** | `issuedRespondent1Unrepresented` | Issue date exists and respondent 1 is marked unrepresented (respondent1Represented = No) |
 | **Claim** | `issuedRespondent2OrgNotRegistered` | Issue date is set where defendant is represented but their organisation is not registered |
-| **Claim** | `issuedRespondent2Unrepresented` | Issue date is set and respondent 2 is unrepresented |
+| **Claim** | `issuedRespondent2Unrepresented` | Issue date exists and respondent 2 is marked unrepresented (respondent2Represented = No) |
 | **Claim** | `pendingIssued` | Issue date is set and all represented defendants have registered organisations (second defendant absent or registered/same solicitor). Used for moving to pending issue |
+| **Claim** | `pendingIssuedUnregistered` | Issue date set; at least one represented defendant has an unregistered org; no defendants are unrepresented; if only defendant 2 is unregistered, defendants must not share the same representative |
 | **Claim** | `pendingIssuedUnrepresented` | Issue date is set and at least one defendant is unrepresented. Applies to all UNSPEC, and to SPEC only for multi‑party scenarios |
+| **Claim** | `pendingIssuedUnrepresentedAndUnregistered` | Issue date set; exactly one defendant unrepresented; the other is represented with unregistered organisation |
+| **Claim** | `pendingIssuedUnrepresentedOneVOneSpec` | One-vs-one SPEC case where respondent 1 is unrepresented and the case is issued |
 | **Claim** | `sameRepresentationBoth` | Same legal representation for both defendants |
 | **Claim** | `submitted1v1RespondentOneUnregistered` | Submitted 1v1 claim where defendant is represented but their organisation is not registered |
 | **Claim** | `submittedBothUnregisteredSolicitors` | Submitted claim with two defendants, each represented by different solicitors and both defendant organisations are not registered |
@@ -31,7 +34,7 @@
 | **Claim** | `submittedTwoRegisteredRespondentRepresentatives` | Submitted claim with two defendants, each represented by different solicitors and both defendant organisations are registered |
 | **Claim** | `submittedTwoRespondentRepresentativesOneUnregistered` | Submitted claim with two defendants, each represented by different solicitors where exactly one defendant organisation is not registered |
 | **Claimant** | `beforeResponse` | Applicant initial response has not been recorded yet (for UNSPEC with applicant 2, neither applicant has responded) |
-| **Claimant** | `correspondenceAddressNotRequired` | Applicant correspondence address not required (Spec) |
+| **Claimant** | `correspondenceAddressNotRequired` | Applicant correspondence address is not required (Spec) — field `specAoSApplicantCorrespondenceAddressRequired` = No. |
 | **Claimant** | `fullDefenceNotProceed` | Applicant has decided not to proceed with the claim. In UNSPEC 1v2, 'not proceed' is recorded against both defendants; in 2v1, both applicants record 'not proceed'; in 1v1, a single 'not proceed' decision applies |
 | **Claimant** | `fullDefenceProceed` | Applicant has decided to proceed with the claim (SPEC/UNSPEC, 1v1/1v2/2v1). In UNSPEC 1v2, proceeding against at least one defendant qualifies; in 2v1, at least one applicant chooses to proceed |
 | **Claimant** | `isIntentionNotSettlePartAdmit` | Claimant intention not settle |
@@ -122,7 +125,7 @@
 | **Applicant** | `hasResponseDateApplicant1` | Applicant 1 initial response date exists on the case |
 | **Applicant** | `hasResponseDateApplicant2` | Applicant 2 initial response date exists on the case |
 | **Applicant** | `isAddApplicant2` | Checks if add applicant 2 is equal to YES |
-| **Applicant** | `isNotApplicantCorrespondenceAddressRequiredSpec` | True when applicant correspondence address is not required (Spec) — field `specAoSApplicantCorrespondenceAddressRequired` = No. |
+| **Applicant** | `isNotCorrespondenceAddressRequiredSpec` | True when applicant correspondence address is not required (Spec) — field `specAoSApplicantCorrespondenceAddressRequired` = No. |
 | **Applicant** | `isRepresented` | Applicant is legally represented (applicant not marked as self-represented) |
 | **Applicant** | `isUnrepresentedApplicant1` | Returns true when applicant 1 is marked as not legally represented / self-represented (the applicant1Represented field is set to No). |
 | **Applicant** | `willProceed` | Applicant has indicated they will proceed with the claim (Yes) |

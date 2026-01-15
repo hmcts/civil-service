@@ -41,6 +41,8 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTransitionBuilder.isNotPartAdmissionPaymentState;
+
 @ExtendWith(MockitoExtension.class)
 class PartAdmissionTransitionBuilderTest {
 
