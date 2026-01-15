@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -51,18 +52,19 @@ class AcknowledgementOfServiceStrategyTest {
 
     @Test
     void supportsReturnsTrueWhenStatePresentEvenIfAckMissing() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         assertThat(strategy.supports(caseData)).isTrue();
     }
 
     @Test
     void contributeAddsSingleDefendantEvent() {
-        CaseData caseData = CaseData.builder()
-            .respondent1(Party.builder()
-                .type(Party.Type.INDIVIDUAL)
-                .individualFirstName("Alex")
-                .individualLastName("Smith")
-                .build())
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+        respondent1.setIndividualFirstName("Alex");
+        respondent1.setIndividualLastName("Smith");
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent1(respondent1)
             .respondent1ClaimResponseIntentionType(ResponseIntention.FULL_DEFENCE)
             .respondent1AcknowledgeNotificationDate(LocalDateTime.of(2024, 3, 1, 10, 0))
             .build();
@@ -79,7 +81,7 @@ class AcknowledgementOfServiceStrategyTest {
 
     @Test
     void contributeAddsSpecEvent() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .respondent1AcknowledgeNotificationDate(LocalDateTime.of(2024, 3, 2, 9, 0))
             .build();
@@ -95,24 +97,23 @@ class AcknowledgementOfServiceStrategyTest {
 
     @Test
     void contributeAddsEventsForTwoDefendantsSameSolicitor() {
-        CaseData caseData = CaseData.builder()
-            .respondent1(Party.builder()
-                .type(Party.Type.INDIVIDUAL)
-                .individualFirstName("Alex")
-                .individualLastName("Smith")
-                .build())
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+        respondent1.setIndividualFirstName("Alex");
+        respondent1.setIndividualLastName("Smith");
+        Party respondent2 = new Party();
+        respondent2.setType(Party.Type.INDIVIDUAL);
+        respondent2.setIndividualFirstName("Jamie");
+        respondent2.setIndividualLastName("Roe");
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent1(respondent1)
             .respondent1ClaimResponseIntentionType(ResponseIntention.FULL_DEFENCE)
             .respondent1AcknowledgeNotificationDate(LocalDateTime.of(2024, 3, 1, 10, 0))
-            .respondent2(Party.builder()
-                .type(Party.Type.INDIVIDUAL)
-                .individualFirstName("Jamie")
-                .individualLastName("Roe")
-                .build())
+            .respondent2(respondent2)
             .respondent2SameLegalRepresentative(uk.gov.hmcts.reform.civil.enums.YesOrNo.YES)
             .respondentResponseIsSame(uk.gov.hmcts.reform.civil.enums.YesOrNo.YES)
             .respondent2AcknowledgeNotificationDate(LocalDateTime.of(2024, 3, 1, 11, 0))
-            .respondent1AcknowledgeNotificationDate(LocalDateTime.of(2024, 3, 1, 10, 0))
-            .respondent1ClaimResponseIntentionType(ResponseIntention.FULL_DEFENCE)
             .build();
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
@@ -128,17 +129,18 @@ class AcknowledgementOfServiceStrategyTest {
 
     @Test
     void contributeAddsEventsForTwoDefendantsTwoSolicitors() {
-        CaseData caseData = CaseData.builder()
-            .respondent1(Party.builder()
-                .type(Party.Type.COMPANY)
-                .companyName("Firm A")
-                .build())
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.COMPANY);
+        respondent1.setCompanyName("Firm A");
+        Party respondent2 = new Party();
+        respondent2.setType(Party.Type.COMPANY);
+        respondent2.setCompanyName("Firm B");
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent1(respondent1)
             .respondent1ClaimResponseIntentionType(ResponseIntention.FULL_DEFENCE)
             .respondent1AcknowledgeNotificationDate(LocalDateTime.of(2024, 3, 1, 9, 0))
-            .respondent2(Party.builder()
-                .type(Party.Type.COMPANY)
-                .companyName("Firm B")
-                .build())
+            .respondent2(respondent2)
             .respondent2ClaimResponseIntentionType(ResponseIntention.PART_DEFENCE)
             .respondent2AcknowledgeNotificationDate(LocalDateTime.of(2024, 3, 2, 9, 0))
             .respondent2SameLegalRepresentative(uk.gov.hmcts.reform.civil.enums.YesOrNo.NO)

@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
@@ -49,18 +50,19 @@ class ConsentExtensionEventStrategyTest {
 
     @Test
     void supportsReturnsFalseWhenNoExtensionsPresent() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         assertThat(strategy.supports(caseData)).isFalse();
     }
 
     @Test
     void contributeAddsSingleDefendantExtensionEvent() {
-        CaseData caseData = CaseData.builder()
-            .respondent1(Party.builder()
-                .type(Party.Type.COMPANY)
-                .companyName("Defendant Ltd")
-                .build())
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.COMPANY);
+        respondent1.setCompanyName("Defendant Ltd");
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent1(respondent1)
             .respondent1TimeExtensionDate(LocalDateTime.of(2024, 3, 10, 9, 0))
             .respondentSolicitor1AgreedDeadlineExtension(LocalDate.of(2024, 3, 25))
             .build();
@@ -80,17 +82,18 @@ class ConsentExtensionEventStrategyTest {
 
     @Test
     void contributeAddsEventsForTwoDefendantsDifferentSolicitors() {
-        CaseData caseData = CaseData.builder()
-            .respondent1(Party.builder()
-                .type(Party.Type.COMPANY)
-                .companyName("Defendant One")
-                .build())
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.COMPANY);
+        respondent1.setCompanyName("Defendant One");
+        Party respondent2 = new Party();
+        respondent2.setType(Party.Type.COMPANY);
+        respondent2.setCompanyName("Defendant Two");
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent1(respondent1)
             .respondent1TimeExtensionDate(LocalDateTime.of(2024, 3, 12, 10, 0))
             .respondentSolicitor1AgreedDeadlineExtension(LocalDate.of(2024, 4, 1))
-            .respondent2(Party.builder()
-                .type(Party.Type.COMPANY)
-                .companyName("Defendant Two")
-                .build())
+            .respondent2(respondent2)
             .respondent2SameLegalRepresentative(YesOrNo.NO)
             .respondent2TimeExtensionDate(LocalDateTime.of(2024, 3, 13, 11, 0))
             .respondentSolicitor2AgreedDeadlineExtension(LocalDate.of(2024, 4, 2))
@@ -112,19 +115,20 @@ class ConsentExtensionEventStrategyTest {
 
     @Test
     void contributeAddsEventsForTwoDefendantsSameSolicitor() {
-        CaseData caseData = CaseData.builder()
-            .respondent1(Party.builder()
-                .type(Party.Type.INDIVIDUAL)
-                .individualFirstName("Alex")
-                .individualLastName("Smith")
-                .build())
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+        respondent1.setIndividualFirstName("Alex");
+        respondent1.setIndividualLastName("Smith");
+        Party respondent2 = new Party();
+        respondent2.setType(Party.Type.INDIVIDUAL);
+        respondent2.setIndividualFirstName("Jamie");
+        respondent2.setIndividualLastName("Roe");
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent1(respondent1)
             .respondent1TimeExtensionDate(LocalDateTime.of(2024, 3, 5, 9, 0))
             .respondentSolicitor1AgreedDeadlineExtension(LocalDate.of(2024, 3, 28))
-            .respondent2(Party.builder()
-                .type(Party.Type.INDIVIDUAL)
-                .individualFirstName("Jamie")
-                .individualLastName("Roe")
-                .build())
+            .respondent2(respondent2)
             .respondent2SameLegalRepresentative(YesOrNo.YES)
             .respondent2TimeExtensionDate(LocalDateTime.of(2024, 3, 6, 9, 0))
             .respondentSolicitor2AgreedDeadlineExtension(LocalDate.of(2024, 3, 29))
@@ -145,7 +149,7 @@ class ConsentExtensionEventStrategyTest {
 
     @Test
     void contributeAddsEmptyListForSpecWhenAgreedDeadlinePresentWithoutTimeExtension() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .caseAccessCategory(uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM)
             .respondentSolicitor1AgreedDeadlineExtension(LocalDate.of(2024, 3, 30))
             .build();

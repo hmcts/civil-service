@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCasemanLR;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
 
@@ -19,9 +20,8 @@ class RoboticsManualOfflineSupportTest {
 
     @Test
     void prepareTakenOfflineEventDetailsThrowsWhenUnspecDetailsMissing() {
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.UNSPEC_CLAIM);
 
         assertThatThrownBy(() -> support.prepareTakenOfflineEventDetails(caseData))
             .isInstanceOf(NullPointerException.class);
@@ -29,9 +29,8 @@ class RoboticsManualOfflineSupportTest {
 
     @Test
     void prepareTakenOfflineEventDetailsThrowsWhenSpecDetailsMissing() {
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
 
         assertThatThrownBy(() -> support.prepareTakenOfflineEventDetails(caseData))
             .isInstanceOf(NullPointerException.class);
@@ -39,13 +38,13 @@ class RoboticsManualOfflineSupportTest {
 
     @Test
     void prepareTakenOfflineEventDetailsHonoursProvidedDetails() {
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .claimProceedsInCasemanLR(ClaimProceedsInCasemanLR.builder()
-                .reason(ReasonForProceedingOnPaper.APPLICATION)
-                .date(LocalDate.of(2023, 3, 2))
-                .build())
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        ClaimProceedsInCasemanLR claimProceedsInCasemanLR = ClaimProceedsInCasemanLR.builder()
+            .reason(ReasonForProceedingOnPaper.APPLICATION)
+            .date(LocalDate.of(2023, 3, 2))
             .build();
+        caseData.setClaimProceedsInCasemanLR(claimProceedsInCasemanLR);
 
         assertThat(support.prepareTakenOfflineEventDetails(caseData))
             .contains("APPLICATION")
@@ -54,14 +53,13 @@ class RoboticsManualOfflineSupportTest {
 
     @Test
     void prepareTakenOfflineEventDetailsHonoursUnspecDetails() {
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-            .claimProceedsInCaseman(ClaimProceedsInCaseman.builder()
-                .reason(ReasonForProceedingOnPaper.OTHER)
-                .other("Manual review")
-                .date(LocalDate.of(2023, 6, 10))
-                .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.UNSPEC_CLAIM);
+        ClaimProceedsInCaseman claimProceedsInCaseman = new ClaimProceedsInCaseman();
+        claimProceedsInCaseman.setReason(ReasonForProceedingOnPaper.OTHER);
+        claimProceedsInCaseman.setOther("Manual review");
+        claimProceedsInCaseman.setDate(LocalDate.of(2023, 6, 10));
+        caseData.setClaimProceedsInCaseman(claimProceedsInCaseman);
 
         assertThat(support.prepareTakenOfflineEventDetails(caseData))
             .contains("Manual review")

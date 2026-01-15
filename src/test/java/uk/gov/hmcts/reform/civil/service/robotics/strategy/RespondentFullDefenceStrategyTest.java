@@ -54,11 +54,9 @@ class RespondentFullDefenceStrategyTest {
     void supportsReturnsTrueWhenCaseDataPresent() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentFullDefence()
-            .build()
-            .toBuilder()
-            .respondent1ResponseDate(null)
-            .respondent2ResponseDate(null)
             .build();
+        caseData.setRespondent1ResponseDate(null);
+        caseData.setRespondent2ResponseDate(null);
 
         assertThat(strategy.supports(caseData)).isTrue();
     }
@@ -108,8 +106,6 @@ class RespondentFullDefenceStrategyTest {
         CaseData caseData = CaseDataBuilder.builder()
             .setClaimTypeToSpecClaim()
             .atStateRespondentFullDefence()
-            .build()
-            .toBuilder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
             .build();
 
@@ -131,10 +127,12 @@ class RespondentFullDefenceStrategyTest {
             .atStateRespondentFullDefence()
             .build();
 
-        CaseData caseData = baseData.toBuilder()
-            .totalClaimAmount(BigDecimal.valueOf(100))
-            .respondToClaim(RespondToClaim.builder().howMuchWasPaid(BigDecimal.valueOf(10_000)).build())
-            .build();
+        RespondToClaim respondToClaim = new RespondToClaim();
+        respondToClaim.setHowMuchWasPaid(BigDecimal.valueOf(10_000));
+
+        CaseData caseData = baseData;
+        caseData.setTotalClaimAmount(BigDecimal.valueOf(100));
+        caseData.setRespondToClaim(respondToClaim);
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11);
 
@@ -184,10 +182,12 @@ class RespondentFullDefenceStrategyTest {
             .respondentResponseIsSame(YES)
             .build();
 
-        CaseData caseData = baseCase.toBuilder()
-            .totalClaimAmount(BigDecimal.valueOf(100))
-            .respondToClaim(RespondToClaim.builder().howMuchWasPaid(BigDecimal.valueOf(10_000)).build())
-            .build();
+        RespondToClaim respondToClaim = new RespondToClaim();
+        respondToClaim.setHowMuchWasPaid(BigDecimal.valueOf(10_000));
+
+        CaseData caseData = baseCase;
+        caseData.setTotalClaimAmount(BigDecimal.valueOf(100));
+        caseData.setRespondToClaim(respondToClaim);
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11, 12, 13, 14);
 
@@ -238,10 +238,12 @@ class RespondentFullDefenceStrategyTest {
             .atStateBothRespondentsSameResponse(FULL_DEFENCE)
             .build();
 
-        CaseData caseData = baseCase.toBuilder()
-            .totalClaimAmount(BigDecimal.valueOf(100))
-            .respondToClaim2(RespondToClaim.builder().howMuchWasPaid(BigDecimal.valueOf(10_000)).build())
-            .build();
+        RespondToClaim respondToClaim2 = new RespondToClaim();
+        respondToClaim2.setHowMuchWasPaid(BigDecimal.valueOf(10_000));
+
+        CaseData caseData = baseCase;
+        caseData.setTotalClaimAmount(BigDecimal.valueOf(100));
+        caseData.setRespondToClaim2(respondToClaim2);
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11, 12, 13);
 
@@ -263,9 +265,8 @@ class RespondentFullDefenceStrategyTest {
             .respondent1Represented(NO)
             .build();
 
-        CaseData caseData = baseCase.toBuilder()
-            .defenceRouteRequired(SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED)
-            .build();
+        CaseData caseData = baseCase;
+        caseData.setDefenceRouteRequired(SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED);
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10);
 

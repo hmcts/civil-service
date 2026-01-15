@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -47,7 +48,7 @@ class TakenOfflineAfterClaimDetailsNotifiedStrategyTest {
 
     @Test
     void supportsReturnsTrueWhenStatePresentEvenIfSubmittedDateMissing() {
-        assertThat(strategy.supports(CaseData.builder().build())).isTrue();
+        assertThat(strategy.supports(CaseDataBuilder.builder().build())).isTrue();
     }
 
     @Test
@@ -56,18 +57,16 @@ class TakenOfflineAfterClaimDetailsNotifiedStrategyTest {
             List.of(State.from(FlowState.Main.CLAIM_DETAILS_NOTIFIED.fullName()))
         );
 
-        CaseData caseData = CaseData.builder()
-            .submittedDate(LocalDateTime.now())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setSubmittedDate(LocalDateTime.now());
 
         assertThat(strategy.supports(caseData)).isFalse();
     }
 
     @Test
     void supportsReturnsTrueWhenStatePresent() {
-        CaseData caseData = CaseData.builder()
-            .submittedDate(LocalDateTime.of(2024, 2, 4, 10, 0))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setSubmittedDate(LocalDateTime.of(2024, 2, 4, 10, 0));
 
         assertThat(strategy.supports(caseData)).isTrue();
     }
@@ -75,9 +74,8 @@ class TakenOfflineAfterClaimDetailsNotifiedStrategyTest {
     @Test
     void contributeAddsMiscEvent() {
         LocalDateTime submitted = LocalDateTime.of(2024, 2, 4, 10, 0);
-        CaseData caseData = CaseData.builder()
-            .submittedDate(submitted)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setSubmittedDate(submitted);
         when(sequenceGenerator.nextSequence(any())).thenReturn(30);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();

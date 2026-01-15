@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -46,7 +47,7 @@ class ClaimIssuedEventStrategyTest {
         when(stateFlow.getStateHistory()).thenReturn(
             List.of(State.from(FlowState.Main.CLAIM_NOTIFIED.fullName()))
         );
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .issueDate(LocalDate.now())
             .build();
 
@@ -55,14 +56,14 @@ class ClaimIssuedEventStrategyTest {
 
     @Test
     void supportsReturnsTrueWhenStatePresent() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         assertThat(strategy.supports(caseData)).isTrue();
     }
 
     @Test
     void contributeAddsClaimIssuedEvent() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .issueDate(LocalDate.of(2024, 1, 10))
             .build();
         when(sequenceGenerator.nextSequence(any())).thenReturn(12);

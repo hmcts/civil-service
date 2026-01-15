@@ -46,7 +46,7 @@ class CertificateOfSatisfactionOrCancellationStrategyTest {
 
     @Test
     void supportsReturnsFalseWhenToggleDisabled() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
 
         assertThat(strategy.supports(caseData)).isFalse();
@@ -58,12 +58,10 @@ class CertificateOfSatisfactionOrCancellationStrategyTest {
         LocalDate paidDate = LocalDate.of(2024, 3, 5);
 
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc()
-            .toBuilder()
-            .joMarkedPaidInFullIssueDate(issueDate)
-            .joCoscRpaStatus(CoscRPAStatus.CANCELLED)
-            .joFullyPaymentMadeDate(paidDate)
-            .build();
+            .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc();
+        caseData.setJoMarkedPaidInFullIssueDate(issueDate);
+        caseData.setJoCoscRpaStatus(CoscRPAStatus.CANCELLED);
+        caseData.setJoFullyPaymentMadeDate(paidDate);
 
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(7);
@@ -88,28 +86,25 @@ class CertificateOfSatisfactionOrCancellationStrategyTest {
 
     @Test
     void contributeAddsEventWhenCoscCertificateApplied() {
-        LocalDateTime defendantIssueDate = LocalDateTime.of(2024, 4, 1, 16, 0);
+        CaseDocument certificateDoc = new CaseDocument();
+        certificateDoc.setDocumentType(CERTIFICATE_OF_DEBT_PAYMENT);
+        DebtPaymentEvidence debtPaymentEvidence = new DebtPaymentEvidence();
+        debtPaymentEvidence.setDebtPaymentOption(DebtPaymentOptions.MADE_FULL_PAYMENT_TO_COURT);
+        CertOfSC certOfSC = new CertOfSC();
         LocalDate defendantPaidDate = LocalDate.of(2024, 3, 25);
-
-        CaseDocument certificateDoc = CaseDocument.builder()
-            .documentType(CERTIFICATE_OF_DEBT_PAYMENT)
-            .build();
-        Element<CaseDocument> certificateElement = ElementUtils.element(certificateDoc);
+        certOfSC.setDefendantFinalPaymentDate(defendantPaidDate);
+        certOfSC.setDebtPaymentEvidence(debtPaymentEvidence);
 
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc()
-            .toBuilder()
-            .systemGeneratedCaseDocuments(List.of(certificateElement))
-            .certOfSC(CertOfSC.builder()
-                .defendantFinalPaymentDate(defendantPaidDate)
-                .debtPaymentEvidence(DebtPaymentEvidence.builder()
-                    .debtPaymentOption(DebtPaymentOptions.MADE_FULL_PAYMENT_TO_COURT).build())
-                .build())
-            .joMarkedPaidInFullIssueDate(null)
-            .joDefendantMarkedPaidInFullIssueDate(defendantIssueDate)
-            .joCoscRpaStatus(CoscRPAStatus.SATISFIED)
-            .joFullyPaymentMadeDate(null)
-            .build();
+            .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc();
+        Element<CaseDocument> certificateElement = ElementUtils.element(certificateDoc);
+        caseData.setSystemGeneratedCaseDocuments(List.of(certificateElement));
+        caseData.setCertOfSC(certOfSC);
+        caseData.setJoMarkedPaidInFullIssueDate(null);
+        LocalDateTime defendantIssueDate = LocalDateTime.of(2024, 4, 1, 16, 0);
+        caseData.setJoDefendantMarkedPaidInFullIssueDate(defendantIssueDate);
+        caseData.setJoCoscRpaStatus(CoscRPAStatus.SATISFIED);
+        caseData.setJoFullyPaymentMadeDate(null);
 
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(12);

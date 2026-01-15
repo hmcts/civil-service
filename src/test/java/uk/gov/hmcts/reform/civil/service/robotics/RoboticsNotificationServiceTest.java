@@ -24,13 +24,14 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Address;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
 import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -50,6 +51,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSp
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static java.lang.String.format;
@@ -228,7 +230,7 @@ class RoboticsNotificationServiceTest {
     void shouldSendNotificationEmailForMultiParty_whenCaseDataIsProvided() {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2(createIndividualRespondent());
         caseData.setAddRespondent2(YES);
         caseData.setRespondent2SameLegalRepresentative(NO);
         if (caseData.getRespondent2OrgRegistered() != null
@@ -266,7 +268,7 @@ class RoboticsNotificationServiceTest {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
         caseData.setCaseAccessCategory(SPEC_CLAIM);
-        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2(createIndividualRespondent());
         caseData.setAddRespondent2(YES);
         caseData.setRespondent2SameLegalRepresentative(NO);
 
@@ -676,5 +678,22 @@ class RoboticsNotificationServiceTest {
         assertThat(capturedEmailData.getAttachments())
             .extracting("filename", "contentType")
             .containsExactlyInAnyOrder(tuple(fileName, "application/json"));
+    }
+
+    private Party createIndividualRespondent() {
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        party.setIndividualTitle("Mr.");
+        party.setIndividualFirstName("John");
+        party.setIndividualLastName("Rambo");
+        party.setIndividualDateOfBirth(LocalDate.now().minusYears(30));
+        party.setPartyName("Mr. John Rambo");
+        Address address = new Address();
+        address.setAddressLine1("1 Example Street");
+        address.setPostCode("AB1 1AB");
+        party.setPrimaryAddress(address);
+        party.setPartyPhone("01234 567890");
+        party.setPartyEmail("john.rambo@example.com");
+        return party;
     }
 }

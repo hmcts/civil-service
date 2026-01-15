@@ -40,10 +40,11 @@ class RoboticsEventSupportTest {
 
     @Test
     void buildDirectionsQuestionnaireEvent_keepsNullPreferredCourtOverride() {
-        FileDirectionsQuestionnaire fdq = FileDirectionsQuestionnaire.builder()
-            .oneMonthStayRequested(YesOrNo.YES)
-            .build();
-        Applicant1DQ dq = buildApplicantDq(fdq, RequestedCourt.builder().responseCourtCode("123").build());
+        FileDirectionsQuestionnaire fdq = new FileDirectionsQuestionnaire();
+        fdq.setOneMonthStayRequested(YesOrNo.YES);
+        RequestedCourt requestedCourt = new RequestedCourt();
+        requestedCourt.setResponseCourtCode("123");
+        Applicant1DQ dq = buildApplicantDq(fdq, requestedCourt);
 
         Event event = RoboticsEventSupport.buildDirectionsQuestionnaireEvent(
             builder,
@@ -64,9 +65,8 @@ class RoboticsEventSupportTest {
 
     @Test
     void buildDirectionsQuestionnaireEvent_respectsPreferredCourtOverride() {
-        FileDirectionsQuestionnaire fdq = FileDirectionsQuestionnaire.builder()
-            .oneMonthStayRequested(YesOrNo.NO)
-            .build();
+        FileDirectionsQuestionnaire fdq = new FileDirectionsQuestionnaire();
+        fdq.setOneMonthStayRequested(YesOrNo.NO);
         Applicant1DQ dq = buildApplicantDq(fdq, null);
 
         Event event = RoboticsEventSupport.buildDirectionsQuestionnaireEvent(
@@ -86,9 +86,9 @@ class RoboticsEventSupportTest {
 
     private Applicant1DQ buildApplicantDq(FileDirectionsQuestionnaire fileDirectionsQuestionnaire,
                                           RequestedCourt requestedCourt) {
-        return Applicant1DQ.builder()
-            .applicant1DQFileDirectionsQuestionnaire(fileDirectionsQuestionnaire)
-            .applicant1DQRequestedCourt(requestedCourt)
-            .build();
+        Applicant1DQ dq = new Applicant1DQ();
+        dq.setApplicant1DQFileDirectionsQuestionnaire(fileDirectionsQuestionnaire);
+        dq.setApplicant1DQRequestedCourt(requestedCourt);
+        return dq;
     }
 }

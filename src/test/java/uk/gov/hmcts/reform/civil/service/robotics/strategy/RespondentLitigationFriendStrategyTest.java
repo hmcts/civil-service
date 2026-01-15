@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 
@@ -32,37 +33,41 @@ class RespondentLitigationFriendStrategyTest {
 
     @Test
     void supportsReturnsFalseWhenNoLitigationFriendDates() {
-        assertThat(strategy.supports(CaseData.builder().build())).isFalse();
+        assertThat(strategy.supports(CaseDataBuilder.builder().build())).isFalse();
     }
 
     @Test
     void supportsReturnsTrueWhenAtLeastOneDatePresent() {
-        CaseData caseData = CaseData.builder()
-            .respondent1LitigationFriendCreatedDate(LocalDateTime.now())
-            .respondent1(Party.builder().partyName("Resp One").build())
+        Party respondent1 = new Party();
+        respondent1.setPartyName("Resp One");
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent1(respondent1)
             .build();
+        caseData.setRespondent1LitigationFriendCreatedDate(LocalDateTime.now());
 
         assertThat(strategy.supports(caseData)).isTrue();
     }
 
     @Test
     void contributeAddsEventsForEachRespondent() {
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+        respondent1.setIndividualFirstName("Resp");
+        respondent1.setIndividualLastName("One");
+        Party respondent2 = new Party();
+        respondent2.setType(Party.Type.INDIVIDUAL);
+        respondent2.setIndividualFirstName("Resp");
+        respondent2.setIndividualLastName("Two");
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent1(respondent1)
+            .respondent2(respondent2)
+            .build();
         LocalDateTime r1Date = LocalDateTime.of(2024, 2, 7, 11, 0);
         LocalDateTime r2Date = LocalDateTime.of(2024, 2, 8, 12, 0);
-        CaseData caseData = CaseData.builder()
-            .respondent1LitigationFriendCreatedDate(r1Date)
-            .respondent1(Party.builder()
-                .type(Party.Type.INDIVIDUAL)
-                .individualFirstName("Resp")
-                .individualLastName("One")
-                .build())
-            .respondent2LitigationFriendCreatedDate(r2Date)
-            .respondent2(Party.builder()
-                .type(Party.Type.INDIVIDUAL)
-                .individualFirstName("Resp")
-                .individualLastName("Two")
-                .build())
-            .build();
+        caseData.setRespondent1LitigationFriendCreatedDate(r1Date);
+        caseData.setRespondent2LitigationFriendCreatedDate(r2Date);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);
@@ -82,10 +87,14 @@ class RespondentLitigationFriendStrategyTest {
     @Test
     void contributeAddsEventOnlyForSecondRespondent() {
         LocalDateTime r2Date = LocalDateTime.of(2024, 3, 10, 10, 30);
-        CaseData caseData = CaseData.builder()
-            .respondent2LitigationFriendCreatedDate(r2Date)
-            .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Resp Two Ltd").build())
+        Party respondent2 = new Party();
+        respondent2.setType(Party.Type.COMPANY);
+        respondent2.setCompanyName("Resp Two Ltd");
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent2(respondent2)
             .build();
+        caseData.setRespondent2LitigationFriendCreatedDate(r2Date);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);

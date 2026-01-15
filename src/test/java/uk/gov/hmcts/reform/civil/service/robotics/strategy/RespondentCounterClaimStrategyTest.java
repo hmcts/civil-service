@@ -7,11 +7,11 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsRespondentResponseSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
@@ -74,7 +74,7 @@ class RespondentCounterClaimStrategyTest {
     void contributeAddsMiscForSingleRespondent() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentCounterClaim()
-            .respondent1(PartyBuilder.builder().individual("Alex").build())
+            .respondent1(createIndividualParty("Alex", "Smith"))
             .build();
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10);
@@ -106,8 +106,8 @@ class RespondentCounterClaimStrategyTest {
         CaseData caseData = CaseDataBuilder.builder()
             .multiPartyClaimOneDefendantSolicitor()
             .atStateBothRespondentsSameResponse1v2SameSolicitor(RespondentResponseType.COUNTER_CLAIM)
-            .respondent1(PartyBuilder.builder().individual("Alex").build())
-            .respondent2(PartyBuilder.builder().individual("Ben").build())
+            .respondent1(createIndividualParty("Alex", "Smith"))
+            .respondent2(createIndividualParty("Ben", "Jones"))
             .build();
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11);
@@ -131,7 +131,7 @@ class RespondentCounterClaimStrategyTest {
     void contributeAddsMiscWhenOnlySecondRespondentHasCounterClaim() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondent2CounterClaimAfterNotifyDetails()
-            .respondent2(PartyBuilder.builder().individual("Ben").build())
+            .respondent2(createIndividualParty("Ben", "Jones"))
             .build();
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10);
@@ -157,7 +157,7 @@ class RespondentCounterClaimStrategyTest {
         CaseData caseData = CaseDataBuilder.builder()
             .setClaimTypeToSpecClaim()
             .atStateRespondentCounterClaimSpec()
-            .respondent1(PartyBuilder.builder().individual("Casey").build())
+            .respondent1(createIndividualParty("Casey", "Brown"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
             .build();
 
@@ -177,5 +177,13 @@ class RespondentCounterClaimStrategyTest {
                 caseData.getRespondent1(),
                 true
             ));
+    }
+
+    private Party createIndividualParty(String firstName, String lastName) {
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        party.setIndividualFirstName(firstName);
+        party.setIndividualLastName(lastName);
+        return party;
     }
 }

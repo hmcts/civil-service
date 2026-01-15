@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -53,13 +54,13 @@ class ClaimDismissedPastDeadlineStrategyTest {
             State.from(FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()),
             State.from(FlowState.Main.CLAIM_NOTIFIED.fullName())
         ));
-        assertThat(strategy.supports(CaseData.builder().build())).isTrue();
+        assertThat(strategy.supports(CaseDataBuilder.builder().build())).isTrue();
     }
 
     @Test
     void supportsReturnsFalseWhenHistoryInsufficient() {
         when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.CLAIM_NOTIFIED.fullName())));
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .claimDismissedDate(LocalDateTime.now())
             .build();
         assertThat(strategy.supports(caseData)).isFalse();
@@ -74,7 +75,7 @@ class ClaimDismissedPastDeadlineStrategyTest {
         ));
 
         LocalDateTime dismissed = LocalDateTime.of(2024, 2, 10, 9, 0);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .claimDismissedDate(dismissed)
             .build();
 
@@ -97,7 +98,7 @@ class ClaimDismissedPastDeadlineStrategyTest {
             State.from(FlowState.Main.DRAFT.fullName())
         ));
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .claimDismissedDate(LocalDateTime.now())
             .build();
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();

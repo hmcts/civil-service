@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
@@ -194,14 +193,14 @@ class RespondentDivergentResponseStrategyTest {
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(30, 31);
 
         BigDecimal claimAmount = BigDecimal.valueOf(1000);
-        CaseData caseData = createUnspecDivergentCase().toBuilder()
-            .totalClaimAmount(claimAmount)
-            .respondToClaim(RespondToClaim.builder()
-                .howMuchWasPaid(claimAmount.multiply(BigDecimal.valueOf(100)))
-                .whenWasThisAmountPaid(LocalDate.now())
-                .build())
-            .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
-            .build();
+        RespondToClaim respondToClaim = new RespondToClaim();
+        respondToClaim.setHowMuchWasPaid(claimAmount.multiply(BigDecimal.valueOf(100)));
+        respondToClaim.setWhenWasThisAmountPaid(LocalDate.now());
+
+        CaseData caseData = createUnspecDivergentCase();
+        caseData.setTotalClaimAmount(claimAmount);
+        caseData.setRespondToClaim(respondToClaim);
+        caseData.setRespondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);
@@ -225,12 +224,10 @@ class RespondentDivergentResponseStrategyTest {
         CaseData caseData = CaseDataBuilder.builder()
             .respondent1DQ()
             .setClaimTypeToSpecClaim()
-            .respondent1(PartyBuilder.builder().individual().build())
-            .build()
-            .toBuilder()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .respondent1ResponseDate(NOW)
+            .respondent1(createIndividualParty("One"))
             .build();
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+        caseData.setRespondent1ResponseDate(NOW);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);
@@ -252,15 +249,13 @@ class RespondentDivergentResponseStrategyTest {
 
         CaseData caseData = CaseDataBuilder.builder()
             .atState1v2SameSolicitorDivergentResponse(RespondentResponseType.FULL_DEFENCE, RespondentResponseType.PART_ADMISSION)
-            .build()
-            .toBuilder()
-            .respondent1(PartyBuilder.builder().individual().build())
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent1ResponseDate(NOW)
-            .respondent2ResponseDate(NOW.plusDays(5))
-            .respondent2SameLegalRepresentative(YesOrNo.YES)
-            .sameSolicitorSameResponse(YesOrNo.YES)
             .build();
+        caseData.setRespondent1(createIndividualParty("One"));
+        caseData.setRespondent2(createIndividualParty("Two"));
+        caseData.setRespondent1ResponseDate(NOW);
+        caseData.setRespondent2ResponseDate(NOW.plusDays(5));
+        caseData.setRespondent2SameLegalRepresentative(YesOrNo.YES);
+        caseData.setSameSolicitorSameResponse(YesOrNo.YES);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);
@@ -286,8 +281,8 @@ class RespondentDivergentResponseStrategyTest {
 
     private CaseData createSpecDivergentCase() {
         CaseDataBuilder builder = StrategyTestDataFactory.specTwoDefendantSolicitorsCase();
-        Party respondent1 = PartyBuilder.builder().individual().build();
-        Party respondent2 = PartyBuilder.builder().individual().build();
+        Party respondent1 = createIndividualParty("One");
+        Party respondent2 = createIndividualParty("Two");
         builder.respondent1(respondent1);
         builder.respondent2(respondent2);
         return builder
@@ -296,5 +291,13 @@ class RespondentDivergentResponseStrategyTest {
             .respondent1ResponseDate(NOW)
             .respondent2ResponseDate(NOW.plusDays(2))
             .build();
+    }
+
+    private Party createIndividualParty(String lastName) {
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        party.setIndividualFirstName("Respondent");
+        party.setIndividualLastName(lastName);
+        return party;
     }
 }

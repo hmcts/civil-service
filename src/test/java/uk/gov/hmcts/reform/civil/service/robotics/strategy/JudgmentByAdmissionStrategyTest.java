@@ -78,19 +78,18 @@ class JudgmentByAdmissionStrategyTest {
         LocalDateTime responseDate = LocalDateTime.of(2024, 2, 1, 10, 0);
         when(timelineHelper.ensurePresentOrNow(any(LocalDateTime.class))).thenReturn(responseDate);
 
+        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
+        ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
+        ccjPaymentDetails.setCcjJudgmentAmountClaimAmount(BigDecimal.valueOf(1000));
+        ccjPaymentDetails.setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(100));
+        ccjPaymentDetails.setCcjJudgmentFixedCostAmount(BigDecimal.valueOf(50));
+        ccjPaymentDetails.setCcjPaymentPaidSomeAmountInPounds(BigDecimal.valueOf(10));
+
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudmentOnlineCaseDataWithPaymentByInstalment()
-            .toBuilder()
-            .ccjPaymentDetails(CCJPaymentDetails.builder()
-                .ccjPaymentPaidSomeOption(YesOrNo.YES)
-                .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(1000))
-                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(100))
-                .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(50))
-                .ccjPaymentPaidSomeAmountInPounds(BigDecimal.valueOf(10))
-                .build())
-            .applicant1ResponseDate(responseDate)
-            .joJudgementByAdmissionIssueDate(null)
-            .build();
+            .buildJudmentOnlineCaseDataWithPaymentByInstalment();
+        caseData.setCcjPaymentDetails(ccjPaymentDetails);
+        caseData.setApplicant1ResponseDate(responseDate);
+        caseData.setJoJudgementByAdmissionIssueDate(null);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
 
@@ -123,12 +122,13 @@ class JudgmentByAdmissionStrategyTest {
         LocalDateTime responseDate = LocalDateTime.of(2024, 1, 1, 10, 0);
         when(timelineHelper.ensurePresentOrNow(any(LocalDateTime.class))).thenReturn(responseDate);
 
-        CaseData caseData = CaseData.builder()
-            .ccjPaymentDetails(CCJPaymentDetails.builder()
-                .ccjPaymentPaidSomeOption(YesOrNo.YES)
-                .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(1000))
-                .ccjPaymentPaidSomeAmountInPounds(BigDecimal.ZERO)
-                .build())
+        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
+        ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
+        ccjPaymentDetails.setCcjJudgmentAmountClaimAmount(BigDecimal.valueOf(1000));
+        ccjPaymentDetails.setCcjPaymentPaidSomeAmountInPounds(BigDecimal.ZERO);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .ccjPaymentDetails(ccjPaymentDetails)
             .totalInterest(BigDecimal.valueOf(200))
             .applicant1Represented(YesOrNo.YES)
             .respondent1Represented(YesOrNo.YES)
@@ -152,13 +152,14 @@ class JudgmentByAdmissionStrategyTest {
         LocalDateTime responseDate = LocalDateTime.of(2024, 1, 2, 10, 0);
         when(timelineHelper.ensurePresentOrNow(any(LocalDateTime.class))).thenReturn(responseDate);
 
-        CaseData caseData = CaseData.builder()
-            .ccjPaymentDetails(CCJPaymentDetails.builder()
-                .ccjPaymentPaidSomeOption(YesOrNo.YES)
-                .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(1000))
-                .ccjJudgmentLipInterest(BigDecimal.valueOf(150))
-                .ccjPaymentPaidSomeAmountInPounds(BigDecimal.ZERO)
-                .build())
+        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
+        ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
+        ccjPaymentDetails.setCcjJudgmentAmountClaimAmount(BigDecimal.valueOf(1000));
+        ccjPaymentDetails.setCcjJudgmentLipInterest(BigDecimal.valueOf(150));
+        ccjPaymentDetails.setCcjPaymentPaidSomeAmountInPounds(BigDecimal.ZERO);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .ccjPaymentDetails(ccjPaymentDetails)
             .totalInterest(BigDecimal.valueOf(200))
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
@@ -182,13 +183,14 @@ class JudgmentByAdmissionStrategyTest {
         LocalDateTime responseDate = LocalDateTime.of(2024, 1, 3, 10, 0);
         when(timelineHelper.ensurePresentOrNow(any(LocalDateTime.class))).thenReturn(responseDate);
 
-        CaseData caseData = CaseData.builder()
-            .ccjPaymentDetails(CCJPaymentDetails.builder()
-                .ccjPaymentPaidSomeOption(YesOrNo.YES)
-                .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(1000))
-                .ccjJudgmentLipInterest(BigDecimal.valueOf(150))
-                .ccjPaymentPaidSomeAmountInPounds(BigDecimal.ZERO)
-                .build())
+        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
+        ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
+        ccjPaymentDetails.setCcjJudgmentAmountClaimAmount(BigDecimal.valueOf(1000));
+        ccjPaymentDetails.setCcjJudgmentLipInterest(BigDecimal.valueOf(150));
+        ccjPaymentDetails.setCcjPaymentPaidSomeAmountInPounds(BigDecimal.ZERO);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .ccjPaymentDetails(ccjPaymentDetails)
             .totalInterest(BigDecimal.ZERO)
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
@@ -211,20 +213,18 @@ class JudgmentByAdmissionStrategyTest {
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(21, 22);
 
-        LocalDateTime issueDate = LocalDateTime.of(2024, 3, 5, 15, 30);
+        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
+        ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
+        ccjPaymentDetails.setCcjJudgmentAmountClaimAmount(BigDecimal.valueOf(800));
+        ccjPaymentDetails.setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(120));
+        ccjPaymentDetails.setCcjJudgmentFixedCostAmount(BigDecimal.valueOf(40));
+        ccjPaymentDetails.setCcjPaymentPaidSomeAmountInPounds(BigDecimal.ZERO);
 
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudmentOnlineCaseDataWithPaymentImmediately()
-            .toBuilder()
-            .ccjPaymentDetails(CCJPaymentDetails.builder()
-                .ccjPaymentPaidSomeOption(YesOrNo.YES)
-                .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(800))
-                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(120))
-                .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(40))
-                .ccjPaymentPaidSomeAmountInPounds(BigDecimal.ZERO)
-                .build())
-            .joJudgementByAdmissionIssueDate(issueDate)
-            .build();
+            .buildJudmentOnlineCaseDataWithPaymentImmediately();
+        caseData.setCcjPaymentDetails(ccjPaymentDetails);
+        LocalDateTime issueDate = LocalDateTime.of(2024, 3, 5, 15, 30);
+        caseData.setJoJudgementByAdmissionIssueDate(issueDate);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);
@@ -246,32 +246,33 @@ class JudgmentByAdmissionStrategyTest {
         LocalDateTime responseDate = LocalDateTime.of(2024, 5, 1, 9, 0);
         when(timelineHelper.ensurePresentOrNow(any(LocalDateTime.class))).thenReturn(responseDate);
 
+        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+        claimantLiPResponse.setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+        Fee claimFee = new Fee();
+        claimFee.setCalculatedAmountInPence(new BigDecimal("9900"));
+        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
+        ccjPaymentDetails.setCcjJudgmentAmountClaimAmount(BigDecimal.valueOf(500));
+        ccjPaymentDetails.setCcjJudgmentLipInterest(BigDecimal.valueOf(45));
+        ccjPaymentDetails.setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(80));
+        ccjPaymentDetails.setCcjJudgmentFixedCostAmount(BigDecimal.valueOf(50));
+        ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
+        ccjPaymentDetails.setCcjPaymentPaidSomeAmountInPounds(BigDecimal.valueOf(5));
+
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudmentOnlineCaseDataWithPaymentByInstalment()
-            .toBuilder()
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1Represented(YesOrNo.NO)
-            .caseDataLiP(CaseDataLiP.builder()
-                .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                    .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                    .build())
-                .build())
-            .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
-            .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(new BigDecimal("2500"))
-            .applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec(
-                PaymentFrequencyClaimantResponseLRspec.ONCE_ONE_MONTH)
-            .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(LocalDate.of(2024, 6, 15))
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal("9900")).build())
-            .ccjPaymentDetails(CCJPaymentDetails.builder()
-                .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(500))
-                .ccjJudgmentLipInterest(BigDecimal.valueOf(45))
-                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(80))
-                .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(50))
-                .ccjPaymentPaidSomeOption(YesOrNo.YES)
-                .ccjPaymentPaidSomeAmountInPounds(BigDecimal.valueOf(5))
-                .build())
-            .applicant1ResponseDate(responseDate)
-            .build();
+            .buildJudmentOnlineCaseDataWithPaymentByInstalment();
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setApplicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN);
+        caseData.setApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec(new BigDecimal("2500"));
+        caseData.setApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec(
+            PaymentFrequencyClaimantResponseLRspec.ONCE_ONE_MONTH);
+        caseData.setApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(LocalDate.of(2024, 6, 15));
+        caseData.setClaimFee(claimFee);
+        caseData.setCcjPaymentDetails(ccjPaymentDetails);
+        caseData.setApplicant1ResponseDate(responseDate);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);
@@ -296,22 +297,22 @@ class JudgmentByAdmissionStrategyTest {
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(41, 42);
 
-        LocalDateTime issueDate = LocalDateTime.of(2024, 7, 10, 14, 0);
         LocalDate paymentDate = LocalDate.of(2024, 8, 20);
 
+        RespondToClaimAdmitPartLRspec respondToClaim = new RespondToClaimAdmitPartLRspec();
+        respondToClaim.setWhenWillThisAmountBePaid(paymentDate);
+        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
+        ccjPaymentDetails.setCcjJudgmentAmountClaimAmount(BigDecimal.valueOf(900));
+        ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
+
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudmentOnlineCaseDataWithPaymentImmediately()
-            .toBuilder()
-            .joJudgementByAdmissionIssueDate(issueDate)
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                .whenWillThisAmountBePaid(paymentDate)
-                .build())
-            .ccjPaymentDetails(CCJPaymentDetails.builder()
-                .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(900))
-                .ccjPaymentPaidSomeOption(YesOrNo.YES)
-                .build())
-            .build();
+            .buildJudmentOnlineCaseDataWithPaymentImmediately();
+        LocalDateTime issueDate = LocalDateTime.of(2024, 7, 10, 14, 0);
+        caseData.setJoJudgementByAdmissionIssueDate(issueDate);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
+            RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+        caseData.setRespondToClaimAdmitPartLRspec(respondToClaim);
+        caseData.setCcjPaymentDetails(ccjPaymentDetails);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);
@@ -336,19 +337,18 @@ class JudgmentByAdmissionStrategyTest {
         LocalDateTime responseDate = LocalDateTime.of(2024, 11, 5, 10, 0);
         when(timelineHelper.ensurePresentOrNow(any(LocalDateTime.class))).thenReturn(responseDate);
 
+        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
+        ccjPaymentDetails.setCcjJudgmentAmountClaimAmount(new BigDecimal("1000"));
+        ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
+
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudmentOnlineCaseDataWithPaymentImmediately()
-            .toBuilder()
-            .applicant1Represented(YesOrNo.YES)
-            .respondent1Represented(YesOrNo.YES)
-            .totalInterest(new BigDecimal("250"))
-            .ccjPaymentDetails(CCJPaymentDetails.builder()
-                .ccjJudgmentAmountClaimAmount(new BigDecimal("1000"))
-                .ccjPaymentPaidSomeOption(YesOrNo.YES)
-                .build())
-            .joJudgementByAdmissionIssueDate(null)
-            .applicant1ResponseDate(responseDate)
-            .build();
+            .buildJudmentOnlineCaseDataWithPaymentImmediately();
+        caseData.setApplicant1Represented(YesOrNo.YES);
+        caseData.setRespondent1Represented(YesOrNo.YES);
+        caseData.setTotalInterest(new BigDecimal("250"));
+        caseData.setCcjPaymentDetails(ccjPaymentDetails);
+        caseData.setJoJudgementByAdmissionIssueDate(null);
+        caseData.setApplicant1ResponseDate(responseDate);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);
@@ -365,23 +365,22 @@ class JudgmentByAdmissionStrategyTest {
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(51, 52);
 
-        LocalDateTime issueDate = LocalDateTime.of(2024, 9, 1, 11, 30);
+        RepaymentPlanLRspec repaymentPlan = new RepaymentPlanLRspec();
+        repaymentPlan.setPaymentAmount(new BigDecimal("4321"));
+        repaymentPlan.setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_TWO_WEEKS);
+        repaymentPlan.setFirstRepaymentDate(LocalDate.of(2024, 9, 15));
+        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
+        ccjPaymentDetails.setCcjJudgmentAmountClaimAmount(BigDecimal.valueOf(750));
+        ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
 
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudmentOnlineCaseDataWithPaymentImmediately()
-            .toBuilder()
-            .joJudgementByAdmissionIssueDate(issueDate)
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
-                .paymentAmount(new BigDecimal("4321"))
-                .repaymentFrequency(PaymentFrequencyLRspec.ONCE_TWO_WEEKS)
-                .firstRepaymentDate(LocalDate.of(2024, 9, 15))
-                .build())
-            .ccjPaymentDetails(CCJPaymentDetails.builder()
-                .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(750))
-                .ccjPaymentPaidSomeOption(YesOrNo.YES)
-                .build())
-            .build();
+            .buildJudmentOnlineCaseDataWithPaymentImmediately();
+        LocalDateTime issueDate = LocalDateTime.of(2024, 9, 1, 11, 30);
+        caseData.setJoJudgementByAdmissionIssueDate(issueDate);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
+            RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+        caseData.setRespondent1RepaymentPlan(repaymentPlan);
+        caseData.setCcjPaymentDetails(ccjPaymentDetails);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);

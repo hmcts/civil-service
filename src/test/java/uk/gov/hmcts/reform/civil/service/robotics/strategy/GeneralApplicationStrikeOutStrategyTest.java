@@ -115,19 +115,22 @@ class GeneralApplicationStrikeOutStrategyTest {
 
     @Test
     void contributeHandlesMultipleApplications() {
-        CaseData initial = CaseDataBuilder.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .getGeneralApplicationWithStrikeOut(RESPONDENT_ID)
             .getGeneralStrikeOutApplicationsDetailsWithCaseState(PROCEEDS_IN_HERITAGE.getDisplayedValue())
             .build();
-
-        Element<GeneralApplication> first = initial.getGeneralApplications().get(0);
-        Element<GeneralApplication> second = new Element<>(UUID.randomUUID(), first.getValue().toBuilder()
+        Element<GeneralApplication> first = caseData.getGeneralApplications().get(0);
+        GeneralApplication secondValue = GeneralApplication.builder()
+            .applicantPartyName(first.getValue().getApplicantPartyName())
             .litigiousPartyID("004")
-            .build());
-
-        CaseData caseData = initial.toBuilder()
-            .generalApplications(List.of(first, second))
+            .generalAppDateDeadline(first.getValue().getGeneralAppDateDeadline())
+            .generalAppSubmittedDateGAspec(first.getValue().getGeneralAppSubmittedDateGAspec())
+            .generalAppType(first.getValue().getGeneralAppType())
+            .caseLink(first.getValue().getCaseLink())
+            .businessProcess(first.getValue().getBusinessProcess())
             .build();
+        Element<GeneralApplication> second = new Element<>(UUID.randomUUID(), secondValue);
+        caseData.setGeneralApplications(List.of(first, second));
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);

@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -43,7 +44,7 @@ class ClaimNotifiedEventStrategyTest {
 
     @Test
     void supportsReturnsTrueWhenStatePresentEvenIfNotificationDateMissing() {
-        assertThat(strategy.supports(CaseData.builder().build())).isTrue();
+        assertThat(strategy.supports(CaseDataBuilder.builder().build())).isTrue();
     }
 
     @Test
@@ -51,27 +52,24 @@ class ClaimNotifiedEventStrategyTest {
         when(stateFlow.getStateHistory()).thenReturn(
             List.of(State.from(FlowState.Main.CLAIM_ISSUED.fullName()))
         );
-        CaseData caseData = CaseData.builder()
-            .claimNotificationDate(LocalDateTime.now())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setClaimNotificationDate(LocalDateTime.now());
 
         assertThat(strategy.supports(caseData)).isFalse();
     }
 
     @Test
     void supportsReturnsTrueWhenNotificationStatePresent() {
-        CaseData caseData = CaseData.builder()
-            .claimNotificationDate(LocalDateTime.of(2024, 2, 1, 10, 15))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setClaimNotificationDate(LocalDateTime.of(2024, 2, 1, 10, 15));
 
         assertThat(strategy.supports(caseData)).isTrue();
     }
 
     @Test
     void contributeAddsMiscEvent() {
-        CaseData caseData = CaseData.builder()
-            .claimNotificationDate(LocalDateTime.of(2024, 2, 1, 10, 15))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setClaimNotificationDate(LocalDateTime.of(2024, 2, 1, 10, 15));
 
         when(sequenceGenerator.nextSequence(any())).thenReturn(15);
 

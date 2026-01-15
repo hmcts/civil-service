@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
@@ -36,18 +37,18 @@ class DefendantNoCDeadlineStrategyTest {
 
     @Test
     void supportsReturnsFalseWhenTakenOfflineDateMissing() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         assertThat(strategy.supports(caseData)).isFalse();
     }
 
     @Test
     void supportsReturnsTrueWhenRespondent1MissesDeadline() {
         LocalDateTime offline = LocalDateTime.of(2024, 5, 1, 10, 0);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .takenOfflineDate(offline)
-            .addLegalRepDeadlineRes1(offline.minusDays(1))
             .respondent1Represented(YesOrNo.NO)
             .build();
+        caseData.setAddLegalRepDeadlineRes1(offline.minusDays(1));
 
         assertThat(strategy.supports(caseData)).isTrue();
     }
@@ -55,11 +56,11 @@ class DefendantNoCDeadlineStrategyTest {
     @Test
     void contributeAddsEventWhenDeadlineMissed() {
         LocalDateTime offline = LocalDateTime.of(2024, 6, 1, 9, 0);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .takenOfflineDate(offline)
-            .addLegalRepDeadlineRes2(offline.minusDays(2))
             .respondent2Represented(YesOrNo.NO)
             .build();
+        caseData.setAddLegalRepDeadlineRes2(offline.minusDays(2));
 
         when(sequenceGenerator.nextSequence(any())).thenReturn(7);
 
@@ -77,11 +78,11 @@ class DefendantNoCDeadlineStrategyTest {
     @Test
     void contributeNoopsWhenDeadlinesNotBreached() {
         LocalDateTime offline = LocalDateTime.of(2024, 6, 1, 9, 0);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .takenOfflineDate(offline)
-            .addLegalRepDeadlineRes1(offline.plusDays(2))
             .respondent1Represented(YesOrNo.NO)
             .build();
+        caseData.setAddLegalRepDeadlineRes1(offline.plusDays(2));
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);

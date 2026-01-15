@@ -10,11 +10,13 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.EventType;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -43,18 +45,21 @@ class SummaryJudgmentStrategyTest {
 
     @Test
     void supportsReturnsFalseWhenDefendantDetailsMissing() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         assertThat(strategy.supports(caseData)).isFalse();
     }
 
     @Test
     void contributeAddsGrantedEventWhenSingleDefendant() {
-        CaseData caseData = CaseData.builder()
-            .defendantDetails(DynamicList.builder()
-                .value(DynamicListElement.builder().label("Mr. Smith").build())
-                .build())
-            .build();
+        DynamicListElement element = new DynamicListElement();
+        element.setCode(UUID.randomUUID().toString());
+        element.setLabel("Mr. Smith");
+        DynamicList defendantDetails = new DynamicList();
+        defendantDetails.setValue(element);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setDefendantDetails(defendantDetails);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
 
@@ -74,16 +79,20 @@ class SummaryJudgmentStrategyTest {
 
     @Test
     void contributeAddsRequestedEventWhenRespondentTwoSelected() {
-        CaseData caseData = CaseData.builder()
-            .respondent2(Party.builder()
-                .type(Party.Type.INDIVIDUAL)
-                .individualFirstName("Alex")
-                .individualLastName("Jones")
-                .build())
-            .defendantDetails(DynamicList.builder()
-                .value(DynamicListElement.builder().label("Mr. Smith").build())
-                .build())
+        Party respondent2 = new Party();
+        respondent2.setType(Party.Type.INDIVIDUAL);
+        respondent2.setIndividualFirstName("Alex");
+        respondent2.setIndividualLastName("Jones");
+        DynamicListElement element = new DynamicListElement();
+        element.setCode(UUID.randomUUID().toString());
+        element.setLabel("Mr. Smith");
+        DynamicList defendantDetails = new DynamicList();
+        defendantDetails.setValue(element);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent2(respondent2)
             .build();
+        caseData.setDefendantDetails(defendantDetails);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
 

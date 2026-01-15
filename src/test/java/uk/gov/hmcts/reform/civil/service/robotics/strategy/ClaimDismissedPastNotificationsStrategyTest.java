@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
@@ -38,14 +39,14 @@ class ClaimDismissedPastNotificationsStrategyTest {
 
     @Test
     void supportsReturnsTrueWhenCaseDataPresent() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         assertThat(strategy.supports(caseData)).isTrue();
     }
 
     @Test
     void supportsReturnsTrueWhenDismissedDatePresent() {
         LocalDateTime dismissedDate = LocalDateTime.of(2024, 2, 6, 9, 0);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .claimDismissedDate(dismissedDate)
             .build();
 
@@ -55,7 +56,7 @@ class ClaimDismissedPastNotificationsStrategyTest {
     @Test
     void contributeAddsEventForNotificationDeadline() {
         LocalDateTime dismissedDate = LocalDateTime.of(2024, 2, 6, 9, 0);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .claimDismissedDate(dismissedDate)
             .build();
 
@@ -72,7 +73,7 @@ class ClaimDismissedPastNotificationsStrategyTest {
     @Test
     void contributeAddsEventForDetailsDeadline() {
         LocalDateTime dismissedDate = LocalDateTime.of(2024, 2, 6, 9, 0);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .claimDismissedDate(dismissedDate)
             .build();
 
@@ -89,7 +90,7 @@ class ClaimDismissedPastNotificationsStrategyTest {
     @Test
     void contributeIgnoresUnrelatedState() {
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
-        strategy.contribute(builder, CaseData.builder().build(), null, FlowState.Main.CLAIM_ISSUED);
+        strategy.contribute(builder, CaseDataBuilder.builder().build(), null, FlowState.Main.CLAIM_ISSUED);
 
         assertThat(builder.build().getMiscellaneous()).isNullOrEmpty();
     }

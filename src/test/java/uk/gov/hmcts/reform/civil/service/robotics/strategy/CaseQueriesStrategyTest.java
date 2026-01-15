@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
@@ -41,16 +42,15 @@ class CaseQueriesStrategyTest {
 
     @Test
     void supportsReturnsFalseWhenNotOffline() {
-        CaseData caseData = CaseData.builder()
-            .qmApplicantSolicitorQueries(null)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setQmApplicantSolicitorQueries(null);
 
         assertThat(strategy.supports(caseData)).isFalse();
     }
 
     @Test
     void supportsReturnsFalseWhenNoQueries() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .takenOfflineDate(LocalDateTime.now())
             .build();
         assertThat(strategy.supports(caseData)).isFalse();
@@ -59,20 +59,20 @@ class CaseQueriesStrategyTest {
     @Test
     void supportsUsesPublicQueryToggle() {
         when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
-        CaseData caseData = CaseData.builder()
-            .ccdState(CaseState.CASE_DISMISSED)
-            .queries(CaseQueriesCollection.builder().build())
-            .build();
+        CaseQueriesCollection queries = new CaseQueriesCollection();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdState(CaseState.CASE_DISMISSED);
+        caseData.setQueries(queries);
 
         assertThat(strategy.supports(caseData)).isTrue();
     }
 
     @Test
     void contributeAddsMiscEventWithFallbackDate() {
-        CaseData caseData = CaseData.builder()
-            .ccdState(CaseState.CASE_DISMISSED)
-            .qmApplicantSolicitorQueries(CaseQueriesCollection.builder().build())
-            .build();
+        CaseQueriesCollection queries = new CaseQueriesCollection();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdState(CaseState.CASE_DISMISSED);
+        caseData.setQmApplicantSolicitorQueries(queries);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);

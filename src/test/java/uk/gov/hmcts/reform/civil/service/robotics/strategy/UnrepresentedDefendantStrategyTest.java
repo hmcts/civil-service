@@ -8,6 +8,7 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -59,41 +60,43 @@ class UnrepresentedDefendantStrategyTest {
 
     @Test
     void supportsReturnsTrueWhenStatePresentEvenIfSubmittedDateMissing() {
-        assertThat(strategy.supports(CaseData.builder().build())).isTrue();
+        assertThat(strategy.supports(CaseDataBuilder.builder().build())).isTrue();
     }
 
     @Test
     void supportsReturnsTrueWhenStatePresent() {
-        CaseData caseData = CaseData.builder()
-            .submittedDate(LocalDateTime.now())
-            .respondent1(Party.builder()
-                .type(Party.Type.INDIVIDUAL)
-                .individualFirstName("Resp")
-                .individualLastName("One")
-                .build())
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+        respondent1.setIndividualFirstName("Resp");
+        respondent1.setIndividualLastName("One");
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent1(respondent1)
             .respondent1Represented(YesOrNo.NO)
             .build();
+        caseData.setSubmittedDate(LocalDateTime.now());
 
         assertThat(strategy.supports(caseData)).isTrue();
     }
 
     @Test
     void contributeAddsEventsForEachUnrepresentedDefendant() {
-        CaseData caseData = CaseData.builder()
-            .submittedDate(LocalDateTime.of(2024, 2, 10, 0, 0))
-            .respondent1(Party.builder()
-                .type(Party.Type.INDIVIDUAL)
-                .individualFirstName("Resp")
-                .individualLastName("One")
-                .build())
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+        respondent1.setIndividualFirstName("Resp");
+        respondent1.setIndividualLastName("One");
+        Party respondent2 = new Party();
+        respondent2.setType(Party.Type.INDIVIDUAL);
+        respondent2.setIndividualFirstName("Resp");
+        respondent2.setIndividualLastName("Two");
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent1(respondent1)
             .respondent1Represented(YesOrNo.NO)
-            .respondent2(Party.builder()
-                .type(Party.Type.INDIVIDUAL)
-                .individualFirstName("Resp")
-                .individualLastName("Two")
-                .build())
+            .respondent2(respondent2)
             .respondent2Represented(YesOrNo.NO)
             .build();
+        caseData.setSubmittedDate(LocalDateTime.of(2024, 2, 10, 0, 0));
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);
@@ -112,27 +115,38 @@ class UnrepresentedDefendantStrategyTest {
 
     @Test
     void supportsReturnsTrueWhenStatePresentEvenIfNoUnrepresentedDefendants() {
-        CaseData caseData = CaseData.builder()
-            .submittedDate(LocalDateTime.now())
-            .respondent1(Party.builder().individualFirstName("Resp").individualLastName("One")
-                .type(Party.Type.INDIVIDUAL).build())
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+        respondent1.setIndividualFirstName("Resp");
+        respondent1.setIndividualLastName("One");
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent1(respondent1)
             .respondent1Represented(YesOrNo.YES)
             .build();
+        caseData.setSubmittedDate(LocalDateTime.now());
 
         assertThat(strategy.supports(caseData)).isTrue();
     }
 
     @Test
     void contributeAddsSingleEventWhenOnlyFirstUnrepresented() {
-        CaseData caseData = CaseData.builder()
-            .submittedDate(LocalDateTime.of(2024, 2, 10, 0, 0))
-            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL)
-                .individualFirstName("Resp").individualLastName("One").build())
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+        respondent1.setIndividualFirstName("Resp");
+        respondent1.setIndividualLastName("One");
+        Party respondent2 = new Party();
+        respondent2.setType(Party.Type.INDIVIDUAL);
+        respondent2.setIndividualFirstName("Resp");
+        respondent2.setIndividualLastName("Two");
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent1(respondent1)
             .respondent1Represented(YesOrNo.NO)
-            .respondent2(Party.builder().type(Party.Type.INDIVIDUAL)
-                .individualFirstName("Resp").individualLastName("Two").build())
+            .respondent2(respondent2)
             .respondent2Represented(YesOrNo.YES)
             .build();
+        caseData.setSubmittedDate(LocalDateTime.of(2024, 2, 10, 0, 0));
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);

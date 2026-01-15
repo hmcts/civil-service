@@ -13,13 +13,13 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -53,31 +53,40 @@ class InterlocutoryJudgmentStrategyTest {
 
     @Test
     void supportsReturnsTrueWhenSummaryJudgmentRequestedForSingleRespondent() {
+        Party respondent2 = new Party();
+        respondent2.setType(Party.Type.INDIVIDUAL);
+        respondent2.setIndividualFirstName("John");
+        respondent2.setIndividualLastName("Rambo");
+        DynamicListElement element = new DynamicListElement();
+        element.setCode(UUID.randomUUID().toString());
+        element.setLabel("Defendant 1");
+        DynamicList defendantDetails = new DynamicList();
+        defendantDetails.setValue(element);
+
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged()
-            .build()
-            .toBuilder()
-            .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
-            .respondent2(PartyBuilder.builder().individual().build())
-            .addRespondent2(YesOrNo.YES)
-            .defendantDetails(DynamicList.builder()
-                .value(DynamicListElement.builder().label("Defendant 1").build())
-                .build())
             .build();
+        HearingSupportRequirementsDJ supportRequirements = new HearingSupportRequirementsDJ();
+        caseData.setHearingSupportRequirementsDJ(supportRequirements);
+        caseData.setRespondent2(respondent2);
+        caseData.setAddRespondent2(YesOrNo.YES);
+        caseData.setDefendantDetails(defendantDetails);
 
         assertThat(strategy.supports(caseData)).isTrue();
     }
 
     @Test
     void supportsReturnsTrueWhenOnlyDefendantDetailsProvided() {
+        DynamicListElement element = new DynamicListElement();
+        element.setCode(UUID.randomUUID().toString());
+        element.setLabel("Both");
+        DynamicList defendantDetails = new DynamicList();
+        defendantDetails.setValue(element);
+
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged()
-            .build()
-            .toBuilder()
-            .defendantDetails(DynamicList.builder()
-                .value(DynamicListElement.builder().label("Both").build())
-                .build())
             .build();
+        caseData.setDefendantDetails(defendantDetails);
 
         assertThat(strategy.supports(caseData)).isTrue();
     }
@@ -86,11 +95,15 @@ class InterlocutoryJudgmentStrategyTest {
     void contributeAddsMiscEventWhenOnlyDefendantDetailsProvided() {
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(15);
 
-        CaseData caseData = CaseData.builder()
-            .defendantDetails(DynamicList.builder()
-                .value(DynamicListElement.builder().label("Both defendants").build())
-                .build())
+        DynamicListElement element = new DynamicListElement();
+        element.setCode(UUID.randomUUID().toString());
+        element.setLabel("Both defendants");
+        DynamicList defendantDetails = new DynamicList();
+        defendantDetails.setValue(element);
+
+        CaseData caseData = CaseDataBuilder.builder()
             .build();
+        caseData.setDefendantDetails(defendantDetails);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);
@@ -105,9 +118,10 @@ class InterlocutoryJudgmentStrategyTest {
     void contributeAddsSingleEventWhenOnlyOneRespondent() {
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10);
 
-        CaseData caseData = CaseData.builder()
-            .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
+        CaseData caseData = CaseDataBuilder.builder()
             .build();
+        HearingSupportRequirementsDJ supportRequirements = new HearingSupportRequirementsDJ();
+        caseData.setHearingSupportRequirementsDJ(supportRequirements);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
 
@@ -131,21 +145,24 @@ class InterlocutoryJudgmentStrategyTest {
     void contributeAddsEventsForBothRespondentsWhenApplicable() {
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(21, 22);
 
+        Party respondent2 = new Party();
+        respondent2.setType(Party.Type.INDIVIDUAL);
+        respondent2.setIndividualFirstName("Alex");
+        respondent2.setIndividualLastName("Jones");
+        DynamicListElement element = new DynamicListElement();
+        element.setCode(UUID.randomUUID().toString());
+        element.setLabel("Both defendants");
+        DynamicList defendantDetails = new DynamicList();
+        defendantDetails.setValue(element);
+
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged()
-            .build()
-            .toBuilder()
-            .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
-            .respondent2(Party.builder()
-                .type(Party.Type.INDIVIDUAL)
-                .individualFirstName("Alex")
-                .individualLastName("Jones")
-                .build())
-            .addRespondent2(YesOrNo.YES)
-            .defendantDetails(DynamicList.builder()
-                .value(DynamicListElement.builder().label("Both defendants").build())
-                .build())
             .build();
+        HearingSupportRequirementsDJ supportRequirements = new HearingSupportRequirementsDJ();
+        caseData.setHearingSupportRequirementsDJ(supportRequirements);
+        caseData.setRespondent2(respondent2);
+        caseData.setAddRespondent2(YesOrNo.YES);
+        caseData.setDefendantDetails(defendantDetails);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
 

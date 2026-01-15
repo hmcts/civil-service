@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -43,7 +44,7 @@ class ClaimDetailsNotifiedEventStrategyTest {
 
     @Test
     void supportsReturnsTrueWhenStatePresentEvenIfDateMissing() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         assertThat(strategy.supports(caseData)).isTrue();
     }
 
@@ -52,7 +53,7 @@ class ClaimDetailsNotifiedEventStrategyTest {
         when(stateFlow.getStateHistory()).thenReturn(
             List.of(State.from(FlowState.Main.CLAIM_NOTIFIED.fullName()))
         );
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .claimDetailsNotificationDate(LocalDateTime.now())
             .build();
 
@@ -61,7 +62,7 @@ class ClaimDetailsNotifiedEventStrategyTest {
 
     @Test
     void supportsReturnsTrueWhenStatePresent() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .claimDetailsNotificationDate(LocalDateTime.of(2024, 2, 2, 9, 0))
             .build();
 
@@ -72,7 +73,7 @@ class ClaimDetailsNotifiedEventStrategyTest {
     void contributeAddsMiscEvent() {
         when(sequenceGenerator.nextSequence(any())).thenReturn(18);
         LocalDateTime notified = LocalDateTime.of(2024, 2, 2, 9, 0);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .claimDetailsNotificationDate(notified)
             .build();
 

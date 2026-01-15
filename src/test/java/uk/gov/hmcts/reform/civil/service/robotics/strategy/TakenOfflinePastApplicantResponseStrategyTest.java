@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -48,7 +49,7 @@ class TakenOfflinePastApplicantResponseStrategyTest {
 
     @Test
     void supportsReturnsTrueWhenTakenOfflineDateMissingButStatePresent() {
-        assertThat(strategy.supports(CaseData.builder().build())).isTrue();
+        assertThat(strategy.supports(CaseDataBuilder.builder().build())).isTrue();
     }
 
     @Test
@@ -56,7 +57,7 @@ class TakenOfflinePastApplicantResponseStrategyTest {
         when(stateFlow.getStateHistory()).thenReturn(
             List.of(State.from(FlowState.Main.CLAIM_NOTIFIED.fullName()))
         );
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .takenOfflineDate(LocalDateTime.now())
             .build();
 
@@ -65,7 +66,7 @@ class TakenOfflinePastApplicantResponseStrategyTest {
 
     @Test
     void supportsReturnsTrueWhenStatePresent() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .takenOfflineDate(LocalDateTime.of(2024, 2, 5, 12, 0))
             .build();
 
@@ -75,7 +76,7 @@ class TakenOfflinePastApplicantResponseStrategyTest {
     @Test
     void contributeAddsMiscEvent() {
         LocalDateTime takenOffline = LocalDateTime.of(2024, 2, 5, 12, 0);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .takenOfflineDate(takenOffline)
             .build();
         when(sequenceGenerator.nextSequence(any())).thenReturn(34);

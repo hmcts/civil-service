@@ -38,55 +38,60 @@ class CaseProceedsInCasemanStrategyTest {
 
     @Test
     void supportsReturnsFalseWhenRequirementsMissing() {
-        assertThat(strategy.supports(CaseData.builder().build())).isFalse();
+        assertThat(strategy.supports(CaseDataBuilder.builder().build())).isFalse();
     }
 
     @Test
     void supportsReturnsTrueWhenTakenOfflineWithOrder() {
-        CaseData caseData = CaseData.builder()
+        Document document = new Document();
+        document.setDocumentFileName("sdo.pdf");
+
+        CaseData caseData = CaseDataBuilder.builder()
             .takenOfflineDate(LocalDateTime.now())
-            .orderSDODocumentDJ(Document.builder().documentFileName("sdo.pdf").build())
             .build();
+        caseData.setOrderSDODocumentDJ(document);
         assertThat(strategy.supports(caseData)).isTrue();
     }
 
     @Test
     void supportsReturnsFalseWhenOrderPresentButNoTakenOfflineDate() {
-        CaseData caseData = CaseData.builder()
-            .orderSDODocumentDJ(Document.builder().documentFileName("sdo.pdf").build())
-            .build();
+        Document document = new Document();
+        document.setDocumentFileName("sdo.pdf");
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setOrderSDODocumentDJ(document);
 
         assertThat(strategy.supports(caseData)).isFalse();
     }
 
     @Test
     void supportsReturnsTrueWhenDirectionsOrderDisabled() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .takenOfflineDate(LocalDateTime.now())
-            .drawDirectionsOrderRequired(YesOrNo.NO)
             .build();
+        caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
         assertThat(strategy.supports(caseData)).isFalse();
     }
 
     @Test
     void supportsReturnsTrueWhenTakenOfflineByStaffAfterSdoConditionsMet() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .takenOfflineDate(LocalDateTime.now())
             .takenOfflineByStaffDate(LocalDateTime.now())
-            .drawDirectionsOrderRequired(YesOrNo.NO)
             .build();
+        caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
         assertThat(strategy.supports(caseData)).isFalse();
     }
 
     @Test
     void supportsReturnsFalseWhenSDONotDrawnReasonPresent() {
-        CaseData caseData = CaseData.builder()
+        ReasonNotSuitableSDO reason = new ReasonNotSuitableSDO();
+        reason.setInput("unforeseen complexities");
+        CaseData caseData = CaseDataBuilder.builder()
             .takenOfflineDate(LocalDateTime.now())
-            .drawDirectionsOrderRequired(YesOrNo.NO)
-            .reasonNotSuitableSDO(ReasonNotSuitableSDO.builder()
-                .input("unforeseen complexities")
-                .build())
             .build();
+        caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
+        caseData.setReasonNotSuitableSDO(reason);
         assertThat(strategy.supports(caseData)).isFalse();
     }
 
@@ -104,10 +109,13 @@ class CaseProceedsInCasemanStrategyTest {
     @Test
     void contributeAddsDuplicateWhenStateAndSdoDocumentPresent() {
         LocalDateTime offline = LocalDateTime.of(2024, 7, 1, 12, 0);
-        CaseData caseData = CaseData.builder()
+        Document document = new Document();
+        document.setDocumentFileName("sdo.pdf");
+
+        CaseData caseData = CaseDataBuilder.builder()
             .takenOfflineDate(offline)
-            .orderSDODocumentDJ(Document.builder().documentFileName("sdo.pdf").build())
             .build();
+        caseData.setOrderSDODocumentDJ(document);
 
         when(sequenceGenerator.nextSequence(any())).thenReturn(1, 2);
 
@@ -125,7 +133,7 @@ class CaseProceedsInCasemanStrategyTest {
 
     @Test
     void supportsReturnsFalseWhenOnlyStateConditionsPresent() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .takenOfflineDate(LocalDateTime.now())
             .build();
 
@@ -135,10 +143,13 @@ class CaseProceedsInCasemanStrategyTest {
     @Test
     void contributeAddsMiscEvent() {
         LocalDateTime offline = LocalDateTime.of(2024, 7, 1, 12, 0);
-        CaseData caseData = CaseData.builder()
+        Document document = new Document();
+        document.setDocumentFileName("sdo.pdf");
+
+        CaseData caseData = CaseDataBuilder.builder()
             .takenOfflineDate(offline)
-            .orderSDODocumentDJ(Document.builder().documentFileName("sdo.pdf").build())
             .build();
+        caseData.setOrderSDODocumentDJ(document);
 
         when(sequenceGenerator.nextSequence(any())).thenReturn(3);
 

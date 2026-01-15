@@ -26,11 +26,13 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextForma
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.robotics.support.StrategyTestDataFactory;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -66,7 +68,7 @@ class DefaultJudgmentEventStrategyTest {
 
     @Test
     void supportsReturnsFalseWhenDefendantDetailsMissing() {
-        assertThat(strategy.supports(CaseData.builder().build())).isFalse();
+        assertThat(strategy.supports(CaseDataBuilder.builder().build())).isFalse();
     }
 
     @Test
@@ -145,12 +147,14 @@ class DefaultJudgmentEventStrategyTest {
         when(partyLookup.respondentId(0)).thenReturn("002");
         when(partyLookup.respondentId(1)).thenReturn("003");
 
+        DynamicListElement element = new DynamicListElement();
+        element.setCode(UUID.randomUUID().toString());
+        element.setLabel("Both defendants");
+        DynamicList defendantDetailsSpec = new DynamicList();
+        defendantDetailsSpec.setValue(element);
+
         CaseData caseData = StrategyTestDataFactory.defaultJudgment1v2Builder()
-            .defendantDetailsSpec(DynamicList.builder()
-                .value(DynamicListElement.builder()
-                    .label("Both defendants")
-                    .build())
-                .build())
+            .defendantDetailsSpec(defendantDetailsSpec)
             .build();
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
@@ -183,19 +187,22 @@ class DefaultJudgmentEventStrategyTest {
         when(timelineHelper.now()).thenReturn(now);
         when(partyLookup.respondentId(0)).thenReturn("002");
 
+        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+        claimantLiPResponse.setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+        Fee claimFee = new Fee();
+        claimFee.setCalculatedAmountInPence(new BigDecimal("5500"));
+
         CaseData caseData = StrategyTestDataFactory.defaultJudgment1v1Builder()
             .applicant1Represented(YesOrNo.NO)
-            .caseDataLiP(CaseDataLiP.builder()
-                .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                    .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                    .build())
-                .build())
+            .caseDataLiP(caseDataLiP)
             .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
             .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
             .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(new BigDecimal("1234"))
             .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(LocalDate.of(2024, 4, 1))
             .repaymentFrequency(RepaymentFrequencyDJ.ONCE_TWO_WEEKS)
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal("5500")).build())
+            .claimFee(claimFee)
             .totalInterest(BigDecimal.valueOf(150))
             .repaymentSuggestion("1234")
             .build();
@@ -213,24 +220,25 @@ class DefaultJudgmentEventStrategyTest {
 
     @Test
     void usesClaimantRequestedSetDateWhenCourtDecisionSupports() {
-        LocalDate requestedPaymentDate = LocalDate.of(2024, 6, 20);
         LocalDateTime now = LocalDate.of(2024, 4, 18).atTime(11, 0);
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
         lenient().when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(1, 2);
         when(timelineHelper.now()).thenReturn(now);
         when(partyLookup.respondentId(0)).thenReturn("002");
 
+        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+        claimantLiPResponse.setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+        PaymentBySetDate paymentBySetDate = new PaymentBySetDate();
+        LocalDate requestedPaymentDate = LocalDate.of(2024, 6, 20);
+        paymentBySetDate.setPaymentSetDate(requestedPaymentDate);
+
         CaseData caseData = StrategyTestDataFactory.defaultJudgment1v1Builder()
-            .caseDataLiP(CaseDataLiP.builder()
-                .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                    .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                    .build())
-                .build())
+            .caseDataLiP(caseDataLiP)
             .paymentTypeSelection(DJPaymentTypeSelection.SET_DATE)
             .applicant1RepaymentOptionForDefendantSpec(PaymentType.IMMEDIATELY)
-            .applicant1RequestedPaymentDateForDefendantSpec(
-                PaymentBySetDate.builder().paymentSetDate(requestedPaymentDate).build()
-            )
+            .applicant1RequestedPaymentDateForDefendantSpec(paymentBySetDate)
             .build();
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
@@ -243,19 +251,20 @@ class DefaultJudgmentEventStrategyTest {
 
     @Test
     void usesApplicantImmediateDateWhenCourtDecisionSupports() {
-        LocalDate immediateDate = LocalDate.of(2024, 7, 10);
         LocalDateTime now = LocalDate.of(2024, 7, 1).atTime(8, 30);
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
         lenient().when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(1, 2);
         when(timelineHelper.now()).thenReturn(now);
         when(partyLookup.respondentId(0)).thenReturn("002");
 
+        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+        claimantLiPResponse.setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+
+        LocalDate immediateDate = LocalDate.of(2024, 7, 10);
         CaseData caseData = StrategyTestDataFactory.defaultJudgment1v1Builder()
-            .caseDataLiP(CaseDataLiP.builder()
-                .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                    .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                    .build())
-                .build())
+            .caseDataLiP(caseDataLiP)
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
             .applicant1RepaymentOptionForDefendantSpec(PaymentType.IMMEDIATELY)
             .applicant1SuggestPayImmediatelyPaymentDateForDefendantSpec(immediateDate)
@@ -276,14 +285,15 @@ class DefaultJudgmentEventStrategyTest {
         when(timelineHelper.now()).thenReturn(now);
         when(partyLookup.respondentId(0)).thenReturn("002");
 
+        RepaymentPlanLRspec repaymentPlan = new RepaymentPlanLRspec();
+        repaymentPlan.setPaymentAmount(new BigDecimal("4321"));
+        repaymentPlan.setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH);
+        repaymentPlan.setFirstRepaymentDate(LocalDate.of(2024, 8, 15));
+
         CaseData caseData = StrategyTestDataFactory.defaultJudgment1v1Builder()
             .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
-            .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
-                .paymentAmount(new BigDecimal("4321"))
-                .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                .firstRepaymentDate(LocalDate.of(2024, 8, 15))
-                .build())
+            .respondent1RepaymentPlan(repaymentPlan)
             .repaymentSuggestion("4321")
             .repaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_WEEK)
             .build();
@@ -345,12 +355,13 @@ class DefaultJudgmentEventStrategyTest {
         when(timelineHelper.now()).thenReturn(now);
         when(partyLookup.respondentId(0)).thenReturn("002");
 
+        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+        claimantLiPResponse.setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+
         CaseData caseData = StrategyTestDataFactory.defaultJudgment1v1Builder()
-            .caseDataLiP(CaseDataLiP.builder()
-                .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                    .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                    .build())
-                .build())
+            .caseDataLiP(caseDataLiP)
             .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
             .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
             .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(new BigDecimal("2000"))

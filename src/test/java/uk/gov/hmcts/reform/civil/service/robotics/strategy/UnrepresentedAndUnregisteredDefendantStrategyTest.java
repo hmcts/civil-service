@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -60,27 +61,30 @@ class UnrepresentedAndUnregisteredDefendantStrategyTest {
 
     @Test
     void supportsReturnsTrueWhenStatePresentEvenIfSubmittedDateMissing() {
-        assertThat(strategy.supports(CaseData.builder().build())).isTrue();
+        assertThat(strategy.supports(CaseDataBuilder.builder().build())).isTrue();
     }
 
     @Test
     void contributeAddsBothEvents() {
-        CaseData caseData = CaseData.builder()
-            .submittedDate(LocalDateTime.of(2024, 2, 20, 0, 0))
-            .respondent1(Party.builder()
-                .type(Party.Type.INDIVIDUAL)
-                .individualFirstName("Resp")
-                .individualLastName("One")
-                .build())
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+        respondent1.setIndividualFirstName("Resp");
+        respondent1.setIndividualLastName("One");
+        Party respondent2 = new Party();
+        respondent2.setType(Party.Type.COMPANY);
+        respondent2.setCompanyName("Firm One");
+        OrganisationPolicy organisationPolicy = new OrganisationPolicy();
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent1(respondent1)
             .respondent1Represented(YesOrNo.NO)
-            .respondent2(Party.builder()
-                .type(Party.Type.COMPANY)
-                .companyName("Firm One")
-                .build())
+            .respondent2(respondent2)
             .respondent2Represented(YesOrNo.YES)
-            .respondent2OrganisationPolicy(OrganisationPolicy.builder().build())
+            .respondent2OrganisationPolicy(organisationPolicy)
             .respondent2OrgRegistered(YesOrNo.NO)
             .build();
+
+        caseData.setSubmittedDate(LocalDateTime.of(2024, 2, 20, 0, 0));
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);

@@ -56,22 +56,18 @@ class CaseNotesStrategyTest {
     @Test
     void contributeAddsMiscellaneousEventsForEachCaseNote() {
         LocalDateTime createdOn = LocalDateTime.now();
-        CaseNote firstNote = CaseNote.builder()
-            .createdBy("user")
-            .createdOn(createdOn)
-            .note("first   note")
-            .build();
-        CaseNote secondNote = CaseNote.builder()
-            .createdBy("user")
-            .createdOn(createdOn.plusDays(1))
-            .note(null)
-            .build();
+        CaseNote firstNote = new CaseNote();
+        firstNote.setCreatedBy("user");
+        firstNote.setCreatedOn(createdOn);
+        firstNote.setNote("first   note");
+
+        CaseNote secondNote = new CaseNote();
+        secondNote.setCreatedBy("user");
+        secondNote.setCreatedOn(createdOn.plusDays(1));
 
         CaseData caseData = CaseDataBuilder.builder()
-            .build()
-            .toBuilder()
-            .caseNotes(wrapElements(of(firstNote, secondNote)))
             .build();
+        caseData.setCaseNotes(wrapElements(of(firstNote, secondNote)));
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);
@@ -97,16 +93,13 @@ class CaseNotesStrategyTest {
     @Test
     void contributeTrimsLongNotesToMaximumLength() {
         String longNote = "x".repeat(300);
-        CaseNote note = CaseNote.builder()
-            .createdOn(LocalDateTime.now())
-            .note(longNote)
-            .build();
+        CaseNote note = new CaseNote();
+        note.setCreatedOn(LocalDateTime.now());
+        note.setNote(longNote);
 
         CaseData caseData = CaseDataBuilder.builder()
-            .build()
-            .toBuilder()
-            .caseNotes(wrapElements(note))
             .build();
+        caseData.setCaseNotes(wrapElements(note));
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);
@@ -118,12 +111,10 @@ class CaseNotesStrategyTest {
 
     @Test
     void contributeHandlesNullCaseNoteFields() {
-        CaseNote emptyNote = CaseNote.builder().build();
+        CaseNote emptyNote = new CaseNote();
         CaseData caseData = CaseDataBuilder.builder()
-            .build()
-            .toBuilder()
-            .caseNotes(wrapElements(emptyNote))
             .build();
+        caseData.setCaseNotes(wrapElements(emptyNote));
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);

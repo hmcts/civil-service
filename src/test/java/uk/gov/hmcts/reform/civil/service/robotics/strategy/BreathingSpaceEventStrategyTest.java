@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
@@ -37,21 +38,21 @@ class BreathingSpaceEventStrategyTest {
 
     @Test
     void supportsReturnsFalseWhenBreathingNull() {
-        assertThat(strategy.supports(CaseData.builder().build())).isFalse();
+        assertThat(strategy.supports(CaseDataBuilder.builder().build())).isFalse();
     }
 
     @Test
     void supportsReturnsTrueWhenBreathingPresent() {
-        CaseData caseData = CaseData.builder()
-            .breathing(new BreathingSpaceInfo())
+        CaseData caseData = CaseDataBuilder.builder()
             .build();
+        caseData.setBreathing(new BreathingSpaceInfo());
         assertThat(strategy.supports(caseData)).isTrue();
     }
 
     @Test
     void contributeNoopsWhenUnsupported() {
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
-        strategy.contribute(builder, CaseData.builder().build(), null);
+        strategy.contribute(builder, CaseDataBuilder.builder().build(), null);
         assertThat(builder.build().getBreathingSpaceEntered()).isNullOrEmpty();
     }
 
@@ -60,13 +61,14 @@ class BreathingSpaceEventStrategyTest {
         LocalDate start = LocalDate.of(2024, 1, 15);
         when(sequenceGenerator.nextSequence(any())).thenReturn(1);
 
-        CaseData caseData = CaseData.builder()
-            .breathing(new BreathingSpaceInfo()
-                .setEnter(new BreathingSpaceEnterInfo()
-                    .setType(BreathingSpaceType.STANDARD)
-                    .setReference("REF-123")
-                    .setStart(start)))
+        BreathingSpaceInfo breathing = new BreathingSpaceInfo();
+        breathing.setEnter(new BreathingSpaceEnterInfo()
+            .setType(BreathingSpaceType.STANDARD)
+            .setReference("REF-123")
+            .setStart(start));
+        CaseData caseData = CaseDataBuilder.builder()
             .build();
+        caseData.setBreathing(breathing);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         LocalTime before = LocalTime.now();
@@ -92,15 +94,16 @@ class BreathingSpaceEventStrategyTest {
         LocalDate end = LocalDate.of(2024, 3, 1);
         when(sequenceGenerator.nextSequence(any())).thenReturn(5, 6);
 
-        CaseData caseData = CaseData.builder()
-            .breathing(new BreathingSpaceInfo()
-                .setEnter(new BreathingSpaceEnterInfo()
-                    .setType(BreathingSpaceType.STANDARD)
-                    .setReference("REF-99")
-                    .setStart(start))
-                .setLift(new BreathingSpaceLiftInfo()
-                    .setExpectedEnd(end)))
+        BreathingSpaceInfo breathing = new BreathingSpaceInfo();
+        breathing.setEnter(new BreathingSpaceEnterInfo()
+            .setType(BreathingSpaceType.STANDARD)
+            .setReference("REF-99")
+            .setStart(start));
+        breathing.setLift(new BreathingSpaceLiftInfo()
+            .setExpectedEnd(end));
+        CaseData caseData = CaseDataBuilder.builder()
             .build();
+        caseData.setBreathing(breathing);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         LocalTime before = LocalTime.now();
@@ -133,12 +136,13 @@ class BreathingSpaceEventStrategyTest {
     void usesFallbackWhenStartDateMissing() {
         when(sequenceGenerator.nextSequence(any())).thenReturn(7);
 
-        CaseData caseData = CaseData.builder()
-            .breathing(new BreathingSpaceInfo()
-                .setEnter(new BreathingSpaceEnterInfo()
-                    .setType(BreathingSpaceType.MENTAL_HEALTH)
-                    .setReference("REF-200")))
+        BreathingSpaceInfo breathing = new BreathingSpaceInfo();
+        breathing.setEnter(new BreathingSpaceEnterInfo()
+            .setType(BreathingSpaceType.MENTAL_HEALTH)
+            .setReference("REF-200"));
+        CaseData caseData = CaseDataBuilder.builder()
             .build();
+        caseData.setBreathing(breathing);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         LocalDateTime before = LocalDateTime.now();
@@ -162,15 +166,17 @@ class BreathingSpaceEventStrategyTest {
         LocalDate end = LocalDate.of(2024, 6, 30);
         when(sequenceGenerator.nextSequence(any())).thenReturn(11, 12);
 
-        CaseData caseData = CaseData.builder()
-            .breathing(new BreathingSpaceInfo()
-                .setEnter(new BreathingSpaceEnterInfo()
-                    .setType(BreathingSpaceType.MENTAL_HEALTH)
-                    .setReference("MH-REF")
-                    .setStart(start))
-                .setLift(new BreathingSpaceLiftInfo()
-                    .setExpectedEnd(end)))
+        BreathingSpaceInfo breathing = new BreathingSpaceInfo();
+        breathing.setEnter(new BreathingSpaceEnterInfo()
+            .setType(BreathingSpaceType.MENTAL_HEALTH)
+            .setReference("MH-REF")
+            .setStart(start));
+        breathing.setLift(new BreathingSpaceLiftInfo()
+            .setExpectedEnd(end));
+        CaseData caseData = CaseDataBuilder.builder()
             .build();
+
+        caseData.setBreathing(breathing);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         LocalTime before = LocalTime.now();
@@ -195,14 +201,16 @@ class BreathingSpaceEventStrategyTest {
         LocalDate start = LocalDate.of(2024, 7, 10);
         when(sequenceGenerator.nextSequence(any())).thenReturn(14, 15);
 
-        CaseData caseData = CaseData.builder()
-            .breathing(new BreathingSpaceInfo()
-                .setEnter(new BreathingSpaceEnterInfo()
-                    .setType(BreathingSpaceType.STANDARD)
-                    .setReference("REF-NO-END")
-                    .setStart(start))
-                .setLift(new BreathingSpaceLiftInfo()))
+        BreathingSpaceInfo breathing = new BreathingSpaceInfo();
+        breathing.setEnter(new BreathingSpaceEnterInfo()
+            .setType(BreathingSpaceType.STANDARD)
+            .setReference("REF-NO-END")
+            .setStart(start));
+        breathing.setLift(new BreathingSpaceLiftInfo());
+        CaseData caseData = CaseDataBuilder.builder()
             .build();
+
+        caseData.setBreathing(breathing);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         LocalDateTime before = LocalDateTime.now();

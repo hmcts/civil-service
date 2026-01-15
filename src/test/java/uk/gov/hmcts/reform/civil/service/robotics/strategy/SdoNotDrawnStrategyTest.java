@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
@@ -79,11 +80,9 @@ class SdoNotDrawnStrategyTest {
 
     @Test
     void contributeAddsSdoNotDrawnEvent() {
-        CaseData base = CaseDataBuilder.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_ONE)
-            .build();
-        CaseData caseData = base.toBuilder()
-            .reasonNotSuitableSDO(base.getReasonNotSuitableSDO().toBuilder().input("No SDO drawn").build())
+            .reasonNotSuitableSDO(ReasonNotSuitableSDO.builder().input("No SDO drawn").build())
             .build();
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
@@ -97,17 +96,15 @@ class SdoNotDrawnStrategyTest {
         String expected = new RoboticsEventTextFormatter()
             .caseProceedOffline("Judge / Legal Advisor did not draw a Direction's Order: No SDO drawn");
         assertThat(history.getMiscellaneous().get(0).getEventDetailsText()).isEqualTo(expected);
-        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isEqualTo(base.getUnsuitableSDODate());
+        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isEqualTo(caseData.getUnsuitableSDODate());
     }
 
     @Test
     void contributeTruncatesLongMessages() {
-        CaseData base = CaseDataBuilder.builder()
-            .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_ONE)
-            .build();
         String longReason = "x".repeat(600);
-        CaseData caseData = base.toBuilder()
-            .reasonNotSuitableSDO(base.getReasonNotSuitableSDO().toBuilder().input(longReason).build())
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_ONE)
+            .reasonNotSuitableSDO(ReasonNotSuitableSDO.builder().input(longReason).build())
             .build();
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();

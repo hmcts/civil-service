@@ -41,9 +41,8 @@ class SetAsideJudgmentStrategyTest {
 
     @Test
     void supportsReturnsFalseWhenToggleDisabled() {
-        CaseData caseData = CaseData.builder()
-            .joSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
 
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
 
@@ -53,14 +52,12 @@ class SetAsideJudgmentStrategyTest {
     @Test
     void contributeAddsSingleRespondentEvent() {
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudmentOnlineCaseDataWithPaymentByInstalment()
-            .toBuilder()
-            .joSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER)
-            .joSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION)
-            .joSetAsideOrderDate(LocalDate.of(2024, 5, 1))
-            .joSetAsideApplicationDate(LocalDate.of(2024, 4, 10))
-            .joSetAsideCreatedDate(LocalDateTime.of(2024, 5, 2, 9, 0))
-            .build();
+            .buildJudmentOnlineCaseDataWithPaymentByInstalment();
+        caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
+        caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
+        caseData.setJoSetAsideOrderDate(LocalDate.of(2024, 5, 1));
+        caseData.setJoSetAsideApplicationDate(LocalDate.of(2024, 4, 10));
+        caseData.setJoSetAsideCreatedDate(LocalDateTime.of(2024, 5, 2, 9, 0));
 
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10);
@@ -85,18 +82,17 @@ class SetAsideJudgmentStrategyTest {
 
     @Test
     void contributeAddsEventsForBothRespondents() {
+        Party respondent2 = new Party();
+        respondent2.setType(Party.Type.INDIVIDUAL);
+        respondent2.setIndividualFirstName("Alex");
+        respondent2.setIndividualLastName("Jones");
+
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudgmentOnlineCaseDataWithPaymentByDate_Multi_party()
-            .toBuilder()
-            .respondent2(Party.builder()
-                .type(Party.Type.INDIVIDUAL)
-                .individualFirstName("Alex")
-                .individualLastName("Jones")
-                .build())
-            .addRespondent2(YesOrNo.YES)
-            .joSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR)
-            .joSetAsideCreatedDate(LocalDateTime.of(2024, 5, 2, 10, 0))
-            .build();
+            .buildJudgmentOnlineCaseDataWithPaymentByDate_Multi_party();
+        caseData.setRespondent2(respondent2);
+        caseData.setAddRespondent2(YesOrNo.YES);
+        caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR);
+        caseData.setJoSetAsideCreatedDate(LocalDateTime.of(2024, 5, 2, 10, 0));
 
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(21, 22);
@@ -117,14 +113,12 @@ class SetAsideJudgmentStrategyTest {
     @Test
     void contributeUsesDefenceDateWhenOrderAfterDefence() {
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudmentOnlineCaseDataWithPaymentByInstalment()
-            .toBuilder()
-            .joSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER)
-            .joSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE)
-            .joSetAsideOrderDate(LocalDate.of(2024, 6, 10))
-            .joSetAsideDefenceReceivedDate(LocalDate.of(2024, 5, 20))
-            .joSetAsideCreatedDate(LocalDateTime.of(2024, 6, 11, 12, 0))
-            .build();
+            .buildJudmentOnlineCaseDataWithPaymentByInstalment();
+        caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
+        caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE);
+        caseData.setJoSetAsideOrderDate(LocalDate.of(2024, 6, 10));
+        caseData.setJoSetAsideDefenceReceivedDate(LocalDate.of(2024, 5, 20));
+        caseData.setJoSetAsideCreatedDate(LocalDateTime.of(2024, 6, 11, 12, 0));
 
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(33);

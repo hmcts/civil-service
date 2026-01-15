@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -46,13 +47,13 @@ class TakenOfflineByStaffEventStrategyTest {
 
     @Test
     void supportsReturnsFalseWhenDateMissing() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         assertThat(strategy.supports(caseData)).isFalse();
     }
 
     @Test
     void supportsReturnsTrueWhenTakenOfflineByStaffDatePresent() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .takenOfflineByStaffDate(LocalDateTime.now())
             .build();
         assertThat(strategy.supports(caseData)).isTrue();
@@ -61,7 +62,7 @@ class TakenOfflineByStaffEventStrategyTest {
     @Test
     void supportsReturnsFalseWhenStateHistoryMissing() {
         when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.CLAIM_ISSUED.fullName())));
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .takenOfflineByStaffDate(LocalDateTime.now())
             .build();
         assertThat(strategy.supports(caseData)).isFalse();
@@ -70,7 +71,7 @@ class TakenOfflineByStaffEventStrategyTest {
     @Test
     void contributeAddsMiscellaneousEvent() {
         LocalDateTime offlineDate = LocalDate.of(2024, 7, 1).atStartOfDay();
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .takenOfflineByStaffDate(offlineDate)
             .build();
         when(sequenceGenerator.nextSequence(any())).thenReturn(4);

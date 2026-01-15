@@ -9,12 +9,14 @@ import org.mockito.Spy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.robotics.Event;
-import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
-import uk.gov.hmcts.reform.civil.model.robotics.EventType;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.model.robotics.Event;
+import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
+import uk.gov.hmcts.reform.civil.model.robotics.EventType;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
@@ -23,7 +25,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -93,12 +94,10 @@ class ClaimantResponseStrategyTest {
         LocalDateTime applicantResponse = LocalDateTime.of(2024, 3, 18, 9, 0);
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed(ONE_V_ONE)
-            .build()
-            .toBuilder()
-            .applicant1ResponseDate(applicantResponse)
-            .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
-            .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
             .build();
+        caseData.setApplicant1ResponseDate(applicantResponse);
+        caseData.setAllocatedTrack(AllocatedTrack.MULTI_CLAIM);
+        caseData.setResponseClaimTrack(AllocatedTrack.FAST_CLAIM.name());
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, "auth-token");
@@ -117,20 +116,19 @@ class ClaimantResponseStrategyTest {
         when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.FULL_DEFENCE_PROCEED.fullName())));
         when(locationRefDataUtil.getPreferredCourtData(any(), any(), any(Boolean.class))).thenReturn(null);
 
-        Applicant1DQ applicant1DQ = Applicant1DQ.builder()
-            .applicant1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
-                                                         .oneMonthStayRequested(YesOrNo.YES)
-                                                         .build())
-            .applicant1DQRequestedCourt(RequestedCourt.builder().responseCourtCode("123").build())
-            .build();
+        FileDirectionsQuestionnaire questionnaire = new FileDirectionsQuestionnaire();
+        questionnaire.setOneMonthStayRequested(YesOrNo.YES);
+        RequestedCourt requestedCourt = new RequestedCourt();
+        requestedCourt.setResponseCourtCode("123");
+        Applicant1DQ applicant1DQ = new Applicant1DQ();
+        applicant1DQ.setApplicant1DQFileDirectionsQuestionnaire(questionnaire);
+        applicant1DQ.setApplicant1DQRequestedCourt(requestedCourt);
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed(ONE_V_ONE)
-            .build()
-            .toBuilder()
-            .applicant1ResponseDate(LocalDateTime.of(2024, 3, 18, 9, 0))
-            .applicant1DQ(applicant1DQ)
             .build();
+        caseData.setApplicant1ResponseDate(LocalDateTime.of(2024, 3, 18, 9, 0));
+        caseData.setApplicant1DQ(applicant1DQ);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, "auth-token");
@@ -147,12 +145,10 @@ class ClaimantResponseStrategyTest {
         CaseData caseData = CaseDataBuilder.builder()
             .multiPartyClaimTwoApplicants()
             .atStateApplicantRespondToDefenceAndProceed(TWO_V_ONE)
-            .build()
-            .toBuilder()
-            .applicant1ResponseDate(LocalDateTime.of(2024, 4, 5, 11, 0))
-            .applicant1ProceedWithClaimMultiParty2v1(YesOrNo.NO)
-            .applicant2ProceedWithClaimMultiParty2v1(YesOrNo.NO)
             .build();
+        caseData.setApplicant1ResponseDate(LocalDateTime.of(2024, 4, 5, 11, 0));
+        caseData.setApplicant1ProceedWithClaimMultiParty2v1(YesOrNo.NO);
+        caseData.setApplicant2ProceedWithClaimMultiParty2v1(YesOrNo.NO);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, null);
@@ -168,10 +164,8 @@ class ClaimantResponseStrategyTest {
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantProceedAllMediation(ONE_V_TWO_TWO_LEGAL_REP)
-            .build()
-            .toBuilder()
-            .applicant1ResponseDate(LocalDateTime.of(2024, 5, 10, 14, 0))
             .build();
+        caseData.setApplicant1ResponseDate(LocalDateTime.of(2024, 5, 10, 14, 0));
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, "token");
@@ -189,13 +183,11 @@ class ClaimantResponseStrategyTest {
         CaseData caseData = CaseDataBuilder.builder()
             .multiPartyClaimTwoApplicants()
             .atStateApplicant2RespondToDefenceAndProceed_2v1()
-            .build()
-            .toBuilder()
-            .allocatedTrack(AllocatedTrack.FAST_CLAIM)
-            .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
-            .applicant1ResponseDate(LocalDateTime.of(2024, 3, 21, 9, 0))
-            .applicant2ResponseDate(LocalDateTime.of(2024, 3, 21, 9, 0))
             .build();
+        caseData.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
+        caseData.setResponseClaimTrack(AllocatedTrack.FAST_CLAIM.name());
+        caseData.setApplicant1ResponseDate(LocalDateTime.of(2024, 3, 21, 9, 0));
+        caseData.setApplicant2ResponseDate(LocalDateTime.of(2024, 3, 21, 9, 0));
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, "token");
@@ -216,10 +208,8 @@ class ClaimantResponseStrategyTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed(ONE_V_ONE)
             .setClaimTypeToSpecClaim()
-            .build()
-            .toBuilder()
-            .applicant1ResponseDate(applicantResponse)
             .build();
+        caseData.setApplicant1ResponseDate(applicantResponse);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, "token");
@@ -239,16 +229,14 @@ class ClaimantResponseStrategyTest {
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceedVsDefendant1Only_1v2()
-            .build()
-            .toBuilder()
-            .respondent2SameLegalRepresentative(YesOrNo.YES)
-            .addRespondent2(YesOrNo.YES)
-            .respondent2(uk.gov.hmcts.reform.civil.sampledata.PartyBuilder.builder().individual().build())
-            .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.YES)
-            .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.NO)
-            .applicant1ResponseDate(LocalDateTime.of(2024, 7, 1, 11, 0))
-            .allocatedTrack(AllocatedTrack.FAST_CLAIM)
             .build();
+        caseData.setRespondent2SameLegalRepresentative(YesOrNo.YES);
+        caseData.setAddRespondent2(YesOrNo.YES);
+        caseData.setRespondent2(createIndividualParty());
+        caseData.setApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.YES);
+        caseData.setApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.NO);
+        caseData.setApplicant1ResponseDate(LocalDateTime.of(2024, 7, 1, 11, 0));
+        caseData.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, "token");
@@ -269,10 +257,8 @@ class ClaimantResponseStrategyTest {
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantProceedAllMediation(ONE_V_ONE)
-            .build()
-            .toBuilder()
-            .applicant1ResponseDate(LocalDateTime.of(2024, 8, 15, 10, 0))
             .build();
+        caseData.setApplicant1ResponseDate(LocalDateTime.of(2024, 8, 15, 10, 0));
 
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
         strategy.contribute(builder, caseData, "token");
@@ -281,5 +267,13 @@ class ClaimantResponseStrategyTest {
         assertThat(history.getMiscellaneous()).hasSize(1);
         assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
             .contains("Claimant proceeds");
+    }
+
+    private Party createIndividualParty() {
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        party.setIndividualFirstName("Alex");
+        party.setIndividualLastName("Jones");
+        return party;
     }
 }

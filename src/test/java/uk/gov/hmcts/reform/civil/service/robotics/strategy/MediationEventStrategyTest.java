@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
@@ -59,17 +60,19 @@ class MediationEventStrategyTest {
 
     @Test
     void supportsReturnsFalseWhenEitherPartyHasNotAgreed() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .responseClaimMediationSpecRequired(YesOrNo.NO)
             .build();
+        caseData.setResponseClaimMediationSpecRequired(YesOrNo.NO);
 
         assertThat(strategy.supports(caseData)).isFalse();
     }
 
     @Test
     void supportsReturnsTrueWhenBothPartiesAgree() {
-        CaseData caseData = baseCaseData(CaseCategory.SPEC_CLAIM);
+        CaseData caseData = baseCaseDataBuilder(CaseCategory.SPEC_CLAIM).build();
+        caseData.setResponseClaimMediationSpecRequired(YesOrNo.YES);
+        caseData.setCaseDataLiP(createCaseDataLiP());
 
         assertThat(strategy.supports(caseData)).isTrue();
     }
@@ -77,24 +80,27 @@ class MediationEventStrategyTest {
     @Test
     void contributeDoesNothingWhenUnsupported() {
         EventHistory.EventHistoryBuilder builder = EventHistory.builder();
-        strategy.contribute(builder, CaseData.builder().build(), null);
+        strategy.contribute(builder, CaseDataBuilder.builder().build(), null);
         assertThat(builder.build().getMiscellaneous()).isNullOrEmpty();
     }
 
     @Test
     void addsDirectionsQuestionnaireAndMiscEventForSpecClaims() {
+        FileDirectionsQuestionnaire dq = new FileDirectionsQuestionnaire();
+        dq.setOneMonthStayRequested(YesOrNo.YES);
+        RequestedCourt requestedCourt = new RequestedCourt();
+        requestedCourt.setResponseCourtCode("432");
+        Applicant1DQ applicant1DQ = new Applicant1DQ();
+        applicant1DQ.setApplicant1DQFileDirectionsQuestionnaire(dq);
+        applicant1DQ.setApplicant1DQRequestedCourt(requestedCourt);
+
         LocalDateTime responseDate = LocalDateTime.now().plusDays(1);
-        CaseData caseData = baseCaseData(CaseCategory.SPEC_CLAIM).toBuilder()
+        CaseData caseData = baseCaseDataBuilder(CaseCategory.SPEC_CLAIM)
             .applicant1ResponseDate(responseDate)
-            .applicant1DQ(Applicant1DQ.builder()
-                .applicant1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
-                    .oneMonthStayRequested(YesOrNo.YES)
-                    .build())
-                .applicant1DQRequestedCourt(RequestedCourt.builder()
-                    .responseCourtCode("432")
-                    .build())
-                .build())
+            .applicant1DQ(applicant1DQ)
             .build();
+        caseData.setResponseClaimMediationSpecRequired(YesOrNo.YES);
+        caseData.setCaseDataLiP(createCaseDataLiP());
 
         when(sequenceGenerator.nextSequence(any())).thenReturn(11, 12);
 
@@ -121,9 +127,11 @@ class MediationEventStrategyTest {
     @Test
     void addsOnlyMiscEventWhenClaimIsUnspec() {
         LocalDateTime responseDate = LocalDateTime.now().plusDays(1);
-        CaseData caseData = baseCaseData(CaseCategory.UNSPEC_CLAIM).toBuilder()
+        CaseData caseData = baseCaseDataBuilder(CaseCategory.UNSPEC_CLAIM)
             .applicant1ResponseDate(responseDate)
             .build();
+        caseData.setResponseClaimMediationSpecRequired(YesOrNo.YES);
+        caseData.setCaseDataLiP(createCaseDataLiP());
 
         when(sequenceGenerator.nextSequence(any())).thenReturn(5);
 
@@ -136,17 +144,22 @@ class MediationEventStrategyTest {
         assertThat(history.getMiscellaneous().get(0).getEventDetailsText()).isEqualTo("IN MEDIATION");
     }
 
-    private CaseData baseCaseData(CaseCategory category) {
-        return CaseData.builder()
+    private CaseDataBuilder baseCaseDataBuilder(CaseCategory category) {
+        ClaimantMediationLip lip = new ClaimantMediationLip();
+        lip.setHasAgreedFreeMediation(MediationDecision.Yes);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(lip);
+
+        return CaseDataBuilder.builder()
             .caseAccessCategory(category)
-            .responseClaimMediationSpecRequired(YesOrNo.YES)
-            .caseDataLiP(CaseDataLiP.builder()
-                .applicant1ClaimMediationSpecRequiredLip(
-                    ClaimantMediationLip.builder()
-                        .hasAgreedFreeMediation(MediationDecision.Yes)
-                        .build())
-                .build())
-            .applicant1ResponseDate(LocalDate.now().atStartOfDay())
-            .build();
+            .applicant1ResponseDate(LocalDate.now().atStartOfDay());
+    }
+
+    private CaseDataLiP createCaseDataLiP() {
+        ClaimantMediationLip lip = new ClaimantMediationLip();
+        lip.setHasAgreedFreeMediation(MediationDecision.Yes);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(lip);
+        return caseDataLiP;
     }
 }

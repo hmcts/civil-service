@@ -237,10 +237,8 @@ class RespondentPartAdmissionStrategyTest {
         CaseData caseData = builder
             .atStateRespondentPartAdmissionSpec()
             .applicant1Represented(YES)
-            .build()
-            .toBuilder()
-            .specDefenceAdmittedRequired(YES)
             .build();
+        caseData.setSpecDefenceAdmittedRequired(YES);
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11);
 

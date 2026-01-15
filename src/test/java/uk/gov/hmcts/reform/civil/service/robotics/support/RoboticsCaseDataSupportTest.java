@@ -29,16 +29,16 @@ class RoboticsCaseDataSupportTest {
 
     @Test
     void buildLitigiousParty_populatesCoreFields() {
-        Party party = Party.builder()
-            .type(Party.Type.INDIVIDUAL)
-            .individualFirstName("John")
-            .individualLastName("Doe")
-            .individualDateOfBirth(LocalDate.of(1990, 1, 1))
-            .primaryAddress(Address.builder()
-                .addressLine1("10 Street")
-                .postCode("AB1 1AB")
-                .build())
-            .build();
+        Address primaryAddress = new Address();
+        primaryAddress.setAddressLine1("10 Street");
+        primaryAddress.setPostCode("AB1 1AB");
+
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        party.setIndividualFirstName("John");
+        party.setIndividualLastName("Doe");
+        party.setIndividualDateOfBirth(LocalDate.of(1990, 1, 1));
+        party.setPrimaryAddress(primaryAddress);
 
         LitigiousParty litigiousParty = support.buildLitigiousParty(
             party,
