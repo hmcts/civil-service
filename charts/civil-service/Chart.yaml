@@ -47,3 +47,7 @@ dependencies:
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: servicebus.enabled
     alias: hmcsb
+  - name: servicebus
+    version: 1.2.1
+    repository: 'oci://hmctspublic.azurecr.io/helm'
+    condition: servicebus.enabled

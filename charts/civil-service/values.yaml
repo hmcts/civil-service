@@ -6,6 +6,8 @@ camunda-bpm:
   enabled: false
 aac-manage-case-assignment:
   enabled: false
+am-org-role-mapping-service:
+  enabled: false
 ccd:
   enabled: false
 ccd-case-document-am-api:
@@ -23,6 +25,7 @@ java:
   environment:
     LAUNCH_DARKLY_ENV: '{{ .Values.global.environment }}'
     IDAM_CLIENT_ID: civil-service
+    ROLE_ASSIGNMENT_API_URL: http://am-role-assignment-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     IDAM_CLIENT_REDIRECT_URI: https://civil-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal/oauth2/callback
     IDAM_API_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
     IDAM_WEB_URL: https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net
