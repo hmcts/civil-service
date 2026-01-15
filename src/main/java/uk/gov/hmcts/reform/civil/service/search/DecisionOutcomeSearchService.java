@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
@@ -26,7 +27,10 @@ public class DecisionOutcomeSearchService extends ElasticSearchService {
                 .minimumShouldMatch(1)
                 .should(boolQuery()
                             .must(rangeQuery("data.hearingDate").lte("now"))
-                            .must(beState(PREPARE_FOR_HEARING_CONDUCT_HEARING))),
+                            .must(beState(PREPARE_FOR_HEARING_CONDUCT_HEARING))
+                            .must(boolQuery()
+                                    .should(rangeQuery("data.nextHearingDetails.hearingDateTime").lte("now"))
+                                    .should(boolQuery().mustNot(existsQuery("data.nextHearingDetails.hearingDateTime"))))),
             List.of("reference"),
             startIndex
         );
