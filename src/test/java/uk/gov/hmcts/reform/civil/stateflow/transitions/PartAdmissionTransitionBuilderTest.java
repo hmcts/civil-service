@@ -41,12 +41,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTransitionBuilder.agreePartAdmitSettle;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTransitionBuilder.getCarmEnabledForCase;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTransitionBuilder.getCarmEnabledForLipCase;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTransitionBuilder.isClaimantNotSettlePartAdmitClaim;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTransitionBuilder.isSpecSmallClaim;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTransitionBuilder.partAdmitPayImmediately;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTransitionBuilder.isNotPartAdmissionPaymentState;
 
 @ExtendWith(MockitoExtension.class)
