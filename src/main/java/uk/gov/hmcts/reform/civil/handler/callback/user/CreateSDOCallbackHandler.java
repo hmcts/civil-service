@@ -1223,13 +1223,17 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             caseData.setSetSmallClaimsFlag(YES);
-            caseData.setSmallClaimsPenalNotice(DEFAULT_PENAL_NOTICE);
+            if (caseData.getSmallClaimsPenalNotice() == null || caseData.getSmallClaimsPenalNotice().isEmpty()) {
+                caseData.setSmallClaimsPenalNotice(DEFAULT_PENAL_NOTICE);
+            }
             if (SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
                 caseData.setIsSdoR2NewScreen(YES);
             }
         } else if (SdoHelper.isFastTrack(caseData)) {
             caseData.setSetFastTrackFlag(YES);
-            caseData.setFastTrackPenalNotice(DEFAULT_PENAL_NOTICE);
+            if (caseData.getFastTrackPenalNotice() == null || caseData.getFastTrackPenalNotice().isEmpty()) {
+                caseData.setFastTrackPenalNotice(DEFAULT_PENAL_NOTICE);
+            }
             if (SdoHelper.isNihlFastTrack(caseData)) {
                 caseData.setIsSdoR2NewScreen(YES);
             }
