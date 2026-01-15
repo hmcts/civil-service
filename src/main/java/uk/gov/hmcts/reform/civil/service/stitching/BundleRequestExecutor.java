@@ -61,10 +61,12 @@ public class BundleRequestExecutor {
             } else {
                 log.warn("The call to the endpoint with URL {} returned a non positive outcome (HTTP-{}). This may "
                              + "cause problems down the line.", endpoint, response1.getStatusCode().value());
+                HttpStatus derivedStatus = HttpStatus.resolve(response1.getStatusCodeValue());
+                String reason = derivedStatus == null ? "Unknown" : derivedStatus.getReasonPhrase();
                 log.info(
                     "Stitching endpoint returned {} with reason {}",
                     response1.getStatusCodeValue(),
-                    response1.getStatusCode().getReasonPhrase()
+                    reason
                 );
                 throw new RetryableStitchingException();
             }
@@ -115,4 +117,3 @@ public class BundleRequestExecutor {
     }
 
 }
-
