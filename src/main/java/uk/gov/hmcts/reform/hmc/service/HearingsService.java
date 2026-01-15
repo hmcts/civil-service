@@ -36,10 +36,10 @@ public class HearingsService {
             return hearingNoticeApi.getHearingRequest(
                 authToken,
                 authTokenGenerator.generate(),
+                hearingId,
                 dataStoreUrl,
                 roleAssignmentUrl,
                 hmctsDeploymentId,
-                hearingId,
                 null);
         } catch (FeignException ex)  {
             log.error("Failed to retrieve hearing with Id: {} from HMC", hearingId);

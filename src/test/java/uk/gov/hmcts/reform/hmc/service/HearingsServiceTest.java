@@ -89,8 +89,9 @@ class HearingsServiceTest {
 
             when(hearingNoticeApi.getHearingRequest(
                 eq(USER_TOKEN), eq(SERVICE_TOKEN),
+                eq(HEARING_ID),
                 isNull(), isNull(), isNull(),
-                eq(HEARING_ID), isNull()))
+                isNull()))
                 .thenReturn(response);
 
             HearingGetResponse actualResponse =
@@ -103,8 +104,9 @@ class HearingsServiceTest {
         void shouldThrowException_whenGetHearingRequestIsNull() {
             when(hearingNoticeApi.getHearingRequest(
                 eq(USER_TOKEN), eq(SERVICE_TOKEN),
+                eq(HEARING_ID),
                 isNull(), isNull(), isNull(),
-                eq(HEARING_ID), isNull()))
+                isNull()))
                 .thenThrow(notFoundFeignException);
 
             Exception exception = assertThrows(
