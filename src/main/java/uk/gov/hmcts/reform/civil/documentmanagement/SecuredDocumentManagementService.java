@@ -128,6 +128,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
             Document document = response.getDocuments().stream()
                 .findFirst()
                 .orElseThrow(() -> new DocumentUploadException(originalFileName));
+            log.info("File uploaded successfully FileName: {},  documentBinaryUrl: {} ", originalFileName, document.links.binary.href);
 
             return CaseDocument.builder()
                 .documentLink(uk.gov.hmcts.reform.civil.documentmanagement.model.Document.builder()
@@ -146,6 +147,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
                 .build();
 
         } catch (Exception ex) {
+            log.error("Failed uploading file {}", originalFileName, ex);
             throw new DocumentUploadException(originalFileName, ex);
         }
 
@@ -232,14 +234,14 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
 
     public Document getDocumentMetaData(String authorisation, String documentPath) {
         log.info("Getting metadata for file {}", documentPath);
-
         try {
-            return caseDocumentClientApi.getMetadataForDocument(
+            Document document = caseDocumentClientApi.getMetadataForDocument(
                 authorisation,
                 authTokenGenerator.generate(),
                 getDocumentIdFromSelfHref(documentPath)
             );
-
+            log.info("Metadata for file {} documentBinaryUrl: {} ", documentPath, document.links.binary);
+            return document;
         } catch (Exception ex) {
             log.error("Failed getting metadata for {}", documentPath, ex);
             throw new DocumentDownloadException(documentPath, ex);
