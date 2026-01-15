@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.Dir
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderParticipantService;
 
 import java.util.Collections;
@@ -29,7 +30,7 @@ class DjPrePopulateTaskTest {
 
     @Test
     void shouldPopulateApplicantVRespondentText() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         when(participantService.buildApplicantVRespondentText(any())).thenReturn("Applicant v Respondent");
 
         CallbackParams params = CallbackParams.builder()

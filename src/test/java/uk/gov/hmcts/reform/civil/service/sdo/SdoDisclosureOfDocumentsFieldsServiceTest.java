@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
 
@@ -40,7 +41,7 @@ class SdoDisclosureOfDocumentsFieldsServiceTest {
         when(deadlineService.nextWorkingDayFromNowWeeks(5)).thenReturn(date5Weeks);
         when(deadlineService.nextWorkingDayFromNowWeeks(8)).thenReturn(date8Weeks);
 
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         service.populateFastTrackDisclosureOfDocuments(caseData);
 

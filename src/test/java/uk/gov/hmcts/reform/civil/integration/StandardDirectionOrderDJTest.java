@@ -686,15 +686,14 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
-            DynamicList expected = DynamicList.builder()
-                .listItems(List.of(
-                               DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                               DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build(),
-                               DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                           )
-                )
-                .value(DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build())
-                .build();
+            DynamicList expected = dynamicList(
+                List.of(
+                    dynamicListElement("00001", "court 1 - 1 address - Y01 7RB"),
+                    dynamicListElement(preSelectedCourt, "court 2 - 2 address - Y02 7RB"),
+                    dynamicListElement("00003", "court 3 - 3 address - Y03 7RB")
+                ),
+                dynamicListElement(preSelectedCourt, "court 2 - 2 address - Y02 7RB")
+            );
 
             assertThat(responseCaseData.getTrialHearingMethodInPersonDJ()).isEqualTo(expected);
             assertThat(responseCaseData.getDisposalHearingMethodInPersonDJ()).isEqualTo(expected);
@@ -816,9 +815,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedTrialDJInPersonHearingNew().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            CaseDocument order = caseDocumentWithUrl();
             when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
@@ -830,9 +827,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedTrialSDOTelephoneHearingNew().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            CaseDocument order = caseDocumentWithUrl();
             when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
@@ -844,9 +839,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedTrialSDOVideoHearingNew().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            CaseDocument order = caseDocumentWithUrl();
             when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
@@ -858,9 +851,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedDisposalSDOInPerson().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            CaseDocument order = caseDocumentWithUrl();
             when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
@@ -872,9 +863,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedDisposalSDOTelephoneCall().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            CaseDocument order = caseDocumentWithUrl();
             when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
@@ -886,9 +875,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedDisposalDJVideoCallNew().build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
+            CaseDocument order = caseDocumentWithUrl();
             when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
@@ -903,7 +890,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             List<String> items = List.of("label 1", "label 2", "label 3");
             DynamicList options = DynamicList.fromList(items, Object::toString, Object::toString, items.get(0), false);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            caseData.setCaseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build());
+            caseData.setCaseManagementLocation(caseLocation("00000", null));
             caseData.setDisposalHearingMethodInPersonDJ(options);
             caseData.setTrialHearingMethodInPersonDJ(options);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -913,18 +900,17 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAssignCategoryId_whenInvoked() {
-            CaseDocument testDocument = CaseDocument.builder()
-                .createdBy("John")
-                .documentName("document name")
-                .documentSize(0L)
-                .documentType(ACKNOWLEDGEMENT_OF_CLAIM)
-                .createdDatetime(LocalDateTime.now())
-                .documentLink(Document.builder()
-                                  .documentUrl("fake-url")
-                                  .documentFileName("file-name")
-                                  .documentBinaryUrl("binary-url")
-                                  .build())
-                .build();
+            Document document = new Document()
+                .setDocumentUrl("fake-url")
+                .setDocumentFileName("file-name")
+                .setDocumentBinaryUrl("binary-url");
+            CaseDocument testDocument = new CaseDocument()
+                .setCreatedBy("John")
+                .setDocumentName("document name")
+                .setDocumentSize(0L)
+                .setDocumentType(ACKNOWLEDGEMENT_OF_CLAIM)
+                .setCreatedDatetime(LocalDateTime.now())
+                .setDocumentLink(document);
             List<Element<CaseDocument>> documentList = new ArrayList<>();
             documentList.add(element(testDocument));
             List<String> items = List.of("label 1", "label 2", "label 3");
@@ -932,7 +918,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             caseData.setCaseManagementLocation(
-                CaseLocationCivil.builder().baseLocation("1010101").region("orange").build());
+                caseLocation("1010101", "orange"));
             caseData.setTrialHearingMethodInPersonDJ(options);
             caseData.setDisposalHearingMethodInPersonDJ(options);
             caseData.setOrderSDODocumentDJCollection(documentList);
@@ -974,12 +960,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         }
         CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
             .caseAccessCategory(SPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .region("2")
-                                        .baseLocation("111")
-                                        .build())
-            .transferCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
-                                                                       .label("Site 1 - Adr 1 - AAA 111").build()).build()).build();
+            .caseManagementLocation(caseLocation("111", "2"))
+            .transferCourtLocationList(dynamicListWithValue(dynamicListElementWithLabel())).build();
 
         caseData.setApplicant1Represented(applicantRepresented);
         caseData.setRespondent1Represented(respondent1Represented);
@@ -1017,12 +999,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         }
         CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
             .caseAccessCategory(SPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .region("2")
-                                        .baseLocation("111")
-                                        .build())
-            .transferCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
-                                                                       .label("Site 1 - Adr 1 - AAA 111").build()).build()).build();
+            .caseManagementLocation(caseLocation("111", "2"))
+            .transferCourtLocationList(dynamicListWithValue(dynamicListElementWithLabel())).build();
 
         caseData.setApplicant1Represented(applicantRepresented);
         caseData.setRespondent1Represented(respondent1Represented);
@@ -1041,10 +1019,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
             .caseAccessCategory(SPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .region("2")
-                                        .baseLocation("111")
-                                        .build())
+            .caseManagementLocation(caseLocation("111", "2"))
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1064,10 +1039,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             .caseAccessCategory(SPEC_CLAIM)
             .applicant1Represented(YES)
             .respondent1Represented(YES)
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .region("2")
-                                        .baseLocation("111")
-                                        .build())
+            .caseManagementLocation(caseLocation("111", "2"))
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1085,10 +1057,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             .caseAccessCategory(UNSPEC_CLAIM)
             .applicant1Represented(NO)
             .respondent1Represented(YES)
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .region("2")
-                                        .baseLocation("111")
-                                        .build())
+            .caseManagementLocation(caseLocation("111", "2"))
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1109,10 +1078,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             .caseAccessCategory(SPEC_CLAIM)
             .applicant1Represented(NO) // LiP
             .respondent1Represented(YES)
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .region("2")
-                                        .baseLocation("111")
-                                        .build())
+            .caseManagementLocation(caseLocation("111", "2"))
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1128,7 +1094,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(false);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-        caseData.setCaseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").build());
+        caseData.setCaseManagementLocation(caseLocation("123456", null));
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         handler.handle(params);
@@ -1141,7 +1107,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-        caseData.setCaseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").build());
+        caseData.setCaseManagementLocation(caseLocation("123456", null));
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         handler.handle(params);
@@ -1167,5 +1133,46 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                     .confirmationBody(format(body))
                     .build());
         }
+    }
+
+    private static DynamicList dynamicList(List<DynamicListElement> items, DynamicListElement value) {
+        DynamicList list = new DynamicList();
+        list.setListItems(items);
+        list.setValue(value);
+        return list;
+    }
+
+    private static DynamicList dynamicListWithValue(DynamicListElement value) {
+        DynamicList list = new DynamicList();
+        list.setValue(value);
+        return list;
+    }
+
+    private static DynamicListElement dynamicListElement(String code, String label) {
+        DynamicListElement element = new DynamicListElement();
+        element.setCode(code);
+        element.setLabel(label);
+        return element;
+    }
+
+    private static DynamicListElement dynamicListElementWithLabel() {
+        DynamicListElement element = new DynamicListElement();
+        element.setLabel("Site 1 - Adr 1 - AAA 111");
+        return element;
+    }
+
+    private static CaseLocationCivil caseLocation(String baseLocation, String region) {
+        CaseLocationCivil location = new CaseLocationCivil();
+        location.setBaseLocation(baseLocation);
+        if (region != null) {
+            location.setRegion(region);
+        }
+        return location;
+    }
+
+    private static CaseDocument caseDocumentWithUrl() {
+        Document document = new Document();
+        document.setDocumentUrl("url");
+        return new CaseDocument().setDocumentLink(document);
     }
 }

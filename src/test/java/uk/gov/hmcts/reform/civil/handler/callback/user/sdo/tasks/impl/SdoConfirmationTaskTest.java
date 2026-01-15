@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.Dir
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoNarrativeService;
 
 import java.util.Map;
@@ -30,7 +31,7 @@ class SdoConfirmationTaskTest {
     @Test
     void shouldBuildSubmittedResponse() {
         SdoConfirmationTask task = new SdoConfirmationTask(narrativeService);
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         CallbackParams params = CallbackParams.builder()
             .params(Map.of(BEARER_TOKEN, "token"))
             .build();

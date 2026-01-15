@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderLifecycleStage;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -51,7 +52,9 @@ class DjOrderDetailsServiceTest {
 
     @Test
     void shouldPopulateDisposalAndTrialDirections() {
-        CaseData caseData = CaseData.builder().legacyCaseReference("MC001").build();
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .legacyCaseReference("MC001")
+            .build();
         DirectionsOrderTaskContext context = new DirectionsOrderTaskContext(
             caseData,
             CallbackParams.builder()
@@ -73,7 +76,7 @@ class DjOrderDetailsServiceTest {
 
     @Test
     void shouldApplyHearingSelectionsViaLocationService() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         CallbackParams params = CallbackParams.builder().version(null).build();
 
         service.applyHearingSelections(caseData, params.getVersion());

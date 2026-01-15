@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.List;
 
@@ -23,22 +24,19 @@ class SdoDisposalDirectionsServiceTest {
 
     @Test
     void shouldReturnFinalHearingTimeLabel() {
-        CaseData caseData = CaseData.builder()
-            .disposalHearingFinalDisposalHearing(
-                DisposalHearingFinalDisposalHearing.builder()
-                    .time(DisposalHearingFinalDisposalHearingTimeEstimate.THIRTY_MINUTES)
-                    .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        DisposalHearingFinalDisposalHearing finalDisposalHearing = new DisposalHearingFinalDisposalHearing();
+        finalDisposalHearing.setTime(DisposalHearingFinalDisposalHearingTimeEstimate.THIRTY_MINUTES);
+        caseData.setDisposalHearingFinalDisposalHearing(finalDisposalHearing);
 
         assertThat(service.getFinalHearingTimeLabel(caseData)).isEqualTo("30 minutes");
     }
 
     @Test
     void shouldReturnTelephoneAndVideoLabels() {
-        CaseData caseData = CaseData.builder()
-            .disposalHearingMethodTelephoneHearing(DisposalHearingMethodTelephoneHearing.telephoneTheClaimant)
-            .disposalHearingMethodVideoConferenceHearing(DisposalHearingMethodVideoConferenceHearing.videoTheDefendant)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setDisposalHearingMethodTelephoneHearing(DisposalHearingMethodTelephoneHearing.telephoneTheClaimant);
+        caseData.setDisposalHearingMethodVideoConferenceHearing(DisposalHearingMethodVideoConferenceHearing.videoTheDefendant);
 
         assertThat(service.getTelephoneHearingLabel(caseData)).isEqualTo("the claimant");
         assertThat(service.getVideoConferenceHearingLabel(caseData)).isEqualTo("the defendant");
@@ -46,13 +44,10 @@ class SdoDisposalDirectionsServiceTest {
 
     @Test
     void shouldFormatBundleTypes() {
-        CaseData caseData = CaseData.builder()
-            .disposalHearingBundle(DisposalHearingBundle.builder()
-                                      .type(List.of(
-                                          DisposalHearingBundleType.DOCUMENTS,
-                                          DisposalHearingBundleType.ELECTRONIC))
-                                      .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        DisposalHearingBundle bundle = new DisposalHearingBundle();
+        bundle.setType(List.of(DisposalHearingBundleType.DOCUMENTS, DisposalHearingBundleType.ELECTRONIC));
+        caseData.setDisposalHearingBundle(bundle);
 
         String expected = DisposalHearingBundleType.DOCUMENTS.getLabel()
             + " / "
@@ -62,12 +57,11 @@ class SdoDisposalDirectionsServiceTest {
 
     @Test
     void shouldDetectDisposalVariables() {
-        CaseData caseData = CaseData.builder()
-            .disposalHearingWitnessOfFactToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
-            .trialHearingTimeDJ(TrialHearingTimeDJ.builder()
-                                    .dateToToggle(List.of(DateToShowToggle.SHOW))
-                                    .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setDisposalHearingWitnessOfFactToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW));
+        TrialHearingTimeDJ hearingTime = new TrialHearingTimeDJ();
+        hearingTime.setDateToToggle(List.of(DateToShowToggle.SHOW));
+        caseData.setTrialHearingTimeDJ(hearingTime);
 
         assertThat(service.hasDisposalVariable(caseData, "disposalHearingWitnessOfFactToggle")).isTrue();
         assertThat(service.hasDisposalVariable(caseData, "disposalHearingDateToToggle")).isTrue();
@@ -76,20 +70,19 @@ class SdoDisposalDirectionsServiceTest {
 
     @Test
     void shouldFormatOtherHearingTime() {
-        CaseData caseData = CaseData.builder()
-            .disposalHearingHearingTime(DisposalHearingHearingTime.builder()
-                                           .time(DisposalHearingFinalDisposalHearingTimeEstimate.OTHER)
-                                           .otherHours("1")
-                                           .otherMinutes("30")
-                                           .build())
-            .build();
+        DisposalHearingHearingTime hearingTime = new DisposalHearingHearingTime();
+        hearingTime.setTime(DisposalHearingFinalDisposalHearingTimeEstimate.OTHER);
+        hearingTime.setOtherHours("1");
+        hearingTime.setOtherMinutes("30");
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setDisposalHearingHearingTime(hearingTime);
 
         assertThat(service.getHearingTimeLabel(caseData)).isEqualTo("1 hour 30 minutes");
     }
 
     @Test
     void shouldReturnEmptyWhenHearingTimeMissing() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         assertThat(service.getHearingTimeLabel(caseData)).isEmpty();
     }

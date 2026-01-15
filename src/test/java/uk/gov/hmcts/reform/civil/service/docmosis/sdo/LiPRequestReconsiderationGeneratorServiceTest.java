@@ -71,13 +71,15 @@ public class LiPRequestReconsiderationGeneratorServiceTest {
             .thenReturn(CLAIMANT_CASE_DOCUMENT);
         when(locationHelper.getHearingLocation(anyString(), any(), anyString())).thenReturn(null);
 
+        ReasonForReconsideration applicantReason = new ReasonForReconsideration();
+        applicantReason.setReasonForReconsiderationTxt("Yes");
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged()
             .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
             .atStateSdoFastTrackTrial()
             .build()
             .toBuilder()
-            .reasonForReconsiderationApplicant(ReasonForReconsideration.builder().reasonForReconsiderationTxt("Yes").build())
+            .reasonForReconsiderationApplicant(applicantReason)
             .build();
 
         CaseDocument caseDocument = requestReconsiderationGeneratorService.generateLiPDocument(caseData, BEARER_TOKEN, true);
@@ -95,13 +97,15 @@ public class LiPRequestReconsiderationGeneratorServiceTest {
             .thenReturn(DEFENDANT_CASE_DOCUMENT);
         when(locationHelper.getHearingLocation(anyString(), any(), anyString())).thenReturn(null);
 
+        ReasonForReconsideration respondentReason = new ReasonForReconsideration();
+        respondentReason.setReasonForReconsiderationTxt("Yes");
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged()
             .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
             .atStateSdoFastTrackTrial()
             .build()
             .toBuilder()
-            .reasonForReconsiderationRespondent1(ReasonForReconsideration.builder().reasonForReconsiderationTxt("Yes").build())
+            .reasonForReconsiderationRespondent1(respondentReason)
             .build();
 
         CaseDocument caseDocument = requestReconsiderationGeneratorService.generateLiPDocument(caseData, BEARER_TOKEN, false);

@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2DisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsPPI;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -35,12 +36,11 @@ class SdoValidationServiceTest {
 
     @Test
     void shouldReturnError_whenSmallClaimsWitnessCountsNegative() {
-        CaseData caseData = CaseData.builder()
-            .smallClaimsWitnessStatement(SmallClaimsWitnessStatement.builder()
-                                              .input2("-1")
-                                              .input3("1")
-                                              .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        SmallClaimsWitnessStatement witnessStatement = new SmallClaimsWitnessStatement();
+        witnessStatement.setInput2("-1");
+        witnessStatement.setInput3("1");
+        caseData.setSmallClaimsWitnessStatement(witnessStatement);
 
         List<String> errors = validationService.validate(caseData);
 
@@ -52,11 +52,10 @@ class SdoValidationServiceTest {
         when(classificationService.isDrhSmallClaim(any())).thenReturn(true);
         when(classificationService.isNihlFastTrack(any())).thenReturn(false);
 
-        CaseData caseData = CaseData.builder()
-            .sdoR2SmallClaimsPPI(SdoR2SmallClaimsPPI.builder()
-                                     .ppiDate(LocalDate.now().minusDays(1))
-                                     .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        SdoR2SmallClaimsPPI ppi = new SdoR2SmallClaimsPPI();
+        ppi.setPpiDate(LocalDate.now().minusDays(1));
+        caseData.setSdoR2SmallClaimsPPI(ppi);
 
         List<String> errors = validationService.validate(caseData);
 
@@ -68,12 +67,11 @@ class SdoValidationServiceTest {
         when(classificationService.isDrhSmallClaim(any())).thenReturn(false);
         when(classificationService.isNihlFastTrack(any())).thenReturn(true);
 
-        CaseData caseData = CaseData.builder()
-            .sdoR2DisclosureOfDocuments(SdoR2DisclosureOfDocuments.builder()
-                                            .standardDisclosureDate(LocalDate.now().minusDays(2))
-                                            .inspectionDate(LocalDate.now().minusDays(1))
-                                            .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        SdoR2DisclosureOfDocuments disclosure = new SdoR2DisclosureOfDocuments();
+        disclosure.setStandardDisclosureDate(LocalDate.now().minusDays(2));
+        disclosure.setInspectionDate(LocalDate.now().minusDays(1));
+        caseData.setSdoR2DisclosureOfDocuments(disclosure);
 
         List<String> errors = validationService.validate(caseData);
 
@@ -85,7 +83,7 @@ class SdoValidationServiceTest {
         when(classificationService.isDrhSmallClaim(any())).thenReturn(false);
         when(classificationService.isNihlFastTrack(any())).thenReturn(false);
 
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         List<String> errors = validationService.validate(caseData);
 

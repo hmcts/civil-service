@@ -36,8 +36,10 @@ class DjBundleFieldServiceTest {
     }
 
     private CaseData caseDataWithBundle(List<DisposalHearingBundleType> types) {
+        DisposalHearingBundleDJ bundle = new DisposalHearingBundleDJ();
+        bundle.setType(types);
         return CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .disposalHearingBundleDJ(DisposalHearingBundleDJ.builder().type(types).build())
+            .disposalHearingBundleDJ(bundle)
             .build();
     }
 }

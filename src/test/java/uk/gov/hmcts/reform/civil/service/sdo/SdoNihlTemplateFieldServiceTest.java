@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Settlement;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2VariationOfDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.List;
 
@@ -23,14 +24,16 @@ class SdoNihlTemplateFieldServiceTest {
 
     @Test
     void shouldDetectNestedIncludeToggles() {
-        CaseData caseData = CaseData.builder()
-            .sdoAltDisputeResolution(SdoR2FastTrackAltDisputeResolution.builder()
-                                         .includeInOrderToggle(List.of(IncludeInOrderToggle.INCLUDE)).build())
-            .sdoVariationOfDirections(SdoR2VariationOfDirections.builder()
-                                          .includeInOrderToggle(List.of(IncludeInOrderToggle.INCLUDE)).build())
-            .sdoR2Settlement(SdoR2Settlement.builder()
-                                  .includeInOrderToggle(List.of(IncludeInOrderToggle.INCLUDE)).build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        SdoR2FastTrackAltDisputeResolution disputeResolution = new SdoR2FastTrackAltDisputeResolution();
+        disputeResolution.setIncludeInOrderToggle(List.of(IncludeInOrderToggle.INCLUDE));
+        caseData.setSdoAltDisputeResolution(disputeResolution);
+        SdoR2VariationOfDirections variationOfDirections = new SdoR2VariationOfDirections();
+        variationOfDirections.setIncludeInOrderToggle(List.of(IncludeInOrderToggle.INCLUDE));
+        caseData.setSdoVariationOfDirections(variationOfDirections);
+        SdoR2Settlement settlement = new SdoR2Settlement();
+        settlement.setIncludeInOrderToggle(List.of(IncludeInOrderToggle.INCLUDE));
+        caseData.setSdoR2Settlement(settlement);
 
         assertThat(service.hasAltDisputeResolution(caseData)).isTrue();
         assertThat(service.hasVariationOfDirections(caseData)).isTrue();
@@ -39,20 +42,19 @@ class SdoNihlTemplateFieldServiceTest {
 
     @Test
     void shouldDetectSimpleToggleLists() {
-        CaseData caseData = CaseData.builder()
-            .sdoR2DisclosureOfDocumentsToggle(List.of(IncludeInOrderToggle.INCLUDE))
-            .sdoR2SeparatorWitnessesOfFactToggle(List.of(IncludeInOrderToggle.INCLUDE))
-            .sdoR2SeparatorExpertEvidenceToggle(List.of(IncludeInOrderToggle.INCLUDE))
-            .sdoR2SeparatorAddendumReportToggle(List.of(IncludeInOrderToggle.INCLUDE))
-            .sdoR2SeparatorFurtherAudiogramToggle(List.of(IncludeInOrderToggle.INCLUDE))
-            .sdoR2SeparatorQuestionsClaimantExpertToggle(List.of(IncludeInOrderToggle.INCLUDE))
-            .sdoR2SeparatorPermissionToRelyOnExpertToggle(List.of(IncludeInOrderToggle.INCLUDE))
-            .sdoR2SeparatorEvidenceAcousticEngineerToggle(List.of(IncludeInOrderToggle.INCLUDE))
-            .sdoR2SeparatorQuestionsToEntExpertToggle(List.of(IncludeInOrderToggle.INCLUDE))
-            .sdoR2ScheduleOfLossToggle(List.of(IncludeInOrderToggle.INCLUDE))
-            .sdoR2SeparatorUploadOfDocumentsToggle(List.of(IncludeInOrderToggle.INCLUDE))
-            .sdoR2TrialToggle(List.of(IncludeInOrderToggle.INCLUDE))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setSdoR2DisclosureOfDocumentsToggle(List.of(IncludeInOrderToggle.INCLUDE));
+        caseData.setSdoR2SeparatorWitnessesOfFactToggle(List.of(IncludeInOrderToggle.INCLUDE));
+        caseData.setSdoR2SeparatorExpertEvidenceToggle(List.of(IncludeInOrderToggle.INCLUDE));
+        caseData.setSdoR2SeparatorAddendumReportToggle(List.of(IncludeInOrderToggle.INCLUDE));
+        caseData.setSdoR2SeparatorFurtherAudiogramToggle(List.of(IncludeInOrderToggle.INCLUDE));
+        caseData.setSdoR2SeparatorQuestionsClaimantExpertToggle(List.of(IncludeInOrderToggle.INCLUDE));
+        caseData.setSdoR2SeparatorPermissionToRelyOnExpertToggle(List.of(IncludeInOrderToggle.INCLUDE));
+        caseData.setSdoR2SeparatorEvidenceAcousticEngineerToggle(List.of(IncludeInOrderToggle.INCLUDE));
+        caseData.setSdoR2SeparatorQuestionsToEntExpertToggle(List.of(IncludeInOrderToggle.INCLUDE));
+        caseData.setSdoR2ScheduleOfLossToggle(List.of(IncludeInOrderToggle.INCLUDE));
+        caseData.setSdoR2SeparatorUploadOfDocumentsToggle(List.of(IncludeInOrderToggle.INCLUDE));
+        caseData.setSdoR2TrialToggle(List.of(IncludeInOrderToggle.INCLUDE));
 
         assertThat(service.hasDisclosureOfDocuments(caseData)).isTrue();
         assertThat(service.hasWitnessOfFact(caseData)).isTrue();
@@ -70,12 +72,11 @@ class SdoNihlTemplateFieldServiceTest {
 
     @Test
     void shouldDetectTrialWindowOnlyWhenToggleAndOptionPresent() {
-        CaseData caseData = CaseData.builder()
-            .sdoR2TrialToggle(List.of(IncludeInOrderToggle.INCLUDE))
-            .sdoR2Trial(SdoR2Trial.builder()
-                            .trialOnOptions(TrialOnRadioOptions.TRIAL_WINDOW)
-                            .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setSdoR2TrialToggle(List.of(IncludeInOrderToggle.INCLUDE));
+        SdoR2Trial trial = new SdoR2Trial();
+        trial.setTrialOnOptions(TrialOnRadioOptions.TRIAL_WINDOW);
+        caseData.setSdoR2Trial(trial);
 
         assertThat(service.hasTrialWindow(caseData)).isTrue();
         assertThat(service.hasTrialPhysicalBundleParty(caseData)).isFalse();
@@ -83,24 +84,22 @@ class SdoNihlTemplateFieldServiceTest {
 
     @Test
     void shouldDetectPhysicalBundleParty() {
-        CaseData caseData = CaseData.builder()
-            .sdoR2TrialToggle(List.of(IncludeInOrderToggle.INCLUDE))
-            .sdoR2Trial(SdoR2Trial.builder()
-                            .physicalBundleOptions(PhysicalTrialBundleOptions.PARTY)
-                            .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setSdoR2TrialToggle(List.of(IncludeInOrderToggle.INCLUDE));
+        SdoR2Trial trial = new SdoR2Trial();
+        trial.setPhysicalBundleOptions(PhysicalTrialBundleOptions.PARTY);
+        caseData.setSdoR2Trial(trial);
 
         assertThat(service.hasTrialPhysicalBundleParty(caseData)).isTrue();
     }
 
     @Test
     void shouldExposeWelshLanguageDetails() {
-        CaseData caseData = CaseData.builder()
-            .sdoR2NihlUseOfWelshIncludeInOrderToggle(List.of(IncludeInOrderToggle.INCLUDE))
-            .sdoR2NihlUseOfWelshLanguage(
-                SdoR2WelshLanguageUsage.builder().description("Welsh text").build()
-            )
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setSdoR2NihlUseOfWelshIncludeInOrderToggle(List.of(IncludeInOrderToggle.INCLUDE));
+        SdoR2WelshLanguageUsage welshLanguageUsage = new SdoR2WelshLanguageUsage();
+        welshLanguageUsage.setDescription("Welsh text");
+        caseData.setSdoR2NihlUseOfWelshLanguage(welshLanguageUsage);
 
         assertThat(service.hasWelshLanguageToggle(caseData)).isTrue();
         assertThat(service.getWelshLanguageDescription(caseData)).isEqualTo("Welsh text");
@@ -108,9 +107,10 @@ class SdoNihlTemplateFieldServiceTest {
 
     @Test
     void shouldDetectNewDirectionsWhenPresent() {
-        CaseData caseData = CaseData.builder()
-            .sdoR2AddNewDirection(wrapElements(SdoR2AddNewDirection.builder().directionComment("note").build()))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        SdoR2AddNewDirection newDirection = new SdoR2AddNewDirection();
+        newDirection.setDirectionComment("note");
+        caseData.setSdoR2AddNewDirection(wrapElements(newDirection));
 
         assertThat(service.hasNewDirections(caseData)).isTrue();
     }

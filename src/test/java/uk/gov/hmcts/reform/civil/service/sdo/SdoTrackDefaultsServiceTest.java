@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackAltDisputeResolution;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -76,7 +77,7 @@ class SdoTrackDefaultsServiceTest {
         when(featureToggleService.isCarmEnabled(any(CaseData.class))).thenReturn(true);
         when(featureToggleService.isWelshJourneyEnabled(any(CaseData.class))).thenReturn(true);
 
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         service.applyBaseTrackDefaults(caseData);
 
@@ -90,7 +91,7 @@ class SdoTrackDefaultsServiceTest {
     void shouldApplyR2Defaults() {
         when(featureToggleService.isCarmEnabled(any(CaseData.class))).thenReturn(true);
 
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         service.applyR2Defaults(caseData);
 
         SdoR2FastTrackAltDisputeResolution disputeResolution = caseData.getSdoAltDisputeResolution();

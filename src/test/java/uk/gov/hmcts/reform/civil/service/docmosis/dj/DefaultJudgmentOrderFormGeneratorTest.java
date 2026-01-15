@@ -176,7 +176,7 @@ class DefaultJudgmentOrderFormGeneratorTest {
             .atStateClaimIssuedDisposalHearingInPersonDJ()
             .atStateDisposalHearingOrderMadeWithoutHearing()
             .build();
-        LocationRefData locationRefData = LocationRefData.builder().build();
+        LocationRefData locationRefData = new LocationRefData();
         Mockito.when(documentHearingLocationHelper.getHearingLocation(
             nullable(String.class), eq(caseData), eq(BEARER_TOKEN)
         )).thenReturn(locationRefData);

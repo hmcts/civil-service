@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -16,11 +17,12 @@ class DjDisposalTemplateFieldServiceTest {
 
     @Test
     void shouldResolveCourtLocationLabel() {
-        CaseData caseData = CaseData.builder()
-            .disposalHearingMethodInPersonDJ(
-                DynamicList.builder()
-                    .value(DynamicListElement.builder().label("Central Court").build())
-                    .build())
+        DynamicListElement element = new DynamicListElement();
+        element.setLabel("Central Court");
+        DynamicList list = new DynamicList();
+        list.setValue(element);
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .disposalHearingMethodInPersonDJ(list)
             .build();
 
         assertThat(service.getCourtLocation(caseData)).isEqualTo("Central Court");
@@ -38,11 +40,10 @@ class DjDisposalTemplateFieldServiceTest {
 
     @Test
     void shouldReturnHearingDurationFromCaseData() {
-        CaseData caseData = CaseData.builder()
-            .disposalHearingFinalDisposalHearingDJ(
-                DisposalHearingFinalDisposalHearingDJ.builder()
-                    .time(DisposalHearingFinalDisposalHearingTimeEstimate.THIRTY_MINUTES)
-                    .build())
+        DisposalHearingFinalDisposalHearingDJ hearing = new DisposalHearingFinalDisposalHearingDJ();
+        hearing.setTime(DisposalHearingFinalDisposalHearingTimeEstimate.THIRTY_MINUTES);
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .disposalHearingFinalDisposalHearingDJ(hearing)
             .build();
 
         assertThat(service.getHearingDuration(caseData)).isEqualTo("30 minutes");
@@ -50,7 +51,7 @@ class DjDisposalTemplateFieldServiceTest {
 
     @Test
     void shouldReturnNullWhenNoDuration() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         assertThat(service.getHearingDuration(caseData)).isNull();
     }
 }

@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,7 +15,7 @@ class DjHearingMethodFieldServiceTest {
 
     @Test
     void shouldResolveTelephoneFromDisposal() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .disposalHearingMethodTelephoneHearingDJ(HearingMethodTelephoneHearingDJ.telephoneTheCourt)
             .build();
 
@@ -23,7 +24,7 @@ class DjHearingMethodFieldServiceTest {
 
     @Test
     void shouldFallbackToTrialTelephone() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .trialHearingMethodTelephoneHearingDJ(HearingMethodTelephoneHearingDJ.telephoneTheDefendant)
             .build();
 
@@ -32,7 +33,7 @@ class DjHearingMethodFieldServiceTest {
 
     @Test
     void shouldResolveVideoFromDisposal() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .disposalHearingMethodVideoConferenceHearingDJ(HearingMethodVideoConferenceDJ.videoTheCourt)
             .build();
 
@@ -41,7 +42,7 @@ class DjHearingMethodFieldServiceTest {
 
     @Test
     void shouldFallbackToTrialVideo() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .trialHearingMethodVideoConferenceHearingDJ(HearingMethodVideoConferenceDJ.videoTheDefendant)
             .build();
 

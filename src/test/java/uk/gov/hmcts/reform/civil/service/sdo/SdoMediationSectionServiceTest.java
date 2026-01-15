@@ -12,7 +12,8 @@ class SdoMediationSectionServiceTest {
 
     @Test
     void shouldShowSectionWhenMediationProvidedAndCarmEnabled() {
-        SmallClaimsMediation mediation = SmallClaimsMediation.builder().input("ADR details").build();
+        SmallClaimsMediation mediation = new SmallClaimsMediation();
+        mediation.setInput("ADR details");
 
         SdoMediationSectionService.MediationSection result = service.resolve(
             mediation,
@@ -26,7 +27,8 @@ class SdoMediationSectionServiceTest {
 
     @Test
     void shouldHideSectionWhenCarmDisabled() {
-        SdoR2SmallClaimsMediation mediation = SdoR2SmallClaimsMediation.builder().input("Text").build();
+        SdoR2SmallClaimsMediation mediation = new SdoR2SmallClaimsMediation();
+        mediation.setInput("Text");
 
         SdoMediationSectionService.MediationSection result = service.resolve(
             mediation,
@@ -50,4 +52,3 @@ class SdoMediationSectionServiceTest {
         assertThat(result.text()).isNull();
     }
 }
-

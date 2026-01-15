@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingAddNewDirectionsDJ;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.List;
 
@@ -23,12 +24,11 @@ class DjDirectionsToggleServiceTest {
 
     @Test
     void shouldDetectAdditionalDirections() {
-        CaseData caseData = CaseData.builder()
-            .disposalHearingAddNewDirectionsDJ(List.of(
-                Element.<DisposalHearingAddNewDirectionsDJ>builder()
-                    .value(DisposalHearingAddNewDirectionsDJ.builder().build())
-                    .build()
-            ))
+        DisposalHearingAddNewDirectionsDJ direction = new DisposalHearingAddNewDirectionsDJ();
+        Element<DisposalHearingAddNewDirectionsDJ> element = new Element<>();
+        element.setValue(direction);
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .disposalHearingAddNewDirectionsDJ(List.of(element))
             .build();
         assertThat(service.hasAdditionalDirections(caseData)).isTrue();
     }

@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
@@ -38,7 +39,9 @@ class DjDocumentServiceTest {
 
     @Test
     void shouldGenerateCaseDocumentWhenDocmosisReturnsDocument() {
-        CaseData caseData = CaseData.builder().legacyCaseReference("001").build();
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .legacyCaseReference("001")
+            .build();
         when(generator.generate(caseData, AUTH)).thenReturn(document);
 
         Optional<CaseDocument> result = service.generateOrder(caseData, AUTH);

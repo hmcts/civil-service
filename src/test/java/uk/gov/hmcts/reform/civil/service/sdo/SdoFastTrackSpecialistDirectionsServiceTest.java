@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackRoadTrafficAccident;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
 
@@ -52,7 +53,7 @@ class SdoFastTrackSpecialistDirectionsServiceTest {
 
     @Test
     void shouldPopulateAllSpecialistSections() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         service.populateSpecialistDirections(caseData);
 

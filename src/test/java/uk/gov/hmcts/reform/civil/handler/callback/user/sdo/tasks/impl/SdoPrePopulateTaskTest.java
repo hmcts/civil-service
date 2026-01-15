@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.Dir
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoPrePopulateService;
 
 import java.util.Map;
@@ -28,7 +29,7 @@ class SdoPrePopulateTaskTest {
     @Test
     void shouldReturnExistingCaseDataDuringPrePopulate() {
         SdoPrePopulateTask task = new SdoPrePopulateTask(prePopulateService);
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         when(prePopulateService.prePopulate(any())).thenReturn(caseData);
         CallbackParams params = CallbackParams.builder()
             .params(Map.of(BEARER_TOKEN, "token"))

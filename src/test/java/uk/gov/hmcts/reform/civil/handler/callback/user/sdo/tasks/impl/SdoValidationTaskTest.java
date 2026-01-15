@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.Dir
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoValidationService;
 
 import java.util.Collections;
@@ -29,7 +30,7 @@ class SdoValidationTaskTest {
 
     @Test
     void shouldReturnErrorsFromService() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         when(validationService.validate(caseData)).thenReturn(List.of("validation-error"));
 
         CallbackParams params = CallbackParams.builder()

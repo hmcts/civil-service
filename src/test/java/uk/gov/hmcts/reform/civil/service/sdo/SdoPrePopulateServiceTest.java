@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 
@@ -190,12 +191,11 @@ class SdoPrePopulateServiceTest {
     @Test
     void shouldPopulateLocationNameWhenLegalAdvisorRoute() {
         CaseData caseData = baseCaseData();
-        RequestedCourt requestedCourt = RequestedCourt.builder()
-            .caseLocation(CaseLocationCivil.builder().baseLocation("EPIMS999").build())
-            .build();
+        RequestedCourt requestedCourt = new RequestedCourt();
+        requestedCourt.setCaseLocation(new CaseLocationCivil().setBaseLocation("EPIMS999"));
         when(locationHelper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData)).thenReturn(Optional.of(requestedCourt));
         when(locationService.fetchCourtLocationsByEpimmsId(AUTH_TOKEN, "EPIMS999"))
-            .thenReturn(List.of(LocationRefData.builder().siteName("Preferred Court").build()));
+            .thenReturn(List.of(locationRefData()));
 
         DirectionsOrderTaskContext context = buildContext(caseData);
 
@@ -213,21 +213,26 @@ class SdoPrePopulateServiceTest {
     }
 
     private CaseData baseCaseData() {
-        return CaseData.builder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("EPIMS123").build())
-            .totalClaimAmount(BigDecimal.valueOf(500))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("EPIMS123"));
+        caseData.setTotalClaimAmount(BigDecimal.valueOf(500));
+        return caseData;
     }
 
     private DynamicList dynamicList(String code, String label) {
-        DynamicListElement element = DynamicListElement.builder()
-            .code(code)
-            .label(label)
-            .build();
-        return DynamicList.builder()
-            .value(element)
-            .listItems(List.of(element))
-            .build();
+        DynamicListElement element = new DynamicListElement();
+        element.setCode(code);
+        element.setLabel(label);
+        DynamicList list = new DynamicList();
+        list.setValue(element);
+        list.setListItems(List.of(element));
+        return list;
+    }
+
+    private LocationRefData locationRefData() {
+        LocationRefData locationRefData = new LocationRefData();
+        locationRefData.setSiteName("Preferred Court");
+        return locationRefData;
     }
 }

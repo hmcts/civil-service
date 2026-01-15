@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
@@ -36,8 +37,8 @@ class SdoDocumentServiceTest {
 
     @Test
     void shouldReturnDocument_whenGeneratorProducesOutput() {
-        CaseData caseData = CaseData.builder().build();
-        CaseDocument expectedDocument = CaseDocument.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        CaseDocument expectedDocument = new CaseDocument();
 
         when(sdoGeneratorService.generate(caseData, AUTH_TOKEN)).thenReturn(expectedDocument);
 
@@ -49,7 +50,7 @@ class SdoDocumentServiceTest {
 
     @Test
     void shouldReturnEmpty_whenGeneratorReturnsNull() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         when(sdoGeneratorService.generate(caseData, AUTH_TOKEN)).thenReturn(null);
 
         Optional<CaseDocument> generated = sdoDocumentService.generateSdoDocument(caseData, AUTH_TOKEN);
@@ -59,7 +60,7 @@ class SdoDocumentServiceTest {
 
     @Test
     void shouldAssignCategoryToDocument() {
-        CaseDocument document = CaseDocument.builder().build();
+        CaseDocument document = new CaseDocument();
         String category = "caseManagementOrders";
 
         sdoDocumentService.assignCategory(document, category);
@@ -67,4 +68,3 @@ class SdoDocumentServiceTest {
         verify(assignCategoryId).assignCategoryIdToCaseDocument(document, category);
     }
 }
-

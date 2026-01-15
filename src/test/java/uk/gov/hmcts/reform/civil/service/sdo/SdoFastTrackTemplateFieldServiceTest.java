@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.List;
 
@@ -22,10 +23,9 @@ class SdoFastTrackTemplateFieldServiceTest {
 
     @Test
     void shouldResolveHearingMethodLabels() {
-        CaseData caseData = CaseData.builder()
-            .fastTrackMethodTelephoneHearing(FastTrackMethodTelephoneHearing.telephoneTheClaimant)
-            .fastTrackMethodVideoConferenceHearing(FastTrackMethodVideoConferenceHearing.videoTheDefendant)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setFastTrackMethodTelephoneHearing(FastTrackMethodTelephoneHearing.telephoneTheClaimant);
+        caseData.setFastTrackMethodVideoConferenceHearing(FastTrackMethodVideoConferenceHearing.videoTheDefendant);
 
         assertThat(service.getMethodTelephoneHearingLabel(caseData)).isEqualTo("the claimant");
         assertThat(service.getMethodVideoConferenceHearingLabel(caseData)).isEqualTo("the defendant");
@@ -33,13 +33,10 @@ class SdoFastTrackTemplateFieldServiceTest {
 
     @Test
     void shouldDescribeTrialBundleSelections() {
-        CaseData caseData = CaseData.builder()
-            .fastTrackTrial(FastTrackTrial.builder()
-                                .type(List.of(
-                                    FastTrackTrialBundleType.DOCUMENTS,
-                                    FastTrackTrialBundleType.ELECTRONIC))
-                                .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        FastTrackTrial trial = new FastTrackTrial();
+        trial.setType(List.of(FastTrackTrialBundleType.DOCUMENTS, FastTrackTrialBundleType.ELECTRONIC));
+        caseData.setFastTrackTrial(trial);
 
         String expected = FastTrackTrialBundleType.DOCUMENTS.getLabel()
             + " / "
@@ -50,12 +47,11 @@ class SdoFastTrackTemplateFieldServiceTest {
 
     @Test
     void shouldDescribeFastTrackAllocationWithoutBand() {
-        CaseData caseData = CaseData.builder()
-            .fastTrackAllocation(FastTrackAllocation.builder()
-                                     .assignComplexityBand(YesOrNo.NO)
-                                     .reasons("it is proportionate")
-                                     .build())
-            .build();
+        FastTrackAllocation allocation = new FastTrackAllocation();
+        allocation.setAssignComplexityBand(YesOrNo.NO);
+        allocation.setReasons("it is proportionate");
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setFastTrackAllocation(allocation);
 
         assertThat(service.getAllocationSummary(caseData))
             .isEqualTo("The claim is allocated to the Fast Track and is not assigned to a complexity band because it is proportionate");
@@ -63,13 +59,12 @@ class SdoFastTrackTemplateFieldServiceTest {
 
     @Test
     void shouldDescribeFastTrackAllocationWithBand() {
-        CaseData caseData = CaseData.builder()
-            .fastTrackAllocation(FastTrackAllocation.builder()
-                                     .assignComplexityBand(YesOrNo.YES)
-                                     .band(ComplexityBand.BAND_2)
-                                     .reasons("complex evidence")
-                                     .build())
-            .build();
+        FastTrackAllocation allocation = new FastTrackAllocation();
+        allocation.setAssignComplexityBand(YesOrNo.YES);
+        allocation.setBand(ComplexityBand.BAND_2);
+        allocation.setReasons("complex evidence");
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setFastTrackAllocation(allocation);
 
         assertThat(service.getAllocationSummary(caseData))
             .isEqualTo("The claim is allocated to the Fast Track and is assigned to complexity band 2 because complex evidence");
@@ -77,24 +72,22 @@ class SdoFastTrackTemplateFieldServiceTest {
 
     @Test
     void shouldReturnEmptyAllocationSummaryWhenMissing() {
-        assertThat(service.getAllocationSummary(CaseData.builder().build())).isEmpty();
+        assertThat(service.getAllocationSummary(CaseDataBuilder.builder().build())).isEmpty();
     }
 
     @Test
     void shouldFormatFastTrackHearingTime() {
-        CaseData otherDuration = CaseData.builder()
-            .fastTrackHearingTime(FastTrackHearingTime.builder()
-                                      .hearingDuration(FastTrackHearingTimeEstimate.OTHER)
-                                      .otherHours("2")
-                                      .otherMinutes("30")
-                                      .build())
-            .build();
+        FastTrackHearingTime otherHearingTime = new FastTrackHearingTime();
+        otherHearingTime.setHearingDuration(FastTrackHearingTimeEstimate.OTHER);
+        otherHearingTime.setOtherHours("2");
+        otherHearingTime.setOtherMinutes("30");
+        CaseData otherDuration = CaseDataBuilder.builder().build();
+        otherDuration.setFastTrackHearingTime(otherHearingTime);
 
-        CaseData standardDuration = CaseData.builder()
-            .fastTrackHearingTime(FastTrackHearingTime.builder()
-                                      .hearingDuration(FastTrackHearingTimeEstimate.TWO_HOURS)
-                                      .build())
-            .build();
+        CaseData standardDuration = CaseDataBuilder.builder().build();
+        FastTrackHearingTime standardHearingTime = new FastTrackHearingTime();
+        standardHearingTime.setHearingDuration(FastTrackHearingTimeEstimate.TWO_HOURS);
+        standardDuration.setFastTrackHearingTime(standardHearingTime);
 
         assertThat(service.getHearingTimeLabel(otherDuration)).isEqualTo("2 hours 30 minutes");
         assertThat(service.getHearingTimeLabel(standardDuration)).isEqualTo("2 hours");

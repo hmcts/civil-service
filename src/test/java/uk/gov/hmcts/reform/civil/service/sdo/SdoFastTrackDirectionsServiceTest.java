@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.List;
 
@@ -18,13 +19,11 @@ class SdoFastTrackDirectionsServiceTest {
 
     @Test
     void shouldResolveAdditionalDirectionsFromEitherSource() {
-        CaseData viaFastClaims = CaseData.builder()
-            .fastClaims(List.of(FastTrack.fastClaimPersonalInjury))
-            .build();
+        CaseData viaFastClaims = CaseDataBuilder.builder().build();
+        viaFastClaims.setFastClaims(List.of(FastTrack.fastClaimPersonalInjury));
 
-        CaseData viaTrialSelections = CaseData.builder()
-            .trialAdditionalDirectionsForFastTrack(List.of(FastTrack.fastClaimRoadTrafficAccident))
-            .build();
+        CaseData viaTrialSelections = CaseDataBuilder.builder().build();
+        viaTrialSelections.setTrialAdditionalDirectionsForFastTrack(List.of(FastTrack.fastClaimRoadTrafficAccident));
 
         assertThat(service.hasFastAdditionalDirections(viaFastClaims, FastTrack.fastClaimPersonalInjury)).isTrue();
         assertThat(service.hasFastAdditionalDirections(viaFastClaims, FastTrack.fastClaimRoadTrafficAccident)).isFalse();
@@ -33,14 +32,13 @@ class SdoFastTrackDirectionsServiceTest {
 
     @Test
     void shouldDetectFastTrackVariableStates() {
-        CaseData caseData = CaseData.builder()
-            .fastTrackAltDisputeResolutionToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
-            .fastTrackTrialBundleToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
-            .fastTrackHearingTime(FastTrackHearingTime.builder()
-                                      .dateToToggle(List.of(DateToShowToggle.SHOW))
-                                      .hearingDuration(FastTrackHearingTimeEstimate.TWO_HOURS)
-                                      .build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setFastTrackAltDisputeResolutionToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW));
+        caseData.setFastTrackTrialBundleToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW));
+        FastTrackHearingTime hearingTime = new FastTrackHearingTime();
+        hearingTime.setDateToToggle(List.of(DateToShowToggle.SHOW));
+        hearingTime.setHearingDuration(FastTrackHearingTimeEstimate.TWO_HOURS);
+        caseData.setFastTrackHearingTime(hearingTime);
 
         assertThat(service.hasFastTrackVariable(caseData, FastTrackVariable.ALT_DISPUTE_RESOLUTION)).isTrue();
         assertThat(service.hasFastTrackVariable(caseData, FastTrackVariable.TRIAL_DATE_TO_TOGGLE)).isTrue();

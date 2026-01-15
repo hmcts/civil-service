@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SmallClaimsMediation;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsMediation;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.math.BigDecimal;
 
@@ -21,19 +22,17 @@ class SdoSmallClaimsTemplateFieldServiceTest {
 
     @Test
     void shouldFormatHearingTimeLabels() {
-        CaseData otherEstimate = CaseData.builder()
-            .smallClaimsHearing(SmallClaimsHearing.builder()
-                                    .time(SmallClaimsTimeEstimate.OTHER)
-                                    .otherHours(BigDecimal.valueOf(2))
-                                    .otherMinutes(BigDecimal.valueOf(45))
-                                    .build())
-            .build();
+        SmallClaimsHearing otherHearing = new SmallClaimsHearing();
+        otherHearing.setTime(SmallClaimsTimeEstimate.OTHER);
+        otherHearing.setOtherHours(BigDecimal.valueOf(2));
+        otherHearing.setOtherMinutes(BigDecimal.valueOf(45));
+        CaseData otherEstimate = CaseDataBuilder.builder().build();
+        otherEstimate.setSmallClaimsHearing(otherHearing);
 
-        CaseData standardEstimate = CaseData.builder()
-            .smallClaimsHearing(SmallClaimsHearing.builder()
-                                    .time(SmallClaimsTimeEstimate.THREE_HOURS)
-                                    .build())
-            .build();
+        CaseData standardEstimate = CaseDataBuilder.builder().build();
+        SmallClaimsHearing standardHearing = new SmallClaimsHearing();
+        standardHearing.setTime(SmallClaimsTimeEstimate.THREE_HOURS);
+        standardEstimate.setSmallClaimsHearing(standardHearing);
 
         assertThat(service.getHearingTimeLabel(otherEstimate)).isEqualTo("2 hours 45 minutes");
         assertThat(service.getHearingTimeLabel(standardEstimate)).isEqualTo("three hours");
@@ -41,10 +40,9 @@ class SdoSmallClaimsTemplateFieldServiceTest {
 
     @Test
     void shouldReturnMethodLabels() {
-        CaseData caseData = CaseData.builder()
-            .smallClaimsMethodTelephoneHearing(SmallClaimsMethodTelephoneHearing.telephoneTheClaimant)
-            .smallClaimsMethodVideoConferenceHearing(SmallClaimsMethodVideoConferenceHearing.videoTheDefendant)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setSmallClaimsMethodTelephoneHearing(SmallClaimsMethodTelephoneHearing.telephoneTheClaimant);
+        caseData.setSmallClaimsMethodVideoConferenceHearing(SmallClaimsMethodVideoConferenceHearing.videoTheDefendant);
 
         assertThat(service.getMethodTelephoneHearingLabel(caseData)).isEqualTo("the claimant");
         assertThat(service.getMethodVideoConferenceHearingLabel(caseData)).isEqualTo("the defendant");
@@ -52,17 +50,14 @@ class SdoSmallClaimsTemplateFieldServiceTest {
 
     @Test
     void shouldHandleMediationSections() {
-        SmallClaimsMediation standardMediation = SmallClaimsMediation.builder()
-            .input("Schedule ADR")
-            .build();
-        SdoR2SmallClaimsMediation drhMediation = SdoR2SmallClaimsMediation.builder()
-            .input("Schedule ADR")
-            .build();
+        SmallClaimsMediation standardMediation = new SmallClaimsMediation();
+        standardMediation.setInput("Schedule ADR");
+        SdoR2SmallClaimsMediation drhMediation = new SdoR2SmallClaimsMediation();
+        drhMediation.setInput("Schedule ADR");
 
-        CaseData caseData = CaseData.builder()
-            .smallClaimsMediationSectionStatement(standardMediation)
-            .sdoR2SmallClaimsMediationSectionStatement(drhMediation)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setSmallClaimsMediationSectionStatement(standardMediation);
+        caseData.setSdoR2SmallClaimsMediationSectionStatement(drhMediation);
 
         assertThat(service.getMediationText(caseData)).isEqualTo("Schedule ADR");
         assertThat(service.showMediationSection(caseData, true)).isTrue();
@@ -74,7 +69,7 @@ class SdoSmallClaimsTemplateFieldServiceTest {
 
     @Test
     void shouldReturnFalseWhenMediationMissing() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         assertThat(service.showMediationSection(caseData, true)).isFalse();
         assertThat(service.showMediationSectionDrh(caseData, true)).isFalse();

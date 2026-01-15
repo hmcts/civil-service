@@ -101,8 +101,10 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
         @Test
         void shouldNotifyDefendantSolicitor_whenInvoked() {
 
+            Organisation organisation = new Organisation();
+            organisation.setName("Test Org Name");
             when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                    .thenReturn(Optional.of(organisation));
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
                     .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
@@ -126,8 +128,10 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
         @Test
         void shouldNotifyDefendantSolicitor2Defendants_whenInvoked() {
 
+            Organisation organisation = new Organisation();
+            organisation.setName("Test Org Name");
             when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                    .thenReturn(Optional.of(organisation));
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
                     .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
@@ -149,8 +153,10 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
         @Test
         void shouldNotNotifyDefendantSolicitor2Defendants_whenInvokedAndNo2Defendant() {
 
+            Organisation organisation = new Organisation();
+            organisation.setName("Test Org Name");
             when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                    .thenReturn(Optional.of(organisation));
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
                     .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
@@ -215,8 +221,10 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
 
         @Test
         public void shouldThrowErrorWhenMissingEmail() {
+            Organisation organisation = new Organisation();
+            organisation.setName("Test Org Name");
             when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                    .thenReturn(Optional.of(organisation));
 
             doThrow(new RuntimeException()).when(notificationService).sendMail(isNull(), any(), any(), any());
             CaseData caseData = CaseDataBuilder.builder()
@@ -246,8 +254,10 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
         @Test
         void shouldThrowErrorWhenInvalidDefendant2Email() {
             final String invalidEmail = "invalidEmail@123";
+            Organisation organisation = new Organisation();
+            organisation.setName("Test Org Name");
             when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                    .thenReturn(Optional.of(organisation));
 
             doThrow(new RuntimeException()).when(notificationService).sendMail(eq(invalidEmail), any(), any(), any());
             CaseData caseData = CaseDataBuilder.builder()

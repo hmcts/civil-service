@@ -64,10 +64,9 @@ class SdoNihlTemplateServiceTest {
         when(trialTemplateFieldService.getTrialMethodOfHearing(caseData)).thenReturn("In person");
         when(trialTemplateFieldService.getPhysicalBundlePartyText(caseData)).thenReturn("party text");
 
-        LocationRefData location = LocationRefData.builder()
-            .epimmsId("123")
-            .siteName("Court A")
-            .build();
+        LocationRefData location = new LocationRefData();
+        location.setEpimmsId("123");
+        location.setSiteName("Court A");
         when(locationHelper.getHearingLocation(any(), eq(caseData), any())).thenReturn(location);
 
         SdoDocumentFormFastNihl result = service.buildTemplate(caseData, "Judge Judy", true, "token");

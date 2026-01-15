@@ -46,10 +46,9 @@ class SdoFastTrackTemplateServiceTest {
         when(templateFieldService.getHearingTimeLabel(caseData)).thenReturn("4 hours");
         when(templateFieldService.getTrialBundleTypeText(caseData)).thenReturn("bundle text");
 
-        LocationRefData location = LocationRefData.builder()
-            .epimmsId("123")
-            .siteName("Court A")
-            .build();
+        LocationRefData location = new LocationRefData();
+        location.setEpimmsId("123");
+        location.setSiteName("Court A");
         when(locationHelper.getHearingLocation(any(), eq(caseData), any())).thenReturn(location);
 
         SdoDocumentFormFast result = service.buildTemplate(caseData, "Judge Judy", true, "token");

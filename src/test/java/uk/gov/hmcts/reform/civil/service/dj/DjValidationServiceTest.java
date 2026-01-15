@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.dj;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.List;
 
@@ -14,11 +15,11 @@ class DjValidationServiceTest {
 
     @Test
     void shouldReturnErrorWhenWitnessNumbersAreNegative() {
-        CaseData caseData = CaseData.builder()
-            .trialHearingWitnessOfFactDJ(TrialHearingWitnessOfFact.builder()
-                .input2("-1")
-                .input3("0")
-                .build())
+        TrialHearingWitnessOfFact witnessOfFact = new TrialHearingWitnessOfFact();
+        witnessOfFact.setInput2("-1");
+        witnessOfFact.setInput3("0");
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .trialHearingWitnessOfFactDJ(witnessOfFact)
             .build();
 
         List<String> errors = validationService.validate(caseData);
@@ -28,11 +29,11 @@ class DjValidationServiceTest {
 
     @Test
     void shouldReturnEmptyListWhenWitnessNumbersAreValid() {
-        CaseData caseData = CaseData.builder()
-            .trialHearingWitnessOfFactDJ(TrialHearingWitnessOfFact.builder()
-                .input2("2")
-                .input3("3")
-                .build())
+        TrialHearingWitnessOfFact witnessOfFact = new TrialHearingWitnessOfFact();
+        witnessOfFact.setInput2("2");
+        witnessOfFact.setInput3("3");
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .trialHearingWitnessOfFactDJ(witnessOfFact)
             .build();
 
         List<String> errors = validationService.validate(caseData);
@@ -42,11 +43,10 @@ class DjValidationServiceTest {
 
     @Test
     void shouldReturnEmptyListWhenWitnessSectionMissing() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         List<String> errors = validationService.validate(caseData);
 
         assertThat(errors).isEmpty();
     }
 }
-

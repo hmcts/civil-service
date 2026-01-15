@@ -48,13 +48,15 @@ class NonImmediatePaymentTypeDefaultJudgmentFormBuilderTest {
             organisationService,
             new DjWelshTextService()
         );
-        when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder().name("org name")
-            .contactInformation(Collections.singletonList(ContactInformation.builder()
-                    .addressLine1("addressLine1")
-                    .addressLine2("addressLine2")
-                    .addressLine3("addressLine3")
-                    .postCode("postCode")
-                    .build())).build()));
+        ContactInformation contactInformation = new ContactInformation();
+        contactInformation.setAddressLine1("addressLine1");
+        contactInformation.setAddressLine2("addressLine2");
+        contactInformation.setAddressLine3("addressLine3");
+        contactInformation.setPostCode("postCode");
+        Organisation organisation = new Organisation();
+        organisation.setName("org name");
+        organisation.setContactInformation(Collections.singletonList(contactInformation));
+        when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(organisation));
     }
 
     @Test

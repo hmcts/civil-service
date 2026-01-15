@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.Dir
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dj.DjOrderDetailsService;
 
 import java.util.Collections;
@@ -30,8 +31,9 @@ class DjOrderDetailsTaskTest {
 
     @Test
     void shouldPopulateTrialDisposalScreen() {
-        CaseData original = CaseData.builder().build();
-        CaseData updated = CaseData.builder().legacyCaseReference("updated").build();
+        CaseData original = CaseDataBuilder.builder().build();
+        CaseData updated = CaseDataBuilder.builder().build();
+        updated.setLegacyCaseReference("updated");
         CallbackParams params = CallbackParams.builder()
             .params(Collections.emptyMap())
             .pageId("trial-disposal-screen")
@@ -49,8 +51,9 @@ class DjOrderDetailsTaskTest {
 
     @Test
     void shouldApplyHearingSelectionsForCreateOrderPage() {
-        CaseData original = CaseData.builder().build();
-        CaseData updated = CaseData.builder().ccdCaseReference(123L).build();
+        CaseData original = CaseDataBuilder.builder().build();
+        CaseData updated = CaseDataBuilder.builder().build();
+        updated.setCcdCaseReference(123L);
         CallbackParams params = CallbackParams.builder()
             .params(Collections.emptyMap())
             .pageId("create-order")
@@ -72,7 +75,8 @@ class DjOrderDetailsTaskTest {
 
     @Test
     void shouldReturnOriginalCaseDataWhenPageNotHandled() {
-        CaseData original = CaseData.builder().legacyCaseReference("original").build();
+        CaseData original = CaseDataBuilder.builder().build();
+        original.setLegacyCaseReference("original");
         CallbackParams params = CallbackParams.builder()
             .params(Collections.emptyMap())
             .pageId("unknown-page")

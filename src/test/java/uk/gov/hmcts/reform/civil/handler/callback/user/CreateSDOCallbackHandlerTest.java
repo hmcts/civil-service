@@ -398,17 +398,13 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateLocationListsWithPreselectedCourt() {
-            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
-                "Y").build();
-            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            Category category = hearingChannelCategory("INTER", "In Person");
+            CategorySearchResult categorySearchResult = categorySearchResult(category);
             String preSelectedCourt = "214320";
             List<LocationRefData> locations = List.of(
-                LocationRefData.builder().epimmsId("00001").courtLocationCode("00001")
-                    .siteName("court 1").courtAddress("1 address").postcode("Y01 7RB").build(),
-                LocationRefData.builder().epimmsId(preSelectedCourt).courtLocationCode(preSelectedCourt)
-                    .siteName("court 2").courtAddress("2 address").postcode("Y02 7RB").build(),
-                LocationRefData.builder().epimmsId("00003").courtLocationCode("00003")
-                    .siteName("court 3").courtAddress("3 address").postcode("Y03 7RB").build()
+                locationRefData("00001", "00001", "court 1", "1 address", "Y01 7RB"),
+                locationRefData(preSelectedCourt, preSelectedCourt, "court 2", "2 address", "Y02 7RB"),
+                locationRefData("00003", "00003", "court 3", "3 address", "Y03 7RB")
             );
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
@@ -435,17 +431,13 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateLocationListsWithPreselectedCourtAndEnableWelshFlagWithClaimantLanguagePreference() {
-            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
-                "Y").build();
-            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            Category category = hearingChannelCategory("INTER", "In Person");
+            CategorySearchResult categorySearchResult = categorySearchResult(category);
             String preSelectedCourt = "214320";
             List<LocationRefData> locations = List.of(
-                LocationRefData.builder().epimmsId("00001").courtLocationCode("00001")
-                    .siteName("court 1").courtAddress("1 address").postcode("Y01 7RB").build(),
-                LocationRefData.builder().epimmsId(preSelectedCourt).courtLocationCode(preSelectedCourt)
-                    .siteName("court 2").courtAddress("2 address").postcode("Y02 7RB").build(),
-                LocationRefData.builder().epimmsId("00003").courtLocationCode("00003")
-                    .siteName("court 3").courtAddress("3 address").postcode("Y03 7RB").build()
+                locationRefData("00001", "00001", "court 1", "1 address", "Y01 7RB"),
+                locationRefData(preSelectedCourt, preSelectedCourt, "court 2", "2 address", "Y02 7RB"),
+                locationRefData("00003", "00003", "court 3", "3 address", "Y03 7RB")
             );
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
@@ -474,17 +466,13 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateLocationListsWithPreselectedCourtAndEnableWelshFlagWithRespondentLanguagePreference() {
-            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
-                "Y").build();
-            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            Category category = hearingChannelCategory("INTER", "In Person");
+            CategorySearchResult categorySearchResult = categorySearchResult(category);
             String preSelectedCourt = "214320";
             List<LocationRefData> locations = List.of(
-                LocationRefData.builder().epimmsId("00001").courtLocationCode("00001")
-                    .siteName("court 1").courtAddress("1 address").postcode("Y01 7RB").build(),
-                LocationRefData.builder().epimmsId(preSelectedCourt).courtLocationCode(preSelectedCourt)
-                    .siteName("court 2").courtAddress("2 address").postcode("Y02 7RB").build(),
-                LocationRefData.builder().epimmsId("00003").courtLocationCode("00003")
-                    .siteName("court 3").courtAddress("3 address").postcode("Y03 7RB").build()
+                locationRefData("00001", "00001", "court 1", "1 address", "Y01 7RB"),
+                locationRefData(preSelectedCourt, preSelectedCourt, "court 2", "2 address", "Y02 7RB"),
+                locationRefData("00003", "00003", "court 3", "3 address", "Y03 7RB")
             );
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
@@ -521,17 +509,13 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateLocationListsWithPreselectedCourtAndEnableWelshFlagWithNoClaimantAndRespondentLanguagePreference() {
-            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
-                "Y").build();
-            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            Category category = hearingChannelCategory("INTER", "In Person");
+            CategorySearchResult categorySearchResult = categorySearchResult(category);
             String preSelectedCourt = "214320";
             List<LocationRefData> locations = List.of(
-                LocationRefData.builder().epimmsId("00001").courtLocationCode("00001")
-                    .siteName("court 1").courtAddress("1 address").postcode("Y01 7RB").build(),
-                LocationRefData.builder().epimmsId(preSelectedCourt).courtLocationCode(preSelectedCourt)
-                    .siteName("court 2").courtAddress("2 address").postcode("Y02 7RB").build(),
-                LocationRefData.builder().epimmsId("00003").courtLocationCode("00003")
-                    .siteName("court 3").courtAddress("3 address").postcode("Y03 7RB").build()
+                locationRefData("00001", "00001", "court 1", "1 address", "Y01 7RB"),
+                locationRefData(preSelectedCourt, preSelectedCourt, "court 2", "2 address", "Y02 7RB"),
+                locationRefData("00003", "00003", "court 3", "3 address", "Y03 7RB")
             );
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
@@ -568,17 +552,13 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateLocationListsWithPreselectedCourtAndEnableWelshFlagWithClaimantAndRespondentLanguagePreference() {
-            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
-                "Y").build();
-            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            Category category = hearingChannelCategory("INTER", "In Person");
+            CategorySearchResult categorySearchResult = categorySearchResult(category);
             String preSelectedCourt = "214320";
             List<LocationRefData> locations = List.of(
-                LocationRefData.builder().epimmsId("00001").courtLocationCode("00001")
-                    .siteName("court 1").courtAddress("1 address").postcode("Y01 7RB").build(),
-                LocationRefData.builder().epimmsId(preSelectedCourt).courtLocationCode(preSelectedCourt)
-                    .siteName("court 2").courtAddress("2 address").postcode("Y02 7RB").build(),
-                LocationRefData.builder().epimmsId("00003").courtLocationCode("00003")
-                    .siteName("court 3").courtAddress("3 address").postcode("Y03 7RB").build()
+                locationRefData("00001", "00001", "court 1", "1 address", "Y01 7RB"),
+                locationRefData(preSelectedCourt, preSelectedCourt, "court 2", "2 address", "Y02 7RB"),
+                locationRefData("00003", "00003", "court 3", "3 address", "Y03 7RB")
             );
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
@@ -615,9 +595,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGenerateDynamicListsCorrectly() {
-            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
-                "Y").build();
-            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            Category category = hearingChannelCategory("INTER", "In Person");
+            CategorySearchResult categorySearchResult = categorySearchResult(category);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
 
@@ -723,12 +702,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPopulateHearingCourtLocationForNihl() {
             String preSelectedCourt = "214320";
             List<LocationRefData> locations = List.of(
-                LocationRefData.builder().epimmsId("00001").courtLocationCode("00001")
-                    .siteName("court 1").courtAddress("1 address").postcode("Y01 7RB").build(),
-                LocationRefData.builder().epimmsId(preSelectedCourt).courtLocationCode(preSelectedCourt)
-                    .siteName("court 2").courtAddress("2 address").postcode("Y02 7RB").build(),
-                LocationRefData.builder().epimmsId("00003").courtLocationCode("00003")
-                    .siteName("court 3").courtAddress("3 address").postcode("Y03 7RB").build()
+                locationRefData("00001", "00001", "court 1", "1 address", "Y01 7RB"),
+                locationRefData(preSelectedCourt, preSelectedCourt, "court 2", "2 address", "Y02 7RB"),
+                locationRefData("00003", "00003", "court 3", "3 address", "Y03 7RB")
             );
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
@@ -761,18 +737,14 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             String preSelectedCourt = "214320";
             List<LocationRefData> locations = List.of(
-                LocationRefData.builder().epimmsId("00001").courtLocationCode("00001")
-                    .siteName("court 1").courtAddress("1 address").postcode("Y01 7RB").build(),
-                LocationRefData.builder().epimmsId(preSelectedCourt).courtLocationCode(preSelectedCourt)
-                    .siteName("court 2").courtAddress("2 address").postcode("Y02 7RB").build(),
-                LocationRefData.builder().epimmsId("00003").courtLocationCode("00003")
-                    .siteName("court 3").courtAddress("3 address").postcode("Y03 7RB").build()
+                locationRefData("00001", "00001", "court 1", "1 address", "Y01 7RB"),
+                locationRefData(preSelectedCourt, preSelectedCourt, "court 2", "2 address", "Y02 7RB"),
+                locationRefData("00003", "00003", "court 3", "3 address", "Y03 7RB")
             );
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
 
-            Category category = Category.builder().categoryKey("HearingChannel").key(HearingSubChannel.INTER.name())
-                .valueEn(HearingMethod.IN_PERSON.getLabel()).activeFlag("Y").build();
-            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            Category category = hearingChannelCategory(HearingSubChannel.INTER.name(), HearingMethod.IN_PERSON.getLabel());
+            CategorySearchResult categorySearchResult = categorySearchResult(category);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
             CaseData caseData = CaseDataBuilder.builder()
@@ -1304,11 +1276,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .thenReturn(isLocationWhiteListed);
         when(locationRefDataService.getLocationMatchingLabel(optionTwo.getCode(), params.getParams().get(
             CallbackParams.Params.BEARER_TOKEN).toString()))
-            .thenReturn(Optional.of(LocationRefData.builder()
-                                        .regionId("region id")
-                                        .epimmsId("epimms id")
-                                        .siteName("site name")
-                                        .build()));
+            .thenReturn(Optional.of(locationRefDataWithRegion()));
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
@@ -1732,9 +1700,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setCaseManagementLocation(createCaseLocation("00000", null));
             given(locationRefDataService.getHearingCourtLocations(any()))
                 .willReturn(getSampleCourLocationsRefObjectToSort());
-            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
-                "Y").build();
-            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            Category category = hearingChannelCategory("INTER", "In Person");
+            CategorySearchResult categorySearchResult = categorySearchResult(category);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
             given(featureToggleService.isCarmEnabledForCase(any())).willReturn(true);
@@ -2194,9 +2161,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1DQWithLocation().build();
             given(locationRefDataService.getHearingCourtLocations(any()))
                 .willReturn(getSampleCourLocationsRefObjectToSort());
-            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
-                "Y").build();
-            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            Category category = hearingChannelCategory("INTER", "In Person");
+            CategorySearchResult categorySearchResult = categorySearchResult(category);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
             given(featureToggleService.isCarmEnabledForCase(any())).willReturn(false);
@@ -2221,9 +2187,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1DQWithLocation().build();
             given(locationRefDataService.getHearingCourtLocations(any()))
                 .willReturn(getSampleCourLocationsRefObjectToSort());
-            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
-                "Y").build();
-            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            Category category = hearingChannelCategory("INTER", "In Person");
+            CategorySearchResult categorySearchResult = categorySearchResult(category);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
 
@@ -2258,9 +2223,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1DQWithLocation().build();
             given(locationRefDataService.getHearingCourtLocations(any()))
                 .willReturn(getSampleCourLocationsRefObjectToSort());
-            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
-                "Y").build();
-            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            Category category = hearingChannelCategory("INTER", "In Person");
+            CategorySearchResult categorySearchResult = categorySearchResult(category);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
 
@@ -2295,18 +2259,14 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
             String preSelectedCourt = "214320";
             List<LocationRefData> locations = List.of(
-                LocationRefData.builder().epimmsId("00001").courtLocationCode("00001")
-                    .siteName("court 1").courtAddress("1 address").postcode("Y01 7RB").build(),
-                LocationRefData.builder().epimmsId(preSelectedCourt).courtLocationCode(preSelectedCourt)
-                    .siteName("court 2").courtAddress("2 address").postcode("Y02 7RB").build(),
-                LocationRefData.builder().epimmsId("00003").courtLocationCode("00003")
-                    .siteName("court 3").courtAddress("3 address").postcode("Y03 7RB").build()
+                locationRefData("00001", "00001", "court 1", "1 address", "Y01 7RB"),
+                locationRefData(preSelectedCourt, preSelectedCourt, "court 2", "2 address", "Y02 7RB"),
+                locationRefData("00003", "00003", "court 3", "3 address", "Y03 7RB")
             );
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
 
-            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
-                "Y").build();
-            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            Category category = hearingChannelCategory("INTER", "In Person");
+            CategorySearchResult categorySearchResult = categorySearchResult(category);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
             given(featureToggleService.isCarmEnabledForCase(any())).willReturn(true);
@@ -2372,9 +2332,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
 
-            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
-                "Y").build();
-            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            Category category = hearingChannelCategory("INTER", "In Person");
+            CategorySearchResult categorySearchResult = categorySearchResult(category);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
             given(featureToggleService.isCarmEnabledForCase(any())).willReturn(false);
@@ -2396,9 +2355,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1DQWithLocation().build();
             given(locationRefDataService.getHearingCourtLocations(any()))
                 .willReturn(getSampleCourLocationsRefObjectToSort());
-            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
-                "Y").build();
-            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            Category category = hearingChannelCategory("INTER", "In Person");
+            CategorySearchResult categorySearchResult = categorySearchResult(category);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
 
@@ -2432,18 +2390,14 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
             String preSelectedCourt = "214320";
             List<LocationRefData> locations = List.of(
-                LocationRefData.builder().epimmsId("00001").courtLocationCode("00001")
-                    .siteName("court 1").courtAddress("1 address").postcode("Y01 7RB").build(),
-                LocationRefData.builder().epimmsId(preSelectedCourt).courtLocationCode(preSelectedCourt)
-                    .siteName("court 2").courtAddress("2 address").postcode("Y02 7RB").build(),
-                LocationRefData.builder().epimmsId("00003").courtLocationCode("00003")
-                    .siteName("court 3").courtAddress("3 address").postcode("Y03 7RB").build()
+                locationRefData("00001", "00001", "court 1", "1 address", "Y01 7RB"),
+                locationRefData(preSelectedCourt, preSelectedCourt, "court 2", "2 address", "Y02 7RB"),
+                locationRefData("00003", "00003", "court 3", "3 address", "Y03 7RB")
             );
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
 
-            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
-                "Y").build();
-            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            Category category = hearingChannelCategory("INTER", "In Person");
+            CategorySearchResult categorySearchResult = categorySearchResult(category);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
             given(featureToggleService.isCarmEnabledForCase(any())).willReturn(true);
@@ -3260,5 +3214,44 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 assertThat(response.getErrors()).hasSize(2);
             }
         }
+    }
+
+    private Category hearingChannelCategory(String key, String valueEn) {
+        Category category = new Category();
+        category.setCategoryKey("HearingChannel");
+        category.setKey(key);
+        category.setValueEn(valueEn);
+        category.setActiveFlag("Y");
+        return category;
+    }
+
+    private CategorySearchResult categorySearchResult(Category category) {
+        CategorySearchResult result = new CategorySearchResult();
+        result.setCategories(List.of(category));
+        return result;
+    }
+
+    private LocationRefData locationRefData(
+        String epimmsId,
+        String courtLocationCode,
+        String siteName,
+        String courtAddress,
+        String postcode
+    ) {
+        LocationRefData location = new LocationRefData();
+        location.setEpimmsId(epimmsId);
+        location.setCourtLocationCode(courtLocationCode);
+        location.setSiteName(siteName);
+        location.setCourtAddress(courtAddress);
+        location.setPostcode(postcode);
+        return location;
+    }
+
+    private LocationRefData locationRefDataWithRegion() {
+        LocationRefData location = new LocationRefData();
+        location.setRegionId("region id");
+        location.setEpimmsId("epimms id");
+        location.setSiteName("site name");
+        return location;
     }
 }

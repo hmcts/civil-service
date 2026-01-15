@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.List;
 
@@ -19,91 +20,86 @@ class SdoCaseClassificationServiceTest {
 
     @Test
     void shouldDetectSmallClaimsTrack() {
-        CaseData caseData = CaseData.builder()
-            .drawDirectionsOrderRequired(YesOrNo.NO)
-            .claimsTrack(ClaimsTrack.smallClaimsTrack)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
+        caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
 
         assertThat(service.isSmallClaimsTrack(caseData)).isTrue();
     }
 
     @Test
     void shouldDetectSmallClaimsTrackWhenOrderRequested() {
-        CaseData caseData = CaseData.builder()
-            .drawDirectionsOrderRequired(YesOrNo.YES)
-            .drawDirectionsOrderSmallClaims(YesOrNo.YES)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
+        caseData.setDrawDirectionsOrderSmallClaims(YesOrNo.YES);
 
         assertThat(service.isSmallClaimsTrack(caseData)).isTrue();
     }
 
     @Test
     void shouldDetectFastTrack() {
-        CaseData caseData = CaseData.builder()
-            .drawDirectionsOrderRequired(YesOrNo.NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
+        caseData.setClaimsTrack(ClaimsTrack.fastTrack);
 
         assertThat(service.isFastTrack(caseData)).isTrue();
     }
 
     @Test
     void shouldDetectFastTrackWhenOrderTypeApplies() {
-        CaseData caseData = CaseData.builder()
-            .drawDirectionsOrderRequired(YesOrNo.YES)
-            .drawDirectionsOrderSmallClaims(YesOrNo.NO)
-            .orderType(OrderType.DECIDE_DAMAGES)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
+        caseData.setDrawDirectionsOrderSmallClaims(YesOrNo.NO);
+        caseData.setOrderType(OrderType.DECIDE_DAMAGES);
 
         assertThat(service.isFastTrack(caseData)).isTrue();
     }
 
     @Test
     void shouldDetectNihlFastTrack() {
-        CaseData caseData = CaseData.builder()
-            .drawDirectionsOrderRequired(YesOrNo.NO)
-            .fastClaims(List.of(FastTrack.fastClaimNoiseInducedHearingLoss))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
+        caseData.setFastClaims(List.of(FastTrack.fastClaimNoiseInducedHearingLoss));
 
         assertThat(service.isNihlFastTrack(caseData)).isTrue();
     }
 
     @Test
     void shouldDetectNihlFastTrackFromAdditionalDirections() {
-        CaseData caseData = CaseData.builder()
-            .drawDirectionsOrderRequired(YesOrNo.YES)
-            .trialAdditionalDirectionsForFastTrack(List.of(FastTrack.fastClaimNoiseInducedHearingLoss))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
+        caseData.setTrialAdditionalDirectionsForFastTrack(
+            List.of(FastTrack.fastClaimNoiseInducedHearingLoss)
+        );
 
         assertThat(service.isNihlFastTrack(caseData)).isTrue();
     }
 
     @Test
     void shouldDetectDrhSmallClaim() {
-        CaseData caseData = CaseData.builder()
-            .drawDirectionsOrderRequired(YesOrNo.NO)
-            .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
+        caseData.setSmallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing));
 
         assertThat(service.isDrhSmallClaim(caseData)).isTrue();
     }
 
     @Test
     void shouldDetectDrhSmallClaimFromAdditionalDirections() {
-        CaseData caseData = CaseData.builder()
-            .drawDirectionsOrderRequired(YesOrNo.YES)
-            .drawDirectionsOrderSmallClaimsAdditionalDirections(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
+        caseData.setDrawDirectionsOrderSmallClaimsAdditionalDirections(
+            List.of(SmallTrack.smallClaimDisputeResolutionHearing)
+        );
 
         assertThat(service.isDrhSmallClaim(caseData)).isTrue();
     }
 
     @Test
     void shouldFallbackToFalseForNonMatchingCase() {
-        CaseData caseData = CaseData.builder()
-            .drawDirectionsOrderRequired(YesOrNo.YES)
-            .orderType(OrderType.DECIDE_DAMAGES)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setDrawDirectionsOrderRequired(YesOrNo.YES);
+        caseData.setOrderType(OrderType.DECIDE_DAMAGES);
 
         assertThat(service.isSmallClaimsTrack(caseData)).isFalse();
         assertThat(service.isFastTrack(caseData)).isFalse();
@@ -113,13 +109,14 @@ class SdoCaseClassificationServiceTest {
 
     @Test
     void shouldDetectAdditionalParties() {
-        Party applicant2 = Party.builder().type(Party.Type.INDIVIDUAL).build();
-        Party respondent2 = Party.builder().type(Party.Type.INDIVIDUAL).build();
+        Party applicant2 = new Party();
+        applicant2.setType(Party.Type.INDIVIDUAL);
+        Party respondent2 = new Party();
+        respondent2.setType(Party.Type.INDIVIDUAL);
 
-        CaseData caseData = CaseData.builder()
-            .applicant2(applicant2)
-            .respondent2(respondent2)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setApplicant2(applicant2);
+        caseData.setRespondent2(respondent2);
 
         assertThat(service.hasApplicant2(caseData)).isTrue();
         assertThat(service.hasRespondent2(caseData)).isTrue();
@@ -127,7 +124,7 @@ class SdoCaseClassificationServiceTest {
 
     @Test
     void shouldReportMissingAdditionalParties() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         assertThat(service.hasApplicant2(caseData)).isFalse();
         assertThat(service.hasRespondent2(caseData)).isFalse();

@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.List;
 
@@ -29,7 +30,7 @@ class SdoChecklistServiceTest {
 
     @Test
     void shouldPopulateOrderChecklistsAndDelegateSmallClaimsToggle() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         List<OrderDetailsPagesSectionsToggle> showList = List.of(OrderDetailsPagesSectionsToggle.SHOW);
 
         service.applyOrderChecklists(caseData, showList);
@@ -42,7 +43,7 @@ class SdoChecklistServiceTest {
 
     @Test
     void shouldPopulateR2ChecklistsAndMediationToggle() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         List<IncludeInOrderToggle> includeList = List.of(IncludeInOrderToggle.INCLUDE);
 
         service.applyR2Checklists(caseData, includeList);

@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.Dir
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.List;
 
@@ -17,9 +18,9 @@ class DirectionsOrderCallbackPipelineTest {
 
     @Test
     void shouldMergeTaskResultsInOrder() {
-        CaseData initial = CaseData.builder().legacyCaseReference("initial").build();
-        CaseData updated = CaseData.builder().legacyCaseReference("updated").build();
-        CaseData finalData = CaseData.builder().legacyCaseReference("final").build();
+        CaseData initial = caseDataWithLegacyReference("initial");
+        CaseData updated = caseDataWithLegacyReference("updated");
+        CaseData finalData = caseDataWithLegacyReference("final");
 
         DirectionsOrderCallbackTask firstTask = new StubTask(DirectionsOrderLifecycleStage.MID_EVENT, updated, List.of("first"));
         DirectionsOrderCallbackTask secondTask = new StubTask(DirectionsOrderLifecycleStage.MID_EVENT, finalData, List.of("second"));
@@ -35,7 +36,7 @@ class DirectionsOrderCallbackPipelineTest {
 
     @Test
     void shouldReturnDefaultResult_whenNoTasksSupportStage() {
-        CaseData initial = CaseData.builder().legacyCaseReference("initial").build();
+        CaseData initial = caseDataWithLegacyReference("initial");
         DirectionsOrderCallbackTask task = new StubTask(DirectionsOrderLifecycleStage.PRE_POPULATE, initial, List.of());
 
         DirectionsOrderCallbackPipeline pipeline = new DirectionsOrderCallbackPipeline(List.of(task));
@@ -49,12 +50,16 @@ class DirectionsOrderCallbackPipelineTest {
 
     @Test
     void shouldIgnoreTasksThatDoNotApplyToContext() {
-        CaseData initial = CaseData.builder().legacyCaseReference("initial").build();
-        CaseData applicableResult = CaseData.builder().legacyCaseReference("applicable").build();
+        CaseData initial = caseDataWithLegacyReference("initial");
+        CaseData applicableResult = caseDataWithLegacyReference("applicable");
 
         DirectionsOrderCallbackTask applicableTask = new StubTask(DirectionsOrderLifecycleStage.PRE_POPULATE, applicableResult, List.of(), true);
-        DirectionsOrderCallbackTask ignoredTask = new StubTask(DirectionsOrderLifecycleStage.PRE_POPULATE, CaseData.builder().legacyCaseReference("ignored").build(), List.of(
-                "error"), false);
+        DirectionsOrderCallbackTask ignoredTask = new StubTask(
+            DirectionsOrderLifecycleStage.PRE_POPULATE,
+            caseDataWithLegacyReference("ignored"),
+            List.of("error"),
+            false
+        );
 
         DirectionsOrderCallbackPipeline pipeline = new DirectionsOrderCallbackPipeline(List.of(applicableTask, ignoredTask));
         CallbackRequest request = CallbackRequest.builder().eventId("EVENT").build();
@@ -89,5 +94,11 @@ class DirectionsOrderCallbackPipelineTest {
         public boolean appliesTo(DirectionsOrderTaskContext context) {
             return applies;
         }
+    }
+
+    private CaseData caseDataWithLegacyReference(String legacyCaseReference) {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setLegacyCaseReference(legacyCaseReference);
+        return caseData;
     }
 }

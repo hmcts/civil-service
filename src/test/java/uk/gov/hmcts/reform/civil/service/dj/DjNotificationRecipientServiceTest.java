@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,9 +17,9 @@ class DjNotificationRecipientServiceTest {
 
     @Test
     void shouldReturnClaimantSolicitorEmailWhenRepresented() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .applicant1Represented(YesOrNo.YES)
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@example.com").build())
+            .applicantSolicitor1UserDetails(userDetails("solicitor@example.com"))
             .build();
 
         assertThat(service.getClaimantEmail(caseData)).isEqualTo("solicitor@example.com");
@@ -26,9 +27,9 @@ class DjNotificationRecipientServiceTest {
 
     @Test
     void shouldReturnClaimantLipEmailWhenUnrepresented() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .applicant1Represented(YesOrNo.NO)
-            .claimantUserDetails(IdamUserDetails.builder().email("applicant@example.com").build())
+            .claimantUserDetails(userDetails("applicant@example.com"))
             .build();
 
         assertThat(service.getClaimantEmail(caseData)).isEqualTo("applicant@example.com");
@@ -36,7 +37,7 @@ class DjNotificationRecipientServiceTest {
 
     @Test
     void shouldReturnRespondent1SolicitorEmail() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YesOrNo.YES)
             .respondentSolicitor1EmailAddress("respondentsolicitor@example.com")
             .build();
@@ -46,9 +47,9 @@ class DjNotificationRecipientServiceTest {
 
     @Test
     void shouldReturnRespondent1LipEmail() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)
-            .defendantUserDetails(IdamUserDetails.builder().email("defendant@example.com").build())
+            .defendantUserDetails(userDetails("defendant@example.com"))
             .build();
 
         assertThat(service.getRespondent1Email(caseData)).isEqualTo("defendant@example.com");
@@ -56,7 +57,7 @@ class DjNotificationRecipientServiceTest {
 
     @Test
     void shouldReturnSharedSolicitorEmailForRespondent2WhenOneLegalRep() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1EmailAddress("sharedsolicitor@example.com")
             .respondent2SameLegalRepresentative(YesOrNo.YES)
             .respondent2(PartyBuilder.builder().individual().build())
@@ -67,7 +68,7 @@ class DjNotificationRecipientServiceTest {
 
     @Test
     void shouldReturnRespondent2SolicitorEmailWhenRepresentedSeparately() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent2Represented(YesOrNo.YES)
             .respondentSolicitor2EmailAddress("respondentsolicitor2@example.com")
             .respondent2(PartyBuilder.builder().individual().build())
@@ -79,7 +80,7 @@ class DjNotificationRecipientServiceTest {
     @Test
     void shouldRequireSelectionForRespondent1Notification() {
         var respondent1 = PartyBuilder.builder().individual().build();
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YesOrNo.YES)
             .respondent1(respondent1)
             .respondentSolicitor1EmailAddress("respondentsolicitor@example.com")
@@ -92,7 +93,7 @@ class DjNotificationRecipientServiceTest {
     @Test
     void shouldRespectBothDefendantsSelection() {
         var respondent1 = PartyBuilder.builder().individual().build();
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YesOrNo.YES)
             .respondent1(respondent1)
             .respondentSolicitor1EmailAddress("respondentsolicitor@example.com")
@@ -107,7 +108,7 @@ class DjNotificationRecipientServiceTest {
 
     @Test
     void shouldRequireRespondent2FlagBeforeNotifyingSecondRespondent() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent2(PartyBuilder.builder().individual().build())
             .defendantDetails(dynamicSelection("Mr. John Rambo"))
             .addRespondent2(YesOrNo.NO)
@@ -117,8 +118,14 @@ class DjNotificationRecipientServiceTest {
     }
 
     private DynamicList dynamicSelection(String label) {
-        return DynamicList.builder()
-            .value(DynamicListElement.dynamicElement(label))
-            .build();
+        DynamicList list = new DynamicList();
+        list.setValue(DynamicListElement.dynamicElement(label));
+        return list;
+    }
+
+    private IdamUserDetails userDetails(String email) {
+        IdamUserDetails details = new IdamUserDetails();
+        details.setEmail(email);
+        return details;
     }
 }

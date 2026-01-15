@@ -17,9 +17,7 @@ class DjPartyFieldServiceTest {
     @Test
     void shouldResolveBothDefendants() {
         CaseData caseData = baseCaseDataBuilder()
-            .defendantDetails(DynamicList.builder()
-                .value(DynamicListElement.builder().label("Both Defendants").build())
-                .build())
+            .defendantDetails(dynamicListWithLabel("Both Defendants"))
             .build();
 
         assertThat(service.resolveRespondent(caseData)).isEqualTo("Resp One, Resp Two");
@@ -36,19 +34,13 @@ class DjPartyFieldServiceTest {
 
     @Test
     void shouldResolveRespondent2WhenSelected() {
-        Party respondent2 = Party.builder()
-            .type(Party.Type.INDIVIDUAL)
-            .individualFirstName("Second")
-            .individualLastName("Resp")
-            .build();
+        Party respondent2 = baseRespondent("Second", "Resp");
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1(baseRespondent("Resp", "One"))
             .respondent2(respondent2)
             .respondent1Represented(YesOrNo.YES)
-            .defendantDetails(DynamicList.builder()
-                .value(DynamicListElement.builder().label(respondent2.getPartyName()).build())
-                .build())
+            .defendantDetails(dynamicListWithLabel(respondent2.getPartyName()))
             .build();
 
         assertThat(service.resolveRespondent(caseData)).isEqualTo(respondent2.getPartyName());
@@ -67,20 +59,26 @@ class DjPartyFieldServiceTest {
         Party respondent1 = baseRespondent("Resp", "One");
         Party respondent2 = baseRespondent("Resp", "Two");
 
-        return CaseData.builder()
+        return CaseDataBuilder.builder().build().toBuilder()
             .respondent1(respondent1)
             .respondent2(respondent2)
             .respondent1Represented(YesOrNo.YES)
-            .defendantDetails(DynamicList.builder()
-                .value(DynamicListElement.builder().label(respondent1.getPartyName()).build())
-                .build());
+            .defendantDetails(dynamicListWithLabel(respondent1.getPartyName()));
     }
 
     private Party baseRespondent(String firstName, String lastName) {
-        return Party.builder()
-            .type(Party.Type.INDIVIDUAL)
-            .individualFirstName(firstName)
-            .individualLastName(lastName)
-            .build();
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        party.setIndividualFirstName(firstName);
+        party.setIndividualLastName(lastName);
+        return party;
+    }
+
+    private DynamicList dynamicListWithLabel(String label) {
+        DynamicListElement element = new DynamicListElement();
+        element.setLabel(label);
+        DynamicList list = new DynamicList();
+        list.setValue(element);
+        return list;
     }
 }

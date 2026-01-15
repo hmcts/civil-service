@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderCaseProgressionService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
@@ -46,16 +47,15 @@ class DjSubmissionServiceTest {
 
     @Test
     void shouldRemovePreviewDocumentAndAssignCategories() {
+        Document document = new Document().setDocumentUrl("url");
         uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument caseDocument =
-            uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument.builder()
-                .documentLink(Document.builder().documentUrl("url").build())
-                .build();
+            new uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument()
+                .setDocumentLink(document);
 
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .orderSDODocumentDJ(Document.builder().documentUrl("url").build())
-            .orderSDODocumentDJCollection(List.of(element(caseDocument)))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        caseData.setOrderSDODocumentDJ(new Document().setDocumentUrl("url"));
+        caseData.setOrderSDODocumentDJCollection(List.of(element(caseDocument)));
 
         CaseData result = service.prepareSubmission(caseData, AUTH_TOKEN);
 
@@ -74,10 +74,9 @@ class DjSubmissionServiceTest {
 
     @Test
     void shouldApplyHelperMutationsToResult() {
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("110").build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("110"));
 
         doAnswer(invocation -> {
             caseData.setEaCourtLocation(YesOrNo.YES);
@@ -92,10 +91,9 @@ class DjSubmissionServiceTest {
 
     @Test
     void shouldDelegateWaUpdatesToHelperOnly() {
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("220").build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.UNSPEC_CLAIM);
+        caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("220"));
 
         service.prepareSubmission(caseData, AUTH_TOKEN);
 

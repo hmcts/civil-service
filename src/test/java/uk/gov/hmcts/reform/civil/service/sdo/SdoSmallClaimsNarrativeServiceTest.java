@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -45,7 +46,7 @@ class SdoSmallClaimsNarrativeServiceTest {
 
     @Test
     void shouldPopulateJudgesRecitalAndDocuments() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         service.applyJudgesRecital(caseData);
         service.applyDocumentDirections(caseData);
@@ -60,7 +61,7 @@ class SdoSmallClaimsNarrativeServiceTest {
 
     @Test
     void shouldPopulateWitnessStatementsAndCreditHire() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         service.applyWitnessStatements(caseData);
         service.applyCreditHire(caseData);
@@ -75,7 +76,7 @@ class SdoSmallClaimsNarrativeServiceTest {
 
     @Test
     void shouldPopulateRoadTrafficAccident() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         service.applyRoadTrafficAccident(caseData);
 
@@ -85,7 +86,7 @@ class SdoSmallClaimsNarrativeServiceTest {
 
     @Test
     void shouldPopulateFlightDelayHearingAndNotes() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         service.applyFlightDelaySection(caseData, List.of(OrderDetailsPagesSectionsToggle.SHOW));
         service.applyHearingSection(caseData);

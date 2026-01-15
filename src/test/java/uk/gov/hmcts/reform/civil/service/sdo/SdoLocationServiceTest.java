@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dmnacourttasklocation.TaskManagementLocationTab;
 import uk.gov.hmcts.reform.civil.model.dmnacourttasklocation.TaskManagementLocationTypes;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
@@ -55,7 +56,9 @@ class SdoLocationServiceTest {
 
     @Test
     void shouldFetchHearingLocations() {
-        List<LocationRefData> locations = List.of(LocationRefData.builder().epimmsId("123").build());
+        LocationRefData location = new LocationRefData();
+        location.setEpimmsId("123");
+        List<LocationRefData> locations = List.of(location);
         when(locationReferenceDataService.getHearingCourtLocations(AUTH_TOKEN)).thenReturn(locations);
 
         List<LocationRefData> result = service.fetchHearingLocations(AUTH_TOKEN);
@@ -66,7 +69,9 @@ class SdoLocationServiceTest {
 
     @Test
     void shouldFetchDefaultJudgmentLocations() {
-        List<LocationRefData> locations = List.of(LocationRefData.builder().epimmsId("456").build());
+        LocationRefData location = new LocationRefData();
+        location.setEpimmsId("456");
+        List<LocationRefData> locations = List.of(location);
         when(locationReferenceDataService.getCourtLocationsForDefaultJudgments(AUTH_TOKEN)).thenReturn(locations);
 
         List<LocationRefData> result = service.fetchDefaultJudgmentLocations(AUTH_TOKEN);
@@ -77,7 +82,9 @@ class SdoLocationServiceTest {
 
     @Test
     void shouldFetchCourtLocationsByEpimmsId() {
-        List<LocationRefData> locations = List.of(LocationRefData.builder().epimmsId("789").build());
+        LocationRefData location = new LocationRefData();
+        location.setEpimmsId("789");
+        List<LocationRefData> locations = List.of(location);
         when(locationReferenceDataService.getCourtLocationsByEpimmsId(AUTH_TOKEN, "789")).thenReturn(locations);
 
         List<LocationRefData> result = service.fetchCourtLocationsByEpimmsId(AUTH_TOKEN, "789");
@@ -88,16 +95,14 @@ class SdoLocationServiceTest {
 
     @Test
     void shouldBuildLocationListWithMatchingSelection() {
-        LocationRefData location = LocationRefData.builder()
-            .epimmsId("123")
-            .siteName("Site")
-            .courtAddress("Address")
-            .postcode("AB1")
-            .build();
+        LocationRefData location = new LocationRefData();
+        location.setEpimmsId("123");
+        location.setSiteName("Site");
+        location.setCourtAddress("Address");
+        location.setPostcode("AB1");
         List<LocationRefData> locations = List.of(location);
-        RequestedCourt requestedCourt = RequestedCourt.builder()
-            .caseLocation(CaseLocationCivil.builder().baseLocation("123").build())
-            .build();
+        RequestedCourt requestedCourt = new RequestedCourt();
+        requestedCourt.setCaseLocation(new CaseLocationCivil().setBaseLocation("123"));
 
         when(locationHelper.getMatching(locations, requestedCourt)).thenReturn(Optional.of(location));
 
@@ -109,14 +114,13 @@ class SdoLocationServiceTest {
 
     @Test
     void shouldBuildLocationListWithoutSelectionWhenAllCourtsRequested() {
-        LocationRefData location = LocationRefData.builder()
-            .epimmsId("123")
-            .siteName("Site")
-            .courtAddress("Address")
-            .postcode("AB1")
-            .build();
+        LocationRefData location = new LocationRefData();
+        location.setEpimmsId("123");
+        location.setSiteName("Site");
+        location.setCourtAddress("Address");
+        location.setPostcode("AB1");
         List<LocationRefData> locations = List.of(location);
-        RequestedCourt requestedCourt = RequestedCourt.builder().build();
+        RequestedCourt requestedCourt = new RequestedCourt();
 
         DynamicList list = service.buildLocationList(requestedCourt, true, locations);
 
@@ -125,16 +129,14 @@ class SdoLocationServiceTest {
 
     @Test
     void shouldBuildCourtLocationListForSdoR2() {
-        LocationRefData location = LocationRefData.builder()
-            .epimmsId("123")
-            .siteName("Site")
-            .courtAddress("Address")
-            .postcode("AB1")
-            .build();
+        LocationRefData location = new LocationRefData();
+        location.setEpimmsId("123");
+        location.setSiteName("Site");
+        location.setCourtAddress("Address");
+        location.setPostcode("AB1");
         List<LocationRefData> locations = List.of(location);
-        RequestedCourt requestedCourt = RequestedCourt.builder()
-            .caseLocation(CaseLocationCivil.builder().baseLocation("123").build())
-            .build();
+        RequestedCourt requestedCourt = new RequestedCourt();
+        requestedCourt.setCaseLocation(new CaseLocationCivil().setBaseLocation("123"));
 
         when(locationHelper.getMatching(locations, requestedCourt)).thenReturn(Optional.of(location));
 
@@ -151,10 +153,9 @@ class SdoLocationServiceTest {
     @Test
     void shouldTrimListToSelectedValue() {
         DynamicListElement selection = DynamicListElement.dynamicElementFromCode("123", "Site");
-        DynamicList list = DynamicList.builder()
-            .value(selection)
-            .listItems(List.of(selection))
-            .build();
+        DynamicList list = new DynamicList();
+        list.setValue(selection);
+        list.setListItems(List.of(selection));
 
         DynamicList trimmed = service.trimListItems(list);
 
@@ -164,7 +165,7 @@ class SdoLocationServiceTest {
 
     @Test
     void shouldUpdateWaLocationsWhenServicePresent() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         doAnswer(invocation -> null).when(updateWaCourtLocationsService)
             .updateCourtListingWALocations(AUTH_TOKEN, caseData);
@@ -182,7 +183,7 @@ class SdoLocationServiceTest {
             Optional.empty()
         );
 
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         service.updateWaLocationsIfRequired(caseData, AUTH_TOKEN);
 
@@ -191,18 +192,16 @@ class SdoLocationServiceTest {
 
     @Test
     void shouldBuildAlternativeLocationList() {
-        LocationRefData location1 = LocationRefData.builder()
-            .epimmsId("123")
-            .siteName("Site 1")
-            .courtAddress("Address 1")
-            .postcode("AB1")
-            .build();
-        LocationRefData location2 = LocationRefData.builder()
-            .epimmsId("456")
-            .siteName("Site 2")
-            .courtAddress("Address 2")
-            .postcode("AB2")
-            .build();
+        LocationRefData location1 = new LocationRefData();
+        location1.setEpimmsId("123");
+        location1.setSiteName("Site 1");
+        location1.setCourtAddress("Address 1");
+        location1.setPostcode("AB1");
+        LocationRefData location2 = new LocationRefData();
+        location2.setEpimmsId("456");
+        location2.setSiteName("Site 2");
+        location2.setCourtAddress("Address 2");
+        location2.setPostcode("AB2");
 
         DynamicList list = service.buildAlternativeCourtLocations(List.of(location1, location2));
 
@@ -211,7 +210,7 @@ class SdoLocationServiceTest {
 
     @Test
     void shouldClearWaMetadataFieldsOnBuilder() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .taskManagementLocations(new TaskManagementLocationTypes())
             .taskManagementLocationsTab(new TaskManagementLocationTab())
             .caseManagementLocationTab(new TaskManagementLocationTab())

@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPersonalInjury;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
 
@@ -35,7 +36,7 @@ class SdoExpertEvidenceFieldsServiceTest {
         when(deadlineService.nextWorkingDayFromNowDays(42)).thenReturn(date42);
         when(deadlineService.nextWorkingDayFromNowDays(49)).thenReturn(date49);
 
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         service.populateFastTrackExpertEvidence(caseData);
 

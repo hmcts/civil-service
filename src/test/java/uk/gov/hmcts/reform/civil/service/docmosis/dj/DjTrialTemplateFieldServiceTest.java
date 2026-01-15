@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.SdoDJR2TrialCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.List;
 
@@ -17,11 +18,10 @@ class DjTrialTemplateFieldServiceTest {
 
     @Test
     void shouldShowCreditHireDetailsWhenTogglePresent() {
-        CaseData caseData = CaseData.builder()
-            .sdoDJR2TrialCreditHire(
-                SdoDJR2TrialCreditHire.builder()
-                    .detailsShowToggle(List.of(AddOrRemoveToggle.ADD))
-                    .build())
+        SdoDJR2TrialCreditHire creditHire = new SdoDJR2TrialCreditHire();
+        creditHire.setDetailsShowToggle(List.of(AddOrRemoveToggle.ADD));
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .sdoDJR2TrialCreditHire(creditHire)
             .build();
 
         assertThat(service.showCreditHireDetails(caseData)).isTrue();
@@ -29,16 +29,16 @@ class DjTrialTemplateFieldServiceTest {
 
     @Test
     void shouldNotShowCreditHireDetailsWithoutToggle() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         assertThat(service.showCreditHireDetails(caseData)).isFalse();
     }
 
     @Test
     void shouldExposeDateToToggleFlag() {
-        CaseData caseData = CaseData.builder()
-            .trialHearingTimeDJ(TrialHearingTimeDJ.builder()
-                                     .dateToToggle(List.of(DateToShowToggle.SHOW))
-                                     .build())
+        TrialHearingTimeDJ hearingTime = new TrialHearingTimeDJ();
+        hearingTime.setDateToToggle(List.of(DateToShowToggle.SHOW));
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .trialHearingTimeDJ(hearingTime)
             .build();
 
         assertThat(service.hasDateToToggle(caseData)).isTrue();
@@ -46,7 +46,7 @@ class DjTrialTemplateFieldServiceTest {
 
     @Test
     void shouldReturnFalseWhenNoDateToToggle() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         assertThat(service.hasDateToToggle(caseData)).isFalse();
     }
 }

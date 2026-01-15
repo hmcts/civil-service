@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
 
@@ -47,7 +48,7 @@ class SdoDisposalNarrativeServiceTest {
 
     @Test
     void shouldPopulateDisclosureAndWitnessSections() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         service.applyDisclosureOfDocuments(caseData);
         service.applyWitnessOfFact(caseData);
@@ -72,7 +73,7 @@ class SdoDisposalNarrativeServiceTest {
 
     @Test
     void shouldPopulateJudgesRecitalUsingSharedConstant() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         service.applyJudgesRecital(caseData);
 
@@ -82,7 +83,7 @@ class SdoDisposalNarrativeServiceTest {
 
     @Test
     void shouldPopulateOrderWithoutHearingAndNotes() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         service.applyOrderWithoutHearing(caseData);
         service.applyNotes(caseData);
@@ -97,7 +98,7 @@ class SdoDisposalNarrativeServiceTest {
 
     @Test
     void shouldPopulateSchedulesAndBundleUsingLibraryText() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         service.applySchedulesOfLoss(caseData);
         service.applyBundle(caseData);
@@ -114,7 +115,7 @@ class SdoDisposalNarrativeServiceTest {
 
     @Test
     void shouldPopulateHearingDatesUsingCurrentClock() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         service.applyFinalDisposalHearing(caseData);
         service.applyHearingTime(caseData);

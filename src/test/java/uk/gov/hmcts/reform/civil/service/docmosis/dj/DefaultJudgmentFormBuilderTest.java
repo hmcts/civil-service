@@ -47,13 +47,15 @@ class DefaultJudgmentFormBuilderTest {
             new DjWelshTextService()
         );
 
-        when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder().name("org name")
-            .contactInformation(Collections.singletonList(ContactInformation.builder()
-                    .addressLine1("addressLine1")
-                    .addressLine2("addressLine2")
-                    .addressLine3("addressLine3")
-                    .postCode("postCode")
-                    .build())).build()));
+        ContactInformation contactInformation = new ContactInformation();
+        contactInformation.setAddressLine1("addressLine1");
+        contactInformation.setAddressLine2("addressLine2");
+        contactInformation.setAddressLine3("addressLine3");
+        contactInformation.setPostCode("postCode");
+        Organisation organisation = new Organisation();
+        organisation.setName("org name");
+        organisation.setContactInformation(Collections.singletonList(contactInformation));
+        when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(organisation));
     }
 
     @Test
@@ -99,12 +101,24 @@ class DefaultJudgmentFormBuilderTest {
 
     @Test
     void shouldReturnDefaultJudgmentFormWithApplicantAndRespondentReferences_whenSolicitorReferencesAreProvided() {
+        Party applicant1 = new Party();
+        applicant1.setOrganisationName("Applicant1 name");
+        applicant1.setType(Party.Type.ORGANISATION);
+        Party applicant2 = new Party();
+        applicant2.setOrganisationName("Applicant2 name");
+        applicant2.setType(Party.Type.ORGANISATION);
+        Party respondent1 = new Party();
+        respondent1.setOrganisationName("Respondent1 name");
+        respondent1.setType(Party.Type.ORGANISATION);
+        Party respondent2 = new Party();
+        respondent2.setOrganisationName("Respondent2 name");
+        respondent2.setType(Party.Type.ORGANISATION);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .totalClaimAmount(new BigDecimal(2000))
-            .applicant1(Party.builder().organisationName("Applicant1 name").type(Party.Type.ORGANISATION).build())
-            .applicant2(Party.builder().organisationName("Applicant2 name").type(Party.Type.ORGANISATION).build())
-            .respondent1(Party.builder().organisationName("Respondent1 name").type(Party.Type.ORGANISATION).build())
-            .respondent2(Party.builder().organisationName("Respondent2 name").type(Party.Type.ORGANISATION).build())
+            .applicant1(applicant1)
+            .applicant2(applicant2)
+            .respondent1(respondent1)
+            .respondent2(respondent2)
             .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build())
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
             .build();

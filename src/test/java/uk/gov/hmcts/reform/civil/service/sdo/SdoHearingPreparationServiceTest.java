@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.crd.model.Category;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
@@ -57,18 +58,16 @@ class SdoHearingPreparationServiceTest {
 
     @Test
     void shouldUpdateCaseManagementLocationWhenLegalAdvisorSdo() {
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .totalClaimAmount(BigDecimal.valueOf(500))
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("EPIMS123").build())
-            .build();
-        RequestedCourt requestedCourt = RequestedCourt.builder()
-            .caseLocation(CaseLocationCivil.builder().baseLocation("NEW").build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        caseData.setTotalClaimAmount(BigDecimal.valueOf(500));
+        caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("EPIMS123"));
+        RequestedCourt requestedCourt = new RequestedCourt();
+        requestedCourt.setCaseLocation(new CaseLocationCivil().setBaseLocation("NEW"));
         when(locationHelper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData))
             .thenReturn(Optional.of(requestedCourt));
         when(sdoLocationService.fetchCourtLocationsByEpimmsId(AUTH, "NEW"))
-            .thenReturn(List.of(LocationRefData.builder().siteName("New Court").build()));
+            .thenReturn(List.of(locationRefData()));
 
         Optional<RequestedCourt> result = service.updateCaseManagementLocationIfLegalAdvisorSdo(caseData, AUTH);
 
@@ -79,14 +78,12 @@ class SdoHearingPreparationServiceTest {
 
     @Test
     void shouldNotFailWhenEpimmsLookupReturnsNull() {
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .totalClaimAmount(BigDecimal.valueOf(500))
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("EPIMS123").build())
-            .build();
-        RequestedCourt requestedCourt = RequestedCourt.builder()
-            .caseLocation(CaseLocationCivil.builder().baseLocation("NEW").build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        caseData.setTotalClaimAmount(BigDecimal.valueOf(500));
+        caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("EPIMS123"));
+        RequestedCourt requestedCourt = new RequestedCourt();
+        requestedCourt.setCaseLocation(new CaseLocationCivil().setBaseLocation("NEW"));
         when(locationHelper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData))
             .thenReturn(Optional.of(requestedCourt));
         when(sdoLocationService.fetchCourtLocationsByEpimmsId(AUTH, "NEW"))
@@ -100,11 +97,10 @@ class SdoHearingPreparationServiceTest {
 
     @Test
     void shouldFallbackToExistingCaseManagementLocationWhenNotLegalAdvisorRoute() {
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("OTHER").build())
-            .totalClaimAmount(BigDecimal.valueOf(2000))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.UNSPEC_CLAIM);
+        caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("OTHER"));
+        caseData.setTotalClaimAmount(BigDecimal.valueOf(2000));
         when(locationHelper.getCaseManagementLocation(caseData)).thenReturn(Optional.empty());
 
         Optional<RequestedCourt> result = service.updateCaseManagementLocationIfLegalAdvisorSdo(caseData, AUTH);
@@ -115,30 +111,29 @@ class SdoHearingPreparationServiceTest {
 
     @Test
     void shouldReturnFilteredHearingMethodList() {
-        Category inPerson = Category.builder()
-            .categoryKey("HearingChannel")
-            .key("INTER")
-            .valueEn(HearingMethod.IN_PERSON.getLabel())
-            .activeFlag("Y")
-            .build();
-        Category telephone = Category.builder()
-            .categoryKey("HearingChannel")
-            .key("TEL")
-            .valueEn(HearingMethod.TELEPHONE.getLabel())
-            .activeFlag("Y")
-            .build();
-        Category notInAttendance = Category.builder()
-            .categoryKey("HearingChannel")
-            .key("NIA")
-            .valueEn(HearingMethod.NOT_IN_ATTENDANCE.getLabel())
-            .activeFlag("Y")
-            .build();
+        Category inPerson = new Category();
+        inPerson.setCategoryKey("HearingChannel");
+        inPerson.setKey("INTER");
+        inPerson.setValueEn(HearingMethod.IN_PERSON.getLabel());
+        inPerson.setActiveFlag("Y");
+        Category telephone = new Category();
+        telephone.setCategoryKey("HearingChannel");
+        telephone.setKey("TEL");
+        telephone.setValueEn(HearingMethod.TELEPHONE.getLabel());
+        telephone.setActiveFlag("Y");
+        Category notInAttendance = new Category();
+        notInAttendance.setCategoryKey("HearingChannel");
+        notInAttendance.setKey("NIA");
+        notInAttendance.setValueEn(HearingMethod.NOT_IN_ATTENDANCE.getLabel());
+        notInAttendance.setActiveFlag("Y");
+        CategorySearchResult searchResult = new CategorySearchResult();
+        searchResult.setCategories(List.of(inPerson, telephone, notInAttendance));
         when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), anyString(), anyString()))
-            .thenReturn(Optional.of(CategorySearchResult.builder().categories(List.of(inPerson, telephone, notInAttendance)).build()));
+            .thenReturn(Optional.of(searchResult));
 
-        DynamicList list = service.getDynamicHearingMethodList(callbackParams(), CaseData.builder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .build());
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        DynamicList list = service.getDynamicHearingMethodList(callbackParams(), caseData);
 
         assertThat(list.getListItems())
             .extracting(DynamicListElement::getLabel)
@@ -147,16 +142,17 @@ class SdoHearingPreparationServiceTest {
 
     @Test
     void shouldApplyVersionSpecificDefaults() {
-        DynamicListElement inPerson = DynamicListElement.builder()
-            .label(HearingMethod.IN_PERSON.getLabel())
-            .code("IN_PERSON")
-            .build();
-        DynamicList hearingList = DynamicList.builder()
-            .listItems(List.of(inPerson))
-            .value(DynamicListElement.builder().label("OTHER").code("OTHER").build())
-            .build();
+        DynamicListElement inPerson = new DynamicListElement();
+        inPerson.setLabel(HearingMethod.IN_PERSON.getLabel());
+        inPerson.setCode("IN_PERSON");
+        DynamicListElement other = new DynamicListElement();
+        other.setLabel("OTHER");
+        other.setCode("OTHER");
+        DynamicList hearingList = new DynamicList();
+        hearingList.setListItems(List.of(inPerson));
+        hearingList.setValue(other);
 
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         service.applyVersionSpecificHearingDefaults(
             CallbackParams.builder().version(V_1).caseData(caseData).build(),
             hearingList
@@ -168,14 +164,18 @@ class SdoHearingPreparationServiceTest {
 
     @Test
     void shouldPopulateHearingLocations() {
-        DynamicList locationList = DynamicList.builder()
-            .listItems(List.of(DynamicListElement.builder().code("loc").label("Location").build()))
-            .build();
-        LocationRefData locationRefData = LocationRefData.builder().epimmsId("123").siteName("Site").build();
+        DynamicListElement locationElement = new DynamicListElement();
+        locationElement.setCode("loc");
+        locationElement.setLabel("Location");
+        DynamicList locationList = new DynamicList();
+        locationList.setListItems(List.of(locationElement));
+        LocationRefData locationRefData = new LocationRefData();
+        locationRefData.setEpimmsId("123");
+        locationRefData.setSiteName("Site");
         when(sdoLocationService.fetchHearingLocations(AUTH)).thenReturn(List.of(locationRefData));
         when(sdoLocationService.buildLocationList(any(), anyBoolean(), anyList())).thenReturn(locationList);
 
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         List<LocationRefData> refs = service.populateHearingLocations(Optional.empty(), AUTH, caseData);
 
         assertThat(refs).hasSize(1);
@@ -184,13 +184,18 @@ class SdoHearingPreparationServiceTest {
     }
 
     private CallbackParams callbackParams() {
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("EPIMS123").build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("EPIMS123"));
         return CallbackParams.builder()
             .caseData(caseData)
             .params(Map.of(BEARER_TOKEN, AUTH))
             .build();
+    }
+
+    private LocationRefData locationRefData() {
+        LocationRefData locationRefData = new LocationRefData();
+        locationRefData.setSiteName("New Court");
+        return locationRefData;
     }
 }

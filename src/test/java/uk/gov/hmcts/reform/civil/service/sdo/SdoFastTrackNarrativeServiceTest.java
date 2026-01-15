@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -45,7 +46,7 @@ class SdoFastTrackNarrativeServiceTest {
 
     @Test
     void shouldPopulateCoreFastTrackNarrative() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         service.populateFastTrackNarrative(caseData);
 
@@ -76,7 +77,7 @@ class SdoFastTrackNarrativeServiceTest {
 
     @Test
     void shouldPopulateOrderWithoutHearingUsingDeadlineService() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         service.populateFastTrackNarrative(caseData);
 

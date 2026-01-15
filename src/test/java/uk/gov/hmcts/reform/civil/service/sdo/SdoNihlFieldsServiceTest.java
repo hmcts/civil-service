@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.Collections;
 import java.util.List;
@@ -41,13 +42,14 @@ class SdoNihlFieldsServiceTest {
 
     @Test
     void shouldSetHearingMethodAndDelegateToOrderService() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         DynamicList hearingList = hearingMethodList();
+        RequestedCourt requestedCourt = new RequestedCourt();
 
         service.populateNihlFields(
             caseData,
             hearingList,
-            Optional.of(RequestedCourt.builder().build()),
+            Optional.of(requestedCourt),
             Collections.emptyList()
         );
 
@@ -65,24 +67,22 @@ class SdoNihlFieldsServiceTest {
     }
 
     private DynamicList hearingMethodList() {
-        DynamicListElement inPerson = DynamicListElement.builder()
-            .code("inPerson")
-            .label(HearingMethod.IN_PERSON.getLabel())
-            .build();
-        return DynamicList.builder()
-            .value(inPerson)
-            .listItems(List.of(inPerson))
-            .build();
+        DynamicListElement inPerson = new DynamicListElement();
+        inPerson.setCode("inPerson");
+        inPerson.setLabel(HearingMethod.IN_PERSON.getLabel());
+        DynamicList list = new DynamicList();
+        list.setValue(inPerson);
+        list.setListItems(List.of(inPerson));
+        return list;
     }
 
     private DynamicList dynamicList(String code, String label) {
-        DynamicListElement element = DynamicListElement.builder()
-            .code(code)
-            .label(label)
-            .build();
-        return DynamicList.builder()
-            .value(element)
-            .listItems(List.of(element))
-            .build();
+        DynamicListElement element = new DynamicListElement();
+        element.setCode(code);
+        element.setLabel(label);
+        DynamicList list = new DynamicList();
+        list.setValue(element);
+        list.setListItems(List.of(element));
+        return list;
     }
 }

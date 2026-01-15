@@ -16,7 +16,7 @@ class DjNarrativeServiceTest {
 
     @Test
     void shouldBuildHeaderWithClaimNumber() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .legacyCaseReference(CLAIM_NUMBER)
             .build();
 
@@ -61,10 +61,7 @@ class DjNarrativeServiceTest {
             .legacyCaseReference(CLAIM_NUMBER)
             .build()
             .toBuilder()
-            .defendantDetails(
-                DynamicList.builder()
-                    .value(DynamicListElement.builder().code("both").label("Both defendants").build())
-                    .build())
+            .defendantDetails(dynamicListWithValue())
             .build();
 
         assertThat(caseData.getRespondent2()).as("respondent2 should be present").isNotNull();
@@ -79,5 +76,14 @@ class DjNarrativeServiceTest {
             .atStateNotificationAcknowledged()
             .legacyCaseReference(CLAIM_NUMBER)
             .build();
+    }
+
+    private DynamicList dynamicListWithValue() {
+        DynamicListElement element = new DynamicListElement();
+        element.setCode("both");
+        element.setLabel("Both defendants");
+        DynamicList list = new DynamicList();
+        list.setValue(element);
+        return list;
     }
 }

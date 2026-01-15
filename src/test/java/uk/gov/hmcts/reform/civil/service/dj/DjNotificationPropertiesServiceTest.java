@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
@@ -57,16 +58,20 @@ class DjNotificationPropertiesServiceTest {
 
     @Test
     void shouldBuildClaimantPropertiesUsingOrganisationName() {
-        CaseData caseData = CaseData.builder()
+        uk.gov.hmcts.reform.ccd.model.Organisation ccdOrganisation = new uk.gov.hmcts.reform.ccd.model.Organisation();
+        ccdOrganisation.setOrganisationID("Org1");
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .ccdCaseReference(1594901956117591L)
             .legacyCaseReference("000DC001")
             .applicant1(PartyBuilder.builder().individual().build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID("Org1").build())
+                .organisation(ccdOrganisation)
                 .build())
             .build();
+        Organisation applicantOrganisation = new Organisation();
+        applicantOrganisation.setName("Applicant Org");
         when(organisationService.findOrganisationById(anyString()))
-            .thenReturn(Optional.of(Organisation.builder().name("Applicant Org").build()));
+            .thenReturn(Optional.of(applicantOrganisation));
 
         Map<String, String> properties = service.buildClaimantProperties(caseData);
 
@@ -79,7 +84,7 @@ class DjNotificationPropertiesServiceTest {
 
     @Test
     void shouldFallbackToPartyNameWhenOrganisationMissing() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .ccdCaseReference(1594901956117591L)
             .legacyCaseReference("000DC001")
             .respondent1(PartyBuilder.builder().individual().build())
@@ -92,16 +97,20 @@ class DjNotificationPropertiesServiceTest {
 
     @Test
     void shouldBuildDefendant2PropertiesUsingOrganisationPolicy() {
-        CaseData caseData = CaseData.builder()
+        uk.gov.hmcts.reform.ccd.model.Organisation ccdOrganisation = new uk.gov.hmcts.reform.ccd.model.Organisation();
+        ccdOrganisation.setOrganisationID("Org2");
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .ccdCaseReference(1594901956117591L)
             .legacyCaseReference("000DC001")
             .respondent2(PartyBuilder.builder().individual().build())
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID("Org2").build())
+                .organisation(ccdOrganisation)
                 .build())
             .build();
+        Organisation respondentOrganisation = new Organisation();
+        respondentOrganisation.setName("Def Two Org");
         when(organisationService.findOrganisationById(anyString()))
-            .thenReturn(Optional.of(Organisation.builder().name("Def Two Org").build()));
+            .thenReturn(Optional.of(respondentOrganisation));
 
         Map<String, String> properties = service.buildDefendant2Properties(caseData);
 
@@ -110,21 +119,23 @@ class DjNotificationPropertiesServiceTest {
 
     @Test
     void shouldFallbackToRespondent1OrganisationWhenSameSolicitor() {
-        CaseData caseData = CaseData.builder()
+        uk.gov.hmcts.reform.ccd.model.Organisation ccdOrganisation = new uk.gov.hmcts.reform.ccd.model.Organisation();
+        ccdOrganisation.setOrganisationID("OrgShared");
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .ccdCaseReference(1594901956117591L)
             .legacyCaseReference("000DC001")
             .respondent2SameLegalRepresentative(YesOrNo.YES)
             .respondent1(PartyBuilder.builder().individual().build())
             .respondent2(PartyBuilder.builder().individual().build())
             .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                    .organisationID("OrgShared")
-                    .build())
+                .organisation(ccdOrganisation)
                 .build())
             .build();
 
+        Organisation sharedOrganisation = new Organisation();
+        sharedOrganisation.setName("Shared Org");
         when(organisationService.findOrganisationById("OrgShared"))
-            .thenReturn(Optional.of(Organisation.builder().name("Shared Org").build()));
+            .thenReturn(Optional.of(sharedOrganisation));
 
         Map<String, String> properties = service.buildDefendant2Properties(caseData);
 

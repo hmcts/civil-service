@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -27,10 +28,9 @@ class SdoDisposalGuardServiceTest {
 
     @Test
     void shouldBlockPrePopulateOnlyForDisposalOrdersInJudicialReferral() {
-        CaseData caseData = CaseData.builder()
-            .orderType(OrderType.DISPOSAL)
-            .ccdState(CaseState.JUDICIAL_REFERRAL)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setOrderType(OrderType.DISPOSAL);
+        caseData.setCcdState(CaseState.JUDICIAL_REFERRAL);
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
         when(featureToggleService.isMultiOrIntermediateTrackCase(caseData)).thenReturn(true);
 
@@ -39,7 +39,7 @@ class SdoDisposalGuardServiceTest {
 
     @Test
     void shouldNotBlockPrePopulateWhenNotDisposal() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
         when(featureToggleService.isMultiOrIntermediateTrackCase(caseData)).thenReturn(true);
 
@@ -48,10 +48,9 @@ class SdoDisposalGuardServiceTest {
 
     @Test
     void shouldBlockOrderDetailsWhenDisposalOnMultiTrack() {
-        CaseData caseData = CaseData.builder()
-            .orderType(OrderType.DISPOSAL)
-            .ccdState(CaseState.JUDICIAL_REFERRAL)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setOrderType(OrderType.DISPOSAL);
+        caseData.setCcdState(CaseState.JUDICIAL_REFERRAL);
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
         when(featureToggleService.isMultiOrIntermediateTrackCase(caseData)).thenReturn(true);
 
@@ -60,7 +59,7 @@ class SdoDisposalGuardServiceTest {
 
     @Test
     void shouldNotBlockWhenFeatureDisabled() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
 
         assertThat(service.shouldBlockPrePopulate(caseData)).isFalse();

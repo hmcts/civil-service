@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.sdo;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -12,9 +13,10 @@ class SdoJudgementDeductionServiceTest {
 
     @Test
     void shouldPopulateDeductionValuesWhenJudgementSumPresent() {
-        CaseData caseData = CaseData.builder()
-            .drawDirectionsOrder(JudgementSum.builder().judgementSum(15d).build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        JudgementSum judgementSum = new JudgementSum();
+        judgementSum.setJudgementSum(15d);
+        caseData.setDrawDirectionsOrder(judgementSum);
 
         service.populateJudgementDeductionValues(caseData);
 
@@ -25,7 +27,7 @@ class SdoJudgementDeductionServiceTest {
 
     @Test
     void shouldSkipPopulationWhenJudgementSumMissing() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         service.populateJudgementDeductionValues(caseData);
 

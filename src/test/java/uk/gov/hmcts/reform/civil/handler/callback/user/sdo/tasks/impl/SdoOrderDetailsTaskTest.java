@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.Dir
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoDisposalGuardService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoOrderDetailsService;
 
@@ -36,7 +37,7 @@ class SdoOrderDetailsTaskTest {
     void shouldReturnErrorWhenDisposalHearingNotAllowed() {
         when(disposalGuardService.shouldBlockOrderDetails(any())).thenReturn(true);
 
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         CallbackParams params = CallbackParams.builder()
             .params(Map.of(BEARER_TOKEN, "token"))
@@ -57,8 +58,9 @@ class SdoOrderDetailsTaskTest {
     void shouldUpdateCaseDataWhenAllowed() {
         when(disposalGuardService.shouldBlockOrderDetails(any())).thenReturn(false);
 
-        CaseData original = CaseData.builder().build();
-        CaseData updated = CaseData.builder().legacyCaseReference("updated").build();
+        CaseData original = CaseDataBuilder.builder().build();
+        CaseData updated = CaseDataBuilder.builder().build();
+        updated.setLegacyCaseReference("updated");
         when(orderDetailsService.updateOrderDetails(any())).thenReturn(updated);
 
         CallbackParams params = CallbackParams.builder()

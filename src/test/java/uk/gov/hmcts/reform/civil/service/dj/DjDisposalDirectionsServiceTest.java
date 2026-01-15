@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesRecitalDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 
 import java.time.LocalDate;
@@ -33,13 +34,12 @@ class DjDisposalDirectionsServiceTest {
     private DeadlinesCalculator deadlinesCalculator;
 
     private DjDisposalDirectionsService service;
-    private DjDisposalNarrativeService disposalNarrativeService;
 
     @BeforeEach
     void setUp() {
         DjWelshLanguageService welshLanguageService = new DjWelshLanguageService();
         DjDeadlineService deadlineService = new DjDeadlineService(workingDayIndicator, deadlinesCalculator);
-        disposalNarrativeService = new DjDisposalNarrativeService(deadlineService);
+        DjDisposalNarrativeService disposalNarrativeService = new DjDisposalNarrativeService(deadlineService);
         service = new DjDisposalDirectionsService(deadlineService, welshLanguageService, disposalNarrativeService);
 
         when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class)))
@@ -54,7 +54,8 @@ class DjDisposalDirectionsServiceTest {
 
     @Test
     void shouldPopulateDisposalDirections() {
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
         service.populateDisposalDirections(builder, JUDGE_NAME);
 

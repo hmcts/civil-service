@@ -235,7 +235,7 @@ public class SdoGeneratorServiceTest {
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameSmall, bytes, SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_SMALL);
 
-        LocationRefData locationRefData = LocationRefData.builder().build();
+        LocationRefData locationRefData = new LocationRefData();
         String locationLabel = "String 1";
         DynamicList formValue = DynamicList.fromList(
             Collections.singletonList(locationLabel),
@@ -276,7 +276,7 @@ public class SdoGeneratorServiceTest {
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameSmall, bytes, SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_SMALL);
 
-        LocationRefData locationRefData = LocationRefData.builder().build();
+        LocationRefData locationRefData = new LocationRefData();
         String locationLabel = "String 1";
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged()
@@ -320,7 +320,7 @@ public class SdoGeneratorServiceTest {
             .thenReturn(CASE_DOCUMENT_SMALL);
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
-        LocationRefData locationRefData = LocationRefData.builder().build();
+        LocationRefData locationRefData = new LocationRefData();
         String locationLabel = "String 1";
         DynamicList formValue = DynamicList.fromList(
             Collections.singletonList(locationLabel),
@@ -468,7 +468,7 @@ public class SdoGeneratorServiceTest {
             .claimsTrack(ClaimsTrack.fastTrack)
             .build();
 
-        LocationRefData locationRefData = LocationRefData.builder().build();
+        LocationRefData locationRefData = new LocationRefData();
         Mockito.when(documentHearingLocationHelper.getHearingLocation(
             nullable(String.class), eq(caseData), eq(BEARER_TOKEN)
         )).thenReturn(locationRefData);
@@ -494,7 +494,7 @@ public class SdoGeneratorServiceTest {
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameDisposal, bytes, SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_DISPOSAL);
 
-        LocationRefData locationRefData = LocationRefData.builder().build();
+        LocationRefData locationRefData = new LocationRefData();
         String locationLabel = "String 1";
         DynamicList formValue = DynamicList.fromList(
             Collections.singletonList(locationLabel),
@@ -588,16 +588,29 @@ public class SdoGeneratorServiceTest {
 
     private CaseData prePopulateNihlFields(CaseData.CaseDataBuilder<?, ?> updatedData) {
 
-        Category inPerson = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
-        Category video = Category.builder().categoryKey("HearingChannel").key("VID").valueEn("Video").activeFlag("Y").build();
-        Category telephone = Category.builder().categoryKey("HearingChannel").key("TEL").valueEn("Telephone").activeFlag("Y").build();
-        CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(inPerson, video, telephone)).build();
+        Category inPerson = new Category();
+        inPerson.setCategoryKey("HearingChannel");
+        inPerson.setKey("INTER");
+        inPerson.setValueEn("In Person");
+        inPerson.setActiveFlag("Y");
+        Category video = new Category();
+        video.setCategoryKey("HearingChannel");
+        video.setKey("VID");
+        video.setValueEn("Video");
+        video.setActiveFlag("Y");
+        Category telephone = new Category();
+        telephone.setCategoryKey("HearingChannel");
+        telephone.setKey("TEL");
+        telephone.setValueEn("Telephone");
+        telephone.setActiveFlag("Y");
+        CategorySearchResult categorySearchResult = new CategorySearchResult();
+        categorySearchResult.setCategories(List.of(inPerson, video, telephone));
         when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), eq("HearingChannel"), anyString())).thenReturn(
             Optional.of(categorySearchResult));
 
-        List<IncludeInOrderToggle> includeInOrderToggle = List.of(IncludeInOrderToggle.INCLUDE);
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+        DynamicListElement selectedCourt = new DynamicListElement();
+        selectedCourt.setCode("00002");
+        selectedCourt.setLabel("court 2 - 2 address - Y02 7RB");
         updatedData.sdoFastTrackJudgesRecital(FastTrackJudgesRecital.builder()
                                                   .input(SdoR2UiConstantFastTrack.JUDGE_RECITAL).build());
         updatedData.sdoR2DisclosureOfDocuments(SdoR2DisclosureOfDocuments.builder()
@@ -637,13 +650,17 @@ public class SdoGeneratorServiceTest {
                                             .sdoR2ScheduleOfLossDefendantDate(LocalDate.now().plusDays(378))
                                             .sdoR2ScheduleOfLossPecuniaryLossTxt(SdoR2UiConstantFastTrack.PECUNIARY_LOSS)
                                             .build());
-        DynamicList options = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            ).build();
+        DynamicListElement optionOne = new DynamicListElement();
+        optionOne.setCode("00001");
+        optionOne.setLabel("court 1 - 1 address - Y01 7RB");
+        DynamicListElement optionTwo = new DynamicListElement();
+        optionTwo.setCode("00002");
+        optionTwo.setLabel("court 2 - 2 address - Y02 7RB");
+        DynamicListElement optionThree = new DynamicListElement();
+        optionThree.setCode("00003");
+        optionThree.setLabel("court 3 - 3 address - Y03 7RB");
+        DynamicList options = new DynamicList();
+        options.setListItems(List.of(optionOne, optionTwo, optionThree));
         updatedData.sdoR2Trial(SdoR2Trial.builder()
                                    .trialOnOptions(TrialOnRadioOptions.OPEN_DATE)
                                    .lengthList(FastTrackHearingTimeEstimate.FIVE_HOURS)
@@ -721,6 +738,7 @@ public class SdoGeneratorServiceTest {
         updatedData.sdoR2UploadOfDocuments(SdoR2UploadOfDocuments.builder()
                                                .sdoUploadOfDocumentsTxt(SdoR2UiConstantFastTrack.UPLOAD_OF_DOCUMENTS)
                                                .build());
+        List<IncludeInOrderToggle> includeInOrderToggle = List.of(IncludeInOrderToggle.INCLUDE);
         updatedData.sdoAltDisputeResolution(SdoR2FastTrackAltDisputeResolution.builder().includeInOrderToggle(includeInOrderToggle).build());
         updatedData.sdoVariationOfDirections(SdoR2VariationOfDirections.builder().includeInOrderToggle(includeInOrderToggle).build());
         updatedData.sdoR2Settlement(SdoR2Settlement.builder().includeInOrderToggle(includeInOrderToggle).build());

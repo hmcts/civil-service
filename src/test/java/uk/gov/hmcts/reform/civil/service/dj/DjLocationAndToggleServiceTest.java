@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
@@ -67,10 +68,9 @@ class DjLocationAndToggleServiceTest {
         stubLocationMocks("123");
         stubHearingCategories();
 
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .caseManagementOrderSelection(DISPOSAL_HEARING)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        caseData.setCaseManagementOrderSelection(DISPOSAL_HEARING);
 
         DirectionsOrderTaskContext context = buildContext(caseData, V_1);
 
@@ -92,10 +92,9 @@ class DjLocationAndToggleServiceTest {
     @Test
     void shouldPrepareTrialTogglesWhenNotDisposal() {
         stubLocationMocks("456");
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-            .caseManagementOrderSelection("TRIAL_HEARING")
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.UNSPEC_CLAIM);
+        caseData.setCaseManagementOrderSelection("TRIAL_HEARING");
 
         DirectionsOrderTaskContext context = buildContext(caseData, V_2);
 
@@ -109,15 +108,11 @@ class DjLocationAndToggleServiceTest {
 
     @Test
     void shouldApplyDisposalHearingSelectionWhenVersionV1() {
-        DynamicList disposalList = DynamicList.builder()
-            .value(DynamicListElement.builder()
-                .label(HearingMethod.TELEPHONE.getLabel())
-                .code("TEL")
-                .build())
-            .build();
-        CaseData caseData = CaseData.builder()
-            .hearingMethodValuesDisposalHearingDJ(disposalList)
-            .build();
+        DynamicList disposalList = dynamicListWithValue(
+            dynamicListElement("TEL", HearingMethod.TELEPHONE.getLabel())
+        );
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setHearingMethodValuesDisposalHearingDJ(disposalList);
 
         CaseData result = service.applyHearingSelections(caseData, V_1);
 
@@ -127,15 +122,11 @@ class DjLocationAndToggleServiceTest {
 
     @Test
     void shouldApplyTrialHearingSelectionWhenDisposalNotPresent() {
-        DynamicList trialList = DynamicList.builder()
-            .value(DynamicListElement.builder()
-                .label(HearingMethod.VIDEO.getLabel())
-                .code("VID")
-                .build())
-            .build();
-        CaseData caseData = CaseData.builder()
-            .hearingMethodValuesTrialHearingDJ(trialList)
-            .build();
+        DynamicList trialList = dynamicListWithValue(
+            dynamicListElement("VID", HearingMethod.VIDEO.getLabel())
+        );
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setHearingMethodValuesTrialHearingDJ(trialList);
 
         CaseData result = service.applyHearingSelections(caseData, V_1);
 
@@ -145,7 +136,7 @@ class DjLocationAndToggleServiceTest {
 
     @Test
     void shouldReturnOriginalCaseDataWhenVersionIsNotV1() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         CaseData result = service.applyHearingSelections(caseData, V_2);
 
@@ -154,15 +145,11 @@ class DjLocationAndToggleServiceTest {
 
     @Test
     void shouldApplyInPersonSelectionForDisposalHearing() {
-        DynamicList disposalList = DynamicList.builder()
-            .value(DynamicListElement.builder()
-                       .label(HearingMethod.IN_PERSON.getLabel())
-                       .code("INP")
-                       .build())
-            .build();
-        CaseData caseData = CaseData.builder()
-            .hearingMethodValuesDisposalHearingDJ(disposalList)
-            .build();
+        DynamicList disposalList = dynamicListWithValue(
+            dynamicListElement("INP", HearingMethod.IN_PERSON.getLabel())
+        );
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setHearingMethodValuesDisposalHearingDJ(disposalList);
 
         CaseData result = service.applyHearingSelections(caseData, V_1);
 
@@ -172,15 +159,11 @@ class DjLocationAndToggleServiceTest {
 
     @Test
     void shouldApplyTelephoneSelectionForTrialHearingWhenDisposalNotProvided() {
-        DynamicList trialList = DynamicList.builder()
-            .value(DynamicListElement.builder()
-                       .label(HearingMethod.TELEPHONE.getLabel())
-                       .code("TEL")
-                       .build())
-            .build();
-        CaseData caseData = CaseData.builder()
-            .hearingMethodValuesTrialHearingDJ(trialList)
-            .build();
+        DynamicList trialList = dynamicListWithValue(
+            dynamicListElement("TEL", HearingMethod.TELEPHONE.getLabel())
+        );
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setHearingMethodValuesTrialHearingDJ(trialList);
 
         CaseData result = service.applyHearingSelections(caseData, V_1);
 
@@ -190,7 +173,7 @@ class DjLocationAndToggleServiceTest {
 
     @Test
     void shouldReturnCaseDataWhenSelectionsAbsent() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         CaseData result = service.applyHearingSelections(caseData, V_1);
 
@@ -199,15 +182,9 @@ class DjLocationAndToggleServiceTest {
 
     @Test
     void shouldLeaveDisposalSelectionUnsetWhenLabelNotRecognised() {
-        DynamicList disposalList = DynamicList.builder()
-            .value(DynamicListElement.builder()
-                       .label("Other option")
-                       .code("OTHER")
-                       .build())
-            .build();
-        CaseData caseData = CaseData.builder()
-            .hearingMethodValuesDisposalHearingDJ(disposalList)
-            .build();
+        DynamicList disposalList = dynamicListWithValue(dynamicListElement("OTHER", "Other option"));
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setHearingMethodValuesDisposalHearingDJ(disposalList);
 
         CaseData result = service.applyHearingSelections(caseData, V_1);
 
@@ -216,15 +193,9 @@ class DjLocationAndToggleServiceTest {
 
     @Test
     void shouldLeaveTrialSelectionUnsetWhenLabelNotRecognised() {
-        DynamicList trialList = DynamicList.builder()
-            .value(DynamicListElement.builder()
-                       .label("Other option")
-                       .code("OTHER")
-                       .build())
-            .build();
-        CaseData caseData = CaseData.builder()
-            .hearingMethodValuesTrialHearingDJ(trialList)
-            .build();
+        DynamicList trialList = dynamicListWithValue(dynamicListElement("OTHER", "Other option"));
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setHearingMethodValuesTrialHearingDJ(trialList);
 
         CaseData result = service.applyHearingSelections(caseData, V_1);
 
@@ -240,43 +211,48 @@ class DjLocationAndToggleServiceTest {
     }
 
     private void stubHearingCategories() {
-        Category inPerson = Category.builder()
-            .categoryKey(HEARING_CHANNEL)
-            .key("INP")
-            .valueEn(HearingMethod.IN_PERSON.getLabel())
-            .activeFlag("Y")
-            .build();
-        Category telephone = Category.builder()
-            .categoryKey(HEARING_CHANNEL)
-            .key("TEL")
-            .valueEn(HearingMethod.TELEPHONE.getLabel())
-            .activeFlag("Y")
-            .build();
-        Category notInAttendance = Category.builder()
-            .categoryKey(HEARING_CHANNEL)
-            .key("NIA")
-            .valueEn(HearingMethod.NOT_IN_ATTENDANCE.getLabel())
-            .activeFlag("Y")
-            .build();
-        CategorySearchResult categorySearchResult =
-            CategorySearchResult.builder().categories(List.of(inPerson, telephone, notInAttendance)).build();
+        Category inPerson = hearingCategory("INP", HearingMethod.IN_PERSON.getLabel());
+        Category telephone = hearingCategory("TEL", HearingMethod.TELEPHONE.getLabel());
+        Category notInAttendance = hearingCategory("NIA", HearingMethod.NOT_IN_ATTENDANCE.getLabel());
+        CategorySearchResult categorySearchResult = new CategorySearchResult();
+        categorySearchResult.setCategories(List.of(inPerson, telephone, notInAttendance));
         when(categoryService.findCategoryByCategoryIdAndServiceId(AUTH_TOKEN, HEARING_CHANNEL, SPEC_SERVICE_ID))
             .thenReturn(Optional.of(categorySearchResult));
     }
 
     private void stubLocationMocks(String epimmsId) {
-        LocationRefData location = LocationRefData.builder()
-            .epimmsId(epimmsId)
-            .siteName("Court-" + epimmsId)
-            .build();
+        LocationRefData location = new LocationRefData();
+        location.setEpimmsId(epimmsId);
+        location.setSiteName("Court-" + epimmsId);
         List<LocationRefData> locations = List.of(location);
 
-        RequestedCourt requestedCourt = RequestedCourt.builder()
-            .caseLocation(CaseLocationCivil.builder().baseLocation(epimmsId).build())
-            .build();
+        RequestedCourt requestedCourt = new RequestedCourt();
+        requestedCourt.setCaseLocation(new CaseLocationCivil().setBaseLocation(epimmsId));
 
         when(locationReferenceDataService.getCourtLocationsForDefaultJudgments(AUTH_TOKEN)).thenReturn(locations);
         when(locationHelper.getCaseManagementLocation(any())).thenReturn(Optional.of(requestedCourt));
         when(locationHelper.getMatching(locations, requestedCourt)).thenReturn(Optional.of(location));
+    }
+
+    private static DynamicListElement dynamicListElement(String code, String label) {
+        DynamicListElement element = new DynamicListElement();
+        element.setCode(code);
+        element.setLabel(label);
+        return element;
+    }
+
+    private static DynamicList dynamicListWithValue(DynamicListElement value) {
+        DynamicList list = new DynamicList();
+        list.setValue(value);
+        return list;
+    }
+
+    private static Category hearingCategory(String key, String label) {
+        Category category = new Category();
+        category.setCategoryKey(HEARING_CHANNEL);
+        category.setKey(key);
+        category.setValueEn(label);
+        category.setActiveFlag("Y");
+        return category;
     }
 }

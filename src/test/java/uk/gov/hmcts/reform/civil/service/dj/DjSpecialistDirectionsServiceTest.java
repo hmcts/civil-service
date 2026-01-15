@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -28,12 +29,12 @@ class DjSpecialistDirectionsServiceTest {
 
     @Test
     void shouldPopulateSpecialistDirectionsUsingNarratives() {
-        TrialBuildingDispute buildingDispute = TrialBuildingDispute.builder().build();
-        TrialClinicalNegligence clinicalNegligence = TrialClinicalNegligence.builder().build();
-        SdoDJR2TrialCreditHire creditHire = SdoDJR2TrialCreditHire.builder().build();
-        TrialPersonalInjury personalInjury = TrialPersonalInjury.builder().build();
-        TrialRoadTrafficAccident rta = TrialRoadTrafficAccident.builder().build();
-        TrialHousingDisrepair housingDisrepair = TrialHousingDisrepair.builder().build();
+        TrialBuildingDispute buildingDispute = new TrialBuildingDispute();
+        TrialClinicalNegligence clinicalNegligence = new TrialClinicalNegligence();
+        SdoDJR2TrialCreditHire creditHire = new SdoDJR2TrialCreditHire();
+        TrialPersonalInjury personalInjury = new TrialPersonalInjury();
+        TrialRoadTrafficAccident rta = new TrialRoadTrafficAccident();
+        TrialHousingDisrepair housingDisrepair = new TrialHousingDisrepair();
 
         when(narrativeService.buildTrialBuildingDispute()).thenReturn(buildingDispute);
         when(narrativeService.buildTrialClinicalNegligence()).thenReturn(clinicalNegligence);
@@ -42,7 +43,8 @@ class DjSpecialistDirectionsServiceTest {
         when(narrativeService.buildTrialRoadTrafficAccident()).thenReturn(rta);
         when(narrativeService.buildTrialHousingDisrepair()).thenReturn(housingDisrepair);
 
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
         service.populateSpecialistDirections(builder);
 

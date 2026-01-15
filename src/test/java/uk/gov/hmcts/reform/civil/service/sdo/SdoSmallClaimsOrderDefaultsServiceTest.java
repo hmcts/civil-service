@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -42,7 +43,7 @@ class SdoSmallClaimsOrderDefaultsServiceTest {
 
     @Test
     void shouldPopulateSmallClaimsFieldsAndMediationStatement() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         service.populateSmallClaimsOrderDetails(
             caseData,

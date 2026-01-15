@@ -7,6 +7,7 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,9 +28,8 @@ class SdoFeatureToggleServiceTest {
 
     @Test
     void shouldReturnTrue_whenWelshJourneyEnabledForBilingualParties() {
-        CaseData caseData = CaseData.builder()
-            .claimantBilingualLanguagePreference(Language.WELSH.name())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setClaimantBilingualLanguagePreference(Language.WELSH.name());
 
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
@@ -38,9 +38,8 @@ class SdoFeatureToggleServiceTest {
 
     @Test
     void shouldReturnFalse_whenWelshToggleDisabled() {
-        CaseData caseData = CaseData.builder()
-            .claimantBilingualLanguagePreference(Language.WELSH.name())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setClaimantBilingualLanguagePreference(Language.WELSH.name());
 
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
 
@@ -49,9 +48,8 @@ class SdoFeatureToggleServiceTest {
 
     @Test
     void shouldReturnTrue_whenCaseIsIntermediateTrackAndToggleOn() {
-        CaseData caseData = CaseData.builder()
-            .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setAllocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM);
 
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
 
@@ -60,9 +58,8 @@ class SdoFeatureToggleServiceTest {
 
     @Test
     void shouldReturnTrue_whenResponseTrackIsMultiTrackAndToggleOn() {
-        CaseData caseData = CaseData.builder()
-            .responseClaimTrack(AllocatedTrack.MULTI_CLAIM.name())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setResponseClaimTrack(AllocatedTrack.MULTI_CLAIM.name());
 
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
 
@@ -71,9 +68,8 @@ class SdoFeatureToggleServiceTest {
 
     @Test
     void shouldReturnFalse_whenToggleDisabled() {
-        CaseData caseData = CaseData.builder()
-            .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setAllocatedTrack(AllocatedTrack.MULTI_CLAIM);
 
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
 
@@ -82,10 +78,9 @@ class SdoFeatureToggleServiceTest {
 
     @Test
     void shouldReturnFalse_whenCaseIsFastTrackEvenIfToggleOn() {
-        CaseData caseData = CaseData.builder()
-            .allocatedTrack(AllocatedTrack.FAST_CLAIM)
-            .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
+        caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
 
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
 

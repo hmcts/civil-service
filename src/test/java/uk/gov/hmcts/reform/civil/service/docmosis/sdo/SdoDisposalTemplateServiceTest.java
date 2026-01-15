@@ -40,10 +40,9 @@ class SdoDisposalTemplateServiceTest {
         when(disposalDirectionsService.getBundleTypeText(caseData)).thenReturn("bundle type");
         when(disposalDirectionsService.hasDisposalVariable(eq(caseData), any())).thenReturn(true);
 
-        LocationRefData location = LocationRefData.builder()
-            .epimmsId("123")
-            .siteName("Court A")
-            .build();
+        LocationRefData location = new LocationRefData();
+        location.setEpimmsId("123");
+        location.setSiteName("Court A");
         when(locationHelper.getHearingLocation(any(), eq(caseData), any())).thenReturn(location);
 
         caseData = caseData.toBuilder()
@@ -65,4 +64,3 @@ class SdoDisposalTemplateServiceTest {
         assertThat(result.isHasDisposalWelshToggle()).isFalse();
     }
 }
-

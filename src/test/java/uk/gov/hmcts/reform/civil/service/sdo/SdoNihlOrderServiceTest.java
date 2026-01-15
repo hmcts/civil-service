@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -38,7 +39,7 @@ class SdoNihlOrderServiceTest {
 
     @Test
     void shouldPopulateSharedSectionsUsingLibraryText() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         DynamicList hearingList = singleOptionList("IN_PERSON");
         DynamicList trialCourt = singleOptionList("Trial Court");
         DynamicList altCourt = singleOptionList("Alt Court");
@@ -60,13 +61,12 @@ class SdoNihlOrderServiceTest {
     }
 
     private DynamicList singleOptionList(String label) {
-        DynamicListElement element = DynamicListElement.builder()
-            .code(label)
-            .label(label)
-            .build();
-        return DynamicList.builder()
-            .value(element)
-            .listItems(List.of(element))
-            .build();
+        DynamicListElement element = new DynamicListElement();
+        element.setCode(label);
+        element.setLabel(label);
+        DynamicList list = new DynamicList();
+        list.setValue(element);
+        list.setListItems(List.of(element));
+        return list;
     }
 }

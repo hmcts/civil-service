@@ -31,30 +31,23 @@ class DjDisposalTemplateServiceTest {
 
     private DjDisposalTemplateService service;
 
-    private DjAuthorisationFieldService authorisationFieldService;
-    private DjBundleFieldService bundleFieldService;
-    private DjDirectionsToggleService directionsToggleService;
-    private DjPartyFieldService partyFieldService;
-    private DjHearingMethodFieldService hearingMethodFieldService;
-    private DjDisposalTemplateFieldService disposalTemplateFieldService;
-
     @BeforeEach
     void setUp() {
-        authorisationFieldService = new DjAuthorisationFieldService();
-        bundleFieldService = new DjBundleFieldService();
-        directionsToggleService = new DjDirectionsToggleService();
-        partyFieldService = new DjPartyFieldService();
-        hearingMethodFieldService = new DjHearingMethodFieldService();
-        disposalTemplateFieldService = new DjDisposalTemplateFieldService();
+        DjAuthorisationFieldService authorisationFieldService = new DjAuthorisationFieldService();
+        DjBundleFieldService bundleFieldService = new DjBundleFieldService();
+        DjDirectionsToggleService directionsToggleService = new DjDirectionsToggleService();
+        DjPartyFieldService partyFieldService = new DjPartyFieldService();
+        DjHearingMethodFieldService hearingMethodFieldService = new DjHearingMethodFieldService();
+        DjDisposalTemplateFieldService disposalTemplateFieldService = new DjDisposalTemplateFieldService();
         service = new DjDisposalTemplateService(
             userService,
             locationHelper,
-            authorisationFieldService,
-            bundleFieldService,
-            directionsToggleService,
-            partyFieldService,
-            hearingMethodFieldService,
-            disposalTemplateFieldService
+                authorisationFieldService,
+                bundleFieldService,
+                directionsToggleService,
+                partyFieldService,
+                hearingMethodFieldService,
+                disposalTemplateFieldService
         );
 
         when(userService.getUserDetails(any())).thenReturn(UserDetails.builder()
@@ -74,10 +67,9 @@ class DjDisposalTemplateServiceTest {
             .atStateClaimIssuedDisposalHearingInPersonDJ()
             .build();
 
-        LocationRefData location = LocationRefData.builder()
-            .epimmsId("123")
-            .siteName("Court A")
-            .build();
+        LocationRefData location = new LocationRefData();
+        location.setEpimmsId("123");
+        location.setSiteName("Court A");
 
         when(locationHelper.getHearingLocation(any(), eq(caseData), any())).thenReturn(location);
 

@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -53,10 +54,11 @@ class SdoDrhFieldsServiceTest {
 
     @Test
     void shouldPopulateDrhFields() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         DynamicList hearingMethodList = dynamicList("initial", HearingMethod.TELEPHONE.getLabel());
+        RequestedCourt requestedCourt = new RequestedCourt();
 
-        service.populateDrhFields(caseData, Optional.of(RequestedCourt.builder().build()),
+        service.populateDrhFields(caseData, Optional.of(requestedCourt),
             hearingMethodList, Collections.emptyList());
 
         assertThat(caseData.getSdoR2SmallClaimsJudgesRecital()).isNotNull();
@@ -68,7 +70,7 @@ class SdoDrhFieldsServiceTest {
 
     @Test
     void shouldDelegateCarmFieldsToJourneyService() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         service.populateDrhFields(caseData, Optional.empty(),
             dynamicList("initial", HearingMethod.TELEPHONE.getLabel()), Collections.emptyList());
@@ -78,16 +80,15 @@ class SdoDrhFieldsServiceTest {
     }
 
     private DynamicList dynamicList(String code, String label) {
-        DynamicListElement element = DynamicListElement.builder()
-            .code(code)
-            .label(label)
-            .build();
-        return DynamicList.builder()
-            .value(element)
-            .listItems(List.of(
-                element,
-                DynamicListElement.builder().code("telephone").label(HearingMethod.TELEPHONE.getLabel()).build()
-            ))
-            .build();
+        DynamicListElement element = new DynamicListElement();
+        element.setCode(code);
+        element.setLabel(label);
+        DynamicListElement telephone = new DynamicListElement();
+        telephone.setCode("telephone");
+        telephone.setLabel(HearingMethod.TELEPHONE.getLabel());
+        DynamicList list = new DynamicList();
+        list.setValue(element);
+        list.setListItems(List.of(element, telephone));
+        return list;
     }
 }

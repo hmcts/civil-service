@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.List;
 
@@ -16,13 +17,13 @@ class SdoSmallClaimsDirectionsServiceTest {
 
     @Test
     void shouldResolveAdditionalDirections() {
-        CaseData viaStandardList = CaseData.builder()
-            .smallClaims(List.of(SmallTrack.smallClaimCreditHire))
-            .build();
+        CaseData viaStandardList = CaseDataBuilder.builder().build();
+        viaStandardList.setSmallClaims(List.of(SmallTrack.smallClaimCreditHire));
 
-        CaseData viaDrawDirections = CaseData.builder()
-            .drawDirectionsOrderSmallClaimsAdditionalDirections(List.of(SmallTrack.smallClaimRoadTrafficAccident))
-            .build();
+        CaseData viaDrawDirections = CaseDataBuilder.builder().build();
+        viaDrawDirections.setDrawDirectionsOrderSmallClaimsAdditionalDirections(
+            List.of(SmallTrack.smallClaimRoadTrafficAccident)
+        );
 
         assertThat(service.hasSmallAdditionalDirections(viaStandardList, SmallTrack.smallClaimCreditHire)).isTrue();
         assertThat(service.hasSmallAdditionalDirections(viaStandardList, SmallTrack.smallClaimRoadTrafficAccident)).isFalse();
@@ -31,17 +32,16 @@ class SdoSmallClaimsDirectionsServiceTest {
 
     @Test
     void shouldDetectVariableStates() {
-        CaseData caseData = CaseData.builder()
-            .smallClaimsHearingToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
-            .smallClaimsDocumentsToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
-            .smallClaimsWitnessStatementToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
-            .smallClaimsWitnessStatement(SmallClaimsWitnessStatement.builder()
-                                             .smallClaimsNumberOfWitnessesToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
-                                             .build())
-            .smallClaimsFlightDelayToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
-            .smallClaimsAddNewDirections(List.of())
-            .sdoR2SmallClaimsUseOfWelshToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setSmallClaimsHearingToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW));
+        caseData.setSmallClaimsDocumentsToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW));
+        caseData.setSmallClaimsWitnessStatementToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW));
+        SmallClaimsWitnessStatement witnessStatement = new SmallClaimsWitnessStatement();
+        witnessStatement.setSmallClaimsNumberOfWitnessesToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW));
+        caseData.setSmallClaimsWitnessStatement(witnessStatement);
+        caseData.setSmallClaimsFlightDelayToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW));
+        caseData.setSmallClaimsAddNewDirections(List.of());
+        caseData.setSdoR2SmallClaimsUseOfWelshToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW));
 
         assertThat(service.hasSmallClaimsVariable(caseData, SmallClaimsVariable.HEARING_TOGGLE)).isTrue();
         assertThat(service.hasSmallClaimsVariable(caseData, SmallClaimsVariable.DOCUMENTS_TOGGLE)).isTrue();

@@ -49,30 +49,24 @@ class DjTrialTemplateServiceTest {
     private DocumentHearingLocationHelper locationHelper;
 
     private DjTrialTemplateService service;
-    private DjAuthorisationFieldService authorisationFieldService;
-    private DjBundleFieldService bundleFieldService;
-    private DjDirectionsToggleService directionsToggleService;
-    private DjPartyFieldService partyFieldService;
-    private DjHearingMethodFieldService hearingMethodFieldService;
-    private DjTrialTemplateFieldService trialTemplateFieldService;
 
     @BeforeEach
     void setUp() {
-        authorisationFieldService = new DjAuthorisationFieldService();
-        bundleFieldService = new DjBundleFieldService();
-        directionsToggleService = new DjDirectionsToggleService();
-        partyFieldService = new DjPartyFieldService();
-        hearingMethodFieldService = new DjHearingMethodFieldService();
-        trialTemplateFieldService = new DjTrialTemplateFieldService();
+        DjAuthorisationFieldService authorisationFieldService = new DjAuthorisationFieldService();
+        DjBundleFieldService bundleFieldService = new DjBundleFieldService();
+        DjDirectionsToggleService directionsToggleService = new DjDirectionsToggleService();
+        DjPartyFieldService partyFieldService = new DjPartyFieldService();
+        DjHearingMethodFieldService hearingMethodFieldService = new DjHearingMethodFieldService();
+        DjTrialTemplateFieldService trialTemplateFieldService = new DjTrialTemplateFieldService();
         service = new DjTrialTemplateService(
             userService,
             locationHelper,
-            authorisationFieldService,
-            bundleFieldService,
-            directionsToggleService,
-            partyFieldService,
-            hearingMethodFieldService,
-            trialTemplateFieldService
+                authorisationFieldService,
+                bundleFieldService,
+                directionsToggleService,
+                partyFieldService,
+                hearingMethodFieldService,
+                trialTemplateFieldService
         );
 
         when(userService.getUserDetails(any())).thenReturn(UserDetails.builder()
@@ -101,10 +95,9 @@ class DjTrialTemplateServiceTest {
             .trialHearingWitnessOfFactDJ(trialNarrativeService.buildWitnessOfFact())
             .build();
 
-        LocationRefData location = LocationRefData.builder()
-            .epimmsId("321")
-            .siteName("Court B")
-            .build();
+        LocationRefData location = new LocationRefData();
+        location.setEpimmsId("321");
+        location.setSiteName("Court B");
         when(locationHelper.getHearingLocation(any(), eq(caseData), any())).thenReturn(location);
 
         DefaultJudgmentSDOOrderForm result = service.buildTemplate(caseData, "token");
@@ -130,10 +123,9 @@ class DjTrialTemplateServiceTest {
             .build();
         CaseData caseData = trialCaseWithSpecialistSections(baseCase);
 
-        LocationRefData location = LocationRefData.builder()
-            .epimmsId("321")
-            .siteName("Court B")
-            .build();
+        LocationRefData location = new LocationRefData();
+        location.setEpimmsId("321");
+        location.setSiteName("Court B");
         when(locationHelper.getHearingLocation(any(), eq(caseData), any())).thenReturn(location);
 
         DefaultJudgmentSDOOrderForm result = service.buildTemplate(caseData, "token");

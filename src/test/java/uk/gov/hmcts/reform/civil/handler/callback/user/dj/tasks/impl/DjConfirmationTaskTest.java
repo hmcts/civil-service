@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.Dir
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dj.DjNarrativeService;
 
 import java.util.Collections;
@@ -32,7 +33,7 @@ class DjConfirmationTaskTest {
 
     @Test
     void shouldBuildSubmittedResponse() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         when(narrativeService.buildConfirmationHeader(caseData)).thenReturn("# Confirmed");
         when(narrativeService.buildConfirmationBody(caseData)).thenReturn("Body text");
 
@@ -61,7 +62,7 @@ class DjConfirmationTaskTest {
 
     @Test
     void shouldOnlyApplyToStandardDirectionOrderEvent() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         CallbackParams matching = CallbackParamsBuilder.builder()
             .of(CallbackType.SUBMITTED, caseData)
             .request(CallbackRequest.builder().eventId(STANDARD_DIRECTION_ORDER_DJ.name()).build())

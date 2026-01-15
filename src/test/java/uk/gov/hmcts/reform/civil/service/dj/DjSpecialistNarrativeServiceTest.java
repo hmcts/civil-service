@@ -44,9 +44,8 @@ class DjSpecialistNarrativeServiceTest {
 
     @Test
     void shouldBuildBuildingDisputeWithCalculatedDates() {
-        TrialBuildingDispute expected = TrialBuildingDispute.builder()
-            .date1(LocalDate.now())
-            .build();
+        TrialBuildingDispute expected = new TrialBuildingDispute();
+        expected.setDate1(LocalDate.now());
         when(buildingDisputeDirectionsService.buildTrialBuildingDispute()).thenReturn(expected);
 
         TrialBuildingDispute dispute = service.buildTrialBuildingDispute();
@@ -57,7 +56,7 @@ class DjSpecialistNarrativeServiceTest {
 
     @Test
     void shouldBuildCreditHireDirectionsWithToggles() {
-        SdoDJR2TrialCreditHire expected = SdoDJR2TrialCreditHire.builder().build();
+        SdoDJR2TrialCreditHire expected = new SdoDJR2TrialCreditHire();
         when(creditHireDirectionsService.buildCreditHireDirections()).thenReturn(expected);
 
         SdoDJR2TrialCreditHire creditHire = service.buildCreditHireDirections();
@@ -69,7 +68,8 @@ class DjSpecialistNarrativeServiceTest {
 
     @Test
     void shouldBuildPersonalInjuryDirections() {
-        TrialPersonalInjury expected = TrialPersonalInjury.builder().date2(LocalDate.now()).build();
+        TrialPersonalInjury expected = new TrialPersonalInjury();
+        expected.setDate2(LocalDate.now());
         when(clinicalDirectionsService.buildTrialPersonalInjury()).thenReturn(expected);
 
         TrialPersonalInjury personalInjury = service.buildTrialPersonalInjury();
@@ -80,8 +80,8 @@ class DjSpecialistNarrativeServiceTest {
 
     @Test
     void shouldBuildRtaAndHousingDisrepairDirections() {
-        TrialRoadTrafficAccident expectedRta = TrialRoadTrafficAccident.builder().build();
-        TrialHousingDisrepair expectedHousing = TrialHousingDisrepair.builder().build();
+        TrialRoadTrafficAccident expectedRta = new TrialRoadTrafficAccident();
+        TrialHousingDisrepair expectedHousing = new TrialHousingDisrepair();
         when(roadTrafficAccidentDirectionsService.buildTrialRoadTrafficAccident()).thenReturn(expectedRta);
         when(buildingDisputeDirectionsService.buildTrialHousingDisrepair()).thenReturn(expectedHousing);
 

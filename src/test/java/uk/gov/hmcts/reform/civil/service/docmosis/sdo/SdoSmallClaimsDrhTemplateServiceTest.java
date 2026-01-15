@@ -52,20 +52,19 @@ class SdoSmallClaimsDrhTemplateServiceTest {
         when(r2Directions.getPhysicalTrialBundleText(caseData)).thenReturn("bundle");
         when(r2Directions.getHearingMethod(caseData)).thenReturn("in person");
         when(r2Directions.getHearingTime(caseData)).thenReturn("2 hours");
-        DynamicListElement locationElement = DynamicListElement.builder().label("Court A").code("123").build();
-        when(r2Directions.getHearingLocation(caseData)).thenReturn(
-            DynamicList.builder()
-                .value(locationElement)
-                .listItems(java.util.List.of(locationElement))
-                .build()
-        );
+        DynamicListElement locationElement = new DynamicListElement();
+        locationElement.setLabel("Court A");
+        locationElement.setCode("123");
+        DynamicList locationList = new DynamicList();
+        locationList.setValue(locationElement);
+        locationList.setListItems(java.util.List.of(locationElement));
+        when(r2Directions.getHearingLocation(caseData)).thenReturn(locationList);
         when(templateFieldService.getMediationTextDrh(caseData)).thenReturn("mediation text");
         when(templateFieldService.showMediationSectionDrh(caseData, true)).thenReturn(true);
 
-        LocationRefData location = LocationRefData.builder()
-            .epimmsId("123")
-            .siteName("Court A")
-            .build();
+        LocationRefData location = new LocationRefData();
+        location.setEpimmsId("123");
+        location.setSiteName("Court A");
         when(locationHelper.getHearingLocation(any(), eq(caseData), any())).thenReturn(location);
 
         SdoDocumentFormSmallDrh result = service.buildTemplate(caseData, "Judge Judy", true, "token");

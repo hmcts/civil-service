@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoFeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoJourneyToggleService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoLocationService;
@@ -39,7 +40,7 @@ class DirectionsOrderCaseProgressionServiceTest {
 
     @Test
     void shouldApplyEaCourtLocationWhenResolverReturnsValue() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         when(journeyToggleService.resolveEaCourtLocation(caseData, true)).thenReturn(YesOrNo.YES);
 
         service.applyEaCourtLocation(caseData, true);
@@ -49,7 +50,7 @@ class DirectionsOrderCaseProgressionServiceTest {
 
     @Test
     void shouldSkipEaCourtLocationWhenResolverReturnsNull() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         when(journeyToggleService.resolveEaCourtLocation(caseData, true)).thenReturn(null);
 
         service.applyEaCourtLocation(caseData, true);
@@ -59,7 +60,7 @@ class DirectionsOrderCaseProgressionServiceTest {
 
     @Test
     void shouldDelegateWaUpdateWhenFeatureEnabled() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
 
         service.updateWaLocationsIfEnabled(caseData, AUTH);
@@ -69,7 +70,7 @@ class DirectionsOrderCaseProgressionServiceTest {
 
     @Test
     void shouldSkipWaUpdateWhenFeatureDisabledAndClearDefaultFalse() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
 
         service.updateWaLocationsIfEnabled(caseData, AUTH);
@@ -80,7 +81,7 @@ class DirectionsOrderCaseProgressionServiceTest {
 
     @Test
     void shouldClearWaMetadataWhenFeatureDisabledAndClearFlagTrue() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
 
         service.updateWaLocationsIfEnabled(caseData, AUTH, true);
@@ -91,7 +92,7 @@ class DirectionsOrderCaseProgressionServiceTest {
 
     @Test
     void shouldApplyRoutingAndUpdateWaMetadata() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         when(journeyToggleService.resolveEaCourtLocation(caseData, true)).thenReturn(YesOrNo.YES);
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
 
@@ -103,7 +104,7 @@ class DirectionsOrderCaseProgressionServiceTest {
 
     @Test
     void shouldClearWaMetadataWhenRoutingDisabled() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
 
         service.applyCaseProgressionRouting(caseData, AUTH, true);
@@ -114,7 +115,7 @@ class DirectionsOrderCaseProgressionServiceTest {
 
     @Test
     void shouldClearWaMetadataWhenRoutingDisabledAndClearFlagTrueExplicit() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
 
         service.applyCaseProgressionRouting(caseData, AUTH, true, true);

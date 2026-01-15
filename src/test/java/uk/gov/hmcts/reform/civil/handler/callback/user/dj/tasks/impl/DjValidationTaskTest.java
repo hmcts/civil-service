@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.Dir
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dj.DjValidationService;
 
 import java.util.Collections;
@@ -29,7 +30,7 @@ class DjValidationTaskTest {
 
     @Test
     void shouldReturnErrorsFromService() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         when(validationService.validate(caseData)).thenReturn(List.of("error"));
 
         CallbackParams params = CallbackParams.builder()

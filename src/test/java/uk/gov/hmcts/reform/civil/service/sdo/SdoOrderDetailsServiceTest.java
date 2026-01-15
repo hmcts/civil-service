@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.Collections;
 
@@ -45,7 +46,7 @@ class SdoOrderDetailsServiceTest {
         when(caseClassificationService.isSmallClaimsTrack(any())).thenReturn(true);
         when(caseClassificationService.isDrhSmallClaim(any())).thenReturn(true);
 
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         CaseData result = service.updateOrderDetails(orderDetailsContext(caseData, V_1));
 
         assertThat(result.getSetSmallClaimsFlag()).isEqualTo(YesOrNo.YES);
@@ -58,7 +59,7 @@ class SdoOrderDetailsServiceTest {
         when(caseClassificationService.isSmallClaimsTrack(any())).thenReturn(true);
         when(caseClassificationService.isDrhSmallClaim(any())).thenReturn(false);
 
-        CaseData result = service.updateOrderDetails(orderDetailsContext(CaseData.builder().build(), V_1));
+        CaseData result = service.updateOrderDetails(orderDetailsContext(CaseDataBuilder.builder().build(), V_1));
 
         assertThat(result.getSetSmallClaimsFlag()).isEqualTo(YesOrNo.YES);
         assertThat(result.getIsSdoR2NewScreen()).isEqualTo(YesOrNo.NO);
@@ -70,7 +71,7 @@ class SdoOrderDetailsServiceTest {
         when(caseClassificationService.isFastTrack(any())).thenReturn(true);
         when(caseClassificationService.isNihlFastTrack(any())).thenReturn(true);
 
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         CaseData result = service.updateOrderDetails(orderDetailsContext(caseData, V_1));
 
         assertThat(result.getSetSmallClaimsFlag()).isEqualTo(YesOrNo.NO);
@@ -84,7 +85,7 @@ class SdoOrderDetailsServiceTest {
         when(caseClassificationService.isFastTrack(any())).thenReturn(true);
         when(caseClassificationService.isNihlFastTrack(any())).thenReturn(false);
 
-        CaseData result = service.updateOrderDetails(orderDetailsContext(CaseData.builder().build(), V_1));
+        CaseData result = service.updateOrderDetails(orderDetailsContext(CaseDataBuilder.builder().build(), V_1));
 
         assertThat(result.getSetFastTrackFlag()).isEqualTo(YesOrNo.YES);
         assertThat(result.getIsSdoR2NewScreen()).isEqualTo(YesOrNo.NO);
@@ -95,11 +96,10 @@ class SdoOrderDetailsServiceTest {
         when(caseClassificationService.isSmallClaimsTrack(any())).thenReturn(false);
         when(caseClassificationService.isFastTrack(any())).thenReturn(false);
 
-        CaseData caseData = CaseData.builder()
-            .setSmallClaimsFlag(YesOrNo.YES)
-            .setFastTrackFlag(YesOrNo.YES)
-            .isSdoR2NewScreen(YesOrNo.YES)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setSetSmallClaimsFlag(YesOrNo.YES);
+        caseData.setSetFastTrackFlag(YesOrNo.YES);
+        caseData.setIsSdoR2NewScreen(YesOrNo.YES);
 
         CaseData result = service.updateOrderDetails(orderDetailsContext(caseData, V_1));
 
@@ -113,9 +113,10 @@ class SdoOrderDetailsServiceTest {
         when(caseClassificationService.isSmallClaimsTrack(any())).thenReturn(false);
         when(caseClassificationService.isFastTrack(any())).thenReturn(false);
 
-        CaseData caseData = CaseData.builder()
-            .drawDirectionsOrder(JudgementSum.builder().judgementSum(20d).build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        JudgementSum judgementSum = new JudgementSum();
+        judgementSum.setJudgementSum(20d);
+        caseData.setDrawDirectionsOrder(judgementSum);
 
         CaseData result = service.updateOrderDetails(orderDetailsContext(caseData, V_1));
 
@@ -129,14 +130,14 @@ class SdoOrderDetailsServiceTest {
         when(caseClassificationService.isSmallClaimsTrack(any())).thenReturn(false);
         when(caseClassificationService.isFastTrack(any())).thenReturn(false);
 
-        DynamicListElement inPerson = DynamicListElement.builder()
-            .code("IN_PERSON")
-            .label(HearingMethod.IN_PERSON.getLabel())
-            .build();
+        DynamicListElement inPerson = new DynamicListElement();
+        inPerson.setCode("IN_PERSON");
+        inPerson.setLabel(HearingMethod.IN_PERSON.getLabel());
+        DynamicList disposalList = new DynamicList();
+        disposalList.setValue(inPerson);
 
-        CaseData caseData = CaseData.builder()
-            .hearingMethodValuesDisposalHearing(DynamicList.builder().value(inPerson).build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setHearingMethodValuesDisposalHearing(disposalList);
 
         CaseData result = service.updateOrderDetails(orderDetailsContext(caseData, V_1));
 
@@ -148,13 +149,13 @@ class SdoOrderDetailsServiceTest {
         when(caseClassificationService.isSmallClaimsTrack(any())).thenReturn(false);
         when(caseClassificationService.isFastTrack(any())).thenReturn(false);
 
-        DynamicListElement telephone = DynamicListElement.builder()
-            .code("TEL")
-            .label(HearingMethod.TELEPHONE.getLabel())
-            .build();
-        CaseData caseData = CaseData.builder()
-            .hearingMethodValuesFastTrack(DynamicList.builder().value(telephone).build())
-            .build();
+        DynamicListElement telephone = new DynamicListElement();
+        telephone.setCode("TEL");
+        telephone.setLabel(HearingMethod.TELEPHONE.getLabel());
+        DynamicList fastTrackList = new DynamicList();
+        fastTrackList.setValue(telephone);
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setHearingMethodValuesFastTrack(fastTrackList);
 
         CaseData result = service.updateOrderDetails(orderDetailsContext(caseData, V_1));
 
@@ -166,13 +167,13 @@ class SdoOrderDetailsServiceTest {
         when(caseClassificationService.isSmallClaimsTrack(any())).thenReturn(false);
         when(caseClassificationService.isFastTrack(any())).thenReturn(false);
 
-        DynamicListElement telephone = DynamicListElement.builder()
-            .code("TEL")
-            .label(HearingMethod.TELEPHONE.getLabel())
-            .build();
-        CaseData caseData = CaseData.builder()
-            .hearingMethodValuesFastTrack(DynamicList.builder().value(telephone).build())
-            .build();
+        DynamicListElement telephone = new DynamicListElement();
+        telephone.setCode("TEL");
+        telephone.setLabel(HearingMethod.TELEPHONE.getLabel());
+        DynamicList fastTrackList = new DynamicList();
+        fastTrackList.setValue(telephone);
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setHearingMethodValuesFastTrack(fastTrackList);
 
         CaseData result = service.updateOrderDetails(orderDetailsContext(caseData, V_2));
 
@@ -184,13 +185,13 @@ class SdoOrderDetailsServiceTest {
         when(caseClassificationService.isSmallClaimsTrack(any())).thenReturn(false);
         when(caseClassificationService.isFastTrack(any())).thenReturn(false);
 
-        DynamicListElement video = DynamicListElement.builder()
-            .code("VIDEO")
-            .label(HearingMethod.VIDEO.getLabel())
-            .build();
-        CaseData caseData = CaseData.builder()
-            .hearingMethodValuesSmallClaims(DynamicList.builder().value(video).build())
-            .build();
+        DynamicListElement video = new DynamicListElement();
+        video.setCode("VIDEO");
+        video.setLabel(HearingMethod.VIDEO.getLabel());
+        DynamicList smallClaimsList = new DynamicList();
+        smallClaimsList.setValue(video);
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setHearingMethodValuesSmallClaims(smallClaimsList);
 
         CaseData result = service.updateOrderDetails(orderDetailsContext(caseData, V_1));
 

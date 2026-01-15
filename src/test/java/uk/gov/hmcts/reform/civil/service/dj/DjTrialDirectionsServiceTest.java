@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingDisclosureOfD
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 
 import java.time.LocalDate;
@@ -80,7 +81,7 @@ class DjTrialDirectionsServiceTest {
 
     @Test
     void shouldPopulateTrialDirections() {
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+        CaseData.CaseDataBuilder<?, ?> builder = CaseDataBuilder.builder().build().toBuilder();
 
         service.populateTrialDirections(builder, JUDGE_NAME);
 

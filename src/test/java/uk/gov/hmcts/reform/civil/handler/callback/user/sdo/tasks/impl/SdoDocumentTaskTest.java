@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.Dir
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoDocumentService;
 
 import java.util.Map;
@@ -35,8 +36,8 @@ class SdoDocumentTaskTest {
     @Test
     void shouldGenerateAndAssignDocument() {
         SdoDocumentTask task = new SdoDocumentTask(sdoDocumentService);
-        CaseData caseData = CaseData.builder().build();
-        CaseDocument document = CaseDocument.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        CaseDocument document = new CaseDocument();
         CallbackParams params = CallbackParams.builder()
             .params(Map.of(BEARER_TOKEN, AUTH_TOKEN))
             .type(CallbackType.MID)
@@ -58,7 +59,7 @@ class SdoDocumentTaskTest {
     @Test
     void shouldSkipCategoryAssignmentWhenDocumentMissing() {
         SdoDocumentTask task = new SdoDocumentTask(sdoDocumentService);
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         CallbackParams params = CallbackParams.builder()
             .params(Map.of(BEARER_TOKEN, AUTH_TOKEN))
             .build();

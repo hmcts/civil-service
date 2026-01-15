@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.mockito.Mockito.verify;
 
@@ -26,7 +27,7 @@ class SdoFastTrackOrderDefaultsServiceTest {
 
     @Test
     void shouldPopulateFastTrackDefaults() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         service.populateFastTrackOrderDetails(caseData);
 

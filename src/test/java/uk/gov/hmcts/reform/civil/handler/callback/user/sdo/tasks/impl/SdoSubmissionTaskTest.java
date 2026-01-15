@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.Dir
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskResult;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSubmissionService;
 
 import java.util.Map;
@@ -28,9 +29,10 @@ class SdoSubmissionTaskTest {
 
     @Test
     void shouldDelegateSubmissionToService() {
-        SdoSubmissionTask task = new SdoSubmissionTask(submissionService);
-        CaseData caseData = CaseData.builder().ccdCaseReference(123L).build();
-        CaseData updatedCaseData = CaseData.builder().ccdCaseReference(456L).build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(123L);
+        CaseData updatedCaseData = CaseDataBuilder.builder().build();
+        updatedCaseData.setCcdCaseReference(456L);
         when(submissionService.prepareSubmission(caseData, AUTH_TOKEN)).thenReturn(updatedCaseData);
 
         CallbackParams params = CallbackParams.builder()
@@ -39,6 +41,7 @@ class SdoSubmissionTaskTest {
         DirectionsOrderTaskContext context =
             new DirectionsOrderTaskContext(caseData, params, DirectionsOrderLifecycleStage.SUBMISSION);
 
+        SdoSubmissionTask task = new SdoSubmissionTask(submissionService);
         DirectionsOrderTaskResult result = task.execute(context);
 
         assertThat(result.updatedCaseData()).isEqualTo(updatedCaseData);

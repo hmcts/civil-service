@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.Dir
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.dj.DjDocumentService;
@@ -43,28 +44,15 @@ class DjDocumentTaskTest {
 
     @Test
     void shouldAppendGeneratedDocumentAndTrimLists() {
-        DynamicList disposalList = DynamicList.builder()
-            .value(DynamicListElement.dynamicElement("original disposal"))
-            .listItems(List.of(DynamicListElement.dynamicElement("original disposal")))
-            .build();
-        DynamicList trialList = DynamicList.builder()
-            .value(DynamicListElement.dynamicElement("original trial"))
-            .listItems(List.of(DynamicListElement.dynamicElement("original trial")))
-            .build();
-        DynamicList trimmedDisposal = DynamicList.builder()
-            .value(DynamicListElement.dynamicElement("trimmed disposal"))
-            .listItems(List.of(DynamicListElement.dynamicElement("trimmed disposal")))
-            .build();
-        DynamicList trimmedTrial = DynamicList.builder()
-            .value(DynamicListElement.dynamicElement("trimmed trial"))
-            .listItems(List.of(DynamicListElement.dynamicElement("trimmed trial")))
-            .build();
-        CaseData caseData = CaseData.builder()
-            .disposalHearingMethodInPersonDJ(disposalList)
-            .trialHearingMethodInPersonDJ(trialList)
-            .build();
+        DynamicList disposalList = dynamicListWithSingleValue("original disposal");
+        DynamicList trialList = dynamicListWithSingleValue("original trial");
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setDisposalHearingMethodInPersonDJ(disposalList);
+        caseData.setTrialHearingMethodInPersonDJ(trialList);
         var document = CaseDocumentBuilder.builder().documentName("dj-order.pdf").build();
         when(documentService.generateOrder(caseData, "auth-token")).thenReturn(Optional.of(document));
+        DynamicList trimmedDisposal = dynamicListWithSingleValue("trimmed disposal");
+        DynamicList trimmedTrial = dynamicListWithSingleValue("trimmed trial");
         when(locationService.trimListItems(disposalList)).thenReturn(trimmedDisposal);
         when(locationService.trimListItems(trialList)).thenReturn(trimmedTrial);
 
@@ -89,7 +77,7 @@ class DjDocumentTaskTest {
 
     @Test
     void shouldReturnOriginalWhenDocumentNotGenerated() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         when(documentService.generateOrder(caseData, "token")).thenReturn(Optional.empty());
 
         CallbackParams params = CallbackParams.builder()
@@ -114,7 +102,7 @@ class DjDocumentTaskTest {
 
     @Test
     void shouldOnlyApplyToStandardDirectionOrderEvent() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         CallbackParams matching = CallbackParamsBuilder.builder()
             .of(CallbackType.ABOUT_TO_SUBMIT, caseData)
             .request(CallbackRequest.builder().eventId(STANDARD_DIRECTION_ORDER_DJ.name()).build())
@@ -132,5 +120,13 @@ class DjDocumentTaskTest {
             new DirectionsOrderTaskContext(caseData, nonMatching, DirectionsOrderLifecycleStage.DOCUMENT_GENERATION);
 
         assertThat(task.appliesTo(nonMatchingContext)).isFalse();
+    }
+
+    private DynamicList dynamicListWithSingleValue(String label) {
+        DynamicListElement element = DynamicListElement.dynamicElement(label);
+        DynamicList list = new DynamicList();
+        list.setValue(element);
+        list.setListItems(List.of(element));
+        return list;
     }
 }

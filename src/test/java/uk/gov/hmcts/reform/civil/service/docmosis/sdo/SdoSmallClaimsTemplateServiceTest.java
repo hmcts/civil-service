@@ -51,10 +51,9 @@ class SdoSmallClaimsTemplateServiceTest {
 
         when(featureToggleService.isCarmEnabledForCase(caseData)).thenReturn(true);
 
-        LocationRefData location = LocationRefData.builder()
-            .epimmsId("123")
-            .siteName("Court A")
-            .build();
+        LocationRefData location = new LocationRefData();
+        location.setEpimmsId("123");
+        location.setSiteName("Court A");
         when(locationHelper.getHearingLocation(any(), eq(caseData), any())).thenReturn(location);
 
         SdoDocumentFormSmall result = service.buildTemplate(caseData, "Judge Judy", true, "token");

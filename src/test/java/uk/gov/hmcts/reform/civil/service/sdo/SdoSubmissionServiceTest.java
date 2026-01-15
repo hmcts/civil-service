@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderCaseProgressionService;
 
 import java.util.ArrayList;
@@ -53,13 +52,13 @@ class SdoSubmissionServiceTest {
 
     @Test
     void shouldMoveDocumentToSystemGeneratedWhenEnglishJourney() {
-        CaseDocument document = CaseDocumentBuilder.builder().documentName("sdo.pdf").build();
+        CaseDocument document = new CaseDocument();
+        document.setDocumentName("sdo.pdf");
         List<Element<CaseDocument>> generatedDocs = new ArrayList<>();
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .sdoOrderDocument(document)
-            .systemGeneratedCaseDocuments(generatedDocs)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        caseData.setSdoOrderDocument(document);
+        caseData.setSystemGeneratedCaseDocuments(generatedDocs);
 
         CaseData result = service.prepareSubmission(caseData, AUTH_TOKEN);
 
@@ -73,13 +72,13 @@ class SdoSubmissionServiceTest {
 
     @Test
     void shouldMoveDocumentToPreTranslationForWelshJourney() {
-        CaseDocument document = CaseDocumentBuilder.builder().documentName("sdo.pdf").build();
+        CaseDocument document = new CaseDocument();
+        document.setDocumentName("sdo.pdf");
         List<Element<CaseDocument>> preTranslationDocs = new ArrayList<>();
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .sdoOrderDocument(document)
-            .preTranslationDocuments(preTranslationDocs)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        caseData.setSdoOrderDocument(document);
+        caseData.setPreTranslationDocuments(preTranslationDocs);
 
         when(featureToggleService.isWelshJourneyEnabled(caseData)).thenReturn(true);
 
@@ -92,12 +91,11 @@ class SdoSubmissionServiceTest {
 
     @Test
     void shouldSetEaCourtLocationForSpecCaseWhenNotLip() {
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .applicant1Represented(YesOrNo.YES)
-            .respondent1Represented(YesOrNo.YES)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123").build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        caseData.setApplicant1Represented(YesOrNo.YES);
+        caseData.setRespondent1Represented(YesOrNo.YES);
+        caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("123"));
 
         mockEaCourtMutation(caseData, YesOrNo.YES);
 
@@ -108,12 +106,11 @@ class SdoSubmissionServiceTest {
 
     @Test
     void shouldRespectLipCaseWhenCourtNotWhiteListed() {
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1Represented(YesOrNo.NO)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123").build())
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("123"));
 
         mockEaCourtMutation(caseData, YesOrNo.NO);
 
@@ -124,31 +121,33 @@ class SdoSubmissionServiceTest {
 
     @Test
     void shouldTrimDynamicListsAndSmallClaimsHearingLocations() {
-        DynamicListElement selected = DynamicListElement.builder().code("loc").label("Loc").build();
-        DynamicList originalList = DynamicList.builder().value(selected).build();
-        DynamicList trimmedList = DynamicList.builder().value(selected).listItems(List.of()).build();
+        DynamicListElement selected = new DynamicListElement();
+        selected.setCode("loc");
+        selected.setLabel("Loc");
+        DynamicList originalList = new DynamicList();
+        originalList.setValue(selected);
+        DynamicList trimmedList = new DynamicList();
+        trimmedList.setValue(selected);
+        trimmedList.setListItems(List.of());
 
         when(locationService.trimListItems(originalList)).thenReturn(trimmedList);
         when(locationService.trimListItems(originalList)).thenReturn(trimmedList);
         when(classificationService.isDrhSmallClaim(any())).thenReturn(true);
 
-        SdoR2SmallClaimsHearing hearing = SdoR2SmallClaimsHearing.builder()
-            .hearingCourtLocationList(originalList)
-            .altHearingCourtLocationList(originalList)
-            .build();
-        SdoR2Trial trial = SdoR2Trial.builder()
-            .hearingCourtLocationList(originalList)
-            .altHearingCourtLocationList(originalList)
-            .build();
+        SdoR2SmallClaimsHearing hearing = new SdoR2SmallClaimsHearing();
+        hearing.setHearingCourtLocationList(originalList);
+        hearing.setAltHearingCourtLocationList(originalList);
+        SdoR2Trial trial = new SdoR2Trial();
+        trial.setHearingCourtLocationList(originalList);
+        trial.setAltHearingCourtLocationList(originalList);
 
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-            .disposalHearingMethodInPerson(originalList)
-            .fastTrackMethodInPerson(originalList)
-            .smallClaimsMethodInPerson(originalList)
-            .sdoR2SmallClaimsHearing(hearing)
-            .sdoR2Trial(trial)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.UNSPEC_CLAIM);
+        caseData.setDisposalHearingMethodInPerson(originalList);
+        caseData.setFastTrackMethodInPerson(originalList);
+        caseData.setSmallClaimsMethodInPerson(originalList);
+        caseData.setSdoR2SmallClaimsHearing(hearing);
+        caseData.setSdoR2Trial(trial);
 
         CaseData result = service.prepareSubmission(caseData, AUTH_TOKEN);
 
@@ -163,9 +162,8 @@ class SdoSubmissionServiceTest {
 
     @Test
     void shouldUpdateClaimsTrackForUnspecSmallClaims() {
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.UNSPEC_CLAIM);
 
         when(classificationService.isSmallClaimsTrack(caseData)).thenReturn(true);
 
@@ -176,9 +174,8 @@ class SdoSubmissionServiceTest {
 
     @Test
     void shouldUpdateClaimsTrackForSpecFastTrack() {
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
 
         when(classificationService.isSmallClaimsTrack(caseData)).thenReturn(false);
         when(classificationService.isFastTrack(caseData)).thenReturn(true);
