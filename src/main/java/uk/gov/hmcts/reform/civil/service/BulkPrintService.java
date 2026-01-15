@@ -35,6 +35,7 @@ public class BulkPrintService {
     )
     public SendLetterResponse printLetter(byte[] letterContent, String claimId,
                                           String claimReference, String letterType, List<String> personList) {
+        log.info("Printing letter for claimId: {}", claimId);
         String authorisation = authTokenGenerator.generate();
         LetterWithPdfsRequest letter =
             generateLetter(additionalInformation(claimId, claimReference, letterType, personList), letterContent);
