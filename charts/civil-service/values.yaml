@@ -1,26 +1,17 @@
-
-idam-pr:
+servicebus:
   enabled: false
-
 xui-webapp:
   enabled: false
-
 camunda-bpm:
   enabled: false
-
-
 aac-manage-case-assignment:
   enabled: false
-
 ccd:
   enabled: false
-
 ccd-case-document-am-api:
   enabled: false
-
 em-ccdorc:
   enabled: false
-
 em-stitching:
   enabled: false
 
