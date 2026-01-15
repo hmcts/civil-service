@@ -28,15 +28,19 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE);
-    private static final List<CaseState> caseProceedInCaseManStates = List.of(CaseState.AWAITING_APPLICANT_INTENTION,
-            CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT,
-            CaseState.IN_MEDIATION, CaseState.JUDICIAL_REFERRAL);
-    private static final List<CaseState> caseMovedInCaseManStatesCaseProgression =
-        List.of(CaseState.CASE_PROGRESSION,
-                CaseState.HEARING_READINESS,
-                CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING,
-                CaseState.DECISION_OUTCOME,
-                CaseState.All_FINAL_ORDERS_ISSUED);
+    private static final List<CaseState> caseProceedInCaseManStates = List.of(
+        CaseState.AWAITING_APPLICANT_INTENTION,
+        CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT,
+        CaseState.IN_MEDIATION,
+        CaseState.JUDICIAL_REFERRAL
+    );
+    private static final List<CaseState> caseMovedInCaseManStatesCaseProgression = List.of(
+        CaseState.CASE_PROGRESSION,
+        CaseState.HEARING_READINESS,
+        CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING,
+        CaseState.DECISION_OUTCOME,
+        CaseState.All_FINAL_ORDERS_ISSUED
+    );
     public static final String TASK_ID = "GenerateDefendantDashboardNotificationCaseProceedOffline";
     public static final String GA = "Applications";
     private final DashboardNotificationService dashboardNotificationService;
@@ -70,12 +74,10 @@ public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCal
 
     @Override
     public Map<String, Boolean> getScenarios(CaseData caseData) {
-
         return Map.of(
-            SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario(),
-            true,
+            SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario(), true,
             SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT.getScenario(),
-            (caseData.getGeneralApplications() != null && !caseData.getGeneralApplications().isEmpty()),
+            caseData.getGeneralApplications() != null && !caseData.getGeneralApplications().isEmpty(),
             SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_DEFENDANT.getScenario(), defendantQueryAwaitingResponse(caseData)
         );
     }
@@ -88,13 +90,10 @@ public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCal
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
         boolean isLipvLipOrLRvLip = caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne();
-        return (caseData.getPreviousCCDState() != null && caseProceedInCaseManStates.contains(caseData.getPreviousCCDState()) && isLipvLipOrLRvLip)
-            || (shouldRecordScenarioInCaseProgression(caseData, isLipvLipOrLRvLip));
-    }
-
-    private boolean defendantQueryAwaitingResponse(CaseData caseData) {
-        return featureToggleService.isPublicQueryManagementEnabled(caseData)
-            && nonNull(caseData.getQueries()) && caseData.getQueries().hasAQueryAwaitingResponse();
+        return (caseData.getPreviousCCDState() != null
+            && caseProceedInCaseManStates.contains(caseData.getPreviousCCDState())
+            && isLipvLipOrLRvLip)
+            || shouldRecordScenarioInCaseProgression(caseData, isLipvLipOrLRvLip);
     }
 
     public boolean shouldRecordScenarioInCaseProgression(CaseData caseData, boolean isLipvLipOrLRvLip) {
@@ -102,13 +101,15 @@ public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCal
                 && isLipvLipOrLRvLip;
     }
 
+    private boolean defendantQueryAwaitingResponse(CaseData caseData) {
+        return featureToggleService.isPublicQueryManagementEnabled(caseData)
+            && nonNull(caseData.getQueries()) && caseData.getQueries().hasAQueryAwaitingResponse();
+    }
+
     @Override
     protected void beforeRecordScenario(CaseData caseData, String authToken) {
         final String caseId = String.valueOf(caseData.getCcdCaseReference());
-        dashboardNotificationService.deleteByReferenceAndCitizenRole(
-            caseId,
-            "DEFENDANT"
-        );
+        dashboardNotificationService.deleteByReferenceAndCitizenRole(caseId, "DEFENDANT");
 
         taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
             caseId,

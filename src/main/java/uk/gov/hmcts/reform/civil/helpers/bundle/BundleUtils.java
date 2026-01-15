@@ -21,31 +21,37 @@ public class BundleUtils {
     }
 
     public static String generateDocName(String fileName, String strParam, String strParam2, LocalDate date) {
+        log.info(
+            "Generating doc name fileName: {} strParam: {} strParam2: {} date: {}",
+            fileName,
+            strParam,
+            strParam2,
+            date
+        );
+        String formatLocalDate = DateFormatHelper.formatLocalDate(date, DATE_FORMAT);
         String formattedTitle;
         if (StringUtils.isBlank(strParam)) {
-            formattedTitle = String.format(fileName, DateFormatHelper.formatLocalDate(date, DATE_FORMAT));
+            formattedTitle = String.format(fileName, formatLocalDate);
         } else if (StringUtils.isBlank(strParam2)) {
-            formattedTitle =  String.format(fileName, strParam, DateFormatHelper.formatLocalDate(date, DATE_FORMAT));
+            formattedTitle = String.format(fileName, strParam, formatLocalDate);
         } else {
-            formattedTitle =  String.format(fileName, strParam, strParam2, DateFormatHelper.formatLocalDate(date, DATE_FORMAT));
+            formattedTitle = String.format(fileName, strParam, strParam2, formatLocalDate);
         }
 
         if (formattedTitle.length() > MAX_DOC_TITLE_LENGTH) {
-            log.warn("Truncating generated doc name to 255 chars: {}", formattedTitle);
+            log.info("Truncating generated doc name to 255 chars: {}", formattedTitle);
             formattedTitle = formattedTitle.substring(0, MAX_DOC_TITLE_LENGTH);
         }
-
         return formattedTitle;
     }
 
     public static BundlingRequestDocument buildBundlingRequestDoc(String docName, Document document, String docType) {
-        return BundlingRequestDocument.builder()
-            .documentFileName(docName)
-            .documentType(docType)
-            .documentLink(DocumentLink.builder()
-                              .documentUrl(document.getDocumentUrl())
-                              .documentBinaryUrl(document.getDocumentBinaryUrl())
-                              .documentFilename(document.getDocumentFileName()).build())
-            .build();
+        return new BundlingRequestDocument()
+            .setDocumentFileName(docName)
+            .setDocumentType(docType)
+            .setDocumentLink(new DocumentLink()
+                                 .setDocumentUrl(document.getDocumentUrl())
+                                 .setDocumentBinaryUrl(document.getDocumentBinaryUrl())
+                                 .setDocumentFilename(document.getDocumentFileName()));
     }
 }

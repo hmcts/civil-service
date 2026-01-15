@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimantresponse.RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -62,17 +63,21 @@ public class GenerateJudgmentByAdmissionSpecNonDivergentCallbackHandler extends 
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<CaseDocument> caseDocuments = requestJudgmentByAdmissionOrDeterminationResponseDocGenerator.generateNonDivergentDocs(
             callbackParams.getCaseData(),
             callbackParams.getParams().get(BEARER_TOKEN).toString(),
             CaseEvent.valueOf(callbackParams.getRequest().getEventId())
         );
         List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
-        caseDocuments.stream().forEach(caseDocument -> systemGeneratedDocuments.add(element(caseDocument)));
-        caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedDocuments);
+        if (systemGeneratedDocuments == null) {
+            systemGeneratedDocuments = new ArrayList<>();
+        }
+        for (CaseDocument caseDocument : caseDocuments) {
+            systemGeneratedDocuments.add(element(caseDocument));
+        }
+        caseData.setSystemGeneratedCaseDocuments(systemGeneratedDocuments);
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 }

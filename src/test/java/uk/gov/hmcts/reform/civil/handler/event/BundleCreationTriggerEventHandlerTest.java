@@ -71,15 +71,17 @@ class BundleCreationTriggerEventHandlerTest {
 
     @BeforeEach
     void setup() {
-        bundle = Bundle.builder().value(BundleDetails.builder().title("Trial Bundle").id("1")
-                                            .stitchStatus("new")
-                                            .stitchedDocument(null)
-                                            .fileName("Trial Bundle.pdf")
-                                            .description("This is trial bundle")
-                                            .bundleHearingDate(LocalDate.of(2023, 12, 12))
-                                            .stitchedDocument(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).build())
-                                            .createdOn(LocalDateTime.of(2023, 11, 12, 1, 1, 1))
-                                            .build()).build();
+        BundleDetails bundleDetails = new BundleDetails()
+            .setId("1")
+            .setTitle("Trial Bundle")
+            .setDescription("This is trial bundle")
+            .setStitchStatus("new")
+            .setStitchedDocument(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).build())
+            .setStitchingFailureMessage(null)
+            .setFileName("Trial Bundle.pdf")
+            .setCreatedOn(LocalDateTime.of(2023, 11, 12, 1, 1, 1))
+            .setBundleHearingDate(LocalDate.of(2023, 12, 12));
+        bundle = new Bundle(bundleDetails);
         List<Bundle> bundlesList = new ArrayList<>();
         bundlesList.add(bundle);
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = setupWitnessEvidenceDocs();
@@ -90,8 +92,8 @@ class BundleCreationTriggerEventHandlerTest {
         caseData = generateCaseData(witnessEvidenceDocs, expertEvidenceDocs, otherEvidenceDocs,
                                     systemGeneratedCaseDocuments, servedDocumentFiles);
         caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
-        bundleCreateResponse =
-            BundleCreateResponse.builder().data(BundleData.builder().caseBundles(bundlesList).build()).build();
+        BundleData bundleData = new BundleData(bundlesList);
+        bundleCreateResponse = new BundleCreateResponse(bundleData, null);
     }
 
     private CaseData generateCaseData(List<Element<UploadEvidenceWitness>> witnessEvidenceDocs,
@@ -159,10 +161,9 @@ class BundleCreationTriggerEventHandlerTest {
 
     private List<Element<UploadEvidenceDocumentType>> setupOtherEvidenceDocs() {
         List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = new ArrayList<>();
-        otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
-                                                       .builder()
-                                                       .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                           .documentFileName(TEST_FILE_NAME).build()).build()));
+        otherEvidenceDocs.add(ElementUtils.element(new UploadEvidenceDocumentType()
+                                                       .setDocumentUpload(Document.builder().documentBinaryUrl(TEST_URL)
+                                                                           .documentFileName(TEST_FILE_NAME).build())));
         return otherEvidenceDocs;
     }
 
@@ -231,9 +232,9 @@ class BundleCreationTriggerEventHandlerTest {
             StartEventResponse.builder().token("123").eventId("event1").caseDetails(caseDetails).build();
         List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> caseBundles = new ArrayList<>();
         caseBundles.add(new IdValue<>("1",
-                                      uk.gov.hmcts.reform.civil.model.Bundle.builder()
-                                          .title("Trial Bundle").fileName("TrialBundle.pdf")
-                                          .stitchStatus(Optional.of("NEW")).build()));
+                                      new uk.gov.hmcts.reform.civil.model.Bundle()
+                                          .setTitle("Trial Bundle").setFileName("TrialBundle.pdf")
+                                          .setStitchStatus(Optional.of("NEW"))));
         // When: I call the prepareCaseContent method
         CaseDataContent caseDataContent = bundleCreationTriggerEventHandler.prepareCaseContent(caseBundles,
                                                                                                startEventResponse);
@@ -248,18 +249,16 @@ class BundleCreationTriggerEventHandlerTest {
 
     private List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> prepareCaseBundles() {
         List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> caseBundles = new ArrayList<>();
-        caseBundles.add(new IdValue<>("1", uk.gov.hmcts.reform.civil.model.Bundle.builder().id("1")
-            .title("Trial Bundle")
-            .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
-            .createdOn(Optional.of(LocalDateTime.now()))
-            .bundleHearingDate(Optional.of(LocalDate.of(2023, 12, 12)))
-            .build()));
-        caseBundles.add(new IdValue<>("1", uk.gov.hmcts.reform.civil.model.Bundle.builder().id("1")
-            .title("Trial Bundle")
-            .stitchStatus(Optional.of("NEW")).description("Trial Bundle")
-            .createdOn(Optional.of(LocalDateTime.now()))
-            .bundleHearingDate(Optional.of(LocalDate.of(2023, 1, 12)))
-            .build()));
+        caseBundles.add(new IdValue<>("1", new uk.gov.hmcts.reform.civil.model.Bundle().setId("1")
+            .setTitle("Trial Bundle")
+            .setStitchStatus(Optional.of("NEW")).setDescription("Trial Bundle")
+            .setCreatedOn(Optional.of(LocalDateTime.now()))
+            .setBundleHearingDate(Optional.of(LocalDate.of(2023, 12, 12)))));
+        caseBundles.add(new IdValue<>("1", new uk.gov.hmcts.reform.civil.model.Bundle().setId("1")
+            .setTitle("Trial Bundle")
+            .setStitchStatus(Optional.of("NEW")).setDescription("Trial Bundle")
+            .setCreatedOn(Optional.of(LocalDateTime.now()))
+            .setBundleHearingDate(Optional.of(LocalDate.of(2023, 1, 12)))));
         return caseBundles;
     }
 

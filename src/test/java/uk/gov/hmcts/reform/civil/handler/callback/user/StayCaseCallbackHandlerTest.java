@@ -79,9 +79,9 @@ public class StayCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_WhenAboutToSubmitIsInvokedToggleTrue() {
-            CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build().toBuilder()
-                .hearingDate(LocalDate.now())
-                .hearingDueDate(LocalDate.now()).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build();
+            caseData.setHearingDate(LocalDate.now());
+            caseData.setHearingDueDate(LocalDate.now());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().getCaseDetailsBefore().setState("CASE_PROGRESSION");
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler

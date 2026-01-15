@@ -41,7 +41,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MAKE_PBA_PAYMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_EVENT;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_STATE;
 
@@ -77,14 +77,15 @@ class PaymentTaskHandlerTest {
 
         @Test
         void shouldTriggerMakePbaPaymentCCDEvent_whenHandlerIsExecuted() {
-            CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            CaseData caseData = new CaseDataBuilder()
+                .atStateClaimSubmitted()
+                .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                 .build();
             VariableMap variables = Variables.createVariables();
             variables.putValue(FLOW_STATE, "MAIN.CLAIM_SUBMITTED");
             variables.putValue(FLOW_FLAGS, getVariableMap());
 
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
             when(mockExternalTask.getTopicName()).thenReturn("test");
             when(mockExternalTask.getActivityId()).thenReturn("activityId");
@@ -150,7 +151,7 @@ class PaymentTaskHandlerTest {
         @Test
         void shouldNotCallHandleFailureMethod_whenCaseIdNotFound() {
             //given: ExternalTask variables without caseId
-            Map<String, Object> allVariables = Map.of("caseEvent", NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE);
+            Map<String, Object> allVariables = Map.of("caseEvent", NOTIFY_EVENT);
             when(mockExternalTask.getAllVariables())
                 .thenReturn(allVariables);
 
@@ -169,10 +170,9 @@ class PaymentTaskHandlerTest {
     }
 
     private StateFlowDTO getStateFlowDTO() {
-        return StateFlowDTO.builder()
-            .state(State.from("MAIN.CLAIM_SUBMITTED"))
-            .flags(getVariableMap())
-            .build();
+        return new StateFlowDTO()
+            .setState(State.from("MAIN.CLAIM_SUBMITTED"))
+            .setFlags(getVariableMap());
     }
 
     private Map<String, Boolean> getVariableMap() {

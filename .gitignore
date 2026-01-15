@@ -3,6 +3,11 @@
 !gradle/wrapper/gradle-wrapper.jar
 *.class
 bin/main/application.yaml
+bin/cftlib/
+bin/contractTest/
+bin/integrationTest/
+bin/main/
+bin/test/
 **/target
 
 ### STS ###
@@ -42,3 +47,5 @@ infrastructure/override.tf
 .aat-env
 /java_pid*.hprof
 /pacts/
+dashboard-notifications/bin
+.vscode

@@ -56,12 +56,10 @@ class DocumentRemovalHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void testWithEmptyDocumentsToRemove() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-                .toBuilder()
-                .ccdCaseReference(Long.valueOf(caseId))
-                .applicant1Represented(YesOrNo.NO)
-                .documentToKeepCollection(new ArrayList<>())
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build();
+            caseData.setCcdCaseReference(Long.valueOf(caseId));
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setDocumentToKeepCollection(new ArrayList<>());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             when(documentRemovalService.getCaseDocumentsList(caseData)).thenReturn(new ArrayList<>());
@@ -77,24 +75,21 @@ class DocumentRemovalHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void testHandleWithValidDocumentsToRemove() {
-            DocumentToKeep docToRemove = DocumentToKeep.builder()
-                .caseDocumentToKeep(CaseDocumentToKeep.builder()
-                    .documentUrl("http://example.com/doc/123")
-                    .documentFilename("example.pdf")
-                    .documentBinaryUrl("http://example.com/doc/123/binary")
-                    .build())
-                .documentId(documentId)
-                .build();
+            CaseDocumentToKeep caseDocumentToKeep = new CaseDocumentToKeep();
+            caseDocumentToKeep.setDocumentUrl("http://example.com/doc/123");
+            caseDocumentToKeep.setDocumentFilename("example.pdf");
+            caseDocumentToKeep.setDocumentBinaryUrl("http://example.com/doc/123/binary");
+            DocumentToKeep docToRemove = new DocumentToKeep();
+            docToRemove.setCaseDocumentToKeep(caseDocumentToKeep);
+            docToRemove.setDocumentId(documentId);
 
-            DocumentToKeepCollection docsToRemoveCollection = DocumentToKeepCollection.builder()
-                .value(docToRemove).build();
+            DocumentToKeepCollection docsToRemoveCollection = new DocumentToKeepCollection();
+            docsToRemoveCollection.setValue(docToRemove);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-                .toBuilder()
-                .ccdCaseReference(Long.valueOf(caseId))
-                .applicant1Represented(YesOrNo.NO)
-                .documentToKeepCollection(List.of(docsToRemoveCollection))
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build();
+            caseData.setCcdCaseReference(Long.valueOf(caseId));
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setDocumentToKeepCollection(List.of(docsToRemoveCollection));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -118,22 +113,18 @@ class DocumentRemovalHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void testWithEmptyDocumentsToRemove() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-                .toBuilder()
-                .ccdCaseReference(Long.valueOf(caseId))
-                .applicant1Represented(YesOrNo.NO)
-                .documentToKeepCollection(new ArrayList<>())
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build();
+            caseData.setCcdCaseReference(Long.valueOf(caseId));
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setDocumentToKeepCollection(new ArrayList<>());
+            DocumentRemovalCaseDataDTO documentRemovalCaseDataDTO = new DocumentRemovalCaseDataDTO();
+            documentRemovalCaseDataDTO.setCaseData(caseData);
+            documentRemovalCaseDataDTO.setDocumentsMarkedForDelete(new ArrayList<>());
 
-                .build();
+            when(documentRemovalService.removeDocuments(any(), anyLong(), anyString())).thenReturn(documentRemovalCaseDataDTO);
+            when(documentRemovalService.removeDocuments(any(), anyLong(), anyString())).thenReturn(documentRemovalCaseDataDTO);
+
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            DocumentRemovalCaseDataDTO documentRemovalCaseDataDTO = DocumentRemovalCaseDataDTO.builder()
-                .caseData(caseData)
-                .documentsMarkedForDelete(new ArrayList<>())
-                .build();
-
-            when(documentRemovalService.removeDocuments(any(), anyLong(), anyString())).thenReturn(documentRemovalCaseDataDTO);
-            when(documentRemovalService.removeDocuments(any(), anyLong(), anyString())).thenReturn(documentRemovalCaseDataDTO);
-
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData())
                 .extracting("documentToKeepCollection")
@@ -144,29 +135,25 @@ class DocumentRemovalHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void testHandleWithValidDocumentsToRemove() {
-            DocumentToKeep docToKeep = DocumentToKeep.builder()
-                .caseDocumentToKeep(CaseDocumentToKeep.builder()
-                    .documentFilename("example.pdf")
-                    .documentUrl("http://example.com/doc/123")
-                    .documentBinaryUrl("http://example.com/doc/123/binary")
-                    .build())
-                .documentId(documentId)
-                .build();
+            CaseDocumentToKeep caseDocumentToKeep = new CaseDocumentToKeep();
+            caseDocumentToKeep.setDocumentFilename("example.pdf");
+            caseDocumentToKeep.setDocumentUrl("http://example.com/doc/123");
+            caseDocumentToKeep.setDocumentBinaryUrl("http://example.com/doc/123/binary");
+            DocumentToKeep docToKeep = new DocumentToKeep();
+            docToKeep.setCaseDocumentToKeep(caseDocumentToKeep);
+            docToKeep.setDocumentId(documentId);
 
-            DocumentToKeepCollection docsToKeepCollection = DocumentToKeepCollection.builder()
-                .value(docToKeep).build();
+            DocumentToKeepCollection docsToKeepCollection = new DocumentToKeepCollection();
+            docsToKeepCollection.setValue(docToKeep);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-                .toBuilder()
-                .ccdCaseReference(Long.valueOf(caseId))
-                .applicant1Represented(YesOrNo.NO)
-                .documentToKeepCollection(List.of(docsToKeepCollection))
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build();
+            caseData.setCcdCaseReference(Long.valueOf(caseId));
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setDocumentToKeepCollection(List.of(docsToKeepCollection));
 
-            DocumentRemovalCaseDataDTO documentRemovalCaseDataDTO = DocumentRemovalCaseDataDTO.builder()
-                .caseData(caseData)
-                .documentsMarkedForDelete(new ArrayList<>())
-                .build();
+            DocumentRemovalCaseDataDTO documentRemovalCaseDataDTO = new DocumentRemovalCaseDataDTO();
+            documentRemovalCaseDataDTO.setCaseData(caseData);
+            documentRemovalCaseDataDTO.setDocumentsMarkedForDelete(new ArrayList<>());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -186,34 +173,39 @@ class DocumentRemovalHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void testWithWarningsWhenSystemGeneratedDocumentsAreRemoved() {
-            DocumentToKeep docToKeep = DocumentToKeep.builder()
-                .caseDocumentToKeep(CaseDocumentToKeep.builder()
-                    .documentFilename("example.pdf")
-                    .documentUrl("http://example.com/doc/123")
-                    .documentBinaryUrl("http://example.com/doc/123/binary")
-                    .build())
-                .documentId(documentId)
-                .systemGenerated(YesOrNo.YES)
-                .build();
+            CaseDocumentToKeep caseDocumentToKeep = new CaseDocumentToKeep();
+            caseDocumentToKeep.setDocumentFilename("example.pdf");
+            caseDocumentToKeep.setDocumentUrl("http://example.com/doc/123");
+            caseDocumentToKeep.setDocumentBinaryUrl("http://example.com/doc/123/binary");
+            DocumentToKeep docToKeep = new DocumentToKeep();
+            docToKeep.setCaseDocumentToKeep(caseDocumentToKeep);
+            docToKeep.setDocumentId(documentId);
+            docToKeep.setSystemGenerated(YesOrNo.YES);
 
-            DocumentToKeepCollection docsToKeepCollection = DocumentToKeepCollection.builder()
-                .value(docToKeep).build();
+            DocumentToKeepCollection docsToKeepCollection = new DocumentToKeepCollection();
+            docsToKeepCollection.setValue(docToKeep);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
-                .toBuilder()
-                .ccdCaseReference(Long.valueOf(caseId))
-                .applicant1Represented(YesOrNo.NO)
-                .documentToKeepCollection(List.of(docsToKeepCollection))
-                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build();
+            caseData.setCcdCaseReference(Long.valueOf(caseId));
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            caseData.setDocumentToKeepCollection(List.of(docsToKeepCollection));
 
-            DocumentRemovalCaseDataDTO documentRemovalCaseDataDTO = DocumentRemovalCaseDataDTO.builder()
-                .caseData(caseData)
-                .documentsMarkedForDelete(
-                    List.of(DocumentToKeep.builder().caseDocumentToKeep(CaseDocumentToKeep.builder().documentFilename("System Doc").build())
-                            .documentId("123").systemGenerated(YesOrNo.YES).build(),
-                        DocumentToKeep.builder().caseDocumentToKeep(CaseDocumentToKeep.builder().documentFilename("User Doc").build())
-                            .documentId("456").systemGenerated(YesOrNo.NO).build()))
-                .build();
+            DocumentRemovalCaseDataDTO documentRemovalCaseDataDTO = new DocumentRemovalCaseDataDTO();
+            documentRemovalCaseDataDTO.setCaseData(caseData);
+            CaseDocumentToKeep caseDocumentToKeepSys = new CaseDocumentToKeep();
+            caseDocumentToKeepSys.setDocumentFilename("System Doc");
+            DocumentToKeep documentToKeepSys = new DocumentToKeep();
+            documentToKeepSys.setCaseDocumentToKeep(caseDocumentToKeepSys);
+            documentToKeepSys.setDocumentId("123");
+            documentToKeepSys.setSystemGenerated(YesOrNo.YES);
+            CaseDocumentToKeep caseDocumentToKeepUsr = new CaseDocumentToKeep();
+            caseDocumentToKeepUsr.setDocumentFilename("User Doc");
+            DocumentToKeep documentToKeepUsr = new DocumentToKeep();
+            documentToKeepUsr.setCaseDocumentToKeep(caseDocumentToKeepUsr);
+            documentToKeepUsr.setDocumentId("456");
+            documentToKeepUsr.setSystemGenerated(YesOrNo.NO);
+            documentRemovalCaseDataDTO.setDocumentsMarkedForDelete(
+                List.of(documentToKeepSys, documentToKeepUsr));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 

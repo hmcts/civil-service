@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -197,7 +198,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
     @BeforeEach
     public void setUp() {
-        lenient().when(feesService.getFeeForGA(any(GeneralApplication.class), any())).thenReturn(Fee.builder().build());
+        lenient().when(feesService.getFeeForGA(any(GeneralApplication.class), any())).thenReturn(new Fee());
     }
 
     @Test
@@ -208,8 +209,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         GeneralApplication result = helper
                 .setRespondentDetailsIfPresent(
-                        GeneralApplication.builder().build(),
-                        getTestCaseData(CaseData.builder().build(), true, null),
+                        new GeneralApplication(),
+                        getTestCaseData(CaseDataBuilder.builder().build(), true, null),
                         getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
                         feesService
                 );
@@ -243,8 +244,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         assertDoesNotThrow(() -> helper
                 .setRespondentDetailsIfPresent(
-                        GeneralApplication.builder().build(),
-                        getTestCaseData(CaseData.builder().build(), true, null),
+                        new GeneralApplication(),
+                        getTestCaseData(CaseDataBuilder.builder().build(), true, null),
                         getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
                         feesService
                 ));
@@ -258,8 +259,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 IllegalArgumentException.class,
                 () -> helper
                         .setRespondentDetailsIfPresent(
-                                GeneralApplication.builder().build(),
-                                CaseData.builder().ccdCaseReference(1234L).build(),
+                                new GeneralApplication(),
+                                CaseDataBuilder.builder().ccdCaseReference(1234L).build(),
                                 getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
                                 feesService
                         )
@@ -274,10 +275,10 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 IllegalArgumentException.class,
                 () -> helper
                         .setRespondentDetailsIfPresent(
-                                GeneralApplication.builder().build(),
-                                CaseData.builder().ccdCaseReference(1234L)
-                                        .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
-                                        .respondent2(Party.builder().type(COMPANY).companyName("Respondent1").build())
+                                new GeneralApplication(),
+                                CaseDataBuilder.builder().ccdCaseReference(1234L)
+                                        .applicant1(createParty(COMPANY, "Applicant1"))
+                                        .respondent2(createParty(COMPANY, "Respondent1"))
                                         .applicant1OrganisationPolicy(OrganisationPolicy.builder().build()).build(),
                                 getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
                                 feesService
@@ -293,12 +294,12 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 IllegalArgumentException.class,
                 () -> helper
                         .setRespondentDetailsIfPresent(
-                                GeneralApplication.builder().build(),
-                                CaseData.builder().ccdCaseReference(1234L)
+                                new GeneralApplication(),
+                                CaseDataBuilder.builder().ccdCaseReference(1234L)
                                         .respondent1OrganisationPolicy(OrganisationPolicy.builder().build())
                                         .addRespondent2(YesOrNo.YES)
-                                        .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
-                                        .respondent2(Party.builder().type(COMPANY).companyName("Respondent1").build())
+                                        .applicant1(createParty(COMPANY, "Applicant1"))
+                                        .respondent2(createParty(COMPANY, "Respondent1"))
                                         .applicant1OrganisationPolicy(OrganisationPolicy.builder().build()).build(),
                                 getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
                                 feesService
@@ -314,8 +315,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                         .caseAssignmentUserRoles(getCaseUsersForApplicantCheck()).build());
 
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
-                GeneralApplication.builder().build(),
-                CaseData.builder().ccdCaseReference(1234L)
+                new GeneralApplication(),
+                CaseDataBuilder.builder().build().toBuilder().ccdCaseReference(1234L)
                         .respondent1OrganisationPolicy(OrganisationPolicy.builder()
                                 .organisation(Organisation.builder().organisationID("100").build())
                                 .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE.getFormattedName())
@@ -324,10 +325,10 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                 .organisation(Organisation.builder().organisationID("101").build())
                                 .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName())
                                 .build())
-                        .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(APPLICANT_EMAIL_ID_CONSTANT).build())
+                        .applicantSolicitor1UserDetails(createIdamUserDetails(null, APPLICANT_EMAIL_ID_CONSTANT))
                         .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
-                        .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
-                        .respondent2(Party.builder().type(COMPANY).companyName("Respondent1").build())
+                        .applicant1(createParty(COMPANY, "Applicant1"))
+                        .respondent2(createParty(COMPANY, "Respondent1"))
                         .addRespondent2(YesOrNo.YES)
                         .applicant1OrganisationPolicy(OrganisationPolicy.builder()
                                 .organisation(Organisation.builder().organisationID("200").build())
@@ -354,8 +355,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                         .caseAssignmentUserRoles(getCaseUsersForApplicantCheck()).build());
 
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
-                GeneralApplication.builder().build(),
-                CaseData.builder().ccdCaseReference(1234L)
+                new GeneralApplication(),
+                CaseDataBuilder.builder().build().toBuilder().ccdCaseReference(1234L)
                         .respondent1OrganisationPolicy(OrganisationPolicy.builder()
                                 .organisation(Organisation.builder().organisationID("100").build())
                                 .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE.getFormattedName())
@@ -364,12 +365,12 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                 .organisation(Organisation.builder().organisationID("101").build())
                                 .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName())
                                 .build())
-                        .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(APPLICANT_EMAIL_ID_CONSTANT).build())
+                        .applicantSolicitor1UserDetails(createIdamUserDetails(null, APPLICANT_EMAIL_ID_CONSTANT))
                         .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
-                        .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
-                        .applicant2(Party.builder().type(COMPANY).companyName("Applicant2").build())
-                        .respondent1(Party.builder().type(COMPANY).companyName("Respondent1").build())
-                        .respondent2(Party.builder().type(COMPANY).companyName("Respondent2").build())
+                        .applicant1(createParty(COMPANY, "Applicant1"))
+                        .applicant2(createParty(COMPANY, "Applicant2"))
+                        .respondent1(createParty(COMPANY, "Respondent1"))
+                        .respondent2(createParty(COMPANY, "Respondent2"))
                         .addRespondent2(YesOrNo.YES)
                         .applicant1OrganisationPolicy(OrganisationPolicy.builder()
                                 .organisation(Organisation.builder().organisationID("200").build())
@@ -396,8 +397,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                         .caseAssignmentUserRoles(getCaseUsersForApplicantCheck()).build());
 
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
-                GeneralApplication.builder().build(),
-                CaseData.builder().ccdCaseReference(1234L)
+                new GeneralApplication(),
+                CaseDataBuilder.builder().build().toBuilder().ccdCaseReference(1234L)
                         .respondent1OrganisationPolicy(OrganisationPolicy.builder()
                                 .organisation(Organisation.builder().organisationID("100").build())
                                 .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE.getFormattedName())
@@ -406,12 +407,12 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                 .organisation(Organisation.builder().organisationID("101").build())
                                 .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName())
                                 .build())
-                        .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(APPLICANT_EMAIL_ID_CONSTANT).build())
+                        .applicantSolicitor1UserDetails(createIdamUserDetails(null, APPLICANT_EMAIL_ID_CONSTANT))
                         .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
-                        .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
-                        .applicant2(Party.builder().type(COMPANY).companyName("Applicant2").build())
-                        .respondent1(Party.builder().type(COMPANY).companyName("Respondent1").build())
-                        .respondent2(Party.builder().type(COMPANY).companyName("Respondent2").build())
+                        .applicant1(createParty(COMPANY, "Applicant1"))
+                        .applicant2(createParty(COMPANY, "Applicant2"))
+                        .respondent1(createParty(COMPANY, "Respondent1"))
+                        .respondent2(createParty(COMPANY, "Respondent2"))
                         .addRespondent2(YesOrNo.YES)
                         .applicant1OrganisationPolicy(OrganisationPolicy.builder()
                                 .organisation(Organisation.builder().organisationID("200").build())
@@ -448,21 +449,21 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .thenReturn(CaseAssignmentUserRolesResource.builder()
                         .caseAssignmentUserRoles(getCaseUsers()).build());
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
-                GeneralApplication.builder().build(),
-                CaseData.builder().ccdCaseReference(1234L)
+                new GeneralApplication(),
+                CaseDataBuilder.builder().build().toBuilder().ccdCaseReference(1234L)
                         .respondent1OrganisationPolicy(OrganisationPolicy.builder()
                                 .organisation(Organisation.builder().organisationID("345").build())
                                 .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE.getFormattedName()).build())
-                        .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(APPLICANT_EMAIL_ID_CONSTANT).build())
+                        .applicantSolicitor1UserDetails(createIdamUserDetails(null, APPLICANT_EMAIL_ID_CONSTANT))
                         .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
-                        .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
-                        .respondent2(Party.builder().type(COMPANY).companyName("Respondent1").build())
+                        .applicant1(createParty(COMPANY, "Applicant1"))
+                        .respondent2(createParty(COMPANY, "Respondent1"))
                         .applicant1OrganisationPolicy(OrganisationPolicy.builder()
                                 .organisation(Organisation.builder().organisationID("123").build())
                                 .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE
                                         .getFormattedName())
                                 .build())
-                        .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
+                        .generalAppEvidenceDocument(wrapElements(createDocument(STRING_CONSTANT)))
                         .build(),
                 getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
                 feesService
@@ -497,23 +498,22 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .thenReturn(CaseAssignmentUserRolesResource.builder()
                         .caseAssignmentUserRoles(getCaseUsersForDefendant1ToBeApplicant()).build());
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
-                GeneralApplication.builder().build(),
-                CaseData.builder().ccdCaseReference(1234L)
+                new GeneralApplication(),
+                CaseDataBuilder.builder().build().toBuilder().ccdCaseReference(1234L)
                         .respondent1OrganisationPolicy(OrganisationPolicy.builder()
                                 .organisation(Organisation.builder().organisationID("345").build())
                                 .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE
                                         .getFormattedName())
                                 .build())
                         .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
-                        .applicantSolicitor1UserDetails(IdamUserDetails.builder().id(STRING_NUM_CONSTANT)
-                                .email(APPLICANT_EMAIL_ID_CONSTANT).build())
+                        .applicantSolicitor1UserDetails(createIdamUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT))
                         .applicant1OrganisationPolicy(OrganisationPolicy.builder()
                                 .organisation(Organisation.builder().organisationID("123").build())
                                 .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
                                 .build())
-                        .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
-                        .respondent1(Party.builder().type(COMPANY).companyName("Respondent1").build())
-                        .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
+                        .applicant1(createParty(COMPANY, "Applicant1"))
+                        .respondent1(createParty(COMPANY, "Respondent1"))
+                        .generalAppEvidenceDocument(wrapElements(createDocument(STRING_CONSTANT)))
                         .build(),
                 getUserDetails("1", RESPONDENT_EMAIL_ID_CONSTANT),
                 feesService
@@ -549,8 +549,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .thenReturn(CaseAssignmentUserRolesResource.builder()
                         .caseAssignmentUserRoles(getCaseUsersForDefendant2ToBeApplicant()).build());
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
-                GeneralApplication.builder().build(),
-                CaseData.builder().ccdCaseReference(1234L)
+                new GeneralApplication(),
+                CaseDataBuilder.builder().build().toBuilder().ccdCaseReference(1234L)
                         .addRespondent2(YesOrNo.NO)
                         .addApplicant2(YesOrNo.NO)
                         .respondent1OrganisationPolicy(OrganisationPolicy.builder()
@@ -565,17 +565,16 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                 .build())
                         .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
                         .respondentSolicitor2EmailAddress(TEST_USER_EMAILID)
-                        .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
-                        .applicant1(Party.builder().type(COMPANY).companyName("Applicant2").build())
-                        .respondent1(Party.builder().type(COMPANY).companyName("Respondent1").build())
-                        .respondent2(Party.builder().type(COMPANY).companyName("Respondent2").build())
-                        .applicantSolicitor1UserDetails(IdamUserDetails.builder().id(STRING_NUM_CONSTANT)
-                                .email(APPLICANT_EMAIL_ID_CONSTANT).build())
+                        .applicant1(createParty(COMPANY, "Applicant1"))
+                        .applicant1(createParty(COMPANY, "Applicant2"))
+                        .respondent1(createParty(COMPANY, "Respondent1"))
+                        .respondent2(createParty(COMPANY, "Respondent2"))
+                        .applicantSolicitor1UserDetails(createIdamUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT))
                         .applicant1OrganisationPolicy(OrganisationPolicy.builder()
                                 .organisation(Organisation.builder().organisationID("6789").build())
                                 .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
                                 .build())
-                        .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
+                        .generalAppEvidenceDocument(wrapElements(createDocument(STRING_CONSTANT)))
                         .build(),
                 getUserDetails("2", TEST_USER_EMAILID),
                 feesService
@@ -617,7 +616,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         @Test
         void shouldReturnsRespondent1_Lr_Vs_Lip_Lr_Is_App() {
 
-            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, null).toBuilder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseDataBuilder.builder().build(), false, null).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                     .addApplicant2(YesOrNo.NO)
                     .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -625,18 +624,14 @@ public class InitiateGeneralApplicationServiceHelperTest {
                             .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
                             .build())
                     .ccdCaseReference(12L)
-                    .respondent1(Party.builder()
-                            .partyID("party")
-                            .partyEmail("party@gmail.com")
-                            .type(Party.Type.INDIVIDUAL)
-                            .individualFirstName("party").build())
-                    .defendantUserDetails(IdamUserDetails.builder().id(DEF_LIP_USER_ID).email("partyemail@gmail.com").build());
+                    .respondent1(createLipParty("party", "party@gmail.com", "party", Party.Type.INDIVIDUAL))
+                    .defendantUserDetails(createIdamUserDetails(DEF_LIP_USER_ID, "partyemail@gmail.com"));
             when(caseAssignmentApi.getUserRoles(any(), any(), eq(List.of("12"))))
                     .thenReturn(CaseAssignmentUserRolesResource.builder()
                             .caseAssignmentUserRoles(getCaseUsersForLrVLipAppLr()).build());
             GeneralApplication result = helper
                     .setRespondentDetailsIfPresent(
-                            GeneralApplication.builder().build(),
+                            new GeneralApplication(),
                             caseDataBuilder.build(),
                             getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
                             feesService
@@ -664,7 +659,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         @Test
         void shouldReturnsApp_Lr_Vs_Lip_Lip_Is_App() {
 
-            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, null).toBuilder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseDataBuilder.builder().build(), false, null).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                     .addApplicant2(YesOrNo.NO)
                     .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -675,19 +670,14 @@ public class InitiateGeneralApplicationServiceHelperTest {
                             .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE.getFormattedName())
                             .build())
                     .ccdCaseReference(12L)
-                    .respondent1(Party.builder()
-                            .partyID("party")
-                            .type(Party.Type.INDIVIDUAL)
-                            .partyName("Lip Lip")
-                            .partyEmail("party@gmail.com")
-                            .individualFirstName("party").build())
-                    .defendantUserDetails(IdamUserDetails.builder().id(DEF_LIP_USER_ID).email("partyemail@gmail.com").build());
+                    .respondent1(createLipPartyWithName("party", "party@gmail.com", "Lip Lip", "party"))
+                    .defendantUserDetails(createIdamUserDetails(DEF_LIP_USER_ID, "partyemail@gmail.com"));
             when(caseAssignmentApi.getUserRoles(any(), any(), eq(List.of("12"))))
                     .thenReturn(CaseAssignmentUserRolesResource.builder()
                             .caseAssignmentUserRoles(getCaseUsersForLrVLipAppLip()).build());
             GeneralApplication result = helper
                     .setRespondentDetailsIfPresent(
-                            GeneralApplication.builder().build(),
+                            new GeneralApplication(),
                             caseDataBuilder.build(),
                             getUserDetails(STRING_NUM_CONSTANT, RESPONDENT_EMAIL_ID_CONSTANT),
                             feesService
@@ -703,7 +693,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         @Test
         void shouldReturnsRespondent1_Lip_Vs_Lr_Lip_Is_App() {
 
-            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, null).toBuilder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseDataBuilder.builder().build(), false, null).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                     .addApplicant2(YesOrNo.NO)
                     .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -715,19 +705,15 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                     .getFormattedName())
                             .build())
                     .ccdCaseReference(12L)
-                    .applicant1(Party.builder()
-                            .partyID("party")
-                            .partyEmail("party@gmail.com")
-                            .type(Party.Type.INDIVIDUAL)
-                            .individualFirstName("party").build())
-                    .claimantUserDetails(IdamUserDetails.builder().id(CL_LIP_USER_ID).email("partyemail@gmail.com").build())
+                    .applicant1(createLipParty("party", "party@gmail.com", "party", Party.Type.INDIVIDUAL))
+                    .claimantUserDetails(createIdamUserDetails(CL_LIP_USER_ID, "partyemail@gmail.com"))
                     .applicant1Represented(NO);
             when(caseAssignmentApi.getUserRoles(any(), any(), eq(List.of("12"))))
                     .thenReturn(CaseAssignmentUserRolesResource.builder()
                             .caseAssignmentUserRoles(getCaseUsersForLipVLrAppLip()).build());
             GeneralApplication result = helper
                     .setRespondentDetailsIfPresent(
-                            GeneralApplication.builder().build(),
+                            new GeneralApplication(),
                             caseDataBuilder.build(),
                             getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
                             feesService
@@ -743,7 +729,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         @Test
         void shouldReturnsRespondent1_Lip_Vs_Lr_Lr_Is_App() {
 
-            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, null).toBuilder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseDataBuilder.builder().build(), false, null).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                     .addApplicant2(YesOrNo.NO)
                     .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -755,20 +741,16 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                     .getFormattedName())
                             .build())
                     .ccdCaseReference(12L)
-                    .respondent1(Party.builder()
-                            .partyID("party")
-                            .partyEmail("party@gmail.com")
-                            .type(Party.Type.INDIVIDUAL)
-                            .individualFirstName("party").build())
-                    .claimantUserDetails(IdamUserDetails.builder().id(CL_LIP_USER_ID).email("partyemail@gmail.com").build())
-                    .defendantUserDetails(IdamUserDetails.builder().id("2").email(RESPONDENT_EMAIL_ID_CONSTANT).build())
+                    .respondent1(createLipParty("party", "party@gmail.com", "party", Party.Type.INDIVIDUAL))
+                    .claimantUserDetails(createIdamUserDetails(CL_LIP_USER_ID, "partyemail@gmail.com"))
+                    .defendantUserDetails(createIdamUserDetails("2", RESPONDENT_EMAIL_ID_CONSTANT))
                     .applicant1Represented(NO);
             when(caseAssignmentApi.getUserRoles(any(), any(), eq(List.of("12"))))
                     .thenReturn(CaseAssignmentUserRolesResource.builder()
                             .caseAssignmentUserRoles(getCaseUsersForLipVLrAppLr()).build());
             GeneralApplication result = helper
                     .setRespondentDetailsIfPresent(
-                            GeneralApplication.builder().build(),
+                            new GeneralApplication(),
                             caseDataBuilder.build(),
                             getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT),
                             feesService
@@ -785,7 +767,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         @Test
         void shouldWork_Lip_Vs_Lip() {
-            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, null).toBuilder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseDataBuilder.builder().build(), false, null).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                     .addApplicant2(YesOrNo.NO)
                     .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -796,20 +778,16 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                     .getFormattedName())
                             .build())
                     .ccdCaseReference(12L)
-                    .respondent1(Party.builder()
-                            .partyID("party")
-                            .partyEmail("party@gmail.com")
-                            .type(Party.Type.INDIVIDUAL)
-                            .individualFirstName("defF").build())
-                    .claimantUserDetails(IdamUserDetails.builder().id(CL_LIP_USER_ID).email("partyemail@gmail.com").build())
-                    .defendantUserDetails(IdamUserDetails.builder().id(DEF_LIP_USER_ID).email("partyemail@gmail.com").build())
+                    .respondent1(createLipParty("party", "party@gmail.com", "defF", Party.Type.INDIVIDUAL))
+                    .claimantUserDetails(createIdamUserDetails(CL_LIP_USER_ID, "partyemail@gmail.com"))
+                    .defendantUserDetails(createIdamUserDetails(DEF_LIP_USER_ID, "partyemail@gmail.com"))
                     .applicant1Represented(NO);
             when(caseAssignmentApi.getUserRoles(any(), any(), eq(List.of("12"))))
                     .thenReturn(CaseAssignmentUserRolesResource.builder()
                             .caseAssignmentUserRoles(getCaseUsersForLipVLip()).build());
             GeneralApplication result = helper
                     .setRespondentDetailsIfPresent(
-                            GeneralApplication.builder().build(),
+                            new GeneralApplication(),
                             caseDataBuilder.build(),
                             getUserDetails(CL_LIP_USER_ID, APPLICANT_EMAIL_ID_CONSTANT),
                             feesService
@@ -826,7 +804,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         @Test
         void shouldUrgency_Lip_Vs_Lip_at_10thDay() {
-            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, 10).toBuilder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseDataBuilder.builder().build(), false, 10).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                     .addApplicant2(YesOrNo.NO)
                     .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -837,13 +815,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                     .getFormattedName())
                             .build())
                     .ccdCaseReference(12L)
-                    .respondent1(Party.builder()
-                            .partyID("party")
-                            .partyEmail("party@gmail.com")
-                            .type(Party.Type.INDIVIDUAL)
-                            .individualFirstName("defF").build())
-                    .claimantUserDetails(IdamUserDetails.builder().id(CL_LIP_USER_ID).email("partyemail@gmail.com").build())
-                    .defendantUserDetails(IdamUserDetails.builder().id(DEF_LIP_USER_ID).email("partyemail@gmail.com").build())
+                    .respondent1(createLipParty("party", "party@gmail.com", "defF", Party.Type.INDIVIDUAL))
+                    .claimantUserDetails(createIdamUserDetails(CL_LIP_USER_ID, "partyemail@gmail.com"))
+                    .defendantUserDetails(createIdamUserDetails(DEF_LIP_USER_ID, "partyemail@gmail.com"))
                     .applicant1Represented(NO);
             when(caseAssignmentApi.getUserRoles(any(), any(), eq(List.of("12"))))
                     .thenReturn(CaseAssignmentUserRolesResource.builder()
@@ -851,7 +825,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
             CaseData caseData = caseDataBuilder.build();
             GeneralApplication result = helper
                     .setRespondentDetailsIfPresent(
-                            GeneralApplication.builder().build(),
+                            new GeneralApplication(),
                             caseData,
                             getUserDetails(CL_LIP_USER_ID, APPLICANT_EMAIL_ID_CONSTANT),
                             feesService
@@ -871,7 +845,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         void should_Non_Urgency_Lip_Vs_Lip_At_25th() {
             LocalDate hearingDate = LocalDate.now().plusDays(25);
             CaseData.CaseDataBuilder<?, ?> caseDataBuilder =
-                getTestCaseData(CaseData.builder().build(), false, 25).toBuilder();
+                getTestCaseData(CaseDataBuilder.builder().build(), false, 25).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                 .addApplicant2(YesOrNo.NO)
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -882,14 +856,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                                                                   .getFormattedName())
                                                    .build())
                 .ccdCaseReference(12L)
-                .respondent1(Party.builder()
-                                 .partyID("party")
-                                 .partyEmail("party@gmail.com")
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .individualFirstName("defF").build())
-                .claimantUserDetails(IdamUserDetails.builder().id(CL_LIP_USER_ID).email("partyemail@gmail.com").build())
-                .defendantUserDetails(IdamUserDetails.builder().id(DEF_LIP_USER_ID).email("partyemail@gmail.com")
-                                          .build())
+                .respondent1(createLipParty("party", "party@gmail.com", "defF", Party.Type.INDIVIDUAL))
+                .claimantUserDetails(createIdamUserDetails(CL_LIP_USER_ID, "partyemail@gmail.com"))
+                .defendantUserDetails(createIdamUserDetails(DEF_LIP_USER_ID, "partyemail@gmail.com"))
                 .applicant1Represented(NO)
                 .hearingDate(hearingDate);
             when(caseAssignmentApi.getUserRoles(any(), any(), eq(List.of("12"))))
@@ -899,7 +868,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
             CaseData caseData = caseDataBuilder.build();
             GeneralApplication result = helper
                 .setRespondentDetailsIfPresent(
-                    GeneralApplication.builder().build(),
+                    new GeneralApplication(),
                     caseData,
                     getUserDetails(CL_LIP_USER_ID, APPLICANT_EMAIL_ID_CONSTANT),
                     feesService
@@ -914,7 +883,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         @Test
         void shouldNotUrgency_Lip_Vs_Lip_at_11thDay() {
-            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseData.builder().build(), false, 11).toBuilder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = getTestCaseData(CaseDataBuilder.builder().build(), false, 11).toBuilder();
             caseDataBuilder.addRespondent2(YesOrNo.NO)
                     .addApplicant2(YesOrNo.NO)
                     .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -925,20 +894,16 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                     .getFormattedName())
                             .build())
                     .ccdCaseReference(12L)
-                    .respondent1(Party.builder()
-                            .partyID("party")
-                            .partyEmail("party@gmail.com")
-                            .type(Party.Type.INDIVIDUAL)
-                            .individualFirstName("defF").build())
-                    .claimantUserDetails(IdamUserDetails.builder().id(CL_LIP_USER_ID).email("partyemail@gmail.com").build())
-                    .defendantUserDetails(IdamUserDetails.builder().id(DEF_LIP_USER_ID).email("partyemail@gmail.com").build())
+                    .respondent1(createLipParty("party", "party@gmail.com", "defF", Party.Type.INDIVIDUAL))
+                    .claimantUserDetails(createIdamUserDetails(CL_LIP_USER_ID, "partyemail@gmail.com"))
+                    .defendantUserDetails(createIdamUserDetails(DEF_LIP_USER_ID, "partyemail@gmail.com"))
                     .applicant1Represented(NO);
             when(caseAssignmentApi.getUserRoles(any(), any(), eq(List.of("12"))))
                     .thenReturn(CaseAssignmentUserRolesResource.builder()
                             .caseAssignmentUserRoles(getCaseUsersForLipVLip()).build());
             GeneralApplication result = helper
                     .setRespondentDetailsIfPresent(
-                            GeneralApplication.builder().build(),
+                            new GeneralApplication(),
                             caseDataBuilder.build(),
                             getUserDetails(CL_LIP_USER_ID, APPLICANT_EMAIL_ID_CONSTANT),
                             feesService
@@ -954,11 +919,11 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-        GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("1")
-            .email("test@gmail.com").organisationIdentifier("org2").build();
+        GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("1")
+            .setEmail("test@gmail.com").setOrganisationIdentifier("org2");
 
-        GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id("2")
-            .email("test@gmail.com").organisationIdentifier("org2").build();
+        GASolicitorDetailsGAspec respondent2 = new GASolicitorDetailsGAspec().setId("2")
+            .setEmail("test@gmail.com").setOrganisationIdentifier("org2");
 
         respondentSols.add(element(respondent1));
         respondentSols.add(element(respondent2));
@@ -969,17 +934,15 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .generalAppType(GAApplicationType.builder()
                                     .types(singletonList(EXTEND_TIME))
                                     .build())
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                    .id(STRING_CONSTANT)
-                                                    .email(APPLICANT_EMAIL_ID_CONSTANT).build())
+                .applicantSolicitor1UserDetails(createIdamUserDetails(STRING_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT))
                 .generalAppRespondentSolicitors(respondentSols)
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec
                                               .builder()
                                               .id("1")
                                               .email(TEST_USER_EMAILID)
                                               .organisationIdentifier("Org1").build())
-                .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
-                .respondent2(Party.builder().type(COMPANY).companyName("Respondent1").build())
+                .applicant1(createParty(COMPANY, "Applicant1"))
+                .respondent2(createParty(COMPANY, "Respondent1"))
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder()
                         .organisation(Organisation.builder()
                                 .organisationID(STRING_CONSTANT).build())
@@ -1004,16 +967,14 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .generalAppType(GAApplicationType.builder()
                                     .types(singletonList(EXTEND_TIME))
                                     .build())
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                    .id(STRING_CONSTANT)
-                                                    .email(APPLICANT_EMAIL_ID_CONSTANT).build())
+                .applicantSolicitor1UserDetails(createIdamUserDetails(STRING_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT))
                 .generalAppRespondentSolicitors(wrapElements(GASolicitorDetailsGAspec
                                                                  .builder()
                                                                  .id("1")
                                                                  .email(TEST_USER_EMAILID)
                                                                  .organisationIdentifier("Org1").build()))
-                .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
-                .respondent2(Party.builder().type(COMPANY).companyName("Respondent1").build())
+                .applicant1(createParty(COMPANY, "Applicant1"))
+                .respondent2(createParty(COMPANY, "Respondent1"))
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder()
                                                   .organisation(Organisation.builder()
                                                                     .organisationID(STRING_CONSTANT).build())
@@ -1034,10 +995,49 @@ public class InitiateGeneralApplicationServiceHelperTest {
     }
 
     public GeneralApplication getGeneralApplication() {
-        GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
-        return builder.generalAppType(GAApplicationType.builder()
-                                          .types(singletonList(SUMMARY_JUDGEMENT))
-                                          .build())
-            .build();
+        GeneralApplication generalApplication = new GeneralApplication();
+        GAApplicationType gaApplicationType = new GAApplicationType();
+        gaApplicationType.setTypes(singletonList(SUMMARY_JUDGEMENT));
+        generalApplication.setGeneralAppType(gaApplicationType);
+        return generalApplication;
+    }
+
+    private Document createDocument(String url) {
+        Document document = new Document();
+        document.setDocumentUrl(url);
+        return document;
+    }
+
+    private Party createParty(Party.Type type, String companyName) {
+        Party party = new Party();
+        party.setType(type);
+        party.setCompanyName(companyName);
+        return party;
+    }
+
+    private Party createLipParty(String partyId, String email, String firstName, Party.Type type) {
+        Party party = new Party();
+        party.setPartyID(partyId);
+        party.setPartyEmail(email);
+        party.setIndividualFirstName(firstName);
+        party.setType(type);
+        return party;
+    }
+
+    private Party createLipPartyWithName(String partyId, String email, String partyName, String firstName) {
+        Party party = new Party();
+        party.setPartyID(partyId);
+        party.setPartyEmail(email);
+        party.setPartyName(partyName);
+        party.setIndividualFirstName(firstName);
+        party.setType(Party.Type.INDIVIDUAL);
+        return party;
+    }
+
+    private IdamUserDetails createIdamUserDetails(String id, String email) {
+        IdamUserDetails idamUserDetails = new IdamUserDetails();
+        idamUserDetails.setId(id);
+        idamUserDetails.setEmail(email);
+        return idamUserDetails;
     }
 }

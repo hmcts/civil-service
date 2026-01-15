@@ -29,10 +29,10 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.hearing.CategoryType;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
-import uk.gov.hmcts.reform.civil.exceptions.MissingFieldsUpdatedException;
 import uk.gov.hmcts.reform.civil.exceptions.NotEarlyAdopterCourtException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
@@ -130,23 +130,30 @@ public class HearingValuesServiceTest {
 
     @Test
     void shouldReturnExpectedHearingValuesWhenCaseDataIsReturned() throws Exception {
-        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
+        WelshLanguageRequirements applicant1WelshLang = new WelshLanguageRequirements();
+        applicant1WelshLang.setCourt(Language.ENGLISH);
+        Applicant1DQ applicant1DQ = new Applicant1DQ();
+        applicant1DQ.setApplicant1DQLanguage(applicant1WelshLang);
+        WelshLanguageRequirements respondent1WelshLang = new WelshLanguageRequirements();
+        respondent1WelshLang.setCourt(Language.WELSH);
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQLanguage(respondent1WelshLang);
+
+        Long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
+            .caseReference(caseId)
             .caseAccessCategory(UNSPEC_CLAIM)
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
                                         .region(WELSH_REGION_ID).build())
             .applicant1DQ(applicant1DQ)
             .respondent1DQ(respondent1DQ)
             .build();
-        caseData = caseData.toBuilder()
-            .applicant1(caseData.getApplicant1().toBuilder()
-                            .flags(Flags.builder().partyName("party name").build())
-                            .build()).build();
-        Long caseId = 1L;
+        Flags flags = new Flags();
+        flags.setPartyName("party name");
+        Party applicant1 = caseData.getApplicant1();
+        applicant1.setFlags(flags);
+        caseData.setApplicant1(applicant1);
         CaseDetails caseDetails = CaseDetails.builder()
             .data(caseData.toMap(mapper))
             .id(caseId).build();
@@ -217,21 +224,22 @@ public class HearingValuesServiceTest {
             .build();
 
         ServiceHearingValuesModel actual = hearingValuesService.getValues(caseId, "auth");
+        ServiceHearingValuesModel actualFromCaseData = hearingValuesService.getValues(caseData, "auth");
 
         verify(caseDetailsConverter).toCaseData(eq(caseDetails.getData()));
         verify(caseDataService, times(0)).triggerEvent(any(), any(), any());
         assertThat(actual).isEqualTo(expected);
+        assertThat(actualFromCaseData).isEqualTo(expected);
     }
 
     @SneakyThrows
     @Test
-    void shouldTriggerEventAndThrowMissingFieldsUpdatedExceptionIfPartyIdMissingFromApplicant1() throws Exception {
+    void shouldTriggerEventIfPartyIdMissingFromApplicant1() throws Exception {
         Long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .caseReference(caseId)
-            .applicant1(PartyBuilder.builder().individual().build().toBuilder()
-                            .flags(Flags.builder().partyName("party name").build()).build())
+            .applicant1(PartyBuilder.builder().individual().build())
             .respondent1(PartyBuilder.builder().company().build())
             .respondent2(PartyBuilder.builder().company().build())
             .multiPartyClaimTwoDefendantSolicitors()
@@ -239,6 +247,9 @@ public class HearingValuesServiceTest {
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
                                         .region(WELSH_REGION_ID).build())
             .build();
+        Flags flags = new Flags();
+        flags.setPartyName("party name");
+        caseData.getApplicant1().setFlags(flags);
         CaseDetails caseDetails = CaseDetails.builder()
             .data(caseData.toMap(mapper))
             .id(caseId).build();
@@ -256,16 +267,14 @@ public class HearingValuesServiceTest {
         given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
-        assertThrows(MissingFieldsUpdatedException.class, () -> {
-            hearingValuesService.getValues(caseId, "auth");
-        });
+        hearingValuesService.getValues(caseId, "auth");
 
         verify(caseDataService).triggerEvent(eq(caseId), eq(CaseEvent.UPDATE_MISSING_FIELDS), any());
     }
 
     @SneakyThrows
     @Test
-    void shouldTriggerEventAndThrowMissingFieldsUpdatedExceptionIfCaseFlagsMissingFromApplicant1() throws Exception {
+    void shouldTriggerEventIfCaseFlagsMissingFromApplicant1() throws Exception {
         Long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
@@ -294,28 +303,19 @@ public class HearingValuesServiceTest {
         given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
-        assertThrows(MissingFieldsUpdatedException.class, () -> {
-            hearingValuesService.getValues(caseId, "auth");
-        });
+        hearingValuesService.getValues(caseId, "auth");
 
         verify(caseDataService).triggerEvent(eq(caseId), eq(CaseEvent.UPDATE_MISSING_FIELDS), any());
     }
 
     @SneakyThrows
     @Test
-    void shouldTriggerEventAndThrowMissingFieldsUpdatedExceptionIfUnavailableDatesMissingFromApplicant1() throws Exception {
+    void shouldTriggerEventIfUnavailableDatesMissingFromApplicant1() throws Exception {
         Long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .caseReference(caseId)
-            .applicant1(PartyBuilder.builder().individual().build().toBuilder()
-                            .partyID("party-id")
-                            .flags(Flags.builder().partyName("party name").build())
-                            .unavailableDates(wrapElements(List.of(UnavailableDate.builder()
-                                                                       .unavailableDateType(SINGLE_DATE)
-                                                                       .date(LocalDate.of(2023, 10, 5))
-                                                                       .build())))
-                            .build())
+            .applicant1(PartyBuilder.builder().individual().build())
             .respondent1(PartyBuilder.builder().company().build())
             .respondent2(PartyBuilder.builder().company().build())
             .multiPartyClaimTwoDefendantSolicitors()
@@ -340,38 +340,37 @@ public class HearingValuesServiceTest {
         given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
-        assertThrows(MissingFieldsUpdatedException.class, () -> {
-            hearingValuesService.getValues(caseId, "auth");
-        });
+        hearingValuesService.getValues(caseId, "auth");
 
         verify(caseDataService).triggerEvent(eq(caseId), eq(CaseEvent.UPDATE_MISSING_FIELDS), any());
     }
 
     @Test
     void shouldNotTriggerEventIfPartyIdCaseFlagsUnavailableDatesExistsForApplicant1() throws Exception {
+        WelshLanguageRequirements applicant1WelshLang = new WelshLanguageRequirements();
+        applicant1WelshLang.setCourt(Language.ENGLISH);
+        UnavailableDate unavailableDate1 = new UnavailableDate();
+        unavailableDate1.setUnavailableDateType(SINGLE_DATE);
+        unavailableDate1.setDate(LocalDate.of(2023, 10, 20));
+        Hearing applicant1Hearing = new Hearing();
+        applicant1Hearing.setUnavailableDates(wrapElements(List.of(unavailableDate1)));
+        Applicant1DQ applicant1DQ = new Applicant1DQ();
+        applicant1DQ.setApplicant1DQLanguage(applicant1WelshLang);
+        applicant1DQ.setApplicant1DQHearing(applicant1Hearing);
+        WelshLanguageRequirements respondent1WelshLang = new WelshLanguageRequirements();
+        respondent1WelshLang.setCourt(Language.WELSH);
+        UnavailableDate unavailableDate2 = new UnavailableDate();
+        unavailableDate2.setUnavailableDateType(SINGLE_DATE);
+        unavailableDate2.setDate(LocalDate.of(2023, 10, 20));
+        Hearing respondent1Hearing = new Hearing();
+        respondent1Hearing.setUnavailableDates(wrapElements(List.of(unavailableDate2)));
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQLanguage(respondent1WelshLang);
+        respondent1DQ.setRespondent1DQHearing(respondent1Hearing);
+
         Long caseId = 1L;
-        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build())
-            .applicant1DQHearing(Hearing.builder()
-                                     .unavailableDates(wrapElements(List.of(UnavailableDate.builder()
-                                                                                .unavailableDateType(SINGLE_DATE)
-                                                                                .date(LocalDate.of(2023, 10, 20))
-                                                                                .build()))).build())
-            .build();
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.WELSH).build())
-            .respondent1DQHearing(Hearing.builder()
-                                     .unavailableDates(wrapElements(List.of(UnavailableDate.builder()
-                                                                                .unavailableDateType(SINGLE_DATE)
-                                                                                .date(LocalDate.of(2023, 10, 20))
-                                                                                .build()))).build())
-            .build();
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
-            .applicant1(PartyBuilder.builder().build()
-                            .toBuilder()
-                            .partyID("party-id")
-                            .build())
             .caseReference(caseId)
             .applicant1(PartyBuilder.builder().individual().build())
             .respondent1(PartyBuilder.builder().company().build())
@@ -405,10 +404,14 @@ public class HearingValuesServiceTest {
     @SneakyThrows
     @Test
     void shouldThrowFeinExceptionIfCaseDataServiceThrowsException() {
-        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
+        WelshLanguageRequirements applicant1WelshLang = new WelshLanguageRequirements();
+        applicant1WelshLang.setCourt(Language.ENGLISH);
+        Applicant1DQ applicant1DQ = new Applicant1DQ();
+        applicant1DQ.setApplicant1DQLanguage(applicant1WelshLang);
+        WelshLanguageRequirements respondent1WelshLang = new WelshLanguageRequirements();
+        respondent1WelshLang.setCourt(Language.WELSH);
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQLanguage(respondent1WelshLang);
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .applicant1(PartyBuilder.builder().individual().build())
@@ -473,13 +476,19 @@ public class HearingValuesServiceTest {
 
     @Nested
     class EarlyAdopter {
-        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
+        Applicant1DQ applicant1DQ;
+        Respondent1DQ respondent1DQ;
 
         @BeforeEach
         void setup() {
+            WelshLanguageRequirements applicant1WelshLang = new WelshLanguageRequirements();
+            applicant1WelshLang.setCourt(Language.ENGLISH);
+            applicant1DQ = new Applicant1DQ();
+            applicant1DQ.setApplicant1DQLanguage(applicant1WelshLang);
+            WelshLanguageRequirements respondent1WelshLang = new WelshLanguageRequirements();
+            respondent1WelshLang.setCourt(Language.WELSH);
+            respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQLanguage(respondent1WelshLang);
             when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
                 .thenReturn(Optional.of(Organisation.builder()
                                             .name(APPLICANT_LR_ORG_NAME)
@@ -502,7 +511,6 @@ public class HearingValuesServiceTest {
         @SneakyThrows
         @Test
         void shouldThrowErrorIfLocationIsNotWhiteListed() {
-            Long caseId = 1L;
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(UNSPEC_CLAIM)
@@ -512,11 +520,13 @@ public class HearingValuesServiceTest {
                 .applicant1DQ(applicant1DQ)
                 .respondent1DQ(respondent1DQ)
                 .build();
-            caseData = caseData.toBuilder()
-                .applicant1(caseData.getApplicant1().toBuilder()
-                                .flags(Flags.builder().partyName("party name").build())
-                                .build()).build();
+            Flags flags = new Flags();
+            flags.setPartyName("party name");
+            Party applicant1 = caseData.getApplicant1();
+            applicant1.setFlags(flags);
+            caseData.setApplicant1(applicant1);
 
+            Long caseId = 1L;
             CaseDetails caseDetails = CaseDetails.builder()
                 .data(caseData.toMap(mapper))
                 .id(caseId).build();
@@ -531,7 +541,6 @@ public class HearingValuesServiceTest {
 
         @Test
         void shouldThrowNotThrowErrorIfLocationIsWhiteListed() {
-            Long caseId = 1L;
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(UNSPEC_CLAIM)
@@ -540,11 +549,13 @@ public class HearingValuesServiceTest {
                 .applicant1DQ(applicant1DQ)
                 .respondent1DQ(respondent1DQ)
                 .build();
-            caseData = caseData.toBuilder()
-                .applicant1(caseData.getApplicant1().toBuilder()
-                                .flags(Flags.builder().partyName("party name").build())
-                                .build()).build();
+            Flags flags = new Flags();
+            flags.setPartyName("party name");
+            Party applicant1 = caseData.getApplicant1();
+            applicant1.setFlags(flags);
+            caseData.setApplicant1(applicant1);
 
+            Long caseId = 1L;
             CaseDetails caseDetails = CaseDetails.builder()
                 .data(caseData.toMap(mapper))
                 .id(caseId).build();
@@ -559,7 +570,6 @@ public class HearingValuesServiceTest {
         @Test
         void shouldNotThrowErrorIfLocationIsNotWhiteListedButWelshEnabled() {
             when(featuretoggleService.isWelshEnabledForMainCase()).thenReturn(true);
-            Long caseId = 1L;
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(UNSPEC_CLAIM)
@@ -569,11 +579,13 @@ public class HearingValuesServiceTest {
                 .applicant1DQ(applicant1DQ)
                 .respondent1DQ(respondent1DQ)
                 .build();
-            caseData = caseData.toBuilder()
-                .applicant1(caseData.getApplicant1().toBuilder()
-                                .flags(Flags.builder().partyName("party name").build())
-                                .build()).build();
+            Flags flags = new Flags();
+            flags.setPartyName("party name");
+            Party applicant1 = caseData.getApplicant1();
+            applicant1.setFlags(flags);
+            caseData.setApplicant1(applicant1);
 
+            Long caseId = 1L;
             CaseDetails caseDetails = CaseDetails.builder()
                 .data(caseData.toMap(mapper))
                 .id(caseId).build();
@@ -587,7 +599,6 @@ public class HearingValuesServiceTest {
         @SneakyThrows
         @Test
         void shouldNotThrowErrorIfApplicantLiPPresent() {
-            Long caseId = 1L;
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(UNSPEC_CLAIM)
@@ -597,11 +608,13 @@ public class HearingValuesServiceTest {
                 .applicant1DQ(applicant1DQ)
                 .respondent1DQ(respondent1DQ)
                 .build();
-            caseData = caseData.toBuilder()
-                .applicant1(caseData.getApplicant1().toBuilder()
-                                .flags(Flags.builder().partyName("party name").build())
-                                .build()).build();
+            Flags flags = new Flags();
+            flags.setPartyName("party name");
+            Party applicant1 = caseData.getApplicant1();
+            applicant1.setFlags(flags);
+            caseData.setApplicant1(applicant1);
 
+            Long caseId = 1L;
             CaseDetails caseDetails = CaseDetails.builder()
                 .data(caseData.toMap(mapper))
                 .id(caseId).build();
@@ -615,7 +628,6 @@ public class HearingValuesServiceTest {
         @SneakyThrows
         @Test
         void shouldNotThrowErrorIfRespondentLiPPresentAndHmcLipToggleOn() {
-            Long caseId = 1L;
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(UNSPEC_CLAIM)
@@ -625,11 +637,13 @@ public class HearingValuesServiceTest {
                 .applicant1DQ(applicant1DQ)
                 .respondent1DQ(respondent1DQ)
                 .build();
-            caseData = caseData.toBuilder()
-                .applicant1(caseData.getApplicant1().toBuilder()
-                                .flags(Flags.builder().partyName("party name").build())
-                                .build()).build();
+            Flags flags = new Flags();
+            flags.setPartyName("party name");
+            Party applicant1 = caseData.getApplicant1();
+            applicant1.setFlags(flags);
+            caseData.setApplicant1(applicant1);
 
+            Long caseId = 1L;
             CaseDetails caseDetails = CaseDetails.builder()
                 .data(caseData.toMap(mapper))
                 .id(caseId).build();
@@ -643,7 +657,6 @@ public class HearingValuesServiceTest {
         @SneakyThrows
         @Test
         void shouldNotThrowErrorIfRespondent2LiPPresentAndHmcLipEnabled() {
-            Long caseId = 1L;
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(UNSPEC_CLAIM)
@@ -653,11 +666,13 @@ public class HearingValuesServiceTest {
                 .applicant1DQ(applicant1DQ)
                 .respondent1DQ(respondent1DQ)
                 .build();
-            caseData = caseData.toBuilder()
-                .applicant1(caseData.getApplicant1().toBuilder()
-                                .flags(Flags.builder().partyName("party name").build())
-                                .build()).build();
+            Flags flags = new Flags();
+            flags.setPartyName("party name");
+            Party applicant1 = caseData.getApplicant1();
+            applicant1.setFlags(flags);
+            caseData.setApplicant1(applicant1);
 
+            Long caseId = 1L;
             CaseDetails caseDetails = CaseDetails.builder()
                 .data(caseData.toMap(mapper))
                 .id(caseId).build();
@@ -671,7 +686,6 @@ public class HearingValuesServiceTest {
         @SneakyThrows
         @Test
         void shouldNotThrowErrorIfNoLiPPresent() {
-            Long caseId = 1L;
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(UNSPEC_CLAIM)
@@ -680,11 +694,13 @@ public class HearingValuesServiceTest {
                 .applicant1DQ(applicant1DQ)
                 .respondent1DQ(respondent1DQ)
                 .build();
-            caseData = caseData.toBuilder()
-                .applicant1(caseData.getApplicant1().toBuilder()
-                                .flags(Flags.builder().partyName("party name").build())
-                                .build()).build();
+            Flags flags = new Flags();
+            flags.setPartyName("party name");
+            Party applicant1 = caseData.getApplicant1();
+            applicant1.setFlags(flags);
+            caseData.setApplicant1(applicant1);
 
+            Long caseId = 1L;
             CaseDetails caseDetails = CaseDetails.builder()
                 .data(caseData.toMap(mapper))
                 .id(caseId).build();
@@ -697,7 +713,6 @@ public class HearingValuesServiceTest {
 
         @Test
         void shouldThrowNotThrowErrorIfEaCourtIsYes() {
-            Long caseId = 1L;
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(UNSPEC_CLAIM)
@@ -707,11 +722,13 @@ public class HearingValuesServiceTest {
                 .applicant1DQ(applicant1DQ)
                 .respondent1DQ(respondent1DQ)
                 .build();
-            caseData = caseData.toBuilder()
-                .applicant1(caseData.getApplicant1().toBuilder()
-                                .flags(Flags.builder().partyName("party name").build())
-                                .build()).build();
+            Flags flags = new Flags();
+            flags.setPartyName("party name");
+            Party applicant1 = caseData.getApplicant1();
+            applicant1.setFlags(flags);
+            caseData.setApplicant1(applicant1);
 
+            Long caseId = 1L;
             CaseDetails caseDetails = CaseDetails.builder()
                 .data(caseData.toMap(mapper))
                 .id(caseId).build();
@@ -807,4 +824,3 @@ public class HearingValuesServiceTest {
             .build();
     }
 }
-

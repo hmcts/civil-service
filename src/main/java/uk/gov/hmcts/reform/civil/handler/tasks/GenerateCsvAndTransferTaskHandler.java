@@ -85,7 +85,7 @@ public class GenerateCsvAndTransferTaskHandler extends GenerateMediationFileAndT
         } catch (Exception e) {
             log.error(e.getMessage());
         }
-        return ExternalTaskData.builder().build();
+        return new ExternalTaskData();
     }
 
     private Optional<EmailData> prepareEmail(String generateCsvData) {

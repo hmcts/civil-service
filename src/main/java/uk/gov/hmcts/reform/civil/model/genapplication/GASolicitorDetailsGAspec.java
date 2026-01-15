@@ -4,13 +4,17 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.util.Optional;
 
 @Setter
 @Data
+@NoArgsConstructor
 @Builder(toBuilder = true)
+@Accessors(chain = true)
 public class GASolicitorDetailsGAspec {
 
     private String email;

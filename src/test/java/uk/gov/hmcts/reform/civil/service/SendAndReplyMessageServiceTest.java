@@ -115,13 +115,12 @@ class SendAndReplyMessageServiceTest {
         when(tableMarkupService.buildTableMarkUp(any())).thenReturn("<div>Some markup</div>");
         caseData = CaseDataBuilder.builder().build();
 
-        message = Message.builder()
-            .updatedTime(updatedDateTime)
-            .sentTime(LocalDateTime.of(2024, 1, 1, 0, 0, 0))
-            .subject("Subject")
-            .senderRoleType(RolePool.ADMIN)
-            .messageContent("Existing message")
-            .build();
+        message = new Message()
+            .setUpdatedTime(updatedDateTime)
+            .setSentTime(LocalDateTime.of(2024, 1, 1, 0, 0, 0))
+            .setSubject("Subject")
+            .setSenderRoleType(RolePool.ADMIN)
+            .setMessageContent("Existing message");
     }
 
     @Nested
@@ -135,8 +134,8 @@ class SendAndReplyMessageServiceTest {
             String expectedUserRoleLabel = "Hearing Centre Administrator";
             when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
-                    RoleAssignmentResponse.builder().roleName("hearing-centre-admin").roleLabel(
-                        "Hearing Centre Administrator").roleCategory("ADMIN").build())
+                    new RoleAssignmentResponse().setRoleName("hearing-centre-admin").setRoleLabel(
+                        "Hearing Centre Administrator").setRoleCategory("ADMIN"))
                 )
             );
 
@@ -163,11 +162,11 @@ class SendAndReplyMessageServiceTest {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
             when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
-                                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                                 RoleAssignmentResponse.builder().roleName("hearing-centre-admin").roleLabel(
-                                                     "Hearing Centre Administrator").roleCategory("ADMIN").build(),
-                                                 RoleAssignmentResponse.builder().roleName("hearing-centre-team-leader").roleLabel(
-                                                     "Hearing Centre Team Leader").roleCategory("ADMIN").build()
+                                                 new RoleAssignmentResponse().setRoleName("other").setRoleLabel("Other").setRoleCategory("OTHER"),
+                                                 new RoleAssignmentResponse().setRoleName("hearing-centre-admin").setRoleLabel(
+                                                     "Hearing Centre Administrator").setRoleCategory("ADMIN"),
+                                                 new RoleAssignmentResponse().setRoleName("hearing-centre-team-leader").setRoleLabel(
+                                                     "Hearing Centre Team Leader").setRoleCategory("ADMIN")
                                              )
                 )
             );
@@ -200,8 +199,8 @@ class SendAndReplyMessageServiceTest {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
             when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
-                                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                                 RoleAssignmentResponse.builder().roleName("ctsc").roleLabel("CTSC").roleCategory("ADMIN").build()
+                                                 new RoleAssignmentResponse().setRoleName("other").setRoleLabel("Other").setRoleCategory("OTHER"),
+                                                 new RoleAssignmentResponse().setRoleName("ctsc").setRoleLabel("CTSC").setRoleCategory("ADMIN")
                                              )
                 ));
             String expectedUserRoleLabel = "CTSC";
@@ -232,10 +231,10 @@ class SendAndReplyMessageServiceTest {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
             when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
-                                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                                 RoleAssignmentResponse.builder().roleName("ctsc").roleLabel("CTSC").roleCategory("ADMIN").build(),
-                                                 RoleAssignmentResponse.builder().roleName("ctsc-team-leader").roleLabel("CTSC Team Leader").roleCategory(
-                                                     "ADMIN").build()
+                                                 new RoleAssignmentResponse().setRoleName("other").setRoleLabel("Other").setRoleCategory("OTHER"),
+                                                 new RoleAssignmentResponse().setRoleName("ctsc").setRoleLabel("CTSC").setRoleCategory("ADMIN"),
+                                                 new RoleAssignmentResponse().setRoleName("ctsc-team-leader").setRoleLabel("CTSC Team Leader").setRoleCategory(
+                                                     "ADMIN")
                                              )
                 )
             );
@@ -267,9 +266,9 @@ class SendAndReplyMessageServiceTest {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
             when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
-                                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                                 RoleAssignmentResponse.builder().roleName("tribunal-caseworker").roleLabel("Tribunal Caseworker").roleCategory(
-                                                     "LEGAL_OPERATIONS").build()
+                                                 new RoleAssignmentResponse().setRoleName("other").setRoleLabel("Other").setRoleCategory("OTHER"),
+                                                 new RoleAssignmentResponse().setRoleName("tribunal-caseworker").setRoleLabel("Tribunal Caseworker").setRoleCategory(
+                                                     "LEGAL_OPERATIONS")
                                              )
                 )
             );
@@ -301,11 +300,11 @@ class SendAndReplyMessageServiceTest {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
             when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
-                                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                                 RoleAssignmentResponse.builder().roleName("tribunal-caseworker").roleLabel("Tribunal Caseworker").roleCategory(
-                                                     "LEGAL_OPERATIONS").build(),
-                                                 RoleAssignmentResponse.builder().roleName("senior-tribunal-caseworker").roleLabel(
-                                                     "Senior Tribunal Caseworker").roleCategory("LEGAL_OPERATIONS").build()
+                                                 new RoleAssignmentResponse().setRoleName("other").setRoleLabel("Other").setRoleCategory("OTHER"),
+                                                 new RoleAssignmentResponse().setRoleName("tribunal-caseworker").setRoleLabel("Tribunal Caseworker").setRoleCategory(
+                                                     "LEGAL_OPERATIONS"),
+                                                 new RoleAssignmentResponse().setRoleName("senior-tribunal-caseworker").setRoleLabel(
+                                                     "Senior Tribunal Caseworker").setRoleCategory("LEGAL_OPERATIONS")
                                              )
                 )
             );
@@ -337,9 +336,9 @@ class SendAndReplyMessageServiceTest {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
             when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
-                                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                                 RoleAssignmentResponse.builder().roleName("national-business-centre").roleLabel(
-                                                     "National Business Centre").roleCategory("ADMIN").build()
+                                                 new RoleAssignmentResponse().setRoleName("other").setRoleLabel("Other").setRoleCategory("OTHER"),
+                                                 new RoleAssignmentResponse().setRoleName("national-business-centre").setRoleLabel(
+                                                     "National Business Centre").setRoleCategory("ADMIN")
                                              )
                 )
             );
@@ -372,11 +371,11 @@ class SendAndReplyMessageServiceTest {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
             when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
-                                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                                 RoleAssignmentResponse.builder().roleName("national-business-centre").roleLabel(
-                                                     "National Business Centre").roleCategory("ADMIN").build(),
-                                                 RoleAssignmentResponse.builder().roleName("nbc-team-leader").roleLabel("NBC Team Leader").roleCategory(
-                                                     "ADMIN").build()
+                                                 new RoleAssignmentResponse().setRoleName("other").setRoleLabel("Other").setRoleCategory("OTHER"),
+                                                 new RoleAssignmentResponse().setRoleName("national-business-centre").setRoleLabel(
+                                                     "National Business Centre").setRoleCategory("ADMIN"),
+                                                 new RoleAssignmentResponse().setRoleName("nbc-team-leader").setRoleLabel("NBC Team Leader").setRoleCategory(
+                                                     "ADMIN")
                                              )
                 )
             );
@@ -408,10 +407,10 @@ class SendAndReplyMessageServiceTest {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
             when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
-                                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                                 RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build(),
-                                                 RoleAssignmentResponse.builder().roleName("district-judge").roleLabel("District Judge").roleCategory(
-                                                     "JUDICIAL").build()
+                                                 new RoleAssignmentResponse().setRoleName("other").setRoleLabel("Other").setRoleCategory("OTHER"),
+                                                 new RoleAssignmentResponse().setRoleName("judge").setRoleLabel("Judge").setRoleCategory("JUDICIAL"),
+                                                 new RoleAssignmentResponse().setRoleName("district-judge").setRoleLabel("District Judge").setRoleCategory(
+                                                     "JUDICIAL")
                                              )
                 )
             );
@@ -443,10 +442,10 @@ class SendAndReplyMessageServiceTest {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
             when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
-                                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                                 RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build(),
-                                                 RoleAssignmentResponse.builder().roleName("circuit-judge").roleLabel("Circuit Judge").roleCategory(
-                                                     "JUDICIAL").build()
+                                                 new RoleAssignmentResponse().setRoleName("other").setRoleLabel("Other").setRoleCategory("OTHER"),
+                                                 new RoleAssignmentResponse().setRoleName("judge").setRoleLabel("Judge").setRoleCategory("JUDICIAL"),
+                                                 new RoleAssignmentResponse().setRoleName("circuit-judge").setRoleLabel("Circuit Judge").setRoleCategory(
+                                                     "JUDICIAL")
                                              )
                 )
             );
@@ -478,8 +477,8 @@ class SendAndReplyMessageServiceTest {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
             when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
-                                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                                 RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build()
+                                                 new RoleAssignmentResponse().setRoleName("other").setRoleLabel("Other").setRoleCategory("OTHER"),
+                                                 new RoleAssignmentResponse().setRoleName("judge").setRoleLabel("Judge").setRoleCategory("JUDICIAL")
                                              )
                 )
             );
@@ -510,9 +509,9 @@ class SendAndReplyMessageServiceTest {
         void should_returnExpectedMessage_forWluAdmin() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
             when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(buildRoleAssignmentsResponse(List.of(
-                                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                                 RoleAssignmentResponse.builder().roleName("wlu-admin").roleLabel(
-                                                     "WLU Administrator").roleCategory("ADMIN").build()
+                                                 new RoleAssignmentResponse().setRoleName("other").setRoleLabel("Other").setRoleCategory("OTHER"),
+                                                 new RoleAssignmentResponse().setRoleName("wlu-admin").setRoleLabel(
+                                                     "WLU Administrator").setRoleCategory("ADMIN")
                                              )
                 )
             );
@@ -542,24 +541,22 @@ class SendAndReplyMessageServiceTest {
         }
 
         private RoleAssignmentServiceResponse buildRoleAssignmentsResponse(List<RoleAssignmentResponse> roleAssignments) {
-            return RoleAssignmentServiceResponse.builder()
-                .roleAssignmentResponse(roleAssignments)
-                .build();
+            return new RoleAssignmentServiceResponse()
+                .setRoleAssignmentResponse(roleAssignments);
         }
 
         private Message buildExpectedMessage(RolePool expectedUserRole, String expectedUserRoleLabel) {
-            return Message.builder()
-                .messageId(MESSAGE_ID.toString())
-                .messageContent(MESSAGE_CONTENT)
-                .sentTime(NOW)
-                .updatedTime(NOW)
-                .subjectType(MESSAGE_METADATA.getSubjectType())
-                .subject(MESSAGE_METADATA.getSubjectType().getLabel())
-                .isUrgent(MESSAGE_METADATA.getIsUrgent())
-                .recipientRoleType(RolePool.JUDICIAL_CIRCUIT)
-                .senderName(String.format("%s, %s", USER_NAME, expectedUserRoleLabel))
-                .senderRoleType(expectedUserRole)
-                .build();
+            return new Message()
+                .setMessageId(MESSAGE_ID.toString())
+                .setMessageContent(MESSAGE_CONTENT)
+                .setSentTime(NOW)
+                .setUpdatedTime(NOW)
+                .setSubjectType(MESSAGE_METADATA.getSubjectType())
+                .setSubject(MESSAGE_METADATA.getSubjectType().getLabel())
+                .setIsUrgent(MESSAGE_METADATA.getIsUrgent())
+                .setRecipientRoleType(RolePool.JUDICIAL_CIRCUIT)
+                .setSenderName(String.format("%s, %s", USER_NAME, expectedUserRoleLabel))
+                .setSenderRoleType(expectedUserRole);
         }
 
     }
@@ -571,26 +568,26 @@ class SendAndReplyMessageServiceTest {
             return Stream.of(
                 Arguments.of(RolePool.JUDICIAL,
                              RolePool.ADMIN,
-                             List.of(RoleAssignmentResponse.builder().roleName("hearing-centre-admin").roleLabel("Hearing Centre Administrator").roleCategory("ADMIN").build()),
+                             List.of(new RoleAssignmentResponse().setRoleName("hearing-centre-admin").setRoleLabel("Hearing Centre Administrator").setRoleCategory("ADMIN")),
                              "Hearing Centre Administrator",
                              "Judge"
                 ),
                 Arguments.of(RolePool.JUDICIAL,
                              RolePool.ADMIN,
                              List.of(
-                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                 RoleAssignmentResponse.builder().roleName("hearing-centre-admin").roleLabel(
-                                     "Hearing Centre Administrator").roleCategory("ADMIN").build(),
-                                 RoleAssignmentResponse.builder().roleName("hearing-centre-team-leader").roleLabel(
-                                     "Hearing Centre Team Leader").roleCategory("ADMIN").build()
+                                 new RoleAssignmentResponse().setRoleName("other").setRoleLabel("Other").setRoleCategory("OTHER"),
+                                 new RoleAssignmentResponse().setRoleName("hearing-centre-admin").setRoleLabel(
+                                     "Hearing Centre Administrator").setRoleCategory("ADMIN"),
+                                 new RoleAssignmentResponse().setRoleName("hearing-centre-team-leader").setRoleLabel(
+                                     "Hearing Centre Team Leader").setRoleCategory("ADMIN")
                              ),
                              "Hearing Centre Team Leader",
                              "Judge"),
                 Arguments.of(RolePool.JUDICIAL,
                              RolePool.ADMIN,
                              List.of(
-                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                 RoleAssignmentResponse.builder().roleName("ctsc").roleLabel("CTSC").roleCategory("ADMIN").build()
+                                 new RoleAssignmentResponse().setRoleName("other").setRoleLabel("Other").setRoleCategory("OTHER"),
+                                 new RoleAssignmentResponse().setRoleName("ctsc").setRoleLabel("CTSC").setRoleCategory("ADMIN")
                              ),
                              "CTSC",
                              "Judge"
@@ -598,58 +595,58 @@ class SendAndReplyMessageServiceTest {
                 Arguments.of(RolePool.JUDICIAL,
                              RolePool.ADMIN,
                              List.of(
-                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                 RoleAssignmentResponse.builder().roleName("ctsc").roleLabel("CTSC").roleCategory("ADMIN").build(),
-                                 RoleAssignmentResponse.builder().roleName("ctsc-team-leader").roleLabel("CTSC Team Leader").roleCategory(
-                                     "ADMIN").build()
+                                 new RoleAssignmentResponse().setRoleName("other").setRoleLabel("Other").setRoleCategory("OTHER"),
+                                 new RoleAssignmentResponse().setRoleName("ctsc").setRoleLabel("CTSC").setRoleCategory("ADMIN"),
+                                 new RoleAssignmentResponse().setRoleName("ctsc-team-leader").setRoleLabel("CTSC Team Leader").setRoleCategory(
+                                     "ADMIN")
                              ),
                              "CTSC Team Leader",
                              "Judge"),
                 Arguments.of(RolePool.JUDICIAL,
                              RolePool.LEGAL_OPERATIONS,
                              List.of(
-                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                 RoleAssignmentResponse.builder().roleName("tribunal-caseworker").roleLabel("Tribunal Caseworker").roleCategory(
-                                     "LEGAL_OPERATIONS").build()
+                                 new RoleAssignmentResponse().setRoleName("other").setRoleLabel("Other").setRoleCategory("OTHER"),
+                                 new RoleAssignmentResponse().setRoleName("tribunal-caseworker").setRoleLabel("Tribunal Caseworker").setRoleCategory(
+                                     "LEGAL_OPERATIONS")
                              ),
                              "Tribunal Caseworker",
                              "Judge"),
                 Arguments.of(RolePool.JUDICIAL,
                              RolePool.LEGAL_OPERATIONS,
                              List.of(
-                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                 RoleAssignmentResponse.builder().roleName("tribunal-caseworker").roleLabel("Tribunal Caseworker").roleCategory(
-                                     "LEGAL_OPERATIONS").build(),
-                                 RoleAssignmentResponse.builder().roleName("senior-tribunal-caseworker").roleLabel(
-                                     "Senior Tribunal Caseworker").roleCategory("LEGAL_OPERATIONS").build()
+                                 new RoleAssignmentResponse().setRoleName("other").setRoleLabel("Other").setRoleCategory("OTHER"),
+                                 new RoleAssignmentResponse().setRoleName("tribunal-caseworker").setRoleLabel("Tribunal Caseworker").setRoleCategory(
+                                     "LEGAL_OPERATIONS"),
+                                 new RoleAssignmentResponse().setRoleName("senior-tribunal-caseworker").setRoleLabel(
+                                     "Senior Tribunal Caseworker").setRoleCategory("LEGAL_OPERATIONS")
                              ),
                              "Senior Tribunal Caseworker",
                              "Judge"),
                 Arguments.of(RolePool.ADMIN,
                              RolePool.JUDICIAL_DISTRICT,
                              List.of(
-                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                 RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build(),
-                                 RoleAssignmentResponse.builder().roleName("district-judge").roleLabel("District Judge").roleCategory(
-                                     "JUDICIAL").build()
+                                 new RoleAssignmentResponse().setRoleName("other").setRoleLabel("Other").setRoleCategory("OTHER"),
+                                 new RoleAssignmentResponse().setRoleName("judge").setRoleLabel("Judge").setRoleCategory("JUDICIAL"),
+                                 new RoleAssignmentResponse().setRoleName("district-judge").setRoleLabel("District Judge").setRoleCategory(
+                                     "JUDICIAL")
                              ),
                              "District Judge",
                              "Hearing centre admin"),
                 Arguments.of(RolePool.ADMIN,
                              RolePool.JUDICIAL_CIRCUIT,
                              List.of(
-                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                 RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build(),
-                                 RoleAssignmentResponse.builder().roleName("circuit-judge").roleLabel("Circuit Judge").roleCategory(
-                                     "JUDICIAL").build()
+                                 new RoleAssignmentResponse().setRoleName("other").setRoleLabel("Other").setRoleCategory("OTHER"),
+                                 new RoleAssignmentResponse().setRoleName("judge").setRoleLabel("Judge").setRoleCategory("JUDICIAL"),
+                                 new RoleAssignmentResponse().setRoleName("circuit-judge").setRoleLabel("Circuit Judge").setRoleCategory(
+                                     "JUDICIAL")
                              ),
                              "Circuit Judge",
                              "Hearing centre admin"),
                 Arguments.of(RolePool.ADMIN,
                              RolePool.JUDICIAL,
                              List.of(
-                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                                 RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build()
+                                 new RoleAssignmentResponse().setRoleName("other").setRoleLabel("Other").setRoleCategory("OTHER"),
+                                 new RoleAssignmentResponse().setRoleName("judge").setRoleLabel("Judge").setRoleCategory("JUDICIAL")
                              ),
                              "Judge",
                              "Hearing centre admin")
@@ -683,11 +680,10 @@ class SendAndReplyMessageServiceTest {
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(existingMessageToBeChanged);
 
-            MessageReply messageReply = MessageReply.builder().isUrgent(NO)
-                .messageContent("This is a reply message")
-                .isUrgent(NO)
-                .sentTime(updatedDateTime)
-                .build();
+            MessageReply messageReply = new MessageReply()
+                .setIsUrgent(NO)
+                .setMessageContent("This is a reply message")
+                .setSentTime(updatedDateTime);
 
             Message expectedMessage = message.toBuilder()
                 .senderName(String.format("%s, %s", USER_NAME, newUserRoleLabel))
@@ -709,15 +705,14 @@ class SendAndReplyMessageServiceTest {
 
             List<MessageReply> actualMessageHistory = unwrapElements(actualMessages.get(0).getHistory());
 
-            assertEquals(List.of(MessageReply.builder()
-                                     .messageContent("Existing message")
-                                     .isUrgent(YES)
-                                     .senderName(String.format("%s, %s", USER_NAME, originalUserRoleLabel))
-                                     .senderRoleType(originalSender)
-                                     .recipientRoleType(currentSender)
-                                     .subject("Subject")
-                                     .sentTime(updatedDateTime)
-                                     .build()), actualMessageHistory);
+            assertEquals(List.of(new MessageReply()
+                                     .setMessageContent("Existing message")
+                                     .setIsUrgent(YES)
+                                     .setSenderName(String.format("%s, %s", USER_NAME, originalUserRoleLabel))
+                                     .setSenderRoleType(originalSender)
+                                     .setRecipientRoleType(currentSender)
+                                     .setSubject("Subject")
+                                     .setSentTime(updatedDateTime)), actualMessageHistory);
             assertEquals(expectedMessage, existingMessageToBeChanged.getValue());
         }
 
@@ -726,30 +721,28 @@ class SendAndReplyMessageServiceTest {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
             when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
-                    RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
-                    RoleAssignmentResponse.builder().roleName("hearing-centre-admin").roleLabel(
-                        "Hearing Centre Administrator").roleCategory("ADMIN").build(),
-                    RoleAssignmentResponse.builder().roleName("hearing-centre-team-leader").roleLabel(
-                        "Hearing Centre Team Leader").roleCategory("ADMIN").build()
+                    new RoleAssignmentResponse().setRoleName("other").setRoleLabel("Other").setRoleCategory("OTHER"),
+                    new RoleAssignmentResponse().setRoleName("hearing-centre-admin").setRoleLabel(
+                        "Hearing Centre Administrator").setRoleCategory("ADMIN"),
+                    new RoleAssignmentResponse().setRoleName("hearing-centre-team-leader").setRoleLabel(
+                        "Hearing Centre Team Leader").setRoleCategory("ADMIN")
                 ))
             );
 
             RolePool expectedSenderRoleCategory = RolePool.ADMIN;
-            MessageReply baseMessage = MessageReply.builder()
-                .messageContent("First reply")
-                .isUrgent(NO)
-                .senderName("John Doe, Hearing Centre Team Leader")
-                .senderRoleType(expectedSenderRoleCategory)
-                .sentTime(NOW.minusDays(2))
-                .build();
+            MessageReply baseMessage = new MessageReply()
+                .setMessageContent("First reply")
+                .setIsUrgent(NO)
+                .setSenderName("John Doe, Hearing Centre Team Leader")
+                .setSenderRoleType(expectedSenderRoleCategory)
+                .setSentTime(NOW.minusDays(2));
 
-            MessageReply firstReply = MessageReply.builder()
-                .messageContent("Second reply")
-                .isUrgent(YES)
-                .senderName("Jane Smith, Hearing Centre Team Leader")
-                .senderRoleType(expectedSenderRoleCategory)
-                .sentTime(NOW.minusDays(1))
-                .build();
+            MessageReply firstReply = new MessageReply()
+                .setMessageContent("Second reply")
+                .setIsUrgent(YES)
+                .setSenderName("Jane Smith, Hearing Centre Team Leader")
+                .setSenderRoleType(expectedSenderRoleCategory)
+                .setSentTime(NOW.minusDays(1));
 
             List<Element<MessageReply>> history = new ArrayList<>();
             history.add(element(firstReply));
@@ -762,7 +755,7 @@ class SendAndReplyMessageServiceTest {
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(existingMessageElement);
 
-            MessageReply newReply = MessageReply.builder().isUrgent(YES).messageContent("This is a new reply message").build();
+            MessageReply newReply = new MessageReply().setIsUrgent(YES).setMessageContent("This is a new reply message");
 
             List<Message> actualMessages = unwrapElements(messageService.addReplyToMessage(
                 messages,
@@ -794,8 +787,8 @@ class SendAndReplyMessageServiceTest {
 
         @BeforeEach
         void setUp() {
-            message1 = element(Message.builder().messageContent("Message content 1").build());
-            message2 = element(Message.builder().messageContent("Message content 2").build());
+            message1 = element(new Message().setMessageContent("Message content 1"));
+            message2 = element(new Message().setMessageContent("Message content 2"));
             messages = List.of(message1, message2);
         }
 
@@ -827,42 +820,31 @@ class SendAndReplyMessageServiceTest {
 
         @BeforeEach
         void setUp() {
-            message1 = element(Message.builder()
-                                   .subject("Subject 1")
-                                   .sentTime(LocalDateTime.of(2024, 11, 14, 10, 30, 0))
-                                   .build());
+            message1 = element(new Message()
+                                   .setSubject("Subject 1")
+                                   .setSentTime(LocalDateTime.of(2024, 11, 14, 10, 30, 0)));
 
-            message2 = element(Message.builder()
-                                   .subject("Subject 2")
-                                   .sentTime(LocalDateTime.of(2024, 11, 14, 12, 45, 0))
-                                   .build());
+            message2 = element(new Message()
+                                   .setSubject("Subject 2")
+                                   .setSentTime(LocalDateTime.of(2024, 11, 14, 12, 45, 0)));
 
             messages = List.of(message1, message2);
         }
 
         @Test
         void shouldCreateMessageSelectionList_withCorrectFormat() {
-            DynamicList result = messageService.createMessageSelectionList(messages);
+            DynamicListElement element1 = new DynamicListElement();
+            element1.setCode(message1.getId().toString());
+            element1.setLabel(String.format("%s, 14 Nov 2024, 10:30:00 AM", message1.getValue().getSubject()));
 
-            assertEquals(DynamicList.builder()
-                             .listItems(List.of(
-                                 DynamicListElement.builder()
-                                     .code(message1.getId().toString())
-                                     .label(
-                                         String.format(
-                                             "%s, 14 Nov 2024, 10:30:00 AM",
-                                             message1.getValue().getSubject()
-                                         ))
-                                     .build(),
-                                 DynamicListElement.builder()
-                                     .code(message2.getId().toString())
-                                     .label(String.format(
-                                         "%s, 14 Nov 2024, 12:45:00 PM",
-                                         message2.getValue().getSubject()
-                                     ))
-                                     .build()
-                             ))
-                             .build(), result);
+            DynamicListElement element2 = new DynamicListElement();
+            element2.setCode(message2.getId().toString());
+            element2.setLabel(String.format("%s, 14 Nov 2024, 12:45:00 PM", message2.getValue().getSubject()));
+
+            DynamicList expected = new DynamicList();
+            expected.setListItems(List.of(element1, element2));
+            DynamicList result = messageService.createMessageSelectionList(messages);
+            assertEquals(expected, result);
         }
 
         @Test
@@ -885,17 +867,16 @@ class SendAndReplyMessageServiceTest {
         @BeforeEach
         void setUp() {
 
-            message = element(Message.builder()
-                                  .sentTime(LocalDateTime.of(2024, 11, 14, 10, 30, 0))
-                                  .updatedTime(LocalDateTime.of(2024, 10, 10, 10, 10, 10))
-                                  .senderName("Sender 1")
-                                  .senderRoleType(RolePool.ADMIN)
-                                  .recipientRoleType(RolePool.JUDICIAL)
-                                  .isUrgent(YES)
-                                  .subjectType(OTHER)
-                                  .subject("Subject 1")
-                                  .messageContent("This is the base message.")
-                                  .build());
+            message = element(new Message()
+                                  .setSentTime(LocalDateTime.of(2024, 11, 14, 10, 30, 0))
+                                  .setUpdatedTime(LocalDateTime.of(2024, 10, 10, 10, 10, 10))
+                                  .setSenderName("Sender 1")
+                                  .setSenderRoleType(RolePool.ADMIN)
+                                  .setRecipientRoleType(RolePool.JUDICIAL)
+                                  .setIsUrgent(YES)
+                                  .setSubjectType(OTHER)
+                                  .setSubject("Subject 1")
+                                  .setMessageContent("This is the base message."));
         }
 
         @Test
@@ -915,14 +896,13 @@ class SendAndReplyMessageServiceTest {
 
         @Test
         void shouldCallTableMarkupService_withExpectedRowData_withReplies() {
-            message.getValue().getHistory().add(element(MessageReply.builder()
-                                                            .messageContent("This is the original message")
-                                                            .isUrgent(NO)
-                                                            .senderName("Sender 2")
-                                                            .senderRoleType(RolePool.JUDICIAL)
-                                                            .recipientRoleType(RolePool.ADMIN)
-                                                            .sentTime(NOW.minusHours(5))
-                                                            .build()));
+            message.getValue().getHistory().add(element(new MessageReply()
+                                                            .setMessageContent("This is the original message")
+                                                            .setIsUrgent(NO)
+                                                            .setSenderName("Sender 2")
+                                                            .setSenderRoleType(RolePool.JUDICIAL)
+                                                            .setRecipientRoleType(RolePool.ADMIN)
+                                                            .setSentTime(NOW.minusHours(5))));
 
             messageService.renderMessageTableList(message);
 
@@ -939,8 +919,7 @@ class SendAndReplyMessageServiceTest {
     }
 
     private RoleAssignmentServiceResponse buildRoleAssignmentsResponse(List<RoleAssignmentResponse> roleAssignments) {
-        return RoleAssignmentServiceResponse.builder()
-            .roleAssignmentResponse(roleAssignments)
-            .build();
+        return new RoleAssignmentServiceResponse()
+            .setRoleAssignmentResponse(roleAssignments);
     }
 }

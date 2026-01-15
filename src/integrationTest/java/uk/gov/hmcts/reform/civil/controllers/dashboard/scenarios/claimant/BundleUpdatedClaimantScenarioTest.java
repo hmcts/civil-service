@@ -54,8 +54,8 @@ public class BundleUpdatedClaimantScenarioTest extends DashboardBaseIntegrationT
         LocalDateTime march = LocalDateTime.of(2024, 3, 1, 0, 0);
         LocalDateTime april = LocalDateTime.of(2024, 4, 1, 0, 0);
         List<IdValue<Bundle>> bundles = List.of(
-            new IdValue<>("1", Bundle.builder().createdOn(Optional.of(march)).build()),
-            new IdValue<>("2", Bundle.builder().createdOn(Optional.of(april)).build())
+              new IdValue<>("1", new Bundle().setCreatedOn(Optional.of(march))),
+              new IdValue<>("2", new Bundle().setCreatedOn(Optional.of(april)))
         );
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
             .toBuilder()
