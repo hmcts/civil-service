@@ -27,10 +27,10 @@ public class UpdateCaseNoteTask extends MigrationTask<CaseNoteReference> {
     protected CaseData migrateCaseData(CaseData caseData, CaseNoteReference obj) {
         List<Element<CaseNote>> caseNotes = caseData.getCaseNotes();
         if (caseNotes != null) {
-            caseNotes.removeIf(caseNoteElement -> caseNoteElement.getId().equals(UUID.fromString(obj.getCaseNoteItemId())));
+            caseNotes.removeIf(caseNoteElement -> caseNoteElement.getId().equals(UUID.fromString(obj.getCaseNoteElementId())));
             caseData.setCaseNotes(caseNotes);
             log.info("Case note for given caseId {} and given caseNoteItemId {} removed successfully",
-                     obj.getCaseReference(), obj.getCaseNoteItemId());
+                     obj.getCaseReference(), obj.getCaseNoteElementId());
         }
         return caseData;
     }

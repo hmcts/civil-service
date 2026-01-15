@@ -56,7 +56,7 @@ class UpdateCaseNoteTaskTest {
 
         CaseNoteReference caseNoteReference = CaseNoteReference.builder()
             .caseReference("123")
-            .caseNoteItemId(noteId.toString())
+            .caseNoteElementId(noteId.toString())
             .build();
 
         CaseData result = task.migrateCaseData(caseData, caseNoteReference);
@@ -83,7 +83,7 @@ class UpdateCaseNoteTaskTest {
 
         CaseNoteReference caseNoteReference = CaseNoteReference.builder()
             .caseReference("123")
-            .caseNoteItemId(noteId.toString())
+            .caseNoteElementId(noteId.toString())
             .build();
 
         CaseData result = task.migrateCaseData(caseData, caseNoteReference);
@@ -107,7 +107,7 @@ class UpdateCaseNoteTaskTest {
 
         CaseNoteReference caseNoteReference = CaseNoteReference.builder()
             .caseReference("123")
-            .caseNoteItemId(UUID.randomUUID().toString())
+            .caseNoteElementId(UUID.randomUUID().toString())
             .build();
 
         CaseData result = task.migrateCaseData(caseData, caseNoteReference);
@@ -121,7 +121,7 @@ class UpdateCaseNoteTaskTest {
         CaseData caseData = CaseData.builder().build();
         CaseNoteReference caseNoteReference = CaseNoteReference.builder()
             .caseReference("123")
-            .caseNoteItemId(UUID.randomUUID().toString())
+            .caseNoteElementId(UUID.randomUUID().toString())
             .build();
 
         CaseData result = task.migrateCaseData(caseData, caseNoteReference);

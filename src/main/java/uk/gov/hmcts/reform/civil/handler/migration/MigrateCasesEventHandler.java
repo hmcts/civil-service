@@ -63,7 +63,7 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
         List<T> caseReferences = new ArrayList<>();
         String caseIds = externalTask.getVariable("caseIds");
         String scenario = externalTask.getVariable("scenario");
-        String caseNoteItemId = externalTask.getVariable("caseNoteItemId");
+        String caseNoteElementId = externalTask.getVariable("caseNoteElementId");
 
         FileValue excelFileValue = externalTask.getVariableTyped("excelFile", false);
 
@@ -100,10 +100,10 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
                         scenarioInstance.setCaseReference(id);
                         scenarioInstance.setDashboardScenario(scenario);
                         instance = scenarioInstance;
-                    } else if (caseNoteItemId != null) {
+                    } else if (caseNoteElementId != null) {
                         CaseNoteReference caseNoteReference = new CaseNoteReference();
                         caseNoteReference.setCaseReference(id);
-                        caseNoteReference.setCaseNoteItemId(caseNoteItemId);
+                        caseNoteReference.setCaseNoteElementId(caseNoteElementId);
                         instance = caseNoteReference;
                     } else {
                         CaseReference caseRef = new CaseReference();

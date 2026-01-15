@@ -20,5 +20,5 @@ import lombok.experimental.SuperBuilder;
 public class CaseNoteReference extends CaseReference {
 
     @JsonProperty
-    private String caseNoteItemId;
+    private String caseNoteElementId;
 }
