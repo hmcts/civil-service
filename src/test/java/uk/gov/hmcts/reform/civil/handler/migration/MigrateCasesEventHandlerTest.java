@@ -5,10 +5,12 @@ import org.camunda.bpm.engine.variable.value.FileValue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseAssignmentMigrationCaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReferenceCsvLoader;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.DashboardScenarioCaseReference;
@@ -31,10 +33,12 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class MigrateCasesEventHandlerTest {
@@ -62,7 +66,7 @@ class MigrateCasesEventHandlerTest {
 
     @Test
     void shouldHandleTaskSuccessfullyWithCsv() {
-        ExternalTask externalTask = mock(ExternalTask.class);
+        ExternalTask externalTask = buildExternalTask();
         when(externalTask.getVariable("taskName")).thenReturn("testTask");
         when(externalTask.getVariable("caseIds")).thenReturn("");
         when(externalTask.getVariable("scenario")).thenReturn(null);
@@ -88,7 +92,7 @@ class MigrateCasesEventHandlerTest {
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
     void shouldHandleTaskWithCaseIdsAndScenario() {
-        ExternalTask externalTask = mock(ExternalTask.class);
+        ExternalTask externalTask = buildExternalTask();
         when(externalTask.getVariable("taskName")).thenReturn("testTask");
         when(externalTask.getVariable("caseIds")).thenReturn("123, 456");
         when(externalTask.getVariable("scenario")).thenReturn("SCENARIO_1");
@@ -108,8 +112,54 @@ class MigrateCasesEventHandlerTest {
     }
 
     @Test
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    void shouldHandleCaseAssignmentMigrationTaskVariables() {
+        ExternalTask externalTask = buildExternalTask();
+        when(externalTask.getVariable("taskName")).thenReturn("unassignTask");
+        when(externalTask.getVariable("caseIds")).thenReturn("123,456");
+        when(externalTask.getVariable("scenario")).thenReturn(null);
+        when(externalTask.getVariable("userEmailAddress")).thenReturn("user@example.com");
+        when(externalTask.getVariable("organisationId")).thenReturn("ORG1");
+
+        @SuppressWarnings("unchecked")
+        MigrationTask<CaseAssignmentMigrationCaseReference> migrationTask = mock(MigrationTask.class);
+        when(migrationTask.getType()).thenReturn((Class) CaseAssignmentMigrationCaseReference.class);
+        when(migrationTaskFactory.getMigrationTask("unassignTask"))
+            .thenReturn(Optional.of((MigrationTask) migrationTask));
+
+        handler.handleTask(externalTask);
+
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<CaseAssignmentMigrationCaseReference>> captor = ArgumentCaptor.forClass(List.class);
+        verify(asyncCaseMigrationService).migrateCasesAsync(eq((MigrationTask) migrationTask), captor.capture(), isNull());
+        List<CaseAssignmentMigrationCaseReference> references = captor.getValue();
+        assertThat(references).hasSize(2);
+        assertThat(references.get(0).getUserEmailAddress()).isEqualTo("user@example.com");
+        assertThat(references.get(0).getOrganisationId()).isEqualTo("ORG1");
+    }
+
+    @Test
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    void shouldThrowWhenEmailMissingForCaseAssignmentTask() {
+        ExternalTask externalTask = buildExternalTask();
+        when(externalTask.getVariable("taskName")).thenReturn("unassignTask");
+        when(externalTask.getVariable("caseIds")).thenReturn("123");
+        when(externalTask.getVariable("scenario")).thenReturn(null);
+        when(externalTask.getVariable("userEmailAddress")).thenReturn(null);
+        when(externalTask.getVariable("organisationId")).thenReturn("ORG1");
+
+        @SuppressWarnings("unchecked")
+        MigrationTask<CaseAssignmentMigrationCaseReference> migrationTask = mock(MigrationTask.class);
+        when(migrationTask.getType()).thenReturn((Class) CaseAssignmentMigrationCaseReference.class);
+        when(migrationTaskFactory.getMigrationTask("unassignTask"))
+            .thenReturn(Optional.of((MigrationTask) migrationTask));
+
+        assertThrows(IllegalArgumentException.class, () -> handler.handleTask(externalTask));
+    }
+
+    @Test
     void shouldThrowExceptionWhenTaskNameMissing() {
-        ExternalTask externalTask = mock(ExternalTask.class);
+        ExternalTask externalTask = buildExternalTask();
         when(externalTask.getVariable("taskName")).thenReturn(null);
 
         assertThrows(AssertionError.class, () -> handler.handleTask(externalTask));
@@ -117,7 +167,7 @@ class MigrateCasesEventHandlerTest {
 
     @Test
     void shouldThrowExceptionWhenMigrationTaskNotFound() {
-        ExternalTask externalTask = mock(ExternalTask.class);
+        ExternalTask externalTask = buildExternalTask();
         when(externalTask.getVariable("taskName")).thenReturn("unknownTask");
 
         when(migrationTaskFactory.getMigrationTask("unknownTask")).thenReturn(Optional.empty());
@@ -128,7 +178,7 @@ class MigrateCasesEventHandlerTest {
     @Test
     void shouldHandleTaskWithCaseIdsAndStateWhenScenarioIsNull() {
         // Arrange
-        ExternalTask externalTask = mock(ExternalTask.class);
+        ExternalTask externalTask = buildExternalTask();
         when(externalTask.getVariable("taskName")).thenReturn("testTask");
         when(externalTask.getVariable("caseIds")).thenReturn("111,222");
         when(externalTask.getVariable("scenario")).thenReturn(null); // scenario is null
@@ -171,7 +221,7 @@ class MigrateCasesEventHandlerTest {
 
     @Test
     void shouldFallbackToCsvWhenCaseIdsEmpty() {
-        ExternalTask externalTask = mock(ExternalTask.class);
+        ExternalTask externalTask = buildExternalTask();
         when(externalTask.getVariable("taskName")).thenReturn("testTask");
         when(externalTask.getVariable("caseIds")).thenReturn("");
         when(externalTask.getVariable("scenario")).thenReturn(null);
@@ -191,6 +241,13 @@ class MigrateCasesEventHandlerTest {
         verify(asyncCaseMigrationService).migrateCasesAsync(migrationTask, mockReferences, null);
     }
 
+    private ExternalTask buildExternalTask() {
+        ExternalTask externalTask = mock(ExternalTask.class);
+        lenient().when(externalTask.getVariable("userEmailAddress")).thenReturn(null);
+        lenient().when(externalTask.getVariable("organisationId")).thenReturn(null);
+        return externalTask;
+    }
+
     private static class ExcelMappableCaseReference extends CaseReference implements ExcelMappable {
         public ExcelMappableCaseReference(String id) {
             setCaseReference(id);
@@ -204,7 +261,7 @@ class MigrateCasesEventHandlerTest {
 
     @Test
     void shouldReturnEmptyExternalTaskDataWhenNoCaseReferencesFound() {
-        ExternalTask externalTask = mock(ExternalTask.class);
+        ExternalTask externalTask = buildExternalTask();
         when(externalTask.getVariable("taskName")).thenReturn("testTask");
         when(externalTask.getVariable("caseIds")).thenReturn("");
         when(externalTask.getVariable("scenario")).thenReturn(null); // stub scenario
@@ -225,7 +282,7 @@ class MigrateCasesEventHandlerTest {
     @SuppressWarnings("unchecked")
     void shouldHandleTaskWithExcelFile() throws Exception {
         // Arrange
-        ExternalTask externalTask = mock(ExternalTask.class);
+        ExternalTask externalTask = buildExternalTask();
         when(externalTask.getVariable("taskName")).thenReturn("excelTask");
 
         byte[] excelBytes = "dummy content".getBytes();
