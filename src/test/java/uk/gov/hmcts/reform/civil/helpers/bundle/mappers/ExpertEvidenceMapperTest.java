@@ -55,7 +55,9 @@ class ExpertEvidenceMapperTest {
         ))
             .thenReturn(Set.of("j1"));
 
-        BundlingRequestDocument doc = BundlingRequestDocument.builder().documentFileName("f").documentType("t").build();
+        BundlingRequestDocument doc = new BundlingRequestDocument()
+            .setDocumentFileName("f")
+            .setDocumentType("t");
         when(bundleDocumentsRetrieval.getAllExpertReports(
             eq(PartyType.CLAIMANT1),
             eq(EvidenceUploadType.EXPERT_REPORT),
