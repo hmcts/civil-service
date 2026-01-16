@@ -51,4 +51,9 @@ public class ClaimContinuingOnlineSpecDefendantEmailDTOGenerator extends Defenda
         properties.put(FRONTEND_URL, pinInPostConfiguration.getCuiFrontEndUrl());
         return properties;
     }
+
+    @Override
+    public Boolean getShouldNotify(CaseData caseData) {
+        return caseData.isRespondent1LiP() &&  caseData.getRespondent1PartyEmail() != null ? Boolean.TRUE : Boolean.FALSE;
+    }
 }
