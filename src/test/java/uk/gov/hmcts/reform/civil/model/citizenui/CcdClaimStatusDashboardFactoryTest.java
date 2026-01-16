@@ -470,7 +470,7 @@ class CcdClaimStatusDashboardFactoryTest {
             .respondent1ResponseDate(LocalDateTime.now())
             .systemGeneratedCaseDocuments(List.of(document))
             .ccdState(CaseState.CASE_PROGRESSION)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(selectedCourt.getCode()))
             .build();
         DashboardClaimStatus status =
             ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(

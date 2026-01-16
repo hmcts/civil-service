@@ -111,7 +111,7 @@ class JudgeFinalOrderGeneratorTest {
     private static final String DATE_FORMAT = "dd/MM/yyyy";
     private static final String fileFreeForm = format(FREE_FORM_ORDER_PDF.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
     private static final String assistedForm = format(ASSISTED_ORDER_PDF.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
-    private static final CaseLocationCivil caseManagementLocation = CaseLocationCivil.builder().baseLocation("000000").build();
+    private static final CaseLocationCivil caseManagementLocation = new CaseLocationCivil().setBaseLocation("000000");
     List<FinalOrderToggle> toggleList = new ArrayList<FinalOrderToggle>(Arrays.asList(FinalOrderToggle.SHOW));
     private static final CaseDocument FREE_FROM_ORDER = CaseDocumentBuilder.builder()
         .documentName(fileFreeForm)
@@ -187,7 +187,7 @@ class JudgeFinalOrderGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000888").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("00000888"))
             .build();
 
         assertThrows(IllegalArgumentException.class, () -> generator.generate(caseData, BEARER_TOKEN));

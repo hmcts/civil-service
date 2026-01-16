@@ -52,10 +52,10 @@ public class DocumentHearingLocationHelperTest {
     void whenNotMatchingForm_thenDefaultToCaseLocation() {
         String fromForm = "label from form";
         CaseData caseData = CaseData.builder()
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation("base location")
-                                        .region("region")
-                                        .build())
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation("base location")
+                                        .setRegion("region")
+                                        )
             .build();
         String authorisation = "authorisation";
 
@@ -83,10 +83,10 @@ public class DocumentHearingLocationHelperTest {
     void whenSeveralLocations_thenDefaultToFirst() {
         String fromForm = "label from form";
         CaseData caseData = CaseData.builder()
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation("base location")
-                                        .region("region")
-                                        .build())
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation("base location")
+                                        .setRegion("region")
+                                        )
             .build();
         String authorisation = "authorisation";
 
@@ -120,10 +120,10 @@ public class DocumentHearingLocationHelperTest {
         String ccmcEpimmId = hearingLocationHelper.ccmccEpimmId;
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation(ccmcEpimmId)
-                                        .region("CCMCC region")
-                                        .build())
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation(ccmcEpimmId)
+                                        .setRegion("CCMCC region")
+                                        )
             .build();
 
         LocationRefData location1 = LocationRefData.builder()
@@ -147,10 +147,10 @@ public class DocumentHearingLocationHelperTest {
         String cnbcEpimmId = hearingLocationHelper.cnbcEpimmId;
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation(cnbcEpimmId)
-                                        .region("CNBC region")
-                                        .build())
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation(cnbcEpimmId)
+                                        .setRegion("CNBC region")
+                                        )
             .build();
 
         LocationRefData location1 = LocationRefData.builder()
@@ -181,10 +181,10 @@ public class DocumentHearingLocationHelperTest {
         String authorisation = "authorisation";
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation("00002")
-                                        .region("random region")
-                                        .build())
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation("00002")
+                                        .setRegion("random region")
+                                        )
             .build();
 
         LocationRefData location1 = LocationRefData.builder()
@@ -211,10 +211,10 @@ public class DocumentHearingLocationHelperTest {
         String authorisation = "authorisation";
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation("00009")
-                                        .region("random region")
-                                        .build())
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation("00009")
+                                        .setRegion("random region")
+                                        )
             .build();
 
         when(locationRefDataService.getHearingCourtLocations(authorisation)).thenReturn(locations);
