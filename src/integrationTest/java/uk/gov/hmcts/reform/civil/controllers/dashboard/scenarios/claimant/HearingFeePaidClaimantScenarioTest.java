@@ -30,8 +30,8 @@ public class HearingFeePaidClaimantScenarioTest extends DashboardBaseIntegration
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .hwfFeeType(FeeType.HEARING)
-            .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
-                                          .hwfFullRemissionGrantedForHearingFee(YesOrNo.NO).build())
+            .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
+                                          .setHwfFullRemissionGrantedForHearingFee(YesOrNo.NO))
             .build();
 
         handler.handle(callbackParams(caseData));

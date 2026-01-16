@@ -28,10 +28,9 @@ public class CCJRequestedClaimantRejectsSettlementAgreementTest extends Dashboar
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
             .toBuilder()
             .ccdCaseReference(Long.valueOf(caseId))
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder().applicant1SignedSettlementAgreement(YesOrNo.YES).build())
-                             .respondentSignSettlementAgreement(YesOrNo.NO)
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1LiPResponse(new ClaimantLiPResponse().setApplicant1SignedSettlementAgreement(YesOrNo.YES))
+                             .setRespondentSignSettlementAgreement(YesOrNo.NO))
             .totalClaimAmount(new BigDecimal(1000))
             .build();
 

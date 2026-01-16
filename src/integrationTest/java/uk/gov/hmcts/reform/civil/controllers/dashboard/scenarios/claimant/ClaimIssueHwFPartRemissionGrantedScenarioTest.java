@@ -31,11 +31,10 @@ public class ClaimIssueHwFPartRemissionGrantedScenarioTest extends DashboardBase
             .toBuilder()
             .hwfFeeType(FeeType.CLAIMISSUED)
             .applicant1Represented(YesOrNo.NO)
-            .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
-                                       .hwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED)
-                                       .remissionAmount(BigDecimal.valueOf(100000))
-                                       .outstandingFeeInPounds(BigDecimal.valueOf(25))
-                                       .build())
+            .claimIssuedHwfDetails(new HelpWithFeesDetails()
+                                       .setHwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED)
+                                       .setRemissionAmount(BigDecimal.valueOf(100000))
+                                       .setOutstandingFeeInPounds(BigDecimal.valueOf(25)))
             .ccdCaseReference(Long.valueOf(caseId))
             .build();
 

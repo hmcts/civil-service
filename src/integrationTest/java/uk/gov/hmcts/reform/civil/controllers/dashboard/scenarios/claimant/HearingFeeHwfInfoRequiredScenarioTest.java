@@ -34,7 +34,7 @@ public class HearingFeeHwfInfoRequiredScenarioTest extends DashboardBaseIntegrat
             .applicant1Represented(YesOrNo.NO)
             .ccdCaseReference(Long.valueOf(caseId))
             .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(45500)).build())
-            .hearingHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(CaseEvent.MORE_INFORMATION_HWF).build())
+            .hearingHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(CaseEvent.MORE_INFORMATION_HWF))
             .hwfFeeType(FeeType.HEARING)
             .build();
 

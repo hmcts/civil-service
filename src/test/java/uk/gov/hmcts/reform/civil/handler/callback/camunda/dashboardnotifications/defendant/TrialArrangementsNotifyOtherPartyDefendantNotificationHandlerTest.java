@@ -66,9 +66,9 @@ class TrialArrangementsNotifyOtherPartyDefendantNotificationHandlerTest  extends
         @Test
         void shouldRecordScenario_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
-                .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
-                                 .applicant1ClaimSettledDate(
-                                     LocalDate.now()).build())
+                .caseDataLip(new CaseDataLiP().setApplicant1SettleClaim(YesOrNo.YES)
+                                 .setApplicant1ClaimSettledDate(
+                                     LocalDate.now()))
                 .respondent1Represented(YesOrNo.NO).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();

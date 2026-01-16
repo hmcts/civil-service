@@ -13,20 +13,16 @@ class DQExtraDetailsLipTest {
     @Test
     void shouldReturnReportExpertDetails_whenItExists() {
         //Given
-        DQExtraDetailsLip extraDetailsLip = DQExtraDetailsLip
-            .builder()
-            .respondent1DQLiPExpert(
-                ExpertLiP
-                    .builder()
-                    .details(
+        DQExtraDetailsLip extraDetailsLip = new DQExtraDetailsLip()
+            .setRespondent1DQLiPExpert(
+                new ExpertLiP()
+                    .setDetails(
                         wrapElements(List.of(
-                            ExpertReportLiP.builder()
-                                .expertName("Name")
-                                .reportDate(LocalDate.now())
-                                .build()))
+                            new ExpertReportLiP()
+                                .setExpertName("Name")
+                                .setReportDate(LocalDate.now())))
                     )
-                    .build())
-            .build();
+            );
         //When
         List<ExpertReportLiP> result = extraDetailsLip.getReportExpertDetails();
         //Then
@@ -36,7 +32,7 @@ class DQExtraDetailsLipTest {
     @Test
     void shouldReturnEmptyList_whenReportExpertDetailsDoNotExist() {
         //Given
-        DQExtraDetailsLip extraDetailsLip = DQExtraDetailsLip.builder().build();
+        DQExtraDetailsLip extraDetailsLip = new DQExtraDetailsLip();
         //When
         List<ExpertReportLiP> result = extraDetailsLip.getReportExpertDetails();
         //Then

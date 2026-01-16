@@ -53,9 +53,8 @@ public class CreateSDORespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenSpecBilingual() {
-        CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-            .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(BOTH.toString()).build())
-            .build();
+        CaseDataLiP caseDataLiP = new CaseDataLiP()
+            .setRespondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage(BOTH.toString()));
         CaseData caseData = CaseData.builder().caseAccessCategory(SPEC_CLAIM).caseDataLiP(caseDataLiP).build();
 
         String expectedTemplateId = "template-id";

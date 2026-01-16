@@ -52,11 +52,10 @@ public class CCJRequestedCourtAgreedWithClaimantScenarioTest extends DashboardBa
                              .individualLastName(claimantLastName)
                              .type(Party.Type.INDIVIDUAL)
                              .build())
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .claimantCourtDecision(RepaymentDecisionType
-                                                                                   .IN_FAVOUR_OF_CLAIMANT).build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                                        .setClaimantCourtDecision(RepaymentDecisionType
+                                                                                   .IN_FAVOUR_OF_CLAIMANT)))
             .build();
 
         handler.handle(callbackParams(caseData));

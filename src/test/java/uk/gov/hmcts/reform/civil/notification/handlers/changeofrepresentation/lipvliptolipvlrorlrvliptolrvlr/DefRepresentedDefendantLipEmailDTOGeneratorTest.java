@@ -50,10 +50,9 @@ class DefRepresentedDefendantLipEmailDTOGeneratorTest {
     @Test
     void shouldReturnBilingualTemplateIdIfRespondentResponseIsBilingual() {
         CaseData bilingualCaseData = baseCaseData.toBuilder()
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                         .respondent1ResponseLanguage(Language.WELSH.toString()).build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                         .setRespondent1ResponseLanguage(Language.WELSH.toString())))
             .build();
 
         when(notificationsProperties.getNotifyDefendantLipBilingualAfterDefendantNOC())
@@ -67,10 +66,9 @@ class DefRepresentedDefendantLipEmailDTOGeneratorTest {
     @Test
     void shouldReturnDefaultTemplateIdIfRespondentResponseIsNotBilingual() {
         CaseData monoCaseData = baseCaseData.toBuilder()
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                         .respondent1ResponseLanguage(Language.ENGLISH.toString()).build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                         .setRespondent1ResponseLanguage(Language.ENGLISH.toString())))
             .build();
 
         when(notificationsProperties.getNotifyDefendantLipForNoLongerAccessTemplate())

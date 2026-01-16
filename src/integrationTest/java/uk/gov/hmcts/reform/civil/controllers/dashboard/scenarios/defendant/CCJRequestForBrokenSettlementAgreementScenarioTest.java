@@ -36,10 +36,10 @@ public class CCJRequestForBrokenSettlementAgreementScenarioTest extends Dashboar
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
                                                .whenWillThisAmountBePaid(LocalDate.now().minusDays(1)).build())
             .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.now().minusDays(1))
-            .caseDataLiP(CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.YES)
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                                         .applicant1SignedSettlementAgreement(
-                                                                             YesOrNo.YES).build()).build())
+            .caseDataLiP(new CaseDataLiP().setRespondentSignSettlementAgreement(YesOrNo.YES)
+                             .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                                                         .setApplicant1SignedSettlementAgreement(
+                                                                             YesOrNo.YES)))
             .build();
         handler.handle(callbackParams(caseData));
 
@@ -79,11 +79,11 @@ public class CCJRequestForBrokenSettlementAgreementScenarioTest extends Dashboar
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
                                                .whenWillThisAmountBePaid(LocalDate.now().minusDays(1)).build())
             .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.now().minusDays(1))
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondentSignSettlementAgreement(YesOrNo.YES)
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                                         .applicant1SignedSettlementAgreement(
-                                                                             YesOrNo.YES).build()).build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setRespondentSignSettlementAgreement(YesOrNo.YES)
+                             .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                                                         .setApplicant1SignedSettlementAgreement(
+                                                                             YesOrNo.YES)))
             .build();
         handler.handle(callbackParams(caseData));
 

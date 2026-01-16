@@ -46,7 +46,7 @@ public class DefendantSignSettlementClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenDefendantSignedSettlementAgreement() {
-        CaseDataLiP caseDataLiP = CaseDataLiP.builder().respondentSignSettlementAgreement(YES).build();
+        CaseDataLiP caseDataLiP = new CaseDataLiP().setRespondentSignSettlementAgreement(YES);
         CaseData caseData = CaseData.builder().caseDataLiP(caseDataLiP).build();
         String expectedTemplateId = "template-id";
 
@@ -59,7 +59,7 @@ public class DefendantSignSettlementClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenDefendantSignedSettlementNotAgreed() {
-        CaseDataLiP caseDataLiP = CaseDataLiP.builder().respondentSignSettlementAgreement(NO).build();
+        CaseDataLiP caseDataLiP = new CaseDataLiP().setRespondentSignSettlementAgreement(NO);
         CaseData caseData = CaseData.builder().caseDataLiP(caseDataLiP).build();
         String expectedTemplateId = "template-id";
 
@@ -72,7 +72,7 @@ public class DefendantSignSettlementClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenDefendantSignedSettlementAgreementBilingual() {
-        CaseDataLiP caseDataLiP = CaseDataLiP.builder().respondentSignSettlementAgreement(YES).build();
+        CaseDataLiP caseDataLiP = new CaseDataLiP().setRespondentSignSettlementAgreement(YES);
         CaseData caseData = CaseData.builder().caseDataLiP(caseDataLiP).claimantBilingualLanguagePreference(BOTH.toString()).build();
         String expectedTemplateId = "template-id";
 
@@ -85,7 +85,7 @@ public class DefendantSignSettlementClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenDefendantSignedSettlementNotAgreedBilingual() {
-        CaseDataLiP caseDataLiP = CaseDataLiP.builder().respondentSignSettlementAgreement(NO).build();
+        CaseDataLiP caseDataLiP = new CaseDataLiP().setRespondentSignSettlementAgreement(NO);
         CaseData caseData = CaseData.builder().caseDataLiP(caseDataLiP).claimantBilingualLanguagePreference(BOTH.toString()).build();
         String expectedTemplateId = "template-id";
 
@@ -129,7 +129,7 @@ public class DefendantSignSettlementClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldNotifyIfRespondentLipAndDefendantSignedSettlementNotAgreed() {
-        CaseDataLiP caseDataLiP = CaseDataLiP.builder().respondentSignSettlementAgreement(NO).build();
+        CaseDataLiP caseDataLiP = new CaseDataLiP().setRespondentSignSettlementAgreement(NO);
         CaseData caseData = CaseData.builder().caseDataLiP(caseDataLiP).respondent1Represented(NO).build();
 
         assertThat(emailDTOGenerator.getShouldNotify(caseData)).isTrue();
@@ -137,7 +137,7 @@ public class DefendantSignSettlementClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldNotifyIfRespondentLipAndDefendantSignedSettlementAgreement() {
-        CaseDataLiP caseDataLiP = CaseDataLiP.builder().respondentSignSettlementAgreement(YES).build();
+        CaseDataLiP caseDataLiP = new CaseDataLiP().setRespondentSignSettlementAgreement(YES);
         CaseData caseData = CaseData.builder().caseDataLiP(caseDataLiP).respondent1Represented(NO).build();
 
         assertThat(emailDTOGenerator.getShouldNotify(caseData)).isTrue();

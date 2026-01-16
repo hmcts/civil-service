@@ -27,8 +27,8 @@ public class ClaimantFeePayOutcomeTest extends DashboardBaseIntegrationTest {
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .hwfFeeType(FeeType.CLAIMISSUED)
-            .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
-                                          .hwfFullRemissionGrantedForClaimIssue(YesOrNo.NO).build())
+            .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
+                                          .setHwfFullRemissionGrantedForClaimIssue(YesOrNo.NO))
             .build();
 
         handler.handle(callbackParams(caseData));

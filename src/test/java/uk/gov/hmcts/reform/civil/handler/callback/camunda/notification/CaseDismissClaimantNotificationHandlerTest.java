@@ -89,17 +89,17 @@ class CaseDismissClaimantNotificationHandlerTest {
     }
 
     private CaseData getCaseData(boolean isClaimantLiP, boolean isClaimantBilingual) {
-        RespondentLiPResponse respondentLip = RespondentLiPResponse.builder()
-            .respondent1ResponseLanguage(isClaimantBilingual ? Language.BOTH.toString()
-                                             : Language.ENGLISH.toString()).build();
+        RespondentLiPResponse respondentLip = new RespondentLiPResponse()
+            .setRespondent1ResponseLanguage(isClaimantBilingual ? Language.BOTH.toString()
+                                             : Language.ENGLISH.toString());
         return commonCaseData()
             .applicant1Represented(isClaimantLiP ? YesOrNo.NO : YesOrNo.YES)
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@example.com").build())
             .claimantBilingualLanguagePreference(isClaimantBilingual ? Language.BOTH.toString()
                                                      : Language.ENGLISH.toString())
             .build().toBuilder()
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1LiPResponse(respondentLip).build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setRespondent1LiPResponse(respondentLip))
             .build();
     }
 

@@ -139,11 +139,9 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             CaseData caseData = createCaseDataForLip(NOTIFICATION_TEXT).toBuilder()
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                             .respondent1ResponseLanguage(Language.BOTH.toString())
-                                                             .build())
-                                 .build())
+                .caseDataLiP(new CaseDataLiP()
+                                 .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                             .setRespondent1ResponseLanguage(Language.BOTH.toString())))
                 .build();
             //when: RepondentNotificationhandler for respondent 1 is called
 

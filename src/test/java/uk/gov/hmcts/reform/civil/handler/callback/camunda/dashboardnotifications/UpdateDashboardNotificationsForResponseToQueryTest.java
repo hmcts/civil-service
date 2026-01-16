@@ -81,8 +81,8 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
             .build();
         CaseData caseData = CaseData.builder()
             .caseDataLiP(
-                CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO
-                ).build()
+                new CaseDataLiP().setRespondentSignSettlementAgreement(YesOrNo.NO
+                )
             )
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.YES)

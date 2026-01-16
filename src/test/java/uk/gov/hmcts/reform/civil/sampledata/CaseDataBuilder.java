@@ -3398,8 +3398,8 @@ public class CaseDataBuilder {
         atStateClaimIssued1v1LiP();
         this.applicant1Represented = NO;
         this.claimantBilingualLanguagePreference = Language.BOTH.toString();
-        this.caseDataLiP = CaseDataLiP.builder()
-            .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(Language.BOTH.toString()).build()).build();
+        this.caseDataLiP = new CaseDataLiP()
+            .setRespondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage(Language.BOTH.toString()));
         setClaimTypeToSpecClaim();
         return this;
     }
@@ -4871,10 +4871,9 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateTrialReadyApplicant() {
         atStateTrialReadyCheck();
         trialReadyApplicant = YES;
-        applicantRevisedHearingRequirements = RevisedHearingRequirements.builder()
-            .revisedHearingRequirements(YES)
-            .revisedHearingComments("Changes requested.")
-            .build();
+        applicantRevisedHearingRequirements = new RevisedHearingRequirements()
+            .setRevisedHearingRequirements(YES)
+            .setRevisedHearingComments("Changes requested.");
 
         return this;
     }
@@ -4882,10 +4881,9 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateTrialNotReadyApplicant() {
         atStateTrialReadyCheck();
         trialReadyApplicant = NO;
-        applicantRevisedHearingRequirements = RevisedHearingRequirements.builder()
-            .revisedHearingRequirements(YES)
-            .revisedHearingComments("Changes requested.")
-            .build();
+        applicantRevisedHearingRequirements = new RevisedHearingRequirements()
+            .setRevisedHearingRequirements(YES)
+            .setRevisedHearingComments("Changes requested.");
 
         return this;
     }
@@ -4893,40 +4891,36 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateTrialReadyRespondent1() {
         atStateTrialReadyCheck();
         trialReadyRespondent1 = YES;
-        respondent1RevisedHearingRequirements = RevisedHearingRequirements.builder()
-            .revisedHearingRequirements(YES)
-            .revisedHearingComments("Changes requested.")
-            .build();
+        respondent1RevisedHearingRequirements = new RevisedHearingRequirements()
+            .setRevisedHearingRequirements(YES)
+            .setRevisedHearingComments("Changes requested.");
         return this;
     }
 
     public CaseDataBuilder atStateTrialNotReadyRespondent1() {
         atStateTrialReadyCheck();
         trialReadyRespondent1 = NO;
-        respondent1RevisedHearingRequirements = RevisedHearingRequirements.builder()
-            .revisedHearingRequirements(YES)
-            .revisedHearingComments("Changes requested.")
-            .build();
+        respondent1RevisedHearingRequirements = new RevisedHearingRequirements()
+            .setRevisedHearingRequirements(YES)
+            .setRevisedHearingComments("Changes requested.");
         return this;
     }
 
     public CaseDataBuilder atStateTrialReadyRespondent2() {
         atStateTrialReadyCheck();
         trialReadyRespondent2 = YES;
-        applicantRevisedHearingRequirements = RevisedHearingRequirements.builder()
-            .revisedHearingRequirements(YES)
-            .revisedHearingComments("Changes requested.")
-            .build();
+        applicantRevisedHearingRequirements = new RevisedHearingRequirements()
+            .setRevisedHearingRequirements(YES)
+            .setRevisedHearingComments("Changes requested.");
         return this;
     }
 
     public CaseDataBuilder atStateTrialNotReadyRespondent2() {
         atStateTrialReadyCheck();
         trialReadyRespondent2 = NO;
-        applicantRevisedHearingRequirements = RevisedHearingRequirements.builder()
-            .revisedHearingRequirements(YES)
-            .revisedHearingComments("Changes requested.")
-            .build();
+        applicantRevisedHearingRequirements = new RevisedHearingRequirements()
+            .setRevisedHearingRequirements(YES)
+            .setRevisedHearingComments("Changes requested.");
         return this;
     }
 
@@ -5534,11 +5528,10 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateMediationUnsuccessful(MultiPartyScenario mpScenario) {
         atStateApplicantProceedAllMediation(mpScenario);
         applicantsProceedIntention = YES;
-        caseDataLiP = CaseDataLiP.builder()
-            .applicant1ClaimMediationSpecRequiredLip(
-                ClaimantMediationLip.builder()
-                    .hasAgreedFreeMediation(MediationDecision.Yes)
-                    .build()).build();
+        caseDataLiP = new CaseDataLiP()
+            .setApplicant1ClaimMediationSpecRequiredLip(
+                new ClaimantMediationLip()
+                    .setHasAgreedFreeMediation(MediationDecision.Yes));
 
         mediation = Mediation.builder().unsuccessfulMediationReason("Unsuccessful").build();
 
@@ -5548,11 +5541,10 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateMediationUnsuccessfulCarm(MultiPartyScenario mpScenario) {
         atStateApplicantProceedAllMediation(mpScenario);
         applicantsProceedIntention = YES;
-        caseDataLiP = CaseDataLiP.builder()
-            .applicant1ClaimMediationSpecRequiredLip(
-                ClaimantMediationLip.builder()
-                    .hasAgreedFreeMediation(MediationDecision.Yes)
-                    .build()).build();
+        caseDataLiP = new CaseDataLiP()
+            .setApplicant1ClaimMediationSpecRequiredLip(
+                new ClaimantMediationLip()
+                    .setHasAgreedFreeMediation(MediationDecision.Yes));
 
         mediation = Mediation.builder().mediationUnsuccessfulReasonsMultiSelect(
             List.of(MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE)).build();
@@ -5561,19 +5553,18 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateLipClaimantDoesNotSettle() {
-        caseDataLiP = CaseDataLiP.builder()
-            .applicant1SettleClaim(NO).build();
+        caseDataLiP = new CaseDataLiP()
+            .setApplicant1SettleClaim(NO);
         return this;
     }
 
     public CaseDataBuilder atStateMediationSuccessful(MultiPartyScenario mpScenario) {
         atStateApplicantProceedAllMediation(mpScenario);
         applicantsProceedIntention = YES;
-        caseDataLiP = CaseDataLiP.builder()
-            .applicant1ClaimMediationSpecRequiredLip(
-                ClaimantMediationLip.builder()
-                    .hasAgreedFreeMediation(MediationDecision.Yes)
-                    .build()).build();
+        caseDataLiP = new CaseDataLiP()
+            .setApplicant1ClaimMediationSpecRequiredLip(
+                new ClaimantMediationLip()
+                    .setHasAgreedFreeMediation(MediationDecision.Yes));
 
         mediation = Mediation.builder()
             .mediationSuccessful(MediationSuccessful.builder()
@@ -7256,8 +7247,8 @@ public class CaseDataBuilder {
         this.caseAccessCategory = SPEC_CLAIM;
         this.respondent1Represented = NO;
         this.ccdCaseReference = CASE_ID;
-        this.caseDataLiP = CaseDataLiP.builder()
-            .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(Language.BOTH.toString()).build()).build();
+        this.caseDataLiP = new CaseDataLiP()
+            .setRespondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage(Language.BOTH.toString()));
         setClaimTypeToSpecClaim();
         return this;
     }
@@ -7517,57 +7508,48 @@ public class CaseDataBuilder {
     public CaseDataBuilder addLiPApplicant1MediationInfo(boolean alternateInfo) {
         if (alternateInfo) {
             if (this.caseDataLiP != null) {
-                this.caseDataLiP = this.caseDataLiP.toBuilder()
-                    .applicant1LiPResponseCarm(MediationLiPCarm.builder()
-                        .isMediationContactNameCorrect(NO)
-                        .alternativeMediationContactPerson("Alt contact person")
-                        .isMediationEmailCorrect(NO)
-                        .alternativeMediationEmail("altemail@mediation.com")
-                        .isMediationPhoneCorrect(NO)
-                        .alternativeMediationTelephone("07222222222")
-                        .hasUnavailabilityNextThreeMonths(YES)
-                        .unavailableDatesForMediation(getMediationUnavailableDates())
-                        .build()).build();
+                this.caseDataLiP.setApplicant1LiPResponseCarm(new MediationLiPCarm()
+                    .setIsMediationContactNameCorrect(NO)
+                    .setAlternativeMediationContactPerson("Alt contact person")
+                    .setIsMediationEmailCorrect(NO)
+                    .setAlternativeMediationEmail("altemail@mediation.com")
+                    .setIsMediationPhoneCorrect(NO)
+                    .setAlternativeMediationTelephone("07222222222")
+                    .setHasUnavailabilityNextThreeMonths(YES)
+                    .setUnavailableDatesForMediation(getMediationUnavailableDates()));
             } else {
-                this.caseDataLiP = CaseDataLiP.builder()
-                    .applicant1LiPResponseCarm(MediationLiPCarm.builder()
-                        .isMediationContactNameCorrect(NO)
-                        .alternativeMediationContactPerson("Alt contact person")
-                        .isMediationEmailCorrect(NO)
-                        .alternativeMediationEmail("altemail@mediation.com")
-                        .isMediationPhoneCorrect(NO)
-                        .alternativeMediationTelephone("07222222222")
-                        .hasUnavailabilityNextThreeMonths(YES)
-                        .unavailableDatesForMediation(getMediationUnavailableDates())
-                        .build()).build();
+                this.caseDataLiP = new CaseDataLiP()
+                    .setApplicant1LiPResponseCarm(new MediationLiPCarm()
+                        .setIsMediationContactNameCorrect(NO)
+                        .setAlternativeMediationContactPerson("Alt contact person")
+                        .setIsMediationEmailCorrect(NO)
+                        .setAlternativeMediationEmail("altemail@mediation.com")
+                        .setIsMediationPhoneCorrect(NO)
+                        .setAlternativeMediationTelephone("07222222222")
+                        .setHasUnavailabilityNextThreeMonths(YES)
+                        .setUnavailableDatesForMediation(getMediationUnavailableDates()));
             }
         } else {
             if (this.caseDataLiP != null) {
-                this.caseDataLiP = this.caseDataLiP.toBuilder()
-                    .applicant1LiPResponseCarm(MediationLiPCarm.builder()
-                        .isMediationContactNameCorrect(YES)
-                        .isMediationEmailCorrect(YES)
-                        .isMediationPhoneCorrect(YES)
-                        .hasUnavailabilityNextThreeMonths(YES)
-                        .unavailableDatesForMediation(getMediationUnavailableDates())
-                        .build())
-                    .applicant1AdditionalLipPartyDetails(AdditionalLipPartyDetails.builder()
-                        .contactPerson("Lip contact person")
-                        .build())
-                    .build();
+                this.caseDataLiP
+                    .setApplicant1LiPResponseCarm(new MediationLiPCarm()
+                        .setIsMediationContactNameCorrect(YES)
+                        .setIsMediationEmailCorrect(YES)
+                        .setIsMediationPhoneCorrect(YES)
+                        .setHasUnavailabilityNextThreeMonths(YES)
+                        .setUnavailableDatesForMediation(getMediationUnavailableDates()))
+                    .setApplicant1AdditionalLipPartyDetails(new AdditionalLipPartyDetails()
+                        .setContactPerson("Lip contact person"));
             } else {
-                this.caseDataLiP = CaseDataLiP.builder()
-                    .applicant1LiPResponseCarm(MediationLiPCarm.builder()
-                        .isMediationContactNameCorrect(YES)
-                        .isMediationEmailCorrect(YES)
-                        .isMediationPhoneCorrect(YES)
-                        .hasUnavailabilityNextThreeMonths(YES)
-                        .unavailableDatesForMediation(getMediationUnavailableDates())
-                        .build())
-                    .applicant1AdditionalLipPartyDetails(AdditionalLipPartyDetails.builder()
-                        .contactPerson("Lip contact person")
-                        .build())
-                    .build();
+                this.caseDataLiP = new CaseDataLiP()
+                    .setApplicant1LiPResponseCarm(new MediationLiPCarm()
+                        .setIsMediationContactNameCorrect(YES)
+                        .setIsMediationEmailCorrect(YES)
+                        .setIsMediationPhoneCorrect(YES)
+                        .setHasUnavailabilityNextThreeMonths(YES)
+                        .setUnavailableDatesForMediation(getMediationUnavailableDates()))
+                    .setApplicant1AdditionalLipPartyDetails(new AdditionalLipPartyDetails()
+                        .setContactPerson("Lip contact person"));
             }
         }
         return this;
@@ -7576,57 +7558,48 @@ public class CaseDataBuilder {
     public CaseDataBuilder addLiPRespondent1MediationInfo(boolean alternateInfo) {
         if (alternateInfo) {
             if (this.caseDataLiP != null) {
-                this.caseDataLiP = this.caseDataLiP.toBuilder()
-                    .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
-                        .isMediationContactNameCorrect(NO)
-                        .alternativeMediationContactPerson("Alt contact person")
-                        .isMediationEmailCorrect(NO)
-                        .alternativeMediationEmail("altemail@mediation.com")
-                        .isMediationPhoneCorrect(NO)
-                        .alternativeMediationTelephone("07222222222")
-                        .hasUnavailabilityNextThreeMonths(YES)
-                        .unavailableDatesForMediation(getMediationUnavailableDates())
-                        .build()).build();
+                this.caseDataLiP.setRespondent1MediationLiPResponseCarm(new MediationLiPCarm()
+                    .setIsMediationContactNameCorrect(NO)
+                    .setAlternativeMediationContactPerson("Alt contact person")
+                    .setIsMediationEmailCorrect(NO)
+                    .setAlternativeMediationEmail("altemail@mediation.com")
+                    .setIsMediationPhoneCorrect(NO)
+                    .setAlternativeMediationTelephone("07222222222")
+                    .setHasUnavailabilityNextThreeMonths(YES)
+                    .setUnavailableDatesForMediation(getMediationUnavailableDates()));
             } else {
-                this.caseDataLiP = CaseDataLiP.builder()
-                    .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
-                        .isMediationContactNameCorrect(NO)
-                        .alternativeMediationContactPerson("Alt contact person")
-                        .isMediationEmailCorrect(NO)
-                        .alternativeMediationEmail("altemail@mediation.com")
-                        .isMediationPhoneCorrect(NO)
-                        .alternativeMediationTelephone("07222222222")
-                        .hasUnavailabilityNextThreeMonths(YES)
-                        .unavailableDatesForMediation(getMediationUnavailableDates())
-                        .build()).build();
+                this.caseDataLiP = new CaseDataLiP()
+                    .setRespondent1MediationLiPResponseCarm(new MediationLiPCarm()
+                        .setIsMediationContactNameCorrect(NO)
+                        .setAlternativeMediationContactPerson("Alt contact person")
+                        .setIsMediationEmailCorrect(NO)
+                        .setAlternativeMediationEmail("altemail@mediation.com")
+                        .setIsMediationPhoneCorrect(NO)
+                        .setAlternativeMediationTelephone("07222222222")
+                        .setHasUnavailabilityNextThreeMonths(YES)
+                        .setUnavailableDatesForMediation(getMediationUnavailableDates()));
             }
         } else {
             if (this.caseDataLiP != null) {
-                this.caseDataLiP = this.caseDataLiP.toBuilder()
-                    .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
-                        .isMediationContactNameCorrect(YES)
-                        .isMediationEmailCorrect(YES)
-                        .isMediationPhoneCorrect(YES)
-                        .hasUnavailabilityNextThreeMonths(YES)
-                        .unavailableDatesForMediation(getMediationUnavailableDates())
-                        .build())
-                    .respondent1LiPResponse(RespondentLiPResponse.builder()
-                        .respondent1LiPContactPerson("Lip contact person")
-                        .build())
-                    .build();
+                this.caseDataLiP
+                    .setRespondent1MediationLiPResponseCarm(new MediationLiPCarm()
+                        .setIsMediationContactNameCorrect(YES)
+                        .setIsMediationEmailCorrect(YES)
+                        .setIsMediationPhoneCorrect(YES)
+                        .setHasUnavailabilityNextThreeMonths(YES)
+                        .setUnavailableDatesForMediation(getMediationUnavailableDates()))
+                    .setRespondent1LiPResponse(new RespondentLiPResponse()
+                        .setRespondent1LiPContactPerson("Lip contact person"));
             } else {
-                this.caseDataLiP = CaseDataLiP.builder()
-                    .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
-                        .isMediationContactNameCorrect(YES)
-                        .isMediationEmailCorrect(YES)
-                        .isMediationPhoneCorrect(YES)
-                        .hasUnavailabilityNextThreeMonths(YES)
-                        .unavailableDatesForMediation(getMediationUnavailableDates())
-                        .build())
-                    .respondent1LiPResponse(RespondentLiPResponse.builder()
-                        .respondent1LiPContactPerson("Lip contact person")
-                        .build())
-                    .build();
+                this.caseDataLiP = new CaseDataLiP()
+                    .setRespondent1MediationLiPResponseCarm(new MediationLiPCarm()
+                        .setIsMediationContactNameCorrect(YES)
+                        .setIsMediationEmailCorrect(YES)
+                        .setIsMediationPhoneCorrect(YES)
+                        .setHasUnavailabilityNextThreeMonths(YES)
+                        .setUnavailableDatesForMediation(getMediationUnavailableDates()))
+                    .setRespondent1LiPResponse(new RespondentLiPResponse()
+                        .setRespondent1LiPContactPerson("Lip contact person"));
             }
         }
         return this;

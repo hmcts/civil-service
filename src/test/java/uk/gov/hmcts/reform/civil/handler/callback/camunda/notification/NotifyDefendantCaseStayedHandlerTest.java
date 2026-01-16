@@ -97,8 +97,8 @@ class NotifyDefendantCaseStayedHandlerTest {
     void sendNotificationShouldSendEmail(boolean isRespondentLiP, boolean isRespondentBilingual, boolean isRespondent1, String template, String email) {
         caseData = caseData.toBuilder()
             .respondent1Represented(isRespondentLiP ? YesOrNo.NO : YesOrNo.YES)
-            .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(
-                isRespondentBilingual ? Language.BOTH.toString() : Language.ENGLISH.toString()).build()).build())
+            .caseDataLiP(new CaseDataLiP().setRespondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage(
+                isRespondentBilingual ? Language.BOTH.toString() : Language.ENGLISH.toString())))
             .respondentSolicitor1EmailAddress(email)
             .respondent2(!isRespondent1
                              ? Party.builder().individualFirstName("John").individualLastName("Johnson").type(Party.Type.INDIVIDUAL).build()

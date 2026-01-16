@@ -224,11 +224,9 @@ class PartAdmissionTransitionBuilderTest {
             .setClaimTypeToSpecClaim()
             .build().toBuilder()
             .responseClaimTrack(SMALL_CLAIM.name())
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
-                                                                      .isMediationContactNameCorrect(YES)
-                                                                      .build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setRespondent1MediationLiPResponseCarm(new MediationLiPCarm()
+                                                                      .setIsMediationContactNameCorrect(YES)))
             .build();
 
         assertTrue(isCarmApplicableLipCase.test(caseData));
@@ -241,12 +239,10 @@ class PartAdmissionTransitionBuilderTest {
             .setClaimTypeToSpecClaim()
             .build().toBuilder()
             .responseClaimTrack(SMALL_CLAIM.name())
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                         .respondent1MediationLiPResponse(MediationLiP.builder()
-                                                                                              .canWeUseMediationLiP(YES)
-                                                                                              .build())
-                                                         .build()).build()).build();
+            .caseDataLiP(new CaseDataLiP()
+                             .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                         .setRespondent1MediationLiPResponse(new MediationLiP()
+                                                                                              .setCanWeUseMediationLiP(YES)))).build();
 
         assertFalse(isCarmApplicableLipCase.test(caseData));
     }
@@ -258,11 +254,9 @@ class PartAdmissionTransitionBuilderTest {
             .setClaimTypeToSpecClaim()
             .build().toBuilder()
             .responseClaimTrack(FAST_CLAIM.name())
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
-                                                                      .isMediationContactNameCorrect(YES)
-                                                                      .build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setRespondent1MediationLiPResponseCarm(new MediationLiPCarm()
+                                                                      .setIsMediationContactNameCorrect(YES)))
             .build();
 
         assertFalse(isCarmApplicableLipCase.test(caseData));
@@ -277,11 +271,9 @@ class PartAdmissionTransitionBuilderTest {
             .respondent2(Party.builder().build())
             .respondent1Represented(YES)
             .responseClaimTrack(SMALL_CLAIM.name())
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponseCarm(MediationLiPCarm.builder()
-                                                            .isMediationContactNameCorrect(YES)
-                                                            .build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1LiPResponseCarm(new MediationLiPCarm()
+                                                            .setIsMediationContactNameCorrect(YES)))
             .build();
 
         assertFalse(isCarmApplicableLipCase.test(caseData));
@@ -296,11 +288,9 @@ class PartAdmissionTransitionBuilderTest {
             .respondent2(Party.builder().build())
             .respondent1Represented(NO)
             .responseClaimTrack(SMALL_CLAIM.name())
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponseCarm(MediationLiPCarm.builder()
-                                                            .isMediationContactNameCorrect(YES)
-                                                            .build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1LiPResponseCarm(new MediationLiPCarm()
+                                                            .setIsMediationContactNameCorrect(YES)))
             .build();
 
         assertFalse(isCarmApplicableLipCase.test(caseData));
@@ -313,11 +303,9 @@ class PartAdmissionTransitionBuilderTest {
             .setClaimTypeToSpecClaim()
             .build().toBuilder()
             .responseClaimTrack(SMALL_CLAIM.name())
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponseCarm(MediationLiPCarm.builder()
-                                                            .isMediationContactNameCorrect(YES)
-                                                            .build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1LiPResponseCarm(new MediationLiPCarm()
+                                                            .setIsMediationContactNameCorrect(YES)))
             .build();
 
         assertTrue(isCarmApplicableLipCase.test(caseData));
@@ -330,9 +318,8 @@ class PartAdmissionTransitionBuilderTest {
             .setClaimTypeToSpecClaim()
             .build().toBuilder()
             .responseClaimTrack(SMALL_CLAIM.name())
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1ClaimMediationSpecRequiredLip(new ClaimantMediationLip()))
             .build();
 
         assertFalse(isCarmApplicableLipCase.test(caseData));
@@ -344,11 +331,9 @@ class PartAdmissionTransitionBuilderTest {
             .applicant1Represented(NO)
             .build().toBuilder()
             .responseClaimTrack(SMALL_CLAIM.name())
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponseCarm(MediationLiPCarm.builder()
-                                                            .isMediationContactNameCorrect(YES)
-                                                            .build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1LiPResponseCarm(new MediationLiPCarm()
+                                                            .setIsMediationContactNameCorrect(YES)))
             .build();
 
         assertFalse(isCarmApplicableLipCase.test(caseData));
@@ -489,9 +474,8 @@ class PartAdmissionTransitionBuilderTest {
             .atState2v1Applicant1NotProceedApplicant2Proceeds()
             .setClaimTypeToSpecClaim()
             .build().toBuilder()
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1SettleClaim(YES)
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1SettleClaim(YES))
             .build();
 
         assertFalse(getCarmEnabledForLipCase(caseData));
@@ -503,11 +487,9 @@ class PartAdmissionTransitionBuilderTest {
             .atState2v1Applicant1NotProceedApplicant2Proceeds()
             .setClaimTypeToSpecClaim()
             .build().toBuilder()
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponseCarm(MediationLiPCarm.builder()
-                                                            .isMediationContactNameCorrect(YES)
-                                                            .build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1LiPResponseCarm(new MediationLiPCarm()
+                                                            .setIsMediationContactNameCorrect(YES)))
             .build();
 
         assertTrue(getCarmEnabledForLipCase(caseData));
@@ -519,11 +501,9 @@ class PartAdmissionTransitionBuilderTest {
             .atState2v1Applicant1NotProceedApplicant2Proceeds()
             .setClaimTypeToSpecClaim()
             .build().toBuilder()
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
-                                                                      .isMediationContactNameCorrect(YES)
-                                                                      .build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setRespondent1MediationLiPResponseCarm(new MediationLiPCarm()
+                                                                      .setIsMediationContactNameCorrect(YES)))
             .build();
 
         assertTrue(getCarmEnabledForLipCase(caseData));

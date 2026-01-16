@@ -453,9 +453,8 @@ class DashboardClaimStatusFactoryTest {
         );
         CaseData caseData = previous.toBuilder()
             .hwfFeeType(FeeType.HEARING)
-            .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                   .hwfCaseEvent(CaseEvent.INVALID_HWF_REFERENCE)
-                                   .build())
+            .hearingHwfDetails(new HelpWithFeesDetails()
+                                   .setHwfCaseEvent(CaseEvent.INVALID_HWF_REFERENCE))
             .build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.CLAIMANT_HWF_INVALID_REF_NUMBER,
@@ -473,9 +472,8 @@ class DashboardClaimStatusFactoryTest {
             new CcdDashboardDefendantClaimMatcher(previous, toggleService, eventHistory)
         );
         CaseData caseData = previous.toBuilder()
-            .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                   .hwfCaseEvent(CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER)
-                                   .build())
+            .hearingHwfDetails(new HelpWithFeesDetails()
+                                   .setHwfCaseEvent(CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER))
             .build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.CLAIMANT_HWF_UPDATED_REF_NUMBER,
@@ -493,9 +491,8 @@ class DashboardClaimStatusFactoryTest {
             new CcdDashboardDefendantClaimMatcher(previous, toggleService, eventHistory)
         );
         CaseData caseData = previous.toBuilder()
-            .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                   .hwfCaseEvent(CaseEvent.MORE_INFORMATION_HWF)
-                                   .build())
+            .hearingHwfDetails(new HelpWithFeesDetails()
+                                   .setHwfCaseEvent(CaseEvent.MORE_INFORMATION_HWF))
             .build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.HWF_MORE_INFORMATION_NEEDED,
@@ -513,9 +510,8 @@ class DashboardClaimStatusFactoryTest {
             new CcdDashboardDefendantClaimMatcher(previous, toggleService, eventHistory)
         );
         CaseData caseData = previous.toBuilder()
-            .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                   .hwfCaseEvent(CaseEvent.NO_REMISSION_HWF)
-                                   .build())
+            .hearingHwfDetails(new HelpWithFeesDetails()
+                                   .setHwfCaseEvent(CaseEvent.NO_REMISSION_HWF))
             .build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.CLAIMANT_HWF_NO_REMISSION,
@@ -584,9 +580,8 @@ class DashboardClaimStatusFactoryTest {
         CaseData caseData = previous.toBuilder()
             .ccdState(CaseState.HEARING_READINESS)
             .hwfFeeType(FeeType.HEARING)
-            .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                   .hwfCaseEvent(CaseEvent.PARTIAL_REMISSION_HWF_GRANTED)
-                                   .build())
+            .hearingHwfDetails(new HelpWithFeesDetails()
+                                   .setHwfCaseEvent(CaseEvent.PARTIAL_REMISSION_HWF_GRANTED))
             .build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.CLAIMANT_HWF_PARTIAL_REMISSION,
@@ -615,9 +610,8 @@ class DashboardClaimStatusFactoryTest {
         CaseData caseData = previous.toBuilder()
             .ccdState(CaseState.HEARING_READINESS)
             .hwfFeeType(FeeType.HEARING)
-            .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                   .hwfCaseEvent(CaseEvent.FULL_REMISSION_HWF)
-                                   .build())
+            .hearingHwfDetails(new HelpWithFeesDetails()
+                                   .setHwfCaseEvent(CaseEvent.FULL_REMISSION_HWF))
             .build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.CLAIMANT_HWF_FULL_REMISSION,

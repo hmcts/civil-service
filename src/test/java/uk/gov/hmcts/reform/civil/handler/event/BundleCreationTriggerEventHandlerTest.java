@@ -142,20 +142,18 @@ class BundleCreationTriggerEventHandlerTest {
 
     private List<Element<UploadEvidenceWitness>> setupWitnessEvidenceDocs() {
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
-        witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
-                                                         .builder()
-                                                         .witnessOptionDocument(Document.builder().documentBinaryUrl(
-                                                                 TEST_URL)
-                                                                                    .documentFileName(TEST_FILE_NAME).build()).build()));
+        witnessEvidenceDocs.add(ElementUtils.element(new UploadEvidenceWitness()
+                                                         .setWitnessOptionDocument(Document.builder().documentBinaryUrl(
+                                                             TEST_URL)
+                                                                                         .documentFileName(TEST_FILE_NAME).build())));
         return witnessEvidenceDocs;
     }
 
     private List<Element<UploadEvidenceExpert>> setupExpertEvidenceDocs() {
         List<Element<UploadEvidenceExpert>> expertEvidenceDocs = new ArrayList<>();
-        expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
-                                                        .builder()
-                                                        .expertDocument(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                            .documentFileName(TEST_FILE_NAME).build()).build()));
+        expertEvidenceDocs.add(ElementUtils.element(new UploadEvidenceExpert()
+                                                        .setExpertDocument(Document.builder().documentBinaryUrl(TEST_URL)
+                                                                                .documentFileName(TEST_FILE_NAME).build())));
         return expertEvidenceDocs;
     }
 

@@ -103,13 +103,9 @@ public class TranslatedOrderNoticeUploadedDefendantNotificationHandlerTest exten
                     .atStatePendingClaimIssued()
                     .build().toBuilder()
                     .respondent1Represented(YesOrNo.NO)
-                    .caseDataLiP(CaseDataLiP
-                                     .builder()
-                                     .respondent1LiPResponse(RespondentLiPResponse
-                                                                 .builder()
-                                                                 .respondent1ResponseLanguage("BOTH")
-                                                                 .build())
-                                     .build())
+                    .caseDataLiP(new CaseDataLiP()
+                                     .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                                 .setRespondent1ResponseLanguage("BOTH")))
                     .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CaseEvent.NOTIFY_DEFENDANT_UPLOADED_DOCUMENT_ORDER_NOTICE.name())
@@ -134,13 +130,9 @@ public class TranslatedOrderNoticeUploadedDefendantNotificationHandlerTest exten
                 .atStatePendingClaimIssued()
                 .build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
-                .caseDataLiP(CaseDataLiP
-                                 .builder()
-                                 .respondent1LiPResponse(RespondentLiPResponse
-                                                             .builder()
-                                                             .respondent1ResponseLanguage("ENGLISH")
-                                                             .build())
-                                 .build())
+                .caseDataLiP(new CaseDataLiP()
+                                 .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                             .setRespondent1ResponseLanguage("ENGLISH")))
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CaseEvent.NOTIFY_DEFENDANT_UPLOADED_DOCUMENT_ORDER_NOTICE.name())
