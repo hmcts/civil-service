@@ -8,30 +8,30 @@ import uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil;
 
 @Slf4j
 @Component
-public class MigrateQueriesTask extends MigrationTask<CaseReference> {
+public class MigrateCaseQueriesTask extends MigrationTask<CaseReference> {
 
-    public MigrateQueriesTask() {
+    public MigrateCaseQueriesTask() {
         super(CaseReference.class);
     }
 
     @Override
     protected String getTaskName() {
-        return "MigrateQueriesTask";
+        return "MigrateCaseQueriesTask";
     }
 
     @Override
     protected String getEventSummary() {
-        return "Migrate queries via migration task";
+        return "Migrate case queries via migration task";
     }
 
     @Override
     protected String getEventDescription() {
-        return "This task migrates queries on the case";
+        return "This task migrates case queries on the case";
     }
 
     @Override
     protected CaseData migrateCaseData(CaseData caseData, CaseReference caseReference) {
-        log.info("Migrating queries for case reference: {}", caseReference.getCaseReference());
+        log.info("Migrating case queries for case reference: {}", caseReference.getCaseReference());
         CaseQueriesUtil.migrateAllQueries(caseData);
         return caseData;
     }

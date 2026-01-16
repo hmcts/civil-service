@@ -17,32 +17,32 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(MockitoExtension.class)
-class MigrateQueriesTaskTest {
+class MigrateCaseQueriesTaskTest {
 
-    private MigrateQueriesTask task;
+    private MigrateCaseQueriesTask task;
 
     @BeforeEach
     void setUp() {
-        task = new MigrateQueriesTask();
+        task = new MigrateCaseQueriesTask();
     }
 
     @Test
     void shouldReturnCorrectTaskName() {
-        assertThat(task.getTaskName()).isEqualTo("MigrateQueriesTask");
+        assertThat(task.getTaskName()).isEqualTo("MigrateCaseQueriesTask");
     }
 
     @Test
     void shouldReturnCorrectEventSummary() {
-        assertThat(task.getEventSummary()).isEqualTo("Migrate queries via migration task");
+        assertThat(task.getEventSummary()).isEqualTo("Migrate case queries via migration task");
     }
 
     @Test
     void shouldReturnCorrectEventDescription() {
-        assertThat(task.getEventDescription()).isEqualTo("This task migrates queries on the case");
+        assertThat(task.getEventDescription()).isEqualTo("This task migrates case queries on the case");
     }
 
     @Test
-    void shouldMigrateQueriesWhenOldQueriesExist() {
+    void shouldMigrateCaseQueriesWhenOldQueriesExist() {
         List<Element<CaseMessage>> messages = new ArrayList<>();
         CaseMessage caseMessage = new CaseMessage();
         caseMessage.setId("1");
@@ -67,7 +67,7 @@ class MigrateQueriesTaskTest {
     }
 
     @Test
-    void shouldNotMigrateWhenNoOldQueriesExist() {
+    void shouldNotMigrateWhenNoOldCaseQueriesExist() {
         CaseData caseData = CaseData.builder().build();
         CaseReference caseReference = CaseReference.builder().caseReference("123").build();
 
