@@ -15,10 +15,16 @@ import java.io.IOException;
 @SpringBootTest
 public class BaseContractTest {
 
-    protected static final String AUTHORIZATION_HEADER = "Authorization";
-    protected static final String SERVICE_AUTHORIZATION_HEADER = "ServiceAuthorization";
-    protected static final String AUTHORIZATION_TOKEN = "Bearer some-access-token";
-    protected static final String SERVICE_AUTH_TOKEN = "someServiceAuthToken";
+    public static final String AUTHORIZATION_HEADER = "Authorization";
+    public static final String SERVICE_AUTHORIZATION_HEADER = "ServiceAuthorization";
+    public static final String DATA_STORE_URL_HEADER = "Data-Store-Url";
+    public static final String ROLE_ASSIGNMENT_URL_HEADER = "Role-Assignment-Url";
+    public static final String HMCTS_DEPLOYMENT_ID_HEADER = "hmctsDeploymentId";
+    public static final String AUTHORIZATION_TOKEN = "Bearer some-access-token";
+    public static final String SERVICE_AUTH_TOKEN = "someServiceAuthToken";
+    public static final String DATA_STORE_URL = "http://data-store-url";
+    public static final String ROLE_ASSIGNMENT_URL = "http://role-assignment-url";
+    public static final String HMCTS_DEPLOYMENT_ID = "deployment-id";
 
     @Autowired
     protected ObjectMapper objectMapper;
