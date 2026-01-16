@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -15,6 +14,8 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 @Slf4j
 @Service
@@ -70,7 +71,7 @@ public class BulkPrintService {
         additionalData.put(ADDITIONAL_DATA_CASE_REFERENCE_NUMBER_KEY, claimReference);
         additionalData.put(RECIPIENTS, personList);
 
-        if (CollectionUtils.isNotEmpty(filenames)) {
+        if (isNotEmpty(filenames)) {
             additionalData.put(FILE_NAMES, filenames);
         }
         return additionalData;
