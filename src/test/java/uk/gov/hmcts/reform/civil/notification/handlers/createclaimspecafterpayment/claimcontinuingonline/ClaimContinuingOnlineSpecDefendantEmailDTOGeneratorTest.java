@@ -123,9 +123,8 @@ public class ClaimContinuingOnlineSpecDefendantEmailDTOGeneratorTest {
     @Test
     void shouldNotNotify_whenRespondentEmailIsNull() {
         CaseData caseData = CaseData.builder()
-            .respondent1Represented(YesOrNo.YES)
-            .respondent1(Party.builder()
-                             .partyEmail("defendant@email.com").build())
+            .respondent1Represented(YesOrNo.NO)
+            .respondent1(Party.builder().build())
             .build();
 
         assertThat(generator.getShouldNotify(caseData)).isFalse();

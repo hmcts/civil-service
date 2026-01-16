@@ -52,6 +52,7 @@ public class ClaimContinuingOnlineSpecDefendantEmailDTOGenerator extends Defenda
         return properties;
     }
 
+    @Override
     public Boolean getShouldNotify(CaseData caseData) {
         return caseData.isRespondent1LiP() &&  caseData.getRespondent1PartyEmail() != null ? Boolean.TRUE : Boolean.FALSE;
     }
