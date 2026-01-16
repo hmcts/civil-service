@@ -792,6 +792,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         caseData.setSdoR2SmallClaimsUseOfWelshLanguage(sdoR2WelshLanguageUsage);
         caseData.setSdoR2DisposalHearingUseOfWelshLanguage(sdoR2WelshLanguageUsage);
 
+        caseData.setSmallClaimsPenalNotice(DEFAULT_PENAL_NOTICE);
+        caseData.setFastTrackPenalNotice(DEFAULT_PENAL_NOTICE);
+        caseData.setSmallClaimsPenalNoticeToggle(new ArrayList<>());
+        caseData.setFastTrackPenalNoticeToggle(new ArrayList<>());
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
@@ -1223,7 +1228,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             caseData.setSetSmallClaimsFlag(YES);
-            caseData.setSmallClaimsPenalNotice(DEFAULT_PENAL_NOTICE);
             if (SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
                 caseData.setIsSdoR2NewScreen(YES);
             }

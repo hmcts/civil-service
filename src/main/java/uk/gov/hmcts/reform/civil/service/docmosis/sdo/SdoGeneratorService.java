@@ -338,6 +338,8 @@ public class SdoGeneratorService {
                 SdoHelper.hasFastTrackVariable(caseData, "sdoR2FastTrackUseOfWelshToggle"))
             .welshLanguageDescription(caseData.getSdoR2FastTrackUseOfWelshLanguage() != null
                                           ? caseData.getSdoR2FastTrackUseOfWelshLanguage().getDescription() : null);
+        sdoDocumentFormBuilder.showPenalNotice(SdoHelper.hasFastTrackVariable(caseData, "fastTrackPenalNoticeToggle"))
+            .penalNoticeText(caseData.getFastTrackPenalNotice());
         sdoDocumentFormBuilder.sdoR2WitnessesOfFact(caseData.getSdoR2FastTrackWitnessOfFact())
             .sdoR2FastTrackCreditHire(caseData.getSdoR2FastTrackCreditHire());
 

@@ -892,6 +892,7 @@ public class SdoHelperTest {
                 .smallClaimsDocumentsToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .smallClaimsWitnessStatementToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .smallClaimsFlightDelayToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
+                .smallClaimsPenalNoticeToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .build();
 
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsHearingToggle")).isTrue();
@@ -900,6 +901,8 @@ public class SdoHelperTest {
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsWitnessStatementToggle"))
                 .isTrue();
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsFlightDelayToggle"))
+                .isTrue();
+            assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsPenalNoticeToggle"))
                 .isTrue();
         }
 
@@ -1129,6 +1132,7 @@ public class SdoHelperTest {
                 .fastTrackCostsToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .fastTrackMethodToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .fastTrackTrialToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
+                .fastTrackPenalNoticeToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .build();
 
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackAltDisputeResolutionToggle"))
@@ -1143,6 +1147,7 @@ public class SdoHelperTest {
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackCostsToggle")).isTrue();
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialToggle")).isTrue();
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackMethodToggle")).isTrue();
+            assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackPenalNoticeToggle")).isTrue();
         }
 
         @Test

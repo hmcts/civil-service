@@ -2408,37 +2408,49 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldSetSmallClaimsPenalNoticeWhenSmallClaimsTrack() {
+        void shouldSetPenalNoticesInPrePopulateOrderDetailsPages() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .build();
-            caseData.setDrawDirectionsOrderRequired(YES);
-            caseData.setDrawDirectionsOrderSmallClaims(YES);
-            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+            given(locationRefDataService.getHearingCourtLocations(anyString())).willReturn(Collections.emptyList());
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
+                "Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
+                categorySearchResult));
 
-            CallbackParams params = callbackParamsOf(caseData, MID, "order-details-navigation");
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(data.getSmallClaimsPenalNotice()).isEqualTo(DEFAULT_PENAL_NOTICE);
+            assertThat(data.getFastTrackPenalNotice()).isEqualTo(DEFAULT_PENAL_NOTICE);
+            // Empty lists may be serialized as null during JSON conversion, both are acceptable for "default/false" state
+            assertThat(data.getSmallClaimsPenalNoticeToggle() == null || data.getSmallClaimsPenalNoticeToggle().isEmpty()).isTrue();
+            assertThat(data.getFastTrackPenalNoticeToggle() == null || data.getFastTrackPenalNoticeToggle().isEmpty()).isTrue();
         }
 
         @Test
-        void shouldNotSetSmallClaimsPenalNoticeWhenFastTrack() {
+        void shouldSetPenalNoticeTogglesToEmptyListByDefault() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .build();
-            caseData.setDrawDirectionsOrderRequired(NO);
-            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
-            caseData.setFastClaims(List.of(FastTrack.fastClaimBuildingDispute));
+            given(locationRefDataService.getHearingCourtLocations(anyString())).willReturn(Collections.emptyList());
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
+                "Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
+                categorySearchResult));
 
-            CallbackParams params = callbackParamsOf(caseData, MID, "order-details-navigation");
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(data.getSmallClaimsPenalNotice()).isNull();
+            // Empty lists may be serialized as null during JSON conversion, both are acceptable for "default/false" state
+            assertThat(data.getSmallClaimsPenalNoticeToggle() == null || data.getSmallClaimsPenalNoticeToggle().isEmpty()).isTrue();
+            assertThat(data.getFastTrackPenalNoticeToggle() == null || data.getFastTrackPenalNoticeToggle().isEmpty()).isTrue();
         }
 
         @Test
