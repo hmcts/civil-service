@@ -33,23 +33,24 @@ class MigrateQueriesTaskTest {
 
     @Test
     void shouldReturnCorrectEventSummary() {
-        assertThat(task.getEventSummary()).isEqualTo("Migrate queries");
+        assertThat(task.getEventSummary()).isEqualTo("Migrate queries via migration task");
     }
 
     @Test
     void shouldReturnCorrectEventDescription() {
-        assertThat(task.getEventDescription()).isEqualTo("Migrate queries");
+        assertThat(task.getEventDescription()).isEqualTo("This task migrates queries on the case");
     }
 
     @Test
     void shouldMigrateQueriesWhenOldQueriesExist() {
         List<Element<CaseMessage>> messages = new ArrayList<>();
-        messages.add(element(CaseMessage.builder().id("1").build()));
+        CaseMessage caseMessage = new CaseMessage();
+        caseMessage.setId("1");
+        messages.add(element(caseMessage));
 
-        CaseQueriesCollection oldCollection = CaseQueriesCollection.builder()
-            .caseMessages(messages)
-            .partyName("Old Party")
-            .build();
+        CaseQueriesCollection oldCollection = new CaseQueriesCollection();
+        oldCollection.setPartyName("Old Party");
+        oldCollection.setCaseMessages(messages);
 
         CaseData caseData = CaseData.builder()
             .qmApplicantSolicitorQueries(oldCollection)

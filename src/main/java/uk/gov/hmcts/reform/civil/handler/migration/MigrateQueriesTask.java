@@ -21,12 +21,12 @@ public class MigrateQueriesTask extends MigrationTask<CaseReference> {
 
     @Override
     protected String getEventSummary() {
-        return "Migrate queries";
+        return "Migrate queries via migration task";
     }
 
     @Override
     protected String getEventDescription() {
-        return "Migrate queries";
+        return "This task migrates queries on the case";
     }
 
     @Override
