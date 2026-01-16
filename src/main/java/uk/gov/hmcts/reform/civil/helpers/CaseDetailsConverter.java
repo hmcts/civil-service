@@ -5,11 +5,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.model.BaseCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static uk.gov.hmcts.reform.civil.helpers.CaseTypeIdentifier.isGeneralApplication;
 
 @Service
 public class CaseDetailsConverter {
@@ -19,6 +23,14 @@ public class CaseDetailsConverter {
     public CaseDetailsConverter(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
         this.objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+    }
+
+    public BaseCaseData toBaseCaseData(CaseDetails caseDetails) {
+        if (isGeneralApplication(caseDetails)) {
+            return toGeneralApplicationCaseData(caseDetails);
+        } else {
+            return toCaseData(caseDetails);
+        }
     }
 
     public CaseData toCaseData(CaseDetails caseDetails) {
@@ -33,6 +45,18 @@ public class CaseDetailsConverter {
 
     public CaseData toCaseData(Map<String, Object> caseDataMap) {
         return objectMapper.convertValue(caseDataMap, CaseData.class);
+    }
+
+    public GeneralApplicationCaseData toGeneralApplicationCaseData(CaseDetails caseDetails) {
+        final Map<String, Object> data = new HashMap<>(caseDetails.getData());
+        data.put("ccdCaseReference", caseDetails.getId());
+        if (caseDetails.getState() != null) {
+            data.put("ccdState", CaseState.valueOf(caseDetails.getState()));
+        }
+        if (caseDetails.getCreatedDate() != null) {
+            data.put("createdDate", caseDetails.getCreatedDate());
+        }
+        return objectMapper.convertValue(data, GeneralApplicationCaseData.class);
     }
 
     public CaseData toGACaseData(CaseDetails caseDetails) {

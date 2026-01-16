@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.ga.service.GaFeesPaymentService;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.service.FeesPaymentService;
 
@@ -26,7 +27,10 @@ public class FeesPaymentController {
 
     public static final String FEES_PAYMENT_REQUEST_URL = "/fees/{feeType}/case/{caseReference}/payment";
     public static final String FEES_PAYMENT_STATUS_URL = "/fees/{feeType}/case/{caseReference}/payment/{paymentReference}/status";
+    public static final String GA_FEES_PAYMENT_REQUEST_URL = "/fees/case/{caseReference}/ga/payment";
+    public static final String GA_FEES_PAYMENT_STATUS_URL = "/fees/case/{caseReference}/ga/payment/{paymentReference}/status";
     private final FeesPaymentService feesPaymentService;
+    private final GaFeesPaymentService gaFeesPaymentService;
 
     @PostMapping(path = FEES_PAYMENT_REQUEST_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @Operation(summary = "Citizen UI will call this API and will get gov pay link for payment")
@@ -56,6 +60,36 @@ public class FeesPaymentController {
         @PathVariable("paymentReference") String paymentReference) {
         return new ResponseEntity<>(
             feesPaymentService.getGovPaymentRequestStatus(feeType, caseReference, paymentReference, authorization),
+            HttpStatus.OK
+        );
+    }
+
+    @PostMapping(path = GA_FEES_PAYMENT_REQUEST_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Citizen UI will call this API and will get gov pay link for general application payment")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successful Gov pay link is created."),
+        @ApiResponse(responseCode = "400", description = "Bad Request")})
+    public ResponseEntity<CardPaymentStatusResponse> createGaGovPaymentRequest(
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
+        @PathVariable("caseReference") String caseReference) {
+
+        return new ResponseEntity<>(
+            gaFeesPaymentService.createGovPaymentRequest(caseReference, authorization),
+            HttpStatus.OK
+        );
+    }
+
+    @GetMapping(path = GA_FEES_PAYMENT_STATUS_URL, produces = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Citizen UI will call this API and will get status of gov pay general application payment")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successful Gov pay status."),
+        @ApiResponse(responseCode = "400", description = "Bad Request")})
+    public ResponseEntity<CardPaymentStatusResponse> getGaGovPaymentRequestStatus(
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
+        @PathVariable("caseReference") String caseReference,
+        @PathVariable("paymentReference") String paymentReference) {
+        return new ResponseEntity<>(
+            gaFeesPaymentService.getGovPaymentRequestStatus(caseReference, paymentReference, authorization),
             HttpStatus.OK
         );
     }

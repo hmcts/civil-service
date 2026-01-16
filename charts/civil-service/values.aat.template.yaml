@@ -31,6 +31,23 @@ java:
     CASE_FLAGS_LOGGING_ENABLED: true
     COURT_LOCATION_WA_DMN_ENABLED: true
     TASK_MANAGEMENT_ENABLED: false
+    IDAM_CLIENT_ID: civil-service
+    IDAM_CLIENT_REDIRECT_URI: https://civil-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal/oauth2/callback
+    IDAM_API_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
+    IDAM_WEB_URL: https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net
+    IDAM_S2S_AUTH_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    MANAGE_CASE_UI_BASE_URL: https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net
+    SPRING_SECURITY_ENABLED: true
+    RESPONSE_DEADLINE_CHECK_EVENT_EMITTER_ENABLED: false
+    PAY_CALLBACK_URL: https://${SERVICE_NAME}.preview.platform.hmcts.net/service-request-update
+    SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUERURI: https://forgerock-am.service.core-compute-idam-{{ .Values.global.environment }}.internal:8443/openam/oauth2/hmcts
+    SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWKSETURI: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net/o/jwks
+    AUTH_IDAM_CLIENT_BASEURL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
+    AUTH_PROVIDER_SERVICE_CLIENT_BASEURL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    FEES_API_URL: http://fees-register-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    GENAPP_LRD_URL: http://rd-location-ref-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    PAYMENTS_API_URL: http://payment-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    DOCUMENT_MANAGEMENT_URL: http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
 
   keyVaults:
     civil:
@@ -82,6 +99,8 @@ java:
           alias: mediation.emails.jsonRecipient
         - name: hmc-servicebus-shared-access-key-tf
           alias: HMC_HEARINGS_TOPIC_ACCESS_KEY
+        - name: AppInsightsInstrumentationKey
+          alias: azure.application-insights.instrumentation-key
   postgresql:
     enabled: true
     image:
