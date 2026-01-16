@@ -12,15 +12,15 @@ import java.util.UUID;
 
 @Slf4j
 @Component
-public class UpdateCaseNoteTask extends MigrationTask<CaseNoteReference> {
+public class RemoveCaseNoteTask extends MigrationTask<CaseNoteReference> {
 
-    public UpdateCaseNoteTask() {
+    public RemoveCaseNoteTask() {
         super(CaseNoteReference.class);
     }
 
     @Override
     protected String getEventSummary() {
-        return "Update case note via migration task";
+        return "Remove case note via migration task";
     }
 
     @Override
@@ -29,7 +29,7 @@ public class UpdateCaseNoteTask extends MigrationTask<CaseNoteReference> {
         if (caseNotes != null) {
             caseNotes.removeIf(caseNoteElement -> caseNoteElement.getId().equals(UUID.fromString(obj.getCaseNoteElementId())));
             caseData.setCaseNotes(caseNotes);
-            log.info("Case note for given caseId {} and given caseNoteItemId {} removed successfully",
+            log.info("Case note for given caseId {} and given caseNoteElementId {} removed successfully",
                      obj.getCaseReference(), obj.getCaseNoteElementId());
         }
         return caseData;
@@ -37,11 +37,11 @@ public class UpdateCaseNoteTask extends MigrationTask<CaseNoteReference> {
 
     @Override
     protected String getEventDescription() {
-        return "This task updates case notes on the case";
+        return "This task removes case note on the case";
     }
 
     @Override
     protected String getTaskName() {
-        return "UpdateCaseNoteTask";
+        return "RemoveCaseNoteTask";
     }
 }

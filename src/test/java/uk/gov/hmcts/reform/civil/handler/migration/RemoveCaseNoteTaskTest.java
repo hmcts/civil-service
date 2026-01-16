@@ -17,28 +17,28 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(MockitoExtension.class)
-class UpdateCaseNoteTaskTest {
+class RemoveCaseNoteTaskTest {
 
-    private UpdateCaseNoteTask task;
+    private RemoveCaseNoteTask task;
 
     @BeforeEach
     void setUp() {
-        task = new UpdateCaseNoteTask();
+        task = new RemoveCaseNoteTask();
     }
 
     @Test
     void shouldReturnCorrectTaskName() {
-        assertThat(task.getTaskName()).isEqualTo("UpdateCaseNoteTask");
+        assertThat(task.getTaskName()).isEqualTo("RemoveCaseNoteTask");
     }
 
     @Test
     void shouldReturnCorrectEventSummary() {
-        assertThat(task.getEventSummary()).isEqualTo("Update case note via migration task");
+        assertThat(task.getEventSummary()).isEqualTo("Remove case note via migration task");
     }
 
     @Test
     void shouldReturnCorrectEventDescription() {
-        assertThat(task.getEventDescription()).isEqualTo("This task updates case notes on the case");
+        assertThat(task.getEventDescription()).isEqualTo("This task removes case note on the case");
     }
 
     @Test
