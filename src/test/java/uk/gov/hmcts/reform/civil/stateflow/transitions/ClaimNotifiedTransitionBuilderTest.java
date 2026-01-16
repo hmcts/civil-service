@@ -8,6 +8,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.NotificationPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
@@ -16,8 +19,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.hasNotifiedClaimDetailsToBoth;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimDetailsNotified;
 
 @ExtendWith(MockitoExtension.class)
 public class ClaimNotifiedTransitionBuilderTest {
@@ -48,13 +49,13 @@ public class ClaimNotifiedTransitionBuilderTest {
     @Test
     void shouldReturnTrue_whenCaseDataIsAtClaimDetailsNotifiedState() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-        assertTrue(hasNotifiedClaimDetailsToBoth.test(caseData));
+        assertTrue(ClaimPredicate.isSpec.negate().and(NotificationPredicate.hasClaimDetailsNotifiedToBoth).test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenCaseDataIsAtClaimNotifiedState() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
-        assertFalse(hasNotifiedClaimDetailsToBoth.test(caseData));
+        assertFalse(ClaimPredicate.isSpec.negate().and(NotificationPredicate.hasClaimDetailsNotifiedToBoth).test(caseData));
     }
 
     @Test
@@ -63,7 +64,7 @@ public class ClaimNotifiedTransitionBuilderTest {
             .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
             .build();
 
-        assertTrue(hasNotifiedClaimDetailsToBoth.test(caseData));
+        assertTrue(ClaimPredicate.isSpec.negate().and(NotificationPredicate.hasClaimDetailsNotifiedToBoth).test(caseData));
     }
 
     @Test
@@ -72,8 +73,8 @@ public class ClaimNotifiedTransitionBuilderTest {
             .atStateClaimDetailsNotified_1v2_andNotifyOnlyOneSolicitor()
             .build();
 
-        assertTrue(takenOfflineAfterClaimDetailsNotified.test(caseData));
-        assertFalse(hasNotifiedClaimDetailsToBoth.test(caseData));
+        assertTrue(TakenOfflinePredicate.afterClaimDetailsNotified.test(caseData));
+        assertFalse(ClaimPredicate.isSpec.negate().and(NotificationPredicate.hasClaimDetailsNotifiedToBoth).test(caseData));
     }
 
     @Test
@@ -82,8 +83,8 @@ public class ClaimNotifiedTransitionBuilderTest {
             .atStateClaimDetailsNotified()
             .build();
 
-        assertTrue(hasNotifiedClaimDetailsToBoth.test(caseData));
-        assertFalse(takenOfflineAfterClaimDetailsNotified.test(caseData));
+        assertTrue(ClaimPredicate.isSpec.negate().and(NotificationPredicate.hasClaimDetailsNotifiedToBoth).test(caseData));
+        assertFalse(TakenOfflinePredicate.afterClaimDetailsNotified.test(caseData));
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {

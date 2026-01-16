@@ -143,13 +143,6 @@ public non-sealed interface ResponsePredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Response",
-        summary = "One-v-one response flag (spec)",
-        description = "Flag indicating a one‑v‑one response was provided (used in SPEC response routing)"
-    )
-    Predicate<CaseData> isOneVOneResponseFlagSpec = CaseDataPredicate.Claim.hasOneVOneResponseFlag;
-
-    @BusinessRule(
-        group = "Response",
         summary = "Matches the specified non-SPEC response type",
         description = "Checks if respondent response type(s) for UNSPEC match the given RespondentResponseType for " +
             "multi‑party scenario"
