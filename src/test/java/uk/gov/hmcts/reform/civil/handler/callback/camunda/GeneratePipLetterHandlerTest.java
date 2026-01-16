@@ -24,6 +24,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -62,11 +63,12 @@ class GeneratePipLetterHandlerTest {
     @Test
     void shouldGenerateAndPrintLetterSuccessfully() {
         when(time.now()).thenReturn(LocalDateTime.now());
-        when(pipLetterGenerator.downloadLetter(any(CaseData.class), any(String.class)))
+        when(pipLetterGenerator.downloadLetter(any(CaseData.class), any(String.class), anyList()))
                 .thenReturn(new byte[]{1, 2, 3, 4});
 
         CaseData caseData = CaseData.builder()
                 .legacyCaseReference("12345")
+                .ccdCaseReference(12345L)
                 .respondent1(Party.builder().partyName("Test Respondent").type(Party.Type.COMPANY).build())
                 .respondent1Represented(YesOrNo.NO)
                 .build();
@@ -83,7 +85,8 @@ class GeneratePipLetterHandlerTest {
                 "12345",
                 "12345",
                 "first-contact-pack",
-                Collections.singletonList(caseData.getRespondent1().getPartyName())
+                Collections.singletonList(caseData.getRespondent1().getPartyName()),
+                List.of()
         );
         assertThat(response.getState()).isEqualTo("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
     }

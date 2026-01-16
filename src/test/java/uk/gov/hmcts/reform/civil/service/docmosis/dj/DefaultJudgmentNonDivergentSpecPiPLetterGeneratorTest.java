@@ -63,12 +63,12 @@ class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final String CLAIM_REFERENCE = "ABC";
     private static String fileNameTrial = "PinAndPost.pdf";
-    private static final String fileName = String.format(DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_LIP_DEFENDANT_LETTER.getDocumentTitle(), CLAIM_REFERENCE);
+    private static final String FILE_NAME = String.format(DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_LIP_DEFENDANT_LETTER.getDocumentTitle(), CLAIM_REFERENCE);
     private static final String PIN = "1234789";
     private static final CaseDocument CASE_DOCUMENT_TRIAL = CaseDocument.builder()
         .documentName(fileNameTrial)
         .documentType(DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER)
-        .documentLink(Document.builder().documentFileName(fileName).documentBinaryUrl("Binary/url").documentUrl("url").build())
+        .documentLink(Document.builder().documentFileName(FILE_NAME).documentBinaryUrl("Binary/url").documentUrl("url").build())
         .build();
     private static final Address RESPONDENT_ADDRESS = Address.builder().addressLine1("123 road")
         .postTown("London")
@@ -149,7 +149,7 @@ class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_LIP_DEFENDANT_LETTER)))
             .thenReturn(new DocmosisDocument(DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_LIP_DEFENDANT_LETTER.getDocumentTitle(), bytes));
         when(documentManagementService
-                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER)))
+                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER)))
             .thenReturn(CASE_DOCUMENT_TRIAL);
         given(documentDownloadService.downloadDocument(any(), any()))
             .willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
@@ -163,14 +163,15 @@ class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
 
         assertThat(letterContentByteData).isNotNull();
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER));
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER));
         verify(bulkPrintService)
             .printLetter(
                 LETTER_CONTENT,
                 CASE_DATA.getLegacyCaseReference(),
                 CASE_DATA.getLegacyCaseReference(),
                 DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER_REF,
-                List.of(CASE_DATA.getRespondent1().getPartyName())
+                List.of(CASE_DATA.getRespondent1().getPartyName()),
+                List.of("default_judgment_non_divergent_spec_pin_letter.pdf", "DefendantDJ.pdf")
             );
     }
 

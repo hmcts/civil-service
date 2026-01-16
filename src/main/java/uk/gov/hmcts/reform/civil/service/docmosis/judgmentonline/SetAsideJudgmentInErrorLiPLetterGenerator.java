@@ -57,8 +57,9 @@ public class SetAsideJudgmentInErrorLiPLetterGenerator {
         }
 
         List<String> recipients = getRecipientsList(caseData);
+        List<String> bulkPrintFileNames = List.of(setAsideLetterCaseDocument.getDocumentLink().getDocumentFileName());
         bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
-                caseData.getLegacyCaseReference(), SET_ASIDE_JUDGMENT_LETTER, recipients);
+                caseData.getLegacyCaseReference(), SET_ASIDE_JUDGMENT_LETTER, recipients, bulkPrintFileNames);
         return letterContent;
     }
 

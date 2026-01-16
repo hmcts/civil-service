@@ -11,9 +11,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
@@ -21,15 +21,15 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.docmosis.judgmentonline.JudgmentByAdmissionLiPDefendantLetter;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
+import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 
 import java.math.BigDecimal;
@@ -38,10 +38,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -59,13 +59,13 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final String CLAIM_REFERENCE = "ABC";
-    private static final String fileName = String.format(JUDGMENT_BY_ADMISSION_PIN_IN_POST_LIP_DEFENDANT_LETTER.getDocumentTitle(), CLAIM_REFERENCE);
+    private static final String FILE_NAME = JUDGMENT_BY_ADMISSION_PIN_IN_POST_LIP_DEFENDANT_LETTER.getDocumentTitle();
     private static final String PIN = "1234789";
     private static final String JUDGMENT_BY_ADMISSION_LETTER = "judgment-by-admission-letter";
     private static final CaseDocument CASE_DOCUMENT_TRIAL = CaseDocument.builder()
         .documentName("PinAndPost.pdf")
         .documentType(DocumentType.JUDGMENT_BY_ADMISSION_NON_DIVERGENT_SPEC_PIP_LETTER)
-        .documentLink(Document.builder().documentFileName(fileName).documentBinaryUrl("Binary/url").documentUrl("url").build())
+        .documentLink(Document.builder().documentFileName(FILE_NAME).documentBinaryUrl("Binary/url").documentUrl("url").build())
         .build();
 
     private static final Address RESPONDENT_ADDRESS = Address.builder().addressLine1("123 road")
@@ -128,12 +128,6 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
     @MockBean
     private GeneralAppFeesService generalAppFeesService;
 
-    private static final String forename = "Judge";
-
-    private static final String surname = "Dredd";
-
-    private static final List<String> roles = List.of("role");
-
     private static final CaseDocument STITCHED_DOC =
         CaseDocument.builder()
             .createdBy("James")
@@ -143,7 +137,7 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
             .createdDatetime(LocalDateTime.now())
             .documentLink(Document.builder()
                               .documentUrl("fake-url")
-                              .documentFileName("file-name")
+                              .documentFileName("file-name.pdf")
                               .documentBinaryUrl("binary-url")
                               .build()).build();
 
@@ -153,7 +147,7 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
             JUDGMENT_BY_ADMISSION_PIN_IN_POST_LIP_DEFENDANT_LETTER)))
             .thenReturn(new DocmosisDocument(JUDGMENT_BY_ADMISSION_PIN_IN_POST_LIP_DEFENDANT_LETTER.getDocumentTitle(), bytes));
         when(documentManagementService
-                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DocumentType.JUDGMENT_BY_ADMISSION_NON_DIVERGENT_SPEC_PIP_LETTER)))
+                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DocumentType.JUDGMENT_BY_ADMISSION_NON_DIVERGENT_SPEC_PIP_LETTER)))
             .thenReturn(CASE_DOCUMENT_TRIAL);
         given(documentDownloadService.downloadDocument(any(), any()))
             .willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
@@ -168,14 +162,15 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
 
         assertThat(letterContentByteData).isNotNull();
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DocumentType.JUDGMENT_BY_ADMISSION_NON_DIVERGENT_SPEC_PIP_LETTER));
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, DocumentType.JUDGMENT_BY_ADMISSION_NON_DIVERGENT_SPEC_PIP_LETTER));
         verify(bulkPrintService)
             .printLetter(
                 LETTER_CONTENT,
                 CASE_DATA.getLegacyCaseReference(),
                 CASE_DATA.getLegacyCaseReference(),
                 JUDGMENT_BY_ADMISSION_LETTER,
-                List.of(CASE_DATA.getRespondent1().getPartyName())
+                List.of(CASE_DATA.getRespondent1().getPartyName()),
+                List.of("file-name.pdf")
             );
     }
 

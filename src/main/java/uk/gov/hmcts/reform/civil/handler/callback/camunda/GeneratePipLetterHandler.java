@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -77,11 +78,15 @@ public class GeneratePipLetterHandler extends CallbackHandler {
     private void generateAndPrintPipLetter(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         log.info("generateAndPrintPipLetter for case {}", caseData.getCcdCaseReference());
-        byte[] letterContent = pipLetterGenerator.downloadLetter(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
+        List<String> bulkPrintFileNames = new ArrayList<>();
+        byte[] letterContent = pipLetterGenerator.downloadLetter(caseData,
+                                                                 callbackParams.getParams().get(BEARER_TOKEN).toString(),
+                                                                 bulkPrintFileNames);
+
         List<String> recipients = Collections.singletonList(caseData.getRespondent1().getPartyName());
         log.info("Printing letter for case {}", caseData.getCcdCaseReference());
         bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
-                caseData.getLegacyCaseReference(), FIRST_CONTACT_PACK_LETTER_TYPE, recipients);
+            String.valueOf(caseData.getCcdCaseReference()), FIRST_CONTACT_PACK_LETTER_TYPE, recipients, bulkPrintFileNames);
         log.info("Finished printing letter for case {}", caseData.getCcdCaseReference());
     }
 

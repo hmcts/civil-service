@@ -12,8 +12,10 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.service.UserService;
+
 import java.time.LocalDateTime;
-import java.util.Arrays;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -22,7 +24,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SETTLE_CLAIM_PAID_IN_FULL_LETTER;
 
 @ExtendWith(SpringExtension.class)
-public class DocumentDownloadServiceTest {
+class DocumentDownloadServiceTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
     @Mock
@@ -79,19 +81,13 @@ public class DocumentDownloadServiceTest {
         // when
         byte[] actualDoc = documentDownloadService.downloadDocument(caseDocument, BEARER_TOKEN, documentId, "error");
         //Then
-        Arrays.equals(actualDoc, expectedDoc);
+        assertArrayEquals(actualDoc, expectedDoc);
     }
 
     @Test
     void testDownloadDocumentByteArray_Error() {
         // given
         String documentId = "documentId";
-        byte[] expectedDoc = "test".getBytes();
-        ByteArrayResource expectedDocResources = new ByteArrayResource(expectedDoc);
-
-        DownloadedDocumentResponse downloadedDoc = new DownloadedDocumentResponse(expectedDocResources,
-                                           "test", "test");
-
         when(userService.getAccessToken(any(), any())).thenReturn("arbitrary access token");
         when(documentManagementService.downloadDocumentWithMetaData(anyString(), anyString())).thenThrow(new RuntimeException());
 

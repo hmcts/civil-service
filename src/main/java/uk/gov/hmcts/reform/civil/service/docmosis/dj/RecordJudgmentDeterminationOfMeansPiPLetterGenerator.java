@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadServ
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.OTHER;
@@ -60,8 +61,11 @@ public class RecordJudgmentDeterminationOfMeansPiPLetterGenerator {
         }
 
         List<String> recipients = getRecipientsList(caseData);
+        List<String> bulkPrintFileNames = new ArrayList<>();
+        bulkPrintFileNames.add(recordJudgmentDeterminationOfMeansLetterCaseDocument.getDocumentLink().getDocumentFileName());
         bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
-                                     caseData.getLegacyCaseReference(), RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LETTER, recipients);
+                                     caseData.getLegacyCaseReference(), RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LETTER,
+                                     recipients, bulkPrintFileNames);
         return letterContent;
     }
 

@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.CoverLetterService;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,8 +21,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.POST_DJ_NON_DIVERGENT_COVER_LETTER_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFAULT_JUDGMENT_CLAIMANT1;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFAULT_JUDGMENT_COVER_LETTER;
 
-@SuppressWarnings("unchecked")
 @Service
 @RequiredArgsConstructor
 public class PostDJNonDivergentCoverLetterLiPClaimantHandler extends CallbackHandler {
@@ -52,7 +53,7 @@ public class PostDJNonDivergentCoverLetterLiPClaimantHandler extends CallbackHan
 
     private CallbackResponse postCoverLetterToLiPClaimant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
+        List<String> bulkPrintFileNames = new ArrayList<>();
         if (caseData.isApplicantLiP()) {
             var claimantDJDoc = caseData.getDefaultJudgmentDocuments().stream()
                 .filter(document -> document.getValue().getDocumentType().equals(DEFAULT_JUDGMENT_CLAIMANT1))
@@ -63,7 +64,8 @@ public class PostDJNonDivergentCoverLetterLiPClaimantHandler extends CallbackHan
                 claimantDJDoc.getValue().getDocumentName(),
                 LocalDate.now().toString()
             ));
-
+            bulkPrintFileNames.add(claimantDJDoc.getValue().getDocumentLink().getDocumentFileName());
+            bulkPrintFileNames.add(DEFAULT_JUDGMENT_COVER_LETTER.getDocumentTitle());
             byte[] claimantDjLetterBinary = coverLetterGeneratorService.generateDocumentWithCoverLetterBinary(
                 caseData.getApplicant1(), caseData, documents,
                 "Claimant DJ letter.pdf",
@@ -72,7 +74,7 @@ public class PostDJNonDivergentCoverLetterLiPClaimantHandler extends CallbackHan
             List<String> recipients = List.of(caseData.getApplicant1().getPartyName());
             bulkPrintService.printLetter(
                 claimantDjLetterBinary, caseData.getLegacyCaseReference(),
-                caseData.getLegacyCaseReference(), COVER_LETTER_REF, recipients
+                caseData.getLegacyCaseReference(), COVER_LETTER_REF, recipients, bulkPrintFileNames
             );
         }
 

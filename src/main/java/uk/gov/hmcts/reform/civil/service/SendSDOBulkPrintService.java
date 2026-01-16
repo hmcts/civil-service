@@ -42,7 +42,7 @@ public class SendSDOBulkPrintService {
                     caseData.getSDODocument().map(Element::getValue).ifPresent(caseDocuments::add);
                     caseData.getTranslatedSDODocument().map(Element::getValue).ifPresent(caseDocuments::add);
                 }
-                default -> { }
+                default -> throw new IllegalArgumentException("Unexpected value: " + language);
             }
 
             if (!caseDocuments.isEmpty()) {
@@ -53,8 +53,10 @@ public class SendSDOBulkPrintService {
                                                                                     caseDocuments.toArray(new CaseDocument[0]));
 
                 List<String> recipients = getRecipientsList(caseData, taskId);
+                List<String> bulkPrintFileNames = new ArrayList<>();
+                caseDocuments.forEach(document -> bulkPrintFileNames.add(document.getDocumentLink().getDocumentFileName()));
                 bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
-                                             caseData.getLegacyCaseReference(), SDO_ORDER_PACK_LETTER_TYPE, recipients);
+                                             caseData.getLegacyCaseReference(), SDO_ORDER_PACK_LETTER_TYPE, recipients, bulkPrintFileNames);
             }
         }
     }

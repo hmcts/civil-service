@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
@@ -78,12 +77,12 @@ class SendFinalOrderBulkPrintServiceTest {
         return caseData;
     }
 
-    private CaseData buildCaseData(Party party, DocumentType documentType1, DocumentType documentType2, boolean addFinalOrder) {
+    private CaseData buildCaseData(Party party) {
         CaseDocument caseDocument1 = new CaseDocument();
-        caseDocument1.setDocumentType(documentType1);
+        caseDocument1.setDocumentType(JUDGE_FINAL_ORDER);
         caseDocument1.setDocumentLink(DOCUMENT_LINK);
         CaseDocument caseDocument2 = new CaseDocument();
-        caseDocument2.setDocumentType(documentType2);
+        caseDocument2.setDocumentType(FINAL_ORDER_TRANSLATED_DOCUMENT);
         caseDocument2.setDocumentLink(DOCUMENT_LINK);
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -91,10 +90,7 @@ class SendFinalOrderBulkPrintServiceTest {
             .respondent1(party)
             .applicant1(party).build();
 
-        if (addFinalOrder) {
-            caseData.setFinalOrderDocumentCollection(wrapElements(caseDocument1, caseDocument2));
-        }
-
+        caseData.setFinalOrderDocumentCollection(wrapElements(caseDocument1, caseDocument2));
         return caseData;
     }
 
@@ -123,7 +119,8 @@ class SendFinalOrderBulkPrintServiceTest {
             caseData.getLegacyCaseReference(),
             caseData.getLegacyCaseReference(),
             FINAL_ORDER_PACK_LETTER_TYPE,
-            List.of(party.getPartyName())
+            List.of(party.getPartyName()),
+            List.of("test")
         );
     }
 
@@ -133,7 +130,8 @@ class SendFinalOrderBulkPrintServiceTest {
             caseData.getLegacyCaseReference(),
             caseData.getLegacyCaseReference(),
             TRANSLATED_ORDER_PACK_LETTER_TYPE,
-            List.of(party.getPartyName())
+            List.of(party.getPartyName()),
+            List.of("test")
         );
     }
 
@@ -327,7 +325,7 @@ class SendFinalOrderBulkPrintServiceTest {
         // given
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = PartyBuilder.builder().soleTrader().build();
-        CaseData caseData = buildCaseData(claimant, JUDGE_FINAL_ORDER, FINAL_ORDER_TRANSLATED_DOCUMENT, true);
+        CaseData caseData = buildCaseData(claimant);
         caseData.setClaimantBilingualLanguagePreference("BOTH");
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
@@ -336,11 +334,22 @@ class SendFinalOrderBulkPrintServiceTest {
         sendFinalOrderBulkPrintService.sendFinalOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
 
         // then
-        verifyPrintLetter(caseData, claimant);
+        verifyPrintLetterWithDocumentNames(caseData, claimant);
         ArgumentCaptor<CaseDocument[]> documentCaptor = ArgumentCaptor.forClass(CaseDocument[].class);
         verify(coverLetterAppendService).makeDocumentMailable(any(), any(), any(), any(DocumentType.class), documentCaptor.capture());
         assertThat(documentCaptor.getValue()).hasSize(2);
         assertThat(documentCaptor.getValue()[0].getDocumentType()).isEqualTo(JUDGE_FINAL_ORDER);
         assertThat(documentCaptor.getValue()[1].getDocumentType()).isEqualTo(FINAL_ORDER_TRANSLATED_DOCUMENT);
+    }
+
+    private void verifyPrintLetterWithDocumentNames(CaseData caseData, Party party) {
+        verify(bulkPrintService).printLetter(
+            LETTER_CONTENT,
+            caseData.getLegacyCaseReference(),
+            caseData.getLegacyCaseReference(),
+            FINAL_ORDER_PACK_LETTER_TYPE,
+            List.of(party.getPartyName()),
+            List.of("test", "test")
+        );
     }
 }

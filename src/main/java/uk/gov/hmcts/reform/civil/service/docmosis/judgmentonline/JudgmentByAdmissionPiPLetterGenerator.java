@@ -55,6 +55,7 @@ public class JudgmentByAdmissionPiPLetterGenerator {
                 DocumentType.JUDGMENT_BY_ADMISSION_NON_DIVERGENT_SPEC_PIP_LETTER
             )
         );
+        List<String> bulkPrintFileNames = new ArrayList<>();
         CaseDocument caseDocument = getDefendantJbaDocStitchedToPinAndPostDoc(
             caseData,
             pinAndPostcaseDocument,
@@ -62,7 +63,7 @@ public class JudgmentByAdmissionPiPLetterGenerator {
         );
         String documentUrl = caseDocument.getDocumentLink().getDocumentUrl();
         String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
-
+        bulkPrintFileNames.add(caseDocument.getDocumentLink().getDocumentFileName());
         byte[] letterContent;
         try {
             letterContent = documentDownloadService.downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
@@ -73,7 +74,7 @@ public class JudgmentByAdmissionPiPLetterGenerator {
 
         List<String> recipients = getRecipientsList(caseData);
         bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
-                caseData.getLegacyCaseReference(), JUDGMENT_BY_ADMISSION_LETTER, recipients);
+                caseData.getLegacyCaseReference(), JUDGMENT_BY_ADMISSION_LETTER, recipients, bulkPrintFileNames);
         return letterContent;
     }
 

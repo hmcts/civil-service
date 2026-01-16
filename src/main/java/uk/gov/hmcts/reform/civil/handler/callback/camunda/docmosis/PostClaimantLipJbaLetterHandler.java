@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.CoverLetterService;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +21,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.POST_CLAIMANT_LIP_JBA_LETTER;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGMENT_BY_ADMISSION_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFAULT_JUDGMENT_COVER_LETTER;
 
 @SuppressWarnings("unchecked")
 @Service
@@ -53,10 +55,10 @@ public class PostClaimantLipJbaLetterHandler extends CallbackHandler {
 
     private CallbackResponse postClaimantLipJbaLetter(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
+        List<String> bulkPrintFileNames = new ArrayList<>();
         if (caseData.isApplicantLiP()) {
             var claimantDJDoc = caseData.getSystemGeneratedCaseDocuments().stream()
-                .filter(document -> document.getValue().getDocumentType().equals(JUDGMENT_BY_ADMISSION_CLAIMANT))
+                .filter(document -> JUDGMENT_BY_ADMISSION_CLAIMANT.equals(document.getValue().getDocumentType()))
                 .toList().get(0);
 
             List<DocumentMetaData> documents = List.of(new DocumentMetaData(
@@ -64,7 +66,8 @@ public class PostClaimantLipJbaLetterHandler extends CallbackHandler {
                 claimantDJDoc.getValue().getDocumentName(),
                 LocalDate.now().toString()
             ));
-
+            bulkPrintFileNames.add(claimantDJDoc.getValue().getDocumentLink().getDocumentFileName());
+            bulkPrintFileNames.add(DEFAULT_JUDGMENT_COVER_LETTER.getDocumentTitle());
             byte[] claimantDjLetterBinary = coverLetterGeneratorService.generateDocumentWithCoverLetterBinary(
                 caseData.getApplicant1(), caseData, documents,
                 "Claimant JBA letter.pdf",
@@ -73,7 +76,7 @@ public class PostClaimantLipJbaLetterHandler extends CallbackHandler {
             List<String> recipients = List.of(caseData.getApplicant1().getPartyName());
             bulkPrintService.printLetter(
                 claimantDjLetterBinary, caseData.getLegacyCaseReference(),
-                caseData.getLegacyCaseReference(), JBA_LETTER_REF, recipients
+                caseData.getLegacyCaseReference(), JBA_LETTER_REF, recipients, bulkPrintFileNames
             );
         }
 

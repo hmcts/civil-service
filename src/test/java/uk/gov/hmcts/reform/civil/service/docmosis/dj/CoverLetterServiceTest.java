@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -8,7 +9,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.core.io.ByteArrayResource;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
-
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
@@ -46,10 +46,16 @@ class CoverLetterServiceTest {
     private CivilStitchService civilStitchService;
     @InjectMocks
     private CoverLetterService coverLetterService;
+    private AutoCloseable autoCloseable;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        autoCloseable = MockitoAnnotations.openMocks(this);
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        autoCloseable.close();
     }
 
     @Test
