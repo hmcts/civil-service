@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,11 +13,11 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RolePool;
+import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.callback.TaskCompletionSubmittedCallbackResponse;
@@ -40,6 +41,7 @@ import uk.gov.hmcts.reform.civil.service.taskmanagement.WaTaskManagementService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,7 +61,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@SuppressWarnings("unchecked")
 @ExtendWith(MockitoExtension.class)
 class SendAndReplyCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -155,8 +156,9 @@ class SendAndReplyCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateMessagesToReplyTo_whenMessagesExist() {
-            List<Element<Message>> messages = List.of(element(new Message()));
+            List<Element<Message>> messages = new ArrayList<>();
             CaseData caseData = CaseDataBuilder.builder().build();
+            messages.add(element(getMessage("mock")));
             caseData.setMessages(messages);
             DynamicList expectedMessages = DynamicList.fromList(List.of("mock"));
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
@@ -268,6 +270,31 @@ class SendAndReplyCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             verify(messageService, times(1))
                 .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
+        }
+
+        @Test
+        void shouldReturnErrorMessageWhenSubjectLineContainsMoreThan250Characters() {
+            String messageContent = "Message Content";
+
+            SendMessageMetadata messageMetaData = new SendMessageMetadata();
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setSendAndReplyOption(SEND);
+            caseData.setAllocatedTrack(AllocatedTrack.SMALL_CLAIM);
+            caseData.setSendMessageMetadata(messageMetaData);
+            caseData.setSendMessageContent(messageContent);
+
+            Message expectedMessage = getMessage(messageContent);
+            List<Element<Message>> actualMessage =  List.of(element(expectedMessage));
+
+            caseData.setMessages(actualMessage);
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).isNotNull();
+            assertThat(response.getErrors())
+                .isEqualTo(List.of("Subject exceeds MAX limit of 250 characters. Please keep subject line less than 250 characters."));
         }
 
         @Test
@@ -535,6 +562,7 @@ class SendAndReplyCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_andSendAndReplyOptionIsReply() {
             Message expectedMessage = new Message();
+            expectedMessage.setSubject("Test Message");
             expectedMessage.setMessageContent("Original Message");
             Element<Message> message = element(expectedMessage);
 
@@ -693,5 +721,22 @@ class SendAndReplyCallbackHandlerTest extends BaseCallbackHandlerTest {
                         "<br /><h2 class=\"govuk-heading-m\">What happens next</h2><br />A task has been created to review your reply.")
                     .setClientContext(clientContext2));
         }
+    }
+
+    private static @NotNull Message getMessage(String messageContent) {
+        Message expectedMessage = new Message();
+        expectedMessage.setMessageContent(messageContent);
+        expectedMessage.setRecipientRoleType(RolePool.ADMIN);
+        String subject = """
+                That was up from 27,731 in 2021, although it marked a fall from the 56,655 seen in 2023.
+                In 2024, just 26% of claims led to a payout, with an average sum of £390 given to claimants.
+                The RAC estimates that a typical repair bill for a family car with damage worse than a puncture from a pothole is £590.
+                Potholes can cause damage to shock absorbers and suspension springs, and can also distort wheels.
+                RAC head of policy Simon Williams told the BBC: "It does seem that councils have a variety of different criteria for what they class as a pothole.
+                "Often they have to be four centimetres deep and so many centimetres wide.
+                "If you hit one, it can cause a real jolt to the car and serious damage... not just damage to vehicles,
+                 it's also a serious road safety danger, particularly on two wheels.""";
+        expectedMessage.setSubject(subject);
+        return expectedMessage;
     }
 }
