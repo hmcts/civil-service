@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
@@ -46,4 +47,7 @@ public class SealedClaimForm implements MappableObject {
     private String hearingCourtLocation;
     private StatementOfTruth statementOfTruth;
     private String applicantRepresentativeOrganisationName;
+    private String claimDeclarationDescription;
+    private YesOrNo isHumanRightsActIssues;
+    private YesOrNo isClaimDeclarationAdded;
 }
