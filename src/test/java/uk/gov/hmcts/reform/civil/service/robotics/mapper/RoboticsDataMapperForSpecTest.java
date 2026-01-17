@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,17 +19,24 @@ import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
+import uk.gov.hmcts.reform.civil.model.robotics.LitigiousParty;
 import uk.gov.hmcts.reform.civil.model.robotics.NoticeOfChange;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
+import uk.gov.hmcts.reform.civil.model.robotics.Solicitor;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsCaseDataSupport;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static java.time.format.DateTimeFormatter.ISO_DATE;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 class RoboticsDataMapperForSpecTest {
@@ -44,7 +52,39 @@ class RoboticsDataMapperForSpecTest {
     private OrganisationService organisationService;
     @Mock
     private FeatureToggleService featureToggleService;
+    @Mock
+    private RoboticsCaseDataSupport caseDataSupport;
     private static final String BEARER_TOKEN = "Bearer Token";
+
+    @BeforeEach
+    void setUp() {
+        when(caseDataSupport.organisationId(any())).thenReturn(Optional.empty());
+        when(caseDataSupport.buildLitigiousParty(
+            any(),
+            any(),
+            nullable(String.class),
+            nullable(String.class),
+            nullable(String.class),
+            nullable(String.class),
+            nullable(LocalDate.class)
+        )).thenAnswer(invocation -> {
+            Party party = invocation.getArgument(0);
+            String type = invocation.getArgument(2);
+            String id = invocation.getArgument(3);
+            String solicitorId = invocation.getArgument(4);
+            String solicitorOrganisationId = invocation.getArgument(5);
+            LocalDate dateOfService = invocation.getArgument(6);
+            return LitigiousParty.builder()
+                .id(id)
+                .solicitorID(solicitorId)
+                .type(type)
+                .name(party != null ? party.getPartyName() : null)
+                .solicitorOrganisationID(solicitorOrganisationId)
+                .dateOfService(dateOfService != null ? dateOfService.format(ISO_DATE) : null)
+                .build();
+        });
+        when(caseDataSupport.buildSolicitor(any())).thenReturn(Solicitor.builder().build());
+    }
 
     @Test
     void whenSpecEnabled_includeBS() {
