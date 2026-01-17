@@ -649,6 +649,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private  YesOrNo isMintiLipCase;
 
+    private  String  smallClaimsPenalNotice;
+
     @Builder.Default
     private  List<Element<CaseDocument>> courtOfficersOrders = new ArrayList<>();
     private  YesOrNo isReferToJudgeClaim;

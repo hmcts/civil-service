@@ -209,6 +209,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             + "claimant fails to pay the fee or obtain a fee exemption by that time the claim will be "
             + "struck without further order.";
 
+    public static final String DEFAULT_PENAL_NOTICE = new StringBuilder().append(
+        "A penal notice against the Defendants is attached to paragraphs X and X below.").append("\n\nPENAL NOTICE").append(
+        "\nWARNING").append(
+        "\nXX and YY IF YOU DO NOT COMPLY WITH THIS ORDER YOU MAY BE HELD IN CONTEMPT OF COURT AND PUNISHED BY A FINE, ").append(
+        "IMPRISONMENT, CONFISCATION OF ASSETS OR OTHER PUNISHMENT UNDER THE LAW.").toString();
+
     public static final String FEEDBACK_LINK = "<p>%s"
         + " <a href='https://www.smartsurvey.co.uk/s/QKJTVU//' target=_blank>here</a></p>";
 
@@ -1217,6 +1223,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             caseData.setSetSmallClaimsFlag(YES);
+            caseData.setSmallClaimsPenalNotice(DEFAULT_PENAL_NOTICE);
             if (SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
                 caseData.setIsSdoR2NewScreen(YES);
             }

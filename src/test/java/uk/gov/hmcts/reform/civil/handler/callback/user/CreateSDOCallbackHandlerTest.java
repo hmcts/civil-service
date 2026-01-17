@@ -184,6 +184,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_1v1;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_1v2;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_2v1;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.DEFAULT_PENAL_NOTICE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MINTI_DISPOSAL_NOT_ALLOWED;
@@ -2404,6 +2405,40 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("date3")
                 .isEqualTo(nextWorkingDayDate.toString());
 
+        }
+
+        @Test
+        void shouldSetSmallClaimsPenalNoticeWhenSmallClaimsTrack() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build();
+            caseData.setDrawDirectionsOrderRequired(YES);
+            caseData.setDrawDirectionsOrderSmallClaims(YES);
+            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "order-details-navigation");
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(data.getSmallClaimsPenalNotice()).isEqualTo(DEFAULT_PENAL_NOTICE);
+        }
+
+        @Test
+        void shouldNotSetSmallClaimsPenalNoticeWhenFastTrack() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build();
+            caseData.setDrawDirectionsOrderRequired(NO);
+            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
+            caseData.setFastClaims(List.of(FastTrack.fastClaimBuildingDispute));
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "order-details-navigation");
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(data.getSmallClaimsPenalNotice()).isNull();
         }
 
         @Test

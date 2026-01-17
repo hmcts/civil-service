@@ -154,6 +154,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private List<OrderDetailsPagesSectionsToggle> smallClaimsWitnessStatementToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsFlightDelayToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsMediationSectionToggle;
+    private List<OrderDetailsPagesSectionsToggle> smallClaimsPenalNoticeToggle;
     private List<DateToShowToggle> smallClaimsHearingDateToToggle;
     private List<DateToShowToggle> fastTrackTrialDateToToggle;
 

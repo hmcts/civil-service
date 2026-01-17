@@ -506,7 +506,9 @@ public class SdoGeneratorService {
             .smallClaimsFlightDelay(caseData.getSmallClaimsFlightDelay())
             .smallClaimsWelshLanguageToggle(SdoHelper.hasSmallClaimsVariable(caseData, "sdoR2SmallClaimsUseOfWelshToggle"))
             .welshLanguageDescription(caseData.getSdoR2SmallClaimsUseOfWelshLanguage() != null ? caseData.getSdoR2SmallClaimsUseOfWelshLanguage().getDescription() : null)
-            .sdoR2SmallClaimsWitnessStatements(caseData.getSdoR2SmallClaimsWitnessStatementOther());
+            .sdoR2SmallClaimsWitnessStatements(caseData.getSdoR2SmallClaimsWitnessStatementOther())
+            .showPenalNotice(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsPenalNoticeToggle"))
+            .penalNoticeText(caseData.getSmallClaimsPenalNotice());
 
         sdoDocumentFormBuilder.hearingLocation(
                 locationHelper.getHearingLocation(
