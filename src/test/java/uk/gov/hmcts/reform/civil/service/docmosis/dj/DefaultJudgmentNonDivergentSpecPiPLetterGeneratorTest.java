@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.judgmentonline.DefaultJudgmentNonDivergentSpecLipDefendantLetter;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
@@ -65,55 +66,30 @@ class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
     private static String fileNameTrial = "PinAndPost.pdf";
     private static final String fileName = String.format(DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_LIP_DEFENDANT_LETTER.getDocumentTitle(), CLAIM_REFERENCE);
     private static final String PIN = "1234789";
-    private static final CaseDocument CASE_DOCUMENT_TRIAL = CaseDocument.builder()
-        .documentName(fileNameTrial)
-        .documentType(DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER)
-        .documentLink(Document.builder().documentFileName(fileName).documentBinaryUrl("Binary/url").documentUrl("url").build())
-        .build();
-    private static final Address RESPONDENT_ADDRESS = Address.builder().addressLine1("123 road")
-        .postTown("London")
-        .postCode("EX12RT")
-        .build();
-    private static final Party DEFENDANT = Party.builder().primaryAddress(RESPONDENT_ADDRESS)
-        .type(Party.Type.INDIVIDUAL)
-        .individualTitle("Mr.")
-        .individualFirstName("Smith")
-        .individualLastName("John")
-        .build();
+    private static final CaseDocument CASE_DOCUMENT_TRIAL = new CaseDocument()
+        .setDocumentName(fileNameTrial)
+        .setDocumentType(DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER)
+        .setDocumentLink(new Document()
+                             .setDocumentFileName(fileName)
+                             .setDocumentBinaryUrl("Binary/url")
+                             .setDocumentUrl("url"));
+    private static final Address RESPONDENT_ADDRESS = buildAddress();
+    private static final Party DEFENDANT = buildIndividualParty("Smith", "John", RESPONDENT_ADDRESS);
 
-    private static final CaseData CASE_DATA = CaseData.builder()
-        .legacyCaseReference(CLAIM_REFERENCE)
-        .ccdCaseReference(12325480L)
-        .applicant1(Party.builder()
-                        .type(Party.Type.INDIVIDUAL)
-                        .individualTitle("Mr.")
-                        .individualFirstName("John")
-                        .individualLastName("Smith").build())
-        .respondent1(DEFENDANT)
-        .respondent1Represented(YesOrNo.NO)
-        .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode(PIN).build())
-        .submittedDate(LocalDateTime.now())
-        .defaultJudgmentDocuments(List.of(
-            Element.<CaseDocument>builder()
-                .value(CaseDocument.builder().documentType(DocumentType.DEFAULT_JUDGMENT_DEFENDANT1)
-                .documentName("DefendantDJ.pdf")
-                .documentLink(Document.builder().documentFileName("DefendantDJ.pdf").documentBinaryUrl("Binary/url").documentUrl("url").build())
-                .createdDatetime(LocalDateTime.now()).build()).build()))
-        .build();
+    private static final CaseData CASE_DATA = buildCaseData();
     private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
     private static final String DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER_REF = "default-judgment-non-divergent-spec-pin_in_letter";
     private static final CaseDocument STITCHED_DOC =
-        CaseDocument.builder()
-            .createdBy("John")
-            .documentName("Stitched document")
-            .documentSize(0L)
-            .documentType(DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build()).build();
+        new CaseDocument()
+            .setCreatedBy("John")
+            .setDocumentName("Stitched document")
+            .setDocumentSize(0L)
+            .setDocumentType(DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER)
+            .setCreatedDatetime(LocalDateTime.now())
+            .setDocumentLink(new Document()
+                                 .setDocumentUrl("fake-url")
+                                 .setDocumentFileName("file-name")
+                                 .setDocumentBinaryUrl("binary-url"));
 
     @MockBean
     private SecuredDocumentManagementService documentManagementService;
@@ -190,5 +166,49 @@ class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
         assertThat(defaultJudgmentNonDivergentSpecLipDefendantLetter.getVaryJudgmentFee()).isEqualTo("£15.00");
         assertThat(defaultJudgmentNonDivergentSpecLipDefendantLetter.getJudgmentSetAsideFee()).isEqualTo("£303.00");
         assertThat(defaultJudgmentNonDivergentSpecLipDefendantLetter.getCertifOfSatisfactionFee()).isEqualTo("£14.00");
+    }
+
+    private static Address buildAddress() {
+        Address address = new Address();
+        address.setAddressLine1("123 road");
+        address.setPostTown("London");
+        address.setPostCode("EX12RT");
+        return address;
+    }
+
+    private static Party buildIndividualParty(String firstName, String lastName, Address address) {
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        party.setIndividualTitle("Mr.");
+        party.setIndividualFirstName(firstName);
+        party.setIndividualLastName(lastName);
+        party.setPrimaryAddress(address);
+        return party;
+    }
+
+    private static CaseData buildCaseData() {
+        Party applicant = buildIndividualParty("John", "Smith", null);
+        DefendantPinToPostLRspec pinDetails = new DefendantPinToPostLRspec();
+        pinDetails.setAccessCode(PIN);
+        CaseDocument defendantDocument = new CaseDocument()
+            .setDocumentType(DocumentType.DEFAULT_JUDGMENT_DEFENDANT1)
+            .setDocumentName("DefendantDJ.pdf")
+            .setDocumentLink(new Document()
+                                 .setDocumentFileName("DefendantDJ.pdf")
+                                 .setDocumentBinaryUrl("Binary/url")
+                                 .setDocumentUrl("url"))
+            .setCreatedDatetime(LocalDateTime.now());
+        Element<CaseDocument> documentElement = new Element<>();
+        documentElement.setValue(defendantDocument);
+        return CaseDataBuilder.builder().build().toBuilder()
+            .legacyCaseReference(CLAIM_REFERENCE)
+            .ccdCaseReference(12325480L)
+            .applicant1(applicant)
+            .respondent1(DEFENDANT)
+            .respondent1Represented(YesOrNo.NO)
+            .respondent1PinToPostLRspec(pinDetails)
+            .submittedDate(LocalDateTime.now())
+            .defaultJudgmentDocuments(List.of(documentElement))
+            .build();
     }
 }

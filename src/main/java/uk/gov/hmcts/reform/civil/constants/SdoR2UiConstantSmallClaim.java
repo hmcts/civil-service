@@ -28,13 +28,11 @@ public final class SdoR2UiConstantSmallClaim {
         a) The principal sum claimed;
         b) The amount of contractual interest already paid on that sum;
         c) The amount of discretionary interest sought under to Section 69 County Courts Act 1984, if claimed, at rates of 1%, 2%, 4% and 8% per annum.""";
-    public static final String UPLOAD_DOC_DESCRIPTION = "Each party must upload to the Digital Portal copies of all documents which they wish the court to consider" +
-        " when reaching " +
-        "its decision not less than 14 days before the hearing. " +
-        "The Court may refuse to consider any document which has not been uploaded to the Digital Portal by the above date.";
-    public static final String WITNESS_STATEMENT_TEXT = "Each party must upload to the Digital Portal copies of all " +
-        "witness statements of the witnesses upon whose evidence they " +
-        "intend to rely at the hearing not less than 14 days before the hearing.";
+    public static final String UPLOAD_DOC_DESCRIPTION = "Each party must upload to the Digital Portal copies of all documents which they wish the court to consider"
+        + " when reaching its decision not less than 14 days before the hearing. "
+        + "The Court may refuse to consider any document which has not been uploaded to the Digital Portal by the above date.";
+    public static final String WITNESS_STATEMENT_TEXT = "Each party must upload to the Digital Portal copies of all "
+        + "witness statements of the witnesses upon whose evidence they intend to rely at the hearing not less than 14 days before the hearing.";
     public static final String WITNESS_DESCRIPTION_TEXT = """
         a) Start with the name of the case and the claim number;
         b) State the full name and address of the witness;
@@ -54,8 +52,8 @@ public final class SdoR2UiConstantSmallClaim {
         it will be for the Court to decide how much reliance, if any, to place on their evidence.""";
     public static final String RESTRICT_WITNESS_TEXT = "For this limitation, a party is counted as a witness.";
     public static final String RESTRICT_NUMBER_PAGES_TEXT1 = "Each witness statement should be no more than";
-    public static final String RESTRICT_NUMBER_PAGES_TEXT2 = "pages of A4 (including exhibits). Statements should" +
-        " be double spaced using a font size of 12.";
+    public static final String RESTRICT_NUMBER_PAGES_TEXT2 = "pages of A4 (including exhibits). Statements should"
+        + " be double spaced using a font size of 12.";
     public static final String BUNDLE_TEXT = "The Claimant's solicitor shall bring to the court, on the day of the hearing, a paper copy of the hearing bundle.";
     public static final String IMP_NOTES_TEXT = "This order has been made without hearing. Each party has the right to apply to have this Order set aside or varied." +
         " Any such application must be received by the Court" +
