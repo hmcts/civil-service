@@ -33,6 +33,7 @@ public class MigrateCaseQueriesTask extends MigrationTask<CaseReference> {
     protected CaseData migrateCaseData(CaseData caseData, CaseReference caseReference) {
         log.info("Migrating case queries for case reference: {}", caseReference.getCaseReference());
         CaseQueriesUtil.migrateAllQueries(caseData);
+        CaseQueriesUtil.clearOldQueryCollections(caseData);
         return caseData;
     }
 }

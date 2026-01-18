@@ -60,7 +60,7 @@ class MigrateCaseQueriesTaskTest {
 
         CaseData result = task.migrateCaseData(caseData, caseReference);
 
-        assertThat(result.getQmApplicantSolicitorQueries()).isNotNull();
+        assertThat(result.getQmApplicantSolicitorQueries()).isNull();
         assertThat(result.getQueries()).isNotNull();
         assertThat(result.getQueries().getCaseMessages()).hasSize(1);
         assertThat(result.getQueries().getPartyName()).isEqualTo("All queries");
