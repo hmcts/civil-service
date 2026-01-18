@@ -193,11 +193,7 @@ public class CaseQueriesUtil {
 
     public static void migrateQueries(CaseQueriesCollection collectionToMigrate, CaseData caseData) {
         if (nonNull(collectionToMigrate) && nonNull(collectionToMigrate.getCaseMessages())) {
-            log.info(
-                "Started to migrate [{}] queries",
-                collectionToMigrate.getPartyName(),
-                caseData.getCcdCaseReference()
-            );
+            log.info("Started to migrate [{}] queries for caseId {}", collectionToMigrate.getPartyName(), caseData.getCcdCaseReference());
             List<Element<CaseMessage>> messages = caseData.getQueries().getCaseMessages();
             messages.addAll(collectionToMigrate.getCaseMessages());
             caseData.getQueries().setCaseMessages(messages);
@@ -221,7 +217,7 @@ public class CaseQueriesUtil {
                 ).stream().filter(Objects::nonNull)
                 .forEach(collection ->
                              log.info(
-                                 "Successfully migrated [{}] queries",
+                                 "Successfully migrated [{}] queries for caseId {}",
                                  collection.getPartyName(), caseDataBefore.getCcdCaseReference()
                              ));
         }
