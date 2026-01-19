@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.trailreadycheck;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.trialreadycheck;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,21 +8,21 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskContext;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.trailreadycheck.TrailReadyCheckClaimantDashboardService;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.trailreadycheck.TrailReadyCheckDefendantDashboardService;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.trialreadycheck.TrialReadyCheckClaimantDashboardService;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.trialreadycheck.TrialReadyCheckDefendantDashboardService;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class TrailReadyCheckDashboardTaskTest {
+class TrialReadyCheckDashboardTaskTest {
 
     private static final String AUTH_TOKEN = "Bearer token";
 
     @Mock
-    private TrailReadyCheckClaimantDashboardService claimantDashboardService;
+    private TrialReadyCheckClaimantDashboardService claimantDashboardService;
     @Mock
-    private TrailReadyCheckDefendantDashboardService defendantDashboardService;
+    private TrialReadyCheckDefendantDashboardService defendantDashboardService;
     @Mock
     private DashboardTaskContext context;
 
@@ -36,19 +36,19 @@ class TrailReadyCheckDashboardTaskTest {
 
     @Test
     void claimantTaskShouldDelegateToDashboardService() {
-        TrailReadyCheckClaimantDashboardTask task = new TrailReadyCheckClaimantDashboardTask(claimantDashboardService);
+        TrialReadyCheckClaimantDashboardTask task = new TrialReadyCheckClaimantDashboardTask(claimantDashboardService);
 
         task.execute(context);
 
-        verify(claimantDashboardService).notifyTrailReadyCheck(caseData, AUTH_TOKEN);
+        verify(claimantDashboardService).notifyTrialReadyCheck(caseData, AUTH_TOKEN);
     }
 
     @Test
     void defendantTaskShouldDelegateToDashboardService() {
-        TrailReadyCheckDefendantDashboardTask task = new TrailReadyCheckDefendantDashboardTask(defendantDashboardService);
+        TrialReadyCheckDefendantDashboardTask task = new TrialReadyCheckDefendantDashboardTask(defendantDashboardService);
 
         task.execute(context);
 
-        verify(defendantDashboardService).notifyCaseTrailReadyCheck(caseData, AUTH_TOKEN);
+        verify(defendantDashboardService).notifyCaseTrialReadyCheck(caseData, AUTH_TOKEN);
     }
 }

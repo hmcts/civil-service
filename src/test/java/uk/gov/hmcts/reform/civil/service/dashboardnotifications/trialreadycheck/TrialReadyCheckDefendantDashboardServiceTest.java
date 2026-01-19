@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.dashboardnotifications.trailreadycheck;
+package uk.gov.hmcts.reform.civil.service.dashboardnotifications.trialreadycheck;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.trailreadycheck.TrailReadyCheckDefendantDashboardService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -26,7 +25,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_CHECK_DEFENDANT;
 
 @ExtendWith(MockitoExtension.class)
-class TrailReadyCheckDefendantDashboardServiceTest {
+class TrialReadyCheckDefendantDashboardServiceTest {
 
     private static final String AUTH_TOKEN = "BEARER";
 
@@ -40,7 +39,7 @@ class TrailReadyCheckDefendantDashboardServiceTest {
     private DashboardNotificationsParamsMapper mapper;
 
     @InjectMocks
-    private TrailReadyCheckDefendantDashboardService service;
+    private TrialReadyCheckDefendantDashboardService service;
 
     @BeforeEach
     void setUp() {
@@ -48,14 +47,14 @@ class TrailReadyCheckDefendantDashboardServiceTest {
     }
 
     @Test
-    void shouldNotifyDefendantWhenTrailReadyCheckRequired() {
+    void shouldNotifyDefendantWhenTrialReadyCheckRequired() {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setRespondent1Represented(YesOrNo.NO);
         caseData.setTrialReadyRespondent1(null);
         caseData.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
         caseData.setCcdCaseReference(1234L);
 
-        service.notifyCaseTrailReadyCheck(caseData, AUTH_TOKEN);
+        service.notifyCaseTrialReadyCheck(caseData, AUTH_TOKEN);
 
         verify(dashboardNotificationService).deleteByReferenceAndCitizenRole("1234", "DEFENDANT");
         verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole("1234", "DEFENDANT");
@@ -75,7 +74,7 @@ class TrailReadyCheckDefendantDashboardServiceTest {
         caseData.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
         caseData.setCcdCaseReference(5678L);
 
-        service.notifyCaseTrailReadyCheck(caseData, AUTH_TOKEN);
+        service.notifyCaseTrialReadyCheck(caseData, AUTH_TOKEN);
 
         verify(dashboardNotificationService).deleteByReferenceAndCitizenRole("5678", "DEFENDANT");
         verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole("5678", "DEFENDANT");
@@ -88,14 +87,14 @@ class TrailReadyCheckDefendantDashboardServiceTest {
     }
 
     @Test
-    void shouldUseTrailReadyCheckScenarioWhenTrialReadyNull() {
+    void shouldUseTrialReadyCheckScenarioWhenTrialReadyNull() {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setRespondent1Represented(YesOrNo.NO);
         caseData.setTrialReadyRespondent1(null);
         caseData.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
         caseData.setCcdCaseReference(9012L);
 
-        service.notifyCaseTrailReadyCheck(caseData, AUTH_TOKEN);
+        service.notifyCaseTrialReadyCheck(caseData, AUTH_TOKEN);
 
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
@@ -113,7 +112,7 @@ class TrailReadyCheckDefendantDashboardServiceTest {
         caseData.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
         caseData.setCcdCaseReference(3456L);
 
-        service.notifyCaseTrailReadyCheck(caseData, AUTH_TOKEN);
+        service.notifyCaseTrialReadyCheck(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardNotificationService);
         verifyNoInteractions(taskListService);
