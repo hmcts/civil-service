@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenari
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.utils.HearingFeeUtils;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.HashMap;
@@ -18,18 +19,17 @@ import java.util.Map;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
-import static uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting.LISTING;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.HearingScheduledClaimantNotificationHandler.fillPreferredLocationData;
+import static uk.gov.hmcts.reform.civil.utils.HearingUtils.hearingFeeRequired;
 
 @Service
-public class HearingScheduledClaimantDashboardService extends DashboardScenarioService {
+public class HearingScheduledClaimantHmcDashboardService extends DashboardScenarioService {
 
     private final LocationReferenceDataService locationRefDataService;
     private final HearingNoticeCamundaService camundaService;
     private final HearingFeesService hearingFeesService;
 
-    public HearingScheduledClaimantDashboardService(DashboardScenariosService dashboardScenariosService, DashboardNotificationsParamsMapper mapper, LocationReferenceDataService locationRefDataService, HearingNoticeCamundaService camundaService, HearingFeesService hearingFeesService) {
+    public HearingScheduledClaimantHmcDashboardService(DashboardScenariosService dashboardScenariosService, DashboardNotificationsParamsMapper mapper, LocationReferenceDataService locationRefDataService, HearingNoticeCamundaService camundaService, HearingFeesService hearingFeesService) {
         super(dashboardScenariosService, mapper);
         this.locationRefDataService = locationRefDataService;
         this.camundaService = camundaService;
@@ -61,17 +61,23 @@ public class HearingScheduledClaimantDashboardService extends DashboardScenarioS
 
         if (shouldRecordScenario(caseData)) {
             boolean hasPaidFee = caseData.isHearingFeePaid();
-            boolean isNewHearingWithoutFee = (caseData.getCcdState() == HEARING_READINESS
-                && caseData.getListingOrRelisting() == LISTING);
+            boolean isHearingFeeRequired = hearingFeeRequired(camundaService.getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId()).getHearingType());
 
-            boolean shouldRecordFeeScenario = !hasPaidFee && isNewHearingWithoutFee;
+            boolean shouldRecordFeeScenario = !hasPaidFee && isHearingFeeRequired;
+            if (shouldRecordFeeScenario) {
+                caseData.setHearingFee(HearingFeeUtils.calculateAndApplyFee(
+                    hearingFeesService,
+                    caseData,
+                    caseData.getAssignedTrack()
+                ));
+            }
             scenarios.put(
                 DashboardScenarios.SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT.getScenario(),
                 shouldRecordFeeScenario
             );
 
-            boolean shouldRecordFastScenario = AllocatedTrack.FAST_CLAIM.name().equals(caseData.getAssignedTrack())
-                && isNull(caseData.getTrialReadyApplicant());
+            boolean shouldRecordFastScenario = AllocatedTrack.FAST_CLAIM.name().equals(caseData.getAssignedTrack()) && isNull(
+                caseData.getTrialReadyApplicant());
             scenarios.put(
                 DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_CLAIMANT.getScenario(),
                 shouldRecordFastScenario

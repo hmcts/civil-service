@@ -1,34 +1,33 @@
 package uk.gov.hmcts.reform.civil.service.dashboardnotifications.hearingscheduled;
 
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
-import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
-import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.HearingScheduledClaimantNotificationHandler.fillPreferredLocationData; //TODO: remove -> helper
 
 @Service
 public class HearingScheduledDefendantDashboardService extends DashboardScenarioService {
 
-    private final DashboardNotificationService dashboardNotificationService;
-    private final TaskListService taskListService;
-    private final FeatureToggleService featureToggleService;
+    private final LocationReferenceDataService locationRefDataService;
 
     public HearingScheduledDefendantDashboardService(DashboardScenariosService dashboardScenariosService,
                                                      DashboardNotificationsParamsMapper mapper,
-                                                     FeatureToggleService featureToggleService,
-                                                     DashboardNotificationService dashboardNotificationService,
-                                                     TaskListService taskListService) {
+                                                     LocationReferenceDataService locationRefDataService) {
         super(dashboardScenariosService, mapper);
-        this.dashboardNotificationService = dashboardNotificationService;
-        this.taskListService = taskListService;
-        this.featureToggleService = featureToggleService;
+        this.locationRefDataService = locationRefDataService;
     }
 
     public void notifyHearingScheduled(CaseData caseData, String authToken) {
@@ -36,33 +35,39 @@ public class HearingScheduledDefendantDashboardService extends DashboardScenario
     }
 
     @Override
+    public void beforeRecordScenario(CaseData caseData, String authToken) {
+        List<LocationRefData> locations = (locationRefDataService
+            .getHearingCourtLocations(authToken));
+        LocationRefData locationRefData = fillPreferredLocationData(locations, caseData.getHearingLocation());
+        if (nonNull(locationRefData)) {
+            caseData.setHearingLocationCourtName(locationRefData.getSiteName());
+        }
+    }
+
+    @Override
     protected String getScenario(CaseData caseData) {
-        return DashboardScenarios.SCENARIO_AAA6_DISMISS_CASE_DEFENDANT.getScenario();
+        return DashboardScenarios.SCENARIO_AAA6_CP_HEARING_SCHEDULED_DEFENDANT.getScenario();
     }
 
     @Override
     protected Map<String, Boolean> getScenarios(CaseData caseData) {
-        return Map.of(
-            DashboardScenarios.SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_DEFENDANT.getScenario(),
-            defendantQueryAwaitingResponse(caseData)
-        );
+        Map<String, Boolean> scenarios = new HashMap<>();
+
+        if (shouldRecordScenario(caseData)) {
+            scenarios.put(
+                DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_DEFENDANT.getScenario(),
+                AllocatedTrack.FAST_CLAIM.name().equals(caseData.getAssignedTrack())
+                    && isNull(caseData.getTrialReadyRespondent1())
+            );
+
+            scenarios.put(DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_DEFENDANT.getScenario(), true);
+        }
+
+        return scenarios;
     }
 
     @Override
     protected boolean shouldRecordScenario(CaseData caseData) {
-        return YesOrNo.NO.equals(caseData.getRespondent1Represented());
-    }
-
-    @Override
-    protected void beforeRecordScenario(CaseData caseData, String authToken) {
-        String caseId = String.valueOf(caseData.getCcdCaseReference());
-        dashboardNotificationService.deleteByReferenceAndCitizenRole(caseId, DEFENDANT_ROLE);
-        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(caseId, DEFENDANT_ROLE);
-    }
-
-    private boolean defendantQueryAwaitingResponse(CaseData caseData) {
-        return featureToggleService.isPublicQueryManagementEnabled(caseData)
-            && caseData.getQueries() != null
-            && caseData.getQueries().hasAQueryAwaitingResponse();
+        return caseData.isRespondent1NotRepresented();
     }
 }
