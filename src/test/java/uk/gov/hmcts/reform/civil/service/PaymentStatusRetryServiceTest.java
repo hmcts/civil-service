@@ -55,13 +55,9 @@ class PaymentStatusRetryServiceTest {
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
         when(coreCaseDataService.startUpdate(any(), any()))
-            .thenReturn(startEvent(caseDetails, CITIZEN_HEARING_FEE_PAYMENT));
+            .thenReturn(startEvent(caseDetails));
 
-       service.updatePaymentStatus(
-            FeeType.HEARING,
-            CASE_ID.toString(),
-            cardPaymentResponse()
-        );
+        service.updatePaymentStatus(FeeType.HEARING, CASE_ID.toString(), cardPaymentResponse());
 
         verify(coreCaseDataService)
             .startUpdate(CASE_ID.toString(), CITIZEN_HEARING_FEE_PAYMENT);
@@ -81,7 +77,7 @@ class PaymentStatusRetryServiceTest {
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
         when(coreCaseDataService.startUpdate(any(), any()))
-            .thenReturn(startEvent(caseDetails, CITIZEN_HEARING_FEE_PAYMENT));
+            .thenReturn(startEvent(caseDetails));
 
         service.updatePaymentStatus(
             FeeType.HEARING,
@@ -118,10 +114,10 @@ class PaymentStatusRetryServiceTest {
             .build();
     }
 
-    private StartEventResponse startEvent(CaseDetails details, CaseEvent event) {
+    private StartEventResponse startEvent(CaseDetails details) {
         return StartEventResponse.builder()
             .token(TOKEN)
-            .eventId(event.name())
+            .eventId(CaseEvent.CITIZEN_HEARING_FEE_PAYMENT.name())
             .caseDetails(details)
             .build();
     }

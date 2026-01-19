@@ -18,7 +18,10 @@ import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PaymentRequestUpdateCallbackServiceTest {
@@ -41,7 +44,6 @@ class PaymentRequestUpdateCallbackServiceTest {
 
     @Spy
     private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-
 
     @Test
     void shouldNotProceed_whenPaymentIsNotPaid() {
