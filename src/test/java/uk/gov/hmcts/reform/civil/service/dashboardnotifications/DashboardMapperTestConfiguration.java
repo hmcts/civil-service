@@ -49,6 +49,8 @@ import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
             pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.discontinueclaimclaimant.*"),
         @Filter(type = FilterType.REGEX,
             pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.notifylipclaimanthwfoutcome.*")
+        @Filter(type = FilterType.REGEX,
+            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.defendantresponsedeadlinecheck.*")
     }
 )
 public class DashboardMapperTestConfiguration {
