@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -95,5 +96,37 @@ public class ClaimContinuingOnlineSpecDefendantEmailDTOGeneratorTest {
                 RESPONSE_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE),
                 FRONTEND_URL, pinInPostConfiguration.getCuiFrontEndUrl()
         ));
+    }
+
+    @Test
+    void shouldNotify_whenRespondentIsLiPAndEmailPresent() {
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(YesOrNo.NO)
+            .respondent1(Party.builder()
+                             .partyEmail("defendant@email.com").build())
+            .build();
+
+        assertThat(generator.getShouldNotify(caseData)).isTrue();
+    }
+
+    @Test
+    void shouldNotNotify_whenRespondentIsNotLiP() {
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(YesOrNo.YES)
+            .respondent1(Party.builder()
+                             .partyEmail("defendant@email.com").build())
+            .build();
+
+        assertThat(generator.getShouldNotify(caseData)).isFalse();
+    }
+
+    @Test
+    void shouldNotNotify_whenRespondentEmailIsNull() {
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(YesOrNo.NO)
+            .respondent1(Party.builder().build())
+            .build();
+
+        assertThat(generator.getShouldNotify(caseData)).isFalse();
     }
 }
