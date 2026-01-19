@@ -328,14 +328,13 @@ public class HearingDetailsMapperTest {
     void getFacilitiesRequired_shouldReturnList_whenDetainedIndividualFlagExists() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
             .withRespondent1Flags(wrapElements(
-                FlagDetail.builder()
-                    .name("Detained individual")
-                    .flagComment("comment")
-                    .flagCode("PF0019")
-                    .hearingRelevant(YES)
-                    .status("Active")
-                    .build()))
-            .build();
+                new FlagDetail()
+                    .setName("Detained individual")
+                    .setFlagComment("comment")
+                    .setFlagCode("PF0019")
+                    .setHearingRelevant(YES)
+                    .setStatus("Active"))
+            ).build();
         assertThat(HearingDetailsMapper.getFacilitiesRequired(caseData)).isEqualTo(List.of("11"));
     }
 
@@ -346,32 +345,26 @@ public class HearingDetailsMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1(
                     Party.builder()
-                        .flags(Flags.builder()
-                                   .details(wrapElements(List.of(
-                                       FlagDetail.builder()
-                                           .name("Audio/Video Evidence")
-                                           .flagCode("PF0014")
-                                           .flagComment("flag comment for evidence")
-                                           .status("Active")
-                                           .build()
-                                   )))
-                                   .build())
+                        .flags(new Flags()
+                                   .setDetails(wrapElements(List.of(
+                                       new FlagDetail()
+                                           .setName("Audio/Video Evidence")
+                                           .setFlagCode("PF0014")
+                                           .setFlagComment("flag comment for evidence")
+                                           .setStatus("Active")
+                                   ))))
                         .build())
                 .respondent1(
                     Party.builder()
-                        .flags(Flags.builder()
-                                   .details(wrapElements(List.of(
-                                       FlagDetail.builder()
-                                           .name("other flag")
-                                           .flagCode("PF0010")
-                                           .flagComment("flag comment")
-                                           .status("Active")
-                                           .build()
-                                   )))
-                                   .build())
-                        .build()
-                )
-                .build();
+                        .flags(new Flags()
+                                   .setDetails(wrapElements(List.of(
+                                       new FlagDetail()
+                                           .setName("other flag")
+                                           .setFlagCode("PF0010")
+                                           .setFlagComment("flag comment")
+                                           .setStatus("Active")
+                                   ))))
+                        .build()).build();
 
             assertThat(HearingDetailsMapper.getListingComments(caseData)).isEqualTo(
                 "Audio/Video Evidence: flag comment for evidence");
@@ -382,29 +375,26 @@ public class HearingDetailsMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1(
                     Party.builder()
-                        .flags(Flags.builder()
-                                   .details(wrapElements(List.of(
-                                       FlagDetail.builder()
-                                           .name("Audio/Video Evidence")
-                                           .flagCode("PF0014")
-                                           .flagComment("flag comment one")
-                                           .status("Active")
-                                           .build()
+                        .flags(new Flags()
+                                   .setDetails(wrapElements(List.of(
+                                       new FlagDetail()
+                                           .setName("Audio/Video Evidence")
+                                           .setFlagCode("PF0014")
+                                           .setFlagComment("flag comment one")
+                                           .setStatus("Active")
                                    )))
-                                   .build())
+                        )
                         .build())
                 .respondent1(
                     Party.builder()
-                        .flags(Flags.builder()
-                                   .details(wrapElements(List.of(
-                                       FlagDetail.builder()
-                                           .name("Audio/Video Evidence")
-                                           .flagCode("PF0014")
-                                           .flagComment("flag comment two")
-                                           .status("Active")
-                                           .build()
-                                   )))
-                                   .build())
+                        .flags(new Flags()
+                                   .setDetails(wrapElements(List.of(
+                                       new FlagDetail()
+                                           .setName("Audio/Video Evidence")
+                                           .setFlagCode("PF0014")
+                                           .setFlagComment("flag comment two")
+                                           .setStatus("Active")
+                                   ))))
                         .build()
                 )
                 .build();
@@ -418,28 +408,24 @@ public class HearingDetailsMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1(
                     Party.builder()
-                        .flags(Flags.builder()
-                                   .details(wrapElements(List.of(
-                                       FlagDetail.builder()
-                                           .name("Audio/Video Evidence")
-                                           .flagCode("PF0014")
-                                           .flagComment("flag comment one")
-                                           .status("Active")
-                                           .build()
-                                   )))
-                                   .build())
+                        .flags(new Flags()
+                                   .setDetails(wrapElements(List.of(
+                                       new FlagDetail()
+                                           .setName("Audio/Video Evidence")
+                                           .setFlagCode("PF0014")
+                                           .setFlagComment("flag comment one")
+                                           .setStatus("Active")
+                                   ))))
                         .build())
                 .respondent1(
                     Party.builder()
-                        .flags(Flags.builder()
-                                   .details(wrapElements(List.of(
-                                       FlagDetail.builder()
-                                           .name("Audio/Video Evidence")
-                                           .flagCode("PF0014")
-                                           .status("Active")
-                                           .build()
-                                   )))
-                                   .build())
+                        .flags(new Flags()
+                                   .setDetails(wrapElements(List.of(
+                                       new FlagDetail()
+                                           .setName("Audio/Video Evidence")
+                                           .setFlagCode("PF0014")
+                                           .setStatus("Active")
+                                   ))))
                         .build()
                 )
                 .build();
@@ -453,29 +439,25 @@ public class HearingDetailsMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1(
                     Party.builder()
-                        .flags(Flags.builder()
-                                   .details(wrapElements(List.of(
-                                       FlagDetail.builder()
-                                           .name("Other 1")
-                                           .flagCode("PF0012")
-                                           .flagComment("flag comment one")
-                                           .status("Active")
-                                           .build()
-                                   )))
-                                   .build())
+                        .flags(new Flags()
+                                   .setDetails(wrapElements(List.of(
+                                       new FlagDetail()
+                                           .setName("Other 1")
+                                           .setFlagCode("PF0012")
+                                           .setFlagComment("flag comment one")
+                                           .setStatus("Active")
+                                   ))))
                         .build())
                 .respondent1(
                     Party.builder()
-                        .flags(Flags.builder()
-                                   .details(wrapElements(List.of(
-                                       FlagDetail.builder()
-                                           .name("Other 2")
-                                           .flagCode("PF0010")
-                                           .status("Active")
-                                           .flagComment("flag comment two")
-                                           .build()
-                                   )))
-                                   .build())
+                        .flags(new Flags()
+                                   .setDetails(wrapElements(List.of(
+                                       new FlagDetail()
+                                           .setName("Other 2")
+                                           .setFlagCode("PF0010")
+                                           .setStatus("Active")
+                                           .setFlagComment("flag comment two")
+                                   ))))
                         .build()
                 )
                 .build();
@@ -488,33 +470,30 @@ public class HearingDetailsMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1(
                     Party.builder()
-                        .flags(Flags.builder()
-                                   .details(wrapElements(List.of(
-                                       FlagDetail.builder()
-                                           .name("Other 1")
-                                           .flagCode("PF0014")
-                                           .flagComment(
+                        .flags(new Flags()
+                                   .setDetails(wrapElements(List.of(
+                                       new FlagDetail()
+                                           .setName("Other 1")
+                                           .setFlagCode("PF0014")
+                                           .setFlagComment(
                                                "flag comment one flag comment one flag comment one flag comment one " +
                                                    "flag comment one flag comment one flag comment one")
-                                           .status("Active")
-                                           .build()
+                                           .setStatus("Active")
                                    )))
-                                   .build())
+                        )
                         .build())
                 .respondent1(
                     Party.builder()
-                        .flags(Flags.builder()
-                                   .details(wrapElements(List.of(
-                                       FlagDetail.builder()
-                                           .name("Other 2")
-                                           .flagCode("PF0014")
-                                           .status("Active")
-                                           .flagComment(
+                        .flags(new Flags()
+                                   .setDetails(wrapElements(List.of(
+                                       new FlagDetail()
+                                           .setName("Other 2")
+                                           .setFlagCode("PF0014")
+                                           .setStatus("Active")
+                                           .setFlagComment(
                                                "flag comment two flag comment two flag comment two flag comment two " +
                                                    "flag comment two flag comment two flag comment two")
-                                           .build()
-                                   )))
-                                   .build())
+                                   ))))
                         .build()
                 )
                 .build();

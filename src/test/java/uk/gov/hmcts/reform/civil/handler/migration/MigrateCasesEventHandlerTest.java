@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseNoteReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReferenceCsvLoader;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.DashboardScenarioCaseReference;
@@ -27,7 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
@@ -66,6 +66,7 @@ class MigrateCasesEventHandlerTest {
         when(externalTask.getVariable("taskName")).thenReturn("testTask");
         when(externalTask.getVariable("caseIds")).thenReturn("");
         when(externalTask.getVariable("scenario")).thenReturn(null);
+        when(externalTask.getVariable("caseNoteElementId")).thenReturn(null);
         when(externalTask.getVariable("csvFileName")).thenReturn("test.csv");
 
         @SuppressWarnings("unchecked")
@@ -92,10 +93,34 @@ class MigrateCasesEventHandlerTest {
         when(externalTask.getVariable("taskName")).thenReturn("testTask");
         when(externalTask.getVariable("caseIds")).thenReturn("123, 456");
         when(externalTask.getVariable("scenario")).thenReturn("SCENARIO_1");
+        when(externalTask.getVariable("caseNoteElementId")).thenReturn(null);
         when(externalTask.getVariable("state")).thenReturn(null);
 
         MigrationTask<? extends CaseReference> migrationTask = mock(MigrationTask.class);
         when(migrationTask.getType()).thenReturn((Class) DashboardScenarioCaseReference.class);
+        doReturn(Optional.of(migrationTask))
+            .when(migrationTaskFactory)
+            .getMigrationTask("testTask");
+
+        ExternalTaskData result = handler.handleTask(externalTask);
+
+        assertNotNull(result);
+        verify(asyncCaseMigrationService, times(1))
+            .migrateCasesAsync(eq(migrationTask), anyList(), isNull());
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    @Test
+    void shouldHandleTaskWithCaseIdsAndCaseNoteElementId() {
+        ExternalTask externalTask = mock(ExternalTask.class);
+        when(externalTask.getVariable("taskName")).thenReturn("testTask");
+        when(externalTask.getVariable("caseIds")).thenReturn("123, 456");
+        when(externalTask.getVariable("scenario")).thenReturn(null);
+        when(externalTask.getVariable("caseNoteElementId")).thenReturn("1234567");
+        when(externalTask.getVariable("state")).thenReturn(null);
+
+        MigrationTask<? extends CaseReference> migrationTask = mock(MigrationTask.class);
+        when(migrationTask.getType()).thenReturn((Class) CaseNoteReference.class);
         doReturn(Optional.of(migrationTask))
             .when(migrationTaskFactory)
             .getMigrationTask("testTask");
@@ -112,7 +137,7 @@ class MigrateCasesEventHandlerTest {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("taskName")).thenReturn(null);
 
-        assertThrows(AssertionError.class, () -> handler.handleTask(externalTask));
+        assertThrows(IllegalArgumentException.class, () -> handler.handleTask(externalTask));
     }
 
     @Test
@@ -133,6 +158,7 @@ class MigrateCasesEventHandlerTest {
         when(externalTask.getVariable("caseIds")).thenReturn("111,222");
         when(externalTask.getVariable("scenario")).thenReturn(null); // scenario is null
         when(externalTask.getVariable("state")).thenReturn("IN_PROGRESS"); // state is present
+        when(externalTask.getVariable("caseNoteElementId")).thenReturn(null);
 
         @SuppressWarnings("unchecked")
         MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
@@ -176,6 +202,7 @@ class MigrateCasesEventHandlerTest {
         when(externalTask.getVariable("caseIds")).thenReturn("");
         when(externalTask.getVariable("scenario")).thenReturn(null);
         when(externalTask.getVariable("state")).thenReturn(null);
+        when(externalTask.getVariable("caseNoteElementId")).thenReturn(null);
         when(externalTask.getVariable("csvFileName")).thenReturn("test.csv");
 
         @SuppressWarnings("unchecked")
@@ -207,7 +234,8 @@ class MigrateCasesEventHandlerTest {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("taskName")).thenReturn("testTask");
         when(externalTask.getVariable("caseIds")).thenReturn("");
-        when(externalTask.getVariable("scenario")).thenReturn(null); // stub scenario
+        when(externalTask.getVariable("scenario")).thenReturn(null);
+        when(externalTask.getVariable("caseNoteElementId")).thenReturn(null); // stub caseNoteItemId
         when(externalTask.getVariable("csvFileName")).thenReturn("empty.csv"); // stub csvFileName
 
         @SuppressWarnings("unchecked")
