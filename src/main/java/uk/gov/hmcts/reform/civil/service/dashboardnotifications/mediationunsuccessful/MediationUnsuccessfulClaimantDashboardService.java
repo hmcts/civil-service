@@ -42,10 +42,10 @@ public class MediationUnsuccessfulClaimantDashboardService extends DashboardScen
     @Override
     public String getScenario(CaseData caseData) {
         if (featureToggleService.isCarmEnabledForCase(caseData)) {
-            if (isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(caseData)) {
-                return SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_CLAIMANT_NONATTENDANCE.getScenario();
-            } else if (isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(caseData)) {
+            if (isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(caseData)) {
                 return SCENARIO_AAA6_CLAIMANT_MEDIATION_WHEN_DEFENDANT_NOT_CONTACTABLE.getScenario();
+            } else if (isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(caseData)) {
+                return SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_CLAIMANT_NONATTENDANCE.getScenario();
             } else {
                 return SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_GENERIC.getScenario();
             }
@@ -53,11 +53,11 @@ public class MediationUnsuccessfulClaimantDashboardService extends DashboardScen
         return SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_UNSUCCESSFUL_CLAIMANT.getScenario();
     }
 
-    private boolean isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(CaseData caseData) {
-        return findMediationUnsuccessfulReason(caseData, List.of(NOT_CONTACTABLE_CLAIMANT_ONE));
-    }
-
     private boolean isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(CaseData caseData) {
         return findMediationUnsuccessfulReason(caseData, List.of(NOT_CONTACTABLE_DEFENDANT_ONE));
+    }
+
+    private boolean isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(CaseData caseData) {
+        return findMediationUnsuccessfulReason(caseData, List.of(NOT_CONTACTABLE_CLAIMANT_ONE));
     }
 }
