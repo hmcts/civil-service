@@ -6,6 +6,8 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
@@ -22,14 +24,15 @@ public class DecisionOutcomeSearchService extends ElasticSearchService {
     }
 
     public Query query(int startIndex) {
+        String timeNow = ZonedDateTime.now(ZoneOffset.UTC).toString();
         return new Query(
             boolQuery()
                 .minimumShouldMatch(1)
                 .should(boolQuery()
-                            .must(rangeQuery("data.hearingDate").lte("now"))
+                            .must(rangeQuery("data.hearingDate").lte(timeNow))
                             .must(beState(PREPARE_FOR_HEARING_CONDUCT_HEARING))
                             .must(boolQuery()
-                                    .should(rangeQuery("data.nextHearingDetails.hearingDateTime").lte("now"))
+                                    .should(rangeQuery("data.nextHearingDetails.hearingDateTime").lte(timeNow))
                                     .should(boolQuery().mustNot(existsQuery("data.nextHearingDetails.hearingDateTime"))))),
             List.of("reference"),
             startIndex
