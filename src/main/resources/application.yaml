@@ -801,7 +801,7 @@ spring:
       hibernate:
         show_sql: false
         format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQL10Dialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   flyway:
     enabled: true
     baselineOnMigrate: true
