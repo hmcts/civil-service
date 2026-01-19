@@ -5,6 +5,7 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.variable.value.FileValue;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseNoteReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReferenceCsvLoader;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.DashboardScenarioCaseReference;
@@ -46,7 +47,9 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        assert externalTask.getVariable(TASK_NAME) != null;
+        if (externalTask.getVariable(TASK_NAME) == null) {
+            throw new IllegalArgumentException("Taskname can't be empty");
+        }
 
         String taskName = externalTask.getVariable(TASK_NAME);
         MigrationTask<? extends CaseReference> task = migrationTaskFactory
@@ -60,6 +63,7 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
         List<T> caseReferences = new ArrayList<>();
         String caseIds = externalTask.getVariable("caseIds");
         String scenario = externalTask.getVariable("scenario");
+        String caseNoteElementId = externalTask.getVariable("caseNoteElementId");
 
         FileValue excelFileValue = externalTask.getVariableTyped("excelFile", false);
 
@@ -96,6 +100,11 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
                         scenarioInstance.setCaseReference(id);
                         scenarioInstance.setDashboardScenario(scenario);
                         instance = scenarioInstance;
+                    } else if (caseNoteElementId != null) {
+                        CaseNoteReference caseNoteReference = new CaseNoteReference();
+                        caseNoteReference.setCaseReference(id);
+                        caseNoteReference.setCaseNoteElementId(caseNoteElementId);
+                        instance = caseNoteReference;
                     } else {
                         CaseReference caseRef = new CaseReference();
                         caseRef.setCaseReference(id);
