@@ -12,8 +12,6 @@ import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.HashMap;
 
-import static java.util.Objects.nonNull;
-
 public abstract class DashboardNotificationsParamsBuilder {
 
     public static final String EN = "EN";
@@ -66,15 +64,14 @@ public abstract class DashboardNotificationsParamsBuilder {
     }
 
     protected RespondToClaim getRespondToClaim(CaseData caseData) {
-        if (nonNull(caseData)) {
-            if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE) {
-                return caseData.getRespondToClaim();
-            } else if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
-                return caseData.getRespondToAdmittedClaim();
-            }
+        RespondToClaim respondToClaim = null;
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE) {
+            respondToClaim = caseData.getRespondToClaim();
+        } else if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
+            respondToClaim = caseData.getRespondToAdmittedClaim();
         }
 
-        return null;
+        return respondToClaim;
     }
 
     protected String getClaimantRepaymentPlanDecision(CaseData caseData) {
