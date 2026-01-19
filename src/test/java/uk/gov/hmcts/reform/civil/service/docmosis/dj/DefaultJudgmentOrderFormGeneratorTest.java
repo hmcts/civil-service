@@ -269,8 +269,7 @@ class DefaultJudgmentOrderFormGeneratorTest {
 
             DisposalHearingBundleDJ disposalHearingBundle = new DisposalHearingBundleDJ()
                 .setInput("test")
-                .setType(disposalHearingBundleTypes)
-                ;
+                .setType(disposalHearingBundleTypes);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
