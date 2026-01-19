@@ -25,4 +25,5 @@ public final class DashboardTaskIds {
     public static final String DEFENDANT_SIGN_SETTLEMENT_AGREEMENT = "GenerateDashboardNotificationsSignSettlementAgreement";
     public static final String DISCONTINUE_CLAIM_CLAIMANT = "GenerateDashboardNotificationsDiscontinueClaimClaimant";
     public static final String NOTIFY_LIP_CLAIMANT_HWF_OUTCOME = "GenerateDashboardNotificationsNotifyLipClaimantHwfOutcome";
+    public static final String DEFENDANT_RESPONSE_DEADLINE_CHECK = "GenerateDashboardNotificationsDefendantResponseDeadlineCheck";
 }
