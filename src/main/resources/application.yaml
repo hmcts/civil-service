@@ -797,7 +797,7 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       naming:
-        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+        physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
     properties:
       hibernate:
         show_sql: false
