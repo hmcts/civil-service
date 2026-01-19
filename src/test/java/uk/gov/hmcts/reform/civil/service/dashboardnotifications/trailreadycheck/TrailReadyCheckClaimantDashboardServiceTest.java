@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.dashboardnotifications.evidenceuploaded;
+package uk.gov.hmcts.reform.civil.service.dashboardnotifications.trailreadycheck;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -6,27 +6,27 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.trailreadycheck.TrailReadyCheckClaimantDashboardService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_NOT_UPLOADED_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOADED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_CHECK_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
-class EvidenceUploadedDefendantDashboardServiceTest {
+class TrailReadyCheckClaimantDashboardServiceTest {
 
     private static final String AUTH_TOKEN = "BEARER";
 
@@ -40,7 +40,7 @@ class EvidenceUploadedDefendantDashboardServiceTest {
     private DashboardNotificationsParamsMapper mapper;
 
     @InjectMocks
-    private EvidenceUploadedDefendantDashboardService service;
+    private TrailReadyCheckClaimantDashboardService service;
 
     @BeforeEach
     void setUp() {
@@ -48,68 +48,72 @@ class EvidenceUploadedDefendantDashboardServiceTest {
     }
 
     @Test
-    void shouldNotifyDefendantWhenEvidenceUploadedWithDocumentDate() {
+    void shouldNotifyClaimantWhenTrailReadyCheckRequired() {
         CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setRespondent1Represented(YesOrNo.NO);
-        caseData.setCaseDocumentUploadDateRes(LocalDateTime.now());
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setTrialReadyApplicant(null);
+        caseData.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
         caseData.setCcdCaseReference(1234L);
 
-        service.notifyCaseEvidenceUploaded(caseData, AUTH_TOKEN);
+        service.notifyTrailReadyCheck(caseData, AUTH_TOKEN);
 
-        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole("1234", "DEFENDANT");
-        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole("1234", "DEFENDANT");
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole("1234", "CLAIMANT");
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole("1234", "CLAIMANT");
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
-            SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOADED_DEFENDANT.getScenario(),
+            SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_CHECK_CLAIMANT.getScenario(),
             "1234",
             ScenarioRequestParams.builder().params(new HashMap<>()).build()
         );
     }
 
     @Test
-    void shouldNotifyDefendantWhenEvidenceNotUploadedWithoutDocumentDate() {
+    void shouldNotifyClaimantWhenFastClaimTrack() {
         CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setRespondent1Represented(YesOrNo.NO);
-        caseData.setCaseDocumentUploadDateRes(null);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setTrialReadyApplicant(null);
+        caseData.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
         caseData.setCcdCaseReference(5678L);
 
-        service.notifyCaseEvidenceUploaded(caseData, AUTH_TOKEN);
+        service.notifyTrailReadyCheck(caseData, AUTH_TOKEN);
 
-        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole("5678", "DEFENDANT");
-        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole("5678", "DEFENDANT");
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole("5678", "CLAIMANT");
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole("5678", "CLAIMANT");
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
-            SCENARIO_AAA6_CP_HEARING_DOCUMENTS_NOT_UPLOADED_DEFENDANT.getScenario(),
+            SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_CHECK_CLAIMANT.getScenario(),
             "5678",
             ScenarioRequestParams.builder().params(new HashMap<>()).build()
         );
     }
 
     @Test
-    void shouldUseUploadedScenarioWhenDocumentDatePresent() {
+    void shouldUseTrailReadyCheckScenarioWhenTrialReadyNull() {
         CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setRespondent1Represented(YesOrNo.NO);
-        caseData.setCaseDocumentUploadDateRes(LocalDateTime.of(2024, 1, 15, 10, 30));
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setTrialReadyApplicant(null);
+        caseData.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
         caseData.setCcdCaseReference(9012L);
 
-        service.notifyCaseEvidenceUploaded(caseData, AUTH_TOKEN);
+        service.notifyTrailReadyCheck(caseData, AUTH_TOKEN);
 
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
-            SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOADED_DEFENDANT.getScenario(),
+            SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_CHECK_CLAIMANT.getScenario(),
             "9012",
             ScenarioRequestParams.builder().params(new HashMap<>()).build()
         );
     }
 
     @Test
-    void shouldNotNotifyDefendantWhenRepresentedYes() {
+    void shouldNotNotifyClaimantWhenRepresentedYes() {
         CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setRespondent1Represented(YesOrNo.YES);
-        caseData.setCaseDocumentUploadDateRes(LocalDateTime.now());
+        caseData.setApplicant1Represented(YesOrNo.YES);
+        caseData.setTrialReadyApplicant(null);
+        caseData.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
         caseData.setCcdCaseReference(3456L);
 
-        service.notifyCaseEvidenceUploaded(caseData, AUTH_TOKEN);
+        service.notifyTrailReadyCheck(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardNotificationService);
         verifyNoInteractions(taskListService);

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -25,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_PIP_LETTER;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GeneratePipLetterHandler extends CallbackHandler {
@@ -74,11 +76,13 @@ public class GeneratePipLetterHandler extends CallbackHandler {
 
     private void generateAndPrintPipLetter(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        log.info("generateAndPrintPipLetter for case {}", caseData.getCcdCaseReference());
         byte[] letterContent = pipLetterGenerator.downloadLetter(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
-
         List<String> recipients = Collections.singletonList(caseData.getRespondent1().getPartyName());
+        log.info("Printing letter for case {}", caseData.getCcdCaseReference());
         bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
                 caseData.getLegacyCaseReference(), FIRST_CONTACT_PACK_LETTER_TYPE, recipients);
+        log.info("Finished printing letter for case {}", caseData.getCcdCaseReference());
     }
 
     private String setClaimState(CaseData caseData) {
