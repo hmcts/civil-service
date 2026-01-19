@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotification
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardServiceTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.trailreadyservice.TrailReadyCheckDefendantDashboardService;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.trailreadycheck.TrailReadyCheckDefendantDashboardService;
 
 @Component
 public class TrailReadyCheckDefendantDashboardTask extends DashboardServiceTask {
