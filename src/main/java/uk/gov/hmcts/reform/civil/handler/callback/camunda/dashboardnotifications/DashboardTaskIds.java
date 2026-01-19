@@ -9,4 +9,5 @@ public final class DashboardTaskIds {
     public static final String CASE_PROCEEDS_IN_CASEMAN = "GenerateDashboardNotificationsCaseProceedsInCaseman";
     public static final String DISMISS_CASE = "GenerateDashboardNotificationsDismissCase";
     public static final String EVIDENCE_UPLOADED = "GenerateDashboardNotificationsEvidenceUploaded";
+    public static final String MEDIATION_UNSUCCESSFUL = "GenerateDashboardNotificationsMediationUnsuccessful";
 }
