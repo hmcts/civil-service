@@ -483,6 +483,8 @@ public class SdoHelper {
                 return caseData.getSdoR2FastTrackUseOfWelshToggle() != null;
             case "fastTrackTrialBundleToggle":
                 return caseData.getFastTrackTrialBundleToggle() != null;
+            case "fastTrackPenalNoticeToggle":
+                return caseData.getFastTrackPenalNoticeToggle() != null;
             default:
                 return false;
         }
