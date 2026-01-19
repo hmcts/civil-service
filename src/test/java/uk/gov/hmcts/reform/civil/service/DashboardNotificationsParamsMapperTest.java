@@ -662,6 +662,36 @@ public class DashboardNotificationsParamsMapperTest {
     }
 
     @Test
+    void shouldReturnEmptyMap_whenCaseDataIsNull() {
+        Map<String, Object> result = mapper.mapCaseDataToParams(null);
+        assertThat(result).isEmpty();
+
+        Map<String, Object> resultWithEvent = mapper.mapCaseDataToParams(null, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT);
+        assertThat(resultWithEvent).isEmpty();
+    }
+
+    @Test
+    void shouldNotThrowException_whenDjSdoCollectionIsEmpty() {
+        caseData.setOrderSDODocumentDJCollection(new ArrayList<>());
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT);
+        assertThat(result).doesNotContainKey("orderDocument");
+    }
+
+    @Test
+    void shouldNotThrowException_whenDjSdoCollectionIsNull() {
+        caseData.setOrderSDODocumentDJCollection(null);
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT);
+        assertThat(result).doesNotContainKey("orderDocument");
+    }
+
+    @Test
+    void shouldNotThrowException_whenSdoDocumentIsNull() {
+        caseData.setSdoOrderDocument(null);
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT);
+        assertThat(result).doesNotContainKey("orderDocument");
+    }
+
+    @Test
     public void shouldMapParameters_whenHearingFast() {
         caseData.setRespondent1ResponseDeadline(null);
         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
