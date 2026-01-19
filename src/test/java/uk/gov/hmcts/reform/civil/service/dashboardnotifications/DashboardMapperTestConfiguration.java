@@ -16,7 +16,8 @@ import org.springframework.context.annotation.FilterType;
         @Filter(type = FilterType.REGEX,
             pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.evidenceuploaded.*"),
         @Filter(type = FilterType.REGEX,
-            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.mediationunsuccessful.*")
+            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.mediationunsuccessful.*"),
+        @Filter(type = FilterType.REGEX,
             pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.trailreadycheck.*")
     }
 )
