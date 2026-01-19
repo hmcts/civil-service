@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskContext;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.mediationsuccessful.MediationSuccessfulClaimantDashboardService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.mediationsuccessful.MediationSuccessfulDefendantDashboardService;
 
@@ -25,7 +26,7 @@ class MediationSuccessfulDashboardTaskTest {
     @Mock
     private MediationSuccessfulDefendantDashboardService defendantDashboardService;
 
-    private final CaseData caseData = CaseData.builder().ccdCaseReference(1L).build();
+    private final CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(1L).build();
 
     @BeforeEach
     void setupContext() {
