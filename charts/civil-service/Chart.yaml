@@ -44,10 +44,10 @@ dependencies:
     condition: em-stitching.enabled
   - name: servicebus
     version: v1.2.2-beta
-    repository: 'oci://hmctspublic.azurecr.io/helm'
+    repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: servicebus.enabled
     alias: hmcsb
   - name: servicebus
-    version: v1.2.2-beta
+    version: v1.2.2
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: servicebus.enabled
