@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.HashMap;
@@ -16,29 +17,33 @@ import java.util.Map;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.HearingScheduledClaimantNotificationHandler.fillPreferredLocationData; //TODO: remove -> helper
 
 @Service
 public class HearingScheduledDefendantDashboardService extends DashboardScenarioService {
 
     private final LocationReferenceDataService locationRefDataService;
+    private final CourtLocationUtils courtLocationUtils;
 
     public HearingScheduledDefendantDashboardService(DashboardScenariosService dashboardScenariosService,
                                                      DashboardNotificationsParamsMapper mapper,
-                                                     LocationReferenceDataService locationRefDataService) {
+                                                     LocationReferenceDataService locationRefDataService,
+                                                     CourtLocationUtils courtLocationUtils) {
         super(dashboardScenariosService, mapper);
         this.locationRefDataService = locationRefDataService;
+        this.courtLocationUtils = courtLocationUtils;
     }
 
     public void notifyHearingScheduled(CaseData caseData, String authToken) {
+        populateCourtName(caseData, authToken);
         recordScenario(caseData, authToken);
     }
 
-    @Override
-    public void beforeRecordScenario(CaseData caseData, String authToken) {
-        List<LocationRefData> locations = (locationRefDataService
-            .getHearingCourtLocations(authToken));
-        LocationRefData locationRefData = fillPreferredLocationData(locations, caseData.getHearingLocation());
+    private void populateCourtName(CaseData caseData, String authToken) {
+        List<LocationRefData> locations = locationRefDataService.getHearingCourtLocations(authToken);
+        LocationRefData locationRefData = courtLocationUtils.fillPreferredLocationData(
+            locations,
+            caseData.getHearingLocation()
+        );
         if (nonNull(locationRefData)) {
             caseData.setHearingLocationCourtName(locationRefData.getSiteName());
         }
@@ -56,8 +61,7 @@ public class HearingScheduledDefendantDashboardService extends DashboardScenario
         if (shouldRecordScenario(caseData)) {
             scenarios.put(
                 DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_DEFENDANT.getScenario(),
-                AllocatedTrack.FAST_CLAIM.name().equals(caseData.getAssignedTrack())
-                    && isNull(caseData.getTrialReadyRespondent1())
+                AllocatedTrack.FAST_CLAIM.name().equals(caseData.getAssignedTrack()) && isNull(caseData.getTrialReadyRespondent1())
             );
 
             scenarios.put(DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_DEFENDANT.getScenario(), true);

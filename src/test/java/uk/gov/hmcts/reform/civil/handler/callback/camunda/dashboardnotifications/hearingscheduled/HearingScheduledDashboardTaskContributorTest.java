@@ -7,24 +7,30 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskIds;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(MockitoExtension.class)
 class HearingScheduledDashboardTaskContributorTest {
 
     @Mock
-    private HearingScheduledClaimantHmcDashboardTask claimantTask;
+    private HearingScheduledClaimantDashboardTask claimantTask;
     @Mock
     private HearingScheduledDefendantDashboardTask defendantTask;
 
     @Test
-    void shouldExposeTaskIdAndHandlers() {
-        HearingScheduledHmcDashboardTaskContributor contributor =
-            new HearingScheduledHmcDashboardTaskContributor(claimantTask, defendantTask);
+    void shouldExposeTaskIdAndHandlersForStandard() {
+        HearingScheduledDashboardTaskContributor contributor =
+            new HearingScheduledDashboardTaskContributor(DashboardTaskIds.HEARING_SCHEDULED, claimantTask, defendantTask);
+
+        assertThat(contributor.taskId()).isEqualTo(DashboardTaskIds.HEARING_SCHEDULED);
+        assertThat(contributor.dashboardTasks()).containsExactly(claimantTask, defendantTask);
+    }
+
+    @Test
+    void shouldExposeTaskIdAndHandlersForHmc() {
+        HearingScheduledDashboardTaskContributor contributor =
+            new HearingScheduledDashboardTaskContributor(DashboardTaskIds.HEARING_SCHEDULED_HMC, claimantTask, defendantTask);
 
         assertThat(contributor.taskId()).isEqualTo(DashboardTaskIds.HEARING_SCHEDULED_HMC);
         assertThat(contributor.dashboardTasks()).containsExactly(claimantTask, defendantTask);
-        assertThatThrownBy(() -> contributor.dashboardTasks().add(claimantTask))
-            .isInstanceOf(UnsupportedOperationException.class);
     }
 }

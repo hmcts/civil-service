@@ -7,9 +7,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
-import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
-import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.HashMap;
@@ -20,31 +19,33 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting.LISTING;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.HearingScheduledClaimantNotificationHandler.fillPreferredLocationData;
 
-@Service
+@Service("hearingScheduledClaimantDashboardService")
 public class HearingScheduledClaimantDashboardService extends DashboardScenarioService {
 
     private final LocationReferenceDataService locationRefDataService;
-    private final HearingNoticeCamundaService camundaService;
-    private final HearingFeesService hearingFeesService;
+    private final CourtLocationUtils courtLocationUtils;
 
-    public HearingScheduledClaimantDashboardService(DashboardScenariosService dashboardScenariosService, DashboardNotificationsParamsMapper mapper, LocationReferenceDataService locationRefDataService, HearingNoticeCamundaService camundaService, HearingFeesService hearingFeesService) {
+    public HearingScheduledClaimantDashboardService(DashboardScenariosService dashboardScenariosService,
+                                                    DashboardNotificationsParamsMapper mapper,
+                                                    LocationReferenceDataService locationRefDataService,
+                                                    CourtLocationUtils courtLocationUtils) {
         super(dashboardScenariosService, mapper);
         this.locationRefDataService = locationRefDataService;
-        this.camundaService = camundaService;
-        this.hearingFeesService = hearingFeesService;
+        this.courtLocationUtils = courtLocationUtils;
     }
 
     public void notifyHearingScheduled(CaseData caseData, String authToken) {
+        populateCourtName(caseData, authToken);
         recordScenario(caseData, authToken);
     }
 
-    @Override
-    public void beforeRecordScenario(CaseData caseData, String authToken) {
-        List<LocationRefData> locations = (locationRefDataService.getHearingCourtLocations(authToken));
-        //TODO: move this logic out into helper
-        LocationRefData locationRefData = fillPreferredLocationData(locations, caseData.getHearingLocation());
+    private void populateCourtName(CaseData caseData, String authToken) {
+        List<LocationRefData> locations = locationRefDataService.getHearingCourtLocations(authToken);
+        LocationRefData locationRefData = courtLocationUtils.fillPreferredLocationData(
+            locations,
+            caseData.getHearingLocation()
+        );
         if (nonNull(locationRefData)) {
             caseData.setHearingLocationCourtName(locationRefData.getSiteName());
         }
@@ -60,27 +61,31 @@ public class HearingScheduledClaimantDashboardService extends DashboardScenarioS
         Map<String, Boolean> scenarios = new HashMap<>();
 
         if (shouldRecordScenario(caseData)) {
-            boolean hasPaidFee = caseData.isHearingFeePaid();
-            boolean isNewHearingWithoutFee = (caseData.getCcdState() == HEARING_READINESS
-                && caseData.getListingOrRelisting() == LISTING);
-
-            boolean shouldRecordFeeScenario = !hasPaidFee && isNewHearingWithoutFee;
             scenarios.put(
                 DashboardScenarios.SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT.getScenario(),
-                shouldRecordFeeScenario
+                isHearingFeeRequired(caseData)
             );
 
-            boolean shouldRecordFastScenario = AllocatedTrack.FAST_CLAIM.name().equals(caseData.getAssignedTrack())
-                && isNull(caseData.getTrialReadyApplicant());
             scenarios.put(
                 DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_CLAIMANT.getScenario(),
-                shouldRecordFastScenario
+                isTrialArrangementEligible(caseData)
             );
 
             scenarios.put(DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT.getScenario(), true);
         }
 
         return scenarios;
+    }
+
+    protected boolean isHearingFeeRequired(CaseData caseData) {
+        boolean hasPaidFee = caseData.isHearingFeePaid();
+        boolean isNewHearingWithoutFee = (caseData.getCcdState() == HEARING_READINESS && caseData.getListingOrRelisting() == LISTING);
+
+        return !hasPaidFee && isNewHearingWithoutFee;
+    }
+
+    protected boolean isTrialArrangementEligible(CaseData caseData) {
+        return AllocatedTrack.FAST_CLAIM.name().equals(caseData.getAssignedTrack()) && isNull(caseData.getTrialReadyApplicant());
     }
 
     @Override
