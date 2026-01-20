@@ -72,7 +72,6 @@ class PaymentStatusRetryServiceTest {
         when(caseData.isLipvLipOneVOne()).thenReturn(false);
         when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.UNSPEC_CLAIM);
 
-
         StartEventResponse startEventResponse = StartEventResponse.builder()
             .token("token")
             .eventId("eventId")
