@@ -142,12 +142,11 @@ class UpdateWaCourtLocationsServiceTest {
             LocationRefData.builder().epimmsId("789654").region("west").regionId("3").siteName("stoke somewhere").build()
         );
 
-        DmnListingLocations dmnListingLocations = DmnListingLocations.builder()
-            .cmcListingLocation(DmnListingLocationsModel.builder().type("String").value("123456").valueInfo(null).build())
-            .ccmcListingLocation(DmnListingLocationsModel.builder().type("String").value("123456").valueInfo(null).build())
-            .ptrListingLocation(DmnListingLocationsModel.builder().type("String").value("654321").valueInfo(null).build())
-            .trialListingLocation(DmnListingLocationsModel.builder().type("String").value("789654").valueInfo(null).build())
-            .build();
+        DmnListingLocations dmnListingLocations = new DmnListingLocations()
+            .setCmcListingLocation(new DmnListingLocationsModel().setType("String").setValue("123456").setValueInfo(null))
+            .setCcmcListingLocation(new DmnListingLocationsModel().setType("String").setValue("123456").setValueInfo(null))
+            .setPtrListingLocation(new DmnListingLocationsModel().setType("String").setValue("654321").setValueInfo(null))
+            .setTrialListingLocation(new DmnListingLocationsModel().setType("String").setValue("789654").setValueInfo(null));
 
         when(camundaClient.getEvaluatedDmnCourtLocations(anyString(), anyString())).thenReturn(testMap);
         when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
@@ -283,12 +282,11 @@ class UpdateWaCourtLocationsServiceTest {
             LocationRefData.builder().epimmsId("789654").region("west").regionId("3").siteName("stoke somewhere").build()
         );
 
-        DmnListingLocations dmnListingLocations = DmnListingLocations.builder()
-            .cmcListingLocation(DmnListingLocationsModel.builder().type("String").value(cnbcEpimmId).valueInfo(null).build())
-            .ccmcListingLocation(DmnListingLocationsModel.builder().type("String").value(cnbcEpimmId).valueInfo(null).build())
-            .ptrListingLocation(DmnListingLocationsModel.builder().type("String").value(cnbcEpimmId).valueInfo(null).build())
-            .trialListingLocation(DmnListingLocationsModel.builder().type("String").value(cnbcEpimmId).valueInfo(null).build())
-            .build();
+        DmnListingLocations dmnListingLocations = new DmnListingLocations()
+            .setCmcListingLocation(new DmnListingLocationsModel().setType("String").setValue(cnbcEpimmId).setValueInfo(null))
+            .setCcmcListingLocation(new DmnListingLocationsModel().setType("String").setValue(cnbcEpimmId).setValueInfo(null))
+            .setPtrListingLocation(new DmnListingLocationsModel().setType("String").setValue(cnbcEpimmId).setValueInfo(null))
+            .setTrialListingLocation(new DmnListingLocationsModel().setType("String").setValue(cnbcEpimmId).setValueInfo(null));
 
         when(camundaClient.getEvaluatedDmnCourtLocations(anyString(), anyString())).thenReturn(testCnbcMap);
         when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
@@ -344,12 +342,11 @@ class UpdateWaCourtLocationsServiceTest {
             LocationRefData.builder().epimmsId("789654").region("west").regionId("3").siteName("stoke somewhere").build()
         );
 
-        DmnListingLocations dmnListingLocations = DmnListingLocations.builder()
-            .cmcListingLocation(DmnListingLocationsModel.builder().type("String").value(ccmccEpimmId).valueInfo(null).build())
-            .ccmcListingLocation(DmnListingLocationsModel.builder().type("String").value(ccmccEpimmId).valueInfo(null).build())
-            .ptrListingLocation(DmnListingLocationsModel.builder().type("String").value(ccmccEpimmId).valueInfo(null).build())
-            .trialListingLocation(DmnListingLocationsModel.builder().type("String").value(ccmccEpimmId).valueInfo(null).build())
-            .build();
+        DmnListingLocations dmnListingLocations = new DmnListingLocations()
+            .setCmcListingLocation(new DmnListingLocationsModel().setType("String").setValue(ccmccEpimmId).setValueInfo(null))
+            .setCcmcListingLocation(new DmnListingLocationsModel().setType("String").setValue(ccmccEpimmId).setValueInfo(null))
+            .setPtrListingLocation(new DmnListingLocationsModel().setType("String").setValue(ccmccEpimmId).setValueInfo(null))
+            .setTrialListingLocation(new DmnListingLocationsModel().setType("String").setValue(ccmccEpimmId).setValueInfo(null));
 
         when(camundaClient.getEvaluatedDmnCourtLocations(anyString(), anyString())).thenReturn(testCnbcMap);
         when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);

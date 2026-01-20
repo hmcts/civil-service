@@ -49,7 +49,7 @@ class ClaimFormGeneratorTest {
     void shouldGenerateDraftClaimForm() {
         //Given
         CaseData caseData = CaseData.builder().build();
-        ClaimForm claimForm = ClaimForm.builder().build();
+        ClaimForm claimForm = new ClaimForm();
         given(claimFormMapper.toClaimForm(any())).willReturn(claimForm);
         DocmosisDocument docmosisDocument = DocmosisDocument.builder().build();
         given(documentGeneratorService.generateDocmosisDocument(any(ClaimForm.class), any())).willReturn(
@@ -72,7 +72,7 @@ class ClaimFormGeneratorTest {
     void shouldGenerateClaimantClaimForm() {
         //Given
         CaseData caseData = CaseData.builder().build();
-        ClaimForm claimForm = ClaimForm.builder().build();
+        ClaimForm claimForm = new ClaimForm();
         given(claimFormMapper.toClaimForm(any())).willReturn(claimForm);
         DocmosisDocument docmosisDocument = DocmosisDocument.builder().build();
         given(documentGeneratorService.generateDocmosisDocument(any(ClaimForm.class), any())).willReturn(
@@ -95,7 +95,7 @@ class ClaimFormGeneratorTest {
     void shouldGenerateDefendantClaimForm() {
         //Given
         CaseData caseData = CaseData.builder().build();
-        ClaimForm claimForm = ClaimForm.builder().build();
+        ClaimForm claimForm = new ClaimForm();
         given(claimFormMapper.toClaimForm(any())).willReturn(claimForm);
         DocmosisDocument docmosisDocument = DocmosisDocument.builder().build();
         given(documentGeneratorService.generateDocmosisDocument(any(ClaimForm.class), any())).willReturn(

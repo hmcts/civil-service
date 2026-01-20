@@ -94,23 +94,23 @@ class AcknowledgementOfClaimGeneratorForSpecTest {
     }
 
     private AcknowledgementOfClaimFormForSpec getExpectedFormData(CaseData caseData) {
-        return AcknowledgementOfClaimFormForSpec.builder()
-            .caseName("Mr. John Rambo \nvs Mr. Sole Trader T/A Sole Trader co")
-            .referenceNumber(LEGACY_CASE_REFERENCE)
-            .submittedOn(LocalDate.now())
-            .solicitorReferences(caseData.getSolicitorReferences())
-            .issueDate(caseData.getIssueDate())
-            .responseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
-            .respondent(
-                Party.builder()
-                    .name(caseData.getRespondent1().getPartyName())
-                    .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
-                    .representative(representative)
-                    .litigationFriendName(
-                        ofNullable(caseData.getRespondent1LitigationFriend())
-                            .map(LitigationFriend::getFullName)
-                            .orElse(""))
-                    .build())
-            .build();
+        return new AcknowledgementOfClaimFormForSpec(
+            "[userImage:courtseal.PNG]",
+            "Mr. John Rambo \nvs Mr. Sole Trader T/A Sole Trader co",
+            LEGACY_CASE_REFERENCE,
+            caseData.getSolicitorReferences(),
+            caseData.getIssueDate(),
+            LocalDate.now(),
+            caseData.getRespondent1ResponseDeadline().toLocalDate(),
+            Party.builder()
+                .name(caseData.getRespondent1().getPartyName())
+                .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
+                .representative(representative)
+                .litigationFriendName(
+                    ofNullable(caseData.getRespondent1LitigationFriend())
+                        .map(LitigationFriend::getFullName)
+                        .orElse(""))
+                .build()
+        );
     }
 }

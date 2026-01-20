@@ -61,14 +61,16 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
     @Override
     public AcknowledgementOfClaimForm getTemplateData(CaseData caseData) {
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-        return AcknowledgementOfClaimForm.builder()
-            .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
-            .referenceNumber(caseData.getLegacyCaseReference())
-            .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData))
-            .issueDate(caseData.getIssueDate())
-            .responseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
-            .respondent(prepareRespondentMultiParty(caseData, multiPartyScenario))
-            .build();
+        return new AcknowledgementOfClaimForm(
+            "[userImage:courtseal.PNG]",
+            DocmosisTemplateDataUtils.toCaseName.apply(caseData),
+            caseData.getLegacyCaseReference(),
+            DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData),
+            caseData.getIssueDate(),
+            caseData.getRespondent1ResponseDeadline().toLocalDate(),
+            prepareRespondentMultiParty(caseData, multiPartyScenario),
+            null
+        );
     }
 
     private List<Party> prepareRespondentMultiParty(CaseData caseData, MultiPartyScenario multiPartyScenario) {
@@ -132,15 +134,16 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
                 }
             }
         }
-        return AcknowledgementOfClaimForm.builder()
-                .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
-                .referenceNumber(caseData.getLegacyCaseReference())
-                .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferencesMultiparty(caseData))
-                .issueDate(caseData.getIssueDate())
-                .responseDeadline(responseDeadline)
-                .respondent(prepareRespondentMultiParty(caseData, multiPartyScenario))
-                .responseIntentions(DocmosisTemplateDataUtils.fetchResponseIntentionsDocmosisTemplate(caseData))
-                .build();
+        return new AcknowledgementOfClaimForm(
+                "[userImage:courtseal.PNG]",
+                DocmosisTemplateDataUtils.toCaseName.apply(caseData),
+                caseData.getLegacyCaseReference(),
+                DocmosisTemplateDataUtils.fetchSolicitorReferencesMultiparty(caseData),
+                caseData.getIssueDate(),
+                responseDeadline,
+                prepareRespondentMultiParty(caseData, multiPartyScenario),
+                DocmosisTemplateDataUtils.fetchResponseIntentionsDocmosisTemplate(caseData)
+        );
 
     }
 }
