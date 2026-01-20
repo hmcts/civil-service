@@ -7,9 +7,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskContext;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.hearingscheduled.HearingScheduledClaimantHmcDashboardService;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.hearingscheduled.HearingScheduledClaimantDashboardService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.hearingscheduled.HearingScheduledDefendantDashboardService;
 
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -19,13 +20,13 @@ class HearingScheduledDashboardTaskTest {
     private static final String AUTH_TOKEN = "Bearer token";
 
     @Mock
-    private HearingScheduledClaimantHmcDashboardService claimantDashboardService;
+    private HearingScheduledClaimantDashboardService claimantDashboardService;
     @Mock
     private HearingScheduledDefendantDashboardService defendantDashboardService;
     @Mock
     private DashboardTaskContext context;
-
-    private final CaseData caseData = CaseData.builder().ccdCaseReference(1L).build();
+    @Mock
+    private CaseData caseData;
 
     @BeforeEach
     void setupContext() {
@@ -35,19 +36,17 @@ class HearingScheduledDashboardTaskTest {
 
     @Test
     void claimantTaskShouldDelegateToDashboardService() {
-        HearingScheduledClaimantHmcDashboardTask task = new HearingScheduledClaimantHmcDashboardTask(claimantDashboardService);
-
+        HearingScheduledClaimantDashboardTask task = new HearingScheduledClaimantDashboardTask(claimantDashboardService);
         task.execute(context);
-
+        verify(context, atLeastOnce()).caseData();
         verify(claimantDashboardService).notifyHearingScheduled(caseData, AUTH_TOKEN);
     }
 
     @Test
     void defendantTaskShouldDelegateToDashboardService() {
         HearingScheduledDefendantDashboardTask task = new HearingScheduledDefendantDashboardTask(defendantDashboardService);
-
         task.execute(context);
-
+        verify(context, atLeastOnce()).caseData();
         verify(defendantDashboardService).notifyHearingScheduled(caseData, AUTH_TOKEN);
     }
 }
