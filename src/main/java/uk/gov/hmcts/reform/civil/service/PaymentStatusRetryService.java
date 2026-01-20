@@ -77,7 +77,7 @@ public class PaymentStatusRetryService {
         log.error("Payment status update (CaseData) failed after retries for case {}", caseReference, ex);
     }
 
-    private CaseData updateCaseDataWithPaymentDetails(CardPaymentStatusResponse response,
+    CaseData updateCaseDataWithPaymentDetails(CardPaymentStatusResponse response,
                                                       CaseData caseData,
                                                       FeeType feeType) {
         return updateCaseDataWithPaymentDetails(response, caseData, feeType, null);
