@@ -20,7 +20,10 @@ import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PaymentStatusRetryServiceTest {
@@ -62,26 +65,27 @@ class PaymentStatusRetryServiceTest {
 
     @Test
     void shouldUpdatePaymentStatusUsingCardPaymentResponse() {
+        CaseDetails caseDetails = mock(CaseDetails.class);
+
+        when(coreCaseDataService.getCase(123L)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(caseData.isLipvLipOneVOne()).thenReturn(false);
+        when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.UNSPEC_CLAIM);
+
+
+        StartEventResponse startEventResponse = StartEventResponse.builder()
+            .token("token")
+            .eventId("eventId")
+            .build();
+        when(coreCaseDataService.startUpdate("123", CaseEvent.CREATE_CLAIM_AFTER_PAYMENT))
+            .thenReturn(startEventResponse);
+
         CardPaymentStatusResponse response = CardPaymentStatusResponse.builder()
             .status("success")
             .paymentReference("ref")
             .errorCode("err")
             .errorDescription("desc")
             .build();
-
-        CaseDetails caseDetails = mock(CaseDetails.class);
-        StartEventResponse startEventResponse = StartEventResponse.builder()
-            .token("token")
-            .eventId("eventId")
-            .build();
-
-        when(coreCaseDataService.getCase(123L)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
-        when(caseData.isLipvLipOneVOne()).thenReturn(false);
-        when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.UNSPEC_CLAIM);
-        when(coreCaseDataService.startUpdate("123", CaseEvent.CREATE_CLAIM_AFTER_PAYMENT))
-            .thenReturn(startEventResponse);
-
         service.updatePaymentStatus(FeeType.CLAIMISSUED, "123", response);
 
         verify(coreCaseDataService).submitUpdate(eq("123"), any());
