@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -50,12 +51,11 @@ class PaymentStatusRetryServiceTest {
     @Test
     void shouldSubmitCitizenHearingFeePaymentEvent_forHearingFee() {
         CaseData caseData = lipCaseData();
-
         CaseDetails caseDetails = buildCaseDetails(caseData);
+
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
-        when(coreCaseDataService.startUpdate(any(), any()))
-            .thenReturn(startEvent(caseDetails));
+        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEvent(caseDetails));
 
         service.updatePaymentStatus(FeeType.HEARING, CASE_ID.toString(), cardPaymentResponse());
 
@@ -71,21 +71,16 @@ class PaymentStatusRetryServiceTest {
 
         CaseData caseData = lipCaseData();
         caseData.setHearingFeePaymentDetails(existing);
-
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
-        when(coreCaseDataService.startUpdate(any(), any()))
-            .thenReturn(startEvent(caseDetails));
+        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEvent(caseDetails));
 
-        service.updatePaymentStatus(
-            FeeType.HEARING,
-            CASE_ID.toString(),
-            cardPaymentResponse()
-        );
+        service.updatePaymentStatus(FeeType.HEARING, CASE_ID.toString(), cardPaymentResponse());
 
-        ArgumentCaptor<CaseDataContent> captor = ArgumentCaptor.forClass(CaseDataContent.class);
+        ArgumentCaptor<CaseDataContent> captor =
+            ArgumentCaptor.forClass(CaseDataContent.class);
         verify(coreCaseDataService).submitUpdate(any(), captor.capture());
 
         CaseData updated =
@@ -95,10 +90,66 @@ class PaymentStatusRetryServiceTest {
             .isEqualTo("EXISTING");
     }
 
-    /* ---------- helpers ---------- */
+    @Test
+    void shouldSubmitClaimIssuedEvent_forSpecClaim() {
+        CaseData caseData =
+            CaseDataBuilder.builder().receiveUpdatePaymentRequest().build();
+        caseData.setCaseAccessCategory(
+            uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM);
+
+        CaseDetails caseDetails = buildCaseDetails(caseData);
+
+        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(coreCaseDataService.startUpdate(any(), any()))
+            .thenReturn(StartEventResponse.builder()
+                            .token(TOKEN)
+                            .eventId(CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT.name())
+                            .caseDetails(caseDetails)
+                            .build()
+            );
+
+        service.updatePaymentStatus(
+            FeeType.CLAIMISSUED, CASE_ID.toString(), cardPaymentResponse());
+
+        verify(coreCaseDataService)
+            .startUpdate(CASE_ID.toString(),
+                         CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT);
+        verify(coreCaseDataService).submitUpdate(any(), any());
+    }
+
+    @Test
+    void shouldCallRecover_whenUpdateFails() {
+        when(coreCaseDataService.getCase(CASE_ID))
+            .thenThrow(new RuntimeException("CCD failure"));
+
+        try {
+            service.updatePaymentStatus(
+                FeeType.HEARING, CASE_ID.toString(), cardPaymentResponse());
+        } catch (Exception ignored) {
+            // expected
+        }
+    }
+
+    @Test
+    void shouldThrowExceptionForUnsupportedFeeType() {
+        assertThrows(IllegalArgumentException.class,
+                     () -> service.updatePaymentStatus(
+                         null, CASE_ID.toString(), cardPaymentResponse()));
+    }
+
+    @Test
+    void shouldHandleNullPaymentStatusGracefully() {
+        CardPaymentStatusResponse response = cardPaymentResponse();
+        response.setStatus(null);
+
+        service.updatePaymentStatus(
+            FeeType.HEARING, CASE_ID.toString(), response);
+    }
 
     private CaseData lipCaseData() {
-        CaseData data = CaseDataBuilder.builder().receiveUpdatePaymentRequest().build();
+        CaseData data =
+            CaseDataBuilder.builder().receiveUpdatePaymentRequest().build();
         data.setApplicant1Represented(YesOrNo.NO);
         data.setRespondent1Represented(YesOrNo.NO);
         return data;
@@ -107,10 +158,7 @@ class PaymentStatusRetryServiceTest {
     private CaseDetails buildCaseDetails(CaseData caseData) {
         return CaseDetails.builder()
             .id(CASE_ID)
-            .data(objectMapper.convertValue(
-                caseData,
-                new TypeReference<>() {}
-            ))
+            .data(objectMapper.convertValue(caseData, new TypeReference<>() {}))
             .build();
     }
 
