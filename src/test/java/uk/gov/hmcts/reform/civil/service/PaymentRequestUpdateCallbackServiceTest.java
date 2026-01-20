@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -73,9 +72,9 @@ class PaymentRequestUpdateCallbackServiceTest {
         service.processCallback(buildServiceDto(PAID), FeeType.HEARING.name());
 
         verify(retryService).updatePaymentStatus(
-            eq(FeeType.HEARING),
-            eq(CASE_ID.toString()),
-            eq(caseData) // now it’s not null
+            FeeType.HEARING,
+            CASE_ID.toString(),
+            caseData
         );
     }
 
