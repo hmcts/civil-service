@@ -13,17 +13,18 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
+import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
+import static uk.gov.hmcts.reform.civil.enums.FeeType.APPLICATION;
 
 @ExtendWith(MockitoExtension.class)
 class PaymentStatusRetryServiceTest {
@@ -124,6 +125,90 @@ class PaymentStatusRetryServiceTest {
 
         assertThat(result).isEqualTo(caseData);
         verify(caseData).setClaimIssuedPaymentDetails(any(PaymentDetails.class));
+    }
+
+    @Test
+    void shouldLogAndRecoverWhenUpdatePaymentStatusCaseDataFails() {
+        PaymentStatusRetryService spyService = spy(service);
+
+        assertThrows(Exception.class, () ->
+            spyService.updatePaymentStatus(FeeType.CLAIMISSUED, "123", caseData)
+        );
+
+        spyService.recover(new CaseDataUpdateException(), FeeType.CLAIMISSUED, "123", caseData);
+    }
+
+    @Test
+    void shouldLogAndRecoverWhenUpdatePaymentStatusCardPaymentFails() {
+        CardPaymentStatusResponse response = CardPaymentStatusResponse.builder()
+            .status("success")
+            .paymentReference("ref")
+            .build();
+
+        when(coreCaseDataService.getCase(123L)).thenThrow(new RuntimeException());
+
+        PaymentStatusRetryService spyService = spy(service);
+
+        assertThrows(CaseDataUpdateException.class, () ->
+            spyService.updatePaymentStatus(FeeType.CLAIMISSUED, "123", response)
+        );
+
+        CardPaymentStatusResponse recoverResponse = CardPaymentStatusResponse.builder()
+            .status("FAILED")
+            .paymentReference("REF123")
+            .errorCode("ERR001")
+            .errorDescription("Payment failed")
+            .build();
+
+        spyService.recover(new CaseDataUpdateException(), FeeType.CLAIMISSUED, "123", recoverResponse);
+    }
+
+    @Test
+    void shouldReturnSpecEventForSpecClaim() {
+        CaseData specCaseData = mock(CaseData.class);
+        when(specCaseData.isLipvLipOneVOne()).thenReturn(false);
+        when(specCaseData.getCaseAccessCategory()).thenReturn(CaseCategory.SPEC_CLAIM);
+
+        CaseEvent event = service.determineEventFromFeeType(specCaseData, FeeType.CLAIMISSUED);
+
+        assertThat(event).isEqualTo(CREATE_CLAIM_SPEC_AFTER_PAYMENT);
+    }
+
+    @Test
+    void shouldThrowExceptionForUnsupportedFeeType() {
+        CaseData dummyCaseData = mock(CaseData.class);
+        when(dummyCaseData.isLipvLipOneVOne()).thenReturn(false);
+
+        assertThrows(IllegalArgumentException.class, () ->
+            service.determineEventFromFeeType(dummyCaseData, APPLICATION)
+        );
+    }
+
+    @Test
+    void shouldLogRetryAndRecoverForCaseData() {
+        CaseDataUpdateException ex = new CaseDataUpdateException();
+        CaseData caseData = mock(CaseData.class);
+
+        try {
+            service.updatePaymentStatus(FeeType.CLAIMISSUED, "123", caseData);
+        } catch (CaseDataUpdateException ignored) {
+        }
+
+        service.recover(ex, FeeType.CLAIMISSUED, "123", caseData);
+    }
+
+    @Test
+    void recoverShouldLogErrorForCardPaymentResponse() {
+        CaseDataUpdateException ex = new CaseDataUpdateException();
+
+        CardPaymentStatusResponse response = CardPaymentStatusResponse.builder()
+            .status("FAILED")
+            .errorCode("ERR123")
+            .errorDescription("Payment failed")
+            .paymentReference("PAY123")
+            .build();
+
+        service.recover(ex, FeeType.CLAIMISSUED, "12345", response);
     }
 }
 

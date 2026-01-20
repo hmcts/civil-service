@@ -66,7 +66,18 @@ public class PaymentStatusRetryService {
                         FeeType feeType,
                         String caseReference,
                         CardPaymentStatusResponse response) {
-        log.error("Payment status update failed after retries for case {}", caseReference, ex);
+
+        String status = response != null ? response.getStatus() : "N/A";
+        String errorCode = response != null ? response.getErrorCode() : "N/A";
+
+        log.error(
+            "Payment status update failed after retries for case {} and fee type {}. Status: {}, ErrorCode: {}",
+            caseReference,
+            feeType,
+            status,
+            errorCode,
+            ex
+        );
     }
 
     @Recover
@@ -74,7 +85,7 @@ public class PaymentStatusRetryService {
                         FeeType feeType,
                         String caseReference,
                         CaseData caseData) {
-        log.error("Payment status update (CaseData) failed after retries for case {}", caseReference, ex);
+        log.error("Payment status update (CaseData) failed after retries for case {} and fee type {}", caseReference, feeType, ex);
     }
 
     CaseData updateCaseDataWithPaymentDetails(CardPaymentStatusResponse response,
@@ -128,7 +139,7 @@ public class PaymentStatusRetryService {
         submitEvent(caseData, caseId, event);
     }
 
-    private CaseEvent determineEventFromFeeType(CaseData caseData, FeeType feeType) {
+    CaseEvent determineEventFromFeeType(CaseData caseData, FeeType feeType) {
         if (caseData.isLipvLipOneVOne()) {
             return switch (feeType) {
                 case HEARING -> CITIZEN_HEARING_FEE_PAYMENT;
