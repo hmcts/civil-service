@@ -193,10 +193,10 @@ class PaymentStatusRetryServiceTest {
         CaseDataUpdateException ex = new CaseDataUpdateException();
         CaseData caseData = mock(CaseData.class);
 
-        try {
-            service.updatePaymentStatus(FeeType.CLAIMISSUED, "123", caseData);
-        } catch (CaseDataUpdateException ignored) {
-        }
+        assertThrows(
+            CaseDataUpdateException.class,
+            () -> service.updatePaymentStatus(FeeType.CLAIMISSUED, "123", caseData)
+        );
 
         service.recover(ex, FeeType.CLAIMISSUED, "123", caseData);
     }
