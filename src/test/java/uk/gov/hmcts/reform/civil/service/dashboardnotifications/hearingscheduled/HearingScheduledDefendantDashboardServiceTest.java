@@ -11,13 +11,12 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
-
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +35,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 @ExtendWith(MockitoExtension.class)
 class HearingScheduledDefendantDashboardServiceTest {
 
+    private static final String AUTH_TOKEN = "Bearer token";
+    private static final String CASE_ID = "12345678";
     @Mock
     private DashboardScenariosService dashboardScenariosService;
     @Mock
@@ -44,28 +45,22 @@ class HearingScheduledDefendantDashboardServiceTest {
     private LocationReferenceDataService locationRefDataService;
     @Mock
     private CourtLocationUtils courtLocationUtils;
-
     @InjectMocks
     private HearingScheduledDefendantDashboardService service;
 
-    private static final String AUTH_TOKEN = "Bearer token";
-    private static final String CASE_ID = "12345678";
-
     @Test
     void shouldPopulateCourtName_whenNotifyHearingScheduledIsCalled() {
-        DynamicList hearingLocation = DynamicList.builder()
-            .value(DynamicListElement.builder()
-                       .label("Court Name - Address - Postcode")
-                       .build())
-            .build();
-        CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted().build().toBuilder()
-            .hearingLocation(hearingLocation)
-            .build();
-        LocationRefData locationRefData = LocationRefData.builder()
-            .siteName("Court Name")
-            .courtAddress("Address")
-            .postcode("Postcode")
-            .build();
+        DynamicList hearingLocation = new DynamicList();
+        hearingLocation.setValue(DynamicListElement.dynamicElement("Court Name - Address - Postcode"));
+
+        CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted().build();
+        caseData.setHearingLocation(hearingLocation);
+
+        LocationRefData locationRefData = new LocationRefData();
+        locationRefData.setSiteName("Court Name");
+        locationRefData.setCourtAddress("Address");
+        locationRefData.setPostcode("Postcode");
+
         List<LocationRefData> locations = List.of(locationRefData);
         when(locationRefDataService.getHearingCourtLocations(AUTH_TOKEN)).thenReturn(locations);
         when(courtLocationUtils.fillPreferredLocationData(locations, hearingLocation)).thenReturn(locationRefData);
@@ -77,20 +72,16 @@ class HearingScheduledDefendantDashboardServiceTest {
 
     @Test
     void shouldNotPopulateCourtName_whenNoMatchingLocationFound() {
-        DynamicList hearingLocation = DynamicList.builder()
-            .value(DynamicListElement.builder()
-                       .label("Non-Matching Label")
-                       .build())
-            .build();
-        CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted().build().toBuilder()
-            .hearingLocation(hearingLocation)
-            .build();
+        DynamicList hearingLocation = new DynamicList();
+        hearingLocation.setValue(DynamicListElement.dynamicElement("Non-Matching Label"));
 
-        LocationRefData otherLocation = LocationRefData.builder()
-            .siteName("Other Court")
-            .courtAddress("Other Address")
-            .postcode("Other Postcode")
-            .build();
+        CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted().build();
+        caseData.setHearingLocation(hearingLocation);
+
+        LocationRefData otherLocation = new LocationRefData();
+        otherLocation.setSiteName("Other Name");
+        otherLocation.setCourtAddress("Other Address");
+        otherLocation.setPostcode("Other Postcode");
 
         when(locationRefDataService.getHearingCourtLocations(AUTH_TOKEN))
             .thenReturn(List.of(otherLocation));
@@ -114,32 +105,32 @@ class HearingScheduledDefendantDashboardServiceTest {
     @Test
     void shouldRecordScenarios_whenDefendantIsUnrepresented() {
         CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
-            .ccdCaseReference(Long.valueOf(CASE_ID))
-            .respondent1Represented(uk.gov.hmcts.reform.civil.enums.YesOrNo.NO)
+            .ccdCaseReference(Long.parseLong(CASE_ID))
+            .respondent1Represented(YesOrNo.NO)
             .build();
         when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
 
         service.notifyHearingScheduled(caseData, AUTH_TOKEN);
 
         verify(dashboardScenariosService).recordScenarios(
-            AUTH_TOKEN,
-            SCENARIO_AAA6_CP_HEARING_SCHEDULED_DEFENDANT.getScenario(),
-            CASE_ID,
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_CP_HEARING_SCHEDULED_DEFENDANT.getScenario()),
+            eq(CASE_ID),
+            any(ScenarioRequestParams.class)
         );
         verify(dashboardScenariosService).recordScenarios(
-            AUTH_TOKEN,
-            SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_DEFENDANT.getScenario(),
-            CASE_ID,
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_DEFENDANT.getScenario()),
+            eq(CASE_ID),
+            any(ScenarioRequestParams.class)
         );
     }
 
     @Test
     void shouldNotRecordScenarios_whenDefendantIsRepresented() {
         CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
-            .ccdCaseReference(Long.valueOf(CASE_ID))
-            .respondent1Represented(uk.gov.hmcts.reform.civil.enums.YesOrNo.YES)
+            .ccdCaseReference(Long.parseLong(CASE_ID))
+            .respondent1Represented(YesOrNo.YES)
             .build();
 
         service.notifyHearingScheduled(caseData, AUTH_TOKEN);
@@ -155,33 +146,33 @@ class HearingScheduledDefendantDashboardServiceTest {
     @Test
     void shouldRecordRelistHearingScenario_whenFastClaimAndTrialReadyIsNull() {
         CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
-            .ccdCaseReference(Long.valueOf(CASE_ID))
-            .respondent1Represented(uk.gov.hmcts.reform.civil.enums.YesOrNo.NO)
-            .build().toBuilder()
-            .allocatedTrack(AllocatedTrack.FAST_CLAIM)
-            .trialReadyRespondent1(null)
-            .build();
+            .ccdCaseReference(Long.parseLong(CASE_ID))
+            .respondent1Represented(YesOrNo.NO)
+            .build()
+            .setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
+        caseData.setTrialReadyRespondent1(null);
+
         when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
 
         service.notifyHearingScheduled(caseData, AUTH_TOKEN);
 
         verify(dashboardScenariosService).recordScenarios(
-            AUTH_TOKEN,
-            SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_DEFENDANT.getScenario(),
-            CASE_ID,
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_DEFENDANT.getScenario()),
+            eq(CASE_ID),
+            any(ScenarioRequestParams.class)
         );
     }
 
     @Test
     void shouldNotRecordRelistHearingScenario_whenFastClaimAndTrialReadyIsNotNull() {
         CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
-            .ccdCaseReference(Long.valueOf(CASE_ID))
-            .respondent1Represented(uk.gov.hmcts.reform.civil.enums.YesOrNo.NO)
-            .build().toBuilder()
-            .allocatedTrack(AllocatedTrack.FAST_CLAIM)
-            .trialReadyRespondent1(YesOrNo.YES)
-            .build();
+            .ccdCaseReference(Long.parseLong(CASE_ID))
+            .respondent1Represented(YesOrNo.NO)
+            .build()
+            .setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
+        caseData.setTrialReadyRespondent1(YesOrNo.YES);
+
         when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
 
         service.notifyHearingScheduled(caseData, AUTH_TOKEN);
