@@ -22,18 +22,27 @@ public class GAPbaDetails {
     private LocalDateTime paymentSuccessfulDate;
     private String generalAppFeeToPayInText;
     private String generalAppPayInformationText;
+    private String serviceReqReference;
+    private String additionalPaymentServiceRef;
+    private PaymentDetails additionalPaymentDetails;
 
     @JsonCreator
     GAPbaDetails(@JsonProperty("fee") Fee fee,
                  @JsonProperty("paymentDetails") PaymentDetails paymentDetails,
                  @JsonProperty("paymentSuccessfulDate") LocalDateTime paymentSuccessfulDate,
                  @JsonProperty("generalAppFeeToPayInText") String generalAppFeeToPayInText,
-                @JsonProperty("generalAppPayInformationText") String generalAppPayInformationText) {
+                 @JsonProperty("generalAppPayInformationText") String generalAppPayInformationText,
+                 @JsonProperty("serviceRequestReference") String serviceReqReference,
+                 @JsonProperty("additionalPaymentServiceRef") String additionalPaymentServiceRef,
+                 @JsonProperty("additionalPaymentDetails") PaymentDetails additionalPaymentDetails) {
 
         this.fee = fee;
         this.paymentDetails = paymentDetails;
         this.paymentSuccessfulDate = paymentSuccessfulDate;
         this.generalAppFeeToPayInText = generalAppFeeToPayInText;
         this.generalAppPayInformationText = generalAppPayInformationText;
+        this.serviceReqReference = serviceReqReference;
+        this.additionalPaymentServiceRef = additionalPaymentServiceRef;
+        this.additionalPaymentDetails = additionalPaymentDetails;
     }
 }
