@@ -27,7 +27,7 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
     public static final String FLOW_STATE = "flowState";
     public static final String FLOW_FLAGS = "flowFlags";
 
-    protected Logger log = LoggerFactory.getLogger(BaseExternalTaskHandler.class);
+    Logger log = LoggerFactory.getLogger(BaseExternalTaskHandler.class);
 
     /**
      * Executed for each fetched and locked task.
@@ -168,7 +168,7 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
      *
      * @return the number of attempts for an external task.
      */
-    protected int getMaxAttempts() {
+    int getMaxAttempts() {
         return 3;
     }
 
@@ -178,7 +178,7 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
      *
      * @return the variables to add to the external task.
      */
-    protected VariableMap getVariableMap(ExternalTaskData data) {
+    VariableMap getVariableMap(ExternalTaskData data) {
         return null;
     }
 

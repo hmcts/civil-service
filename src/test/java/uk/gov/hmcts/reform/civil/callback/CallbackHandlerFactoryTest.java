@@ -32,7 +32,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_EVENT;
 @SpringBootTest(classes = {
     CallbackHandlerFactory.class,
     CaseDetailsConverter.class,
-    CaseTypeHandlerKeyFactory.class,
     JacksonAutoConfiguration.class},
     properties = {"spring.main.allow-bean-definition-overriding=true"}
 )

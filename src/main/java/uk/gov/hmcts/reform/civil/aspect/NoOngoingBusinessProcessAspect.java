@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -18,6 +17,7 @@ import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 
 import java.util.List;
 
+import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 
 @Slf4j
@@ -36,11 +36,6 @@ public class NoOngoingBusinessProcessAspect {
         ProceedingJoinPoint joinPoint,
         CallbackParams callbackParams
     ) throws Throwable {
-
-        if (callbackParams.isGeneralApplicationCaseType()) {
-            return checkOngoingBusinessProcessGa(joinPoint, callbackParams);
-        }
-
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         CaseData caseData = callbackParams.getCaseData();
 
@@ -51,7 +46,6 @@ public class NoOngoingBusinessProcessAspect {
         ) {
             return joinPoint.proceed();
         }
-
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
         StringBuilder stateHistoryBuilder = new StringBuilder();
         stateFlow.getStateHistory().forEach(s -> {
@@ -60,41 +54,17 @@ public class NoOngoingBusinessProcessAspect {
         });
 
         try {
-            log.info(
-                "{} is not allowed on the case {} due to ongoing business process, current FlowState: {}, stateFlowHistory: {}",
+            log.info(format(
+                "%s is not allowed on the case %s due to ongoing business process, current FlowState: %s, "
+                    + "stateFlowHistory: %s",
                 caseEvent.name(),
                 caseData.getCcdCaseReference(),
                 FlowState.fromFullName(stateFlow.getState().getName()),
                 stateHistoryBuilder
-            );
+            ));
         } catch (StateFlowException e) {
             log.warn("Error during state flow evaluation.", e);
         }
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(List.of(ERROR_MESSAGE))
-            .build();
-    }
-
-    private Object checkOngoingBusinessProcessGa(
-        ProceedingJoinPoint joinPoint,
-        CallbackParams callbackParams
-    ) throws Throwable {
-
-        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
-
-        if (callbackParams.getType() == SUBMITTED
-            || caseEvent.isCamundaEvent()
-            || caseData.hasNoOngoingBusinessProcess()) {
-            return joinPoint.proceed();
-        }
-
-        log.info(
-            "{} is not allowed on the case {} due to ongoing business process",
-            caseEvent.name(),
-            caseData.getCcdCaseReference()
-        );
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(List.of(ERROR_MESSAGE))

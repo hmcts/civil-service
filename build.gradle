@@ -222,11 +222,7 @@ task awaitApplicationReadiness(type: Exec, description: 'Awaits until applicatio
 }
 
 task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
-  if (System.env.FT_TYPE == 'CIVIL_FT') {
-    commandLine '/usr/bin/yarn', '--silent', 'run', 'test:smoke'
-  } else {
-    commandLine '/usr/bin/yarn', '--silent', 'run', 'test:ga-smoke'
-  }
+  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:smoke'
 }
 
 task runApiTests(type: Exec, description: 'Runs Prod features in functional tests.') {
@@ -288,7 +284,6 @@ configure(subprojects.findAll { it.name == 'dashboard-notifications' }) {
 }
 
 jacocoTestReport {
-  dependsOn "bootStartScripts"
   executionData(test, integration)
   executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
   subprojects.each {
@@ -311,12 +306,7 @@ jacocoTestReport.dependsOn subprojects.collect { project ->
   project.tasks.findByName('jacocoTestReport')
 }.findAll { it != null }
 
-jacocoTestReport.dependsOn tasks.matching {
-  it.name.startsWith('compile')
-          || it.name.startsWith('process')
-          || it.name.equals('startScripts')
-          || it.name.equals('bootStartScripts')
-}
+jacocoTestReport.dependsOn tasks.matching { it.name.startsWith('compile') || it.name.startsWith('process') }
 
 tasks.named('test') {
   finalizedBy jacocoTestReport

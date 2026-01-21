@@ -552,43 +552,4 @@ class DeadlinesCalculatorTest {
         }
     }
 
-    @Nested
-    class ApplicantResponseDeadlineDates {
-
-        @Test
-        void shouldReturnDeadlinePlus2Days_whenResponseDateIsWeekday() {
-            LocalDateTime weekdayDate = LocalDate.of(2022, 2, 15).atTime(12, 0);
-            LocalDateTime expectedDeadline = weekdayDate.toLocalDate().plusDays(2).atTime(END_OF_BUSINESS_DAY);
-            LocalDateTime responseDeadline = calculator.calculateApplicantResponseDeadline(weekdayDate, 2);
-
-            org.assertj.core.api.Assertions.assertThat(responseDeadline).isEqualTo(expectedDeadline);
-        }
-
-        @Test
-        void shouldReturnDeadlinePlus3Days_whenResponseDateIsWeekday() {
-            LocalDateTime weekdayDate = LocalDate.of(2022, 2, 15).atTime(12, 0);
-            LocalDateTime expectedDeadline = weekdayDate.toLocalDate().plusDays(3).atTime(END_OF_BUSINESS_DAY);
-            LocalDateTime responseDeadline = calculator.calculateApplicantResponseDeadline(weekdayDate, 3);
-
-            org.assertj.core.api.Assertions.assertThat(responseDeadline).isEqualTo(expectedDeadline);
-        }
-
-        @Test
-        void shouldReturnDeadlinePlus8Days_whenResponseDateIsBankHoliday() {
-            LocalDateTime weekdayDate = LocalDate.of(2020, 8, 31).atTime(8, 0);
-            LocalDateTime expectedDeadline = weekdayDate.toLocalDate().plusDays(8).atTime(END_OF_BUSINESS_DAY);
-            LocalDateTime responseDeadline = calculator.calculateApplicantResponseDeadline(weekdayDate, 5);
-
-            org.assertj.core.api.Assertions.assertThat(responseDeadline).isEqualTo(expectedDeadline);
-        }
-
-        @Test
-        void shouldReturnDeadlinePlus8Days_whenResponseDateIsWeekEnd() {
-            LocalDateTime weekdayDate = LocalDate.of(2022, 10, 1).atTime(8, 0);
-            LocalDateTime expectedDeadline = weekdayDate.toLocalDate().plusDays(8).atTime(END_OF_BUSINESS_DAY);
-            LocalDateTime responseDeadline = calculator.calculateApplicantResponseDeadline(weekdayDate, 5);
-
-            org.assertj.core.api.Assertions.assertThat(responseDeadline).isEqualTo(expectedDeadline);
-        }
-    }
 }

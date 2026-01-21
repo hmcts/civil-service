@@ -15,8 +15,6 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
-import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.ga.service.GaPaymentRequestUpdateCallbackService;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -24,10 +22,8 @@ import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
-import java.util.Objects;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.GENERALAPPLICATION_CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_CLAIM_ISSUE_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_HEARING_FEE_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
@@ -42,7 +38,6 @@ public class PaymentRequestUpdateCallbackService {
     private static final String PAID = "Paid";
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
-    private final GaPaymentRequestUpdateCallbackService gaPaymentRequestUpdateCallbackService;
     private final ObjectMapper objectMapper;
 
     public void processCallback(ServiceRequestUpdateDto dto, String feeTypeStr) {
@@ -66,23 +61,10 @@ public class PaymentRequestUpdateCallbackService {
         log.debug("ServiceRequestUpdateDto: {}", dto);
 
         CaseDetails caseDetails = coreCaseDataService.getCase(caseId);
+        CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
 
-        if (Objects.equals(caseDetails.getCaseTypeId(), GENERALAPPLICATION_CASE_TYPE) && dto.getServiceRequestStatus().equalsIgnoreCase(PAID)) {
-            log.info("Processing payment callback for General Application Case details for caseId {}", caseId);
-
-            GeneralApplicationCaseData caseData = caseDetailsConverter.toGeneralApplicationCaseData(caseDetails);
-            gaPaymentRequestUpdateCallbackService.processServiceRequest(dto, caseData, false);
-        } else {
-            log.info("Processing payment callback for Civil Case details for caseId {}", caseId);
-
-            CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
-
-            if ((caseData.isLipvLipOneVOne() && isPaymentUpdateValid(
-                feeType,
-                caseData
-            )) || !caseData.isLipvLipOneVOne()) {
-                handlePaymentUpdate(dto, caseData, feeType);
-            }
+        if ((caseData.isLipvLipOneVOne() && isPaymentUpdateValid(feeType, caseData)) || !caseData.isLipvLipOneVOne()) {
+            handlePaymentUpdate(dto, caseData, feeType);
         }
     }
 

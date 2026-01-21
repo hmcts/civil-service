@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.controllers.cases;
 
 import com.google.common.collect.Lists;
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.auth.checker.core.exceptions.BearerTokenMissingException;
@@ -14,8 +13,6 @@ import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
 import uk.gov.hmcts.reform.civil.exceptions.UserNotFoundOnCaseException;
-import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
-import uk.gov.hmcts.reform.civil.ga.service.events.GaCaseEventService;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.bulkclaims.CaseworkerSubmitEventDTo;
@@ -39,12 +36,11 @@ import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Collections.singletonList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -79,13 +75,8 @@ public class CasesControllerTest extends BaseIntegrationTest {
     private static final String AGREED_RESPONSE_DEADLINE_DATE_URL = "/cases/response/agreeddeadline/{claimId}";
     private static final String USER_CASE_ROLES = "/cases/{caseId}/userCaseRoles";
     private static final String COURT_DECISION_URL = "/cases/{caseId}/courtDecision";
-
-    private static final String GA_CLAIMS_LIST_URL = "/cases/ga/";
-    private static final String GA_SUBMIT_EVENT_URL = "/cases/{caseId}/ga/citizen/{submitterId}/event";
-    private static final String GA_CASE_APP_URL = "/cases/{caseId}/ga/applications";
-
     private static final List<DashboardClaimInfo> claimResults =
-        singletonList(new DashboardClaimInfo()
+        Collections.singletonList(new DashboardClaimInfo()
                                       .setClaimAmount(new BigDecimal(
                                           "1000"))
                                       .setClaimNumber("4786")
@@ -104,8 +95,6 @@ public class CasesControllerTest extends BaseIntegrationTest {
     @MockBean
     private CoreCaseDataService coreCaseDataService;
     @MockBean
-    private GaCoreCaseDataService gaCoreCaseDataService;
-    @MockBean
     private CaseDetailsConverter caseDetailsConverter;
 
     @MockBean
@@ -116,9 +105,6 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @MockBean
     private CaseEventService caseEventService;
-
-    @MockBean
-    private GaCaseEventService gaCaseEventService;
 
     @MockBean
     private CaseworkerCaseEventService caseworkerCaseEventService;
@@ -446,84 +432,4 @@ public class CasesControllerTest extends BaseIntegrationTest {
             .andExpect(status().isOk());
     }
 
-    @Nested
-    class GeneralApplicationTests {
-
-        @Test
-        @SneakyThrows
-        public void shouldReturnHttpStatusOK() {
-            SearchResult expectedCaseDetails = SearchResult.builder()
-                .total(1)
-                .cases(singletonList(CaseDetails
-                                         .builder()
-                                         .id(1L)
-                                         .id(1L)
-                                         .build()))
-                .build();
-
-            SearchResult expectedCaseData = SearchResult.builder()
-                .total(1)
-                .cases(singletonList(CaseDetails.builder().id(1L).build()))
-                .build();
-
-            when(gaCoreCaseDataService.searchGeneralApplication(any(), anyString()))
-                .thenReturn(expectedCaseDetails);
-
-            doPost(BEARER_TOKEN, ELASTICSEARCH, GA_CLAIMS_LIST_URL, "")
-                .andExpect(content().json(toJson(expectedCaseData)))
-                .andExpect(status().isOk());
-
-        }
-
-        @Test
-        @SneakyThrows
-        void shouldSubmitEventSuccessfully() {
-            CaseDetails expectedCaseDetails = CaseDetails.builder().id(1L).build();
-            when(gaCaseEventService.submitEvent(any())).thenReturn(expectedCaseDetails);
-            doPost(
-                BEARER_TOKEN,
-                EventDto.builder().event(CaseEvent.RESPOND_TO_APPLICATION).caseDataUpdate(Map.of()).build(),
-                GA_SUBMIT_EVENT_URL,
-                "123",
-                "123"
-            ).andExpect(content().json(toJson(expectedCaseDetails)))
-                .andExpect(status().isOk());
-        }
-
-        @Test
-        @SneakyThrows
-        void shouldReturnApplicationsByMainCaseId() {
-            SearchResult result = SearchResult.builder().cases(List.of()).total(1).build();
-            when(gaCoreCaseDataService.searchGeneralApplicationWithCaseId(any(), any())).thenReturn(result);
-            doGet(BEARER_TOKEN, GA_CASE_APP_URL, 1L)
-                .andExpect(content().json(toJson(result)))
-                .andExpect(status().isOk());
-        }
-
-        @Test
-        @SneakyThrows
-        void shouldReturnApplicationsByMainCaseIdWithMoreThan10Applications() {
-            List<CaseDetails> cases = new ArrayList<>();
-            cases.add(CaseDetails.builder().id(1L).build());
-            cases.add(CaseDetails.builder().id(2L).build());
-            cases.add(CaseDetails.builder().id(3L).build());
-            cases.add(CaseDetails.builder().id(4L).build());
-            cases.add(CaseDetails.builder().id(5L).build());
-            cases.add(CaseDetails.builder().id(6L).build());
-            cases.add(CaseDetails.builder().id(7L).build());
-            cases.add(CaseDetails.builder().id(8L).build());
-            cases.add(CaseDetails.builder().id(9L).build());
-            cases.add(CaseDetails.builder().id(10L).build());
-            cases.add(CaseDetails.builder().id(11L).build());
-
-            SearchResult result = SearchResult.builder()
-                .total(10)
-                .cases(cases).total(1).build();
-
-            when(gaCoreCaseDataService.searchGeneralApplicationWithCaseId(any(), any())).thenReturn(result);
-            doGet(BEARER_TOKEN, GA_CASE_APP_URL, 1L)
-                .andExpect(content().json(toJson(result)))
-                .andExpect(status().isOk());
-        }
-    }
 }

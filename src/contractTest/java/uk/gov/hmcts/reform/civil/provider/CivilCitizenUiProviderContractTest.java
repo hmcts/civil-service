@@ -26,7 +26,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.hmcts.reform.civil.controllers.fees.FeesPaymentController;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
-import uk.gov.hmcts.reform.civil.ga.service.GaFeesPaymentService;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.service.FeesPaymentService;
 
@@ -53,8 +52,6 @@ class CivilCitizenUiProviderContractTest {
 
     @Mock
     private FeesPaymentService feesPaymentService;
-    @Mock
-    private GaFeesPaymentService gaFeesPaymentService;
     private AutoCloseable mocks;
 
     @PactBrokerConsumerVersionSelectors
@@ -72,7 +69,7 @@ class CivilCitizenUiProviderContractTest {
             System.setProperty("pactbroker.url", brokerUrl);
         }
         mocks = MockitoAnnotations.openMocks(this);
-        FeesPaymentController controller = new FeesPaymentController(feesPaymentService, gaFeesPaymentService);
+        FeesPaymentController controller = new FeesPaymentController(feesPaymentService);
         MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter(buildObjectMapper());
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
             .setMessageConverters(messageConverter)
@@ -130,39 +127,6 @@ class CivilCitizenUiProviderContractTest {
                 .setStatus("Success")
                 .setPaymentFor("claimissued")
                 .setPaymentAmount(new BigDecimal("200"))
-        );
-    }
-
-    @State("Claim issue payment can be initiated for general application case 1234567890123456")
-    void claimIssuePaymentExistsForGeneralApplication() {
-        when(gaFeesPaymentService.createGovPaymentRequest(
-            CASE_REFERENCE,
-            AUTH_HEADER
-        )).thenReturn(
-            CardPaymentStatusResponse.builder()
-                .externalReference("2023-1701090705688")
-                .paymentReference(PAYMENT_REFERENCE)
-                .status("Initiated")
-                .nextUrl("https://card.payments.service.gov.uk/secure/7b0716b2-40c4-413e-b62e-72c599c91960")
-                .dateCreated(OffsetDateTime.parse("2023-11-27T13:15:06.313+00:00"))
-                .build()
-        );
-    }
-
-    @State("Payment status SUCCESS is available for general application payment RC-1701-0909-0602-0418")
-    void paymentStatusSuccessForGeneralApplication() {
-        when(gaFeesPaymentService.getGovPaymentRequestStatus(
-            CASE_REFERENCE,
-            PAYMENT_REFERENCE,
-            AUTH_HEADER
-        )).thenReturn(
-            CardPaymentStatusResponse.builder()
-                .externalReference("2023-1701090705688")
-                .paymentReference(PAYMENT_REFERENCE)
-                .status("Success")
-                .paymentFor("claimissued")
-                .paymentAmount(new BigDecimal("200"))
-                .build()
         );
     }
 

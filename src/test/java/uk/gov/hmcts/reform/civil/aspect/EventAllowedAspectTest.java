@@ -13,17 +13,12 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
-import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaFlowStateAllowedEventService;
-import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
-import uk.gov.hmcts.reform.civil.ga.stateflow.GaStateFlow;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.flowstate.AllowedEventService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
@@ -52,13 +47,7 @@ class EventAllowedAspectTest {
     private AllowedEventService allowedEventService;
 
     @Mock
-    private GaFlowStateAllowedEventService gaFlowStateAllowedEventService;
-
-    @Mock
     private SimpleStateFlowEngine stateFlowEngine;
-
-    @Mock
-    private GaStateFlowEngine gaStateFlowEngine;
 
     private static final String ERROR_MESSAGE = "This action cannot currently be performed because it has either "
         + "already been completed or another action must be completed first.";
@@ -99,45 +88,9 @@ class EventAllowedAspectTest {
     }
 
     @Test
-    void shouldNotProceed_whenGeneralApplicationEventIsNotAllowed() throws Throwable {
-        AboutToStartOrSubmitCallbackResponse response = buildErrorResponse();
-
-        GaStateFlow stateFlow = mock(GaStateFlow.class);
-        when(gaStateFlowEngine.evaluate(any(GeneralApplicationCaseData.class))).thenReturn(stateFlow);
-        when(gaFlowStateAllowedEventService.isAllowed(any(), any())).thenReturn(false);
-
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().build();
-        CallbackParams callbackParams = buildCallbackParamsWithGaRequest(
-            caseData,
-            DEFENDANT_RESPONSE.name(),
-            CaseDetailsBuilder.builder().atStatePendingClaimIssued()
-        );
-
-        Object result = eventAllowedAspect.checkEventAllowed(proceedingJoinPoint, callbackParams);
-
-        assertThat(result).isEqualTo(response);
-        verify(proceedingJoinPoint, never()).proceed();
-    }
-
-    @Test
     void shouldProceed_whenEventIsAllowed() throws Throwable {
         AboutToStartOrSubmitCallbackResponse response = mockProceedingJoinPoint();
         when(allowedEventService.isAllowed(any(CaseDetails.class), any())).thenReturn(true);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
-        CallbackParams callbackParams = buildCallbackParamsWithRequest(CallbackType.ABOUT_TO_START, caseData,
-                                                                       CLAIMANT_RESPONSE.name(), CaseDetailsBuilder.builder().atStateRespondedToClaim());
-
-        Object result = eventAllowedAspect.checkEventAllowed(proceedingJoinPoint, callbackParams);
-
-        assertThat(result).isEqualTo(response);
-        verify(proceedingJoinPoint).proceed();
-    }
-
-    @Test
-    void shouldProceed_whenGeneralApplicationEventIsAllowed() throws Throwable {
-        AboutToStartOrSubmitCallbackResponse response = mockProceedingJoinPoint();
-        when(gaFlowStateAllowedEventService.isAllowed(any(), any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
         CallbackParams callbackParams = buildCallbackParamsWithRequest(CallbackType.ABOUT_TO_START, caseData,
@@ -164,17 +117,6 @@ class EventAllowedAspectTest {
     private CallbackParams buildCallbackParamsWithRequest(CallbackType callbackType, CaseData caseData, String eventId, CaseDetailsBuilder caseDetailsBuilder) {
         return CallbackParamsBuilder.builder()
             .of(callbackType, caseData)
-            .request(CallbackRequest.builder()
-                         .eventId(eventId)
-                         .caseDetails(caseDetailsBuilder.build())
-                         .build())
-            .build();
-    }
-
-    private CallbackParams buildCallbackParamsWithGaRequest(GeneralApplicationCaseData caseData, String eventId, CaseDetailsBuilder caseDetailsBuilder) {
-        return CallbackParamsBuilder.builder()
-            .of(CallbackType.ABOUT_TO_START, caseData)
-            .isGeneralApplicationCase(true)
             .request(CallbackRequest.builder()
                          .eventId(eventId)
                          .caseDetails(caseDetailsBuilder.build())

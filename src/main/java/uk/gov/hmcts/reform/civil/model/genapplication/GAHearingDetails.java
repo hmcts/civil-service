@@ -47,7 +47,6 @@ public class GAHearingDetails {
     private String supportRequirementSignLanguage;
     private String supportRequirementLanguageInterpreter;
     private String supportRequirementOther;
-    private String respondentResponsePartyName;
 
     @JsonCreator
     GAHearingDetails(@JsonProperty("hearingYesorNo") YesOrNo hearingYesorNo,
@@ -76,8 +75,7 @@ public class GAHearingDetails {
                      @JsonProperty("SupportRequirementSignLanguage") String supportRequirementSignLanguage,
                      @JsonProperty("SupportRequirementLanguageInterpreter")
                              String supportRequirementLanguageInterpreter,
-                     @JsonProperty("SupportRequirementOther") String supportRequirementOther,
-                     @JsonProperty("respondentResponsePartyName") String respondentResponsePartyName) {
+                     @JsonProperty("SupportRequirementOther") String supportRequirementOther) {
         this.hearingYesorNo = hearingYesorNo;
         this.hearingDate = hearingDate;
         this.judgeRequiredYesOrNo = judgeRequiredYesOrNo;
@@ -103,6 +101,5 @@ public class GAHearingDetails {
         this.supportRequirementSignLanguage = supportRequirementSignLanguage;
         this.supportRequirementLanguageInterpreter = supportRequirementLanguageInterpreter;
         this.supportRequirementOther = supportRequirementOther;
-        this.respondentResponsePartyName = respondentResponsePartyName;
     }
 }

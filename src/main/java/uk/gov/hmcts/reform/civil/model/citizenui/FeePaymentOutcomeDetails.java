@@ -22,8 +22,4 @@ public class FeePaymentOutcomeDetails {
     private YesOrNo hwfFullRemissionGrantedForHearingFee;
     private List<String> hwfOutstandingFeePaymentDoneForClaimIssue;
     private List<String> hwfOutstandingFeePaymentDoneForHearingFee;
-    private YesOrNo hwfFullRemissionGrantedForGa;
-    private YesOrNo hwfFullRemissionGrantedForAdditionalFee;
-    private List<String> hwfOutstandingFeePaymentDoneForGa;
-    private List<String> hwfOutstandingFeePaymentDoneForAdditional;
 }

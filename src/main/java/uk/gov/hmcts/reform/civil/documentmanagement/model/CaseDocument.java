@@ -34,27 +34,4 @@ public class CaseDocument {
             .createdDatetime(LocalDateTime.now())
             .build();
     }
-
-    @JsonIgnore
-    public static CaseDocument toCaseDocumentGA(Document document, DocumentType documentType, String translator) {
-        return CaseDocument.builder()
-            .documentLink(document)
-            .documentName(document.documentFileName)
-            .documentType(setOnlyCCDDocumentTypes(documentType))
-            .createdDatetime(LocalDateTime.now())
-            .createdBy(translator)
-            .build();
-    }
-
-    public static DocumentType setOnlyCCDDocumentTypes(DocumentType documentType) {
-        switch (documentType) {
-            case JUDGES_DIRECTIONS_RESPONDENT_TRANSLATED:
-            case JUDGES_DIRECTIONS_APPLICANT_TRANSLATED:
-            case UPLOADED_DOCUMENT_RESPONDENT:
-            case UPLOADED_DOCUMENT_APPLICANT:
-                return null;
-            default:
-                return documentType;
-        }
-    }
 }

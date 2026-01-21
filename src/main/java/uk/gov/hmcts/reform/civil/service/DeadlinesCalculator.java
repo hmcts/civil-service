@@ -66,21 +66,6 @@ public class DeadlinesCalculator {
         return calculateFirstWorkingDay(dateTime.toLocalDate()).plusDays(28).atTime(END_OF_BUSINESS_DAY);
     }
 
-    public LocalDateTime calculateApplicantResponseDeadline(LocalDateTime responseDate, int daysToAdd) {
-        LocalDateTime dateTime = responseDate;
-        if (checkIf4pmOrAfter(responseDate)) {
-            dateTime = responseDate.plusDays(1);
-        }
-
-        LocalDate startDate = calculateFirstWorkingDay(dateTime.toLocalDate());
-        LocalDate endDate = startDate.plusDays(daysToAdd);
-
-        long noOfHoliday = startDate.datesUntil(endDate.plusDays(1)).filter(data -> !workingDayIndicator
-                .isWorkingDay(data)).count();
-
-        return endDate.plusDays(noOfHoliday).atTime(END_OF_BUSINESS_DAY);
-    }
-
     public LocalDateTime calculateApplicantResponseDeadlineSpec(LocalDateTime responseDate) {
         LocalDateTime dateTime = responseDate;
         if (is4pmOrAfter(responseDate)) {
@@ -158,24 +143,5 @@ public class DeadlinesCalculator {
         LocalDate fromDate = is4pmOrAfter(responseDate) ? responseDate.toLocalDate().plusDays(1)
                 : responseDate.toLocalDate();
         return plusWorkingDays(fromDate, 5).atTime(END_OF_BUSINESS_DAY);
-    }
-
-    private boolean checkIf4pmOrAfter(LocalDateTime dateOfService) {
-        return dateOfService.getHour() >= 16;
-    }
-
-    /*
-     * Order dates are required to be pre-populated as follows
-     *
-     * calculate the any follow-up date/s from Next day
-     * When the date calculation (result) fall on a non-working day (i.e. a bank holiday/weekend/privilege day)
-     * - Then automatically move any calculated follow-up date/s to the next working/business day
-     *
-     * */
-    public LocalDate getJudicialOrderDeadlineDate(LocalDateTime responseDate, int daysToAdd) {
-        LocalDateTime dateTime = responseDate.plusDays(daysToAdd);
-
-        LocalDate deadLineDate = calculateFirstWorkingDay(dateTime.toLocalDate());
-        return deadLineDate;
     }
 }

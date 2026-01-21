@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.aspect.NoOngoingBusinessProcess;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -23,30 +24,18 @@ public class CallbackHandlerFactory {
 
     private final HashMap<String, CallbackHandler> eventHandlers = new HashMap<>();
     private final CaseDetailsConverter caseDetailsConverter;
-    private final CaseTypeHandlerKeyFactory caseTypeHandlerKeyFactory;
 
     @Autowired
-    public CallbackHandlerFactory(CaseDetailsConverter caseDetailsConverter,
-                                  CaseTypeHandlerKeyFactory caseTypeHandlerKeyFactory,
-                                  CallbackHandler... callbackHandlers) {
+    public CallbackHandlerFactory(CaseDetailsConverter caseDetailsConverter, CallbackHandler... beans) {
         this.caseDetailsConverter = caseDetailsConverter;
-        this.caseTypeHandlerKeyFactory = caseTypeHandlerKeyFactory;
-        for (CallbackHandler callbackHandler : callbackHandlers) {
-            for (CaseEvent handledEvent : callbackHandler.handledEvents()) {
-                eventHandlers.put(
-                    caseTypeHandlerKeyFactory.createHandlerKey(callbackHandler, handledEvent),
-                    callbackHandler
-                );
-            }
-        }
+        Arrays.asList(beans).forEach(bean -> bean.register(eventHandlers));
     }
 
     @EventAllowed
     @NoOngoingBusinessProcess
     @EventEmitter
     public CallbackResponse dispatch(CallbackParams callbackParams) {
-        final String eventId = caseTypeHandlerKeyFactory.createHandlerKey(callbackParams);
-
+        String eventId = callbackParams.getRequest().getEventId();
         return ofNullable(eventHandlers.get(eventId))
             .map(h -> processEvent(h, callbackParams, eventId))
             .orElseThrow(() -> new CallbackException("Could not handle callback for event " + eventId));

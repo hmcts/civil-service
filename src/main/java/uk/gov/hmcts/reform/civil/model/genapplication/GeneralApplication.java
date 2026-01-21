@@ -11,14 +11,12 @@ import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.ga.model.genapplication.GARespondentResponse;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
-import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
-import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -48,11 +46,9 @@ public class GeneralApplication implements MappableObject {
     private GAHearingDetails generalAppHearingDetails;
     private GASolicitorDetailsGAspec generalAppApplnSolicitor;
     private List<Element<GASolicitorDetailsGAspec>> generalAppRespondentSolicitors;
-    private List<Element<GASolicitorDetailsGAspec>> generalAppApplicantAddlSolicitors;
     private List<Element<Document>> generalAppEvidenceDocument;
     private LocalDateTime generalAppDateDeadline;
     private YesOrNo isMultiParty;
-    private YesOrNo isDocumentVisibleGA;
     private YesOrNo parentClaimantIsApplicant;
     private String gaApplicantDisplayName;
     private CaseLink caseLink;
@@ -75,8 +71,6 @@ public class GeneralApplication implements MappableObject {
     private YesOrNo generalAppVaryJudgementType;
     private Document generalAppN245FormUpload;
     private GAHearingDateGAspec generalAppHearingDate;
-    private GeneralAppParentCaseLink generalAppParentCaseLink;
-    private List<Element<GARespondentResponse>> respondentsResponses;
     // GA for LIP
     private YesOrNo isGaApplicantLip;
     private YesOrNo isGaRespondentOneLip;
@@ -112,12 +106,9 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("generalAppApplnSolicitor") GASolicitorDetailsGAspec generalAppApplnSolicitor,
                        @JsonProperty("generalAppRespondentSolicitors") List<Element<GASolicitorDetailsGAspec>>
                            generalAppRespondentSolicitors,
-                       @JsonProperty("generalAppApplicantAddlSolicitors") List<Element<GASolicitorDetailsGAspec>>
-                           generalAppApplicantAddlSolicitors,
                        @JsonProperty("generalAppEvidenceDocument") List<Element<Document>> generalAppEvidenceDocument,
                        @JsonProperty("generalAppDateDeadline") LocalDateTime generalAppDateDeadline,
                        @JsonProperty("isMultiParty") YesOrNo isMultiParty,
-                       @JsonProperty("isDocumentVisibleGA") YesOrNo isDocumentVisibleGA,
                        @JsonProperty("parentClaimantIsApplicant") YesOrNo parentClaimantIsApplicant,
                        @JsonProperty("gaApplicantDisplayName") String gaApplicantDisplayName,
                        @JsonProperty("caseLink") CaseLink caseLink,
@@ -140,8 +131,6 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("generalAppVaryJudgementType") YesOrNo generalAppVaryJudgementType,
                        @JsonProperty("generalAppN245FormUpload") Document generalAppN245FormUpload,
                        @JsonProperty("generalAppHearingDate") GAHearingDateGAspec generalAppHearingDate,
-                       @JsonProperty("generalAppParentCaseLink") GeneralAppParentCaseLink generalAppParentCaseLink,
-                       @JsonProperty("respondentsResponses") List<Element<GARespondentResponse>> respondentsResponses,
                        @JsonProperty("isGaApplicantLip") YesOrNo isGaApplicantLip,
                        @JsonProperty("isGaRespondentOneLip") YesOrNo isGaRespondentOneLip,
                        @JsonProperty("isGaRespondentTwoLip") YesOrNo isGaRespondentTwoLip,
@@ -169,11 +158,9 @@ public class GeneralApplication implements MappableObject {
         this.generalAppHearingDetails = generalAppHearingDetails;
         this.generalAppApplnSolicitor = generalAppApplnSolicitor;
         this.generalAppRespondentSolicitors = generalAppRespondentSolicitors;
-        this.generalAppApplicantAddlSolicitors = generalAppApplicantAddlSolicitors;
         this.generalAppEvidenceDocument = generalAppEvidenceDocument;
         this.generalAppDateDeadline = generalAppDateDeadline;
         this.isMultiParty = isMultiParty;
-        this.isDocumentVisibleGA = isDocumentVisibleGA;
         this.parentClaimantIsApplicant = parentClaimantIsApplicant;
         this.gaApplicantDisplayName = gaApplicantDisplayName;
         this.caseLink = caseLink;
@@ -196,8 +183,6 @@ public class GeneralApplication implements MappableObject {
         this.generalAppVaryJudgementType = generalAppVaryJudgementType;
         this.generalAppN245FormUpload = generalAppN245FormUpload;
         this.generalAppHearingDate = generalAppHearingDate;
-        this.generalAppParentCaseLink = generalAppParentCaseLink;
-        this.respondentsResponses = respondentsResponses;
         this.isGaApplicantLip = isGaApplicantLip;
         this.isGaRespondentOneLip = isGaRespondentOneLip;
         this.isGaRespondentTwoLip = isGaRespondentTwoLip;
