@@ -256,6 +256,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private  LocalDate respondentSolicitor1AgreedDeadlineExtension;
     private  LocalDate respondentSolicitor2AgreedDeadlineExtension;
+    private  LocalDate ppiDate;
     private  ResponseIntention respondent1ClaimResponseIntentionType;
     private  ResponseIntention respondent2ClaimResponseIntentionType;
     private  ResponseIntention respondent1ClaimResponseIntentionTypeApplicant2;
