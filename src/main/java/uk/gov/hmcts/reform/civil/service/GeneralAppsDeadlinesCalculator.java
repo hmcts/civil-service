@@ -19,4 +19,8 @@ public class GeneralAppsDeadlinesCalculator extends DeadlinesCalculator {
         }
         return calculateFirstWorkingDay(dateTime.toLocalDate()).plusDays(daysToAdd).atTime(END_OF_BUSINESS_DAY);
     }
+
+    private boolean checkIf4pmOrAfter(LocalDateTime dateOfService) {
+        return dateOfService.getHour() >= 16;
+    }
 }
