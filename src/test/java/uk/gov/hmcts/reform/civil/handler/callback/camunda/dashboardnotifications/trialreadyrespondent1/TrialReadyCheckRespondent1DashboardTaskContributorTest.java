@@ -2,9 +2,13 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotification
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskIds;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardWorkflowTask;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -17,14 +21,20 @@ class TrialReadyCheckRespondent1DashboardTaskContributorTest {
     @Mock
     private TrialReadyCheckRespondent1DefendantDashboardTask defendantTask;
 
-    @Test
-    void shouldExposeTaskIdAndHandlers() {
-        TrialReadyCheckRespondent1DashboardTaskContributor contributor =
-            new TrialReadyCheckRespondent1DashboardTaskContributor(claimantTask, defendantTask);
+    @InjectMocks
+    private TrialReadyCheckRespondent1DashboardTaskContributor contributor;
 
+    @Test
+    void shouldReturnCorrectTaskId() {
         assertThat(contributor.taskId()).isEqualTo(DashboardTaskIds.TRIAL_READY_CHECK_RESPONDENT1);
-        assertThat(contributor.dashboardTasks()).containsExactly(claimantTask, defendantTask);
-        assertThatThrownBy(() -> contributor.dashboardTasks().add(claimantTask))
+    }
+
+    @Test
+    void shouldReturnImmutableListOfDashboardTasksInCorrectOrder() {
+        List<DashboardWorkflowTask> dashboardTasks = contributor.dashboardTasks();
+
+        assertThat(dashboardTasks).containsExactly(claimantTask, defendantTask);
+        assertThatThrownBy(() -> dashboardTasks.add(claimantTask))
             .isInstanceOf(UnsupportedOperationException.class);
     }
 }
