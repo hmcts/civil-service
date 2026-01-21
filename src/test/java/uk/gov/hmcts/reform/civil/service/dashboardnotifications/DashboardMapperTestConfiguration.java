@@ -16,10 +16,11 @@ import org.springframework.context.annotation.FilterType;
         @Filter(type = FilterType.REGEX,
             pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.defendantnoc.*"),
         @Filter(type = FilterType.REGEX,
-            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.ccjrequested.*")
+            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.ccjrequested.*"),
         @Filter(type = FilterType.REGEX,
-            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.evidenceuploaded.*")
             pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.evidenceuploaded.*"),
+        @Filter(type = FilterType.REGEX,
+            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.claimantresponse.*"),
         @Filter(type = FilterType.REGEX,
             pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.courtofficerorder.*"),
         @Filter(type = FilterType.REGEX,

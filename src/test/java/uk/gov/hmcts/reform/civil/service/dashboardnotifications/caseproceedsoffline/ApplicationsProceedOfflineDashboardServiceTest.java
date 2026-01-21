@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -44,11 +45,18 @@ class ApplicationsProceedOfflineDashboardServiceTest {
     private TestDashboardService dashboardService;
 
     private static CaseData baseCaseData() {
-        List<Element<GeneralApplication>> generalApplications =
-            wrapElements(GeneralApplication.builder().build());
+        CaseLink caseLink = new CaseLink();
+        caseLink.setCaseReference("123");
 
-        return CaseDataBuilder.builder().build().toBuilder()
+        GeneralApplication generalApplication = new GeneralApplication();
+        generalApplication.setCaseLink(caseLink);
+
+        List<Element<GeneralApplication>> generalApplications = wrapElements(generalApplication);
+
+        return CaseDataBuilder.builder()
             .ccdCaseReference(1234L)
+            .build()
+            .toBuilder()
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .generalApplications(generalApplications)
             .build();

@@ -57,10 +57,15 @@ class DefendantNocClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordOfflineScenarioWhenNocOnlineDisabled() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        PaymentDetails paymentDetails = new PaymentDetails();
+        paymentDetails.setStatus(PaymentStatus.SUCCESS);
+
+        CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(1234L)
+            .build()
+            .toBuilder()
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
-            .hearingFeePaymentDetails(PaymentDetails.builder().status(PaymentStatus.SUCCESS).build())
+            .hearingFeePaymentDetails(paymentDetails)
             .build();
 
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
@@ -83,12 +88,19 @@ class DefendantNocClaimantDashboardServiceTest {
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        PaymentDetails paymentDetails = new PaymentDetails();
+        paymentDetails.setStatus(PaymentStatus.SUCCESS);
+
+        JudgmentDetails judgmentDetails = new JudgmentDetails();
+
+        CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(1234L)
+            .build()
+            .toBuilder()
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .previousCCDState(CaseState.All_FINAL_ORDERS_ISSUED)
-            .activeJudgment(JudgmentDetails.builder().build())
-            .hearingFeePaymentDetails(PaymentDetails.builder().status(PaymentStatus.SUCCESS).build())
+            .activeJudgment(judgmentDetails)
+            .hearingFeePaymentDetails(paymentDetails)
             .build();
 
         service.notifyClaimant(caseData, AUTH_TOKEN);
@@ -104,8 +116,10 @@ class DefendantNocClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordAdditionalScenariosWhenEligible() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(1234L)
+            .build()
+            .toBuilder()
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .drawDirectionsOrderRequired(YesOrNo.NO)
             .claimsTrack(ClaimsTrack.fastTrack)
@@ -138,8 +152,10 @@ class DefendantNocClaimantDashboardServiceTest {
 
     @Test
     void shouldNotRecordWhenLipVlipsDisabled() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(1234L)
+            .build()
+            .toBuilder()
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .build();
 

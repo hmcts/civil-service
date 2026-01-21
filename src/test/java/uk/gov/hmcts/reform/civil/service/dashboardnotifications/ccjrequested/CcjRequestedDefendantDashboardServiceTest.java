@@ -60,9 +60,9 @@ class CcjRequestedDefendantDashboardServiceTest {
         caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
         caseDataLiP.setRespondentSignSettlementAgreement(YesOrNo.NO);
 
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(1234L)
-            .caseDataLiP(caseDataLiP)
+            .caseDataLip(caseDataLiP)
             .build();
 
         service.notifyDefendant(caseData, AUTH_TOKEN);
@@ -86,10 +86,14 @@ class CcjRequestedDefendantDashboardServiceTest {
         caseDataLiP.setRespondentSignSettlementAgreement(YesOrNo.YES);
         caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
 
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        RespondToClaimAdmitPartLRspec respondToClaim = new RespondToClaimAdmitPartLRspec(LocalDate.now().minusDays(1));
+
+        CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(1234L)
-            .caseDataLiP(caseDataLiP)
-            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec(LocalDate.now().minusDays(1)))
+            .caseDataLip(caseDataLiP)
+            .build()
+            .toBuilder()
+            .respondToClaimAdmitPartLRspec(respondToClaim)
             .build();
 
         service.notifyDefendant(caseData, AUTH_TOKEN);
@@ -106,7 +110,7 @@ class CcjRequestedDefendantDashboardServiceTest {
     void shouldRecordDefaultScenarioWhenNoSettlementAgreementData() {
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(1234L)
             .build();
 
@@ -124,7 +128,7 @@ class CcjRequestedDefendantDashboardServiceTest {
     void shouldNotRecordWhenToggleDisabled() {
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
 
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(1234L)
             .build();
 

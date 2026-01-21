@@ -56,17 +56,24 @@ class ApplicationsProceedOfflineClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordScenariosWhenEligible() {
-        List<Element<GeneralApplication>> applications = wrapElements(
-            GeneralApplication.builder().caseLink(CaseLink.builder().caseReference("123").build()).build()
-        );
-        List<Element<GeneralApplicationsDetails>> claimantDetails = wrapElements(
-            GeneralApplicationsDetails.builder().caseState("Awaiting Respondent Response").build()
-        );
+        CaseLink caseLink = CaseLink.builder().caseReference("123").build();
+        GeneralApplication application = GeneralApplication.builder()
+            .caseLink(caseLink)
+            .build();
 
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+        GeneralApplicationsDetails claimantDetail = GeneralApplicationsDetails.builder()
+            .caseState("Awaiting Respondent Response")
+            .build();
+
+        List<Element<GeneralApplication>> applications = wrapElements(application);
+        List<Element<GeneralApplicationsDetails>> claimantDetails = wrapElements(claimantDetail);
+
+        CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(1234L)
             .applicant1Represented(uk.gov.hmcts.reform.civil.enums.YesOrNo.NO)
+            .build()
+            .toBuilder()
+            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .generalApplications(applications)
             .claimantGaAppDetails(claimantDetails)
             .build();
@@ -90,17 +97,24 @@ class ApplicationsProceedOfflineClaimantDashboardServiceTest {
 
     @Test
     void shouldOnlyRecordInitiateScenarioWhenNoLiveApplications() {
-        List<Element<GeneralApplication>> applications = wrapElements(
-            GeneralApplication.builder().caseLink(CaseLink.builder().caseReference("123").build()).build()
-        );
-        List<Element<GeneralApplicationsDetails>> claimantDetails = wrapElements(
-            GeneralApplicationsDetails.builder().caseState("Application Closed").build()
-        );
+        CaseLink caseLink = CaseLink.builder().caseReference("123").build();
+        GeneralApplication application = GeneralApplication.builder()
+            .caseLink(caseLink)
+            .build();
 
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+        GeneralApplicationsDetails claimantDetail = GeneralApplicationsDetails.builder()
+            .caseState("Application Closed")
+            .build();
+
+        List<Element<GeneralApplication>> applications = wrapElements(application);
+        List<Element<GeneralApplicationsDetails>> claimantDetails = wrapElements(claimantDetail);
+
+        CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(1234L)
             .applicant1Represented(uk.gov.hmcts.reform.civil.enums.YesOrNo.NO)
+            .build()
+            .toBuilder()
+            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .generalApplications(applications)
             .claimantGaAppDetails(claimantDetails)
             .build();
@@ -117,10 +131,12 @@ class ApplicationsProceedOfflineClaimantDashboardServiceTest {
 
     @Test
     void shouldNotRecordWhenNotLip() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+        CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(1234L)
             .applicant1Represented(uk.gov.hmcts.reform.civil.enums.YesOrNo.YES)
+            .build()
+            .toBuilder()
+            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .build();
 
         service.notify(caseData, AUTH_TOKEN);
@@ -131,10 +147,12 @@ class ApplicationsProceedOfflineClaimantDashboardServiceTest {
 
     @Test
     void shouldNotRecordWhenFeatureDisabled() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+        CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(1234L)
             .applicant1Represented(uk.gov.hmcts.reform.civil.enums.YesOrNo.NO)
+            .build()
+            .toBuilder()
+            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .build();
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
 
