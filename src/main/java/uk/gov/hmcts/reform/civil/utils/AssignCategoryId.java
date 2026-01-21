@@ -17,6 +17,9 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class AssignCategoryId {
 
+    public static final String ORDER_DOCUMENTS = "ordersMadeOnApplications";
+    public static final String APPLICATIONS = "applications";
+
     public <T> void assignCategoryIdToCollection(List<Element<T>> documentUpload, Function<Element<T>, Document> documentExtractor, String theID) {
         if (documentUpload == null) {
             return;
