@@ -160,7 +160,7 @@ public class DeadlinesCalculator {
         return plusWorkingDays(fromDate, 5).atTime(END_OF_BUSINESS_DAY);
     }
 
-    private boolean checkIf4pmOrAfter(LocalDateTime dateOfService) {
+    boolean checkIf4pmOrAfter(LocalDateTime dateOfService) {
         return dateOfService.getHour() >= 16;
     }
 
