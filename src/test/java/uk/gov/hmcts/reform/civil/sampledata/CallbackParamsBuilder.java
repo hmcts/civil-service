@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
+import uk.gov.hmcts.reform.civil.model.BaseCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.Map;
@@ -16,13 +17,26 @@ public class CallbackParamsBuilder {
     private Map<CallbackParams.Params, Object> params;
     private CallbackVersion version;
     private String pageId;
-    private CaseData caseData;
+    private BaseCaseData caseData;
+    private boolean isGeneralApplicationCase = false;
 
     public static CallbackParamsBuilder builder() {
         return new CallbackParamsBuilder();
     }
 
     public CallbackParamsBuilder of(CallbackType type, CaseData caseData) {
+        this.type = type;
+        this.caseData = caseData;
+        this.request = CallbackRequest.builder()
+            .caseDetails(CaseDetailsBuilder.builder()
+                             .data(caseData)
+                             .build())
+            .build();
+        this.params = Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN");
+        return this;
+    }
+
+    public CallbackParamsBuilder of(CallbackType type, BaseCaseData caseData) {
         this.type = type;
         this.caseData = caseData;
         this.request = CallbackRequest.builder()
@@ -66,6 +80,11 @@ public class CallbackParamsBuilder {
         return this;
     }
 
+    public CallbackParamsBuilder isGeneralApplicationCase(boolean isGeneralApplicationCase) {
+        this.isGeneralApplicationCase = isGeneralApplicationCase;
+        return this;
+    }
+
     public CallbackParams build() {
         return CallbackParams.builder()
             .type(type)
@@ -74,6 +93,7 @@ public class CallbackParamsBuilder {
             .version(version)
             .pageId(pageId)
             .caseData(caseData)
+            .isGeneralApplicationCaseType(isGeneralApplicationCase)
             .build();
     }
 }
