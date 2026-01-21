@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -24,6 +25,7 @@ public class PaymentRequestUpdateCallbackService {
     private static final String PAID = "Paid";
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
+    private final GaPaymentRequestUpdateCallbackService gaPaymentRequestUpdateCallbackService;
     private final ObjectMapper objectMapper;
     private final PaymentStatusRetryService retryService;
 
@@ -48,10 +50,23 @@ public class PaymentRequestUpdateCallbackService {
         log.debug("ServiceRequestUpdateDto: {}", dto);
 
         CaseDetails caseDetails = coreCaseDataService.getCase(caseId);
-        CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
 
-        if ((caseData.isLipvLipOneVOne() && isPaymentUpdateValid(feeType, caseData)) || !caseData.isLipvLipOneVOne()) {
-            handlePaymentUpdate(dto, caseData, feeType);
+        if (Objects.equals(caseDetails.getCaseTypeId(), GENERALAPPLICATION_CASE_TYPE) && dto.getServiceRequestStatus().equalsIgnoreCase(PAID)) {
+            log.info("Processing payment callback for General Application Case details for caseId {}", caseId);
+
+            GeneralApplicationCaseData caseData = caseDetailsConverter.toGeneralApplicationCaseData(caseDetails);
+            gaPaymentRequestUpdateCallbackService.processServiceRequest(dto, caseData, false);
+        } else {
+            log.info("Processing payment callback for Civil Case details for caseId {}", caseId);
+
+            CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
+
+            if ((caseData.isLipvLipOneVOne() && isPaymentUpdateValid(
+                feeType,
+                caseData
+            )) || !caseData.isLipvLipOneVOne()) {
+                handlePaymentUpdate(dto, caseData, feeType);
+            }
         }
     }
 
