@@ -18,10 +18,10 @@ public final class DashboardTaskIds {
     public static final String COURT_OFFICER_ORDER = "GenerateDashboardNotificationsCourtOfficerOrder";
     public static final String CREATE_LIP_CLAIM = "GenerateDashboardNotificationsCreateLipClaim";
     public static final String MOVE_TO_DECISION_OUTCOME = "GenerateDashboardNotificationsDecisionOutcome";
-    public static final String DEFENDANT_RESPONSE = "GenerateDashboardNotificationsDefendantResponse";
     public static final String CLAIM_ISSUE = "GenerateDashboardNotificationsClaimIssue";
     public static final String RAISE_QUERY = "GenerateDashboardNotificationsRaiseQuery";
     public static final String RESPOND_TO_QUERY = "GenerateDashboardNotificationsRespondToQuery";
     public static final String CITIZEN_HEARING_FEE_PAYMENT = "GenerateDashboardNotificationsCitizenHearingFeePayment";
     public static final String DEFENDANT_SIGN_SETTLEMENT_AGREEMENT = "GenerateDashboardNotificationsSignSettlementAgreement";
+    public static final String DISCONTINUE_CLAIM_CLAIMANT = "GenerateDashboardNotificationsDiscontinueClaimClaimant";
 }
