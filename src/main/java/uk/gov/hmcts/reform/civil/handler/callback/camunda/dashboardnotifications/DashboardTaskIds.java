@@ -17,6 +17,7 @@ public final class DashboardTaskIds {
         "GenerateDashboardNotificationsRequestJudgementAdmissionSpec";
     public static final String CLAIMANT_RESPONSE_CUI = "GenerateDashboardNotificationsClaimantResponseCui";
     public static final String CLAIMANT_RESPONSE_SPEC = "GenerateDashboardNotificationsClaimantResponseSpec";
+    public static final String TAKE_CASE_OFFLINE = "GenerateDashboardNotificationsTakeCaseOffline";
     public static final String UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_LR_INTENTION =
         "GenerateDashboardNotificationsUploadTranslatedDocumentClaimantLrIntention";
     public static final String UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_REJECTS_REPAYMENT_PLAN =

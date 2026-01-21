@@ -43,32 +43,32 @@ public class ClaimantResponseClaimantDashboardService extends ClaimantResponseDa
 
     @Override
     protected String getScenario(CaseData caseData) {
-        if (isMintiApplicable(caseData) && isCaseStateAwaitingApplicantIntention(caseData)) {
+        if (shouldShowMultiIntScenario(caseData)) {
             return SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_CLAIMANT.getScenario();
-        } else if (isCaseStateSettled(caseData)) {
+        }
+        if (isCaseStateSettled(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_CLAIMANT.getScenario();
-        } else if (isCaseStateJudicialReferral(caseData)) {
+        }
+        if (isCaseStateJudicialReferral(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING.getScenario();
-        } else if (isCaseStateInMediation(caseData)) {
-            if (isCarmApplicableForMediation(caseData)) {
-                return SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_CLAIMANT_CARM.getScenario();
-            } else {
-                return SCENARIO_AAA6_CLAIMANT_MEDIATION.getScenario();
-            }
-        } else if (caseData.hasApplicant1SignedSettlementAgreement()) {
+        }
+        if (isCaseStateInMediation(caseData)) {
+            return getMediationScenario(caseData);
+        }
+        if (caseData.hasApplicant1SignedSettlementAgreement()) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT.getScenario();
-        } else if (hasClaimantRejectedCourtDecision(caseData)) {
+        }
+        if (hasClaimantRejectedCourtDecision(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_JUDGE_PLAN_REQUESTED_CCJ_CLAIMANT.getScenario();
-        } else if (caseData.getCcdState() == CaseState.CASE_STAYED && caseData.isClaimantDontWantToProceedWithFulLDefenceFD()) {
+        }
+        if (shouldShowClaimantEndsClaimScenario(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_CLAIMANT.getScenario();
         }
 
-        if (caseData.isPayBySetDate() || caseData.isPayByInstallment()) {
-            if (caseData.getRespondent1().isCompanyOROrganisation() && caseData.hasApplicantRejectedRepaymentPlan()) {
-                return featureToggleService.isJudgmentOnlineLive()
-                    ? SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_JO_CLAIMANT.getScenario()
-                    : SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_CLAIMANT.getScenario();
-            }
+        if (shouldShowCompanyRepaymentPlanRejectedScenario(caseData)) {
+            return featureToggleService.isJudgmentOnlineLive()
+                ? SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_JO_CLAIMANT.getScenario()
+                : SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_CLAIMANT.getScenario();
         }
 
         if (caseData.isPartAdmitImmediatePaymentClaimSettled()) {
@@ -99,5 +99,26 @@ public class ClaimantResponseClaimantDashboardService extends ClaimantResponseDa
                 .map(CaseDataLiP::getApplicant1LiPResponse)
                 .filter(ClaimantLiPResponse::hasClaimantRejectedCourtDecision)
                 .isPresent();
+    }
+
+    private boolean shouldShowMultiIntScenario(CaseData caseData) {
+        return isMintiApplicable(caseData) && isCaseStateAwaitingApplicantIntention(caseData);
+    }
+
+    private String getMediationScenario(CaseData caseData) {
+        return isCarmApplicableForMediation(caseData)
+            ? SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_CLAIMANT_CARM.getScenario()
+            : SCENARIO_AAA6_CLAIMANT_MEDIATION.getScenario();
+    }
+
+    private boolean shouldShowClaimantEndsClaimScenario(CaseData caseData) {
+        return caseData.getCcdState() == CaseState.CASE_STAYED
+            && caseData.isClaimantDontWantToProceedWithFulLDefenceFD();
+    }
+
+    private boolean shouldShowCompanyRepaymentPlanRejectedScenario(CaseData caseData) {
+        return (caseData.isPayBySetDate() || caseData.isPayByInstallment())
+            && caseData.getRespondent1().isCompanyOROrganisation()
+            && caseData.hasApplicantRejectedRepaymentPlan();
     }
 }

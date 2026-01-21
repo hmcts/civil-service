@@ -56,35 +56,43 @@ public class ClaimantResponseDefendantDashboardService extends ClaimantResponseD
 
     @Override
     protected String getScenario(CaseData caseData) {
-        if (isMintiApplicable(caseData) && isCaseStateAwaitingApplicantIntention(caseData)) {
+        if (shouldShowMultiIntScenario(caseData)) {
             return SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_DEFENDANT.getScenario();
-        } else if (isCaseStateSettled(caseData)) {
+        }
+        if (isCaseStateSettled(caseData)) {
             return getCaseSettledScenarios(caseData);
-        } else if (caseData.isPartAdmitImmediatePaymentClaimSettled() || isLrvLipFullAdmitImmediatePayClaimSettled(caseData)) {
+        }
+        if (isImmediatePaymentScenario(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT.getScenario();
-        } else if (isCourtDecisionRejected(caseData)) {
+        }
+        if (isCourtDecisionRejected(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_CCJ_CLAIMANT_REJECTS_DEF_PLAN_CLAIMANT_DISAGREES_COURT_PLAN_DEFENDANT.getScenario();
-        } else if (caseData.hasApplicant1CourtDecisionInFavourOfDefendant()) {
+        }
+        if (caseData.hasApplicant1CourtDecisionInFavourOfDefendant()) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_COURT_AGREE_DEFENDANT_DEFENDANT.getScenario();
-        } else if (caseData.hasApplicant1SignedSettlementAgreement() && caseData.hasApplicant1CourtDecisionInFavourOfClaimant()) {
+        }
+        if (isSettlementAgreementRejectedByCourtScenario(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_REJECTS_COURT_AGREES_WITH_CLAIMANT_DEFENDANT.getScenario();
-        } else if (caseData.hasApplicantAcceptedRepaymentPlan() && caseData.hasApplicant1SignedSettlementAgreement()) {
+        }
+        if (isSettlementAgreementAcceptedScenario(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_ACCEPTS_DEFENDANT.getScenario();
-        } else if (isCaseStateJudicialReferral(caseData)) {
+        }
+        if (isCaseStateJudicialReferral(caseData)) {
             return getJudicialReferralScenarios(caseData);
-        } else if (isCaseStateInMediation(caseData)) {
-            if (isCarmApplicableForMediation(caseData)) {
-                return SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT_CARM.getScenario();
-            } else {
-                return SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT.getScenario();
-            }
-        } else if (isClaimantRejectRepaymentPlan(caseData)) {
+        }
+        if (isCaseStateInMediation(caseData)) {
+            return getMediationScenario(caseData);
+        }
+        if (isClaimantRejectRepaymentPlan(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT.getScenario();
-        } else if (isLrvLipPartFullAdmitAndPayByPlan(caseData)) {
+        }
+        if (isLrvLipPartFullAdmitAndPayByPlan(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT.getScenario();
-        } else if (isLrvLipFullDefenceNotProceed(caseData)) {
+        }
+        if (isLrvLipFullDefenceNotProceed(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario();
-        } else if (caseData.getCcdState() == CASE_STAYED && caseData.isClaimantDontWantToProceedWithFulLDefenceFD()) {
+        }
+        if (shouldShowClaimantEndsClaimScenario(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_DEFENDANT.getScenario();
         }
         return null;
@@ -164,6 +172,36 @@ public class ClaimantResponseDefendantDashboardService extends ClaimantResponseD
             && applicant1Response.hasClaimantRejectedCourtDecision();
     }
 
+    private boolean shouldShowMultiIntScenario(CaseData caseData) {
+        return isMintiApplicable(caseData) && isCaseStateAwaitingApplicantIntention(caseData);
+    }
+
+    private boolean isImmediatePaymentScenario(CaseData caseData) {
+        return caseData.isPartAdmitImmediatePaymentClaimSettled()
+            || isLrvLipFullAdmitImmediatePayClaimSettled(caseData);
+    }
+
+    private boolean isSettlementAgreementRejectedByCourtScenario(CaseData caseData) {
+        return caseData.hasApplicant1SignedSettlementAgreement()
+            && caseData.hasApplicant1CourtDecisionInFavourOfClaimant();
+    }
+
+    private boolean isSettlementAgreementAcceptedScenario(CaseData caseData) {
+        return caseData.hasApplicantAcceptedRepaymentPlan()
+            && caseData.hasApplicant1SignedSettlementAgreement();
+    }
+
+    private String getMediationScenario(CaseData caseData) {
+        return isCarmApplicableForMediation(caseData)
+            ? SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT_CARM.getScenario()
+            : SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT.getScenario();
+    }
+
+    private boolean shouldShowClaimantEndsClaimScenario(CaseData caseData) {
+        return caseData.getCcdState() == CASE_STAYED
+            && caseData.isClaimantDontWantToProceedWithFulLDefenceFD();
+    }
+
     private boolean isClaimantRejectRepaymentPlan(CaseData caseData) {
         return ((caseData.isPayBySetDate() || caseData.isPayByInstallment())
             && (caseData.isLRvLipOneVOne() || caseData.getRespondent1().isCompanyOROrganisation())
@@ -181,7 +219,8 @@ public class ClaimantResponseDefendantDashboardService extends ClaimantResponseD
         return !caseData.isApplicantLiP()
             && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
             && NO.equals(caseData.getApplicant1ProceedWithClaim())
-            && uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired());
+            && uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
+            .equals(caseData.getDefenceRouteRequired());
     }
 
     private boolean isLrvLipFullAdmitImmediatePayClaimSettled(CaseData caseData) {

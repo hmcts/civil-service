@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
@@ -58,7 +59,7 @@ public class CcjRequestedClaimantDashboardService extends DashboardScenarioServi
             && whenWillThisAmountBePaid.isBefore(LocalDate.now())
             && caseData.isFullAdmitPayImmediatelyClaimSpec())
             || ((!caseData.getDefaultJudgmentDocuments().isEmpty() && caseData.getDefaultJudgmentDocuments().stream()
-            .map(element -> element.getValue())
+            .map(Element::getValue)
             .anyMatch(doc -> doc.getDocumentType().equals(DocumentType.DEFAULT_JUDGMENT)))
             || (Objects.nonNull(caseData.getRepaymentSummaryObject())));
     }

@@ -554,4 +554,47 @@ class ClaimantResponseDefendantDashboardServiceTest {
             any(ScenarioRequestParams.class)
         );
     }
+
+    @Test
+    void shouldNotRecordScenarioWhenCaseSettledWithoutIntention() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setCcdState(CaseState.CASE_SETTLED);
+        caseData.setApplicant1PartAdmitIntentionToSettleClaimSpec(null);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
+    }
+
+    @Test
+    void shouldNotRecordScenarioWhenJudicialReferralHasNoMatchingScenario() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setCcdState(CaseState.JUDICIAL_REFERRAL);
+        caseData.setResponseClaimMediationSpecRequired(YesOrNo.YES);
+        caseData.setApplicant1AcceptAdmitAmountPaidSpec(null);
+        caseData.setRespondent1ClaimResponseTypeForSpec(null);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
+    }
+
+    @Test
+    void shouldNotRecordScenarioWhenNoScenarioMatches() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(null);
+        caseData.setApplicant1AcceptAdmitAmountPaidSpec(null);
+        caseData.setRespondent1ClaimResponseTypeForSpec(null);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
+    }
 }

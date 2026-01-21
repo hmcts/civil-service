@@ -349,4 +349,19 @@ class ClaimantResponseClaimantDashboardServiceTest {
             any(ScenarioRequestParams.class)
         );
     }
+
+    @Test
+    void shouldNotRecordScenarioWhenNoScenarioMatches() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(null);
+        caseData.setApplicant1AcceptAdmitAmountPaidSpec(null);
+        caseData.setRespondent1ClaimResponseTypeForSpec(null);
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
+    }
 }

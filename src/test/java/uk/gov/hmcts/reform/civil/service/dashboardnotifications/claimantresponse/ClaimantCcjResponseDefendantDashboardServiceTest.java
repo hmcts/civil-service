@@ -147,4 +147,18 @@ class ClaimantCcjResponseDefendantDashboardServiceTest {
 
         verifyNoInteractions(dashboardScenariosService);
     }
+
+    @Test
+    void shouldNotRecordScenarioWhenNoCcjDecisionMatches() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(null);
+        caseData.setApplicant1AcceptPartAdmitPaymentPlanSpec(null);
+        caseData.setCaseDataLiP(null);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService);
+    }
 }
