@@ -19,7 +19,7 @@ public class PartyDetailsPopulatorTest {
 
     @Test
     void shouldPopulateLitigantWithCorrectInfo_whenAllFieldsProvided() {
-        PartyFlags flags = PartyFlags.builder().roleOnCase("Defendant").build();
+        PartyFlags flags = (PartyFlags) new PartyFlags().setRoleOnCase("Defendant");
 
         Party party = new Party();
         party.setPartyID("P1");

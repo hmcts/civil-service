@@ -107,6 +107,9 @@ class SubmitClaimTaskTest {
         Party partyDetails = new Party();
         partyDetails.setCompanyName("Defendant Inc.");
         partyDetails.setType(Party.Type.COMPANY);
+        partyDetails.setPartyName("Defendant Inc.");
+        Flags respFlag = new Flags().setPartyName("Defendant").setRoleOnCase("Defendant 1");
+        partyDetails.setFlags(respFlag);
         SolicitorReferences solicitorRef = new SolicitorReferences();
         solicitorRef.setRespondentSolicitor1Reference("1234");
         CaseData caseData = CaseDataBuilder.builder()
