@@ -46,15 +46,8 @@ public class TrialReadyCheckRespondent1ClaimantDashboardService extends Dashboar
 
     @Override
     protected void beforeRecordScenario(CaseData caseData, String authToken) {
-        final String caseId = String.valueOf(caseData.getCcdCaseReference());
-        dashboardNotificationService.deleteByReferenceAndCitizenRole(
-            caseId,
-            CLAIMANT_ROLE
-        );
-
-        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
-            caseId,
-            CLAIMANT_ROLE
-        );
+        String caseId = String.valueOf(caseData.getCcdCaseReference());
+        dashboardNotificationService.deleteByReferenceAndCitizenRole(caseId, CLAIMANT_ROLE);
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(caseId, CLAIMANT_ROLE);
     }
 }

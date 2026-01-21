@@ -46,15 +46,8 @@ public class TrialReadyCheckRespondent1DefendantDashboardService extends Dashboa
 
     @Override
     protected void beforeRecordScenario(CaseData caseData, String authToken) {
-        final String caseId = String.valueOf(caseData.getCcdCaseReference());
-        dashboardNotificationService.deleteByReferenceAndCitizenRole(
-            caseId,
-            DEFENDANT_ROLE
-        );
-
-        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
-            caseId,
-            DEFENDANT_ROLE
-        );
+        String caseId = String.valueOf(caseData.getCcdCaseReference());
+        dashboardNotificationService.deleteByReferenceAndCitizenRole(caseId, DEFENDANT_ROLE);
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(caseId, DEFENDANT_ROLE);
     }
 }
