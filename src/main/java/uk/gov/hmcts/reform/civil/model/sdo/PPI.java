@@ -15,6 +15,10 @@ import javax.validation.constraints.Future;
 @AllArgsConstructor
 public class PPI {
 
+    private String label;
+    private String subheading;
+    private String introText;
     @Future(message = "The date entered must be in the future")
     private LocalDate ppiDate;
+    private String clauses;
 }
