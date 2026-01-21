@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.ga.service.GaPaymentRequestUpdateCallbackService;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
@@ -36,6 +37,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_CLAIM_ISSUE_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_HEARING_FEE_PAYMENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -60,6 +62,9 @@ class PaymentRequestUpdateCallbackServiceTest {
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
 
+    @Mock
+    private GaPaymentRequestUpdateCallbackService gaPaymentRequestUpdateCallbackService;
+
     @Spy
     private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
@@ -79,6 +84,7 @@ class PaymentRequestUpdateCallbackServiceTest {
                 .data(objectMapper.convertValue(caseData, new TypeReference<>() {
                 }))
                 .id(CASE_ID)
+                .caseTypeId(CASE_TYPE)
                 .build();
     }
 
