@@ -78,26 +78,24 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
         var respondent = caseData.getRespondent1();
 
         var respondentParties = new ArrayList<>(List.of(
-            Party.builder()
-                .name(respondent.getPartyName())
-                .primaryAddress(respondent.getPrimaryAddress())
-                .representative(representativeService.getRespondent1Representative(caseData))
-                .litigationFriendName(
+            new Party()
+                .setName(respondent.getPartyName())
+                .setPrimaryAddress(respondent.getPrimaryAddress())
+                .setRepresentative(representativeService.getRespondent1Representative(caseData))
+                .setLitigationFriendName(
                     ofNullable(caseData.getRespondent1LitigationFriend())
                         .map(LitigationFriend::getFullName)
-                        .orElse(""))
-                .build()));
+                        .orElse(""))));
         if ((multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP) || (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP)) {
             var respondent2 = caseData.getRespondent2();
-            respondentParties.add(Party.builder()
-                                      .name(respondent2.getPartyName())
-                                      .primaryAddress(respondent2.getPrimaryAddress())
-                                      .representative(representativeService.getRespondent2Representative(caseData))
-                                      .litigationFriendName(
+            respondentParties.add(new Party()
+                                      .setName(respondent2.getPartyName())
+                                      .setPrimaryAddress(respondent2.getPrimaryAddress())
+                                      .setRepresentative(representativeService.getRespondent2Representative(caseData))
+                                      .setLitigationFriendName(
                                           ofNullable(caseData.getRespondent2LitigationFriend())
                                               .map(LitigationFriend::getFullName)
-                                              .orElse(""))
-                                      .build());
+                                              .orElse("")));
 
         }
         if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {

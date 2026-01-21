@@ -58,14 +58,13 @@ class SdoCoverLetterAppendServiceTest {
 
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
 
-    private static final Party partyDetails = Party.builder()
-        .primaryAddress(Address.builder()
+    private static final Party partyDetails = new Party()
+        .setPrimaryAddress(Address.builder()
                 .addressLine1("456 Avenue")
                 .postTown("London")
                 .postCode("EX12RT")
                 .build())
-        .name("Mr.John White")
-        .build();
+        .setName("Mr.John White");
 
     private static final SdoCoverLetter PARTY_LETTER_TEMPLATE_DATA = SdoCoverLetter.builder()
         .party(partyDetails)

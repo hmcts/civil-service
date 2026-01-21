@@ -102,15 +102,14 @@ class AcknowledgementOfClaimGeneratorForSpecTest {
             caseData.getIssueDate(),
             LocalDate.now(),
             caseData.getRespondent1ResponseDeadline().toLocalDate(),
-            Party.builder()
-                .name(caseData.getRespondent1().getPartyName())
-                .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
-                .representative(representative)
-                .litigationFriendName(
+            new Party()
+                .setName(caseData.getRespondent1().getPartyName())
+                .setPrimaryAddress(caseData.getRespondent1().getPrimaryAddress())
+                .setRepresentative(representative)
+                .setLitigationFriendName(
                     ofNullable(caseData.getRespondent1LitigationFriend())
                         .map(LitigationFriend::getFullName)
                         .orElse(""))
-                .build()
         );
     }
 }

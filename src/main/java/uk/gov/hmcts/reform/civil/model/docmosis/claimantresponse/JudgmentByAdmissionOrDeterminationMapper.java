@@ -149,13 +149,11 @@ public class JudgmentByAdmissionOrDeterminationMapper {
     }
 
     private static RepaymentPlanTemplateData addRepaymentPlan(CaseData caseData) {
-        RepaymentPlanTemplateData.RepaymentPlanTemplateDataBuilder builder = RepaymentPlanTemplateData.builder();
         if (caseData.getApplicant1RepaymentOptionForDefendantSpec().equals(PaymentType.REPAYMENT_PLAN)) {
-            return builder
-                .firstRepaymentDate(caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec())
-                .paymentAmount(caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec().setScale(2))
-                .paymentFrequencyDisplay(caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec().getLabel())
-                .build();
+            return new RepaymentPlanTemplateData()
+                .setFirstRepaymentDate(caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec())
+                .setPaymentAmount(caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec().setScale(2))
+                .setPaymentFrequencyDisplay(caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec().getLabel());
         }
         return null;
     }

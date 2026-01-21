@@ -175,46 +175,41 @@ public class DQGeneratorFormBuilder {
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
             return List.of(
-                Party.builder()
-                    .name(applicant.getPartyName())
-                    .emailAddress(caseData.getApplicant1().getPartyEmail())
-                    .phoneNumber(caseData.getApplicant1().getPartyPhone())
-                    .primaryAddress(applicant.getPrimaryAddress())
-                    .representative(respondentRepresentative)
-                    .litigationFriendName(
+                new Party()
+                    .setName(applicant.getPartyName())
+                    .setEmailAddress(caseData.getApplicant1().getPartyEmail())
+                    .setPhoneNumber(caseData.getApplicant1().getPartyPhone())
+                    .setPrimaryAddress(applicant.getPrimaryAddress())
+                    .setRepresentative(respondentRepresentative)
+                    .setLitigationFriendName(
                         ofNullable(litigationFriend)
                             .map(LitigationFriend::getFullName)
                             .orElse(""))
-                    .legalRepHeading(legalRepHeading)
-                    .build(),
-                Party.builder()
-                    .name(applicant2.getPartyName())
-                    .emailAddress(caseData.getApplicant2().getPartyEmail())
-                    .phoneNumber(caseData.getApplicant2().getPartyPhone())
-                    .primaryAddress(applicant2.getPrimaryAddress())
-                    .representative(respondentRepresentative)
-                    .litigationFriendName(
+                    .setLegalRepHeading(legalRepHeading),
+                new Party()
+                    .setName(applicant2.getPartyName())
+                    .setEmailAddress(caseData.getApplicant2().getPartyEmail())
+                    .setPhoneNumber(caseData.getApplicant2().getPartyPhone())
+                    .setPrimaryAddress(applicant2.getPrimaryAddress())
+                    .setRepresentative(respondentRepresentative)
+                    .setLitigationFriendName(
                         ofNullable(litigationFriend)
                             .map(LitigationFriend::getFullName)
                             .orElse(""))
-                    .legalRepHeading(legalRepHeading)
-                    .build()
+                    .setLegalRepHeading(legalRepHeading)
             );
         }
-        return List.of(Party.builder()
-                           .name(applicant.getPartyName())
-                           .emailAddress(applicant.getPartyEmail())
-                           .phoneNumber(applicant.getPartyPhone())
-                           .primaryAddress(applicant.getPrimaryAddress())
-                           .representative(respondentRepresentative)
-                           .litigationFriendName(
+        return List.of(new Party()
+                           .setName(applicant.getPartyName())
+                           .setEmailAddress(applicant.getPartyEmail())
+                           .setPhoneNumber(applicant.getPartyPhone())
+                           .setPrimaryAddress(applicant.getPrimaryAddress())
+                           .setRepresentative(respondentRepresentative)
+                           .setLitigationFriendName(
                                ofNullable(litigationFriend)
                                    .map(LitigationFriend::getFullName)
                                    .orElse(""))
-                           .phoneNumber(applicant.getPartyPhone())
-                           .emailAddress(applicant.getPartyEmail())
-                           .legalRepHeading(legalRepHeading)
-                           .build());
+                           .setLegalRepHeading(legalRepHeading));
     }
 
     private String getClaimTrack(CaseData caseData) {

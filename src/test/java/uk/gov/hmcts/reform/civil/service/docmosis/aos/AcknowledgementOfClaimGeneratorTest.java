@@ -112,15 +112,14 @@ class AcknowledgementOfClaimGeneratorTest {
             caseData.getIssueDate(),
             caseData.getRespondent1ResponseDeadline().toLocalDate(),
             new ArrayList<>(List.of(
-                Party.builder()
-                    .name(caseData.getRespondent1().getPartyName())
-                    .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
-                    .representative(representative)
-                    .litigationFriendName(
+                new Party()
+                    .setName(caseData.getRespondent1().getPartyName())
+                    .setPrimaryAddress(caseData.getRespondent1().getPrimaryAddress())
+                    .setRepresentative(representative)
+                    .setLitigationFriendName(
                         ofNullable(caseData.getRespondent1LitigationFriend())
                             .map(LitigationFriend::getFullName)
-                            .orElse(""))
-                    .build())),
+                            .orElse("")))),
             DocmosisTemplateDataUtils.fetchResponseIntentionsDocmosisTemplate(caseData)
         );
 
@@ -158,23 +157,21 @@ class AcknowledgementOfClaimGeneratorTest {
             caseData.getIssueDate(),
             caseData.getRespondent1ResponseDeadline().toLocalDate(),
             new ArrayList<>(List.of(
-                Party.builder()
-                    .name(caseData.getRespondent1().getPartyName())
-                    .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
-                    .representative(representative)
-                    .litigationFriendName(
+                new Party()
+                    .setName(caseData.getRespondent1().getPartyName())
+                    .setPrimaryAddress(caseData.getRespondent1().getPrimaryAddress())
+                    .setRepresentative(representative)
+                    .setLitigationFriendName(
                         ofNullable(caseData.getRespondent1LitigationFriend())
                             .map(LitigationFriend::getFullName)
-                            .orElse(""))
-                    .build(), Party.builder()
-                    .name(caseData.getRespondent2().getPartyName())
-                    .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
-                    .representative(representative)
-                    .litigationFriendName(
+                            .orElse("")), new Party()
+                    .setName(caseData.getRespondent2().getPartyName())
+                    .setPrimaryAddress(caseData.getRespondent2().getPrimaryAddress())
+                    .setRepresentative(representative)
+                    .setLitigationFriendName(
                         ofNullable(caseData.getRespondent2LitigationFriend())
                             .map(LitigationFriend::getFullName)
                             .orElse(""))
-                    .build()
                 )),
             DocmosisTemplateDataUtils.fetchResponseIntentionsDocmosisTemplate(caseData)
         );
@@ -212,23 +209,21 @@ class AcknowledgementOfClaimGeneratorTest {
             caseData.getIssueDate(),
             caseData.getRespondent1ResponseDeadline().toLocalDate(),
             new ArrayList<>(List.of(
-                Party.builder()
-                    .name(caseData.getRespondent1().getPartyName())
-                    .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
-                    .representative(representative)
-                    .litigationFriendName(
+                new Party()
+                    .setName(caseData.getRespondent1().getPartyName())
+                    .setPrimaryAddress(caseData.getRespondent1().getPrimaryAddress())
+                    .setRepresentative(representative)
+                    .setLitigationFriendName(
                         ofNullable(caseData.getRespondent1LitigationFriend())
                             .map(LitigationFriend::getFullName)
-                            .orElse(""))
-                    .build(), Party.builder()
-                    .name(caseData.getRespondent2().getPartyName())
-                    .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
-                    .representative(representative)
-                    .litigationFriendName(
+                            .orElse("")), new Party()
+                    .setName(caseData.getRespondent2().getPartyName())
+                    .setPrimaryAddress(caseData.getRespondent2().getPrimaryAddress())
+                    .setRepresentative(representative)
+                    .setLitigationFriendName(
                         ofNullable(caseData.getRespondent2LitigationFriend())
                             .map(LitigationFriend::getFullName)
                             .orElse(""))
-                    .build()
             )),
             DocmosisTemplateDataUtils.fetchResponseIntentionsDocmosisTemplate(caseData)
         );
@@ -276,15 +271,14 @@ class AcknowledgementOfClaimGeneratorTest {
             caseData.getIssueDate(),
             caseData.getRespondent1ResponseDeadline().toLocalDate(),
             new ArrayList<>(List.of(
-                Party.builder()
-                    .name(caseData.getRespondent2().getPartyName())
-                    .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
-                    .representative(representative)
-                    .litigationFriendName(
+                new Party()
+                    .setName(caseData.getRespondent2().getPartyName())
+                    .setPrimaryAddress(caseData.getRespondent2().getPrimaryAddress())
+                    .setRepresentative(representative)
+                    .setLitigationFriendName(
                         ofNullable(caseData.getRespondent2LitigationFriend())
                             .map(LitigationFriend::getFullName)
                             .orElse(""))
-                    .build()
             )),
             DocmosisTemplateDataUtils.fetchResponseIntentionsDocmosisTemplate(caseData)
         );
@@ -328,15 +322,14 @@ class AcknowledgementOfClaimGeneratorTest {
             caseData.getIssueDate(),
             caseData.getRespondent1ResponseDeadline().toLocalDate(),
             new ArrayList<>(List.of(
-                Party.builder()
-                    .name(caseData.getRespondent1().getPartyName())
-                    .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
-                    .representative(representative)
-                    .litigationFriendName(
+                new Party()
+                    .setName(caseData.getRespondent1().getPartyName())
+                    .setPrimaryAddress(caseData.getRespondent1().getPrimaryAddress())
+                    .setRepresentative(representative)
+                    .setLitigationFriendName(
                         ofNullable(caseData.getRespondent1LitigationFriend())
                             .map(LitigationFriend::getFullName)
                             .orElse(""))
-                    .build()
             )),
             DocmosisTemplateDataUtils.fetchResponseIntentionsDocmosisTemplate(caseData)
         );
@@ -435,12 +428,11 @@ class AcknowledgementOfClaimGeneratorTest {
                     templateData.getResponseDeadline(),
                     caseData.getRespondent1ResponseDeadline().toLocalDate()
                 ),
-                () -> assertEquals(templateData.getRespondent(), new ArrayList<>(List.of(Party.builder()
-                    .name(caseData.getRespondent1().getPartyName())
-                    .representative(representative)
-                    .litigationFriendName(caseData.getRespondent1LitigationFriend().getFullName())
-                    .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
-                    .build()))
+                () -> assertEquals(templateData.getRespondent(), new ArrayList<>(List.of(new Party()
+                    .setName(caseData.getRespondent1().getPartyName())
+                    .setRepresentative(representative)
+                    .setLitigationFriendName(caseData.getRespondent1LitigationFriend().getFullName())
+                    .setPrimaryAddress(caseData.getRespondent1().getPrimaryAddress())))
                 )
             );
         }

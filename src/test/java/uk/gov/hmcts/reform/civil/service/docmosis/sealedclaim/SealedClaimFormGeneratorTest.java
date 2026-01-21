@@ -404,33 +404,30 @@ class SealedClaimFormGeneratorTest {
 
         private List<Party> getRespondent(CaseData caseData) {
             var respondent = caseData.getRespondent1();
-            return List.of(Party.builder()
-                               .type(respondent.getType().getDisplayValue())
-                               .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent))
-                               .name(respondent.getPartyName())
-                               .primaryAddress(respondent.getPrimaryAddress())
-                               .representative(representative1)
-                               .build());
+            return List.of(new Party()
+                               .setType(respondent.getType().getDisplayValue())
+                               .setSoleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent))
+                               .setName(respondent.getPartyName())
+                               .setPrimaryAddress(respondent.getPrimaryAddress())
+                               .setRepresentative(representative1));
         }
 
         private List<Party> getRespondentsSameSolicitor(CaseData caseData) {
             var respondent1 = caseData.getRespondent1();
             var respondent2 = caseData.getRespondent2();
             return List.of(
-                Party.builder()
-                    .type(respondent1.getType().getDisplayValue())
-                    .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent1))
-                    .name(respondent1.getPartyName())
-                    .primaryAddress(respondent1.getPrimaryAddress())
-                    .representative(representative1)
-                    .build(),
-                Party.builder()
-                    .type(respondent2.getType().getDisplayValue())
-                    .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent2))
-                    .name(respondent2.getPartyName())
-                    .primaryAddress(respondent2.getPrimaryAddress())
-                    .representative(representative1)
-                    .build()
+                new Party()
+                    .setType(respondent1.getType().getDisplayValue())
+                    .setSoleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent1))
+                    .setName(respondent1.getPartyName())
+                    .setPrimaryAddress(respondent1.getPrimaryAddress())
+                    .setRepresentative(representative1),
+                new Party()
+                    .setType(respondent2.getType().getDisplayValue())
+                    .setSoleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent2))
+                    .setName(respondent2.getPartyName())
+                    .setPrimaryAddress(respondent2.getPrimaryAddress())
+                    .setRepresentative(representative1)
             );
         }
 
@@ -438,55 +435,50 @@ class SealedClaimFormGeneratorTest {
             var respondent1 = caseData.getRespondent1();
             var respondent2 = caseData.getRespondent2();
             return List.of(
-                Party.builder()
-                    .type(respondent1.getType().getDisplayValue())
-                    .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent1))
-                    .name(respondent1.getPartyName())
-                    .primaryAddress(respondent1.getPrimaryAddress())
-                    .representative(representative1)
-                    .build(),
-                Party.builder()
-                    .type(respondent2.getType().getDisplayValue())
-                    .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent2))
-                    .name(respondent2.getPartyName())
-                    .primaryAddress(respondent2.getPrimaryAddress())
-                    .representative(representative2)
-                    .build()
+                new Party()
+                    .setType(respondent1.getType().getDisplayValue())
+                    .setSoleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent1))
+                    .setName(respondent1.getPartyName())
+                    .setPrimaryAddress(respondent1.getPrimaryAddress())
+                    .setRepresentative(representative1),
+                new Party()
+                    .setType(respondent2.getType().getDisplayValue())
+                    .setSoleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent2))
+                    .setName(respondent2.getPartyName())
+                    .setPrimaryAddress(respondent2.getPrimaryAddress())
+                    .setRepresentative(representative2)
             );
         }
 
         private List<Party> getApplicant(CaseData caseData) {
             var applicant = caseData.getApplicant1();
-            return List.of(Party.builder()
-                               .type(applicant.getType().getDisplayValue())
-                               .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(applicant))
-                               .name(applicant.getPartyName())
-                               .primaryAddress(applicant.getPrimaryAddress())
-                               .litigationFriendName("applicant LF")
-                               .representative(getRepresentative())
-                               .build());
+            return List.of(new Party()
+                               .setType(applicant.getType().getDisplayValue())
+                               .setSoleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(applicant))
+                               .setName(applicant.getPartyName())
+                               .setPrimaryAddress(applicant.getPrimaryAddress())
+                               .setLitigationFriendName("applicant LF")
+                               .setRepresentative(getRepresentative()));
         }
 
         private List<Party> getApplicants(CaseData caseData) {
             var applicant = caseData.getApplicant1();
             var applicant2 = caseData.getApplicant2();
             return List.of(
-                Party.builder()
-                    .type(applicant.getType().getDisplayValue())
-                    .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(applicant))
-                    .name(applicant.getPartyName())
-                    .primaryAddress(applicant.getPrimaryAddress())
-                    .litigationFriendName("applicant LF")
-                    .representative(getRepresentative())
-                    .build(),
-                Party.builder()
-                    .type(applicant2.getType().getDisplayValue())
-                    .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(applicant2))
-                    .name(applicant2.getPartyName())
-                    .primaryAddress(applicant2.getPrimaryAddress())
-                    .litigationFriendName("applicant2 LF")
-                    .representative(getRepresentative())
-                    .build()
+                new Party()
+                    .setType(applicant.getType().getDisplayValue())
+                    .setSoleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(applicant))
+                    .setName(applicant.getPartyName())
+                    .setPrimaryAddress(applicant.getPrimaryAddress())
+                    .setLitigationFriendName("applicant LF")
+                    .setRepresentative(getRepresentative()),
+                new Party()
+                    .setType(applicant2.getType().getDisplayValue())
+                    .setSoleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(applicant2))
+                    .setName(applicant2.getPartyName())
+                    .setPrimaryAddress(applicant2.getPrimaryAddress())
+                    .setLitigationFriendName("applicant2 LF")
+                    .setRepresentative(getRepresentative())
             );
         }
     }

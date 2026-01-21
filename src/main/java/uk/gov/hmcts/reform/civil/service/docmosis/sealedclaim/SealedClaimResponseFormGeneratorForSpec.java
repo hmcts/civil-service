@@ -268,11 +268,11 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     }
 
     private SpecifiedParty getSpecifiedParty(Party party, Representative representative) {
-        SpecifiedParty.SpecifiedPartyBuilder builder = SpecifiedParty.builder()
-            .name(party.getPartyName())
-            .primaryAddress(party.getPrimaryAddress());
-        Optional.ofNullable(representative).ifPresent(builder::representative);
-        return builder.build();
+        SpecifiedParty form = new SpecifiedParty()
+            .setName(party.getPartyName())
+            .setPrimaryAddress(party.getPrimaryAddress());
+        Optional.ofNullable(representative).ifPresent(form::setRepresentative);
+        return form;
     }
 
     private List<TimelineEventDetailsDocmosis> getTimeLine(CaseData caseData) {

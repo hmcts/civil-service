@@ -170,21 +170,19 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
     private static void addRepaymentPlan(CaseData caseData, ResponseRepaymentDetailsFormBuilder builder, BigDecimal totalClaimAmount) {
         RepaymentPlanLRspec repaymentPlan = caseData.getRespondent1RepaymentPlan();
         if (repaymentPlan != null) {
-            builder.repaymentPlan(RepaymentPlanTemplateData.builder()
-                                      .paymentFrequencyDisplay(repaymentPlan.getPaymentFrequencyDisplay())
-                                      .firstRepaymentDate(repaymentPlan.getFirstRepaymentDate())
-                                      .paymentAmount(MonetaryConversions.penniesToPounds(repaymentPlan.getPaymentAmount()))
-                                      .build())
+            builder.repaymentPlan(new RepaymentPlanTemplateData()
+                                      .setPaymentFrequencyDisplay(repaymentPlan.getPaymentFrequencyDisplay())
+                                      .setFirstRepaymentDate(repaymentPlan.getFirstRepaymentDate())
+                                      .setPaymentAmount(MonetaryConversions.penniesToPounds(repaymentPlan.getPaymentAmount())))
                 .payBy(repaymentPlan.finalPaymentBy(totalClaimAmount))
                 .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
             builder.amountToPay(totalClaimAmount + "");
         } else if (caseData.getRespondent2RepaymentPlan() != null) {
             repaymentPlan = caseData.getRespondent2RepaymentPlan();
-            builder.repaymentPlan(RepaymentPlanTemplateData.builder()
-                                      .paymentFrequencyDisplay(repaymentPlan.getPaymentFrequencyDisplay())
-                                      .firstRepaymentDate(repaymentPlan.getFirstRepaymentDate())
-                                      .paymentAmount(MonetaryConversions.penniesToPounds(repaymentPlan.getPaymentAmount()))
-                                      .build())
+            builder.repaymentPlan(new RepaymentPlanTemplateData()
+                                      .setPaymentFrequencyDisplay(repaymentPlan.getPaymentFrequencyDisplay())
+                                      .setFirstRepaymentDate(repaymentPlan.getFirstRepaymentDate())
+                                      .setPaymentAmount(MonetaryConversions.penniesToPounds(repaymentPlan.getPaymentAmount())))
                 .payBy(repaymentPlan.finalPaymentBy(totalClaimAmount))
                 .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
             builder.amountToPay = (totalClaimAmount + "");

@@ -58,14 +58,13 @@ public class AcknowledgementOfClaimGeneratorForSpec
 
     private Party prepareRespondent(CaseData caseData) {
         var respondent = caseData.getRespondent1();
-        return Party.builder()
-            .name(respondent.getPartyName())
-            .primaryAddress(respondent.getPrimaryAddress())
-            .representative(representativeService.getRespondent1Representative(caseData))
-            .litigationFriendName(
+        return new Party()
+            .setName(respondent.getPartyName())
+            .setPrimaryAddress(respondent.getPrimaryAddress())
+            .setRepresentative(representativeService.getRespondent1Representative(caseData))
+            .setLitigationFriendName(
                 ofNullable(caseData.getRespondent1LitigationFriend())
                     .map(LitigationFriend::getFullName)
-                    .orElse(""))
-            .build();
+                    .orElse(""));
     }
 }

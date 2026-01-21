@@ -112,34 +112,31 @@ public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<S
         var respondent = caseData.getRespondent1();
         var respondent1Representative = representativeService.getRespondent1Representative(caseData);
         var respondentParties = new ArrayList<>(List.of(
-            Party.builder()
-                .type(respondent.getType().getDisplayValue())
-                .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent))
-                .name(respondent.getPartyName())
-                .primaryAddress(respondent.getPrimaryAddress())
-                .representative(respondent1Representative)
-                .build()));
+            new Party()
+                .setType(respondent.getType().getDisplayValue())
+                .setSoleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent))
+                .setName(respondent.getPartyName())
+                .setPrimaryAddress(respondent.getPrimaryAddress())
+                .setRepresentative(respondent1Representative)));
 
         if (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP) {
             var respondent2 = caseData.getRespondent2();
-            respondentParties.add(Party.builder()
-                                      .type(respondent2.getType().getDisplayValue())
-                                      .soleTraderTradingAs(
+            respondentParties.add(new Party()
+                                      .setType(respondent2.getType().getDisplayValue())
+                                      .setSoleTraderTradingAs(
                                           DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent2))
-                                      .name(respondent2.getPartyName())
-                                      .primaryAddress(respondent2.getPrimaryAddress())
-                                      .representative(respondent1Representative)
-                                      .build());
+                                      .setName(respondent2.getPartyName())
+                                      .setPrimaryAddress(respondent2.getPrimaryAddress())
+                                      .setRepresentative(respondent1Representative));
         } else if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
             var respondent2 = caseData.getRespondent2();
-            respondentParties.add(Party.builder()
-                                      .type(respondent2.getType().getDisplayValue())
-                                      .soleTraderTradingAs(
+            respondentParties.add(new Party()
+                                      .setType(respondent2.getType().getDisplayValue())
+                                      .setSoleTraderTradingAs(
                                           DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent2))
-                                      .name(respondent2.getPartyName())
-                                      .primaryAddress(respondent2.getPrimaryAddress())
-                                      .representative(representativeService.getRespondent2Representative(caseData))
-                                      .build());
+                                      .setName(respondent2.getPartyName())
+                                      .setPrimaryAddress(respondent2.getPrimaryAddress())
+                                      .setRepresentative(representativeService.getRespondent2Representative(caseData)));
         }
 
         return respondentParties;
@@ -150,29 +147,27 @@ public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<S
         var applicantRepresentative = representativeService.getApplicantRepresentative(caseData);
         var litigationFriend1 = caseData.getApplicant1LitigationFriend();
         var applicantParties = new ArrayList<>(List.of(
-            Party.builder()
-                .type(applicant.getType().getDisplayValue())
-                .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(applicant))
-                .name(applicant.getPartyName())
-                .primaryAddress(applicant.getPrimaryAddress())
-                .litigationFriendName(litigationFriend1 != null ? litigationFriend1.getFirstName() + " "
+            new Party()
+                .setType(applicant.getType().getDisplayValue())
+                .setSoleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(applicant))
+                .setName(applicant.getPartyName())
+                .setPrimaryAddress(applicant.getPrimaryAddress())
+                .setLitigationFriendName(litigationFriend1 != null ? litigationFriend1.getFirstName() + " "
                     + litigationFriend1.getLastName() : "")
-                .representative(applicantRepresentative)
-                .build()));
+                .setRepresentative(applicantRepresentative)));
 
         if (multiPartyScenario == TWO_V_ONE) {
             var applicant2 = caseData.getApplicant2();
             var litigationFriend2 = caseData.getApplicant2LitigationFriend();
             applicantParties.add(
-                Party.builder()
-                    .type(applicant2.getType().getDisplayValue())
-                    .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(applicant2))
-                    .name(applicant2.getPartyName())
-                    .primaryAddress(applicant2.getPrimaryAddress())
-                    .litigationFriendName(litigationFriend2 != null ? litigationFriend2.getFirstName() + " "
+                new Party()
+                    .setType(applicant2.getType().getDisplayValue())
+                    .setSoleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(applicant2))
+                    .setName(applicant2.getPartyName())
+                    .setPrimaryAddress(applicant2.getPrimaryAddress())
+                    .setLitigationFriendName(litigationFriend2 != null ? litigationFriend2.getFirstName() + " "
                         + litigationFriend2.getLastName() : "")
-                    .representative(applicantRepresentative)
-                    .build());
+                    .setRepresentative(applicantRepresentative));
         }
 
         return applicantParties;
