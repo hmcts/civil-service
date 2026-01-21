@@ -94,7 +94,7 @@ import static java.util.Optional.ofNullable;
 @SuperBuilder(toBuilder = true)
 @EqualsAndHashCode(callSuper = false)
 @Data
-public class CaseDataCaseProgression extends CaseDataCaseSdo implements MappableObject {
+public class CaseDataCaseProgression extends CivilCaseData implements MappableObject {
 
     private  String notificationText;
     private  List<EvidenceUploadDisclosure> disclosureSelectionEvidence;
