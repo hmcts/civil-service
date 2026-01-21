@@ -53,6 +53,10 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
     private CoreCaseDataService coreCaseDataService;
     @MockBean
     private PaymentStatusRetryService paymentStatusRetryService;
+    @MockBean
+    private GaCoreCaseDataService gaCoreCaseDataService;
+    @MockBean
+    private UpdatePaymentStatusService updatePaymentStatusService;
 
     @BeforeEach
     void before() {
