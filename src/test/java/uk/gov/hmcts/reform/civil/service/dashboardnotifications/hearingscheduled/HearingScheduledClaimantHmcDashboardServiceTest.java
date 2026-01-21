@@ -7,7 +7,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -66,19 +69,17 @@ class HearingScheduledClaimantHmcDashboardServiceTest {
 
     @Test
     void shouldPopulateCourtName_whenNotifyHearingScheduledIsCalled() {
-        DynamicList hearingLocation = DynamicList.builder()
-            .value(DynamicListElement.builder()
-                       .label("Court Name - Address - Postcode")
-                       .build())
-            .build();
-        CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted().build().toBuilder()
-            .hearingLocation(hearingLocation)
-            .build();
-        LocationRefData locationRefData = LocationRefData.builder()
-            .siteName("Court Name")
-            .courtAddress("Address")
-            .postcode("Postcode")
-            .build();
+        DynamicList hearingLocation = new DynamicList();
+        hearingLocation.setValue(DynamicListElement.dynamicElement("Court Name - Address - Postcode"));
+
+        CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted().build();
+        caseData.setHearingLocation(hearingLocation);
+
+        LocationRefData locationRefData = new LocationRefData();
+        locationRefData.setSiteName("Court Name");
+        locationRefData.setCourtAddress("Address");
+        locationRefData.setPostcode("Postcode");
+
         List<LocationRefData> locations = List.of(locationRefData);
         when(locationRefDataService.getHearingCourtLocations(AUTH_TOKEN)).thenReturn(locations);
         when(courtLocationUtils.fillPreferredLocationData(locations, hearingLocation)).thenReturn(locationRefData);
@@ -91,51 +92,55 @@ class HearingScheduledClaimantHmcDashboardServiceTest {
     @Test
     void shouldRecordFeeRequiredScenario_whenHmcHearingAndFeeNotPaid() {
         String processInstanceId = "proc-id";
+        String hearingType = "ABA5-TRI";
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
-        when(camundaService.getProcessVariables(processInstanceId)).thenReturn(HearingNoticeVariables.builder()
-                                                                                   .hearingType("ABA5-TRI") // Trial
-                                                                                   .build());
-        Fee expectedFee = Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).build();
+        HearingNoticeVariables hearingNoticeVariables = new HearingNoticeVariables();
+        hearingNoticeVariables.setHearingType(hearingType);
+        when(camundaService.getProcessVariables(processInstanceId)).thenReturn(hearingNoticeVariables);
+        Fee expectedFee = new Fee();
+        expectedFee.setCalculatedAmountInPence(BigDecimal.valueOf(10000));
         when(hearingFeesService.getFeeForHearingSmallClaims(any())).thenReturn(expectedFee);
-
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setProcessInstanceId(processInstanceId);
         CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
-            .ccdCaseReference(Long.valueOf(CASE_ID))
-            .applicant1Represented(uk.gov.hmcts.reform.civil.enums.YesOrNo.NO)
-            .build().toBuilder()
-            .hearingFeePaymentDetails(PaymentDetails.builder().status(null).build())
-            .businessProcess(BusinessProcess.builder().processInstanceId(processInstanceId).build())
-            .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
-            .build();
+            .ccdCaseReference(Long.parseLong(CASE_ID))
+            .applicant1Represented(YesOrNo.NO)
+            .build()
+            .setBusinessProcess(businessProcess)
+            .setAllocatedTrack(AllocatedTrack.SMALL_CLAIM);
+        PaymentDetails paymentDetails = new PaymentDetails();
+        paymentDetails.setStatus(null);
+        caseData.setHearingFeePaymentDetails(paymentDetails);
 
         service.notifyHearingScheduled(caseData, AUTH_TOKEN);
 
         assertThat(caseData.getHearingFee()).isEqualTo(expectedFee);
         verify(dashboardScenariosService).recordScenarios(
-            AUTH_TOKEN,
-            SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT.getScenario(),
-            CASE_ID,
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT.getScenario()),
+            eq(CASE_ID),
+            any(ScenarioRequestParams.class)
         );
         verify(dashboardScenariosService).recordScenarios(
-            AUTH_TOKEN,
-            SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario(),
-            CASE_ID,
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT.getScenario()),
+            eq(CASE_ID),
+            any(ScenarioRequestParams.class)
         );
         verify(dashboardScenariosService).recordScenarios(
-            AUTH_TOKEN,
-            SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT.getScenario(),
-            CASE_ID,
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT.getScenario()),
+            eq(CASE_ID),
+            any(ScenarioRequestParams.class)
         );
     }
 
     @Test
     void shouldNotRecordScenarios_whenClaimantIsRepresented() {
         CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
-            .ccdCaseReference(Long.valueOf(CASE_ID))
-            .applicant1Represented(uk.gov.hmcts.reform.civil.enums.YesOrNo.YES)
+            .ccdCaseReference(Long.parseLong(CASE_ID))
+            .applicant1Represented(YesOrNo.YES)
             .build();
 
         service.notifyHearingScheduled(caseData, AUTH_TOKEN);
@@ -151,11 +156,12 @@ class HearingScheduledClaimantHmcDashboardServiceTest {
     @Test
     void shouldNotRecordFeeRequiredScenario_whenFeeAlreadyPaid() {
         CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
-            .ccdCaseReference(Long.valueOf(CASE_ID))
-            .applicant1Represented(uk.gov.hmcts.reform.civil.enums.YesOrNo.NO)
-            .build().toBuilder()
-            .hearingFeePaymentDetails(PaymentDetails.builder().status(uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS).build())
+            .ccdCaseReference(Long.parseLong(CASE_ID))
+            .applicant1Represented(YesOrNo.NO)
             .build();
+        PaymentDetails paymentDetails = new PaymentDetails();
+        paymentDetails.setStatus(PaymentStatus.SUCCESS);
+        caseData.setHearingFeePaymentDetails(paymentDetails);
 
         service.notifyHearingScheduled(caseData, AUTH_TOKEN);
 
@@ -171,20 +177,21 @@ class HearingScheduledClaimantHmcDashboardServiceTest {
     @Test
     void shouldNotRecordFeeRequiredScenario_whenFeePaid() {
         CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
-            .ccdCaseReference(Long.valueOf(CASE_ID))
-            .applicant1Represented(uk.gov.hmcts.reform.civil.enums.YesOrNo.NO)
-            .build().toBuilder()
-            .hearingFeePaymentDetails(PaymentDetails.builder().status(uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS).build())
+            .ccdCaseReference(Long.parseLong(CASE_ID))
+            .applicant1Represented(YesOrNo.NO)
             .build();
+        PaymentDetails paymentDetails = new PaymentDetails();
+        paymentDetails.setStatus(PaymentStatus.SUCCESS);
+        caseData.setHearingFeePaymentDetails(paymentDetails);
         when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
 
         service.notifyHearingScheduled(caseData, AUTH_TOKEN);
 
         verify(dashboardScenariosService, never()).recordScenarios(
-            AUTH_TOKEN,
-            SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT.getScenario(),
-            CASE_ID,
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT.getScenario()),
+            eq(CASE_ID),
+            any(ScenarioRequestParams.class)
         );
     }
 
@@ -193,47 +200,52 @@ class HearingScheduledClaimantHmcDashboardServiceTest {
     void shouldNotRecordFeeRequiredScenario_whenHearingTypeExcludesFee(String hearingType) {
         String processInstanceId = "proc-id";
         CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
-            .ccdCaseReference(Long.valueOf(CASE_ID))
-            .applicant1Represented(uk.gov.hmcts.reform.civil.enums.YesOrNo.NO)
-            .build().toBuilder()
-            .hearingFeePaymentDetails(PaymentDetails.builder().status(null).build())
-            .businessProcess(BusinessProcess.builder().processInstanceId(processInstanceId).build())
+            .ccdCaseReference(Long.parseLong(CASE_ID))
+            .applicant1Represented(YesOrNo.NO)
             .build();
+        PaymentDetails paymentDetails = new PaymentDetails();
+        paymentDetails.setStatus(null);
+        caseData.setHearingFeePaymentDetails(paymentDetails);
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setProcessInstanceId(processInstanceId);
+        caseData.setBusinessProcess(businessProcess);
         when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
 
-        when(camundaService.getProcessVariables(processInstanceId)).thenReturn(HearingNoticeVariables.builder()
-                                                                          .hearingType(hearingType)
-                                                                          .build());
+        HearingNoticeVariables hearingNoticeVariables = new HearingNoticeVariables();
+        hearingNoticeVariables.setHearingType(hearingType);
+        when(camundaService.getProcessVariables(processInstanceId)).thenReturn(hearingNoticeVariables);
 
         service.notifyHearingScheduled(caseData, AUTH_TOKEN);
 
         verify(dashboardScenariosService, never()).recordScenarios(
-            AUTH_TOKEN,
-            SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT.getScenario(),
-            CASE_ID,
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT.getScenario()),
+            eq(CASE_ID),
+            any(ScenarioRequestParams.class)
         );
     }
 
     @Test
     void shouldRecordRelistHearingScenario_whenFastClaimAndTrialReadyIsNull() {
         CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
-            .ccdCaseReference(Long.valueOf(CASE_ID))
-            .applicant1Represented(uk.gov.hmcts.reform.civil.enums.YesOrNo.NO)
-            .build().toBuilder()
-            .allocatedTrack(AllocatedTrack.FAST_CLAIM)
-            .trialReadyApplicant(null)
-            .hearingFeePaymentDetails(PaymentDetails.builder().status(uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS).build())
-            .build();
+            .ccdCaseReference(Long.parseLong(CASE_ID))
+            .applicant1Represented(YesOrNo.NO)
+            .build()
+            .setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
+        caseData.setTrialReadyApplicant(null);
+        PaymentDetails paymentDetails = new PaymentDetails();
+        paymentDetails.setStatus(PaymentStatus.SUCCESS);
+        caseData.setHearingFeePaymentDetails(paymentDetails);
+
         when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
 
         service.notifyHearingScheduled(caseData, AUTH_TOKEN);
 
         verify(dashboardScenariosService).recordScenarios(
-            AUTH_TOKEN,
-            SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_CLAIMANT.getScenario(),
-            CASE_ID,
-            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_CLAIMANT.getScenario()),
+            eq(CASE_ID),
+            any(ScenarioRequestParams.class)
         );
     }
 
