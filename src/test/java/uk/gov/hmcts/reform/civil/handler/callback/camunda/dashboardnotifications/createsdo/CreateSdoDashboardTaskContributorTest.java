@@ -12,11 +12,25 @@ class CreateSdoDashboardTaskContributorTest {
     void shouldExposeTaskIdAndTasks() {
         CreateSdoClaimantDashboardTask claimantTask = mock(CreateSdoClaimantDashboardTask.class);
         CreateSdoDefendantDashboardTask defendantTask = mock(CreateSdoDefendantDashboardTask.class);
+        UploadHearingDocumentsClaimantDashboardTask documentsClaimantDashboardTask = mock(
+            UploadHearingDocumentsClaimantDashboardTask.class);
+        UploadHearingDocumentsDefendantDashboardTask documentsDefendantDashboardTask = mock(
+            UploadHearingDocumentsDefendantDashboardTask.class);
 
         CreateSdoDashboardTaskContributor contributor =
-            new CreateSdoDashboardTaskContributor(claimantTask, defendantTask);
+            new CreateSdoDashboardTaskContributor(
+                claimantTask,
+                defendantTask,
+                documentsClaimantDashboardTask,
+                documentsDefendantDashboardTask
+            );
 
         assertThat(contributor.taskId()).isEqualTo(CREATE_SDO);
-        assertThat(contributor.dashboardTasks()).containsExactly(claimantTask, defendantTask);
+        assertThat(contributor.dashboardTasks()).containsExactly(
+            claimantTask,
+            defendantTask,
+            documentsClaimantDashboardTask,
+            documentsDefendantDashboardTask
+        );
     }
 }

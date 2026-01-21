@@ -7,12 +7,16 @@ import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications
 @Component
 public class CreateSdoDashboardTaskContributor extends DashboardTaskContributor {
 
-    public CreateSdoDashboardTaskContributor(CreateSdoClaimantDashboardTask claimantTask,
-                                             CreateSdoDefendantDashboardTask defendantTask) {
+    public CreateSdoDashboardTaskContributor(CreateSdoClaimantDashboardTask createSdoClaimantTask,
+                                             CreateSdoDefendantDashboardTask createSdoDefendantTask,
+                                             UploadHearingDocumentsClaimantDashboardTask uploadHearingDocumentsClaimantTask,
+                                             UploadHearingDocumentsDefendantDashboardTask uploadHearingDocumentsDefendantTask) {
         super(
             DashboardTaskIds.CREATE_SDO,
-            claimantTask,
-            defendantTask
+            createSdoClaimantTask,
+            createSdoDefendantTask,
+            uploadHearingDocumentsClaimantTask,
+            uploadHearingDocumentsDefendantTask
         );
     }
 }
