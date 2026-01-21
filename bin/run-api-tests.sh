@@ -6,9 +6,9 @@ compare_ft_groups() {
 
   # Extract ftGroups array as a comma-separated string (sorted)
   ft_groups_csv=$(jq -r '
-    if (.ftGroups == null or (.ftGroups | length == 0)) 
-    then "" 
-    else (.ftGroups | sort | join(",")) 
+    if (.ftGroups == null or (.ftGroups | length == 0))
+    then ""
+    else (.ftGroups | sort | join(","))
     end
   ' "$TEST_FILES_REPORT")
 
@@ -29,7 +29,7 @@ compare_ft_groups() {
 run_functional_test_groups() {
   command="yarn test:api-nonprod --grep "
   pr_ft_groups=$(echo "$PR_FT_GROUPS" | awk '{print tolower($0)}')
-  
+
   regex_pattern=""
 
   IFS=',' read -ra ft_groups_array <<< "$pr_ft_groups"
@@ -49,7 +49,11 @@ run_functional_test_groups() {
 run_functional_tests() {
   echo "Running all functional tests on ${ENVIRONMENT} env"
   if [ "$ENVIRONMENT" = "aat" ]; then
-    yarn test:api-prod
+    if [ "$FT_TYPE" = "CIVIL_FT" ]; then
+      yarn test:api-prod
+    else
+      yarn test:api
+    fi
   elif [ -z "$PR_FT_GROUPS" ]; then
     yarn test:api-nonprod
   else
@@ -72,13 +76,22 @@ run_failed_not_executed_functional_tests() {
   # Export as environment variable
   export PREV_FAILED_TEST_FILES="$PREV_FAILED_TEST_FILES"
   export PREV_NOT_EXECUTED_TEST_FILES="$PREV_NOT_EXECUTED_TEST_FILES"
-  
+
   run_functional_tests
 }
 
 #MAIN SCRIPT
 TEST_FILES_REPORT="test-results/functional/testFilesReport.json"
 PREV_TEST_FILES_REPORT="test-results/functional/prevTestFilesReport.json"
+FT_TYPE_STATE_FILE="test-results/functional/prevFtType.txt"
+
+echo "Running functional tests for '$FT_TYPE'"
+
+if [ ! -f "$FT_TYPE_STATE_FILE" ]; then
+  echo "No previous functional type file '$FT_TYPE_STATE_FILE' new state '$FT_TYPE'."
+else
+  echo "FT_TYPE previous state '$(cat "$FT_TYPE_STATE_FILE")' new state '$FT_TYPE'."
+fi
 
 #Check if RUN_ALL_FUNCTIONAL_TESTS is set to true
 if [ "$RUN_ALL_FUNCTIONAL_TESTS" = "true" ]; then
@@ -86,13 +99,19 @@ if [ "$RUN_ALL_FUNCTIONAL_TESTS" = "true" ]; then
   echo "Running all fucntional tests."
   run_functional_tests
 
+#Check if FT_TYPE has changed since the previous run
+elif [ -f "$FT_TYPE_STATE_FILE" ] && [ "$(cat "$FT_TYPE_STATE_FILE")" != "$FT_TYPE" ]; then
+  echo "FT_TYPE changed from '$(cat "$FT_TYPE_STATE_FILE")' to '$FT_TYPE'."
+  echo "Ignoring $TEST_FILES_REPORT and running all functional tests."
+  run_functional_tests
+
 #Check if testFilesReport.json exists and is non-empty
 elif [ ! -f "$TEST_FILES_REPORT" ] || [ ! -s "$TEST_FILES_REPORT" ]; then
   echo "testFilesReport.json not found or is empty."
   run_functional_tests
 
-#Check if latest current git commit is the not the same as git commit of test files report 
-elif [ "$(jq -r 'if .gitCommitId == null then "__NULL__" else .gitCommitId end' "$TEST_FILES_REPORT")" != "$GIT_COMMIT" ]; then 
+#Check if latest current git commit is the not the same as git commit of test files report
+elif [ "$(jq -r 'if .gitCommitId == null then "__NULL__" else .gitCommitId end' "$TEST_FILES_REPORT")" != "$GIT_COMMIT" ]; then
   echo "The gitCommitId does not match the current GIT_COMMIT.";
   run_functional_tests
 
@@ -104,3 +123,7 @@ elif ! compare_ft_groups; then
 else
   run_failed_not_executed_functional_tests
 fi
+
+# Update saved FT_TYPE for next run
+mkdir -p "$(dirname "$FT_TYPE_STATE_FILE")"
+echo -n "$FT_TYPE" > "$FT_TYPE_STATE_FILE"
