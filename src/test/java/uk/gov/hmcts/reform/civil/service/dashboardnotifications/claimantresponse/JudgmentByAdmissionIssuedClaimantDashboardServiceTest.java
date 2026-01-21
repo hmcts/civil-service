@@ -48,10 +48,49 @@ class JudgmentByAdmissionIssuedClaimantDashboardServiceTest {
     }
 
     @Test
-    void shouldRecordScenarioWhenEligible() {
+    void shouldRecordScenarioWhenIndividualJudgmentIssued() {
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
-        CaseData caseData = buildCaseData();
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+
+        JudgmentDetails activeJudgment = new JudgmentDetails();
+        activeJudgment.setState(JudgmentState.ISSUED);
+        activeJudgment.setType(JudgmentType.JUDGMENT_BY_ADMISSION);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setRespondent1(respondent1);
+        caseData.setActiveJudgment(activeJudgment);
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_UPDATE_JUDGEMENTS_ONLINE_ISSUED_CCJ_CLAIMANT.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
+    void shouldRecordScenarioWhenCompanyAcceptedRepaymentPlan() {
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.COMPANY);
+
+        JudgmentDetails activeJudgment = new JudgmentDetails();
+        activeJudgment.setState(JudgmentState.ISSUED);
+        activeJudgment.setType(JudgmentType.JUDGMENT_BY_ADMISSION);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES);
+        caseData.setRespondent1(respondent1);
+        caseData.setActiveJudgment(activeJudgment);
 
         service.notifyClaimant(caseData, AUTH_TOKEN);
 
@@ -67,14 +106,6 @@ class JudgmentByAdmissionIssuedClaimantDashboardServiceTest {
     void shouldNotRecordWhenToggleDisabled() {
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
 
-        CaseData caseData = buildCaseData();
-
-        service.notifyClaimant(caseData, AUTH_TOKEN);
-
-        verifyNoInteractions(dashboardScenariosService);
-    }
-
-    private CaseData buildCaseData() {
         Party respondent1 = new Party();
         respondent1.setType(Party.Type.INDIVIDUAL);
 
@@ -82,13 +113,32 @@ class JudgmentByAdmissionIssuedClaimantDashboardServiceTest {
         activeJudgment.setState(JudgmentState.ISSUED);
         activeJudgment.setType(JudgmentType.JUDGMENT_BY_ADMISSION);
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .ccdCaseReference(1234L)
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1Represented(YesOrNo.NO)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setApplicant1Represented(YesOrNo.NO);
         caseData.setRespondent1(respondent1);
         caseData.setActiveJudgment(activeJudgment);
-        return caseData;
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService);
+    }
+
+    @Test
+    void shouldNotRecordWhenJudgmentNotIssued() {
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+
+        JudgmentDetails activeJudgment = new JudgmentDetails();
+        activeJudgment.setState(JudgmentState.REQUESTED);
+        activeJudgment.setType(JudgmentType.JUDGMENT_BY_ADMISSION);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setRespondent1(respondent1);
+        caseData.setActiveJudgment(activeJudgment);
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService);
     }
 }

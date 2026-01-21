@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.ClaimantResponseOnCourtDecisionType;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -28,6 +29,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_COURT_AGREE_WITH_CLAIMANT_CCJ_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_CCJ_REJECT_PLAN_COURT_FAVOURS_DEFENDANT;
 
 @ExtendWith(MockitoExtension.class)
 class ClaimantCcjResponseDefendantDashboardServiceTest {
@@ -55,15 +57,13 @@ class ClaimantCcjResponseDefendantDashboardServiceTest {
 
         ClaimantLiPResponse claimantResponse = new ClaimantLiPResponse();
         claimantResponse.setApplicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ);
-
         CaseDataLiP caseDataLiP = new CaseDataLiP();
         caseDataLiP.setApplicant1LiPResponse(claimantResponse);
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .ccdCaseReference(1234L)
-            .respondent1Represented(YesOrNo.NO)
-            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES);
         caseData.setCaseDataLiP(caseDataLiP);
 
         service.notifyDefendant(caseData, AUTH_TOKEN);
@@ -85,14 +85,12 @@ class ClaimantCcjResponseDefendantDashboardServiceTest {
 
         ClaimantLiPResponse claimantResponse = new ClaimantLiPResponse();
         claimantResponse.setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
-
         CaseDataLiP caseDataLiP = new CaseDataLiP();
         caseDataLiP.setApplicant1LiPResponse(claimantResponse);
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .ccdCaseReference(1234L)
-            .respondent1Represented(YesOrNo.NO)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
         caseData.setCcjPaymentDetails(ccjPaymentDetails);
         caseData.setCaseDataLiP(caseDataLiP);
 
@@ -107,20 +105,42 @@ class ClaimantCcjResponseDefendantDashboardServiceTest {
     }
 
     @Test
+    void shouldRecordScenarioWhenCourtFavoursDefendantAndDecisionAccepted() {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        ClaimantLiPResponse claimantResponse = new ClaimantLiPResponse();
+        claimantResponse.setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
+        claimantResponse.setClaimantResponseOnCourtDecision(ClaimantResponseOnCourtDecisionType.ACCEPT_REPAYMENT_PLAN);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantResponse);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setCaseDataLiP(caseDataLiP);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_CCJ_REJECT_PLAN_COURT_FAVOURS_DEFENDANT.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
     void shouldNotRecordWhenIneligible() {
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
 
         ClaimantLiPResponse claimantResponse = new ClaimantLiPResponse();
         claimantResponse.setApplicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ);
-
         CaseDataLiP caseDataLiP = new CaseDataLiP();
         caseDataLiP.setApplicant1LiPResponse(claimantResponse);
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .ccdCaseReference(1234L)
-            .respondent1Represented(YesOrNo.NO)
-            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES);
         caseData.setCaseDataLiP(caseDataLiP);
 
         service.notifyDefendant(caseData, AUTH_TOKEN);

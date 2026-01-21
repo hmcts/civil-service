@@ -9,8 +9,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
@@ -52,14 +52,12 @@ class ClaimantCcjResponseClaimantDashboardServiceTest {
 
         ClaimantLiPResponse claimantResponse = new ClaimantLiPResponse();
         claimantResponse.setApplicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ);
-
         CaseDataLiP caseDataLiP = new CaseDataLiP();
         caseDataLiP.setApplicant1LiPResponse(claimantResponse);
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .ccdCaseReference(1234L)
-            .applicant1Represented(YesOrNo.NO)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setApplicant1Represented(YesOrNo.NO);
         caseData.setCaseDataLiP(caseDataLiP);
 
         service.notifyClaimant(caseData, AUTH_TOKEN);
@@ -73,13 +71,53 @@ class ClaimantCcjResponseClaimantDashboardServiceTest {
     }
 
     @Test
-    void shouldNotRecordWhenIneligible() {
+    void shouldNotRecordWhenToggleDisabled() {
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .ccdCaseReference(1234L)
-            .applicant1Represented(YesOrNo.NO)
-            .build();
+        ClaimantLiPResponse claimantResponse = new ClaimantLiPResponse();
+        claimantResponse.setApplicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantResponse);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setCaseDataLiP(caseDataLiP);
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService);
+    }
+
+    @Test
+    void shouldNotRecordWhenClaimantDidNotRequestCcj() {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        ClaimantLiPResponse claimantResponse = new ClaimantLiPResponse();
+        claimantResponse.setApplicant1ChoosesHowToProceed(ChooseHowToProceed.SIGN_A_SETTLEMENT_AGREEMENT);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantResponse);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setCaseDataLiP(caseDataLiP);
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService);
+    }
+
+    @Test
+    void shouldNotRecordWhenApplicantIsRepresented() {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        ClaimantLiPResponse claimantResponse = new ClaimantLiPResponse();
+        claimantResponse.setApplicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantResponse);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setApplicant1Represented(YesOrNo.YES);
+        caseData.setCaseDataLiP(caseDataLiP);
 
         service.notifyClaimant(caseData, AUTH_TOKEN);
 

@@ -1,25 +1,18 @@
 package uk.gov.hmcts.reform.civil.service.dashboardnotifications.claimantresponse;
 
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
-import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING;
@@ -34,21 +27,14 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_CLAIMANT;
 
 @Service
-public class ClaimantResponseClaimantDashboardService extends DashboardScenarioService {
-
-    private final FeatureToggleService featureToggleService;
-    private final DashboardNotificationService dashboardNotificationService;
-    private final TaskListService taskListService;
+public class ClaimantResponseClaimantDashboardService extends ClaimantResponseDashboardServiceBase {
 
     public ClaimantResponseClaimantDashboardService(DashboardScenariosService dashboardScenariosService,
                                                     DashboardNotificationsParamsMapper mapper,
                                                     FeatureToggleService featureToggleService,
                                                     DashboardNotificationService dashboardNotificationService,
                                                     TaskListService taskListService) {
-        super(dashboardScenariosService, mapper);
-        this.featureToggleService = featureToggleService;
-        this.dashboardNotificationService = dashboardNotificationService;
-        this.taskListService = taskListService;
+        super(dashboardScenariosService, mapper, featureToggleService, dashboardNotificationService, taskListService);
     }
 
     public void notifyClaimant(CaseData caseData, String authToken) {
@@ -59,11 +45,11 @@ public class ClaimantResponseClaimantDashboardService extends DashboardScenarioS
     protected String getScenario(CaseData caseData) {
         if (isMintiApplicable(caseData) && isCaseStateAwaitingApplicantIntention(caseData)) {
             return SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_CLAIMANT.getScenario();
-        } else if (caseData.getCcdState() == CASE_SETTLED) {
+        } else if (isCaseStateSettled(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_CLAIMANT.getScenario();
-        } else if (caseData.getCcdState() == JUDICIAL_REFERRAL) {
+        } else if (isCaseStateJudicialReferral(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING.getScenario();
-        } else if (caseData.getCcdState() == IN_MEDIATION) {
+        } else if (isCaseStateInMediation(caseData)) {
             if (isCarmApplicableForMediation(caseData)) {
                 return SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_CLAIMANT_CARM.getScenario();
             } else {
@@ -98,25 +84,12 @@ public class ClaimantResponseClaimantDashboardService extends DashboardScenarioS
 
     @Override
     protected void beforeRecordScenario(CaseData caseData, String authToken) {
-        final String caseId = String.valueOf(caseData.getCcdCaseReference());
-        if (caseData.getCcdState() == CASE_SETTLED) {
-            dashboardNotificationService.deleteByReferenceAndCitizenRole(
-                caseId,
-                "CLAIMANT"
-            );
-            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
-                caseId,
-                "CLAIMANT"
-            );
-        }
-        if (caseData.getCcdState() == CaseState.PROCEEDS_IN_HERITAGE_SYSTEM) {
-            ScenarioRequestParams notificationParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
-            dashboardScenariosService.recordScenarios(
-                authToken,
-                SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT.getScenario(),
-                caseId,
-                notificationParams);
-        }
+        clearSettledCaseNotificationsIfNeeded(caseData, CLAIMANT_ROLE);
+        recordGeneralApplicationScenarioIfNeeded(
+            caseData,
+            authToken,
+            SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT.getScenario()
+        );
     }
 
     private boolean hasClaimantRejectedCourtDecision(CaseData caseData) {
@@ -126,19 +99,5 @@ public class ClaimantResponseClaimantDashboardService extends DashboardScenarioS
                 .map(CaseDataLiP::getApplicant1LiPResponse)
                 .filter(ClaimantLiPResponse::hasClaimantRejectedCourtDecision)
                 .isPresent();
-    }
-
-    private boolean isMintiApplicable(CaseData caseData) {
-        return featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
-            && (AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
-            || AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack()));
-    }
-
-    private static boolean isCaseStateAwaitingApplicantIntention(CaseData caseData) {
-        return caseData.getCcdState() == AWAITING_APPLICANT_INTENTION;
-    }
-
-    private boolean isCarmApplicableForMediation(CaseData caseData) {
-        return featureToggleService.isCarmEnabledForCase(caseData);
     }
 }
