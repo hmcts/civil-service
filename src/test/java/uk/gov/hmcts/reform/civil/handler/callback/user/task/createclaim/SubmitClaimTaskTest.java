@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
