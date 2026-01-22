@@ -104,6 +104,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingWindow;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsImpNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsMediation;
+import uk.gov.hmcts.reform.civil.model.sdo.PPI;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsPPI;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsRestrictPages;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsRestrictWitness;
@@ -778,7 +779,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             caseData.setSdoR2SmallClaimsWitnessStatementsToggle(null);
             caseData.setSdoR2SmallClaimsPPIToggle(null);
             caseData.setSdoR2SmallClaimsUploadDocToggle(null);
+            caseData.setSmallClaimsPPI(null);
+            caseData.setFastTrackPPI(null);
         }
+
+        populatePpiFields(caseData);
 
         updateExpertEvidenceFields(caseData);
         updateDisclosureOfDocumentFields(caseData);
@@ -958,6 +963,25 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             SdoR2SmallClaimsMediation mediationStatement = new SdoR2SmallClaimsMediation();
             mediationStatement.setInput(SdoR2UiConstantSmallClaim.CARM_MEDIATION_TEXT);
             updatedData.setSdoR2SmallClaimsMediationSectionStatement(mediationStatement);
+        }
+    }
+
+    private void populatePpiFields(CaseData caseData) {
+        if (SdoHelper.isSmallClaimsTrack(caseData) && SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimPPI")) {
+            PPI smallClaimsPpi = new PPI();
+            smallClaimsPpi.setPpiDate(LocalDate.now().plusDays(28));
+            smallClaimsPpi.setText(SdoR2UiConstantSmallClaim.PPI_DESCRIPTION);
+            caseData.setSmallClaimsPPI(smallClaimsPpi);
+        } else {
+            caseData.setSmallClaimsPPI(null);
+        }
+        if (SdoHelper.isFastTrack(caseData) && SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimPPI")) {
+            PPI fastTrackPpi = new PPI();
+            fastTrackPpi.setPpiDate(LocalDate.now().plusDays(28));
+            fastTrackPpi.setText(SdoR2UiConstantSmallClaim.PPI_DESCRIPTION);
+            caseData.setFastTrackPPI(fastTrackPpi);
+        } else {
+            caseData.setFastTrackPPI(null);
         }
     }
 
