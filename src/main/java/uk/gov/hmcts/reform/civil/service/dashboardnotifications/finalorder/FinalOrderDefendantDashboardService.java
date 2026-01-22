@@ -5,7 +5,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.utils.DashboardDecisionHelper;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardNotificationHelper;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_DASHBOARD_DEFENDANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS;
@@ -14,12 +14,12 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 @Service
 public class FinalOrderDefendantDashboardService extends DashboardScenarioService {
 
-    private final DashboardDecisionHelper dashboardDecisionHelper;
+    private final DashboardNotificationHelper dashboardDecisionHelper;
     private final FeatureToggleService featureToggleService;
 
     protected FinalOrderDefendantDashboardService(DashboardScenariosService dashboardScenariosService,
                                                   DashboardNotificationsParamsMapper mapper,
-                                                  DashboardDecisionHelper dashboardDecisionHelper,
+                                                  DashboardNotificationHelper dashboardDecisionHelper,
                                                   FeatureToggleService featureToggleService) {
         super(dashboardScenariosService, mapper);
         this.dashboardDecisionHelper = dashboardDecisionHelper;

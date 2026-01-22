@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.dashboardnotifications.utils;
+package uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
-class DashboardDecisionHelperTest {
+class DashboardNotificationHelperTest {
 
     public static final String BASE_LOCATION = "Base Location";
 
@@ -46,7 +46,7 @@ class DashboardDecisionHelperTest {
     private SimpleStateFlowEngine simpleStateFlowEngine;
 
     @InjectMocks
-    private DashboardDecisionHelper dashboardDecisionHelper;
+    private DashboardNotificationHelper dashboardDecisionHelper;
 
     @Nested
     class UploadDocumentsTest {

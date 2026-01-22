@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.dashboardnotifications.utils;
+package uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper;
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
@@ -19,12 +19,12 @@ import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulRea
 import static uk.gov.hmcts.reform.civil.utils.MediationUtils.findMediationUnsuccessfulReason;
 
 @Service
-public class DashboardDecisionHelper {
+public class DashboardNotificationHelper {
 
     private final FeatureToggleService featureToggleService;
     private final SimpleStateFlowEngine simpleStateFlowEngine;
 
-    public DashboardDecisionHelper(FeatureToggleService featureToggleService, SimpleStateFlowEngine simpleStateFlowEngine) {
+    public DashboardNotificationHelper(FeatureToggleService featureToggleService, SimpleStateFlowEngine simpleStateFlowEngine) {
         this.featureToggleService = featureToggleService;
         this.simpleStateFlowEngine = simpleStateFlowEngine;
     }

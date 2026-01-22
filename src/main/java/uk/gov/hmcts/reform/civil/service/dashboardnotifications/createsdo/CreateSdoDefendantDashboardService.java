@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.utils.DashboardDecisionHelper;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardNotificationHelper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -25,13 +25,13 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 public class CreateSdoDefendantDashboardService extends DashboardScenarioService {
 
     private final FeatureToggleService featureToggleService;
-    private final DashboardDecisionHelper dashboardDecisionHelper;
+    private final DashboardNotificationHelper dashboardDecisionHelper;
     private final CreateSdoDashboardDate createSdoDashboardDate;
 
     public CreateSdoDefendantDashboardService(DashboardScenariosService dashboardScenariosService,
                                               DashboardNotificationsParamsMapper mapper,
                                               FeatureToggleService featureToggleService,
-                                              DashboardDecisionHelper dashboardDecisionHelper,
+                                              DashboardNotificationHelper dashboardDecisionHelper,
                                               CreateSdoDashboardDate createSdoDashboardDate) {
         super(dashboardScenariosService, mapper);
         this.featureToggleService = featureToggleService;
