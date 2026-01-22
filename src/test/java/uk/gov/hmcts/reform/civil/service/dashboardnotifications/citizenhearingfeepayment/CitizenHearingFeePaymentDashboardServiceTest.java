@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -48,9 +49,8 @@ class CitizenHearingFeePaymentDashboardServiceTest {
 
     @Test
     void shouldRecordScenarioWhenHearingFeePaymentSuccessful() {
-        CaseData caseData = baseCaseDataBuilder()
-            .hearingFeePaymentDetails(PaymentDetails.builder().status(SUCCESS).build())
-            .build();
+        CaseData caseData = baseCaseData();
+        caseData.setHearingFeePaymentDetails(PaymentDetails.builder().status(SUCCESS).build());
         HashMap<String, Object> params = new HashMap<>();
         params.put("status", "success");
         when(mapper.mapCaseDataToParams(caseData)).thenReturn(params);
@@ -69,14 +69,13 @@ class CitizenHearingFeePaymentDashboardServiceTest {
 
     @Test
     void shouldRecordScenarioWhenHwfRemissionNotGranted() {
-        CaseData caseData = baseCaseDataBuilder()
-            .hwfFeeType(FeeType.HEARING)
-            .feePaymentOutcomeDetails(
-                FeePaymentOutcomeDetails.builder()
-                    .hwfFullRemissionGrantedForHearingFee(YesOrNo.NO)
-                    .build()
-            )
-            .build();
+        CaseData caseData = baseCaseData();
+        caseData.setHwfFeeType(FeeType.HEARING);
+        caseData.setFeePaymentOutcomeDetails(
+            FeePaymentOutcomeDetails.builder()
+                .hwfFullRemissionGrantedForHearingFee(YesOrNo.NO)
+                .build()
+        );
 
         service.notifyCitizenHearingFeePayment(caseData, AUTH_TOKEN);
 
@@ -90,10 +89,9 @@ class CitizenHearingFeePaymentDashboardServiceTest {
 
     @Test
     void shouldNotRecordScenarioWhenApplicantRepresented() {
-        CaseData caseData = baseCaseDataBuilder()
-            .applicant1Represented(YesOrNo.YES)
-            .hearingFeePaymentDetails(PaymentDetails.builder().status(SUCCESS).build())
-            .build();
+        CaseData caseData = baseCaseData();
+        caseData.setApplicant1Represented(YesOrNo.YES);
+        caseData.setHearingFeePaymentDetails(PaymentDetails.builder().status(SUCCESS).build());
 
         service.notifyCitizenHearingFeePayment(caseData, AUTH_TOKEN);
 
@@ -102,16 +100,17 @@ class CitizenHearingFeePaymentDashboardServiceTest {
 
     @Test
     void shouldNotRecordScenarioWhenNoTriggeringEvent() {
-        CaseData caseData = baseCaseDataBuilder().build();
+        CaseData caseData = baseCaseData();
 
         service.notifyCitizenHearingFeePayment(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
     }
 
-    private CaseData.CaseDataBuilder<?, ?> baseCaseDataBuilder() {
-        return CaseData.builder()
+    private CaseData baseCaseData() {
+        return CaseDataBuilder.builder()
             .ccdCaseReference(CASE_REFERENCE)
-            .applicant1Represented(YesOrNo.NO);
+            .applicant1Represented(YesOrNo.NO)
+            .build();
     }
 }
