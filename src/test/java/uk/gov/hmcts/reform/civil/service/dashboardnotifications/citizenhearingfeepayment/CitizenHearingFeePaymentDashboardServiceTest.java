@@ -50,7 +50,9 @@ class CitizenHearingFeePaymentDashboardServiceTest {
     @Test
     void shouldRecordScenarioWhenHearingFeePaymentSuccessful() {
         CaseData caseData = baseCaseData();
-        caseData.setHearingFeePaymentDetails(PaymentDetails.builder().status(SUCCESS).build());
+        PaymentDetails paymentDetails = new PaymentDetails();
+        paymentDetails.setStatus(SUCCESS);
+        caseData.setHearingFeePaymentDetails(paymentDetails);
         HashMap<String, Object> params = new HashMap<>();
         params.put("status", "success");
         when(mapper.mapCaseDataToParams(caseData)).thenReturn(params);
@@ -71,11 +73,9 @@ class CitizenHearingFeePaymentDashboardServiceTest {
     void shouldRecordScenarioWhenHwfRemissionNotGranted() {
         CaseData caseData = baseCaseData();
         caseData.setHwfFeeType(FeeType.HEARING);
-        caseData.setFeePaymentOutcomeDetails(
-            FeePaymentOutcomeDetails.builder()
-                .hwfFullRemissionGrantedForHearingFee(YesOrNo.NO)
-                .build()
-        );
+        FeePaymentOutcomeDetails feeOutcome = new FeePaymentOutcomeDetails();
+        feeOutcome.setHwfFullRemissionGrantedForHearingFee(YesOrNo.NO);
+        caseData.setFeePaymentOutcomeDetails(feeOutcome);
 
         service.notifyCitizenHearingFeePayment(caseData, AUTH_TOKEN);
 
@@ -91,7 +91,9 @@ class CitizenHearingFeePaymentDashboardServiceTest {
     void shouldNotRecordScenarioWhenApplicantRepresented() {
         CaseData caseData = baseCaseData();
         caseData.setApplicant1Represented(YesOrNo.YES);
-        caseData.setHearingFeePaymentDetails(PaymentDetails.builder().status(SUCCESS).build());
+        PaymentDetails paymentDetails = new PaymentDetails();
+        paymentDetails.setStatus(SUCCESS);
+        caseData.setHearingFeePaymentDetails(paymentDetails);
 
         service.notifyCitizenHearingFeePayment(caseData, AUTH_TOKEN);
 
