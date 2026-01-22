@@ -5,8 +5,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskIds;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.caseproceedsoffline.ApplicationsProceedOfflineClaimantDashboardTask;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.caseproceedsoffline.ApplicationsProceedOfflineDefendantDashboardTask;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.ccjrequested.CcjRequestedClaimantDashboardTask;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.ccjrequested.CcjRequestedDefendantDashboardTask;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimantresponse.ClaimantCcjResponseClaimantDashboardTask;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimantresponse.ClaimantCcjResponseDefendantDashboardTask;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimantresponse.ClaimantResponseClaimantDashboardTask;
@@ -24,8 +22,6 @@ public class UploadTranslatedDocumentClaimantIntentionDashboardTaskContributor e
         ClaimantCcjResponseDefendantDashboardTask defendantCcjResponseTask,
         ApplicationsProceedOfflineClaimantDashboardTask claimantOfflineTask,
         ApplicationsProceedOfflineDefendantDashboardTask defendantOfflineTask,
-        CcjRequestedClaimantDashboardTask claimantJbaTask,
-        CcjRequestedDefendantDashboardTask defendantJbaTask,
         JudgmentByAdmissionIssuedClaimantDashboardTask judgmentByAdmissionClaimantTask,
         JudgmentByAdmissionIssuedDefendantDashboardTask judgmentByAdmissionDefendantTask) {
         super(
@@ -36,8 +32,6 @@ public class UploadTranslatedDocumentClaimantIntentionDashboardTaskContributor e
             defendantCcjResponseTask,
             claimantOfflineTask,
             defendantOfflineTask,
-            claimantJbaTask,
-            defendantJbaTask,
             judgmentByAdmissionClaimantTask,
             judgmentByAdmissionDefendantTask
         );

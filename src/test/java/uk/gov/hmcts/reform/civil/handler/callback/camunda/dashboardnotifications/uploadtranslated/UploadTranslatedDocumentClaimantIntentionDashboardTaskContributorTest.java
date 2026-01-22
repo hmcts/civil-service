@@ -8,8 +8,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardWorkflowTask;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.caseproceedsoffline.ApplicationsProceedOfflineClaimantDashboardTask;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.caseproceedsoffline.ApplicationsProceedOfflineDefendantDashboardTask;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.ccjrequested.CcjRequestedClaimantDashboardTask;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.ccjrequested.CcjRequestedDefendantDashboardTask;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimantresponse.ClaimantCcjResponseClaimantDashboardTask;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimantresponse.ClaimantCcjResponseDefendantDashboardTask;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimantresponse.ClaimantResponseClaimantDashboardTask;
@@ -36,10 +34,6 @@ class UploadTranslatedDocumentClaimantIntentionDashboardTaskContributorTest {
     @Mock
     private ApplicationsProceedOfflineDefendantDashboardTask defendantOfflineTask;
     @Mock
-    private CcjRequestedClaimantDashboardTask claimantJbaTask;
-    @Mock
-    private CcjRequestedDefendantDashboardTask defendantJbaTask;
-    @Mock
     private JudgmentByAdmissionIssuedClaimantDashboardTask judgmentByAdmissionClaimantTask;
     @Mock
     private JudgmentByAdmissionIssuedDefendantDashboardTask judgmentByAdmissionDefendantTask;
@@ -54,8 +48,6 @@ class UploadTranslatedDocumentClaimantIntentionDashboardTaskContributorTest {
                 defendantCcjTask,
                 claimantOfflineTask,
                 defendantOfflineTask,
-                claimantJbaTask,
-                defendantJbaTask,
                 judgmentByAdmissionClaimantTask,
                 judgmentByAdmissionDefendantTask
             );
@@ -68,8 +60,6 @@ class UploadTranslatedDocumentClaimantIntentionDashboardTaskContributorTest {
             defendantCcjTask,
             claimantOfflineTask,
             defendantOfflineTask,
-            claimantJbaTask,
-            defendantJbaTask,
             judgmentByAdmissionClaimantTask,
             judgmentByAdmissionDefendantTask
         );
