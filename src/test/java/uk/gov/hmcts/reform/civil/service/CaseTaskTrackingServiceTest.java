@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class CaseTaskTrackingServiceTest {
@@ -98,6 +99,15 @@ class CaseTaskTrackingServiceTest {
         assertEquals("OVERRIDDEN", captured.get("caseId"));
         assertEquals("OVERRIDE_TYPE", captured.get("eventType"));
         assertEquals("x", captured.get("extra"));
+    }
+
+    @Test
+    void trackCaseTask_whenTelemetryClientNotAvailable_skipsTracking() {
+        org.mockito.Mockito.when(telemetryClientProvider.getIfAvailable()).thenReturn(null);
+
+        caseTaskTrackingService.trackCaseTask("444", "type", "name", null);
+
+        verifyNoInteractions(telemetryClient);
     }
 
     @Test
