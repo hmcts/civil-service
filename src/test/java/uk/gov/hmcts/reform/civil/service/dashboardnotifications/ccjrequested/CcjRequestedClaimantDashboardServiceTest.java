@@ -124,6 +124,32 @@ class CcjRequestedClaimantDashboardServiceTest {
     }
 
     @Test
+    void shouldRecordRequestedCcjScenarioWhenPaymentDateBeforeTodayButNotImmediate() {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        RespondToClaimAdmitPartLRspec respondToClaimAdmitPart = new RespondToClaimAdmitPartLRspec();
+        respondToClaimAdmitPart.setWhenWillThisAmountBePaid(LocalDate.now().minusDays(1));
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setRespondToClaimAdmitPartLRspec(respondToClaimAdmitPart);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
+            RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+        caseData.setDefaultJudgmentDocuments(List.of());
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
     void shouldRecordCcjRequestedScenarioWhenRepaymentSummaryPresent() {
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
@@ -144,12 +170,76 @@ class CcjRequestedClaimantDashboardServiceTest {
     }
 
     @Test
+    void shouldRecordRequestedCcjScenarioWhenPaymentDateAfterToday() {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        RespondToClaimAdmitPartLRspec respondToClaimAdmitPart = new RespondToClaimAdmitPartLRspec();
+        respondToClaimAdmitPart.setWhenWillThisAmountBePaid(LocalDate.now().plusDays(1));
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setRespondToClaimAdmitPartLRspec(respondToClaimAdmitPart);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
+            RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+        caseData.setDefaultJudgmentDocuments(List.of());
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
+    void shouldRecordRequestedCcjScenarioWhenDocumentTypeIsNotDefaultJudgment() {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        CaseDocument caseDocument = new CaseDocument();
+        caseDocument.setDocumentType(DocumentType.SEALED_CLAIM);
+        caseDocument.setCreatedDatetime(LocalDateTime.now());
+        Element<CaseDocument> element = new Element<>();
+        element.setValue(caseDocument);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setDefaultJudgmentDocuments(List.of(element));
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
     void shouldNotRecordWhenToggleDisabled() {
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(1234L);
         caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setDefaultJudgmentDocuments(List.of());
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService);
+    }
+
+    @Test
+    void shouldNotRecordWhenApplicantIsRepresented() {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setApplicant1Represented(YesOrNo.YES);
         caseData.setDefaultJudgmentDocuments(List.of());
 
         service.notifyClaimant(caseData, AUTH_TOKEN);

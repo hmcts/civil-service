@@ -7,11 +7,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -32,6 +34,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_TRIAL_ARRANGEMENTS_TASK_LIST;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_NOTICE_OF_CHANGE_JBA_CLAIM_MOVES_OFFLINE_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
 class DefendantNocClaimantDashboardServiceTest {
@@ -60,13 +63,10 @@ class DefendantNocClaimantDashboardServiceTest {
         PaymentDetails paymentDetails = new PaymentDetails();
         paymentDetails.setStatus(PaymentStatus.SUCCESS);
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .ccdCaseReference(1234L)
-            .build()
-            .toBuilder()
-            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
-            .hearingFeePaymentDetails(paymentDetails)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
+        caseData.setHearingFeePaymentDetails(paymentDetails);
 
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
@@ -93,15 +93,12 @@ class DefendantNocClaimantDashboardServiceTest {
 
         JudgmentDetails judgmentDetails = new JudgmentDetails();
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .ccdCaseReference(1234L)
-            .build()
-            .toBuilder()
-            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
-            .previousCCDState(CaseState.All_FINAL_ORDERS_ISSUED)
-            .activeJudgment(judgmentDetails)
-            .hearingFeePaymentDetails(paymentDetails)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
+        caseData.setPreviousCCDState(CaseState.All_FINAL_ORDERS_ISSUED);
+        caseData.setActiveJudgment(judgmentDetails);
+        caseData.setHearingFeePaymentDetails(paymentDetails);
 
         service.notifyClaimant(caseData, AUTH_TOKEN);
 
@@ -115,15 +112,157 @@ class DefendantNocClaimantDashboardServiceTest {
     }
 
     @Test
+    void shouldRecordMoveOfflineScenarioWhenOnlineEnabledWithoutActiveJudgment() {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+        PaymentDetails paymentDetails = new PaymentDetails();
+        paymentDetails.setStatus(PaymentStatus.SUCCESS);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
+        caseData.setPreviousCCDState(CaseState.All_FINAL_ORDERS_ISSUED);
+        caseData.setHearingFeePaymentDetails(paymentDetails);
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verify(dashboardNotificationService, never()).deleteByReferenceAndCitizenRole(any(), any());
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
+    void shouldRecordMoveOfflineScenarioWhenPreviousStateNotFinalOrdersIssued() {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+        PaymentDetails paymentDetails = new PaymentDetails();
+        paymentDetails.setStatus(PaymentStatus.SUCCESS);
+
+        JudgmentDetails judgmentDetails = new JudgmentDetails();
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
+        caseData.setPreviousCCDState(CaseState.AWAITING_APPLICANT_INTENTION);
+        caseData.setActiveJudgment(judgmentDetails);
+        caseData.setHearingFeePaymentDetails(paymentDetails);
+        caseData.setTrialReadyApplicant(YesOrNo.YES);
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
+    void shouldNotRecordWhenNotProceedingOffline() {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardNotificationService, dashboardScenariosService);
+    }
+
+    @Test
+    void shouldRecordHwfHearingFeeScenarioWhenOutcomePending() {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
+
+        PaymentDetails paymentDetails = new PaymentDetails();
+        paymentDetails.setStatus(PaymentStatus.FAILED);
+
+        FeePaymentOutcomeDetails feeOutcome = new FeePaymentOutcomeDetails();
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
+        caseData.setHwfFeeType(FeeType.HEARING);
+        caseData.setHearingFeePaymentDetails(paymentDetails);
+        caseData.setFeePaymentOutcomeDetails(feeOutcome);
+        caseData.setTrialReadyApplicant(YesOrNo.YES);
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+        verify(dashboardScenariosService, never()).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_TRIAL_ARRANGEMENTS_TASK_LIST.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
+    void shouldNotRecordExtraScenariosWhenFeePaidAndTrialReadySet() {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
+
+        PaymentDetails paymentDetails = new PaymentDetails();
+        paymentDetails.setStatus(PaymentStatus.SUCCESS);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
+        caseData.setHearingFeePaymentDetails(paymentDetails);
+        caseData.setTrialReadyApplicant(YesOrNo.YES);
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+        verify(dashboardScenariosService, never()).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_TRIAL_ARRANGEMENTS_TASK_LIST.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+        verify(dashboardScenariosService, never()).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
     void shouldRecordAdditionalScenariosWhenEligible() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .ccdCaseReference(1234L)
-            .build()
-            .toBuilder()
-            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
-            .drawDirectionsOrderRequired(YesOrNo.NO)
-            .claimsTrack(ClaimsTrack.fastTrack)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
+        caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
+        caseData.setClaimsTrack(ClaimsTrack.fastTrack);
 
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
@@ -151,13 +290,82 @@ class DefendantNocClaimantDashboardServiceTest {
     }
 
     @Test
+    void shouldNotRecordTrialArrangementsWhenNotFastTrack() {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
+
+        PaymentDetails paymentDetails = new PaymentDetails();
+        paymentDetails.setStatus(PaymentStatus.SUCCESS);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
+        caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
+        caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
+        caseData.setHearingFeePaymentDetails(paymentDetails);
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+        verify(dashboardScenariosService, never()).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_TRIAL_ARRANGEMENTS_TASK_LIST.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+        verify(dashboardScenariosService, never()).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
+    void shouldNotRecordHearingFeeScenarioWhenHwfRemissionGranted() {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
+
+        PaymentDetails paymentDetails = new PaymentDetails();
+        paymentDetails.setStatus(PaymentStatus.FAILED);
+
+        FeePaymentOutcomeDetails feeOutcome = new FeePaymentOutcomeDetails();
+        feeOutcome.setHwfFullRemissionGrantedForHearingFee(YesOrNo.YES);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
+        caseData.setHwfFeeType(FeeType.HEARING);
+        caseData.setHearingFeePaymentDetails(paymentDetails);
+        caseData.setFeePaymentOutcomeDetails(feeOutcome);
+        caseData.setTrialReadyApplicant(YesOrNo.YES);
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+        verify(dashboardScenariosService, never()).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
     void shouldNotRecordWhenLipVlipsDisabled() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .ccdCaseReference(1234L)
-            .build()
-            .toBuilder()
-            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
 
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
 

@@ -43,38 +43,17 @@ public class ClaimantResponseClaimantDashboardService extends ClaimantResponseDa
 
     @Override
     protected String getScenario(CaseData caseData) {
-        if (shouldShowMultiIntScenario(caseData)) {
-            return SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_CLAIMANT.getScenario();
-        }
-        if (isCaseStateSettled(caseData)) {
-            return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_CLAIMANT.getScenario();
-        }
-        if (isCaseStateJudicialReferral(caseData)) {
-            return SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING.getScenario();
-        }
-        if (isCaseStateInMediation(caseData)) {
-            return getMediationScenario(caseData);
-        }
-        if (caseData.hasApplicant1SignedSettlementAgreement()) {
-            return SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT.getScenario();
-        }
-        if (hasClaimantRejectedCourtDecision(caseData)) {
-            return SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_JUDGE_PLAN_REQUESTED_CCJ_CLAIMANT.getScenario();
-        }
-        if (shouldShowClaimantEndsClaimScenario(caseData)) {
-            return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_CLAIMANT.getScenario();
-        }
-
-        if (shouldShowCompanyRepaymentPlanRejectedScenario(caseData)) {
-            return featureToggleService.isJudgmentOnlineLive()
-                ? SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_JO_CLAIMANT.getScenario()
-                : SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_CLAIMANT.getScenario();
-        }
-
-        if (caseData.isPartAdmitImmediatePaymentClaimSettled()) {
-            return SCENARIO_AAA6_CLAIM_PART_ADMIT_CLAIMANT.getScenario();
-        }
-        return null;
+        return resolveScenario(
+            () -> multiIntScenario(caseData),
+            () -> caseSettledScenario(caseData),
+            () -> judicialReferralScenario(caseData),
+            () -> mediationScenario(caseData),
+            () -> settlementAgreementScenario(caseData),
+            () -> courtDecisionRejectedScenario(caseData),
+            () -> claimantEndsClaimScenario(caseData),
+            () -> companyRepaymentRejectedScenario(caseData),
+            () -> partAdmitImmediateScenario(caseData)
+        );
     }
 
     @Override
@@ -105,7 +84,10 @@ public class ClaimantResponseClaimantDashboardService extends ClaimantResponseDa
         return isMintiApplicable(caseData) && isCaseStateAwaitingApplicantIntention(caseData);
     }
 
-    private String getMediationScenario(CaseData caseData) {
+    private String mediationScenario(CaseData caseData) {
+        if (!isCaseStateInMediation(caseData)) {
+            return null;
+        }
         return isCarmApplicableForMediation(caseData)
             ? SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_CLAIMANT_CARM.getScenario()
             : SCENARIO_AAA6_CLAIMANT_MEDIATION.getScenario();
@@ -120,5 +102,56 @@ public class ClaimantResponseClaimantDashboardService extends ClaimantResponseDa
         return (caseData.isPayBySetDate() || caseData.isPayByInstallment())
             && caseData.getRespondent1().isCompanyOROrganisation()
             && caseData.hasApplicantRejectedRepaymentPlan();
+    }
+
+    private String multiIntScenario(CaseData caseData) {
+        return shouldShowMultiIntScenario(caseData)
+            ? SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_CLAIMANT.getScenario()
+            : null;
+    }
+
+    private String caseSettledScenario(CaseData caseData) {
+        return isCaseStateSettled(caseData)
+            ? SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_CLAIMANT.getScenario()
+            : null;
+    }
+
+    private String judicialReferralScenario(CaseData caseData) {
+        return isCaseStateJudicialReferral(caseData)
+            ? SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING.getScenario()
+            : null;
+    }
+
+    private String settlementAgreementScenario(CaseData caseData) {
+        return caseData.hasApplicant1SignedSettlementAgreement()
+            ? SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT.getScenario()
+            : null;
+    }
+
+    private String courtDecisionRejectedScenario(CaseData caseData) {
+        return hasClaimantRejectedCourtDecision(caseData)
+            ? SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_JUDGE_PLAN_REQUESTED_CCJ_CLAIMANT.getScenario()
+            : null;
+    }
+
+    private String claimantEndsClaimScenario(CaseData caseData) {
+        return shouldShowClaimantEndsClaimScenario(caseData)
+            ? SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_CLAIMANT.getScenario()
+            : null;
+    }
+
+    private String companyRepaymentRejectedScenario(CaseData caseData) {
+        if (!shouldShowCompanyRepaymentPlanRejectedScenario(caseData)) {
+            return null;
+        }
+        return featureToggleService.isJudgmentOnlineLive()
+            ? SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_JO_CLAIMANT.getScenario()
+            : SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_CLAIMANT.getScenario();
+    }
+
+    private String partAdmitImmediateScenario(CaseData caseData) {
+        return caseData.isPartAdmitImmediatePaymentClaimSettled()
+            ? SCENARIO_AAA6_CLAIM_PART_ADMIT_CLAIMANT.getScenario()
+            : null;
     }
 }

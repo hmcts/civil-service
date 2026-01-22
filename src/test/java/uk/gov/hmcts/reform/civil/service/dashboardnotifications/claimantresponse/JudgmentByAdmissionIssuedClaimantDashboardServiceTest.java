@@ -141,4 +141,79 @@ class JudgmentByAdmissionIssuedClaimantDashboardServiceTest {
 
         verifyNoInteractions(dashboardScenariosService);
     }
+
+    @Test
+    void shouldNotRecordWhenApplicantIsRepresented() {
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+
+        JudgmentDetails activeJudgment = new JudgmentDetails();
+        activeJudgment.setState(JudgmentState.ISSUED);
+        activeJudgment.setType(JudgmentType.JUDGMENT_BY_ADMISSION);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setApplicant1Represented(YesOrNo.YES);
+        caseData.setRespondent1(respondent1);
+        caseData.setActiveJudgment(activeJudgment);
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService);
+    }
+
+    @Test
+    void shouldNotRecordWhenJudgmentTypeIsNotByAdmission() {
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+
+        JudgmentDetails activeJudgment = new JudgmentDetails();
+        activeJudgment.setState(JudgmentState.ISSUED);
+        activeJudgment.setType(JudgmentType.DEFAULT_JUDGMENT);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setRespondent1(respondent1);
+        caseData.setActiveJudgment(activeJudgment);
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService);
+    }
+
+    @Test
+    void shouldNotRecordWhenActiveJudgmentMissing() {
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setRespondent1(respondent1);
+        caseData.setActiveJudgment(null);
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService);
+    }
+
+    @Test
+    void shouldNotRecordWhenCompanyWithoutAcceptedPlan() {
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.COMPANY);
+
+        JudgmentDetails activeJudgment = new JudgmentDetails();
+        activeJudgment.setState(JudgmentState.ISSUED);
+        activeJudgment.setType(JudgmentType.JUDGMENT_BY_ADMISSION);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO);
+        caseData.setRespondent1(respondent1);
+        caseData.setActiveJudgment(activeJudgment);
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService);
+    }
 }

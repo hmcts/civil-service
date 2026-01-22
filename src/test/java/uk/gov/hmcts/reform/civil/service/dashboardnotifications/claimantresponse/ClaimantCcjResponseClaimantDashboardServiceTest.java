@@ -123,4 +123,17 @@ class ClaimantCcjResponseClaimantDashboardServiceTest {
 
         verifyNoInteractions(dashboardScenariosService);
     }
+
+    @Test
+    void shouldNotRecordWhenCaseDataLipIsMissing() {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setCaseDataLiP(null);
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService);
+    }
 }

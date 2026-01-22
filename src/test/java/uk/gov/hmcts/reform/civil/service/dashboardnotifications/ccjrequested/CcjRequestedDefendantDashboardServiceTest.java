@@ -60,10 +60,9 @@ class CcjRequestedDefendantDashboardServiceTest {
         caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
         caseDataLiP.setRespondentSignSettlementAgreement(YesOrNo.NO);
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .ccdCaseReference(1234L)
-            .caseDataLip(caseDataLiP)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setCaseDataLiP(caseDataLiP);
 
         service.notifyDefendant(caseData, AUTH_TOKEN);
 
@@ -88,13 +87,10 @@ class CcjRequestedDefendantDashboardServiceTest {
 
         RespondToClaimAdmitPartLRspec respondToClaim = new RespondToClaimAdmitPartLRspec(LocalDate.now().minusDays(1));
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .ccdCaseReference(1234L)
-            .caseDataLip(caseDataLiP)
-            .build()
-            .toBuilder()
-            .respondToClaimAdmitPartLRspec(respondToClaim)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setRespondToClaimAdmitPartLRspec(respondToClaim);
 
         service.notifyDefendant(caseData, AUTH_TOKEN);
 
@@ -110,9 +106,8 @@ class CcjRequestedDefendantDashboardServiceTest {
     void shouldRecordDefaultScenarioWhenNoSettlementAgreementData() {
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .ccdCaseReference(1234L)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
 
         service.notifyDefendant(caseData, AUTH_TOKEN);
 
@@ -125,15 +120,64 @@ class CcjRequestedDefendantDashboardServiceTest {
     }
 
     @Test
+    void shouldRecordNoResponseScenarioWhenDeadlineExpired() {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+        claimantLiPResponse.setApplicant1SignedSettlementAgreement(YesOrNo.YES);
+
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setRespondent1RespondToSettlementAgreementDeadline(LocalDate.now().minusDays(1).atStartOfDay());
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_CCJ_CLAIMANT_ACCEPT_OR_REJECT_PLAN_SETTLEMENT_REQUESTED_NO_DEF_RESPONSE_DEFENDANT.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
     void shouldNotRecordWhenToggleDisabled() {
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .ccdCaseReference(1234L)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
 
         service.notifyDefendant(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
+    }
+
+    @Test
+    void shouldRecordDefaultScenarioWhenSettlementAgreementNotRespondedAndDeadlineNotExpired() {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+        claimantLiPResponse.setApplicant1SignedSettlementAgreement(YesOrNo.YES);
+
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setRespondent1RespondToSettlementAgreementDeadline(LocalDate.now().plusDays(1).atStartOfDay());
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_DEFENDANT.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
     }
 }

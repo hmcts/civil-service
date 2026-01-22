@@ -97,6 +97,58 @@ class JudgmentByAdmissionIssuedDefendantDashboardServiceTest {
     }
 
     @Test
+    void shouldNotRecordScenarioWhenLrvLipPaymentRouteMissing() {
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setApplicant1Represented(YesOrNo.YES);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setRespondent1(respondent1);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(null);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService);
+    }
+
+    @Test
+    void shouldNotRecordScenarioWhenLipvLipWithoutIssuedJudgment() {
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setRespondent1(respondent1);
+        caseData.setActiveJudgment(null);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService);
+    }
+
+    @Test
+    void shouldNotRecordScenarioWhenAcceptedPlanWithoutPaymentRoute() {
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setRespondent1(respondent1);
+        caseData.setApplicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.YES);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(null);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService);
+    }
+
+    @Test
     void shouldRecordScenarioWhenLipvLipCompanyAcceptedPlan() {
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
@@ -144,6 +196,32 @@ class JudgmentByAdmissionIssuedDefendantDashboardServiceTest {
     }
 
     @Test
+    void shouldRecordScenarioWhenAcceptedPlanAndPayByInstallment() {
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setRespondent1(respondent1);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
+            RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN);
+        caseData.setApplicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.YES);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
     void shouldNotRecordWhenToggleDisabled() {
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
 
@@ -162,6 +240,26 @@ class JudgmentByAdmissionIssuedDefendantDashboardServiceTest {
     void shouldNotRecordWhenRespondentRepresented() {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setRespondent1Represented(YesOrNo.YES);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService);
+    }
+
+    @Test
+    void shouldNotRecordWhenNoJudgmentAndNoAcceptedPlan() {
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setRespondent1(respondent1);
+        caseData.setActiveJudgment(null);
+        caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(null);
+        caseData.setApplicant1AcceptPartAdmitPaymentPlanSpec(null);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(null);
 
         service.notifyDefendant(caseData, AUTH_TOKEN);
 

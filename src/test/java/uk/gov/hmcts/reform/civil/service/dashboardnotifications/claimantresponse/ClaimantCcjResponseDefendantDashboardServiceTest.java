@@ -130,6 +130,24 @@ class ClaimantCcjResponseDefendantDashboardServiceTest {
     }
 
     @Test
+    void shouldNotRecordWhenCourtDecisionInFavourOfDefendantNotAccepted() {
+        ClaimantLiPResponse claimantResponse = new ClaimantLiPResponse();
+        claimantResponse.setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
+        claimantResponse.setClaimantResponseOnCourtDecision(ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_PLAN);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantResponse);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setCaseDataLiP(caseDataLiP);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService);
+    }
+
+    @Test
     void shouldNotRecordWhenIneligible() {
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
 
@@ -156,6 +174,71 @@ class ClaimantCcjResponseDefendantDashboardServiceTest {
         caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(null);
         caseData.setApplicant1AcceptPartAdmitPaymentPlanSpec(null);
         caseData.setCaseDataLiP(null);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService);
+    }
+
+    @Test
+    void shouldNotRecordWhenNoCcjRequestPresent() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES);
+        caseData.setCaseDataLiP(null);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService);
+    }
+
+    @Test
+    void shouldNotRecordWhenCcjNotRequestedDespiteAcceptedPlan() {
+        ClaimantLiPResponse claimantResponse = new ClaimantLiPResponse();
+        claimantResponse.setApplicant1ChoosesHowToProceed(ChooseHowToProceed.SIGN_A_SETTLEMENT_AGREEMENT);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantResponse);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES);
+        caseData.setCaseDataLiP(caseDataLiP);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService);
+    }
+
+    @Test
+    void shouldNotRecordWhenCourtDecisionInFavourOfClaimantButNoCcjRequest() {
+        ClaimantLiPResponse claimantResponse = new ClaimantLiPResponse();
+        claimantResponse.setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantResponse);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setCcjPaymentDetails(null);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService);
+    }
+
+    @Test
+    void shouldNotRecordWhenRespondentIsRepresented() {
+        ClaimantLiPResponse claimantResponse = new ClaimantLiPResponse();
+        claimantResponse.setApplicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantResponse);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondent1Represented(YesOrNo.YES);
+        caseData.setCaseDataLiP(caseDataLiP);
 
         service.notifyDefendant(caseData, AUTH_TOKEN);
 

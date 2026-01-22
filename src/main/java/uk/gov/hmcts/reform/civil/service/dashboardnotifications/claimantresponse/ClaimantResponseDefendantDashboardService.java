@@ -56,46 +56,21 @@ public class ClaimantResponseDefendantDashboardService extends ClaimantResponseD
 
     @Override
     protected String getScenario(CaseData caseData) {
-        if (shouldShowMultiIntScenario(caseData)) {
-            return SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_DEFENDANT.getScenario();
-        }
-        if (isCaseStateSettled(caseData)) {
-            return getCaseSettledScenarios(caseData);
-        }
-        if (isImmediatePaymentScenario(caseData)) {
-            return SCENARIO_AAA6_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT.getScenario();
-        }
-        if (isCourtDecisionRejected(caseData)) {
-            return SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_CCJ_CLAIMANT_REJECTS_DEF_PLAN_CLAIMANT_DISAGREES_COURT_PLAN_DEFENDANT.getScenario();
-        }
-        if (caseData.hasApplicant1CourtDecisionInFavourOfDefendant()) {
-            return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_COURT_AGREE_DEFENDANT_DEFENDANT.getScenario();
-        }
-        if (isSettlementAgreementRejectedByCourtScenario(caseData)) {
-            return SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_REJECTS_COURT_AGREES_WITH_CLAIMANT_DEFENDANT.getScenario();
-        }
-        if (isSettlementAgreementAcceptedScenario(caseData)) {
-            return SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_ACCEPTS_DEFENDANT.getScenario();
-        }
-        if (isCaseStateJudicialReferral(caseData)) {
-            return getJudicialReferralScenarios(caseData);
-        }
-        if (isCaseStateInMediation(caseData)) {
-            return getMediationScenario(caseData);
-        }
-        if (isClaimantRejectRepaymentPlan(caseData)) {
-            return SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT.getScenario();
-        }
-        if (isLrvLipPartFullAdmitAndPayByPlan(caseData)) {
-            return SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT.getScenario();
-        }
-        if (isLrvLipFullDefenceNotProceed(caseData)) {
-            return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario();
-        }
-        if (shouldShowClaimantEndsClaimScenario(caseData)) {
-            return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_DEFENDANT.getScenario();
-        }
-        return null;
+        return resolveScenario(
+            () -> multiIntScenario(caseData),
+            () -> caseSettledScenario(caseData),
+            () -> immediatePaymentScenario(caseData),
+            () -> courtDecisionRejectedScenario(caseData),
+            () -> courtDecisionInFavourOfDefendantScenario(caseData),
+            () -> settlementAgreementRejectedScenario(caseData),
+            () -> settlementAgreementAcceptedScenario(caseData),
+            () -> judicialReferralScenario(caseData),
+            () -> mediationScenario(caseData),
+            () -> claimantRejectRepaymentPlanScenario(caseData),
+            () -> lrvLipPartFullAdmitScenario(caseData),
+            () -> lrvLipFullDefenceNotProceedScenario(caseData),
+            () -> claimantEndsClaimScenario(caseData)
+        );
     }
 
     @Override
@@ -241,4 +216,75 @@ public class ClaimantResponseDefendantDashboardService extends ClaimantResponseD
         return respondToClaim;
     }
 
+    private String multiIntScenario(CaseData caseData) {
+        return shouldShowMultiIntScenario(caseData)
+            ? SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_DEFENDANT.getScenario()
+            : null;
+    }
+
+    private String caseSettledScenario(CaseData caseData) {
+        return isCaseStateSettled(caseData) ? getCaseSettledScenarios(caseData) : null;
+    }
+
+    private String immediatePaymentScenario(CaseData caseData) {
+        return isImmediatePaymentScenario(caseData)
+            ? SCENARIO_AAA6_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT.getScenario()
+            : null;
+    }
+
+    private String courtDecisionRejectedScenario(CaseData caseData) {
+        return isCourtDecisionRejected(caseData)
+            ? SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_CCJ_CLAIMANT_REJECTS_DEF_PLAN_CLAIMANT_DISAGREES_COURT_PLAN_DEFENDANT.getScenario()
+            : null;
+    }
+
+    private String courtDecisionInFavourOfDefendantScenario(CaseData caseData) {
+        return caseData.hasApplicant1CourtDecisionInFavourOfDefendant()
+            ? SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_COURT_AGREE_DEFENDANT_DEFENDANT.getScenario()
+            : null;
+    }
+
+    private String settlementAgreementRejectedScenario(CaseData caseData) {
+        return isSettlementAgreementRejectedByCourtScenario(caseData)
+            ? SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_REJECTS_COURT_AGREES_WITH_CLAIMANT_DEFENDANT.getScenario()
+            : null;
+    }
+
+    private String settlementAgreementAcceptedScenario(CaseData caseData) {
+        return isSettlementAgreementAcceptedScenario(caseData)
+            ? SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_ACCEPTS_DEFENDANT.getScenario()
+            : null;
+    }
+
+    private String judicialReferralScenario(CaseData caseData) {
+        return isCaseStateJudicialReferral(caseData) ? getJudicialReferralScenarios(caseData) : null;
+    }
+
+    private String mediationScenario(CaseData caseData) {
+        return isCaseStateInMediation(caseData) ? getMediationScenario(caseData) : null;
+    }
+
+    private String claimantRejectRepaymentPlanScenario(CaseData caseData) {
+        return isClaimantRejectRepaymentPlan(caseData)
+            ? SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT.getScenario()
+            : null;
+    }
+
+    private String lrvLipPartFullAdmitScenario(CaseData caseData) {
+        return isLrvLipPartFullAdmitAndPayByPlan(caseData)
+            ? SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT.getScenario()
+            : null;
+    }
+
+    private String lrvLipFullDefenceNotProceedScenario(CaseData caseData) {
+        return isLrvLipFullDefenceNotProceed(caseData)
+            ? SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario()
+            : null;
+    }
+
+    private String claimantEndsClaimScenario(CaseData caseData) {
+        return shouldShowClaimantEndsClaimScenario(caseData)
+            ? SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_DEFENDANT.getScenario()
+            : null;
+    }
 }

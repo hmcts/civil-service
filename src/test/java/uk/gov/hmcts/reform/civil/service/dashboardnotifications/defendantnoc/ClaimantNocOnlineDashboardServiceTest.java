@@ -45,10 +45,9 @@ class ClaimantNocOnlineDashboardServiceTest {
 
     @Test
     void shouldRecordScenarioWhenOnlineAndNotOffline() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .ccdCaseReference(1234L)
-            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
 
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
 
@@ -64,10 +63,9 @@ class ClaimantNocOnlineDashboardServiceTest {
 
     @Test
     void shouldNotRecordWhenOffline() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .ccdCaseReference(1234L)
-            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
 
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
 
@@ -78,12 +76,24 @@ class ClaimantNocOnlineDashboardServiceTest {
 
     @Test
     void shouldNotRecordWhenToggleDisabled() {
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .ccdCaseReference(1234L)
-            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
 
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService);
+    }
+
+    @Test
+    void shouldNotRecordWhenStateIsNull() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setCcdState(null);
+
+        when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
 
         service.notifyClaimant(caseData, AUTH_TOKEN);
 

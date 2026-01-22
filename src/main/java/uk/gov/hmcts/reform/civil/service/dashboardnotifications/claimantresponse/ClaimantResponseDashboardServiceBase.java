@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
+import java.util.function.Supplier;
+
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
@@ -82,5 +84,16 @@ abstract class ClaimantResponseDashboardServiceBase extends DashboardScenarioSer
             caseId,
             notificationParams
         );
+    }
+
+    @SafeVarargs
+    protected final String resolveScenario(Supplier<String>... scenarioResolvers) {
+        for (Supplier<String> resolver : scenarioResolvers) {
+            String scenario = resolver.get();
+            if (scenario != null) {
+                return scenario;
+            }
+        }
+        return null;
     }
 }

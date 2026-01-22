@@ -128,6 +128,20 @@ class ClaimantResponseClaimantDashboardServiceTest {
     }
 
     @Test
+    void shouldNotRecordWhenApplicantIsRepresented() {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setApplicant1Represented(YesOrNo.YES);
+        caseData.setCcdState(CaseState.CASE_SETTLED);
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
+    }
+
+    @Test
     void shouldRecordScenarioForMultiTrackAwaitingIntention() {
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
@@ -146,6 +160,55 @@ class ClaimantResponseClaimantDashboardServiceTest {
             eq("1234"),
             any(ScenarioRequestParams.class)
         );
+    }
+
+    @Test
+    void shouldRecordScenarioForMultiClaimAwaitingIntention() {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setResponseClaimTrack(AllocatedTrack.MULTI_CLAIM.name());
+        caseData.setCcdState(CaseState.AWAITING_APPLICANT_INTENTION);
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_CLAIMANT.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
+    void shouldNotRecordScenarioForMultiTrackWhenNotAwaitingIntention() {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setResponseClaimTrack(AllocatedTrack.INTERMEDIATE_CLAIM.name());
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
+    }
+
+    @Test
+    void shouldNotRecordScenarioWhenTrackNotMultiOrIntermediate() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setResponseClaimTrack(AllocatedTrack.FAST_CLAIM.name());
+        caseData.setCcdState(CaseState.AWAITING_APPLICANT_INTENTION);
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
     }
 
     @Test
@@ -277,6 +340,20 @@ class ClaimantResponseClaimantDashboardServiceTest {
     }
 
     @Test
+    void shouldNotRecordScenarioWhenClaimantProceedsAfterCaseStayed() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setCcdState(CaseState.CASE_STAYED);
+        caseData.setDefenceRouteRequired(DISPUTES_THE_CLAIM);
+        caseData.setApplicant1ProceedWithClaim(YesOrNo.YES);
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
+    }
+
+    @Test
     void shouldRecordScenarioForRejectRepaymentCompanyWhenJoEnabled() {
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
@@ -300,6 +377,44 @@ class ClaimantResponseClaimantDashboardServiceTest {
             eq("1234"),
             any(ScenarioRequestParams.class)
         );
+    }
+
+    @Test
+    void shouldNotRecordScenarioWhenRespondentNotCompanyForRejectedPlan() {
+        Party respondent = new Party();
+        respondent.setType(Party.Type.INDIVIDUAL);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setRespondent1(respondent);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
+            RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+        caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO);
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
+    }
+
+    @Test
+    void shouldNotRecordScenarioWhenCompanyAcceptedPlan() {
+        Party respondent = new Party();
+        respondent.setType(Party.Type.COMPANY);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setRespondent1(respondent);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
+            RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+        caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES);
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
     }
 
     @Test
@@ -348,6 +463,25 @@ class ClaimantResponseClaimantDashboardServiceTest {
             eq("1234"),
             any(ScenarioRequestParams.class)
         );
+    }
+
+    @Test
+    void shouldNotRecordScenarioWhenCompanyRejectsPlanButPayImmediately() {
+        Party respondent = new Party();
+        respondent.setType(Party.Type.COMPANY);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setRespondent1(respondent);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
+            RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+        caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO);
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+
+        service.notifyClaimant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
     }
 
     @Test

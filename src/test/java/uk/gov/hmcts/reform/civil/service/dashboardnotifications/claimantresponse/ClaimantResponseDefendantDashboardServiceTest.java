@@ -162,6 +162,21 @@ class ClaimantResponseDefendantDashboardServiceTest {
     }
 
     @Test
+    void shouldNotRecordWhenRespondentRepresented() {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.YES);
+        caseData.setApplicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES);
+        caseData.setCcdState(CaseState.CASE_SETTLED);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
+    }
+
+    @Test
     void shouldRecordScenarioForPartAdmitImmediatePaymentClaimSettled() {
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
@@ -202,6 +217,25 @@ class ClaimantResponseDefendantDashboardServiceTest {
             eq("1234"),
             any(ScenarioRequestParams.class)
         );
+    }
+
+    @Test
+    void shouldNotRecordScenarioWhenTrackNotMultiOrIntermediate() {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+        Party respondent = new Party();
+        respondent.setType(Party.Type.INDIVIDUAL);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setRespondent1(respondent);
+        caseData.setResponseClaimTrack(AllocatedTrack.FAST_CLAIM.name());
+        caseData.setCcdState(CaseState.AWAITING_APPLICANT_INTENTION);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
     }
 
     @Test
@@ -373,6 +407,30 @@ class ClaimantResponseDefendantDashboardServiceTest {
     }
 
     @Test
+    void shouldRecordScenarioForJudicialReferralWhenMediationRequiredIsNull() {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+        caseData.setApplicant1FullDefenceConfirmAmountPaidSpec(YesOrNo.YES);
+        caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES);
+        caseData.setApplicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES);
+        caseData.setResponseClaimMediationSpecRequired(null);
+        caseData.setCcdState(CaseState.JUDICIAL_REFERRAL);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENCE_CLAIMANT_DISPUTES_DEFENDANT.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
     void shouldRecordScenarioForJudicialReferralFullDefenceNoMediation() {
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
@@ -386,6 +444,33 @@ class ClaimantResponseDefendantDashboardServiceTest {
         caseData.setRespondent1Represented(YesOrNo.NO);
         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
         caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES);
+        caseData.setResponseClaimMediationSpecRequired(YesOrNo.YES);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setCcdState(CaseState.JUDICIAL_REFERRAL);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENSE_CLAIMANT_DISPUTES_NO_MEDIATION_DEFENDANT.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
+    void shouldRecordScenarioForJudicialReferralWhenClaimantMediationMissing() {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+        caseData.setApplicant1FullDefenceConfirmAmountPaidSpec(YesOrNo.YES);
+        caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES);
+        caseData.setApplicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES);
         caseData.setResponseClaimMediationSpecRequired(YesOrNo.YES);
         caseData.setCaseDataLiP(caseDataLiP);
         caseData.setCcdState(CaseState.JUDICIAL_REFERRAL);
@@ -476,6 +561,32 @@ class ClaimantResponseDefendantDashboardServiceTest {
             RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
         caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO);
         caseData.setRespondent1(respondent);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
+    void shouldRecordScenarioForClaimantRejectRepaymentPlanWhenLrvLip() {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        Party respondent = new Party();
+        respondent.setType(Party.Type.INDIVIDUAL);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setApplicant1Represented(YesOrNo.YES);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setRespondent1(respondent);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
+            RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+        caseData.setApplicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO);
 
         service.notifyDefendant(caseData, AUTH_TOKEN);
 
@@ -592,6 +703,381 @@ class ClaimantResponseDefendantDashboardServiceTest {
         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(null);
         caseData.setApplicant1AcceptAdmitAmountPaidSpec(null);
         caseData.setRespondent1ClaimResponseTypeForSpec(null);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
+    }
+
+    @Test
+    void shouldNotRecordScenarioWhenCaseSettledButClaimantDidNotSettlePartAdmit() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO);
+        caseData.setCcdState(CaseState.CASE_SETTLED);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
+    }
+
+    @Test
+    void shouldRecordScenarioForJudicialReferralNotPaidWhenFullDefenceAndNoConfirmation() {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+        caseData.setApplicant1FullDefenceConfirmAmountPaidSpec(YesOrNo.NO);
+        caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(null);
+        caseData.setResponseClaimMediationSpecRequired(YesOrNo.NO);
+        caseData.setCcdState(CaseState.JUDICIAL_REFERRAL);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_CLAIMANT_REJECTED_NOT_PAID_DEFENDANT.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
+    void shouldRecordScenarioForJudicialReferralStatesPaidWhenClaimantRejectsMediation() {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        RespondToClaim respondToClaim = new RespondToClaim();
+        respondToClaim.setHowMuchWasPaid(BigDecimal.ONE);
+
+        ClaimantMediationLip mediationLip = new ClaimantMediationLip();
+        mediationLip.setHasAgreedFreeMediation(MediationDecision.No);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(mediationLip);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+        caseData.setRespondToClaim(respondToClaim);
+        caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES);
+        caseData.setResponseClaimMediationSpecRequired(YesOrNo.YES);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setCcdState(CaseState.JUDICIAL_REFERRAL);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_PART_ADMIT_FULL_DEFENCE_STATES_PAID_CLAIMANT_CONFIRMS_DEFENDANT.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
+    void shouldRecordScenarioForJudicialReferralPartAdmitRejectsClaimantMediation() {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        ClaimantMediationLip mediationLip = new ClaimantMediationLip();
+        mediationLip.setHasAgreedFreeMediation(MediationDecision.No);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(mediationLip);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+        caseData.setApplicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO);
+        caseData.setResponseClaimMediationSpecRequired(YesOrNo.YES);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setCcdState(CaseState.JUDICIAL_REFERRAL);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_DEFENDANT_PART_ADMIT.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
+    void shouldNotRecordJudicialReferralScenarioWhenNotFullDefenceForMediationCheck() {
+        ClaimantMediationLip mediationLip = new ClaimantMediationLip();
+        mediationLip.setHasAgreedFreeMediation(MediationDecision.No);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(mediationLip);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+        caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES);
+        caseData.setResponseClaimMediationSpecRequired(YesOrNo.YES);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setCcdState(CaseState.JUDICIAL_REFERRAL);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
+    }
+
+    @Test
+    void shouldNotRecordJudicialReferralScenarioWhenClaimantAgreedMediation() {
+        ClaimantMediationLip mediationLip = new ClaimantMediationLip();
+        mediationLip.setHasAgreedFreeMediation(MediationDecision.Yes);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(mediationLip);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+        caseData.setApplicant1FullDefenceConfirmAmountPaidSpec(YesOrNo.YES);
+        caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES);
+        caseData.setApplicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES);
+        caseData.setResponseClaimMediationSpecRequired(YesOrNo.YES);
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setCcdState(CaseState.JUDICIAL_REFERRAL);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
+    }
+
+    @Test
+    void shouldNotRecordScenarioForMultiTrackWhenNotAwaitingIntention() {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setResponseClaimTrack(AllocatedTrack.INTERMEDIATE_CLAIM.name());
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
+    }
+
+    @Test
+    void shouldNotRecordScenarioWhenClaimantProceedsAfterCaseStayed() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setCcdState(CaseState.CASE_STAYED);
+        caseData.setDefenceRouteRequired(DISPUTES_THE_CLAIM);
+        caseData.setApplicant1ProceedWithClaim(YesOrNo.YES);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
+    }
+
+    @Test
+    void shouldNotRecordScenarioWhenRejectRepaymentPlanNotCompanyOrLrvLip() {
+        Party respondent = new Party();
+        respondent.setType(Party.Type.INDIVIDUAL);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setRespondent1(respondent);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
+            RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+        caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO);
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
+    }
+
+    @Test
+    void shouldNotRecordScenarioWhenCompanyAcceptedPlan() {
+        Party respondent = new Party();
+        respondent.setType(Party.Type.COMPANY);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.YES);
+        caseData.setRespondent1(respondent);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
+            RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+        caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES);
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
+    }
+
+    @Test
+    void shouldNotRecordScenarioWhenJudgmentOnlineEnabledForLrvLipPlan() {
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
+        ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.YES);
+        caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES);
+        caseData.setCcjPaymentDetails(ccjPaymentDetails);
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
+    }
+
+    @Test
+    void shouldNotRecordScenarioWhenApplicantLipForLrvLipPlan() {
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
+
+        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
+        ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES);
+        caseData.setCcjPaymentDetails(ccjPaymentDetails);
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
+    }
+
+    @Test
+    void shouldNotRecordScenarioWhenCcjRequestMissingForLrvLipPlan() {
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.YES);
+        caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES);
+        caseData.setCcjPaymentDetails(null);
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
+    }
+
+    @Test
+    void shouldNotRecordScenarioWhenApplicantLipForFullDefenceNotProceed() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+        caseData.setApplicant1ProceedWithClaim(YesOrNo.NO);
+        caseData.setDefenceRouteRequired(HAS_PAID_THE_AMOUNT_CLAIMED);
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
+    }
+
+    @Test
+    void shouldNotRecordScenarioWhenNotFullDefenceForFullDefenceNotProceed() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.YES);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+        caseData.setApplicant1ProceedWithClaim(YesOrNo.NO);
+        caseData.setDefenceRouteRequired(HAS_PAID_THE_AMOUNT_CLAIMED);
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
+    }
+
+    @Test
+    void shouldNotRecordScenarioWhenDefenceRouteNotPaidForFullDefenceNotProceed() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.YES);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+        caseData.setApplicant1ProceedWithClaim(YesOrNo.NO);
+        caseData.setDefenceRouteRequired(DISPUTES_THE_CLAIM);
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
+    }
+
+    @Test
+    void shouldNotRecordScenarioWhenJudgmentOnlineDisabledForFullAdmitImmediate() {
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.YES);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
+            RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+        caseData.setApplicant1ProceedWithClaim(null);
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
+    }
+
+    @Test
+    void shouldNotRecordScenarioWhenApplicantLipForFullAdmitImmediate() {
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
+            RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+        caseData.setApplicant1ProceedWithClaim(null);
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+
+        service.notifyDefendant(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
+    }
+
+    @Test
+    void shouldNotRecordScenarioWhenNotImmediatePayForFullAdmitImmediate() {
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+        Party respondent = new Party();
+        respondent.setType(Party.Type.INDIVIDUAL);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1234L);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setApplicant1Represented(YesOrNo.YES);
+        caseData.setRespondent1(respondent);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
+            RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+        caseData.setApplicant1ProceedWithClaim(null);
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
 
         service.notifyDefendant(caseData, AUTH_TOKEN);
 
