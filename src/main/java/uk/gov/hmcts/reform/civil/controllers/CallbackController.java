@@ -31,6 +31,8 @@ import jakarta.validation.constraints.NotNull;
 
 import static uk.gov.hmcts.reform.civil.helpers.CaseTypeIdentifier.isGeneralApplication;
 
+import static uk.gov.hmcts.reform.civil.helpers.CaseTypeIdentifier.isGeneralApplication;
+
 @Tag(name = "Callback Controller")
 @Slf4j
 @RestController
