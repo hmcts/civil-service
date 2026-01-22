@@ -779,11 +779,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             caseData.setSdoR2SmallClaimsWitnessStatementsToggle(null);
             caseData.setSdoR2SmallClaimsPPIToggle(null);
             caseData.setSdoR2SmallClaimsUploadDocToggle(null);
-            caseData.setSmallClaimsPPI(null);
-            caseData.setFastTrackPPI(null);
         }
-
-        populatePpiFields(caseData);
 
         updateExpertEvidenceFields(caseData);
         updateDisclosureOfDocumentFields(caseData);
@@ -1261,6 +1257,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 caseData.setIsSdoR2NewScreen(YES);
             }
         }
+
+        populatePpiFields(caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
