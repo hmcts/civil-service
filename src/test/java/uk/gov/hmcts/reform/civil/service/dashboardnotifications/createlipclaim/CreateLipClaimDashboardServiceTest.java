@@ -148,12 +148,16 @@ class CreateLipClaimDashboardServiceTest {
 
     private CaseData buildCaseData(long reference, YesOrNo applicantRepresented, YesOrNo helpWithFees,
                                    BigDecimal totalClaimAmount) {
+        HelpWithFees helpWithFeesData = new HelpWithFees();
+        helpWithFeesData.setHelpWithFee(helpWithFees);
+
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setHelpWithFees(helpWithFeesData);
+
         return CaseDataBuilder.builder()
             .ccdCaseReference(reference)
             .applicant1Represented(applicantRepresented)
-            .caseDataLip(CaseDataLiP.builder()
-                .helpWithFees(HelpWithFees.builder().helpWithFee(helpWithFees).build())
-                .build())
+            .caseDataLip(caseDataLiP)
             .totalClaimAmount(totalClaimAmount)
             .build();
     }
