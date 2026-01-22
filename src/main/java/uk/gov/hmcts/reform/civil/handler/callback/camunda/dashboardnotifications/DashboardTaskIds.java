@@ -15,6 +15,8 @@ public final class DashboardTaskIds {
         "GenerateDashboardNotificationsUploadTranslatedDocumentClaimantIntention";
     public static final String REQUEST_JUDGEMENT_ADMISSION_SPEC =
         "GenerateDashboardNotificationsRequestJudgementAdmissionSpec";
+    public static final String JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC =
+        "GenerateDashboardNotificationsJudgementByAdmissionNonDivergentSpec";
     public static final String CLAIMANT_RESPONSE_CUI = "GenerateDashboardNotificationsClaimantResponseCui";
     public static final String CLAIMANT_RESPONSE_SPEC = "GenerateDashboardNotificationsClaimantResponseSpec";
     public static final String TAKE_CASE_OFFLINE = "GenerateDashboardNotificationsTakeCaseOffline";
