@@ -89,16 +89,14 @@ public class JudgmentByAdmissionPiPLetterGenerator {
     }
 
     public JudgmentByAdmissionLiPDefendantLetter getTemplateData(CaseData caseData) {
-        return JudgmentByAdmissionLiPDefendantLetter
-            .builder()
-            .claimReferenceNumber(caseData.getLegacyCaseReference())
-            .claimantName(caseData.getApplicant1().getPartyName())
-            .defendant(caseData.getRespondent1())
-            .pin(caseData.getRespondent1PinToPostLRspec().getAccessCode())
-            .respondToClaimUrl(pipInPostConfiguration.getRespondToClaimUrl())
-            .varyJudgmentFee(String.valueOf(generalAppFeesService.getFeeForJOWithApplicationType(VARY_ORDER).formData()))
-            .certifOfSatisfactionFee(String.valueOf(generalAppFeesService.getFeeForJOWithApplicationType(OTHER).formData()))
-            .build();
+        return new JudgmentByAdmissionLiPDefendantLetter()
+            .setClaimReferenceNumber(caseData.getLegacyCaseReference())
+            .setClaimantName(caseData.getApplicant1().getPartyName())
+            .setDefendant(caseData.getRespondent1())
+            .setPin(caseData.getRespondent1PinToPostLRspec().getAccessCode())
+            .setRespondToClaimUrl(pipInPostConfiguration.getRespondToClaimUrl())
+            .setVaryJudgmentFee(String.valueOf(generalAppFeesService.getFeeForJOWithApplicationType(VARY_ORDER).formData()))
+            .setCertifOfSatisfactionFee(String.valueOf(generalAppFeesService.getFeeForJOWithApplicationType(OTHER).formData()));
     }
 
     private CaseDocument getDefendantJbaDocStitchedToPinAndPostDoc(CaseData caseData, CaseDocument pinAndPostLetterDoc, String authorisation) {

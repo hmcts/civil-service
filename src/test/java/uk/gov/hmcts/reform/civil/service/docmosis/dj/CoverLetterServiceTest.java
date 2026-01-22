@@ -172,11 +172,10 @@ class CoverLetterServiceTest {
         JudgementCoverLetter result = coverLetterService.buildTemplateData(party, caseData);
 
         assertThat(result).isEqualTo(
-            JudgementCoverLetter.builder()
-                .claimNumber(caseData.getLegacyCaseReference())
-                .partyName(party.getPartyName())
-                .address(party.getPrimaryAddress())
-                .build());
+            new JudgementCoverLetter()
+                .setClaimNumber(caseData.getLegacyCaseReference())
+                .setPartyName(party.getPartyName())
+                .setAddress(party.getPrimaryAddress()));
     }
 
     @Test

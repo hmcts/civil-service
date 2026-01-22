@@ -60,67 +60,66 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     @Override
     public SealedClaimResponseFormForSpec getTemplateData(CaseData caseData, String authorisation) {
         log.info("GetTemplateData for case ID {}", caseData.getCcdCaseReference());
-        SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder =
-            SealedClaimResponseFormForSpec.builder();
+        SealedClaimResponseFormForSpec form = new SealedClaimResponseFormForSpec();
 
-        referenceNumberPopulator.populateReferenceNumberDetails(builder, caseData, authorisation);
-        statementOfTruthPopulator.populateStatementOfTruthDetails(builder, caseData);
+        referenceNumberPopulator.populateReferenceNumberDetails(form, caseData, authorisation);
+        statementOfTruthPopulator.populateStatementOfTruthDetails(form, caseData);
 
-        addCarmMediationDetails(builder, caseData);
-        addRepaymentPlanDetails(builder, caseData);
-        handleRespondents(builder, caseData);
+        addCarmMediationDetails(form, caseData);
+        addRepaymentPlanDetails(form, caseData);
+        handleRespondents(form, caseData);
 
-        Optional.ofNullable(caseData.getSolicitorReferences()).ifPresent(builder::solicitorReferences);
+        Optional.ofNullable(caseData.getSolicitorReferences()).ifPresent(form::setSolicitorReferences);
 
-        handleClaimResponse(builder, caseData);      // sets defendantResponse/submittedOn
-        mapWhyDisputeTheClaim(builder, caseData);    // <— missing before; fixes failing test
+        handleClaimResponse(form, caseData);      // sets defendantResponse/submittedOn
+        mapWhyDisputeTheClaim(form, caseData);    // <— missing before; fixes failing test
 
-        handleTimeline(builder, caseData);
-        handleDefenceResponseDocument(builder, caseData);
-        handlePayments(caseData, builder);
+        handleTimeline(form, caseData);
+        handleDefenceResponseDocument(form, caseData);
+        handlePayments(caseData, form);
 
-        return builder.build();
+        return form;
     }
 
-    private void handleRespondents(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
+    private void handleRespondents(SealedClaimResponseFormForSpec form, CaseData caseData) {
         if (MultiPartyScenario.getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
             SpecifiedParty currentRespondent = getDefendant1v2ds(caseData);
-            builder.respondent1(currentRespondent);
+            form.setRespondent1(currentRespondent);
 
             Optional.ofNullable(currentRespondent)
                 .map(SpecifiedParty::getRepresentative)
                 .map(Representative::getOrganisationName)
-                .ifPresent(builder::respondentRepresentativeOrganisationName);
+                .ifPresent(form::setRespondentRepresentativeOrganisationName);
         } else {
             Representative respondent1Representative = representativeService.getRespondent1Representative(caseData);
-            builder.respondent1(getSpecifiedParty(caseData.getRespondent1(), respondent1Representative));
+            form.setRespondent1(getSpecifiedParty(caseData.getRespondent1(), respondent1Representative));
             Optional.ofNullable(respondent1Representative)
                 .map(Representative::getOrganisationName)
-                .ifPresent(builder::respondentRepresentativeOrganisationName);
+                .ifPresent(form::setRespondentRepresentativeOrganisationName);
             Optional.ofNullable(caseData.getRespondent2()).ifPresent(
-                respondent2 -> builder.respondent2(
+                respondent2 -> form.setRespondent2(
                     getSpecifiedParty(respondent2, representativeService.getRespondent2Representative(caseData))
                 )
             );
         }
     }
 
-    private void handleClaimResponse(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
+    private void handleClaimResponse(SealedClaimResponseFormForSpec form, CaseData caseData) {
         if (isRespondent2(caseData) && !YesOrNo.YES.equals(caseData.getRespondentResponseIsSame())) {
             Optional.ofNullable(caseData.getRespondent2ClaimResponseTypeForSpec())
                 .map(RespondentResponseTypeSpec::getDisplayedValue)
-                .ifPresent(builder::defendantResponse);
-            builder.submittedOn(caseData.getRespondent2ResponseDate().toLocalDate());
+                .ifPresent(form::setDefendantResponse);
+            form.setSubmittedOn(caseData.getRespondent2ResponseDate().toLocalDate());
         } else if (caseData.getRespondent2() != null && YesOrNo.YES.equals(caseData.getRespondentResponseIsSame())) {
             Optional.ofNullable(caseData.getRespondent1ClaimResponseTypeForSpec())
                 .map(RespondentResponseTypeSpec::getDisplayedSingularValue)
-                .ifPresent(builder::defendantResponse);
-            builder.submittedOn(caseData.getRespondent1ResponseDate().toLocalDate());
+                .ifPresent(form::setDefendantResponse);
+            form.setSubmittedOn(caseData.getRespondent1ResponseDate().toLocalDate());
         } else {
             Optional.ofNullable(caseData.getRespondent1ClaimResponseTypeForSpec())
                 .map(RespondentResponseTypeSpec::getDisplayedValue)
-                .ifPresent(builder::defendantResponse);
-            builder.submittedOn(caseData.getRespondent1ResponseDate().toLocalDate());
+                .ifPresent(form::setDefendantResponse);
+            form.setSubmittedOn(caseData.getRespondent1ResponseDate().toLocalDate());
         }
     }
 
@@ -131,7 +130,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
      * - 1v2 latest is respondent2 → detailsOfWhyDoesYouDisputeTheClaim2
      * - 1v2 latest is respondent1 → detailsOfWhyDoesYouDisputeTheClaim
      */
-    private void mapWhyDisputeTheClaim(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder,
+    private void mapWhyDisputeTheClaim(SealedClaimResponseFormForSpec form,
                                        CaseData caseData) {
         String why;
         if (caseData.getRespondent2() != null && isRespondent2(caseData)) {
@@ -141,59 +140,59 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
             // single defendant or respondent 1 is the latest
             why = caseData.getDetailsOfWhyDoesYouDisputeTheClaim();
         }
-        builder.whyDisputeTheClaim(why);
+        form.setWhyDisputeTheClaim(why);
     }
 
-    private void handleTimeline(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
+    private void handleTimeline(SealedClaimResponseFormForSpec form, CaseData caseData) {
         if (caseData.getSpecResponseTimelineDocumentFiles() != null) {
-            builder.timelineUploaded(true)
-                .specResponseTimelineDocumentFiles(
+            form.setTimelineUploaded(true)
+                .setSpecResponseTimelineDocumentFiles(
                     caseData.getSpecResponseTimelineDocumentFiles().getDocumentFileName()
                 );
         } else {
-            builder.timelineUploaded(false)
-                .timeline(getTimeLine(caseData));
+            form.setTimelineUploaded(false)
+                .setTimeline(getTimeLine(caseData));
         }
     }
 
-    private void handleDefenceResponseDocument(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
+    private void handleDefenceResponseDocument(SealedClaimResponseFormForSpec form, CaseData caseData) {
         if (caseData.getRespondent1SpecDefenceResponseDocument() != null && !isRespondent2(caseData)) {
-            builder.respondent1SpecDefenceResponseDocument(
+            form.setRespondent1SpecDefenceResponseDocument(
                 caseData.getRespondent1SpecDefenceResponseDocument().getFile().getDocumentFileName()
             );
         } else if (caseData.getRespondent2SpecDefenceResponseDocument() != null && isRespondent2(caseData)) {
-            builder.respondent1SpecDefenceResponseDocument(
+            form.setRespondent1SpecDefenceResponseDocument(
                 caseData.getRespondent2SpecDefenceResponseDocument().getFile().getDocumentFileName()
             );
         }
     }
 
-    private void handlePayments(CaseData caseData, SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder) {
+    private void handlePayments(CaseData caseData, SealedClaimResponseFormForSpec form) {
         Stream.of(caseData.getRespondToClaim(), caseData.getRespondToAdmittedClaim())
             .filter(Objects::nonNull)
             .findFirst()
-            .ifPresent(response -> builder
-                .poundsPaid(MonetaryConversions.penniesToPounds(response.getHowMuchWasPaid()).toString())
-                .paymentDate(response.getWhenWasThisAmountPaid())
-                .paymentMethod(getPaymentMethod(response)));
+            .ifPresent(response -> form
+                .setPoundsPaid(MonetaryConversions.penniesToPounds(response.getHowMuchWasPaid()).toString())
+                .setPaymentDate(response.getWhenWasThisAmountPaid())
+                .setPaymentMethod(getPaymentMethod(response)));
     }
 
-    private void addRepaymentPlanDetails(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
-        builder.commonDetails(ResponseRepaymentDetailsForm.toSealedClaimResponseCommonContent(caseData));
+    private void addRepaymentPlanDetails(SealedClaimResponseFormForSpec form, CaseData caseData) {
+        form.setCommonDetails(ResponseRepaymentDetailsForm.toSealedClaimResponseCommonContent(caseData));
     }
 
-    private void addCarmMediationDetails(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
+    private void addCarmMediationDetails(SealedClaimResponseFormForSpec form, CaseData caseData) {
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_ONE, TWO_V_ONE, ONE_V_TWO_ONE_LEGAL_REP ->
-                populateCarmMediationFieldsForRespondent1(builder, caseData);
-            case ONE_V_TWO_TWO_LEGAL_REP -> populateCarmMediationFieldsForRelevantRespondent(builder, caseData);
+                populateCarmMediationFieldsForRespondent1(form, caseData);
+            case ONE_V_TWO_TWO_LEGAL_REP -> populateCarmMediationFieldsForRelevantRespondent(form, caseData);
             default -> throw new CallbackException("Cannot populate CARM fields");
         }
     }
 
-    private void populateCarmMediationFieldsForRespondent1(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
+    private void populateCarmMediationFieldsForRespondent1(SealedClaimResponseFormForSpec form, CaseData caseData) {
         getCarmMediationFields(
-            builder,
+            form,
             getRespondent1MediationFirstName(caseData),
             getRespondent1MediationLastName(caseData),
             getRespondent1MediationContactNumber(caseData),
@@ -203,10 +202,10 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         );
     }
 
-    private void populateCarmMediationFieldsForRelevantRespondent(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
+    private void populateCarmMediationFieldsForRelevantRespondent(SealedClaimResponseFormForSpec form, CaseData caseData) {
         if (shouldUseRespondent2MediationDetails(caseData)) {
             getCarmMediationFields(
-                builder,
+                form,
                 getRespondent2MediationFirstName(caseData),
                 getRespondent2MediationLastName(caseData),
                 getRespondent2MediationContactNumber(caseData),
@@ -215,7 +214,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
                 getRespondent2FromDateUnavailableList(caseData)
             );
         } else {
-            populateCarmMediationFieldsForRespondent1(builder, caseData);
+            populateCarmMediationFieldsForRespondent1(form, caseData);
         }
     }
 
@@ -225,16 +224,16 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
             && caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate()));
     }
 
-    private void getCarmMediationFields(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder,
+    private void getCarmMediationFields(SealedClaimResponseFormForSpec form,
                                         String firstName, String lastName, String contactNumber, String email,
                                         Boolean unavailableDatesExists, List<Element<UnavailableDate>> unavailableDatesList) {
-        builder
-            .mediationFirstName(firstName)
-            .mediationLastName(lastName)
-            .mediationContactNumber(contactNumber)
-            .mediationEmail(email)
-            .mediationUnavailableDatesExists(unavailableDatesExists)
-            .mediationUnavailableDatesList(unavailableDatesList);
+        form
+            .setMediationFirstName(firstName)
+            .setMediationLastName(lastName)
+            .setMediationContactNumber(contactNumber)
+            .setMediationEmail(email)
+            .setMediationUnavailableDatesExists(unavailableDatesExists)
+            .setMediationUnavailableDatesList(unavailableDatesList);
     }
 
     private SpecifiedParty getDefendant1v2ds(CaseData caseData) {

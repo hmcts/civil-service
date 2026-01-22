@@ -151,14 +151,12 @@ class DirectionsQuestionnaireGeneratorTest {
             .build();
 
     private final Representative defendant1Representative =
-        Representative.builder()
-            .organisationName("test org")
-            .build();
+        new Representative()
+            .setOrganisationName("test org");
 
     private final Representative defendant2Representative =
-        Representative.builder()
-            .organisationName("test org 2")
-            .build();
+        new Representative()
+            .setOrganisationName("test org 2");
 
     @MockBean
     private SecuredDocumentManagementService documentManagementService;

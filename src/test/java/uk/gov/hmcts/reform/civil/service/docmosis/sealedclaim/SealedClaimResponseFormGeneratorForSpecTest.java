@@ -163,15 +163,15 @@ class SealedClaimResponseFormGeneratorForSpecTest {
 
         // Minimal stubs for the two "populator" collaborators to keep this unit test atomic
         lenient().doAnswer(inv -> {
-            SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder b = inv.getArgument(0);
+            SealedClaimResponseFormForSpec b = inv.getArgument(0);
             CaseData cd = inv.getArgument(1);
-            b.referenceNumber(cd.getLegacyCaseReference());
-            b.ccdCaseReference(cd.getCcdCaseReference() == null ? null : cd.getCcdCaseReference().toString());
+            b.setReferenceNumber(cd.getLegacyCaseReference());
+            b.setCcdCaseReference(cd.getCcdCaseReference() == null ? null : cd.getCcdCaseReference().toString());
             return null;
         }).when(referenceNumberPopulator).populateReferenceNumberDetails(any(), any(), any());
 
         lenient().doAnswer(inv -> {
-            SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder b = inv.getArgument(0);
+            SealedClaimResponseFormForSpec b = inv.getArgument(0);
             CaseData cd = inv.getArgument(1);
             StatementOfTruth sot = cd.getRespondent2DQ() != null && cd.getRespondent2ResponseDate() != null
                 && (cd.getRespondent1ResponseDate() == null
@@ -179,7 +179,7 @@ class SealedClaimResponseFormGeneratorForSpecTest {
                 ? cd.getRespondent2DQ().getRespondent2DQStatementOfTruth()
                 : (cd.getRespondent1DQ() != null ? cd.getRespondent1DQ().getRespondent1DQStatementOfTruth() : null);
             if (sot != null) {
-                b.statementOfTruth(sot);
+                b.setStatementOfTruth(sot);
             }
             return null;
         }).when(statementOfTruthPopulator).populateStatementOfTruthDetails(any(), any());

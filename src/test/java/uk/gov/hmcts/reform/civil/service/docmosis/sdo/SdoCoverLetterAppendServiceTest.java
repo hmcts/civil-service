@@ -66,10 +66,9 @@ class SdoCoverLetterAppendServiceTest {
                 .build())
         .setName("Mr.John White");
 
-    private static final SdoCoverLetter PARTY_LETTER_TEMPLATE_DATA = SdoCoverLetter.builder()
-        .party(partyDetails)
-        .claimReferenceNumber("MC0001")
-        .build();
+    private static final SdoCoverLetter PARTY_LETTER_TEMPLATE_DATA = new SdoCoverLetter()
+        .setParty(partyDetails)
+        .setClaimReferenceNumber("MC0001");
 
     private static final CaseDocument caseDocument = CaseDocument.builder()
         .documentType(SDO_ORDER)

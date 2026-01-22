@@ -74,14 +74,12 @@ public class SetAsideJudgmentInErrorLiPLetterGenerator {
     }
 
     public SetAsideJudgmentInErrorLiPDefendantLetter getTemplateData(CaseData caseData) {
-        return SetAsideJudgmentInErrorLiPDefendantLetter
-            .builder()
-            .claimReferenceNumber(caseData.getLegacyCaseReference())
-            .claimantName(caseData.getApplicant1().getPartyName())
-            .defendant(caseData.getRespondent1())
-            .letterIssueDate(LocalDate.now())
-            .issueDate(getJudgmentIssueDate(caseData))
-            .build();
+        return new SetAsideJudgmentInErrorLiPDefendantLetter()
+            .setClaimReferenceNumber(caseData.getLegacyCaseReference())
+            .setClaimantName(caseData.getApplicant1().getPartyName())
+            .setDefendant(caseData.getRespondent1())
+            .setLetterIssueDate(LocalDate.now())
+            .setIssueDate(getJudgmentIssueDate(caseData));
     }
 
     private LocalDate getJudgmentIssueDate(CaseData caseData) {
