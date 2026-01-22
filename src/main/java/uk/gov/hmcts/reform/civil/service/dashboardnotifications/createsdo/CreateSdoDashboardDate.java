@@ -9,11 +9,11 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @Service
-public class CreateSdoDashboardDateService {
+public class CreateSdoDashboardDate {
 
     private final WorkingDayIndicator workingDayIndicator;
 
-    public CreateSdoDashboardDateService(WorkingDayIndicator workingDayIndicator) {
+    public CreateSdoDashboardDate(WorkingDayIndicator workingDayIndicator) {
         this.workingDayIndicator = workingDayIndicator;
     }
 

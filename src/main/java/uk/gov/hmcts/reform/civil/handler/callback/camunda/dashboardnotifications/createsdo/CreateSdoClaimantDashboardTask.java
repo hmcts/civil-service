@@ -16,6 +16,6 @@ public class CreateSdoClaimantDashboardTask extends DashboardServiceTask {
 
     @Override
     protected void notifyDashboard(CaseData caseData, String authToken) {
-        dashboardService.notifyBundleUpdated(caseData, authToken);
+        dashboardService.notifySdoCreated(caseData, authToken);
     }
 }

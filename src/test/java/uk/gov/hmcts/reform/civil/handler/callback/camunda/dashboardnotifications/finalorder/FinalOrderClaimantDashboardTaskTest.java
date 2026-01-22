@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.createsdo;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.finalorder;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -7,35 +7,35 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskContext;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.createsdo.CreateSdoClaimantDashboardService;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.finalorder.FinalOrderClaimantDashboardService;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class CreateSdoClaimantDashboardTaskTest {
+class FinalOrderClaimantDashboardTaskTest {
 
     @Mock
-    private CreateSdoClaimantDashboardService createSdoClaimantDashboardService;
+    private FinalOrderClaimantDashboardService finalOrderClaimantDashboardService;
 
     @Mock
     private DashboardTaskContext context;
 
     @InjectMocks
-    private CreateSdoClaimantDashboardTask createSdoClaimantDashboardTask;
+    private FinalOrderClaimantDashboardTask finalOrderClaimantDashboardTask;
 
     @Test
-    void shouldDelegateToCreateSdoClaimantDashboardService() {
+    void shouldDelegateToFinalOrderClaimantDashboardService() {
         CaseData caseData = CaseData.builder().build();
         String authToken = "token";
 
         when(context.caseData()).thenReturn(caseData);
         when(context.authToken()).thenReturn(authToken);
 
-        createSdoClaimantDashboardTask.execute(context);
+        finalOrderClaimantDashboardTask.execute(context);
 
-        verify(createSdoClaimantDashboardService).notifySdoCreated(caseData, authToken);
-        verifyNoMoreInteractions(createSdoClaimantDashboardService);
+        verify(finalOrderClaimantDashboardService).notifyFinalOrder(caseData, authToken);
+        verifyNoMoreInteractions(finalOrderClaimantDashboardService);
     }
 }

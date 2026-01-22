@@ -17,13 +17,13 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.assertion.DayAssert.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-class CreateSdoDashboardDateServiceTest {
+class CreateSdoDashboardDateTest {
 
     @Mock
     private WorkingDayIndicator workingDayIndicator;
 
     @InjectMocks
-    private CreateSdoDashboardDateService createSdoDashboardDateService;
+    private CreateSdoDashboardDate createSdoDashboardDate;
 
     @Test
     void shouldReturnPlus7DaysSkippingBankHolidays_whenResponseDateIsProvided() {
@@ -34,7 +34,7 @@ class CreateSdoDashboardDateServiceTest {
         when(workingDayIndicator.isPublicHoliday(any())).thenReturn(false);
         when(workingDayIndicator.isPublicHoliday(eq(christmasDay))).thenReturn(true);
 
-        LocalDateTime deadline = createSdoDashboardDateService.getDateWithoutBankHolidays(providedDate);
+        LocalDateTime deadline = createSdoDashboardDate.getDateWithoutBankHolidays(providedDate);
 
         assertThat(deadline).isTheSame(expectedDeadline);
     }
@@ -46,7 +46,7 @@ class CreateSdoDashboardDateServiceTest {
 
         doThrow(RuntimeException.class).when(workingDayIndicator).isPublicHoliday(any());
 
-        LocalDateTime deadline = createSdoDashboardDateService.getDateWithoutBankHolidays(providedDate);
+        LocalDateTime deadline = createSdoDashboardDate.getDateWithoutBankHolidays(providedDate);
 
         assertThat(deadline).isTheSame(expectedDeadline);
     }

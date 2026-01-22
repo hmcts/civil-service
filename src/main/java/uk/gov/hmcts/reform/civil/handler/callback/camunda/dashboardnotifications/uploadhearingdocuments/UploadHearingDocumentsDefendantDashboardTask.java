@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.createsdo;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.uploadhearingdocuments;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardServiceTask;
@@ -8,14 +8,14 @@ import uk.gov.hmcts.reform.civil.service.dashboardnotifications.uploadhearingdoc
 @Component
 public class UploadHearingDocumentsDefendantDashboardTask extends DashboardServiceTask {
 
-    private final UploadHearingDocumentsDefendantService uploadHearingDocumentsDefendantService;
+    private final UploadHearingDocumentsDefendantService dashboardService;
 
-    public UploadHearingDocumentsDefendantDashboardTask(UploadHearingDocumentsDefendantService uploadHearingDocumentsDefendantService) {
-        this.uploadHearingDocumentsDefendantService = uploadHearingDocumentsDefendantService;
+    public UploadHearingDocumentsDefendantDashboardTask(UploadHearingDocumentsDefendantService dashboardService) {
+        this.dashboardService = dashboardService;
     }
 
     @Override
     protected void notifyDashboard(CaseData caseData, String authToken) {
-        uploadHearingDocumentsDefendantService.notifyBundleUpdated(caseData, authToken);
+        dashboardService.notifyUploadHearingDocuments(caseData, authToken);
     }
 }

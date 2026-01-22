@@ -35,7 +35,7 @@ class CreateSdoDefendantDashboardTaskTest {
 
         createSdoDefendantDashboardTask.execute(context);
 
-        verify(createSdoDefendantDashboardService).notifyBundleUpdated(caseData, authToken);
+        verify(createSdoDefendantDashboardService).notifySdoCreated(caseData, authToken);
         verifyNoMoreInteractions(createSdoDefendantDashboardService);
     }
 }

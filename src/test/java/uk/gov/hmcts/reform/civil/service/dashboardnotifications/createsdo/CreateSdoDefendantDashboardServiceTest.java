@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.Mediation;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.utils.DashboardDecisionHelper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -43,11 +44,11 @@ class CreateSdoDefendantDashboardServiceTest {
     @Mock
     private DashboardNotificationsParamsMapper mapper;
     @Mock
-    private CreateSdoDashboardDateService createSdoDashboardDateService;
+    private CreateSdoDashboardDate createSdoDashboardDate;
     @Mock
     private FeatureToggleService featureToggleService;
     @Mock
-    private CreateSdoDashboardDecisionService createSdoDashboardDecisionService;
+    private DashboardDecisionHelper dashboardDecisionHelper;
 
     @InjectMocks
     private CreateSdoDefendantDashboardService createSdoDefendantDashboardService;
@@ -65,9 +66,9 @@ class CreateSdoDefendantDashboardServiceTest {
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(createSdoDashboardDecisionService.isDashBoardEnabledForCase(caseData)).thenReturn(true);
+        when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
 
-        createSdoDefendantDashboardService.notifyBundleUpdated(caseData, AUTH_TOKEN);
+        createSdoDefendantDashboardService.notifySdoCreated(caseData, AUTH_TOKEN);
 
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
@@ -91,7 +92,7 @@ class CreateSdoDefendantDashboardServiceTest {
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
 
-        createSdoDefendantDashboardService.notifyBundleUpdated(caseData, AUTH_TOKEN);
+        createSdoDefendantDashboardService.notifySdoCreated(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
     }
@@ -109,9 +110,9 @@ class CreateSdoDefendantDashboardServiceTest {
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(createSdoDashboardDecisionService.isDashBoardEnabledForCase(caseData)).thenReturn(false);
+        when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(false);
 
-        createSdoDefendantDashboardService.notifyBundleUpdated(caseData, AUTH_TOKEN);
+        createSdoDefendantDashboardService.notifySdoCreated(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
     }
@@ -129,7 +130,7 @@ class CreateSdoDefendantDashboardServiceTest {
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
-        createSdoDefendantDashboardService.notifyBundleUpdated(caseData, AUTH_TOKEN);
+        createSdoDefendantDashboardService.notifySdoCreated(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
     }
@@ -154,14 +155,14 @@ class CreateSdoDefendantDashboardServiceTest {
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(createSdoDashboardDecisionService.isDashBoardEnabledForCase(caseData)).thenReturn(true);
-        when(createSdoDashboardDecisionService.isCarmApplicableCase(any())).thenReturn(true);
-        when(createSdoDashboardDecisionService.isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(any()))
+        when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
+        when(dashboardDecisionHelper.isCarmApplicableCase(any())).thenReturn(true);
+        when(dashboardDecisionHelper.isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(any()))
             .thenReturn(true);
-        when(createSdoDashboardDecisionService.hasTrackChanged(any())).thenReturn(true);
-        when(createSdoDashboardDecisionService.hasUploadDocuments(any())).thenReturn(false);
+        when(dashboardDecisionHelper.hasTrackChanged(any())).thenReturn(true);
+        when(dashboardDecisionHelper.hasUploadDocuments(any())).thenReturn(false);
 
-        createSdoDefendantDashboardService.notifyBundleUpdated(caseData, AUTH_TOKEN);
+        createSdoDefendantDashboardService.notifySdoCreated(caseData, AUTH_TOKEN);
 
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
@@ -193,12 +194,12 @@ class CreateSdoDefendantDashboardServiceTest {
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(createSdoDashboardDecisionService.isDashBoardEnabledForCase(caseData)).thenReturn(true);
-        when(createSdoDashboardDecisionService.isCarmApplicableCase(any())).thenReturn(true);
-        when(createSdoDashboardDecisionService.isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(any()))
+        when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
+        when(dashboardDecisionHelper.isCarmApplicableCase(any())).thenReturn(true);
+        when(dashboardDecisionHelper.isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(any()))
             .thenReturn(false);
 
-        createSdoDefendantDashboardService.notifyBundleUpdated(caseData, AUTH_TOKEN);
+        createSdoDefendantDashboardService.notifySdoCreated(caseData, AUTH_TOKEN);
 
         verify(dashboardScenariosService, never()).recordScenarios(
             AUTH_TOKEN,
@@ -237,13 +238,13 @@ class CreateSdoDefendantDashboardServiceTest {
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(createSdoDashboardDecisionService.isDashBoardEnabledForCase(caseData)).thenReturn(true);
-        when(createSdoDashboardDecisionService.isCarmApplicableCase(any())).thenReturn(true);
-        when(createSdoDashboardDecisionService.isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(any()))
+        when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
+        when(dashboardDecisionHelper.isCarmApplicableCase(any())).thenReturn(true);
+        when(dashboardDecisionHelper.isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(any()))
             .thenReturn(true);
-        when(createSdoDashboardDecisionService.hasTrackChanged(any())).thenReturn(false);
+        when(dashboardDecisionHelper.hasTrackChanged(any())).thenReturn(false);
 
-        createSdoDefendantDashboardService.notifyBundleUpdated(caseData, AUTH_TOKEN);
+        createSdoDefendantDashboardService.notifySdoCreated(caseData, AUTH_TOKEN);
 
         verify(dashboardScenariosService, never()).recordScenarios(
             AUTH_TOKEN,
@@ -282,14 +283,14 @@ class CreateSdoDefendantDashboardServiceTest {
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(createSdoDashboardDecisionService.isDashBoardEnabledForCase(caseData)).thenReturn(true);
-        when(createSdoDashboardDecisionService.isCarmApplicableCase(any())).thenReturn(true);
-        when(createSdoDashboardDecisionService.isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(any()))
+        when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
+        when(dashboardDecisionHelper.isCarmApplicableCase(any())).thenReturn(true);
+        when(dashboardDecisionHelper.isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(any()))
             .thenReturn(true);
-        when(createSdoDashboardDecisionService.hasTrackChanged(any())).thenReturn(true);
-        when(createSdoDashboardDecisionService.hasUploadDocuments(any())).thenReturn(true);
+        when(dashboardDecisionHelper.hasTrackChanged(any())).thenReturn(true);
+        when(dashboardDecisionHelper.hasUploadDocuments(any())).thenReturn(true);
 
-        createSdoDefendantDashboardService.notifyBundleUpdated(caseData, AUTH_TOKEN);
+        createSdoDefendantDashboardService.notifySdoCreated(caseData, AUTH_TOKEN);
 
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
@@ -319,11 +320,11 @@ class CreateSdoDefendantDashboardServiceTest {
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(createSdoDashboardDecisionService.isDashBoardEnabledForCase(caseData)).thenReturn(true);
-        when(createSdoDashboardDecisionService.isCarmApplicableCase(any())).thenReturn(false);
-        when(createSdoDashboardDecisionService.isSDODrawnPreCPRelease(any())).thenReturn(true);
+        when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
+        when(dashboardDecisionHelper.isCarmApplicableCase(any())).thenReturn(false);
+        when(dashboardDecisionHelper.isSDODrawnPreCPRelease(any())).thenReturn(true);
 
-        createSdoDefendantDashboardService.notifyBundleUpdated(caseData, AUTH_TOKEN);
+        createSdoDefendantDashboardService.notifySdoCreated(caseData, AUTH_TOKEN);
 
         verify(dashboardScenariosService, never()).recordScenarios(
             AUTH_TOKEN,
@@ -353,10 +354,10 @@ class CreateSdoDefendantDashboardServiceTest {
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(createSdoDashboardDecisionService.isDashBoardEnabledForCase(caseData)).thenReturn(true);
-        when(createSdoDashboardDecisionService.isSDODrawnPreCPRelease(any())).thenReturn(true);
+        when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
+        when(dashboardDecisionHelper.isSDODrawnPreCPRelease(any())).thenReturn(true);
 
-        createSdoDefendantDashboardService.notifyBundleUpdated(caseData, AUTH_TOKEN);
+        createSdoDefendantDashboardService.notifySdoCreated(caseData, AUTH_TOKEN);
 
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
@@ -379,9 +380,9 @@ class CreateSdoDefendantDashboardServiceTest {
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(createSdoDashboardDecisionService.isDashBoardEnabledForCase(caseData)).thenReturn(true);
+        when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
 
-        createSdoDefendantDashboardService.notifyBundleUpdated(caseData, AUTH_TOKEN);
+        createSdoDefendantDashboardService.notifySdoCreated(caseData, AUTH_TOKEN);
 
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
@@ -401,10 +402,10 @@ class CreateSdoDefendantDashboardServiceTest {
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(createSdoDashboardDecisionService.isDashBoardEnabledForCase(caseData)).thenReturn(true);
-        when(createSdoDashboardDecisionService.isEligibleForReconsideration(any())).thenReturn(true);
+        when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
+        when(dashboardDecisionHelper.isEligibleForReconsideration(any())).thenReturn(true);
 
-        createSdoDefendantDashboardService.notifyBundleUpdated(caseData, AUTH_TOKEN);
+        createSdoDefendantDashboardService.notifySdoCreated(caseData, AUTH_TOKEN);
 
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
@@ -424,10 +425,10 @@ class CreateSdoDefendantDashboardServiceTest {
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(createSdoDashboardDecisionService.isDashBoardEnabledForCase(caseData)).thenReturn(true);
-        when(createSdoDashboardDecisionService.isEligibleForReconsideration(any())).thenReturn(false);
+        when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
+        when(dashboardDecisionHelper.isEligibleForReconsideration(any())).thenReturn(false);
 
-        createSdoDefendantDashboardService.notifyBundleUpdated(caseData, AUTH_TOKEN);
+        createSdoDefendantDashboardService.notifySdoCreated(caseData, AUTH_TOKEN);
 
         verify(dashboardScenariosService, never()).recordScenarios(
             AUTH_TOKEN,
@@ -454,10 +455,10 @@ class CreateSdoDefendantDashboardServiceTest {
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(createSdoDashboardDecisionService.isDashBoardEnabledForCase(caseData)).thenReturn(true);
-        when(createSdoDashboardDecisionService.isEligibleForReconsideration(any())).thenReturn(true);
+        when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
+        when(dashboardDecisionHelper.isEligibleForReconsideration(any())).thenReturn(true);
 
-        createSdoDefendantDashboardService.notifyBundleUpdated(caseData, AUTH_TOKEN);
+        createSdoDefendantDashboardService.notifySdoCreated(caseData, AUTH_TOKEN);
 
         verify(dashboardScenariosService, never()).recordScenarios(
             AUTH_TOKEN,

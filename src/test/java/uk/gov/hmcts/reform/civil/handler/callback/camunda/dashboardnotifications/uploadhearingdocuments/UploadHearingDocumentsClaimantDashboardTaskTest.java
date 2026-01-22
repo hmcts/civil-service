@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.createsdo;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.uploadhearingdocuments;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,7 +35,7 @@ class UploadHearingDocumentsClaimantDashboardTaskTest {
 
         uploadHearingDocumentsClaimantDashboardTask.execute(context);
 
-        verify(uploadHearingDocumentsClaimantService).notifyBundleUpdated(caseData, authToken);
+        verify(uploadHearingDocumentsClaimantService).notifyUploadHearingDocuments(caseData, authToken);
         verifyNoMoreInteractions(uploadHearingDocumentsClaimantService);
     }
 }

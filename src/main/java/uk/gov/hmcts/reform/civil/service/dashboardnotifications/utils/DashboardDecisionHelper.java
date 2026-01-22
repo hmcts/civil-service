@@ -1,8 +1,9 @@
-package uk.gov.hmcts.reform.civil.service.dashboardnotifications.createsdo;
+package uk.gov.hmcts.reform.civil.service.dashboardnotifications.utils;
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
+import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
@@ -18,12 +19,12 @@ import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulRea
 import static uk.gov.hmcts.reform.civil.utils.MediationUtils.findMediationUnsuccessfulReason;
 
 @Service
-public class CreateSdoDashboardDecisionService {
+public class DashboardDecisionHelper {
 
     private final FeatureToggleService featureToggleService;
     private final SimpleStateFlowEngine simpleStateFlowEngine;
 
-    public CreateSdoDashboardDecisionService(FeatureToggleService featureToggleService, SimpleStateFlowEngine simpleStateFlowEngine) {
+    public DashboardDecisionHelper(FeatureToggleService featureToggleService, SimpleStateFlowEngine simpleStateFlowEngine) {
         this.featureToggleService = featureToggleService;
         this.simpleStateFlowEngine = simpleStateFlowEngine;
     }
@@ -70,6 +71,10 @@ public class CreateSdoDashboardDecisionService {
 
     public boolean isDashBoardEnabledForCase(CaseData caseData) {
         return simpleStateFlowEngine.evaluate(caseData).isFlagSet(FlowFlag.DASHBOARD_SERVICE_ENABLED);
+    }
+
+    public boolean isOrderMadeFastTrackTrialNotResponded(CaseData caseData) {
+        return SdoHelper.isFastTrack(caseData) && isNull(caseData.getTrialReadyApplicant());
     }
 
     private AllocatedTrack getPreviousAllocatedTrack(CaseData caseData) {

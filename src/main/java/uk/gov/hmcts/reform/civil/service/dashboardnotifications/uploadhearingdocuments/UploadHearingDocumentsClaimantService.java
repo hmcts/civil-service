@@ -21,7 +21,7 @@ public class UploadHearingDocumentsClaimantService extends DashboardScenarioServ
         this.featureToggleService = featureToggleService;
     }
 
-    public void notifyBundleUpdated(CaseData caseData, String authToken) {
+    public void notifyUploadHearingDocuments(CaseData caseData, String authToken) {
         recordScenario(caseData, authToken);
     }
 

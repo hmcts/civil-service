@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.utils.DashboardDecisionHelper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -24,21 +25,21 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 public class CreateSdoDefendantDashboardService extends DashboardScenarioService {
 
     private final FeatureToggleService featureToggleService;
-    private final CreateSdoDashboardDecisionService createSdoDashboardDecisionService;
-    private final CreateSdoDashboardDateService createSdoDashboardDateService;
+    private final DashboardDecisionHelper dashboardDecisionHelper;
+    private final CreateSdoDashboardDate createSdoDashboardDate;
 
     public CreateSdoDefendantDashboardService(DashboardScenariosService dashboardScenariosService,
                                               DashboardNotificationsParamsMapper mapper,
                                               FeatureToggleService featureToggleService,
-                                              CreateSdoDashboardDecisionService createSdoDashboardDecisionService,
-                                              CreateSdoDashboardDateService createSdoDashboardDateService) {
+                                              DashboardDecisionHelper dashboardDecisionHelper,
+                                              CreateSdoDashboardDate createSdoDashboardDate) {
         super(dashboardScenariosService, mapper);
         this.featureToggleService = featureToggleService;
-        this.createSdoDashboardDecisionService = createSdoDashboardDecisionService;
-        this.createSdoDashboardDateService = createSdoDashboardDateService;
+        this.dashboardDecisionHelper = dashboardDecisionHelper;
+        this.createSdoDashboardDate = createSdoDashboardDate;
     }
 
-    public void notifyBundleUpdated(CaseData caseData, String authToken) {
+    public void notifySdoCreated(CaseData caseData, String authToken) {
         recordScenario(caseData, authToken);
     }
 
@@ -47,19 +48,19 @@ public class CreateSdoDefendantDashboardService extends DashboardScenarioService
 
         final String scenario;
 
-        if (createSdoDashboardDecisionService.isEligibleForReconsideration(caseData)
+        if (dashboardDecisionHelper.isEligibleForReconsideration(caseData)
             && Objects.isNull(caseData.getIsReferToJudgeClaim())) {
             scenario = SCENARIO_AAA6_CP_SDO_MADE_BY_LA_DEFENDANT.getScenario();
-        } else if (createSdoDashboardDecisionService.isCarmApplicableCase(caseData)
-            && createSdoDashboardDecisionService.isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(caseData)
-            && createSdoDashboardDecisionService.hasTrackChanged(caseData)) {
+        } else if (dashboardDecisionHelper.isCarmApplicableCase(caseData)
+            && dashboardDecisionHelper.isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(caseData)
+            && dashboardDecisionHelper.hasTrackChanged(caseData)) {
 
-            if (createSdoDashboardDecisionService.hasUploadDocuments(caseData)) {
+            if (dashboardDecisionHelper.hasUploadDocuments(caseData)) {
                 scenario = SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_DEFENDANT_CARM.getScenario();
             } else {
                 scenario = SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_DEFENDANT_WITHOUT_UPLOAD_FILES_CARM.getScenario();
             }
-        } else if (createSdoDashboardDecisionService.isSDODrawnPreCPRelease(caseData)) {
+        } else if (dashboardDecisionHelper.isSDODrawnPreCPRelease(caseData)) {
             scenario = SCENARIO_AAA6_DEFENDANT_SDO_DRAWN_PRE_CASE_PROGRESSION.getScenario();
         } else {
             scenario = SCENARIO_AAA6_CP_ORDER_MADE_DEFENDANT.getScenario();
@@ -72,15 +73,15 @@ public class CreateSdoDefendantDashboardService extends DashboardScenarioService
     protected boolean shouldRecordScenario(CaseData caseData) {
         return caseData.isRespondent1NotRepresented()
             && featureToggleService.isLipVLipEnabled()
-            && createSdoDashboardDecisionService.isDashBoardEnabledForCase(caseData);
+            && dashboardDecisionHelper.isDashBoardEnabledForCase(caseData);
     }
 
     @Override
     protected ScenarioRequestParams scenarioRequestParamsFrom(CaseData caseData) {
         if (isNull(caseData.getRequestForReconsiderationDeadline())
-            && createSdoDashboardDecisionService.isEligibleForReconsideration(caseData)) {
+            && dashboardDecisionHelper.isEligibleForReconsideration(caseData)) {
             caseData.setRequestForReconsiderationDeadline(
-                createSdoDashboardDateService.getDateWithoutBankHolidays(LocalDateTime.now()));
+                createSdoDashboardDate.getDateWithoutBankHolidays(LocalDateTime.now()));
         }
 
         return ScenarioRequestParams.builder()

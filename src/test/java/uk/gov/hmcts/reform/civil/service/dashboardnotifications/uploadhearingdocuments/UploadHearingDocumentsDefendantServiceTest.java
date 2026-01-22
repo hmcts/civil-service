@@ -62,7 +62,7 @@ class UploadHearingDocumentsDefendantServiceTest {
         caseData.setCcdState(CaseState.CASE_PROGRESSION);
         caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION));
 
-        uploadHearingDocumentsDefendantService.notifyBundleUpdated(caseData, AUTH_TOKEN);
+        uploadHearingDocumentsDefendantService.notifyUploadHearingDocuments(caseData, AUTH_TOKEN);
 
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
@@ -81,7 +81,7 @@ class UploadHearingDocumentsDefendantServiceTest {
         caseData.setCcdState(CaseState.CASE_PROGRESSION);
         caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION));
 
-        uploadHearingDocumentsDefendantService.notifyBundleUpdated(caseData, AUTH_TOKEN);
+        uploadHearingDocumentsDefendantService.notifyUploadHearingDocuments(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
     }
@@ -95,7 +95,7 @@ class UploadHearingDocumentsDefendantServiceTest {
         caseData.setCcdState(CaseState.CASE_ISSUED);
         caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION));
 
-        uploadHearingDocumentsDefendantService.notifyBundleUpdated(caseData, AUTH_TOKEN);
+        uploadHearingDocumentsDefendantService.notifyUploadHearingDocuments(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
     }
@@ -113,7 +113,7 @@ class UploadHearingDocumentsDefendantServiceTest {
         caseData.setCcdState(CaseState.CASE_PROGRESSION);
         caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION));
 
-        uploadHearingDocumentsDefendantService.notifyBundleUpdated(caseData, AUTH_TOKEN);
+        uploadHearingDocumentsDefendantService.notifyUploadHearingDocuments(caseData, AUTH_TOKEN);
 
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
@@ -136,7 +136,7 @@ class UploadHearingDocumentsDefendantServiceTest {
         caseData.setCcdState(CaseState.CASE_PROGRESSION);
         caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION));
 
-        uploadHearingDocumentsDefendantService.notifyBundleUpdated(caseData, AUTH_TOKEN);
+        uploadHearingDocumentsDefendantService.notifyUploadHearingDocuments(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
     }
@@ -152,7 +152,7 @@ class UploadHearingDocumentsDefendantServiceTest {
         caseData.setCcdState(CaseState.CASE_PROGRESSION);
         caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION));
 
-        uploadHearingDocumentsDefendantService.notifyBundleUpdated(caseData, AUTH_TOKEN);
+        uploadHearingDocumentsDefendantService.notifyUploadHearingDocuments(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
     }
