@@ -798,6 +798,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         caseData.setSmallClaimsPenalNoticeToggle(new ArrayList<>());
         caseData.setFastTrackPenalNoticeToggle(new ArrayList<>());
 
+        caseData.setSmallClaimsPPI(getOrCreatePpi(caseData.getSmallClaimsPPI()));
+        caseData.setFastTrackPPI(getOrCreatePpi(caseData.getFastTrackPPI()));
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
