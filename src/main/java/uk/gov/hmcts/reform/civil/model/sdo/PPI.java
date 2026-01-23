@@ -7,12 +7,15 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
+import javax.validation.constraints.Future;
+
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class PPI {
 
+    @Future(message = "The date entered must be in the future")
     private LocalDate ppiDate;
     private String text;
 }
