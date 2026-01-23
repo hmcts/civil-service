@@ -7,17 +7,20 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardNotificationHelper;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 @Service
 public class UploadHearingDocumentsDefendantService extends DashboardScenarioService {
 
+    private final DashboardNotificationHelper dashboardDecisionHelper;
     private final FeatureToggleService featureToggleService;
 
     public UploadHearingDocumentsDefendantService(DashboardScenariosService dashboardScenariosService,
-                                                  DashboardNotificationsParamsMapper mapper,
+                                                  DashboardNotificationsParamsMapper mapper, DashboardNotificationHelper dashboardDecisionHelper,
                                                   FeatureToggleService featureToggleService) {
         super(dashboardScenariosService, mapper);
+        this.dashboardDecisionHelper = dashboardDecisionHelper;
         this.featureToggleService = featureToggleService;
     }
 
@@ -35,6 +38,7 @@ public class UploadHearingDocumentsDefendantService extends DashboardScenarioSer
         return caseData.isRespondent1NotRepresented()
             && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && featureToggleService.isLipVLipEnabled()
+            && dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)
             && (featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
             || featureToggleService.isWelshEnabledForMainCase());
     }

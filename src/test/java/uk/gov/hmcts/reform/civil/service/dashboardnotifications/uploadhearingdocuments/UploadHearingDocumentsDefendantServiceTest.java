@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardNotificationHelper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
@@ -38,6 +39,8 @@ class UploadHearingDocumentsDefendantServiceTest {
     private DashboardNotificationsParamsMapper mapper;
     @Mock
     private FeatureToggleService featureToggleService;
+    @Mock
+    private DashboardNotificationHelper dashboardDecisionHelper;
 
     @InjectMocks
     private UploadHearingDocumentsDefendantService uploadHearingDocumentsDefendantService;
@@ -54,6 +57,7 @@ class UploadHearingDocumentsDefendantServiceTest {
     void shouldCreateDashboardNotifications_ifRespondent1NotRepresented() {
 
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(dashboardDecisionHelper.isDashBoardEnabledForCase(any())).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -104,6 +108,7 @@ class UploadHearingDocumentsDefendantServiceTest {
     void shouldCreateDashboardNotificationsAfterNroChangesAndWelshEnabledForMainCase() {
 
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(dashboardDecisionHelper.isDashBoardEnabledForCase(any())).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
@@ -127,6 +132,7 @@ class UploadHearingDocumentsDefendantServiceTest {
     void shouldCreateDashboardNotificationsAfterNroChangesAndWelshNotEnabledForMainCase() {
 
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(dashboardDecisionHelper.isDashBoardEnabledForCase(any())).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
 
@@ -145,6 +151,23 @@ class UploadHearingDocumentsDefendantServiceTest {
     void shouldNotCreateDashboardNotifications_ifNotLipVLipEnabled() {
 
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setCcdCaseReference(CASE_ID);
+        caseData.setCcdState(CaseState.CASE_PROGRESSION);
+        caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION));
+
+        uploadHearingDocumentsDefendantService.notifyUploadHearingDocuments(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService);
+    }
+
+    @Test
+    void shouldNotCreateDashboardNotifications_ifDashBoardDisabled() {
+
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(dashboardDecisionHelper.isDashBoardEnabledForCase(any())).thenReturn(false);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setRespondent1Represented(YesOrNo.NO);
