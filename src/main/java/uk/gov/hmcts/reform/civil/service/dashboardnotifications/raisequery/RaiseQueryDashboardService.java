@@ -25,7 +25,6 @@ import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
 public class RaiseQueryDashboardService extends DashboardScenarioService {
 
     private final CoreCaseUserService coreCaseUserService;
-
     private final QueryManagementCamundaService runtimeService;
 
     public RaiseQueryDashboardService(DashboardScenariosService dashboardScenariosService,
@@ -38,59 +37,57 @@ public class RaiseQueryDashboardService extends DashboardScenarioService {
     }
 
     public void notifyRaiseQuery(CaseData caseData, String authToken) {
-        if (caseData == null || !caseData.isLipCase() || caseData.getBusinessProcess() == null
-            || caseData.getBusinessProcess().getProcessInstanceId() == null) {
-            return;
-        }
-        ScenarioRequestParams
-            notificationParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
-        boolean firstQueryRaisedOnClaim = isFirstQueryRaisedOnClaim(caseData);
-        deleteDuplicateNotifications(caseData, authToken, notificationParams);
-        String processInstanceId = caseData.getBusinessProcess().getProcessInstanceId();
-        List<String> roles = getQueryCreatorRoles(caseData, processInstanceId);
-        createDashboardNotificationForOtherParty(caseData, authToken, notificationParams, roles);
-        // update tasklist item
-        if (firstQueryRaisedOnClaim) {
-            dashboardScenariosService.recordScenarios(
-                authToken,
-                SCENARIO_AAA6_VIEW_AVAILABLE_MESSAGES_TO_THE_COURT.getScenario(),
-                caseData.getCcdCaseReference().toString(),
-                notificationParams
-            );
-        }
+        recordScenario(caseData, authToken);
     }
 
-    private void createDashboardNotificationForOtherParty(CaseData caseData, String authToken, ScenarioRequestParams notificationParams, List<String> roles) {
-        if (!isLIPClaimant(roles) && caseData.getQueries() != null) {
-            dashboardScenariosService.recordScenarios(
-                authToken,
-                SCENARIO_AAA6_QUERY_RAISED_BY_OTHER_PARTY_CLAIMANT.getScenario(),
-                caseData.getCcdCaseReference().toString(),
-                notificationParams
-            );
+    @Override
+    protected String getScenario(CaseData caseData) {
+        List<String> roles = getQueryCreatorRoles(caseData);
+        if (roles.isEmpty()) {
+            return null;
         }
-        if (!isLIPDefendant(roles) && caseData.getQueries() != null) {
-            dashboardScenariosService.recordScenarios(
-                authToken,
-                SCENARIO_AAA6_QUERY_RAISED_BY_OTHER_PARTY_DEFENDANT.getScenario(),
-                caseData.getCcdCaseReference().toString(),
-                notificationParams
-            );
+        if (!isLIPClaimant(roles)) {
+            return SCENARIO_AAA6_QUERY_RAISED_BY_OTHER_PARTY_CLAIMANT.getScenario();
         }
+        if (!isLIPDefendant(roles)) {
+            return SCENARIO_AAA6_QUERY_RAISED_BY_OTHER_PARTY_DEFENDANT.getScenario();
+        }
+        return null;
     }
 
-    private void deleteDuplicateNotifications(CaseData caseData, String authToken, ScenarioRequestParams notificationParams) {
+    @Override
+    protected String getExtraScenario() {
+        return SCENARIO_AAA6_VIEW_AVAILABLE_MESSAGES_TO_THE_COURT.getScenario();
+    }
+
+    @Override
+    protected boolean shouldRecordScenario(CaseData caseData) {
+        return caseData.isLipCase();
+    }
+
+    @Override
+    protected boolean shouldRecordExtraScenario(CaseData caseData) {
+        return shouldRecordScenario(caseData) && isFirstQueryRaisedOnClaim(caseData);
+    }
+
+    @Override
+    protected void beforeRecordScenario(CaseData caseData, String authToken) {
+        deleteDuplicateNotifications(caseData, authToken);
+    }
+
+    private void deleteDuplicateNotifications(CaseData caseData, String authToken) {
+        ScenarioRequestParams params = buildScenarioParams(caseData);
         dashboardScenariosService.recordScenarios(
             authToken,
             SCENARIO_AAA6_QUERY_RAISED_BY_OTHER_PARTY_CLAIMANT_DELETE.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            notificationParams
+            params
         );
         dashboardScenariosService.recordScenarios(
             authToken,
             SCENARIO_AAA6_QUERY_RAISED_BY_OTHER_PARTY_DEFENDANT_DELETE.getScenario(),
             caseData.getCcdCaseReference().toString(),
-            notificationParams
+            params
         );
     }
 
@@ -101,14 +98,16 @@ public class RaiseQueryDashboardService extends DashboardScenarioService {
         return false;
     }
 
-    private List<String> getQueryCreatorRoles(CaseData caseData, String processInstanceId) {
-        QueryManagementVariables processVariables = runtimeService.getProcessVariables(processInstanceId);
-        String queryId = processVariables.getQueryId();
-        return getUserRoleForQuery(caseData, coreCaseUserService, queryId);
+    private List<String> getQueryCreatorRoles(CaseData caseData) {
+        QueryManagementVariables variables = runtimeService.getProcessVariables(
+            caseData.getBusinessProcess().getProcessInstanceId()
+        );
+        return getUserRoleForQuery(caseData, coreCaseUserService, variables.getQueryId());
     }
 
-    @Override
-    protected String getScenario(CaseData caseData) {
-        return null;
+    private ScenarioRequestParams buildScenarioParams(CaseData caseData) {
+        return ScenarioRequestParams.builder()
+            .params(mapper.mapCaseDataToParams(caseData))
+            .build();
     }
 }
