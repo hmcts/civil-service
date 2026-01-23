@@ -23,8 +23,4 @@ public enum ClaimType {
         LOWER,
         HIGHER
     }
-
-    public boolean isLowerFeeType() {
-        return this.feeType.equals(FeeType.LOWER);
-    }
 }
