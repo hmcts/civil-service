@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
+import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
+import uk.gov.hmcts.reform.civil.ga.service.events.GaCaseEventService;
 import uk.gov.hmcts.reform.civil.model.bulkclaims.CaseworkerSubmitEventDTo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.ExtendedDeadlineDto;
@@ -62,8 +64,10 @@ public class CasesController {
 
     private final RoleAssignmentsService roleAssignmentsService;
     private final CoreCaseDataService coreCaseDataService;
+    private final GaCoreCaseDataService gaCoreCaseDataService;
     private final DashboardClaimInfoService dashboardClaimInfoService;
     private final CaseEventService caseEventService;
+    private final GaCaseEventService gaCaseEventService;
     private final CaseSdtRequestSearchService caseSdtRequestSearchService;
     private final CaseworkerCaseEventService caseworkerCaseEventService;
     private final DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
@@ -264,4 +268,50 @@ public class CasesController {
         return repaymentPlanDecisionService.getCalculatedDecision(caseDetails, claimantProposedPlan);
     }
 
+    @PostMapping(path = "/ga")
+    @Operation(summary = "get list of the general application cases from CCD")
+    public ResponseEntity<SearchResult> getGaCaseList(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
+                                                      @RequestBody String searchString) {
+
+        log.info("Received getCaseList");
+
+        Query query = new Query(
+            QueryBuilders
+                .wrapperQuery(searchString), emptyList(), 0
+        );
+        SearchResult claims = gaCoreCaseDataService.searchGeneralApplication(query, authorization);
+        return new ResponseEntity<>(claims, HttpStatus.OK);
+    }
+
+    @PostMapping(path = "/{caseId}/ga/citizen/{submitterId}/event")
+    @Operation(summary = "Submits event")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized")})
+    public ResponseEntity<CaseDetails> submitGaEvent(
+        @PathVariable("submitterId") String submitterId,
+        @PathVariable("caseId") String caseId,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
+        @RequestBody EventDto eventDto
+    ) {
+        EventSubmissionParams params = EventSubmissionParams
+            .builder()
+            .authorisation(authorization)
+            .caseId(caseId)
+            .userId(submitterId)
+            .event(eventDto.getEvent())
+            .updates(eventDto.getCaseDataUpdate())
+            .build();
+        CaseDetails caseDetails = gaCaseEventService.submitEvent(params);
+        return new ResponseEntity<>(caseDetails, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/{caseId}/ga/applications")
+    @Operation(summary = "get list of the applications with given general application case id from CCD")
+    public ResponseEntity<SearchResult> getGaCaseApplications(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
+                                                              @PathVariable("caseId") String caseId) {
+
+        SearchResult claims = gaCoreCaseDataService.searchGeneralApplicationWithCaseId(caseId, authorization);
+        return new ResponseEntity<>(claims, HttpStatus.OK);
+    }
 }
