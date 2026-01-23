@@ -112,7 +112,7 @@ class PiPLetterGeneratorTest {
                                                              anyString())).thenReturn(buildStitchedDocument());
         given(pipInPostConfiguration.getRespondToClaimUrl()).willReturn(CUI_URL);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
-            .willReturn(DocmosisDocument.builder().bytes(new byte[]{1, 2, 3, 4, 5, 6}).build());
+            .willReturn(new DocmosisDocument().setBytes(new byte[]{1, 2, 3, 4, 5, 6}));
 
         specClaimTimelineDocuments = List.of(
             new DocumentMetaData(buildClaimFormDocument().getDocumentLink(), "PiP Letter", LocalDate.now().toString()),

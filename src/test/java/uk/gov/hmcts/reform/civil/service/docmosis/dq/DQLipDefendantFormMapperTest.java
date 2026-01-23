@@ -96,15 +96,15 @@ class DQLipDefendantFormMapperTest {
                                                                 .setDetails("details"))
                                                          .build());
         //When
-        FixedRecoverableCostsSection expectedFrc = dqLipDefendantFormMapper.getFixedRecoverableCostsIntermediate(caseData);
-        DisclosureOfElectronicDocuments expectedEletronicDisclosure = dqLipDefendantFormMapper.getDisclosureOfElectronicDocuments(caseData);
-        DisclosureOfNonElectronicDocuments expectedNonEletronicDisclosure = dqLipDefendantFormMapper.getDisclosureOfNonElectronicDocuments(caseData);
+        final FixedRecoverableCostsSection expectedFrc = dqLipDefendantFormMapper.getFixedRecoverableCostsIntermediate(caseData);
+        final DisclosureOfElectronicDocuments expectedEletronicDisclosure = dqLipDefendantFormMapper.getDisclosureOfElectronicDocuments(caseData);
+        final DisclosureOfNonElectronicDocuments expectedNonEletronicDisclosure = dqLipDefendantFormMapper.getDisclosureOfNonElectronicDocuments(caseData);
         final DocumentsToBeConsideredSection expectedDocsToBeConsidered = dqLipDefendantFormMapper.getDocumentsToBeConsidered(caseData);
         //Then
-        assertThat(expectedFrc).isEqualTo(FixedRecoverableCostsSection.builder()
-                                              .isSubjectToFixedRecoverableCostRegime(YesOrNo.NO)
-                                              .reasons("reasons")
-                                              .build());
+        FixedRecoverableCostsSection expectedFrcSection = new FixedRecoverableCostsSection();
+        expectedFrcSection.setIsSubjectToFixedRecoverableCostRegime(YesOrNo.NO);
+        expectedFrcSection.setReasons("reasons");
+        assertThat(expectedFrc).isEqualTo(expectedFrcSection);
 
         assertThat(expectedEletronicDisclosure).isEqualTo(DisclosureOfElectronicDocuments.builder()
                                                               .reachedAgreement(YesOrNo.NO)

@@ -115,18 +115,18 @@ class DQLipClaimantFormMapperTest {
                                                                                                                               .setDetails("details"))
                                                          .build());
         //When
-        FixedRecoverableCostsSection expectedFrc = dqLipClaimantFormMapper.getFixedRecoverableCostsIntermediate(caseData);
-        DisclosureOfElectronicDocuments expectedEletronicDisclosure = dqLipClaimantFormMapper.getDisclosureOfElectronicDocuments(caseData);
-        DisclosureOfNonElectronicDocuments expectedNonEletronicDisclosure = dqLipClaimantFormMapper.getDisclosureOfNonElectronicDocuments(caseData);
+        final FixedRecoverableCostsSection expectedFrc = dqLipClaimantFormMapper.getFixedRecoverableCostsIntermediate(caseData);
+        final DisclosureOfElectronicDocuments expectedEletronicDisclosure = dqLipClaimantFormMapper.getDisclosureOfElectronicDocuments(caseData);
+        final DisclosureOfNonElectronicDocuments expectedNonEletronicDisclosure = dqLipClaimantFormMapper.getDisclosureOfNonElectronicDocuments(caseData);
         final DocumentsToBeConsideredSection expectedDocsToBeConsidered = dqLipClaimantFormMapper.getDocumentsToBeConsidered(caseData);
         //Then
-        assertThat(expectedFrc).isEqualTo(FixedRecoverableCostsSection.builder()
-                                              .isSubjectToFixedRecoverableCostRegime(YesOrNo.YES)
-                                              .complexityBandingAgreed(YesOrNo.YES)
-                                              .reasons("reasons")
-                                              .band(ComplexityBand.BAND_1)
-                                              .bandText("Band 1")
-                                              .build());
+        FixedRecoverableCostsSection expectedFrcSection = new FixedRecoverableCostsSection();
+        expectedFrcSection.setIsSubjectToFixedRecoverableCostRegime(YesOrNo.YES);
+        expectedFrcSection.setComplexityBandingAgreed(YesOrNo.YES);
+        expectedFrcSection.setReasons("reasons");
+        expectedFrcSection.setBand(ComplexityBand.BAND_1);
+        expectedFrcSection.setBandText("Band 1");
+        assertThat(expectedFrc).isEqualTo(expectedFrcSection);
 
         assertThat(expectedEletronicDisclosure).isEqualTo(DisclosureOfElectronicDocuments.builder()
                                                                           .reachedAgreement(YesOrNo.YES).build());

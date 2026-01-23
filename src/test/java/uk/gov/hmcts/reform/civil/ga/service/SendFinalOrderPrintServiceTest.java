@@ -164,7 +164,7 @@ class SendFinalOrderPrintServiceTest {
         given(coreCaseDataService.getCase(any())).willReturn(CaseDetails.builder().build());
         given(caseDetailsConverter.toGeneralApplicationCaseData(any())).willReturn(civilCaseData);
         given(documentGeneratorService.generateDocmosisDocument(any(PostOrderCoverLetter.class), eq(POST_ORDER_COVER_LETTER_LIP))).willReturn(
-                DocmosisDocument.builder().build());
+                new DocmosisDocument());
         given(documentManagementService.uploadDocument(any(), (PDF) any())).willReturn(CaseDocument.builder().build());
         Document document = Document.builder().documentUrl("url").documentFileName("filename").documentHash("hash")
                 .documentBinaryUrl("binaryUrl").build();
@@ -183,7 +183,7 @@ class SendFinalOrderPrintServiceTest {
         given(coreCaseDataService.getCase(any())).willReturn(CaseDetails.builder().build());
         given(caseDetailsConverter.toGeneralApplicationCaseData(any())).willReturn(civilCaseData);
         given(documentGeneratorService.generateDocmosisDocument(any(PostOrderCoverLetter.class), eq(POST_ORDER_COVER_LETTER_LIP))).willReturn(
-                DocmosisDocument.builder().build());
+                new DocmosisDocument());
         given(documentManagementService.uploadDocument((String) any(), (PDF) any())).willReturn(CaseDocument.builder().build());
         given(civilStitchService.generateStitchedCaseDocument(any(), any(), any(), any(), any())).willReturn(CaseDocument.builder()
                 .documentLink(Document.builder()
@@ -211,7 +211,7 @@ class SendFinalOrderPrintServiceTest {
         given(coreCaseDataService.getCase(any())).willReturn(CaseDetails.builder().build());
         given(caseDetailsConverter.toGeneralApplicationCaseData(any())).willReturn(civilCaseData);
         given(documentGeneratorService.generateDocmosisDocument(any(PostOrderCoverLetter.class), eq(POST_ORDER_COVER_LETTER_LIP))).willReturn(
-                DocmosisDocument.builder().build());
+                new DocmosisDocument());
         given(documentManagementService.uploadDocument((String) any(), (PDF) any())).willReturn(CaseDocument.builder().build());
         given(civilStitchService.generateStitchedCaseDocument(any(), any(), any(), any(), any())).willReturn(CaseDocument.builder()
                 .documentLink(Document.builder()
@@ -240,7 +240,7 @@ class SendFinalOrderPrintServiceTest {
         given(coreCaseDataService.getCase(any())).willReturn(CaseDetails.builder().build());
         given(caseDetailsConverter.toGeneralApplicationCaseData(any())).willReturn(civilCaseData);
         given(documentGeneratorService.generateDocmosisDocument(any(PostOrderCoverLetter.class), eq(POST_ORDER_COVER_LETTER_LIP))).willReturn(
-                DocmosisDocument.builder().build());
+                new DocmosisDocument());
         given(documentManagementService.uploadDocument((String) any(), (PDF) any())).willReturn(CaseDocument.builder().build());
         given(civilStitchService.generateStitchedCaseDocument(any(), any(), any(), any(), any())).willReturn(CaseDocument.builder()
                 .documentLink(Document.builder()
@@ -269,7 +269,7 @@ class SendFinalOrderPrintServiceTest {
         given(coreCaseDataService.getCase(any())).willReturn(CaseDetails.builder().build());
         given(caseDetailsConverter.toGeneralApplicationCaseData(any())).willReturn(civilCaseData);
         given(documentGeneratorService.generateDocmosisDocument(any(PostOrderCoverLetter.class), eq(POST_ORDER_COVER_LETTER_LIP))).willReturn(
-                DocmosisDocument.builder().build());
+                new DocmosisDocument());
         given(documentManagementService.uploadDocument((String) any(), (PDF) any())).willReturn(CaseDocument.builder().build());
         given(civilStitchService.generateStitchedCaseDocument(any(), any(), any(), any(), any())).willReturn(CaseDocument.builder()
                 .documentLink(Document.builder()

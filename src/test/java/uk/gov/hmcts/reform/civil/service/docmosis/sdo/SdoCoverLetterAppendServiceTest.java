@@ -85,7 +85,7 @@ class SdoCoverLetterAppendServiceTest {
     @BeforeEach
     void setup() {
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
-                .willReturn(DocmosisDocument.builder().bytes(new byte[]{1, 2, 3, 4, 5, 6}).build());
+                .willReturn(new DocmosisDocument().setBytes(new byte[]{1, 2, 3, 4, 5, 6}));
         given(documentManagementService.uploadDocument(any(), any(PDF.class))).willReturn(caseDocument);
         byte[] bytes = new ByteArrayResource(STITCHED_DOC_BYTES).getByteArray();
         given(documentDownloadService.downloadDocument(

@@ -273,9 +273,7 @@ class SealedClaimResponseFormGeneratorForSpecTest {
     @Test
     void generate_1v1_uses_lr_admission_bulk_template_and_uploads_pdf() {
         when(documentGeneratorService.generateDocmosisDocument(any(), any()))
-            .thenReturn(DocmosisDocument.builder()
-                            .bytes(new byte[]{1, 2, 3})
-                            .build());
+            .thenReturn(new DocmosisDocument().setBytes(new byte[]{1, 2, 3}));
         when(documentManagementService.uploadDocument(anyString(), any(PDF.class)))
             .thenReturn(CaseDocument.builder().documentType(DocumentType.SEALED_CLAIM).build());
 
@@ -306,7 +304,7 @@ class SealedClaimResponseFormGeneratorForSpecTest {
         multipartySame.setRespondentResponseIsSame(YesOrNo.YES);
 
         when(documentGeneratorService.generateDocmosisDocument(any(), any()))
-            .thenReturn(DocmosisDocument.builder().bytes(new byte[]{9}).build());
+            .thenReturn(new DocmosisDocument().setBytes(new byte[]{9}));
         when(documentManagementService.uploadDocument(anyString(), any(PDF.class)))
             .thenReturn(CaseDocument.builder().documentType(DocumentType.SEALED_CLAIM).build());
 
