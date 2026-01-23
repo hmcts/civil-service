@@ -73,11 +73,9 @@ public class RespondentDivergentResponseStrategy implements EventHistoryStrategy
         }
 
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-        boolean hasState = stateFlow.getStateHistory().stream()
+        return stateFlow.getStateHistory().stream()
             .map(State::getName)
             .anyMatch(SUPPORTED_STATES::contains);
-
-        return hasState;
     }
 
     @Override

@@ -24,6 +24,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -55,7 +56,6 @@ class RespondentFullAdmissionStrategyTest {
             sequenceGenerator,
             respondentResponseSupport,
             formatter,
-                timelineHelper,
             stateFlowEngine
         );
 
@@ -94,6 +94,25 @@ class RespondentFullAdmissionStrategyTest {
             .build();
 
         assertThat(strategy.supports(caseData)).isTrue();
+    }
+
+    @Test
+    void contributeDoesNothingWhenNotSupported() {
+        when(stateFlow.getStateHistory()).thenReturn(List.of(
+            State.from(FlowState.Main.CLAIM_ISSUED.fullName())
+        ));
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentFullAdmission()
+            .build();
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventHistory history = builder.build();
+        assertThat(history.getReceiptOfAdmission()).isNullOrEmpty();
+        assertThat(history.getMiscellaneous()).isNullOrEmpty();
+        verifyNoInteractions(sequenceGenerator);
     }
 
     @Test

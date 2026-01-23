@@ -269,6 +269,58 @@ class ClaimantResponseStrategyTest {
             .contains("Claimant proceeds");
     }
 
+    @Test
+    void addsProceedAndNotProceedEventsWhenBothStatesPresent() {
+        when(stateFlow.getStateHistory()).thenReturn(List.of(
+            State.from(FlowState.Main.FULL_DEFENCE_PROCEED.fullName()),
+            State.from(FlowState.Main.FULL_DEFENCE_NOT_PROCEED.fullName())
+        ));
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed(ONE_V_ONE)
+            .build();
+        caseData.setApplicant1ResponseDate(LocalDateTime.of(2024, 9, 1, 10, 0));
+        caseData.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
+        caseData.setResponseClaimTrack(AllocatedTrack.FAST_CLAIM.name());
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, "token");
+
+        EventHistory history = builder.build();
+        assertThat(history.getMiscellaneous())
+            .extracting(Event::getEventDetailsText)
+            .contains(
+                "Claimant proceeds.",
+                "RPA Reason: Claimant intends not to proceed."
+            );
+    }
+
+    @Test
+    void skipsDirectionsQuestionnaireWhenNoApplicantsProceed() {
+        when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.FULL_DEFENCE_PROCEED.fullName())));
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .multiPartyClaimTwoApplicants()
+            .atStateApplicantRespondToDefenceAndProceed(TWO_V_ONE)
+            .build();
+        caseData.setApplicant1ProceedWithClaimMultiParty2v1(YesOrNo.NO);
+        caseData.setApplicant2ProceedWithClaimMultiParty2v1(YesOrNo.NO);
+        caseData.setApplicant1ResponseDate(LocalDateTime.of(2024, 9, 5, 10, 0));
+        caseData.setApplicant2ResponseDate(LocalDateTime.of(2024, 9, 5, 10, 0));
+        caseData.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
+        caseData.setResponseClaimTrack(AllocatedTrack.FAST_CLAIM.name());
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, "token");
+
+        EventHistory history = builder.build();
+        assertThat(history.getDirectionsQuestionnaireFiled()).isNullOrEmpty();
+        assertThat(history.getMiscellaneous())
+            .extracting(Event::getEventDetailsText)
+            .anySatisfy(text -> assertThat(text).contains("[1 of 2"))
+            .anySatisfy(text -> assertThat(text).contains("[2 of 2"));
+    }
+
     private Party createIndividualParty() {
         Party party = new Party();
         party.setType(Party.Type.INDIVIDUAL);

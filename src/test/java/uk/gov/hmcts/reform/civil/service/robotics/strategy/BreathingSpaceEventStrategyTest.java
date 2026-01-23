@@ -156,8 +156,9 @@ class BreathingSpaceEventStrategyTest {
         assertThat(event.getEventCode()).isEqualTo(EventType.MENTAL_HEALTH_BREATHING_SPACE_ENTERED.getCode());
         String prefix = "Breathing space reference REF-200, actual start date ";
         LocalDateTime detailsTimestamp = extractTimestamp(event.getEventDetailsText(), prefix);
-        assertThat(detailsTimestamp).isAfterOrEqualTo(before);
-        assertThat(detailsTimestamp).isBeforeOrEqualTo(after);
+        assertThat(detailsTimestamp)
+            .isAfterOrEqualTo(before)
+            .isBeforeOrEqualTo(after);
     }
 
     @Test
@@ -224,6 +225,30 @@ class BreathingSpaceEventStrategyTest {
         assertThat(history.getBreathingSpaceLifted()).hasSize(1);
         assertThat(history.getBreathingSpaceLifted().get(0).getEventDetailsText())
             .isEqualTo("Breathing space reference REF-NO-END, ");
+    }
+
+    @Test
+    void formatsDetailsWhenReferenceMissingAndStartMissing() {
+        when(sequenceGenerator.nextSequence(any())).thenReturn(16);
+
+        BreathingSpaceInfo breathing = new BreathingSpaceInfo();
+        breathing.setEnter(new BreathingSpaceEnterInfo()
+            .setType(BreathingSpaceType.STANDARD));
+        CaseData caseData = CaseDataBuilder.builder()
+            .build();
+        caseData.setBreathing(breathing);
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        LocalDateTime before = LocalDateTime.now();
+        strategy.contribute(builder, caseData, null);
+        LocalDateTime after = LocalDateTime.now();
+
+        Event event = builder.build().getBreathingSpaceEntered().get(0);
+        assertThat(event.getEventDetailsText()).startsWith("Actual start date ");
+        LocalDateTime detailsTimestamp = extractTimestamp(event.getEventDetailsText(), "Actual start date ");
+        assertThat(detailsTimestamp)
+            .isAfterOrEqualTo(before)
+            .isBeforeOrEqualTo(after);
     }
 
     private LocalDateTime extractTimestamp(String details, String prefix) {

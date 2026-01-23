@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.PaymentBySetDate;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -389,5 +390,66 @@ class JudgmentByAdmissionStrategyTest {
         var details = history.getJudgmentByAdmission().get(0).getEventDetails();
         assertThat(details.getInstallmentPeriod()).isEqualTo("FW");
         assertThat(details.getPaymentInFullDate()).isNull();
+    }
+
+    @Test
+    void usesCurrentTimeWhenApplicantResponseDateMissing() {
+        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(71, 72);
+
+        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
+        ccjPaymentDetails.setCcjJudgmentAmountClaimAmount(BigDecimal.valueOf(500));
+        ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .buildJudmentOnlineCaseDataWithPaymentImmediately();
+        caseData.setCcjPaymentDetails(ccjPaymentDetails);
+        caseData.setApplicant1ResponseDate(null);
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        LocalDateTime before = LocalDateTime.now();
+        strategy.contribute(builder, caseData, null);
+        LocalDateTime after = LocalDateTime.now();
+
+        EventHistory history = builder.build();
+        LocalDateTime miscDate = history.getMiscellaneous().get(0).getDateReceived();
+        LocalDateTime judgmentDate = history.getJudgmentByAdmission().get(0).getDateReceived();
+        assertThat(miscDate).isAfterOrEqualTo(before);
+        assertThat(miscDate).isBeforeOrEqualTo(after);
+        assertThat(judgmentDate).isAfterOrEqualTo(before);
+        assertThat(judgmentDate).isBeforeOrEqualTo(after);
+    }
+
+    @Test
+    void usesApplicantRequestedSetDateWhenClaimantDecisionIsInFavour() {
+        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(81, 82);
+
+        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
+        claimantLiPResponse.setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
+        PaymentBySetDate paymentBySetDate = new PaymentBySetDate();
+        paymentBySetDate.setPaymentSetDate(LocalDate.of(2024, 12, 20));
+
+        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
+        ccjPaymentDetails.setCcjJudgmentAmountClaimAmount(BigDecimal.valueOf(600));
+        ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .buildJudmentOnlineCaseDataWithPaymentImmediately();
+        caseData.setCaseDataLiP(caseDataLiP);
+        caseData.setApplicant1RepaymentOptionForDefendantSpec(PaymentType.SET_DATE);
+        caseData.setApplicant1RequestedPaymentDateForDefendantSpec(paymentBySetDate);
+        caseData.setCcjPaymentDetails(ccjPaymentDetails);
+        caseData.setApplicant1ResponseDate(LocalDateTime.of(2024, 10, 1, 9, 0));
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventHistory history = builder.build();
+        assertThat(history.getJudgmentByAdmission()).hasSize(1);
+        assertThat(history.getJudgmentByAdmission().get(0).getEventDetails().getPaymentInFullDate())
+            .isEqualTo(LocalDate.of(2024, 12, 20).atStartOfDay());
     }
 }

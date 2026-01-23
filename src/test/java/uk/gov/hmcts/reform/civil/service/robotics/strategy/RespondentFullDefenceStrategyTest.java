@@ -375,4 +375,22 @@ class RespondentFullDefenceStrategyTest {
         assertThat(history.getDefenceFiled().get(0).getLitigiousPartyID())
             .isEqualTo("002");
     }
+
+    @Test
+    void skipsRespondent2EventsWhenResponseDateMissing() {
+        CaseData caseData = StrategyTestDataFactory.unspecTwoDefendantSolicitorsCase()
+            .atStateBothRespondentsSameResponse(FULL_DEFENCE)
+            .build();
+        caseData.setRespondent2ResponseDate(null);
+
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(20, 21);
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventHistory history = builder.build();
+        assertThat(history.getDefenceFiled()).hasSize(1);
+        assertThat(history.getDirectionsQuestionnaireFiled()).hasSize(1);
+        assertThat(history.getDirectionsQuestionnaireFiled().get(0).getLitigiousPartyID()).isEqualTo("002");
+    }
 }

@@ -118,8 +118,7 @@ public final class RoboticsEventSupport {
 
     public static Event buildLipVsLrMiscEvent(EventHistory.EventHistoryBuilder builder,
                                               RoboticsSequenceGenerator sequenceGenerator,
-                                              RoboticsEventTextFormatter textFormatter,
-                                              RoboticsTimelineHelper timelineHelper) {
+                                              RoboticsEventTextFormatter textFormatter) {
         return buildMiscEvent(
             builder,
             sequenceGenerator,

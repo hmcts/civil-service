@@ -25,6 +25,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -55,7 +56,6 @@ class RespondentPartAdmissionStrategyTest {
         strategy = new RespondentPartAdmissionStrategy(
             sequenceGenerator,
             respondentResponseSupport,
-                timelineHelper,
             formatter,
             stateFlowEngine
         );
@@ -85,12 +85,35 @@ class RespondentPartAdmissionStrategyTest {
     }
 
     @Test
+    void supportsReturnsFalseWhenCaseDataNull() {
+        assertThat(strategy.supports(null)).isFalse();
+    }
+
+    @Test
     void supportsReturnsTrueWhenStatePresentAndResponseExists() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentPartAdmission()
             .build();
 
         assertThat(strategy.supports(caseData)).isTrue();
+    }
+
+    @Test
+    void contributeDoesNothingWhenNotSupported() {
+        when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.CLAIM_ISSUED.fullName())));
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentPartAdmission()
+            .build();
+
+        EventHistory.EventHistoryBuilder historyBuilder = EventHistory.builder();
+        strategy.contribute(historyBuilder, caseData, null);
+
+        EventHistory history = historyBuilder.build();
+        assertThat(history.getReceiptOfPartAdmission()).isNullOrEmpty();
+        assertThat(history.getMiscellaneous()).isNullOrEmpty();
+        assertThat(history.getDirectionsQuestionnaireFiled()).isNullOrEmpty();
+        verifyNoInteractions(sequenceGenerator);
     }
 
     @Test
@@ -251,6 +274,28 @@ class RespondentPartAdmissionStrategyTest {
         assertThat(history.getStatesPaid().get(0).getEventCode()).isEqualTo(EventType.STATES_PAID.getCode());
 
         assertThat(history.getReceiptOfPartAdmission()).isNullOrEmpty();
+        assertThat(history.getMiscellaneous()).isNullOrEmpty();
+    }
+
+    @Test
+    void contributeAddsReceiptOfPartAdmissionWhenSpecDoesNotRequireStatesPaid() {
+        CaseDataBuilder builder = CaseDataBuilder.builder().setClaimTypeToSpecClaim();
+        builder.respondent1DQ();
+        CaseData caseData = builder
+            .atStateRespondentPartAdmissionSpec()
+            .applicant1Represented(YES)
+            .build();
+        caseData.setSpecDefenceAdmittedRequired(NO);
+
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(20, 21);
+
+        EventHistory.EventHistoryBuilder historyBuilder = EventHistory.builder();
+        strategy.contribute(historyBuilder, caseData, null);
+
+        EventHistory history = historyBuilder.build();
+        assertThat(history.getReceiptOfPartAdmission()).hasSize(1);
+        assertThat(history.getReceiptOfPartAdmission().get(0).getEventSequence()).isEqualTo(20);
+        assertThat(history.getStatesPaid()).isNullOrEmpty();
         assertThat(history.getMiscellaneous()).isNullOrEmpty();
     }
 }

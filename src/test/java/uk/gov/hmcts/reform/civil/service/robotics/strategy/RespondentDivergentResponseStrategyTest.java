@@ -31,6 +31,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 class RespondentDivergentResponseStrategyTest {
@@ -74,6 +75,11 @@ class RespondentDivergentResponseStrategyTest {
     }
 
     @Test
+    void supportsReturnsFalseWhenCaseDataNull() {
+        assertThat(strategy.supports(null)).isFalse();
+    }
+
+    @Test
     void supportsReturnsTrueWhenStatePresentEvenIfResponsesMissing() {
         when(stateFlow.getStateHistory()).thenReturn(List.of(
             State.from(FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName())
@@ -93,6 +99,24 @@ class RespondentDivergentResponseStrategyTest {
         CaseData caseData = createUnspecDivergentCase();
 
         assertThat(strategy.supports(caseData)).isTrue();
+    }
+
+    @Test
+    void contributeDoesNothingWhenNotSupported() {
+        when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.CLAIM_ISSUED.fullName())));
+        when(stateFlow.getState()).thenReturn(State.from(FlowState.Main.CLAIM_ISSUED.fullName()));
+
+        CaseData caseData = createUnspecDivergentCase();
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventHistory history = builder.build();
+        assertThat(history.getDefenceFiled()).isNullOrEmpty();
+        assertThat(history.getDirectionsQuestionnaireFiled()).isNullOrEmpty();
+        assertThat(history.getReceiptOfPartAdmission()).isNullOrEmpty();
+        assertThat(history.getMiscellaneous()).isNullOrEmpty();
+        verifyNoInteractions(sequenceGenerator);
     }
 
     @Test
@@ -137,6 +161,25 @@ class RespondentDivergentResponseStrategyTest {
             .containsExactly(
                 respondentResponseSupport.prepareRespondentResponseText(caseData, caseData.getRespondent2(), false)
             );
+    }
+
+    @Test
+    void contributeUsesStateFlowWhenFlowStateNull() {
+        when(stateFlow.getStateHistory()).thenReturn(List.of(
+            State.from(FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName())
+        ));
+        when(stateFlow.getState()).thenReturn(
+            State.from(FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE.fullName())
+        );
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(70, 71, 72, 73);
+
+        CaseData caseData = createSpecDivergentCase();
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null, null);
+
+        EventHistory history = builder.build();
+        assertThat(history.getMiscellaneous()).hasSize(1);
     }
 
     @Test
@@ -268,6 +311,137 @@ class RespondentDivergentResponseStrategyTest {
         assertThat(history.getMiscellaneous())
             .extracting(Event::getDateReceived)
             .contains(expectedDate);
+    }
+
+    @Test
+    void addsReceiptOfAdmissionForFullAdmissionResponse() {
+        when(stateFlow.getStateHistory()).thenReturn(List.of(
+            State.from(FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName())
+        ));
+        when(stateFlow.getState()).thenReturn(
+            State.from(FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName())
+        );
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(60, 61, 62, 63);
+
+        CaseData caseData = createUnspecDivergentCase();
+        caseData.setRespondent2ClaimResponseType(RespondentResponseType.FULL_ADMISSION);
+        caseData.setRespondent2ResponseDate(NOW.plusDays(3));
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventHistory history = builder.build();
+        assertThat(history.getReceiptOfAdmission()).hasSize(1);
+        assertThat(history.getReceiptOfAdmission().get(0).getLitigiousPartyID()).isEqualTo("003");
+    }
+
+    @Test
+    void usesClaimantResponseTypeForTwoVOneSpec() {
+        when(stateFlow.getStateHistory()).thenReturn(List.of(
+            State.from(FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName())
+        ));
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(80);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .setClaimTypeToSpecClaim()
+            .respondent1(createIndividualParty("Solo"))
+            .respondent1ResponseDate(NOW)
+            .build();
+        caseData.setAddApplicant2(YesOrNo.YES);
+        caseData.setClaimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null, FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED);
+
+        EventHistory history = builder.build();
+        assertThat(history.getReceiptOfAdmission()).hasSize(1);
+        assertThat(history.getDefenceFiled()).isNullOrEmpty();
+        assertThat(history.getDirectionsQuestionnaireFiled()).isNullOrEmpty();
+    }
+
+    @Test
+    void usesRespondent1ResponseWhenSameSolicitorSameResponseForRespondent2() {
+        when(stateFlow.getStateHistory()).thenReturn(List.of(
+            State.from(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())
+        ));
+        when(stateFlow.getState()).thenReturn(
+            State.from(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())
+        );
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(90, 91, 92, 93, 94, 95);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .multiPartyClaimOneDefendantSolicitor()
+            .build();
+        caseData.setRespondent1(createIndividualParty("One"));
+        caseData.setRespondent2(createIndividualParty("Two"));
+        caseData.setRespondent2SameLegalRepresentative(YesOrNo.YES);
+        caseData.setRespondentResponseIsSame(YesOrNo.YES);
+        caseData.setSameSolicitorSameResponse(YesOrNo.YES);
+        caseData.setRespondent1ResponseDate(NOW);
+        caseData.setRespondent2ResponseDate(NOW.plusDays(1));
+        caseData.setRespondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE);
+        caseData.setRespondent2ClaimResponseType(RespondentResponseType.FULL_DEFENCE);
+        caseData.setTotalClaimAmount(BigDecimal.valueOf(100));
+
+        RespondToClaim respondToClaim = new RespondToClaim();
+        respondToClaim.setHowMuchWasPaid(BigDecimal.valueOf(10000));
+        respondToClaim.setWhenWasThisAmountPaid(LocalDate.now());
+        caseData.setRespondToClaim(respondToClaim);
+
+        RespondToClaim respondToClaim2 = new RespondToClaim();
+        respondToClaim2.setHowMuchWasPaid(BigDecimal.ZERO);
+        caseData.setRespondToClaim2(respondToClaim2);
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventHistory history = builder.build();
+        assertThat(history.getStatesPaid())
+            .extracting(Event::getLitigiousPartyID)
+            .contains("003");
+    }
+
+    @Test
+    void addsDefenceFiledWhenPaidLessThanClaimForRespondent2() {
+        when(stateFlow.getStateHistory()).thenReturn(List.of(
+            State.from(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())
+        ));
+        when(stateFlow.getState()).thenReturn(
+            State.from(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())
+        );
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(100, 101, 102, 103, 104, 105);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .multiPartyClaimOneDefendantSolicitor()
+            .build();
+        caseData.setRespondent1(createIndividualParty("One"));
+        caseData.setRespondent2(createIndividualParty("Two"));
+        caseData.setRespondent2SameLegalRepresentative(YesOrNo.YES);
+        caseData.setRespondentResponseIsSame(YesOrNo.YES);
+        caseData.setSameSolicitorSameResponse(YesOrNo.YES);
+        caseData.setRespondent1ResponseDate(NOW);
+        caseData.setRespondent2ResponseDate(NOW.plusDays(1));
+        caseData.setRespondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE);
+        caseData.setRespondent2ClaimResponseType(RespondentResponseType.FULL_DEFENCE);
+        caseData.setTotalClaimAmount(BigDecimal.valueOf(100));
+
+        RespondToClaim respondToClaim = new RespondToClaim();
+        respondToClaim.setHowMuchWasPaid(BigDecimal.valueOf(5000));
+        respondToClaim.setWhenWasThisAmountPaid(LocalDate.now());
+        caseData.setRespondToClaim(respondToClaim);
+
+        RespondToClaim respondToClaim2 = new RespondToClaim();
+        respondToClaim2.setHowMuchWasPaid(BigDecimal.valueOf(0));
+        caseData.setRespondToClaim2(respondToClaim2);
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventHistory history = builder.build();
+        assertThat(history.getDefenceFiled())
+            .extracting(Event::getLitigiousPartyID)
+            .contains("003");
     }
 
     private CaseData createUnspecDivergentCase() {

@@ -24,6 +24,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 class UnrepresentedAndUnregisteredDefendantStrategyTest {
@@ -49,7 +50,10 @@ class UnrepresentedAndUnregisteredDefendantStrategyTest {
         when(stateFlow.getStateHistory()).thenReturn(
             List.of(State.from(FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName()))
         );
-        when(timelineHelper.now()).thenReturn(LocalDateTime.of(2024, 3, 2, 10, 0));
+        when(timelineHelper.now()).thenReturn(
+            LocalDateTime.of(2024, 3, 2, 10, 0),
+            LocalDateTime.of(2024, 3, 3, 0, 1)
+        );
         when(sequenceGenerator.nextSequence(any())).thenReturn(31, 32);
         when(textFormatter.unrepresentedAndUnregisteredCombined("[1 of 2 - 2024-03-02] ",
             "Unrepresented defendant and unregistered defendant solicitor firm. Unrepresented defendant: Resp One"))
@@ -62,6 +66,24 @@ class UnrepresentedAndUnregisteredDefendantStrategyTest {
     @Test
     void supportsReturnsTrueWhenStatePresentEvenIfSubmittedDateMissing() {
         assertThat(strategy.supports(CaseDataBuilder.builder().build())).isTrue();
+    }
+
+    @Test
+    void supportsReturnsFalseWhenCaseDataNull() {
+        assertThat(strategy.supports(null)).isFalse();
+    }
+
+    @Test
+    void contributeDoesNothingWhenNotSupported() {
+        when(stateFlow.getStateHistory()).thenReturn(
+            List.of(State.from(FlowState.Main.CLAIM_ISSUED.fullName()))
+        );
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, CaseDataBuilder.builder().build(), null);
+
+        assertThat(builder.build().getMiscellaneous()).isNullOrEmpty();
+        verifyNoInteractions(sequenceGenerator);
     }
 
     @Test

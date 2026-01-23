@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsRespondentResponseSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
-import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
@@ -35,7 +34,6 @@ public class RespondentFullAdmissionStrategy implements EventHistoryStrategy {
     private final RoboticsSequenceGenerator sequenceGenerator;
     private final RoboticsRespondentResponseSupport respondentResponseSupport;
     private final RoboticsEventTextFormatter textFormatter;
-    private final RoboticsTimelineHelper timelineHelper;
     private final IStateFlowEngine stateFlowEngine;
 
     @Override
@@ -98,7 +96,7 @@ public class RespondentFullAdmissionStrategy implements EventHistoryStrategy {
             return;
         }
 
-        builder.miscellaneous(buildLipVsLrMiscEvent(builder, sequenceGenerator, textFormatter, timelineHelper));
+        builder.miscellaneous(buildLipVsLrMiscEvent(builder, sequenceGenerator, textFormatter));
     }
 
     private boolean hasFullAdmissionState(CaseData caseData) {

@@ -23,6 +23,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 class AcknowledgementOfServiceStrategyTest {
@@ -54,6 +55,25 @@ class AcknowledgementOfServiceStrategyTest {
     void supportsReturnsTrueWhenStatePresentEvenIfAckMissing() {
         CaseData caseData = CaseDataBuilder.builder().build();
         assertThat(strategy.supports(caseData)).isTrue();
+    }
+
+    @Test
+    void supportsReturnsFalseWhenCaseDataNull() {
+        assertThat(strategy.supports(null)).isFalse();
+    }
+
+    @Test
+    void contributeDoesNothingWhenNotSupported() {
+        when(stateFlow.getStateHistory()).thenReturn(
+            List.of(State.from(FlowState.Main.CLAIM_ISSUED.fullName()))
+        );
+        CaseData caseData = CaseDataBuilder.builder().build();
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        assertThat(builder.build().getAcknowledgementOfServiceReceived()).isNullOrEmpty();
+        verifyNoInteractions(sequenceGenerator);
     }
 
     @Test
@@ -155,5 +175,47 @@ class AcknowledgementOfServiceStrategyTest {
             .contains("Defendant: Firm A has acknowledged");
         assertThat(history.getAcknowledgementOfServiceReceived().get(1).getEventDetailsText())
             .contains("Defendant: Firm B has acknowledged");
+    }
+
+    @Test
+    void contributeDoesNothingWhenAcknowledgeDateMissingForSingleDefendant() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent1ClaimResponseIntentionType(ResponseIntention.FULL_DEFENCE)
+            .respondent1AcknowledgeNotificationDate(null)
+            .build();
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventHistory history = builder.build();
+        assertThat(history.getAcknowledgementOfServiceReceived()).isNullOrEmpty();
+    }
+
+    @Test
+    void contributeAddsOnlyExistingAckForTwoSolicitors() {
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.COMPANY);
+        respondent1.setCompanyName("Firm A");
+        Party respondent2 = new Party();
+        respondent2.setType(Party.Type.COMPANY);
+        respondent2.setCompanyName("Firm B");
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent1(respondent1)
+            .respondent1ClaimResponseIntentionType(ResponseIntention.FULL_DEFENCE)
+            .respondent1AcknowledgeNotificationDate(LocalDateTime.of(2024, 3, 1, 9, 0))
+            .respondent2(respondent2)
+            .respondent2ClaimResponseIntentionType(null)
+            .respondent2AcknowledgeNotificationDate(null)
+            .respondent2SameLegalRepresentative(uk.gov.hmcts.reform.civil.enums.YesOrNo.NO)
+            .build();
+
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, caseData, null);
+
+        EventHistory history = builder.build();
+        assertThat(history.getAcknowledgementOfServiceReceived()).hasSize(1);
+        assertThat(history.getAcknowledgementOfServiceReceived().get(0).getEventDetailsText())
+            .contains("Defendant: Firm A has acknowledged");
     }
 }

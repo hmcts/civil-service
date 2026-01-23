@@ -128,6 +128,32 @@ class RoboticsCaseDataSupportTest {
     }
 
     @Test
+    void applyOrganisationUsesContactInformationWhenNoServiceAddress() {
+        ContactInformation contactInformation = ContactInformation.builder()
+            .addressLine1("Contact Line 1")
+            .postCode("AA1 1AA")
+            .dxAddress(List.of(DxAddress.builder().dxNumber("DX 555").build()))
+            .build();
+        uk.gov.hmcts.reform.civil.prd.model.Organisation organisation = mock(
+            uk.gov.hmcts.reform.civil.prd.model.Organisation.class);
+        when(organisation.getName()).thenReturn("Organisation Ltd");
+        when(organisation.getContactInformation()).thenReturn(List.of(contactInformation));
+
+        Solicitor.SolicitorBuilder<?, ?> builder = Solicitor.builder();
+        support.applyOrganisation(builder, organisation, null);
+        Solicitor solicitor = builder.build();
+
+        assertThat(solicitor.getAddresses().getContactAddress().getAddressLine1()).isEqualTo("Contact Line 1");
+        assertThat(solicitor.getContactDX()).isEqualTo("DX 555");
+    }
+
+    @Test
+    void resolveDxReturnsNullWhenContactInfoMissingOrEmpty() {
+        assertThat(support.resolveDx(null)).isNull();
+        assertThat(support.resolveDx(List.of(ContactInformation.builder().build()))).isNull();
+    }
+
+    @Test
     void buildSolicitor_appliesOrganisationAndDetails() {
         ContactInformation contactInformation = ContactInformation.builder()
             .addressLine1("Org Line 1")

@@ -43,9 +43,6 @@ public class ClaimDismissedPastNotificationsStrategy implements EventHistoryStra
 
     @Override
     public void contribute(EventHistory.EventHistoryBuilder builder, CaseData caseData, String authToken) {
-        if (!supports(caseData)) {
-            return;
-        }
         // The flow-state aware overload is used by the mapper; keep this as a no-op to avoid double-emitting.
     }
 

@@ -61,9 +61,7 @@ public class AcknowledgementOfServiceStrategy implements EventHistoryStrategy {
             default -> buildSingleDefendantEvents(builder, caseData);
         };
 
-        if (scenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
-            builder.acknowledgementOfServiceReceived(events);
-        } else if (!events.isEmpty()) {
+        if (scenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP || !events.isEmpty()) {
             builder.acknowledgementOfServiceReceived(events);
         }
     }

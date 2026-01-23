@@ -43,4 +43,17 @@ class RoboticsSequenceGeneratorTest {
 
         assertThat(generator.nextSequence(history)).isEqualTo(1);
     }
+
+    @Test
+    void nextSequenceSkipsNullSequencesAcrossLists() {
+        Event nullSequence = Event.builder().eventSequence(null).dateReceived(LocalDateTime.now()).build();
+        Event maxEvent = Event.builder().eventSequence(7).dateReceived(LocalDateTime.now()).build();
+
+        EventHistory history = EventHistory.builder()
+            .miscellaneous(List.of(nullSequence))
+            .statesPaid(List.of(maxEvent))
+            .build();
+
+        assertThat(generator.nextSequence(history)).isEqualTo(8);
+    }
 }

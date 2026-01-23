@@ -44,6 +44,11 @@ class ClaimDismissedPastNotificationsStrategyTest {
     }
 
     @Test
+    void supportsReturnsFalseWhenCaseDataNull() {
+        assertThat(strategy.supports(null)).isFalse();
+    }
+
+    @Test
     void supportsReturnsTrueWhenDismissedDatePresent() {
         LocalDateTime dismissedDate = LocalDateTime.of(2024, 2, 6, 9, 0);
         CaseData caseData = CaseDataBuilder.builder()
@@ -85,6 +90,22 @@ class ClaimDismissedPastNotificationsStrategyTest {
         assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(40);
         assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
             .isEqualTo("RPA Reason: Claim dismissed. Claimant hasn't notified defendant of the claim details within the allowed 2 weeks.");
+    }
+
+    @Test
+    void contributeNoOpOverloadDoesNotAddEvents() {
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, CaseDataBuilder.builder().build(), null);
+
+        assertThat(builder.build().getMiscellaneous()).isNullOrEmpty();
+    }
+
+    @Test
+    void contributeReturnsWhenFlowStateNull() {
+        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        strategy.contribute(builder, CaseDataBuilder.builder().build(), null, null);
+
+        assertThat(builder.build().getMiscellaneous()).isNullOrEmpty();
     }
 
     @Test

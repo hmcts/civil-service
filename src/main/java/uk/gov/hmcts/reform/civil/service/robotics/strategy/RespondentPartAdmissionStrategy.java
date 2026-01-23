@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsRespondentResponseSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
-import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
@@ -42,7 +41,6 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
 
     private final RoboticsSequenceGenerator sequenceGenerator;
     private final RoboticsRespondentResponseSupport respondentResponseSupport;
-    private final RoboticsTimelineHelper timelineHelper;
     private final RoboticsEventTextFormatter textFormatter;
     private final IStateFlowEngine stateFlowEngine;
 
@@ -52,15 +50,10 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
             return false;
         }
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-        boolean hasState = stateFlow.getStateHistory().stream()
+
+        return stateFlow.getStateHistory().stream()
             .map(State::getName)
             .anyMatch(FlowState.Main.PART_ADMISSION.fullName()::equals);
-
-        if (!hasState) {
-            return false;
-        }
-
-        return true;
     }
 
     @Override
@@ -70,7 +63,7 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
         }
         log.info("Building respondent part admission robotics events for caseId {}", caseData.getCcdCaseReference());
 
-        List<Event> directionsQuestionnaireEvents = new ArrayList<>();
+        DirectionsQuestionnaireCollector dqCollector = new DirectionsQuestionnaireCollector();
 
         if (defendant1ResponseExists.test(caseData)) {
             addLipVsLrMisc(builder, caseData);
@@ -83,7 +76,7 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
 
             addRespondentMisc(builder, caseData, caseData.getRespondent1(), true, caseData.getRespondent1ResponseDate());
 
-            directionsQuestionnaireEvents.add(buildDirectionsQuestionnaireEvent(
+            dqCollector.add(buildDirectionsQuestionnaireEvent(
                 builder,
                 sequenceGenerator,
                 caseData.getRespondent1ResponseDate(),
@@ -106,7 +99,7 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
                     false,
                     respondentResponseSupport.resolveRespondent2ResponseDate(caseData)
                 );
-                directionsQuestionnaireEvents.add(buildDirectionsQuestionnaireEvent(
+                dqCollector.add(buildDirectionsQuestionnaireEvent(
                     builder,
                     sequenceGenerator,
                     respondentResponseSupport.resolveRespondent2ResponseDate(caseData),
@@ -122,7 +115,7 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
             builder.receiptOfPartAdmission(addReceiptOfPartAdmissionEvent(builder, caseData.getRespondent2ResponseDate(), RESPONDENT2_ID));
             addRespondentMisc(builder, caseData, caseData.getRespondent2(), false, caseData.getRespondent2ResponseDate());
 
-            directionsQuestionnaireEvents.add(buildDirectionsQuestionnaireEvent(
+            dqCollector.add(buildDirectionsQuestionnaireEvent(
                 builder,
                 sequenceGenerator,
                 caseData.getRespondent2ResponseDate(),
@@ -134,7 +127,7 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
         }
 
         builder.clearDirectionsQuestionnaireFiled()
-            .directionsQuestionnaireFiled(directionsQuestionnaireEvents);
+            .directionsQuestionnaireFiled(dqCollector.events());
     }
 
     private boolean useStatesPaid(CaseData caseData) {
@@ -179,7 +172,7 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
             return;
         }
 
-        builder.miscellaneous(buildLipVsLrMiscEvent(builder, sequenceGenerator, textFormatter, timelineHelper));
+        builder.miscellaneous(buildLipVsLrMiscEvent(builder, sequenceGenerator, textFormatter));
     }
 
     private String prepareEventDetailsText(CaseData caseData,
@@ -187,5 +180,17 @@ public class RespondentPartAdmissionStrategy implements EventHistoryStrategy {
                                            Party respondent,
                                            boolean isRespondent1) {
         return respondentResponseSupport.prepareFullDefenceEventText(dq, caseData, isRespondent1, respondent);
+    }
+
+    private static final class DirectionsQuestionnaireCollector {
+        private final List<Event> events = new ArrayList<>();
+
+        private void add(Event event) {
+            events.add(event);
+        }
+
+        private List<Event> events() {
+            return events;
+        }
     }
 }
