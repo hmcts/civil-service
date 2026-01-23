@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -23,11 +24,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1_MULTIPARTY_SAME_SOL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1_MULTIPARTY_SAME_SOL_OTHER_REMEDY;
@@ -93,7 +96,8 @@ public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<S
             .isClaimDeclarationAdded(caseData.getIsClaimDeclarationAdded())
             .claimDeclarationDescription(caseData.getClaimDeclarationDescription())
             .isHumanRightsActIssues(caseData.getIsHumanRightsActIssues())
-            .courtFee(caseData.getClaimFee().formData());
+            .courtFee(caseData.getClaimFee().formData())
+            .otherRemedyFee(YES.equals(caseData.getIsClaimDeclarationAdded()) && nonNull(caseData.getOtherRemedyFee()) ? caseData.getOtherRemedyFee().formData() : null);
 
         if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
             sealedClaimFormBuilder.respondent2ExternalReference(caseData.getRespondentSolicitor2Reference());
