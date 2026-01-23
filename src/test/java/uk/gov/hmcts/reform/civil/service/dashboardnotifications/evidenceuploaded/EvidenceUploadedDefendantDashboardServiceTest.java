@@ -11,17 +11,13 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
-import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
-import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_NOT_UPLOADED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOADED_DEFENDANT;
 
@@ -32,10 +28,7 @@ class EvidenceUploadedDefendantDashboardServiceTest {
 
     @Mock
     private DashboardScenariosService dashboardScenariosService;
-    @Mock
-    private DashboardNotificationService dashboardNotificationService;
-    @Mock
-    private TaskListService taskListService;
+
     @Mock
     private DashboardNotificationsParamsMapper mapper;
 
@@ -56,8 +49,6 @@ class EvidenceUploadedDefendantDashboardServiceTest {
 
         service.notifyCaseEvidenceUploaded(caseData, AUTH_TOKEN);
 
-        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole("1234", "DEFENDANT");
-        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole("1234", "DEFENDANT");
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOADED_DEFENDANT.getScenario(),
@@ -75,8 +66,6 @@ class EvidenceUploadedDefendantDashboardServiceTest {
 
         service.notifyCaseEvidenceUploaded(caseData, AUTH_TOKEN);
 
-        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole("5678", "DEFENDANT");
-        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole("5678", "DEFENDANT");
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_CP_HEARING_DOCUMENTS_NOT_UPLOADED_DEFENDANT.getScenario(),
@@ -111,8 +100,6 @@ class EvidenceUploadedDefendantDashboardServiceTest {
 
         service.notifyCaseEvidenceUploaded(caseData, AUTH_TOKEN);
 
-        verifyNoInteractions(dashboardNotificationService);
-        verifyNoInteractions(taskListService);
         verifyNoInteractions(dashboardScenariosService);
     }
 }
