@@ -27,7 +27,6 @@ public class ClaimIssueClaimantDashboardService extends DashboardScenarioService
         recordScenario(caseData, authToken);
     }
 
-
     @Override
     protected boolean shouldRecordScenario(CaseData caseData) {
         return featureToggleService.isLipVLipEnabled();
@@ -41,7 +40,7 @@ public class ClaimIssueClaimantDashboardService extends DashboardScenarioService
     @Override
     protected Map<String, Boolean> getScenarios(CaseData caseData) {
         Map<String, Boolean> scenarios = new HashMap<>();
-        if(featureToggleService.isLipVLipEnabled()) {
+        if (featureToggleService.isLipVLipEnabled()) {
             if (featureToggleService.isLipQueryManagementEnabled(caseData)) {
                 scenarios.put(DashboardScenarios.SCENARIO_AAA6_APPLICATIONS_TO_THE_COURT.getScenario(), true);
                 scenarios.put(DashboardScenarios.SCENARIO_AAA6_MESSAGES_TO_THE_COURT.getScenario(), true);
