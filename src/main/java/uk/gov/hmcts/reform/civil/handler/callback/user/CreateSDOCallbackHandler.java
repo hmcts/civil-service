@@ -962,31 +962,23 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
     }
 
-    private void populatePpiFields(CaseData caseData, boolean isSmallClaimsTrack, boolean isFastTrack) {
-        if (isSmallClaimsTrack) {
-            if (SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimPPI")) {
-                caseData.setSmallClaimsPPI(getOrCreatePpi(caseData.getSmallClaimsPPI()));
-            } else {
-                caseData.setSmallClaimsPPI(null);
-            }
+    private void populatePpiFields(CaseData caseData) {
+        if (SdoHelper.isSmallClaimsTrack(caseData) && SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimPPI")) {
+            PPI smallClaimsPpi = new PPI();
+            smallClaimsPpi.setPpiDate(LocalDate.now().plusDays(28));
+            smallClaimsPpi.setText(SdoR2UiConstantSmallClaim.PPI_DESCRIPTION);
+            caseData.setSmallClaimsPPI(smallClaimsPpi);
+        } else {
+            caseData.setSmallClaimsPPI(null);
         }
-
-        if (isFastTrack) {
-            if (SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimPPI")) {
-                caseData.setFastTrackPPI(getOrCreatePpi(caseData.getFastTrackPPI()));
-            } else {
-                caseData.setFastTrackPPI(null);
-            }
+        if (SdoHelper.isFastTrack(caseData) && SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimPPI")) {
+            PPI fastTrackPpi = new PPI();
+            fastTrackPpi.setPpiDate(LocalDate.now().plusDays(28));
+            fastTrackPpi.setText(SdoR2UiConstantSmallClaim.PPI_DESCRIPTION);
+            caseData.setFastTrackPPI(fastTrackPpi);
+        } else {
+            caseData.setFastTrackPPI(null);
         }
-    }
-
-    private PPI getOrCreatePpi(PPI existingPpi) {
-        PPI ppi = existingPpi != null ? existingPpi : new PPI();
-        if (ppi.getPpiDate() == null) {
-            ppi.setPpiDate(LocalDate.now().plusDays(28));
-        }
-        ppi.setText(SdoR2UiConstantSmallClaim.PPI_DESCRIPTION);
-        return ppi;
     }
 
     private void prePopulateNihlFields(CaseData updatedData, DynamicList hearingMethodList,
@@ -1254,22 +1246,19 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         caseData.setSetFastTrackFlag(NO);
         caseData.setIsSdoR2NewScreen(NO);
 
-        boolean isSmallClaimsTrack = SdoHelper.isSmallClaimsTrack(caseData);
-        boolean isFastTrack = SdoHelper.isFastTrack(caseData);
-
-        if (isSmallClaimsTrack) {
+        if (SdoHelper.isSmallClaimsTrack(caseData)) {
             caseData.setSetSmallClaimsFlag(YES);
             if (SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
                 caseData.setIsSdoR2NewScreen(YES);
             }
-        } else if (isFastTrack) {
+        } else if (SdoHelper.isFastTrack(caseData)) {
             caseData.setSetFastTrackFlag(YES);
             if (SdoHelper.isNihlFastTrack(caseData)) {
                 caseData.setIsSdoR2NewScreen(YES);
             }
         }
 
-        populatePpiFields(caseData, isSmallClaimsTrack, isFastTrack);
+        populatePpiFields(caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
