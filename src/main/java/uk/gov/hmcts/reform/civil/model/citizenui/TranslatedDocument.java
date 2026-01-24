@@ -113,4 +113,20 @@ public class TranslatedDocument {
                 throw new DocumentUploadException("No document file type found for Translated document");
         }
     }
+
+    public static TranslatedDocument builder() {
+        return new TranslatedDocument();
+    }
+
+    public TranslatedDocument documentType(TranslatedDocumentType documentType) {
+        return setDocumentType(documentType);
+    }
+
+    public TranslatedDocument file(Document file) {
+        return setFile(file);
+    }
+
+    public TranslatedDocument build() {
+        return this;
+    }
 }

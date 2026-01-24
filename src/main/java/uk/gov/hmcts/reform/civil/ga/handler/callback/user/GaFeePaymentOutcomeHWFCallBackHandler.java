@@ -67,14 +67,14 @@ public class GaFeePaymentOutcomeHWFCallBackHandler extends CallbackHandler imple
     private CallbackResponse setData(CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        FeePaymentOutcomeDetails.FeePaymentOutcomeDetailsBuilder feeDetailBuilder = FeePaymentOutcomeDetails.builder();
-        feeDetailBuilder.hwfNumberAvailable(YesOrNo.NO);
+        FeePaymentOutcomeDetails feePaymentOutcomeDetails = new FeePaymentOutcomeDetails();
+        feePaymentOutcomeDetails.setHwfNumberAvailable(YesOrNo.NO);
         if (Objects.nonNull(caseData.getGeneralAppHelpWithFees())
             && Objects.nonNull(caseData.getGeneralAppHelpWithFees().getHelpWithFeesReferenceNumber())) {
-            feeDetailBuilder.hwfNumberAvailable(YesOrNo.YES)
-                .hwfNumberForFeePaymentOutcome(caseData.getGeneralAppHelpWithFees().getHelpWithFeesReferenceNumber());
+            feePaymentOutcomeDetails.setHwfNumberAvailable(YesOrNo.YES)
+                .setHwfNumberForFeePaymentOutcome(caseData.getGeneralAppHelpWithFees().getHelpWithFeesReferenceNumber());
         }
-        caseDataBuilder.feePaymentOutcomeDetails(feeDetailBuilder.build());
+        caseDataBuilder.feePaymentOutcomeDetails(feePaymentOutcomeDetails);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();

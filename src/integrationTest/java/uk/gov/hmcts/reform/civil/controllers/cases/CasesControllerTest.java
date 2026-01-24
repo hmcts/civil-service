@@ -482,7 +482,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
             when(gaCaseEventService.submitEvent(any())).thenReturn(expectedCaseDetails);
             doPost(
                 BEARER_TOKEN,
-                EventDto.builder().event(CaseEvent.RESPOND_TO_APPLICATION).caseDataUpdate(Map.of()).build(),
+                new EventDto().setEvent(CaseEvent.RESPOND_TO_APPLICATION).setCaseDataUpdate(Map.of()),
                 GA_SUBMIT_EVENT_URL,
                 "123",
                 "123"
