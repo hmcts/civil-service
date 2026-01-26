@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.MarkPaidConsentList;
 import uk.gov.hmcts.reform.civil.model.Bundle;
@@ -572,6 +573,24 @@ public class DashboardNotificationsParamsMapperTest {
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData, caseEvent);
 
         assertThat(result).extracting("orderDocument").isEqualTo("binary-url");
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = CaseEvent.class, names = {
+        "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT",
+        "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT"
+    })
+    void shouldNotMapOrderDocument_whenWelshEnabledAndBilingual(CaseEvent caseEvent) {
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+        caseData.setClaimantBilingualLanguagePreference(Language.WELSH.toString());
+
+        List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
+        finalCaseDocuments.add(element(generateOrder(JUDGE_FINAL_ORDER)));
+        caseData.setFinalOrderDocumentCollection(finalCaseDocuments);
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData, caseEvent);
+
+        assertThat(result).doesNotContainKey("orderDocument");
     }
 
     @ParameterizedTest
