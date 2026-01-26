@@ -5,12 +5,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.util.ContentCachingRequestWrapper;
+import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.context.request.WebRequest;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentUploadException;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
@@ -72,9 +75,14 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>("Document upload unsuccessful", new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public ResponseEntity<Object> documentUploadException(MaxUploadSizeExceededException maxUploadSizeExceededException,
-                                                          ContentCachingRequestWrapper contentCachingRequestWrapper) {
+    @Override
+    protected ResponseEntity<Object> handleMaxUploadSizeExceededException(
+        MaxUploadSizeExceededException maxUploadSizeExceededException,
+        HttpHeaders headers,
+        HttpStatusCode status,
+        WebRequest request
+    ) {
+        ContentCachingRequestWrapper contentCachingRequestWrapper = getContentCachingRequestWrapper(request);
         String errorMessage = "Max upload size exceeded error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(
             maxUploadSizeExceededException.getMessage(),
@@ -120,5 +128,14 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
             getUserId(contentCachingRequestWrapper)
         ));
         return new ResponseEntity<>(userNotFoundOnCaseException.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
+    }
+
+    private ContentCachingRequestWrapper getContentCachingRequestWrapper(WebRequest request) {
+        if (request instanceof ServletWebRequest servletWebRequest) {
+            if (servletWebRequest.getRequest() instanceof ContentCachingRequestWrapper wrapper) {
+                return wrapper;
+            }
+        }
+        return null;
     }
 }

@@ -115,6 +115,42 @@ class BundleRequestExecutorTest {
     }
 
     @Test
+    void whenPostIsCalledAndEndpointReturnsUnknownStatus_thenThrowsRetryable() {
+        String endpoint = "some url";
+        CaseDetails responseCaseDetails = CaseDetails.builder().build();
+        ResponseEntity<CaseDetails> responseEntity = ResponseEntity.status(499).body(responseCaseDetails);
+        given(evidenceManagementApiClient.stitchBundle(any(), any(), any(BundleRequest.class)))
+            .willReturn(responseEntity);
+
+        BundleRequest request = BundleRequest.builder().build();
+        RetryableStitchingException exception = assertThrows(
+            RetryableStitchingException.class,
+            () -> bundleRequestExecutor.post(request, endpoint, "not important")
+        );
+
+        assertEquals("Stitching failed, retrying...", exception.getMessage());
+    }
+
+    @Test
+    void whenPostIsCalledAndErrorPayloadIsNotJson_thenThrowsRetryable() {
+        String endpoint = "some url";
+        String errorData = "not-json";
+        given(evidenceManagementApiClient.stitchBundle(any(), any(), any(BundleRequest.class)))
+            .willThrow(new RestClientResponseException("random exception", 500, "Internal server error",
+                                                       HttpHeaders.EMPTY, errorData.getBytes(),
+                                                       Charset.defaultCharset()
+            ));
+        BundleRequest request = BundleRequest.builder().build();
+
+        RetryableStitchingException exception = assertThrows(
+            RetryableStitchingException.class,
+            () -> bundleRequestExecutor.post(request, endpoint, "not important")
+        );
+
+        assertEquals("Stitching failed, retrying...", exception.getMessage());
+    }
+
+    @Test
     public void whenRecoveryNeededReturnEmptyOptional() {
         assertThat(bundleRequestExecutor.recover(new RetryableStitchingException(), null, null, null))
             .isEqualTo(Optional.empty());
