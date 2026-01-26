@@ -647,7 +647,8 @@ public class DashboardNotificationsParamsMapperTest {
 
         Map<String, Object> result =
             mapper.mapCaseDataToParams(caseData, CaseEvent.ADD_CASE_NOTE);
-        assertThat(result).doesNotContainEntry("orderDocument", null);
+        assertThat(result).doesNotContainKey("orderDocument");
+        assertThat(result).doesNotContainKey("hiddenOrderDocument");
     }
 
     @Test
@@ -658,7 +659,8 @@ public class DashboardNotificationsParamsMapperTest {
 
         Map<String, Object> result =
             mapper.mapCaseDataToParams(caseData, null);
-        assertThat(result).doesNotContainEntry("orderDocument", null);
+        assertThat(result).doesNotContainKey("orderDocument");
+        assertThat(result).doesNotContainKey("hiddenOrderDocument");
     }
 
     @Test
@@ -686,9 +688,24 @@ public class DashboardNotificationsParamsMapperTest {
 
     @Test
     void shouldNotThrowException_whenSdoDocumentIsNull() {
-        caseData.setSdoOrderDocument(null);
+        caseData.setSystemGeneratedCaseDocuments(null);
+        caseData.setPreTranslationDocuments(null);
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT);
         assertThat(result).doesNotContainKey("orderDocument");
+        assertThat(result).doesNotContainKey("hiddenOrderDocument");
+    }
+
+    @Test
+    void shouldNotThrowException_whenHiddenSdoDocumentIsNull() {
+        List<Element<CaseDocument>> systemGeneratedDocuments = new ArrayList<>();
+        systemGeneratedDocuments.add(element(generateOrder(SDO_ORDER)));
+        caseData.setSystemGeneratedCaseDocuments(systemGeneratedDocuments);
+        caseData.setPreTranslationDocuments(null);
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT);
+
+        assertThat(result).extracting("orderDocument").isEqualTo("binary-url");
+        assertThat(result).doesNotContainKey("hiddenOrderDocument");
     }
 
     @Test
@@ -758,4 +775,3 @@ public class DashboardNotificationsParamsMapperTest {
             markedPaidInFullDate, false));
     }
 }
-
