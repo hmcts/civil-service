@@ -10,7 +10,9 @@ import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementVariable
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_QUERY_RAISED_BY_OTHER_PARTY_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_QUERY_RAISED_BY_OTHER_PARTY_CLAIMANT_DELETE;
@@ -37,6 +39,9 @@ public class RaiseQueryDashboardService extends DashboardScenarioService {
     }
 
     public void notifyRaiseQuery(CaseData caseData, String authToken) {
+        if (caseData.isLipCase()) {
+            deleteDuplicateNotifications(caseData, authToken);
+        }
         recordScenario(caseData, authToken);
     }
 
@@ -71,8 +76,17 @@ public class RaiseQueryDashboardService extends DashboardScenarioService {
     }
 
     @Override
-    protected void beforeRecordScenario(CaseData caseData, String authToken) {
-        deleteDuplicateNotifications(caseData, authToken);
+    protected Map<String, Boolean> getScenarios(CaseData caseData) {
+        Map<String, Boolean> scenarios = new HashMap<>();
+        if (!shouldRecordScenario(caseData)) {
+            return scenarios;
+        }
+        List<String> roles = getQueryCreatorRoles(caseData);
+        if (roles.isEmpty()) {
+            scenarios.put(SCENARIO_AAA6_QUERY_RAISED_BY_OTHER_PARTY_CLAIMANT.getScenario(), true);
+            scenarios.put(SCENARIO_AAA6_QUERY_RAISED_BY_OTHER_PARTY_DEFENDANT.getScenario(), true);
+        }
+        return scenarios;
     }
 
     private void deleteDuplicateNotifications(CaseData caseData, String authToken) {
