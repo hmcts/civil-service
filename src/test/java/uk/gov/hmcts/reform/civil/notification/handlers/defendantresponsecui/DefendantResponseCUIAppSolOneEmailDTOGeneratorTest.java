@@ -131,12 +131,11 @@ public class DefendantResponseCUIAppSolOneEmailDTOGeneratorTest {
         CaseData caseData = CaseData.builder()
             .applicant1Represented(YES)
             .caseDataLiP(
-                CaseDataLiP.builder()
-                    .respondent1LiPResponse(
-                        RespondentLiPResponse.builder()
-                            .respondent1ResponseLanguage(BOTH.toString())
-                            .build()
-                    ).build()
+                new CaseDataLiP()
+                    .setRespondent1LiPResponse(
+                        new RespondentLiPResponse()
+                            .setRespondent1ResponseLanguage(BOTH.toString())
+                    )
             ).build();
 
         assertThat(emailDTOGenerator.getShouldNotify(caseData)).isFalse();
@@ -154,12 +153,11 @@ public class DefendantResponseCUIAppSolOneEmailDTOGeneratorTest {
         CaseData caseData = CaseData.builder()
             .applicant1Represented(NO)
             .caseDataLiP(
-                CaseDataLiP.builder()
-                    .respondent1LiPResponse(
-                        RespondentLiPResponse.builder()
-                            .respondent1ResponseLanguage(BOTH.toString())
-                            .build()
-                    ).build()
+                new CaseDataLiP()
+                    .setRespondent1LiPResponse(
+                        new RespondentLiPResponse()
+                            .setRespondent1ResponseLanguage(BOTH.toString())
+                    )
             ).build();
 
         assertThat(emailDTOGenerator.getShouldNotify(caseData)).isFalse();

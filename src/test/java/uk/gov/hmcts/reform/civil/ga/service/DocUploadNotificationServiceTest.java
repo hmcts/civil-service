@@ -90,7 +90,7 @@ public class DocUploadNotificationServiceTest {
         @BeforeEach
         void setup() {
             when(notificationsProperties.getEvidenceUploadTemplate())
-                    .thenReturn("general-apps-notice-of-document-template-id");
+                .thenReturn("general-apps-notice-of-document-template-id");
             when(notificationsProperties.getLipGeneralAppApplicantEmailTemplate())
                 .thenReturn("ga-notice-of-document-lip-appln-template-id");
             when(notificationsProperties.getLipGeneralAppApplicantEmailTemplateInWelsh())
@@ -105,21 +105,24 @@ public class DocUploadNotificationServiceTest {
             when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
             when(configuration.getWelshContact()).thenReturn("E-bost: ymholiadaucymraeg@justice.gov.uk");
             when(configuration.getSpecContact()).thenReturn("Email: contactocmc@justice.gov.uk");
-            when(configuration.getWelshHmctsSignature()).thenReturn("Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
+            when(configuration.getWelshHmctsSignature()).thenReturn(
+                "Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
             when(configuration.getWelshPhoneContact()).thenReturn("Ffôn: 0300 303 5174");
-            when(configuration.getWelshOpeningHours()).thenReturn("Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
+            when(configuration.getWelshOpeningHours()).thenReturn(
+                "Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
         }
 
         @Test
         void appNotificationShouldSendWhenInvoked() {
             GeneralApplicationCaseData caseData = getCaseData(true, NO, NO);
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(
+                CaseState.CASE_PROGRESSION).build());
             docUploadNotificationService.notifyApplicantEvidenceUpload(caseData);
             verify(notificationService, times(1)).sendMail(
-                    DUMMY_EMAIL,
-                    "general-apps-notice-of-document-template-id",
-                    getNotificationDataMap(false, false),
-                    "general-apps-notice-of-document-upload-" + CASE_REFERENCE
+                DUMMY_EMAIL,
+                "general-apps-notice-of-document-template-id",
+                getNotificationDataMap(false, false),
+                "general-apps-notice-of-document-upload-" + CASE_REFERENCE
             );
         }
 
@@ -127,7 +130,8 @@ public class DocUploadNotificationServiceTest {
         void appNotificationWithSolicitorReferenceAdded() {
 
             GeneralApplicationCaseData caseData = getCaseData(false, NO, NO);
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(
+                CaseState.CASE_PROGRESSION).build());
             docUploadNotificationService.notifyApplicantEvidenceUpload(caseData);
             verify(notificationService, times(1)).sendMail(
                 DUMMY_EMAIL,
@@ -139,23 +143,26 @@ public class DocUploadNotificationServiceTest {
 
         @Test
         void respNotificationShouldSendTwice1V2() {
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
-            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(
+                CaseState.CASE_PROGRESSION).build());
+            when(configuration.getSpecUnspecContact()).thenReturn(
+                "Email for Specified Claims: contactocmc@justice.gov.uk "
+                    + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
             GeneralApplicationCaseData caseData = getCaseData(true, NO, YES);
             docUploadNotificationService.notifyRespondentEvidenceUpload(caseData);
             verify(notificationService, times(2)).sendMail(
-                    DUMMY_EMAIL,
-                    "general-apps-notice-of-document-template-id",
-                    getNotificationDataMap(false, true),
-                    "general-apps-notice-of-document-upload-" + CASE_REFERENCE
+                DUMMY_EMAIL,
+                "general-apps-notice-of-document-template-id",
+                getNotificationDataMap(false, true),
+                "general-apps-notice-of-document-upload-" + CASE_REFERENCE
             );
         }
 
         @Test
         void lipApplicantNotificationShouldSendWhenInvoked() {
-            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+            when(configuration.getSpecUnspecContact()).thenReturn(
+                "Email for Specified Claims: contactocmc@justice.gov.uk "
+                    + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
             when(gaForLipService.isLipApp(any())).thenReturn(true);
             GeneralApplicationCaseData caseData = getCaseData(true, YES, NO);
@@ -171,13 +178,15 @@ public class DocUploadNotificationServiceTest {
 
         @Test
         void lipApplicantNotificationShouldSendWhenInvoked_whenMainClaimIssuedInWelsh() {
-            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+            when(configuration.getSpecUnspecContact()).thenReturn(
+                "Email for Specified Claims: contactocmc@justice.gov.uk "
+                    + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
             when(gaForLipService.isLipApp(any())).thenReturn(true);
             GeneralApplicationCaseData caseData =
                 getCaseData(true, YES, NO).toBuilder().applicantBilingualLanguagePreference(YES).build();
-            GeneralApplicationCaseData claimantClaimIssueFlag = GeneralApplicationCaseData.builder().applicantBilingualLanguagePreference(YES)
+            GeneralApplicationCaseData claimantClaimIssueFlag = GeneralApplicationCaseData.builder().applicantBilingualLanguagePreference(
+                    YES)
                 .claimantBilingualLanguagePreference("WELSH").build();
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(claimantClaimIssueFlag);
             docUploadNotificationService.notifyApplicantEvidenceUpload(caseData);
@@ -191,8 +200,9 @@ public class DocUploadNotificationServiceTest {
 
         @Test
         void lipRespondentNotificationShouldSend() {
-            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+            when(configuration.getSpecUnspecContact()).thenReturn(
+                "Email for Specified Claims: contactocmc@justice.gov.uk "
+                    + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
             when(gaForLipService.isLipApp(any())).thenReturn(false);
             when(gaForLipService.isLipResp(any())).thenReturn(true);
@@ -216,8 +226,9 @@ public class DocUploadNotificationServiceTest {
 
         @Test
         void lipRespondentNotificationShouldSend_whenRespondentResponseInWelsh() {
-            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+            when(configuration.getSpecUnspecContact()).thenReturn(
+                "Email for Specified Claims: contactocmc@justice.gov.uk "
+                    + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
             when(gaForLipService.isLipApp(any())).thenReturn(false);
             when(gaForLipService.isLipResp(any())).thenReturn(true);
@@ -230,8 +241,7 @@ public class DocUploadNotificationServiceTest {
             GeneralApplicationCaseData caseData = getCaseData(true, NO, YES).toBuilder()
                 .generalAppRespondentSolicitors(respondentSols).respondentBilingualLanguagePreference(YES).build();
             GeneralApplicationCaseData claimantClaimIssueFlag = GeneralApplicationCaseData.builder().respondentBilingualLanguagePreference(YES)
-                .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(
-                Language.BOTH.toString()).build()).build();
+                .respondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage(Language.BOTH.toString())).build();
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(claimantClaimIssueFlag);
             docUploadNotificationService.notifyRespondentEvidenceUpload(caseData);
             verify(notificationService, times(1)).sendMail(
@@ -249,16 +259,26 @@ public class DocUploadNotificationServiceTest {
             customProp.put(NotificationDataGA.CASE_TITLE, "CL v DEF");
             customProp.put(NotificationDataGA.PARTY_REFERENCE, PARTY_REFERENCE);
             customProp.put(NotificationDataGA.WELSH_CONTACT, "E-bost: ymholiadaucymraeg@justice.gov.uk");
-            customProp.put(NotificationDataGA.WELSH_HMCTS_SIGNATURE, "Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
-            customProp.put(NotificationDataGA.WELSH_OPENING_HOURS, "Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
+            customProp.put(
+                NotificationDataGA.WELSH_HMCTS_SIGNATURE,
+                "Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF"
+            );
+            customProp.put(
+                NotificationDataGA.WELSH_OPENING_HOURS,
+                "Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm"
+            );
             customProp.put(NotificationDataGA.WELSH_PHONE_CONTACT, "Ffôn: 0300 303 5174");
             customProp.put(NotificationDataGA.SPEC_CONTACT, "Email: contactocmc@justice.gov.uk");
-            customProp.put(NotificationDataGA.SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk "
-                + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+            customProp.put(
+                NotificationDataGA.SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk "
+                    + "\n Email for Damages Claims: damagesclaims@justice.gov.uk"
+            );
             customProp.put(NotificationDataGA.HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
             customProp.put(NotificationDataGA.OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
-            customProp.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
-                + "\n For all other matters, call 0300 123 7050");
+            customProp.put(
+                NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
+                    + "\n For all other matters, call 0300 123 7050"
+            );
 
             if (isLipAppln == YES) {
                 customProp.put(NotificationDataGA.GA_LIP_APPLICANT_NAME, "App");
@@ -282,20 +302,30 @@ public class DocUploadNotificationServiceTest {
                 properties.put(NotificationDataGA.PARTY_REFERENCE, PARTY_REFERENCE);
             }
             properties.put(NotificationDataGA.WELSH_CONTACT, "E-bost: ymholiadaucymraeg@justice.gov.uk");
-            properties.put(NotificationDataGA.WELSH_HMCTS_SIGNATURE, "Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
-            properties.put(NotificationDataGA.WELSH_OPENING_HOURS, "Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
+            properties.put(
+                NotificationDataGA.WELSH_HMCTS_SIGNATURE,
+                "Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF"
+            );
+            properties.put(
+                NotificationDataGA.WELSH_OPENING_HOURS,
+                "Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm"
+            );
             properties.put(NotificationDataGA.WELSH_PHONE_CONTACT, "Ffôn: 0300 303 5174");
             properties.put(NotificationDataGA.SPEC_CONTACT, "Email: contactocmc@justice.gov.uk");
             if (isLipCase) {
-                properties.put(NotificationData.SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk "
-                    + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+                properties.put(
+                    NotificationData.SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk "
+                        + "\n Email for Damages Claims: damagesclaims@justice.gov.uk"
+                );
             } else {
                 properties.put(NotificationData.SPEC_UNSPEC_CONTACT, RAISE_QUERY_LR);
             }
             properties.put(NotificationData.HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
             properties.put(NotificationData.OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
-            properties.put(NotificationData.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
-                + "\n For all other matters, call 0300 123 7050");
+            properties.put(
+                NotificationData.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
+                    + "\n For all other matters, call 0300 123 7050"
+            );
             return properties;
         }
 
@@ -304,10 +334,10 @@ public class DocUploadNotificationServiceTest {
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
             GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-                    .email(DUMMY_EMAIL).forename("forename").organisationIdentifier("2").build();
+                .email(DUMMY_EMAIL).forename("forename").organisationIdentifier("2").build();
 
             GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id("id")
-                    .email(DUMMY_EMAIL).forename("forename").organisationIdentifier("3").build();
+                .email(DUMMY_EMAIL).forename("forename").organisationIdentifier("3").build();
 
             respondentSols.add(element(respondent1));
             respondentSols.add(element(respondent2));
@@ -315,65 +345,65 @@ public class DocUploadNotificationServiceTest {
             if (isMet) {
 
                 return new GeneralApplicationCaseDataBuilder()
-                        .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
-                                .email(DUMMY_EMAIL).organisationIdentifier("1").build())
-                        .generalAppRespondentSolicitors(respondentSols)
-                        .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
-                        .applicantPartyName("App")
-                        .claimant1PartyName("CL")
-                        .defendant1PartyName("DEF")
-                        .isGaRespondentOneLip(isGaRespondentOneLip)
-                        .isGaApplicantLip(isGaApplicantLip)
-                        .businessProcess(BusinessProcess.builder().status(STARTED)
-                                .processInstanceId(PROCESS_INSTANCE_ID).build())
-                        .gaInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
-                        .gaUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
-                        .parentClaimantIsApplicant(YES)
-                        .gaRespondentOrderAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
-                        .respondentSolicitor1EmailAddress(DUMMY_EMAIL)
-                        .respondentSolicitor2EmailAddress(DUMMY_EMAIL)
-                        .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                .organisation(Organisation.builder().organisationID("1").build())
-                                .build())
-                        .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                .organisation(Organisation.builder().organisationID("2").build())
-                                .build())
-                        .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                .organisation(Organisation.builder().organisationID("3").build())
-                                .build())
-                        .ccdCaseReference(CASE_REFERENCE)
-                        .build();
+                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
+                                                  .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                    .generalAppRespondentSolicitors(respondentSols)
+                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
+                    .applicantPartyName("App")
+                    .claimant1PartyName("CL")
+                    .defendant1PartyName("DEF")
+                    .isGaRespondentOneLip(isGaRespondentOneLip)
+                    .isGaApplicantLip(isGaApplicantLip)
+                    .businessProcess(BusinessProcess.builder().status(STARTED)
+                                         .processInstanceId(PROCESS_INSTANCE_ID).build())
+                    .gaInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
+                    .gaUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
+                    .parentClaimantIsApplicant(YES)
+                    .gaRespondentOrderAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
+                    .respondentSolicitor1EmailAddress(DUMMY_EMAIL)
+                    .respondentSolicitor2EmailAddress(DUMMY_EMAIL)
+                    .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                                                      .organisation(Organisation.builder().organisationID("1").build())
+                                                      .build())
+                    .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                                       .organisation(Organisation.builder().organisationID("2").build())
+                                                       .build())
+                    .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                                                       .organisation(Organisation.builder().organisationID("3").build())
+                                                       .build())
+                    .ccdCaseReference(CASE_REFERENCE)
+                    .build();
             } else {
                 return new GeneralApplicationCaseDataBuilder()
-                        .emailPartyReference("Claimant Reference: ABC Ltd - Defendant Reference: Defendant Ltd")
-                        .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
-                                                      .email(DUMMY_EMAIL).organisationIdentifier("1").build())
-                        .generalAppRespondentSolicitors(respondentSols)
-                        .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
-                        .applicantPartyName("App")
-                        .claimant1PartyName("CL")
-                        .defendant1PartyName("DEF")
-                        .isGaRespondentOneLip(isGaRespondentOneLip)
-                        .isGaApplicantLip(isGaApplicantLip)
-                        .businessProcess(BusinessProcess.builder().status(STARTED)
-                                             .processInstanceId(PROCESS_INSTANCE_ID).build())
-                        .gaInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
-                        .gaUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
-                        .parentClaimantIsApplicant(YES)
-                        .gaRespondentOrderAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
-                        .respondentSolicitor1EmailAddress(DUMMY_EMAIL)
-                        .respondentSolicitor2EmailAddress(DUMMY_EMAIL)
-                        .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                                          .organisation(Organisation.builder().organisationID("1").build())
-                                                          .build())
-                        .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                                           .organisation(Organisation.builder().organisationID("2").build())
-                                                           .build())
-                        .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                                           .organisation(Organisation.builder().organisationID("3").build())
-                                                           .build())
-                        .ccdCaseReference(CASE_REFERENCE)
-                        .build();
+                    .emailPartyReference("Claimant Reference: ABC Ltd - Defendant Reference: Defendant Ltd")
+                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
+                                                  .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                    .generalAppRespondentSolicitors(respondentSols)
+                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
+                    .applicantPartyName("App")
+                    .claimant1PartyName("CL")
+                    .defendant1PartyName("DEF")
+                    .isGaRespondentOneLip(isGaRespondentOneLip)
+                    .isGaApplicantLip(isGaApplicantLip)
+                    .businessProcess(BusinessProcess.builder().status(STARTED)
+                                         .processInstanceId(PROCESS_INSTANCE_ID).build())
+                    .gaInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
+                    .gaUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
+                    .parentClaimantIsApplicant(YES)
+                    .gaRespondentOrderAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
+                    .respondentSolicitor1EmailAddress(DUMMY_EMAIL)
+                    .respondentSolicitor2EmailAddress(DUMMY_EMAIL)
+                    .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                                                      .organisation(Organisation.builder().organisationID("1").build())
+                                                      .build())
+                    .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                                       .organisation(Organisation.builder().organisationID("2").build())
+                                                       .build())
+                    .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                                                       .organisation(Organisation.builder().organisationID("3").build())
+                                                       .build())
+                    .ccdCaseReference(CASE_REFERENCE)
+                    .build();
             }
         }
     }

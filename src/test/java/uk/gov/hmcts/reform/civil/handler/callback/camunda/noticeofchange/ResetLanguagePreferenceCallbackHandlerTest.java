@@ -85,10 +85,10 @@ public class ResetLanguagePreferenceCallbackHandlerTest extends BaseCallbackHand
                 .changeOfRepresentation(false, false, NEW_ORG_ID, null, null)
                 .claimantUserDetails(IdamUserDetails.builder().email("xyz@hmcts.com").id("1234").build())
                 .build();
-            caseData.setCaseDataLiP(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(
-                                     RespondentLiPResponse.builder().respondent1ResponseLanguage("WELSH").build()
-                                 ).build());
+            caseData.setCaseDataLiP(new CaseDataLiP()
+                                 .setRespondent1LiPResponse(
+                                     new RespondentLiPResponse().setRespondent1ResponseLanguage("WELSH")
+                                 ));
             caseData.setDefendantLanguagePreferenceDisplay(PreferredLanguage.WELSH);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 

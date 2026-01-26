@@ -90,10 +90,9 @@ public class TranslatedDocumentUploadedDefendantNotificationHandlerTest {
                 .build();
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .caseDataLip(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                             .respondent1ResponseLanguage(Language.BOTH.toString()).build())
-                                 .build())
+                .caseDataLip(new CaseDataLiP()
+                                 .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                             .setRespondent1ResponseLanguage(Language.BOTH.toString())))
                 .setClaimTypeToSpecClaim()
                 .respondent1(party)
                 .build();
@@ -132,10 +131,9 @@ public class TranslatedDocumentUploadedDefendantNotificationHandlerTest {
                 .build();
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .caseDataLip(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                             .respondent1ResponseLanguage(Language.ENGLISH.toString()).build())
-                                 .build())
+                .caseDataLip(new CaseDataLiP()
+                                 .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                             .setRespondent1ResponseLanguage(Language.ENGLISH.toString())))
                 .setClaimTypeToSpecClaim()
                 .respondent1(party)
                 .build();

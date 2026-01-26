@@ -454,10 +454,9 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
             CaseData caseData;
             if (isWelsh) {
                 caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().toBuilder()
-                    .caseDataLiP(CaseDataLiP.builder()
-                                     .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                                 .respondent1ResponseLanguage("WELSH").build())
-                                     .build())
+                    .caseDataLiP(new CaseDataLiP()
+                                     .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                                 .setRespondent1ResponseLanguage("WELSH")))
                     .respondent1Represented(YesOrNo.NO)
                     .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
                     .queries(query)
@@ -465,10 +464,9 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
                     .build();
             } else {
                 caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().toBuilder()
-                    .caseDataLiP(CaseDataLiP.builder()
-                                     .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                                 .respondent1ResponseLanguage("ENGLSH").build())
-                                     .build())
+                    .caseDataLiP(new CaseDataLiP()
+                                     .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                                 .setRespondent1ResponseLanguage("ENGLSH")))
                     .respondent1Represented(YesOrNo.NO)
                     .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
                     .queries(query)

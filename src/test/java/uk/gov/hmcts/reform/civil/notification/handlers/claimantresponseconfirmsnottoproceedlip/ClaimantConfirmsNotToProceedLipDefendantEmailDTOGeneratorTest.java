@@ -84,12 +84,11 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
             .defenceRouteRequired(DISPUTES_THE_CLAIM)
             .applicant1ProceedWithClaim(NO)
             .caseDataLiP(
-                CaseDataLiP.builder()
-                    .respondent1LiPResponse(
-                        RespondentLiPResponse.builder()
-                            .respondent1ResponseLanguage(BOTH.toString())
-                            .build()
-                    ).build())
+                new CaseDataLiP()
+                    .setRespondent1LiPResponse(
+                        new RespondentLiPResponse()
+                            .setRespondent1ResponseLanguage(BOTH.toString())
+                    ))
             .build();
         String expectedTemplateId = "template-id";
 

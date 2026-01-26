@@ -50,11 +50,10 @@ class ConversionToBundleRequestDocsTest {
             .categoryID("SomeCategoryID")
             .build();
 
-        UploadEvidenceWitness uploadEvidenceWitness = UploadEvidenceWitness.builder()
-            .witnessOptionName("WitnessOptionName1")
-            .witnessOptionDocument(witnessDocument)
-            .witnessOptionUploadDate(LocalDate.of(2023, 2, 5))
-            .build();
+        UploadEvidenceWitness uploadEvidenceWitness = new UploadEvidenceWitness()
+            .setWitnessOptionName("WitnessOptionName1")
+            .setWitnessOptionDocument(witnessDocument)
+            .setWitnessOptionUploadDate(LocalDate.of(2023, 2, 5));
         List<Element<UploadEvidenceWitness>> listOfUploadEvidenceWitness =
             List.of(Element.<UploadEvidenceWitness>builder().value(uploadEvidenceWitness).build());
 
@@ -82,11 +81,10 @@ class ConversionToBundleRequestDocsTest {
             .categoryID("SomeCategoryID")
             .build();
 
-        UploadEvidenceWitness uploadEvidenceWitness = UploadEvidenceWitness.builder()
-            .witnessOptionName("WitnessOptionName1")
-            .witnessOptionDocument(witnessDocument)
-            .witnessOptionUploadDate(LocalDate.of(2023, 2, 5))
-            .build();
+        UploadEvidenceWitness uploadEvidenceWitness = new UploadEvidenceWitness()
+            .setWitnessOptionName("WitnessOptionName1")
+            .setWitnessOptionDocument(witnessDocument)
+            .setWitnessOptionUploadDate(LocalDate.of(2023, 2, 5));
 
         List<Element<UploadEvidenceWitness>> listOfUploadEvidenceWitness =
             List.of(Element.<UploadEvidenceWitness>builder().value(uploadEvidenceWitness).build());

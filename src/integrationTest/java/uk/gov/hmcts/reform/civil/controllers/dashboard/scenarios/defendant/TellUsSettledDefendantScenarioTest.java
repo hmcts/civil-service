@@ -27,9 +27,8 @@ public class TellUsSettledDefendantScenarioTest extends DashboardBaseIntegration
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1ClaimSettledDate(LocalDate.of(2024, 03, 19))
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1ClaimSettledDate(LocalDate.of(2024, 03, 19)))
             .build();
 
         handler.handle(callbackParams(caseData));

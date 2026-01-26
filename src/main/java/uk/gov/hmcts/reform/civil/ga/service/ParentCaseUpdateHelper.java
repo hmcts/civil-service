@@ -935,7 +935,7 @@ public class ParentCaseUpdateHelper {
             .caseManagementCategory(GACaseManagementCategory.builder().build())
             .locationName(EMPTY)
             .generalAppHearingDate(GAHearingDateGAspec.builder().build())
-            .certOfSC(CertOfSC.builder().build())
+            .certOfSC(new CertOfSC())
             .applicantPartyName(EMPTY).build();
 
         return applicationBuilder.build();

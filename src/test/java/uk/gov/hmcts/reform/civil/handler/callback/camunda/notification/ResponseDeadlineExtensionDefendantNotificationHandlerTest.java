@@ -91,7 +91,7 @@ class ResponseDeadlineExtensionDefendantNotificationHandlerTest extends BaseCall
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("ENGLISH").build()).build())
+                .caseDataLip(new CaseDataLiP().setRespondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage("ENGLISH")))
                 .legacyCaseReference(legacyReference)
                 .respondent1(Party
                                  .builder().type(Party.Type.INDIVIDUAL)
@@ -136,7 +136,7 @@ class ResponseDeadlineExtensionDefendantNotificationHandlerTest extends BaseCall
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
+                .caseDataLip(new CaseDataLiP().setRespondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage("BOTH")))
                 .legacyCaseReference(legacyReference)
                 .respondent1(Party
                                  .builder().type(Party.Type.INDIVIDUAL)

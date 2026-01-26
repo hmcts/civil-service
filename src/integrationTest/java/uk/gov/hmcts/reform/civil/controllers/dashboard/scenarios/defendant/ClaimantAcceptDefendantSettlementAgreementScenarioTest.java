@@ -39,11 +39,10 @@ public class ClaimantAcceptDefendantSettlementAgreementScenarioTest extends Dash
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
             .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.of(2024, 3, 16, 0, 0, 0))
             .caseDataLiP(
-                CaseDataLiP.builder()
-                    .respondentSignSettlementAgreement(YesOrNo.NO)
-                    .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                               .applicant1SignedSettlementAgreement(YesOrNo.YES).build())
-                    .build()
+                new CaseDataLiP()
+                    .setRespondentSignSettlementAgreement(YesOrNo.NO)
+                    .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                               .setApplicant1SignedSettlementAgreement(YesOrNo.YES))
             )
             .build();
 

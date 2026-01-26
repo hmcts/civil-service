@@ -30,10 +30,9 @@ public class ClaimantAcceptsRepaymentPlanCCJDefendantScenarioTest extends Dashbo
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
-            .caseDataLiP(CaseDataLiP.builder().applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                                         .applicant1ChoosesHowToProceed(
-                                                                             ChooseHowToProceed.REQUEST_A_CCJ).build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP().setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                                                         .setApplicant1ChoosesHowToProceed(
+                                                                             ChooseHowToProceed.REQUEST_A_CCJ)))
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
             .build();
 

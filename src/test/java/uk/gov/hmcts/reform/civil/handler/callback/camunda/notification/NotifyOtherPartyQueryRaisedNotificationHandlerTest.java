@@ -338,10 +338,9 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                 CaseData caseData;
                 if (isWelsh) {
                     caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().toBuilder()
-                        .caseDataLiP(CaseDataLiP.builder()
-                                         .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                                     .respondent1ResponseLanguage("WELSH").build())
-                                         .build())
+                        .caseDataLiP(new CaseDataLiP()
+                                         .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                                     .setRespondent1ResponseLanguage("WELSH")))
                         .respondent1Represented(YesOrNo.NO)
                         .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
                         .queries(query)
@@ -349,10 +348,9 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                         .build();
                 } else {
                     caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().toBuilder()
-                        .caseDataLiP(CaseDataLiP.builder()
-                                         .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                                     .respondent1ResponseLanguage("ENGLSH").build())
-                                         .build())
+                        .caseDataLiP(new CaseDataLiP()
+                                         .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                                     .setRespondent1ResponseLanguage("ENGLSH")))
                         .respondent1Represented(YesOrNo.NO)
                         .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
                         .queries(query)

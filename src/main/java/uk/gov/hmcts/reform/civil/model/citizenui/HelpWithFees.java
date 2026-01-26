@@ -1,19 +1,23 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 @Data
-@Builder(toBuilder = true)
-@Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 public class HelpWithFees {
 
     private YesOrNo helpWithFee;
     private String helpWithFeesReferenceNumber;
+
+    public HelpWithFees copy() {
+        return new HelpWithFees()
+            .setHelpWithFee(this.helpWithFee)
+            .setHelpWithFeesReferenceNumber(this.helpWithFeesReferenceNumber);
+    }
 }

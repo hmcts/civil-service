@@ -31,11 +31,10 @@ public class ClaimSettledCourtDecisionInFavorOfDefendantScenarioTest extends Das
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build().toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .claimantCourtDecision(RepaymentDecisionType
-                                                                                   .IN_FAVOUR_OF_DEFENDANT).build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                                        .setClaimantCourtDecision(RepaymentDecisionType
+                                                                                   .IN_FAVOUR_OF_DEFENDANT)))
             .specRespondent1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
             .respondent1RespondToSettlementAgreementDeadline(responseDeadline)

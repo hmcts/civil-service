@@ -51,7 +51,7 @@ class ClaimFeeUtilityTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .claimFee(Fee.builder().calculatedAmountInPence(CLAIM_FEE_IN_PENCE).build())
-                .claimIssuedHwfDetails(HelpWithFeesDetails.builder().build())
+                .claimIssuedHwfDetails(new HelpWithFeesDetails())
                 .build();
 
             // When
@@ -66,9 +66,8 @@ class ClaimFeeUtilityTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .claimFee(Fee.builder().calculatedAmountInPence(CLAIM_FEE_IN_PENCE).build())
-                .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
-                                           .remissionAmount(CLAIM_FEE_IN_PENCE)
-                                           .build())
+                .claimIssuedHwfDetails(new HelpWithFeesDetails()
+                                           .setRemissionAmount(CLAIM_FEE_IN_PENCE))
                 .build();
 
             // When
@@ -85,10 +84,9 @@ class ClaimFeeUtilityTest {
             BigDecimal remissionAmount = new BigDecimal("7500"); // 75 pounds
             CaseData caseData = CaseDataBuilder.builder()
                 .claimFee(Fee.builder().calculatedAmountInPence(CLAIM_FEE_IN_PENCE).build())
-                .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
-                                           .remissionAmount(remissionAmount)
-                                           .outstandingFeeInPounds(outstandingFee)
-                                           .build())
+                .claimIssuedHwfDetails(new HelpWithFeesDetails()
+                                           .setRemissionAmount(remissionAmount)
+                                           .setOutstandingFeeInPounds(outstandingFee))
                 .build();
 
             // When
@@ -104,10 +102,9 @@ class ClaimFeeUtilityTest {
             BigDecimal remissionAmount = new BigDecimal("7500"); // 75 pounds
             CaseData caseData = CaseDataBuilder.builder()
                 .claimFee(Fee.builder().calculatedAmountInPence(CLAIM_FEE_IN_PENCE).build())
-                .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
-                                           .remissionAmount(remissionAmount)
-                                           .outstandingFeeInPounds(null)
-                                           .build())
+                .claimIssuedHwfDetails(new HelpWithFeesDetails()
+                                           .setRemissionAmount(remissionAmount)
+                                           .setOutstandingFeeInPounds(null))
                 .build();
 
             // When

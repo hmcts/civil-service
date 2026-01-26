@@ -137,9 +137,8 @@ class NotificationUtilsTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentFullDefence()
             .applicant1Represented(NO)
-            .caseDataLip(CaseDataLiP.builder()
-                             .applicant1SettleClaim(NO)
-                             .build())
+            .caseDataLip(new CaseDataLiP()
+                             .setApplicant1SettleClaim(NO))
             .build();
 
         boolean actual = NotificationUtils.shouldSendMediationNotificationDefendant1LRCarm(caseData, true);
@@ -175,9 +174,8 @@ class NotificationUtilsTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentFullDefence()
             .applicant1Represented(NO)
-            .caseDataLip(CaseDataLiP.builder()
-                             .applicant1SettleClaim(YES)
-                             .build())
+            .caseDataLip(new CaseDataLiP()
+                             .setApplicant1SettleClaim(YES))
             .build();
 
         boolean actual = NotificationUtils.shouldSendMediationNotificationDefendant1LRCarm(caseData, true);

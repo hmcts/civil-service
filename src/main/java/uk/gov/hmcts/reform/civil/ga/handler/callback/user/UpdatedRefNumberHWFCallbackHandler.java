@@ -62,7 +62,7 @@ public class UpdatedRefNumberHWFCallbackHandler extends CallbackHandler implemen
         if (caseData.isHWFTypeApplication()) {
             String newRefNumber = getHwFNewReferenceNumber(caseData.getGaHwfDetails());
             ofNullable(caseData.getGeneralAppHelpWithFees())
-                .ifPresent(hwf -> updatedData.generalAppHelpWithFees(hwf.toBuilder().helpWithFeesReferenceNumber(newRefNumber).build()));
+                .ifPresent(hwf -> updatedData.generalAppHelpWithFees(hwf.copy().setHelpWithFeesReferenceNumber(newRefNumber)));
             if (caseData.getGaHwfDetails() != null) {
                 updatedData.gaHwfDetails(caseData.getGaHwfDetails().toBuilder()
                         .hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER_GA).hwfReferenceNumber(null).build());
@@ -72,7 +72,7 @@ public class UpdatedRefNumberHWFCallbackHandler extends CallbackHandler implemen
         if (caseData.isHWFTypeAdditional()) {
             String newRefNumber = getHwFNewReferenceNumber(caseData.getAdditionalHwfDetails());
             ofNullable(caseData.getGeneralAppHelpWithFees())
-                .ifPresent(hwf -> updatedData.generalAppHelpWithFees(hwf.toBuilder().helpWithFeesReferenceNumber(newRefNumber).build()));
+                .ifPresent(hwf -> updatedData.generalAppHelpWithFees(hwf.copy().setHelpWithFeesReferenceNumber(newRefNumber)));
             if (caseData.getAdditionalHwfDetails() != null) {
                 updatedData.additionalHwfDetails(caseData.getAdditionalHwfDetails().toBuilder()
                         .hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER_GA).hwfReferenceNumber(null).build());

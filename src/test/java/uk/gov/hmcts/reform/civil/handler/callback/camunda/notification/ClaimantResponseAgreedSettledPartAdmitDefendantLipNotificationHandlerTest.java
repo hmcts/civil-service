@@ -175,7 +175,7 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .specClaim1v1LrVsLip()
-                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(bothLangResponse).build()).build())
+                .caseDataLip(new CaseDataLiP().setRespondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage(bothLangResponse)))
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -201,7 +201,7 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .specClaim1v1LrVsLip()
-                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(englishLangResponse).build()).build())
+                .caseDataLip(new CaseDataLiP().setRespondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage(englishLangResponse)))
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(

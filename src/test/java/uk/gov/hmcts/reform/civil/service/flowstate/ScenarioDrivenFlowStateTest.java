@@ -493,7 +493,7 @@ class ScenarioDrivenFlowStateTest {
 
         if (category == SPEC_CLAIM) {
             // Ensure Spec flows have minimal non-null LiP structure to avoid NPEs in predicates
-            builder.caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(NO).build());
+            builder.caseDataLip(new CaseDataLiP().setApplicant1SettleClaim(NO));
         }
 
         return switch (shape) {

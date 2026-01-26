@@ -246,8 +246,8 @@ class JudgeFinalOrderGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
-            .orderOnCourtInitiative(FreeFormOrderValues.builder().onInitiativeSelectionTextArea("test").onInitiativeSelectionDate(
-                LocalDate.now()).build())
+            .orderOnCourtInitiative(new FreeFormOrderValues().setOnInitiativeSelectionTextArea("test")
+                                     .setOnInitiativeSelectionDate(LocalDate.now()))
             .caseManagementLocation(caseManagementLocation)
             .build();
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
@@ -269,8 +269,8 @@ class JudgeFinalOrderGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
             .ccdState(CaseState.CASE_PROGRESSION)
-            .orderWithoutNotice(FreeFormOrderValues.builder().withoutNoticeSelectionTextArea("test without notice")
-                                    .withoutNoticeSelectionDate(LocalDate.now()).build())
+            .orderWithoutNotice(new FreeFormOrderValues().setWithoutNoticeSelectionTextArea("test without notice")
+                                .setWithoutNoticeSelectionDate(LocalDate.now()))
             .respondent2(PartyBuilder.builder().individual().build().toBuilder()
                              .partyID("app-2-party-id")
                              .partyName("Applicant2")
@@ -301,8 +301,8 @@ class JudgeFinalOrderGeneratorTest {
             .caseManagementLocation(caseManagementLocation)
             .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
             .ccdState(CaseState.CASE_PROGRESSION)
-            .orderWithoutNotice(FreeFormOrderValues.builder().withoutNoticeSelectionTextArea("test without notice")
-                                    .withoutNoticeSelectionDate(LocalDate.now()).build())
+            .orderWithoutNotice(new FreeFormOrderValues().setWithoutNoticeSelectionTextArea("test without notice")
+                                .setWithoutNoticeSelectionDate(LocalDate.now()))
             .respondent2(PartyBuilder.builder().individual().build().toBuilder()
                              .partyID("app-2-party-id")
                              .partyName("Applicant2")

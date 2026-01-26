@@ -144,10 +144,9 @@ class FreeFormOrderGeneratorTest {
 
     @Test
     void test_getFreeFormOrderValueOnCourt() {
-        FreeFormOrderValues values = FreeFormOrderValues.builder()
-            .onInitiativeSelectionTextArea("test")
-            .onInitiativeSelectionDate(LocalDate.now())
-            .build();
+        FreeFormOrderValues values = new FreeFormOrderValues()
+            .setOnInitiativeSelectionTextArea("test")
+            .setOnInitiativeSelectionDate(LocalDate.now());
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().orderOnCourtsList(
                 ORDER_ON_COURT_INITIATIVE)
             .orderOnCourtInitiative(values).build();
@@ -157,10 +156,9 @@ class FreeFormOrderGeneratorTest {
 
     @Test
     void test_getFreeFormOrderValueWithoutNotice() {
-        FreeFormOrderValues values = FreeFormOrderValues.builder()
-            .withoutNoticeSelectionTextArea("test")
-            .withoutNoticeSelectionDate(LocalDate.now())
-            .build();
+        FreeFormOrderValues values = new FreeFormOrderValues()
+            .setWithoutNoticeSelectionTextArea("test")
+            .setWithoutNoticeSelectionDate(LocalDate.now());
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().orderOnCourtsList(
                 ORDER_WITHOUT_NOTICE)
             .orderWithoutNotice(values).build();

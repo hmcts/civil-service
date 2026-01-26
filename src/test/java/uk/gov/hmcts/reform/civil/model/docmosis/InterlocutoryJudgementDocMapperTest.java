@@ -179,12 +179,9 @@ public class InterlocutoryJudgementDocMapperTest {
         //Given
         caseData = getCaseData();
         caseData = caseData.toBuilder()
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .applicant1RejectedRepaymentReason("Rejected in test")
-                                                        .build())
-
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                                        .setApplicant1RejectedRepaymentReason("Rejected in test")))
             .build();
 
         // When
@@ -217,11 +214,9 @@ public class InterlocutoryJudgementDocMapperTest {
             .applicant1ResponseDate(CLAIMANT_RESPONSE_DATE_TIME)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(SUGGESTION_OF_REPAYMENT_PLAN)
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .applicant1RejectedRepaymentReason("Rejected")
-                                                        .build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                                        .setApplicant1RejectedRepaymentReason("Rejected")))
             .build();
     }
 

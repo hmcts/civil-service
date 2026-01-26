@@ -139,24 +139,22 @@ public class BundleFileNameHelperTest {
 
     private List<Element<UploadEvidenceWitness>> getWitnessDocs() {
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
-        witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
-                                                         .builder()
-                                                         .witnessOptionDocument(Document.builder().documentBinaryUrl(
+        witnessEvidenceDocs.add(ElementUtils.element(new UploadEvidenceWitness()
+                                                         .setWitnessOptionDocument(Document.builder().documentBinaryUrl(
                                                              "Test")
-                                                                                    .documentFileName("Test").build())
-                                                         .witnessOptionName("FirstName LastName")
-                                                         .witnessOptionUploadDate(LocalDate.of(2023, 2, 10)).build()));
+                                                                                         .documentFileName("Test").build())
+                                                         .setWitnessOptionName("FirstName LastName")
+                                                         .setWitnessOptionUploadDate(LocalDate.of(2023, 2, 10))));
         return witnessEvidenceDocs;
     }
 
     private List<Element<UploadEvidenceExpert>> getExpertDocs() {
         List<Element<UploadEvidenceExpert>> expertEvidenceDocs = new ArrayList<>();
-        expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
-                                                        .builder()
-                                                        .expertDocument(Document.builder().documentBinaryUrl("Test")
-                                                                            .documentFileName("Test").build())
-                                                        .expertOptionUploadDate(LocalDate.of(2023, 1, 12))
-                                                        .expertOptionName("FirstName LastName").build()));
+        expertEvidenceDocs.add(ElementUtils.element(new UploadEvidenceExpert()
+                                                        .setExpertDocument(Document.builder().documentBinaryUrl("Test")
+                                                                              .documentFileName("Test").build())
+                                                        .setExpertOptionUploadDate(LocalDate.of(2023, 1, 12))
+                                                        .setExpertOptionName("FirstName LastName")));
 
         return  expertEvidenceDocs;
     }

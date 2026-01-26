@@ -319,8 +319,8 @@ class GaPaymentRequestUpdateCallbackServiceTest {
                 .ccdCaseReference(1L)
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                         .fee(Fee.builder().calculatedAmountInPence(BigDecimal.ONE).build()).build())
-                .generalAppHelpWithFees(HelpWithFees.builder()
-                        .helpWithFeesReferenceNumber("ref").build())
+                .generalAppHelpWithFees(new HelpWithFees()
+                        .setHelpWithFeesReferenceNumber("ref"))
                 .build();
         GeneralApplicationCaseData updatedCaseData = paymentRequestUpdateCallbackService.processHwf(caseData);
         verify(coreCaseDataService, never()).startGaUpdate(any(), any());
@@ -334,8 +334,8 @@ class GaPaymentRequestUpdateCallbackServiceTest {
                 .ccdCaseReference(1L)
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                         .fee(Fee.builder().calculatedAmountInPence(BigDecimal.ONE).build()).build())
-                .generalAppHelpWithFees(HelpWithFees.builder()
-                        .helpWithFeesReferenceNumber("ref").build())
+                .generalAppHelpWithFees(new HelpWithFees()
+                        .setHelpWithFeesReferenceNumber("ref"))
                 .build();
         GeneralApplicationCaseData updatedCaseData = paymentRequestUpdateCallbackService.processHwf(caseData);
         assertThat(updatedCaseData).isNull();

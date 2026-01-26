@@ -213,11 +213,9 @@ class CaseDataTest {
     void givenApplicantAgreedToMediation_whenHasClaimantAgreedToFreeMediation_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                                                          .hasAgreedFreeMediation(MediationDecision.Yes)
-                                                                          .build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1ClaimMediationSpecRequiredLip(new ClaimantMediationLip()
+                                                                          .setHasAgreedFreeMediation(MediationDecision.Yes)))
             .build();
         //When
         boolean result = caseData.hasClaimantAgreedToFreeMediation();
@@ -239,11 +237,9 @@ class CaseDataTest {
     void givenApplicantDidNotAgreeToFreeMediation_whenHasClaimantAgreedToFeeMediation_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder()
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                                                          .hasAgreedFreeMediation(MediationDecision.No)
-                                                                          .build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1ClaimMediationSpecRequiredLip(new ClaimantMediationLip()
+                                                                          .setHasAgreedFreeMediation(MediationDecision.No)))
             .build();
         //When
         boolean result = caseData.hasClaimantAgreedToFreeMediation();
@@ -858,7 +854,7 @@ class CaseDataTest {
 
         //Given
         CaseData caseData = CaseDataBuilder.builder()
-            .caseDataLip(CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO).build())
+            .caseDataLip(new CaseDataLiP().setRespondentSignSettlementAgreement(YesOrNo.NO))
             .build();
 
         //When
@@ -873,7 +869,7 @@ class CaseDataTest {
 
         //Given
         CaseData caseData = CaseDataBuilder.builder()
-            .caseDataLip(CaseDataLiP.builder().build())
+            .caseDataLip(new CaseDataLiP())
             .build();
 
         //When
@@ -1094,7 +1090,7 @@ class CaseDataTest {
 
             //Given
             CaseData caseData = CaseDataBuilder.builder()
-                .caseDataLip(CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO).build())
+                .caseDataLip(new CaseDataLiP().setRespondentSignSettlementAgreement(YesOrNo.NO))
                 .build();
 
             //When
@@ -1126,8 +1122,8 @@ class CaseDataTest {
         @Test
         void shouldReturnTrueWhenFirstRepaymentDateIsAfterCurrentDateAndDefendantAcceptsSettlementAgreement() {
             //Given
-            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-                .respondentSignSettlementAgreement(YesOrNo.YES).build();
+            CaseDataLiP caseDataLiP = new CaseDataLiP()
+                .setRespondentSignSettlementAgreement(YesOrNo.YES);
 
             CaseData caseData = CaseData.builder()
                 .caseDataLiP(caseDataLiP)
@@ -1173,8 +1169,8 @@ class CaseDataTest {
         @Test
         void shouldReturnFalseWhenSignSettlementAgreementIsRejectedByDefendant() {
             //Given
-            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-                .respondentSignSettlementAgreement(YesOrNo.NO).build();
+            CaseDataLiP caseDataLiP = new CaseDataLiP()
+                .setRespondentSignSettlementAgreement(YesOrNo.NO);
 
             CaseData caseData = CaseData.builder()
                 .caseDataLiP(caseDataLiP)
@@ -1190,8 +1186,8 @@ class CaseDataTest {
         @Test
         void shouldReturnFalseWhenFirstRepaymentDateIsBeforeCurrentDateAndDefendantAcceptsSettlementAgreement() {
             //Given
-            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-                .respondentSignSettlementAgreement(YesOrNo.YES).build();
+            CaseDataLiP caseDataLiP = new CaseDataLiP()
+                .setRespondentSignSettlementAgreement(YesOrNo.YES);
 
             CaseData caseData = CaseData.builder()
                 .caseDataLiP(caseDataLiP)
@@ -1207,8 +1203,8 @@ class CaseDataTest {
         @Test
         void shouldReturnFalseWhenWillThisAmountBePaidIsBeforeCurrentDateAndDefendantAcceptsSettlementAgreement() {
             //Given
-            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-                .respondentSignSettlementAgreement(YesOrNo.YES).build();
+            CaseDataLiP caseDataLiP = new CaseDataLiP()
+                .setRespondentSignSettlementAgreement(YesOrNo.YES);
 
             CaseData caseData = CaseData.builder()
                 .caseDataLiP(caseDataLiP)
@@ -1239,10 +1235,10 @@ class CaseDataTest {
                 .applicant1RepaymentOptionForDefendantSpec(PaymentType.SET_DATE)
                 .applicant1RequestedPaymentDateForDefendantSpec(PaymentBySetDate.builder()
                                                                     .paymentSetDate(LocalDate.now().plusDays(1)).build())
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT).build())
-                                 .respondentSignSettlementAgreement(YES).build())
+                .caseDataLiP(new CaseDataLiP()
+                                 .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT))
+                                 .setRespondentSignSettlementAgreement(YES))
                 .build();
             //When
             boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
@@ -1256,10 +1252,10 @@ class CaseDataTest {
             CaseData caseData = CaseData.builder()
                 .applicant1RepaymentOptionForDefendantSpec(PaymentType.IMMEDIATELY)
                 .applicant1SuggestPayImmediatelyPaymentDateForDefendantSpec(LocalDate.now().plusDays(1))
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT).build())
-                                 .respondentSignSettlementAgreement(YES).build())
+                .caseDataLiP(new CaseDataLiP()
+                                 .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT))
+                                 .setRespondentSignSettlementAgreement(YES))
                 .build();
             //When
             boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
@@ -1419,9 +1415,8 @@ class CaseDataTest {
             CaseData caseData = CaseData.builder()
                 .hearingHelpFeesReferenceNumber("hwf-ref")
                 .feePaymentOutcomeDetails(
-                    FeePaymentOutcomeDetails.builder()
-                        .hwfFullRemissionGrantedForHearingFee(YES)
-                        .build())
+                    new FeePaymentOutcomeDetails()
+                        .setHwfFullRemissionGrantedForHearingFee(YES))
                 .applicant1Represented(NO)
                 .respondent1Represented(NO)
                 .build();

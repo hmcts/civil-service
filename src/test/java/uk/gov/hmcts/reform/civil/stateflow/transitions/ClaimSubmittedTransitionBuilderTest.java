@@ -149,13 +149,11 @@ class ClaimSubmittedTransitionBuilderTest {
     }
 
     private CaseData buildCaseDataWithHelpWithFees(YesOrNo helpWithFee) {
-        HelpWithFees helpWithFees = HelpWithFees.builder()
-            .helpWithFee(helpWithFee)
-            .build();
+        HelpWithFees helpWithFees = new HelpWithFees()
+            .setHelpWithFee(helpWithFee);
 
-        CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-            .helpWithFees(helpWithFees)
-            .build();
+        CaseDataLiP caseDataLiP = new CaseDataLiP()
+            .setHelpWithFees(helpWithFees);
 
         return CaseData.builder()
             .caseDataLiP(caseDataLiP)

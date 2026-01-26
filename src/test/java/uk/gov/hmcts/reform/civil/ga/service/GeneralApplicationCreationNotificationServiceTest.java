@@ -366,8 +366,8 @@ public class GeneralApplicationCreationNotificationServiceTest {
                      .validateSolicitorEmail(any(), any()))
                 .thenReturn(caseData);
             GeneralApplicationCaseData claimRespondentResponseLan = GeneralApplicationCaseData.builder().respondentBilingualLanguagePreference(YES)
-                .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(
-                    Language.BOTH.toString()).build()).build();
+                .respondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage(
+                    Language.BOTH.toString())).build();
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(claimRespondentResponseLan);
             gaNotificationService.sendNotification(caseData);
             verify(notificationService, times(2)).sendMail(

@@ -245,9 +245,8 @@ class HearingNoticeHmcGeneratorTest {
             .hearingHelpFeesReferenceNumber("123")
             .respondent1Represented(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)
-            .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
-                                          .hwfFullRemissionGrantedForHearingFee(YesOrNo.YES)
-                                          .build())
+            .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
+                                          .setHwfFullRemissionGrantedForHearingFee(YesOrNo.YES))
             .build();
 
         when(hearingFeesService

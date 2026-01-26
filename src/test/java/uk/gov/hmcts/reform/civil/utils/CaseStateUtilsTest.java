@@ -35,9 +35,8 @@ class CaseStateUtilsTest {
     void shouldReturnTrue_whenCarmEnabledSmallClaim1v1ClaimantNotSettle() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
             .responseClaimTrack(SMALL_CLAIM.name())
-            .caseDataLip(CaseDataLiP.builder()
-                             .applicant1SettleClaim(NO)
-                             .build())
+            .caseDataLip(new CaseDataLiP()
+                             .setApplicant1SettleClaim(NO))
             .build();
 
         when(featureToggleService.isCarmEnabledForCase(caseData)).thenReturn(true);

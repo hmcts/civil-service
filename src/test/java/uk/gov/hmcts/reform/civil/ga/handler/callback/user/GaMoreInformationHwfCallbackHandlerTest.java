@@ -45,9 +45,8 @@ class GaMoreInformationHwfCallbackHandlerTest extends GeneralApplicationBaseCall
             //Given
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .helpWithFeesMoreInformationGa(
-                        HelpWithFeesMoreInformation.builder()
-                        .hwFMoreInfoDocumentDate(LocalDate.now())
-                        .build())
+                        new HelpWithFeesMoreInformation()
+                        .setHwFMoreInfoDocumentDate(LocalDate.now()))
                 .build();
             //When
             CallbackParams params = callbackParamsOf(caseData, MID, "more-information-hwf");
@@ -62,9 +61,8 @@ class GaMoreInformationHwfCallbackHandlerTest extends GeneralApplicationBaseCall
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .hwfFeeType(FeeType.ADDITIONAL)
                 .helpWithFeesMoreInformationAdditional(
-                    HelpWithFeesMoreInformation.builder()
-                        .hwFMoreInfoDocumentDate(LocalDate.now())
-                        .build())
+                    new HelpWithFeesMoreInformation()
+                        .setHwFMoreInfoDocumentDate(LocalDate.now()))
                 .build();
             //When
             CallbackParams params = callbackParamsOf(caseData, MID, "more-information-hwf");

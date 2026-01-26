@@ -90,8 +90,8 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
             .build();
         CaseData caseData = CaseData.builder()
             .caseDataLiP(
-                CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO
-                ).build()
+                new CaseDataLiP().setRespondentSignSettlementAgreement(YesOrNo.NO
+                )
             )
             .applicant1Represented(YesOrNo.NO)
             .qmLatestQuery(LatestQuery.builder().queryId("123456").build())
@@ -150,8 +150,8 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
             .build();
         CaseData caseData = CaseData.builder()
             .caseDataLiP(
-                CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO
-                ).build()
+                new CaseDataLiP().setRespondentSignSettlementAgreement(YesOrNo.NO
+                )
             )
             .applicant1Represented(YesOrNo.NO)
             .qmLatestQuery(LatestQuery.builder().queryId("123457").build())
@@ -214,8 +214,8 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
             .build();
         CaseData caseData = CaseData.builder()
             .caseDataLiP(
-                CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO
-                ).build()
+                new CaseDataLiP().setRespondentSignSettlementAgreement(YesOrNo.NO
+                )
             )
             .applicant1Represented(YesOrNo.NO)
             .qmLatestQuery(LatestQuery.builder().queryId("123457").build())
@@ -273,8 +273,8 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
             .build();
         CaseData caseData = CaseData.builder()
             .caseDataLiP(
-                CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO
-                ).build()
+                new CaseDataLiP().setRespondentSignSettlementAgreement(YesOrNo.NO
+                )
             )
             .applicant1Represented(YesOrNo.NO)
             .qmLatestQuery(LatestQuery.builder().queryId("123457").build())

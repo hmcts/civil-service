@@ -80,7 +80,7 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends GeneralApplic
                 .build();
             GeneralApplicationCaseData civilCaseData = GeneralApplicationCaseData.builder()
                 .claimantBilingualLanguagePreference("ENGLISH")
-                .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("ENGLISH").build())
+                .respondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage("ENGLISH"))
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(mockCaseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(mockCaseDetails)).thenReturn(civilCaseData);
@@ -101,7 +101,7 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends GeneralApplic
                 .build();
             GeneralApplicationCaseData civilCaseData = GeneralApplicationCaseData.builder()
                 .claimantBilingualLanguagePreference("WELSH")
-                .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("WELSH").build())
+                .respondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage("WELSH"))
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(mockCaseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(mockCaseDetails)).thenReturn(civilCaseData);
@@ -122,7 +122,7 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends GeneralApplic
                 .build();
             GeneralApplicationCaseData civilCaseData = GeneralApplicationCaseData.builder()
                 .claimantBilingualLanguagePreference("BOTH")
-                .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build())
+                .respondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage("BOTH"))
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(mockCaseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(mockCaseDetails)).thenReturn(civilCaseData);
@@ -161,7 +161,7 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends GeneralApplic
                 .build();
             GeneralApplicationCaseData civilCaseData = GeneralApplicationCaseData.builder()
                 .claimantBilingualLanguagePreference("ENGLISH")
-                .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("ENGLISH").build())
+                .respondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage("ENGLISH"))
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(mockCaseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(mockCaseDetails)).thenReturn(civilCaseData);
@@ -182,7 +182,7 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends GeneralApplic
                 .build();
             GeneralApplicationCaseData civilCaseData = GeneralApplicationCaseData.builder()
                 .claimantBilingualLanguagePreference("WELSH")
-                .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("WELSH").build())
+                .respondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage("WELSH"))
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(mockCaseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(mockCaseDetails)).thenReturn(civilCaseData);
@@ -203,7 +203,7 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends GeneralApplic
                 .build();
             GeneralApplicationCaseData civilCaseData = GeneralApplicationCaseData.builder()
                 .claimantBilingualLanguagePreference("BOTH")
-                .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build())
+                .respondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage("BOTH"))
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(mockCaseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(mockCaseDetails)).thenReturn(civilCaseData);

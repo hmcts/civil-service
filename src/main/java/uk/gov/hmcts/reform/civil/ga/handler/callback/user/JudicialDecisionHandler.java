@@ -682,18 +682,16 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
                                                                                    LocalDateTime.now(), PLUS_7DAYS))
                 .build());
 
-        caseDataBuilder.orderOnCourtInitiative(FreeFormOrderValues.builder()
-                                                   .onInitiativeSelectionTextArea(ON_INITIATIVE_SELECTION_TEST)
-                                                   .onInitiativeSelectionDate(deadlinesCalculator
+        caseDataBuilder.orderOnCourtInitiative(new FreeFormOrderValues()
+                                                   .setOnInitiativeSelectionTextArea(ON_INITIATIVE_SELECTION_TEST)
+                                                   .setOnInitiativeSelectionDate(deadlinesCalculator
                                                                                   .getJudicialOrderDeadlineDate(
-                                                                                      LocalDateTime.now(), PLUS_7DAYS))
-                                                   .build());
-        caseDataBuilder.orderWithoutNotice(FreeFormOrderValues.builder()
-                                               .withoutNoticeSelectionTextArea(WITHOUT_NOTICE_SELECTION_TEXT)
-                                               .withoutNoticeSelectionDate(deadlinesCalculator
+                                                                                      LocalDateTime.now(), PLUS_7DAYS)));
+        caseDataBuilder.orderWithoutNotice(new FreeFormOrderValues()
+                                               .setWithoutNoticeSelectionTextArea(WITHOUT_NOTICE_SELECTION_TEXT)
+                                               .setWithoutNoticeSelectionDate(deadlinesCalculator
                                                                                .getJudicialOrderDeadlineDate(
-                                                                                   LocalDateTime.now(), PLUS_7DAYS))
-                                               .build());
+                                                                                   LocalDateTime.now(), PLUS_7DAYS)));
         caseDataBuilder.judicialDecisionMakeAnOrderForWrittenRepresentations(
             GAJudicialWrittenRepresentations.builder()
                 .writtenConcurrentRepresentationsBy(deadlinesCalculator

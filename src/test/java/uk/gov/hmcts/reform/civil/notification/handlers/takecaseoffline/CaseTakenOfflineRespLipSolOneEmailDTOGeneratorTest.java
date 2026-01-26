@@ -39,9 +39,9 @@ class CaseTakenOfflineRespLipSolOneEmailDTOGeneratorTest {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .applicant1Represented(YesOrNo.YES)
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                         .respondent1ResponseLanguage("ENGLISH").build()).build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                         .setRespondent1ResponseLanguage("ENGLISH")))
             .applicant1ResponseDeadline(LocalDateTime.now().plusDays(1))
             .build();
 
@@ -57,9 +57,9 @@ class CaseTakenOfflineRespLipSolOneEmailDTOGeneratorTest {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .applicant1Represented(YesOrNo.YES)
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                         .respondent1ResponseLanguage("WELSH").build()).build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                         .setRespondent1ResponseLanguage("WELSH")))
 
             .applicant1ResponseDeadline(LocalDateTime.now().plusDays(1))
             .build();

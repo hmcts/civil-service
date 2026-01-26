@@ -90,12 +90,11 @@ public class ServiceRequestCUICallbackHandlerTest extends BaseCallbackHandlerTes
         void shouldNotMakeAnyServiceRequest_whenClaimantHasRequestedHelpWithFees() {
             // GIVEN
             caseData = CaseDataBuilder.builder().buildCuiCaseDataWithFee();
-            caseData.setCaseDataLiP(CaseDataLiP.builder()
-                                 .helpWithFees(
-                                     HelpWithFees.builder()
-                                         .helpWithFee(YesOrNo.YES)
-                                         .build()
-                                 ).build());
+            caseData.setCaseDataLiP(new CaseDataLiP()
+                                 .setHelpWithFees(
+                                     new HelpWithFees()
+                                         .setHelpWithFee(YesOrNo.YES)
+                                 ));
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_CUI_CLAIM_ISSUE, ABOUT_TO_SUBMIT);
 
             // THEN

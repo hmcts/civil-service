@@ -115,11 +115,9 @@ class DirectionsQuestionnaireLipGeneratorTest {
             .postCode("SN28AX")
             .build();
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
-            .caseDataLiP(CaseDataLiP.builder()
-                .respondent1LiPResponse(RespondentLiPResponse.builder()
-                    .respondent1LiPCorrespondenceAddress(correspondenceAddress)
-                    .build())
-                .build())
+            .caseDataLiP(new CaseDataLiP()
+                .setRespondent1LiPResponse(new RespondentLiPResponse()
+                    .setRespondent1LiPCorrespondenceAddress(correspondenceAddress)))
             .build();
         //When
         DirectionsQuestionnaireForm form = generator.getTemplateData(caseData, BEARER_TOKEN);
@@ -143,15 +141,12 @@ class DirectionsQuestionnaireLipGeneratorTest {
     void shouldGenerateHearingLipRequirements_whenTheyExist() {
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
-            .caseDataLiP(CaseDataLiP
-                .builder()
-                .respondent1LiPResponse(
-                    RespondentLiPResponse
-                        .builder()
-                        .respondent1DQHearingSupportLip(
-                            HearingSupportLip
-                                .builder()
-                                .requirementsLip(wrapElements(List.of(
+            .caseDataLiP(new CaseDataLiP()
+                .setRespondent1LiPResponse(
+                    new RespondentLiPResponse()
+                        .setRespondent1DQHearingSupportLip(
+                            new HearingSupportLip()
+                                .setRequirementsLip(wrapElements(List.of(
                                     RequirementsLip
                                         .builder()
                                         .name("Name")
@@ -162,9 +157,9 @@ class DirectionsQuestionnaireLipGeneratorTest {
                                         )
                                         .build()
                                 )))
-                                .build())
-                        .build())
-                .build())
+                        )
+                )
+            )
             .build();
         //When
         DirectionsQuestionnaireForm form = generator.getTemplateData(caseData, BEARER_TOKEN);
@@ -187,18 +182,14 @@ class DirectionsQuestionnaireLipGeneratorTest {
     void shouldGenerateLipExtraDetails_whenTheyExist() {
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
-            .caseDataLiP(CaseDataLiP
-                .builder()
-                .respondent1LiPResponse(
-                    RespondentLiPResponse
-                        .builder()
-                        .respondent1DQExtraDetails(
-                            DQExtraDetailsLip.builder()
-                                .requestExtra4weeks(YesOrNo.YES)
-                                .build()
-                        ).build())
-                .build())
-            .build();
+            .caseDataLiP(new CaseDataLiP()
+                .setRespondent1LiPResponse(
+                    new RespondentLiPResponse()
+                        .setRespondent1DQExtraDetails(
+                            new DQExtraDetailsLip()
+                                .setRequestExtra4weeks(YesOrNo.YES)
+                        ))
+                ).build();
         //When
         DirectionsQuestionnaireForm form = generator.getTemplateData(caseData, BEARER_TOKEN);
         //Then
@@ -209,25 +200,21 @@ class DirectionsQuestionnaireLipGeneratorTest {
     void shouldGenerateLipGiveEvidenceYourselfConfirmDetails_whenTheyExist() {
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
-            .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .respondent1LiPResponse(
-                                 RespondentLiPResponse
-                                     .builder()
-                                     .respondent1DQExtraDetails(
-                                         DQExtraDetailsLip.builder()
-                                             .giveEvidenceYourSelf(YesOrNo.YES)
-                                             .build())
-                                     .respondent1DQEvidenceConfirmDetails(EvidenceConfirmDetails
-                                                                              .builder()
-                                                                              .firstName("Sam")
-                                                                              .lastName("Wise")
-                                                                              .phone("07788994455")
-                                                                              .email("sam@wise.come")
-                                                                              .jobTitle("wise man")
-                                                                              .build())
-                                     .build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setRespondent1LiPResponse(
+                                 new RespondentLiPResponse()
+                                     .setRespondent1DQExtraDetails(
+                                         new DQExtraDetailsLip()
+                                             .setGiveEvidenceYourSelf(YesOrNo.YES))
+                                     .setRespondent1DQEvidenceConfirmDetails(new EvidenceConfirmDetails()
+                                                                              .setFirstName("Sam")
+                                                                              .setLastName("Wise")
+                                                                              .setPhone("07788994455")
+                                                                              .setEmail("sam@wise.come")
+                                                                              .setJobTitle("wise man")
+                                     )
+                             )
+            )
             .build();
         //When
         DirectionsQuestionnaireForm form = generator.getTemplateData(caseData, BEARER_TOKEN);
@@ -249,30 +236,25 @@ class DirectionsQuestionnaireLipGeneratorTest {
     void shouldGenerateLipExperts_whenReportExpertsExist() {
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
-            .caseDataLiP(CaseDataLiP
-                .builder()
-                .respondent1LiPResponse(
-                    RespondentLiPResponse
-                        .builder()
-                        .respondent1DQExtraDetails(
-                            DQExtraDetailsLip.builder()
-                                .respondent1DQLiPExpert(
-                                    ExpertLiP
-                                        .builder()
-                                        .caseNeedsAnExpert(YesOrNo.YES)
-                                        .expertReportRequired(YesOrNo.YES)
-                                        .expertCanStillExamineDetails("details")
-                                        .details(
+            .caseDataLiP(new CaseDataLiP()
+                .setRespondent1LiPResponse(
+                    new RespondentLiPResponse()
+                        .setRespondent1DQExtraDetails(
+                            new DQExtraDetailsLip()
+                                .setRespondent1DQLiPExpert(
+                                    new ExpertLiP()
+                                        .setCaseNeedsAnExpert(YesOrNo.YES)
+                                        .setExpertReportRequired(YesOrNo.YES)
+                                        .setExpertCanStillExamineDetails("details")
+                                        .setDetails(
                                             wrapElements(List.of(
-                                                ExpertReportLiP.builder()
-                                                    .expertName("Name")
-                                                    .reportDate(LocalDate.now())
-                                                    .build()))
+                                                new ExpertReportLiP()
+                                                    .setExpertName("Name")
+                                                    .setReportDate(LocalDate.now())))
                                         )
-                                        .build())
-                                .build())
-                        .build())
-                .build())
+                                ))
+                )
+            )
             .build();
         //When
         DirectionsQuestionnaireForm form = generator.getTemplateData(caseData, BEARER_TOKEN);
@@ -287,15 +269,13 @@ class DirectionsQuestionnaireLipGeneratorTest {
     void shouldGenerateLipExpertsWithEmptyFields_whenReportExpertsDoNotExist() {
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
-            .caseDataLiP(CaseDataLiP
-                .builder()
-                .respondent1LiPResponse(
-                    RespondentLiPResponse
-                        .builder()
-                        .respondent1DQExtraDetails(
-                            DQExtraDetailsLip.builder().build())
-                        .build())
-                .build())
+            .caseDataLiP(new CaseDataLiP()
+                .setRespondent1LiPResponse(
+                    new RespondentLiPResponse()
+                        .setRespondent1DQExtraDetails(
+                            new DQExtraDetailsLip())
+                )
+            )
             .build();
         //When
         DirectionsQuestionnaireForm form = generator.getTemplateData(caseData, BEARER_TOKEN);
