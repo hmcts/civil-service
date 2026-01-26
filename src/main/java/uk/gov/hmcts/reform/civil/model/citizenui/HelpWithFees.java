@@ -14,4 +14,10 @@ public class HelpWithFees {
 
     private YesOrNo helpWithFee;
     private String helpWithFeesReferenceNumber;
+
+    public HelpWithFees copy() {
+        return new HelpWithFees()
+            .setHelpWithFee(this.helpWithFee)
+            .setHelpWithFeesReferenceNumber(this.helpWithFeesReferenceNumber);
+    }
 }

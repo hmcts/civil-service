@@ -20,4 +20,23 @@ public class FeePaymentOutcomeDetails {
     private YesOrNo hwfFullRemissionGrantedForHearingFee;
     private List<String> hwfOutstandingFeePaymentDoneForClaimIssue;
     private List<String> hwfOutstandingFeePaymentDoneForHearingFee;
+    private YesOrNo hwfFullRemissionGrantedForGa;
+    private YesOrNo hwfFullRemissionGrantedForAdditionalFee;
+    private List<String> hwfOutstandingFeePaymentDoneForGa;
+    private List<String> hwfOutstandingFeePaymentDoneForAdditional;
+
+    public FeePaymentOutcomeDetails copy() {
+        return new FeePaymentOutcomeDetails(
+            hwfNumberAvailable,
+            hwfNumberForFeePaymentOutcome,
+            hwfFullRemissionGrantedForClaimIssue,
+            hwfFullRemissionGrantedForHearingFee,
+            hwfOutstandingFeePaymentDoneForClaimIssue,
+            hwfOutstandingFeePaymentDoneForHearingFee,
+            hwfFullRemissionGrantedForGa,
+            hwfFullRemissionGrantedForAdditionalFee,
+            hwfOutstandingFeePaymentDoneForGa,
+            hwfOutstandingFeePaymentDoneForAdditional
+        );
+    }
 }

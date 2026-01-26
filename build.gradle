@@ -284,6 +284,7 @@ configure(subprojects.findAll { it.name == 'dashboard-notifications' }) {
 }
 
 jacocoTestReport {
+  dependsOn "bootStartScripts"
   executionData(test, integration)
   executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
   subprojects.each {
@@ -306,7 +307,12 @@ jacocoTestReport.dependsOn subprojects.collect { project ->
   project.tasks.findByName('jacocoTestReport')
 }.findAll { it != null }
 
-jacocoTestReport.dependsOn tasks.matching { it.name.startsWith('compile') || it.name.startsWith('process') }
+jacocoTestReport.dependsOn tasks.matching {
+  it.name.startsWith('compile')
+          || it.name.startsWith('process')
+          || it.name.equals('startScripts')
+          || it.name.equals('bootStartScripts')
+}
 
 tasks.named('test') {
   finalizedBy jacocoTestReport
