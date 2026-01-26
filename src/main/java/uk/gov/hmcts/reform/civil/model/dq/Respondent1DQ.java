@@ -2,10 +2,10 @@ package uk.gov.hmcts.reform.civil.model.dq;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.DeterWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
@@ -19,9 +19,9 @@ import java.util.stream.Stream;
 
 @Setter
 @Data
-@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 public class Respondent1DQ implements DQ {
 
     private FileDirectionsQuestionnaire respondent1DQFileDirectionsQuestionnaire;
@@ -181,17 +181,16 @@ public class Respondent1DQ implements DQ {
                 optRespond.map(RequestedCourt::getReasonForHearingAtSpecificCourt)
             ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(null);
 
-            RequestedCourt.RequestedCourtBuilder copyBuilder = RequestedCourt.builder()
-                .responseCourtCode(responseCourtCode)
-                .reasonForHearingAtSpecificCourt(reasonForHearingAtSpecificCourt);
+            RequestedCourt copy = new RequestedCourt()
+                .setResponseCourtCode(responseCourtCode)
+                .setReasonForHearingAtSpecificCourt(reasonForHearingAtSpecificCourt);
 
             Stream.of(
                 optRespondentDQ.map(RequestedCourt::getCaseLocation),
                 optRespond.map(RequestedCourt::getCaseLocation)
-            ).filter(Optional::isPresent).findFirst().map(Optional::get).ifPresent(copyBuilder::caseLocation);
+            ).filter(Optional::isPresent).findFirst().map(Optional::get).ifPresent(copy::setCaseLocation);
 
-            return copyBuilder
-                .build();
+            return copy;
         }
         return respondent1DQRequestedCourt;
     }
