@@ -101,67 +101,73 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
         @Test
         void shouldNotifyDefendantSolicitor_whenInvoked() {
 
+            Organisation organisation = new Organisation();
+            organisation.setName("Test Org Name");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                    .thenReturn(Optional.of(organisation));
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified()
-                .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
-                .build();
+                    .atStateClaimDetailsNotified()
+                    .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+                    .build();
             CallbackParams params = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_SUBMIT, caseData)
-                .request(CallbackRequest.builder()
-                             .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT.name())
-                             .build())
-                .build();
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                            .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT.name())
+                            .build())
+                    .build();
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "respondentsolicitor@example.com",
-                "template-id-sdo",
-                getNotificationDataMap(),
-                "sdo-dj-order-notification-defendant-000DC001"
+                    "respondentsolicitor@example.com",
+                    "template-id-sdo",
+                    getNotificationDataMap(),
+                    "sdo-dj-order-notification-defendant-000DC001"
             );
         }
 
         @Test
         void shouldNotifyDefendantSolicitor2Defendants_whenInvoked() {
 
+            Organisation organisation = new Organisation();
+            organisation.setName("Test Org Name");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                    .thenReturn(Optional.of(organisation));
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
-                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
-                .build();
+                    .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
+                    .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+                    .build();
             CallbackParams params = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_SUBMIT, caseData)
-                .request(CallbackRequest.builder()
-                             .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2.name())
-                             .build())
-                .build();
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                            .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2.name())
+                            .build())
+                    .build();
             handler.handle(params);
 
             verify(notificationService, times(1)).sendMail(
-                anyString(),
-                eq("template-id-sdo"), anyMap(),
-                eq("sdo-dj-order-notification-defendant-000DC001"));
+                    anyString(),
+                    eq("template-id-sdo"), anyMap(),
+                    eq("sdo-dj-order-notification-defendant-000DC001"));
         }
 
         @Test
         void shouldNotNotifyDefendantSolicitor2Defendants_whenInvokedAndNo2Defendant() {
 
+            Organisation organisation = new Organisation();
+            organisation.setName("Test Org Name");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                    .thenReturn(Optional.of(organisation));
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
-                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
-                .addRespondent2(NO)
-                .build();
+                    .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
+                    .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+                    .addRespondent2(NO)
+                    .build();
             CallbackParams params = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_SUBMIT, caseData)
-                .request(CallbackRequest.builder()
-                             .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2.name())
-                             .build())
-                .build();
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                            .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2.name())
+                            .build())
+                    .build();
             handler.handle(params);
 
             verifyNoInteractions(notificationService);
@@ -171,22 +177,22 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
         void shouldReturnRespondent1name_whenInvokedAndNoOrgPolicy() {
 
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified()
-                .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
-                .build();
+                    .atStateClaimDetailsNotified()
+                    .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+                    .build();
             CallbackParams params = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_SUBMIT, caseData)
-                .request(CallbackRequest.builder()
-                             .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT.name())
-                             .build())
-                .build();
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                            .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT.name())
+                            .build())
+                    .build();
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "respondentsolicitor@example.com",
-                "template-id-sdo",
-                getNotificationDataMapRes1(),
-                "sdo-dj-order-notification-defendant-000DC001"
+                    "respondentsolicitor@example.com",
+                    "template-id-sdo",
+                    getNotificationDataMapRes1(),
+                    "sdo-dj-order-notification-defendant-000DC001"
             );
         }
 
@@ -194,82 +200,86 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
         void shouldReturnRespondent2name_whenInvokedAndNoOrgPolicy() {
 
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
-                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
-                .build();
+                    .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
+                    .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+                    .build();
             CallbackParams params = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_SUBMIT, caseData)
-                .request(CallbackRequest.builder()
-                             .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2.name())
-                             .build())
-                .build();
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                            .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2.name())
+                            .build())
+                    .build();
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "respondentsolicitor2@example.com",
-                "template-id-sdo",
-                getNotificationDataMapRes2(),
-                "sdo-dj-order-notification-defendant-000DC001"
+                    "respondentsolicitor2@example.com",
+                    "template-id-sdo",
+                    getNotificationDataMapRes2(),
+                    "sdo-dj-order-notification-defendant-000DC001"
             );
         }
 
         @Test
         public void shouldThrowErrorWhenMissingEmail() {
+            Organisation organisation = new Organisation();
+            organisation.setName("Test Org Name");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                    .thenReturn(Optional.of(organisation));
 
             doThrow(new RuntimeException()).when(notificationService).sendMail(isNull(), any(), any(), any());
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified()
-                .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
-                .respondentSolicitor1EmailAddress(null)
-                .respondent1Represented(YES)
-                .build();
+                    .atStateClaimDetailsNotified()
+                    .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+                    .respondentSolicitor1EmailAddress(null)
+                    .respondent1Represented(YES)
+                    .build();
             CallbackParams params = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_SUBMIT, caseData)
-                .request(CallbackRequest.builder()
-                             .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT.name())
-                             .caseDetails(CaseDetails.builder().id(123L).build())
-                             .build())
-                .build();
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                            .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT.name())
+                            .caseDetails(CaseDetails.builder().id(123L).build())
+                            .build())
+                    .build();
 
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                any(),
-                any(),
-                any(),
-                any()
+                    any(),
+                    any(),
+                    any(),
+                    any()
             );
         }
 
         @Test
         void shouldThrowErrorWhenInvalidDefendant2Email() {
             final String invalidEmail = "invalidEmail@123";
+            Organisation organisation = new Organisation();
+            organisation.setName("Test Org Name");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                    .thenReturn(Optional.of(organisation));
 
             doThrow(new RuntimeException()).when(notificationService).sendMail(eq(invalidEmail), any(), any(), any());
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
-                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
-                .respondentSolicitor2EmailAddress(invalidEmail)
-                .respondent2Represented(YES)
-                .build();
+                    .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
+                    .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+                    .respondentSolicitor2EmailAddress(invalidEmail)
+                    .respondent2Represented(YES)
+                    .build();
             CallbackParams params = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_SUBMIT, caseData)
-                .request(CallbackRequest.builder()
-                             .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2.name())
-                             .caseDetails(CaseDetails.builder().id(123L).build())
-                             .build())
-                .build();
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                            .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2.name())
+                            .caseDetails(CaseDetails.builder().id(123L).build())
+                            .build())
+                    .build();
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                any(),
-                any(),
-                any(),
-                any()
+                    any(),
+                    any(),
+                    any(),
+                    any()
             );
         }
 

@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
-import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -14,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.sdo.DesicionOnReconsiderationDoc
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
@@ -25,6 +25,7 @@ public class RequestReconsiderationGeneratorService {
     private final DocumentGeneratorService documentGeneratorService;
     private final DocumentManagementService documentManagementService;
     private final UserService userService;
+    private final SdoCaseClassificationService sdoCaseClassificationService;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         MappableObject templateData;
@@ -71,12 +72,12 @@ public class RequestReconsiderationGeneratorService {
             .caseNumber(caseData.getLegacyCaseReference())
             .applicant1(caseData.getApplicant1())
             .hasApplicant2(
-                SdoHelper.hasSharedVariable(caseData, "applicant2")
+                sdoCaseClassificationService.hasApplicant2(caseData)
             )
             .applicant2(caseData.getApplicant2())
             .respondent1(caseData.getRespondent1())
             .hasRespondent2(
-                SdoHelper.hasSharedVariable(caseData, "respondent2")
+                sdoCaseClassificationService.hasRespondent2(caseData)
             )
             .respondent2(caseData.getRespondent2())
             .upholdingPreviousOrderReason(caseData.getUpholdingPreviousOrderReason());
