@@ -538,6 +538,9 @@ hmcsb:
         ignoreSubscriptionDeletion: true
         rules:
           - name: "servicefilter"
-            filterType: SqlFilter
-            sqlFilter:
-              sqlExpression: "hmctsServiceId IN ('AAA7','AAA6') AND hmctsDeploymentId = 'civil-${CHANGE_ID}'"
+            filterType: CorrelationFilter
+            correlationFilter:
+              - name: "hmctsServiceId"
+                value: "AAA7"
+              - name: "hmctsDeploymentId"
+                value: "civil-${CHANGE_ID}"
