@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoCoverLetterAppendService;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -64,7 +65,7 @@ class SendSDOBulkPrintServiceTest {
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
-        verifyPrintLetter(caseData, respondent1);
+        verifyPrintLetter(caseData, respondent1, List.of("test"));
     }
 
     @Test
@@ -76,7 +77,7 @@ class SendSDOBulkPrintServiceTest {
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
 
-        verifyPrintLetter(caseData, applicant1);
+        verifyPrintLetter(caseData, applicant1, List.of("test"));
     }
 
     @Test
@@ -94,7 +95,7 @@ class SendSDOBulkPrintServiceTest {
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
-        verifyPrintLetter(caseData, applicant1);
+        verifyPrintLetter(caseData, applicant1, List.of("test"));
         ArgumentCaptor<CaseDocument[]> captor = ArgumentCaptor.forClass(CaseDocument[].class);
         verify(sdoCoverLetterAppendService).makeSdoDocumentMailable(any(), any(), any(), any(), captor.capture());
         assertThat(captor.getValue()).hasSize(1);
@@ -115,7 +116,7 @@ class SendSDOBulkPrintServiceTest {
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
-        verifyPrintLetter(caseData, applicant1);
+        verifyPrintLetter(caseData, applicant1, List.of("test"));
         ArgumentCaptor<CaseDocument[]> captor = ArgumentCaptor.forClass(CaseDocument[].class);
         verify(sdoCoverLetterAppendService).makeSdoDocumentMailable(any(), any(), any(), any(), captor.capture());
         assertThat(captor.getValue()).hasSize(1);
@@ -136,7 +137,7 @@ class SendSDOBulkPrintServiceTest {
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
-        verifyPrintLetter(caseData, applicant1);
+        verifyPrintLetter(caseData, applicant1, List.of("test", "test"));
         ArgumentCaptor<CaseDocument[]> captor = ArgumentCaptor.forClass(CaseDocument[].class);
         verify(sdoCoverLetterAppendService).makeSdoDocumentMailable(any(), any(), any(), any(), captor.capture());
         assertThat(captor.getValue()).hasSize(2);
@@ -153,7 +154,7 @@ class SendSDOBulkPrintServiceTest {
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
 
-        verifyPrintLetter(caseData, applicant1);
+        verifyPrintLetter(caseData, applicant1, List.of("test"));
         ArgumentCaptor<CaseDocument[]> captor = ArgumentCaptor.forClass(CaseDocument[].class);
         verify(sdoCoverLetterAppendService).makeSdoDocumentMailable(any(), any(), any(), any(), captor.capture());
         assertThat(captor.getValue()).hasSize(1);
@@ -170,7 +171,7 @@ class SendSDOBulkPrintServiceTest {
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
 
-        verifyPrintLetter(caseData, applicant1);
+        verifyPrintLetter(caseData, applicant1, List.of("test"));
         ArgumentCaptor<CaseDocument[]> captor = ArgumentCaptor.forClass(CaseDocument[].class);
         verify(sdoCoverLetterAppendService).makeSdoDocumentMailable(any(), any(), any(), any(), captor.capture());
         assertThat(captor.getValue()).hasSize(1);
@@ -187,7 +188,7 @@ class SendSDOBulkPrintServiceTest {
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
 
-        verifyPrintLetter(caseData, applicant1);
+        verifyPrintLetter(caseData, applicant1, List.of("test", "test"));
         ArgumentCaptor<CaseDocument[]> captor = ArgumentCaptor.forClass(CaseDocument[].class);
         verify(sdoCoverLetterAppendService).makeSdoDocumentMailable(any(), any(), any(), any(), captor.capture());
         assertThat(captor.getValue()).hasSize(2);
@@ -212,13 +213,14 @@ class SendSDOBulkPrintServiceTest {
         verifyNoInteractions(bulkPrintService);
     }
 
-    private void verifyPrintLetter(CaseData caseData, Party party) {
+    private void verifyPrintLetter(CaseData caseData, Party party, List<String> fileNames) {
         verify(bulkPrintService).printLetter(
             LETTER_CONTENT,
             caseData.getLegacyCaseReference(),
             caseData.getLegacyCaseReference(),
             SDO_ORDER_PACK_LETTER_TYPE,
-            Collections.singletonList(party.getPartyName())
+            Collections.singletonList(party.getPartyName()),
+            fileNames
         );
     }
 
