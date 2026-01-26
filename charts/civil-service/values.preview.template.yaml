@@ -533,7 +533,7 @@ hmcsb:
     topics:
       - name: civil
         fullName: hmc-to-cft-aat
-        create: true
+        create: false
         subscriptionNeeded: yes
         ignoreSubscriptionDeletion: true
         rules:
