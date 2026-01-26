@@ -151,7 +151,8 @@ class RecordJudgmentDeterminationOfMeansPiPLetterGeneratorTest {
                 caseData.getLegacyCaseReference(),
                 caseData.getLegacyCaseReference(),
                 RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LETTER,
-                List.of(caseData.getRespondent1().getPartyName())
+                List.of(caseData.getRespondent1().getPartyName()),
+                List.of("file-name")
             );
     }
 
