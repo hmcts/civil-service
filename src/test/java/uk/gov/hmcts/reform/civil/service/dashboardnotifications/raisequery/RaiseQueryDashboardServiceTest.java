@@ -139,6 +139,44 @@ class RaiseQueryDashboardServiceTest {
         verifyNoInteractions(dashboardScenariosService);
     }
 
+    @Test
+    void shouldDeleteDuplicatesWhenNoPartyScenarioIsRecorded() {
+        CaseData caseData = lipCaseData(singleMessageQuery(DEFENDANT_QUERY_ID, "defendant"));
+        when(runtimeService.getProcessVariables(PROCESS_INSTANCE_ID))
+            .thenReturn(QueryManagementVariables.builder().queryId(DEFENDANT_QUERY_ID).build());
+        when(coreCaseUserService.getUserCaseRoles(String.valueOf(CASE_REFERENCE), "defendant"))
+            .thenReturn(List.of());
+
+        service.notifyRaiseQuery(caseData, AUTH_TOKEN);
+
+        verifyDeletionScenarios();
+    }
+
+    @Test
+    void shouldNotifyBothPartiesWhenQueryCreatorHasNoLipRole() {
+        CaseData caseData = lipCaseData(singleMessageQuery(DEFENDANT_QUERY_ID, "defendant"));
+        when(runtimeService.getProcessVariables(PROCESS_INSTANCE_ID))
+            .thenReturn(QueryManagementVariables.builder().queryId(DEFENDANT_QUERY_ID).build());
+        when(coreCaseUserService.getUserCaseRoles(String.valueOf(CASE_REFERENCE), "defendant"))
+            .thenReturn(List.of());
+
+        service.notifyRaiseQuery(caseData, AUTH_TOKEN);
+
+        verifyDeletionScenarios();
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_QUERY_RAISED_BY_OTHER_PARTY_CLAIMANT.getScenario()),
+            eq(String.valueOf(CASE_REFERENCE)),
+            any(ScenarioRequestParams.class)
+        );
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_QUERY_RAISED_BY_OTHER_PARTY_DEFENDANT.getScenario()),
+            eq(String.valueOf(CASE_REFERENCE)),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
     private CaseData lipCaseData(CaseQueriesCollection queries) {
         return CaseDataBuilder.builder()
             .ccdCaseReference(CASE_REFERENCE)
