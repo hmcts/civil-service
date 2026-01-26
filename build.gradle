@@ -440,6 +440,7 @@ dependencies {
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.107'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.43'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.29'
+  // CVE-2025-15104 - resolved in java21 pipeline, suppressed 01-26
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.8'
 
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: versions.jackson
