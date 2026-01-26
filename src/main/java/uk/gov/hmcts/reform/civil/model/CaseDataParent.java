@@ -224,7 +224,6 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private List<DisposalAndTrialHearingDJToggle> sdoR2TrialUseOfWelshLangToggleDJ;
     private SdoR2FastTrackCreditHire sdoR2FastTrackCreditHire;
 
-
     private PPI smallClaimsPPI;
     private PPI fastTrackPPI;
 
