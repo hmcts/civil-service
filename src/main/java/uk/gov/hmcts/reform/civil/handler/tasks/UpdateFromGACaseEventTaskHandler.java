@@ -93,7 +93,7 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
                     getUpdatedCaseData(caseData, generalAppCaseData)
                 )
             );
-            return new ExternalTaskData().setCaseData(caseData).setGeneralApplicationCaseData(generalAppCaseData);
+            return new ExternalTaskData().setCaseData(caseData).setGeneralApplicationData(generalAppCaseData);
         } catch (NumberFormatException ne) {
             throw new InvalidCaseDataException(
                 "Conversion to long datatype failed for general application for a case ", ne

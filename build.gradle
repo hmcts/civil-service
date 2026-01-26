@@ -269,7 +269,7 @@ sonarqube {
     property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java, **/*CcdDashboardClaimantClaimMatcher.java, **/*CcdDashboardDefendantClaimMatcher.java"
     property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**, **/handler/callback/camunda/dashboardnotifications/claimant/CCJRequestedDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantCCJResponseNotificationHandler.java" +
       ", **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantResponseNotificationHandler.java, **/utils/**, **/filters/**, **/handler/callback/camunda/dashboardnotifications/defendant/MoreTimeRequestedDashboardNotificationDefendantHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantMediationSuccessfulDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimSettledDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/HearingScheduledClaimantNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/defendant/SettleClaimPaidInFullDefendantDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/defendant/DefendantNotifyDiscontinuanceDashboardNotificationHandler.java" +
-      ",**/utils/CaseQueriesUtil.java, **/handler/callback/user/RaiseQueryCallbackHandler.java, **/handler/callback/user/RespondQueryCallbackHandler.java, **/service/servicebus/CcdCaseEventsExecutor.java, **/tasklisteners/MigrateCasesTaskListener.java, **/migration/MigrationTask.java, **/migration/CustomRequestScopeAttr.java"
+      ",**/utils/CaseQueriesUtil.java, **/handler/callback/user/RaiseQueryCallbackHandler.java,**/handler/migration/MigrateCaseQueriesTask.java, **/handler/callback/user/RespondQueryCallbackHandler.java, **/service/servicebus/CcdCaseEventsExecutor.java, **/tasklisteners/MigrateCasesTaskListener.java, **/migration/MigrationTask.java, **/migration/CustomRequestScopeAttr.java"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
     property "sonar.web.javaOpts", "-Xmx2G"
   }
@@ -284,6 +284,7 @@ configure(subprojects.findAll { it.name == 'dashboard-notifications' }) {
 }
 
 jacocoTestReport {
+  dependsOn "bootStartScripts"
   executionData(test, integration)
   executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
   subprojects.each {
@@ -306,7 +307,12 @@ jacocoTestReport.dependsOn subprojects.collect { project ->
   project.tasks.findByName('jacocoTestReport')
 }.findAll { it != null }
 
-jacocoTestReport.dependsOn tasks.matching { it.name.startsWith('compile') || it.name.startsWith('process') }
+jacocoTestReport.dependsOn tasks.matching {
+  it.name.startsWith('compile')
+          || it.name.startsWith('process')
+          || it.name.equals('startScripts')
+          || it.name.equals('bootStartScripts')
+}
 
 tasks.named('test') {
   finalizedBy jacocoTestReport
@@ -322,29 +328,35 @@ ext.libraries = [
   ]
 ]
 
-configurations.all {
-  resolutionStrategy.eachDependency { details ->
-    if (details.requested.group == 'org.projectlombok') {
-      details.useVersion versions.lombok
-    }
-    if (details.requested.group == 'io.netty') {
-      if (details.requested.name in [
-        'netty-buffer', 'netty-codec', 'netty-codec-dns',
-        'netty-codec-http', 'netty-codec-http2', 'netty-codec-socks',
-        'netty-common', 'netty-handler', 'netty-handler-proxy',
-        'netty-resolver', 'netty-resolver-dns', 'netty-resolver-dns-classes-macos',
-        'netty-resolver-dns-native-macos',
-        'netty-transport', 'netty-transport-classes-epoll',
-        'netty-transport-classes-kqueue', 'netty-transport-native-epoll',
-        'netty-transport-native-kqueue', 'netty-transport-native-unix-common'
-      ]) {
-        details.useVersion('4.1.129.Final')
-        details.because('CVE-2025-25193, CVE-2025-67735')
+allprojects {
+  configurations.all {
+    resolutionStrategy.eachDependency { details ->
+      if (details.requested.group == 'org.projectlombok') {
+        details.useVersion versions.lombok
+      }
+      if (details.requested.group == 'io.netty') {
+        if (details.requested.name in [
+          'netty-buffer', 'netty-codec', 'netty-codec-dns',
+          'netty-codec-http', 'netty-codec-http2', 'netty-codec-socks',
+          'netty-common', 'netty-handler', 'netty-handler-proxy',
+          'netty-resolver', 'netty-resolver-dns', 'netty-resolver-dns-classes-macos',
+          'netty-resolver-dns-native-macos',
+          'netty-transport', 'netty-transport-classes-epoll',
+          'netty-transport-classes-kqueue', 'netty-transport-native-epoll',
+          'netty-transport-native-kqueue', 'netty-transport-native-unix-common'
+        ]) {
+          details.useVersion('4.1.129.Final')
+          details.because('CVE-2025-25193, CVE-2025-67735')
+        }
+      }
+      if (details.requested.group == 'org.apache.logging.log4j') {
+        details.useVersion('2.25.3')
+        details.because('CVE-2025-68161 vendor recommended version')
       }
     }
+    exclude group: 'org.springframework.security', module: 'spring-security-rsa'
+    exclude group: 'org.projectlombok', module: 'lombok-mapstruct-binding'
   }
-  exclude group: 'org.springframework.security', module: 'spring-security-rsa'
-  exclude group: 'org.projectlombok', module: 'lombok-mapstruct-binding'
 }
 
 dependencies {
@@ -417,8 +429,13 @@ dependencies {
   implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.5'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.12.6'
   implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.2'
-  implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.1'
-  implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.25.1'
+  implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.3'
+  implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.25.3'
+  constraints {
+    implementation('org.apache.logging.log4j:log4j-core:2.25.3') {
+      because 'CVE-2025-68161 (upgrade to vendor recommended version)'
+    }
+  }
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.1'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.107'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.43'
