@@ -3,9 +3,11 @@ package uk.gov.hmcts.reform.civil.model.docmosis.claimantresponse;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -16,9 +18,11 @@ import uk.gov.hmcts.reform.civil.model.docmosis.common.RepaymentPlanTemplateData
 import java.time.LocalDate;
 import java.util.List;
 
-@Builder(toBuilder = true)
 @Getter
+@Setter
 @EqualsAndHashCode
+@NoArgsConstructor
+@Accessors(chain = true)
 public class JudgmentByAdmissionOrDetermination implements MappableObject {
 
     private String formHeader;

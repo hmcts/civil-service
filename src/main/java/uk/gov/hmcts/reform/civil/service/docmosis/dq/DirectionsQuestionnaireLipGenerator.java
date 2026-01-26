@@ -119,12 +119,11 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
     }
 
     protected List<Party> getRespondents(CaseData caseData, String defendantIdentifier) {
-        return List.of(Party.builder()
-            .name(caseData.getRespondent1().getPartyName())
-            .emailAddress(caseData.getRespondent1().getPartyEmail())
-            .phoneNumber(caseData.getRespondent1().getPartyPhone())
-            .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
-            .build());
+        return List.of(new Party()
+            .setName(caseData.getRespondent1().getPartyName())
+            .setEmailAddress(caseData.getRespondent1().getPartyEmail())
+            .setPhoneNumber(caseData.getRespondent1().getPartyPhone())
+            .setPrimaryAddress(caseData.getRespondent1().getPrimaryAddress()));
     }
 
     protected RequestedCourt getRequestedCourt(DQ dq, String authorisation) {

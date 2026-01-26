@@ -1,15 +1,15 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.casepogression;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 
 @Getter
-@Builder
 @AllArgsConstructor
 @EqualsAndHashCode
+@Accessors(chain = true)
 public class CourtOfficerOrderForm implements MappableObject {
 
     private String caseNumber;

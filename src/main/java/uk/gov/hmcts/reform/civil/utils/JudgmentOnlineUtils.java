@@ -70,15 +70,13 @@ public class JudgmentOnlineUtils {
                                            uk.gov.hmcts.reform.civil.model.Party applicant2) {
 
         List<Party> applicants = new ArrayList<>();
-        applicants.add(Party.builder()
-                           .name(applicant1.getPartyName())
-                           .primaryAddress(applicant1.getPrimaryAddress())
-                           .build());
+        applicants.add(new Party()
+                           .setName(applicant1.getPartyName())
+                           .setPrimaryAddress(applicant1.getPrimaryAddress()));
         if (applicant2 != null) {
-            applicants.add(Party.builder()
-                               .name(" and " + applicant2.getPartyName())
-                               .primaryAddress(applicant2.getPrimaryAddress())
-                               .build());
+            applicants.add(new Party()
+                               .setName(" and " + applicant2.getPartyName())
+                               .setPrimaryAddress(applicant2.getPrimaryAddress()));
         }
         return applicants;
     }
@@ -95,10 +93,9 @@ public class JudgmentOnlineUtils {
     }
 
     public static Party getPartyDetails(uk.gov.hmcts.reform.civil.model.Party party) {
-        return Party.builder()
-            .name(party.getPartyName())
-            .primaryAddress(party.getPrimaryAddress())
-            .build();
+        return new Party()
+            .setName(party.getPartyName())
+            .setPrimaryAddress(party.getPrimaryAddress());
     }
 
     public static Party getOrgDetails(OrganisationPolicy organisationPolicy, OrganisationService organisationService) {
@@ -106,10 +103,9 @@ public class JudgmentOnlineUtils {
             .map(OrganisationPolicy::getOrganisation)
             .map(uk.gov.hmcts.reform.ccd.model.Organisation::getOrganisationID)
             .map(organisationService::findOrganisationById)
-            .flatMap(value -> value.map(o -> Party.builder()
-                .name(o.getName())
-                .primaryAddress(getAddress(o.getContactInformation().get(0)))
-                .build())).orElse(null);
+            .flatMap(value -> value.map(o -> new Party()
+                .setName(o.getName())
+                .setPrimaryAddress(getAddress(o.getContactInformation().get(0))))).orElse(null);
     }
 
 }

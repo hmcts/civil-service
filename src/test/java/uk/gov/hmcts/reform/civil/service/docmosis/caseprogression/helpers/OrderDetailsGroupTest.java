@@ -41,18 +41,18 @@ public class OrderDetailsGroupTest {
         String freeFormRecordedText = "Recorded text";
         String freeFormOrderedText = "Ordered text";
 
-        JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder()
-            .freeFormOrderedText("Ordered Text")
-            .freeFormRecordedText("Recorded text");
+        JudgeFinalOrderForm form = new JudgeFinalOrderForm()
+            .setFreeFormOrderedText("Ordered Text")
+            .setFreeFormRecordedText("Recorded text");
 
-        builder = orderDetailsPopulator.populateOrderDetails(builder, caseData);
+        form = orderDetailsPopulator.populateOrderDetails(form, caseData);
 
         String onInitiativeText = "On initiative text";
         LocalDate onInitiativeDate = LocalDate.now();
         String withoutNoticeText = "Without notice text";
         LocalDate withoutNoticeDate = LocalDate.now();
 
-        JudgeFinalOrderForm result = builder.build();
+        JudgeFinalOrderForm result = form;
         Assertions.assertEquals(freeFormRecordedText, result.getFreeFormRecordedText());
         Assertions.assertEquals(freeFormOrderedText, result.getFreeFormOrderedText());
         Assertions.assertEquals(onInitiativeText, result.getOnInitiativeSelectionText());

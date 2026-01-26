@@ -2,8 +2,10 @@ package uk.gov.hmcts.reform.civil.model.docmosis.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.Evidence;
 
 import java.util.Collection;
@@ -11,8 +13,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-@Getter
-@Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
 public class EvidenceTemplateData {
 
     private String type;
@@ -20,9 +24,9 @@ public class EvidenceTemplateData {
 
     @JsonIgnore
     public static EvidenceTemplateData toEvidenceTemplateData(Evidence evidence) {
-        return EvidenceTemplateData.builder().type(evidence.getValue().getEvidenceType())
-            .explanation(evidence.getValue().getEvidenceDescription())
-            .build();
+        return new EvidenceTemplateData()
+            .setType(evidence.getValue().getEvidenceType())
+            .setExplanation(evidence.getValue().getEvidenceDescription());
     }
 
     @JsonIgnore

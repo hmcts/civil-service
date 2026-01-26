@@ -40,68 +40,66 @@ public class SetApplicantsForDQGenerator {
         var legalRepHeading = caseData.getCaseAccessCategory().equals(SPEC_CLAIM) ? "Name" : organisationName;
         var applicant = caseData.getApplicant2();
         var litigationFriend = caseData.getApplicant2LitigationFriend();
-        var applicant2PartyBuilder = Party.builder()
-            .name(applicant.getPartyName())
-            .primaryAddress(applicant.getPrimaryAddress())
-            .emailAddress(applicant.getPartyEmail())
-            .phoneNumber(applicant.getPartyPhone())
-            .representative(representativeService
+        return new Party()
+            .setName(applicant.getPartyName())
+            .setPrimaryAddress(applicant.getPrimaryAddress())
+            .setEmailAddress(applicant.getPartyEmail())
+            .setPhoneNumber(applicant.getPartyPhone())
+            .setRepresentative(representativeService
                                 .getApplicantRepresentative(caseData))
             // remove litigationFriendName when HNL toggle is enabled
-            .litigationFriendName(
+            .setLitigationFriendName(
                 ofNullable(litigationFriend)
                     .map(LitigationFriend::getFullName)
                     .orElse(""))
-            .litigationFriendFirstName(
+            .setLitigationFriendFirstName(
                 ofNullable(litigationFriend)
                     .map(LitigationFriend::getFirstName)
                     .orElse(""))
-            .litigationFriendLastName(
+            .setLitigationFriendLastName(
                 ofNullable(litigationFriend)
                     .map(LitigationFriend::getLastName)
                     .orElse(""))
-            .litigationFriendPhoneNumber(ofNullable(litigationFriend)
+            .setLitigationFriendPhoneNumber(ofNullable(litigationFriend)
                                              .map(LitigationFriend::getPhoneNumber)
                                              .orElse(""))
-            .litigationFriendEmailAddress(ofNullable(litigationFriend)
+            .setLitigationFriendEmailAddress(ofNullable(litigationFriend)
                                               .map(LitigationFriend::getEmailAddress)
                                               .orElse(""))
-            .legalRepHeading(legalRepHeading);
-        return applicant2PartyBuilder.build();
+            .setLegalRepHeading(legalRepHeading);
     }
 
     public Party getApplicant1DQParty(CaseData caseData) {
         var legalRepHeading = caseData.getCaseAccessCategory().equals(SPEC_CLAIM) ? "Name" : organisationName;
         var applicant = caseData.getApplicant1();
         var litigationFriend = caseData.getApplicant1LitigationFriend();
-        var applicant1PartyBuilder = Party.builder()
-            .name(applicant.getPartyName())
-            .primaryAddress(caseData.getApplicant1().getPrimaryAddress())
-            .emailAddress(applicant.getPartyEmail())
-            .phoneNumber(applicant.getPartyPhone())
-            .representative(representativeService
+        return new Party()
+            .setName(applicant.getPartyName())
+            .setPrimaryAddress(caseData.getApplicant1().getPrimaryAddress())
+            .setEmailAddress(applicant.getPartyEmail())
+            .setPhoneNumber(applicant.getPartyPhone())
+            .setRepresentative(representativeService
                                 .getApplicantRepresentative(caseData))
             // remove litigationFriendName when HNL toggle is enabled
-            .litigationFriendName(
+            .setLitigationFriendName(
                 ofNullable(litigationFriend)
                     .map(LitigationFriend::getFullName)
                     .orElse(""))
-            .litigationFriendFirstName(
+            .setLitigationFriendFirstName(
                 ofNullable(litigationFriend)
                     .map(LitigationFriend::getFirstName)
                     .orElse(""))
-            .litigationFriendLastName(
+            .setLitigationFriendLastName(
                 ofNullable(litigationFriend)
                     .map(LitigationFriend::getLastName)
                     .orElse(""))
-            .litigationFriendPhoneNumber(ofNullable(litigationFriend)
+            .setLitigationFriendPhoneNumber(ofNullable(litigationFriend)
                                              .map(LitigationFriend::getPhoneNumber)
                                              .orElse(""))
-            .litigationFriendEmailAddress(ofNullable(litigationFriend)
+            .setLitigationFriendEmailAddress(ofNullable(litigationFriend)
                                               .map(LitigationFriend::getEmailAddress)
                                               .orElse(""))
-            .legalRepHeading(legalRepHeading);
-        return applicant1PartyBuilder.build();
+            .setLegalRepHeading(legalRepHeading);
     }
 
     private boolean onlyApplicant2IsProceeding(CaseData caseData) {

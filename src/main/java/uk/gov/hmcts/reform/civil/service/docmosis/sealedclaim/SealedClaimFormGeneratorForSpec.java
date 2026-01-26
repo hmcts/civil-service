@@ -280,11 +280,10 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
     private SpecifiedParty getRespondent(
         Party respondent, CaseData caseData,
         Function<CaseData, Representative> representativeExtractor) {
-        return SpecifiedParty.builder()
-            .name(respondent.getPartyName())
-            .primaryAddress(respondent.getPrimaryAddress())
-            .representative(representativeExtractor.apply(caseData))
-            .build();
+        return new SpecifiedParty()
+            .setName(respondent.getPartyName())
+            .setPrimaryAddress(respondent.getPrimaryAddress())
+            .setRepresentative(representativeExtractor.apply(caseData));
     }
 
     private List<TimelineEventDetailsDocmosis> getTimeLine(CaseData caseData) {
@@ -345,13 +344,12 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
         var representative = representativeService.getApplicantRepresentative(caseData);
         representative.setContactName(caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName());
 
-        return SpecifiedParty.builder()
-            .name(applicant.getPartyName())
-            .primaryAddress(applicant.getPrimaryAddress())
-            .representative(representative)
-            .individualDateOfBirth(applicant.getIndividualDateOfBirth() != null
-                ? applicant.getIndividualDateOfBirth() : null)
-            .build();
+        return new SpecifiedParty()
+            .setName(applicant.getPartyName())
+            .setPrimaryAddress(applicant.getPrimaryAddress())
+            .setRepresentative(representative)
+            .setIndividualDateOfBirth(applicant.getIndividualDateOfBirth() != null
+                ? applicant.getIndividualDateOfBirth() : null);
     }
 
     private YesOrNo getRespondentsOrgRegistered(CaseData caseData) {

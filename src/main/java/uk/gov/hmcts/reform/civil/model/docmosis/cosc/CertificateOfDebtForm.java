@@ -1,15 +1,15 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.cosc;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 
-@Getter
-@Builder
+@Data
 @AllArgsConstructor
-@EqualsAndHashCode
+@NoArgsConstructor
+@Accessors(chain = true)
 public class CertificateOfDebtForm implements MappableObject {
 
     private String courtLocationName;

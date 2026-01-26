@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.common;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.HomeTypeOptionLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.HomeDetails;
 
@@ -19,7 +19,7 @@ import static uk.gov.hmcts.reform.civil.enums.HomeTypeOptionLRspec.PRIVATE_RENTA
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Builder
+@Accessors(chain = true)
 public class AccommodationTemplate {
 
     private static final Map<HomeTypeOptionLRspec, String> WHERE_DO_THEY_LIVE_MAP = Map.of(OWNED_HOME,

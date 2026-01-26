@@ -2,8 +2,10 @@ package uk.gov.hmcts.reform.civil.model.docmosis.common;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.dq.ExpenseTypeLRspec;
 import uk.gov.hmcts.reform.civil.enums.dq.IncomeTypeLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringExpenseLRspec;
@@ -39,8 +41,10 @@ import static uk.gov.hmcts.reform.civil.enums.dq.IncomeTypeLRspec.PENSION;
 import static uk.gov.hmcts.reform.civil.enums.dq.IncomeTypeLRspec.UNIVERSAL_CREDIT;
 import static uk.gov.hmcts.reform.civil.enums.dq.IncomeTypeLRspec.WORKING_TAX_CREDIT;
 
-@Builder
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
 public class ReasonMoneyTemplateData {
 
     @JsonIgnore
@@ -82,24 +86,22 @@ public class ReasonMoneyTemplateData {
 
     @JsonIgnore
     public static ReasonMoneyTemplateData toReasonMoneyTemplateData(RecurringIncomeLRspec item) {
-        return ReasonMoneyTemplateData.builder()
-            .type(item.getType() == IncomeTypeLRspec.OTHER
+        return new ReasonMoneyTemplateData()
+            .setType(item.getType() == IncomeTypeLRspec.OTHER
                       ? "Other: " + item.getTypeOtherDetails()
                       : INCOME_TYPE_LIP_RESPONSE.get(item.getType()))
-            .amountPounds(getAmountPounds(item.getAmount()))
-            .frequency(item.getFrequency().getDashboardLabel())
-            .build();
+            .setAmountPounds(getAmountPounds(item.getAmount()))
+            .setFrequency(item.getFrequency().getDashboardLabel());
     }
 
     @JsonIgnore
     public static ReasonMoneyTemplateData toReasonMoneyTemplateData(RecurringExpenseLRspec item) {
-        return ReasonMoneyTemplateData.builder()
-            .type(item.getType() == ExpenseTypeLRspec.OTHER
+        return new ReasonMoneyTemplateData()
+            .setType(item.getType() == ExpenseTypeLRspec.OTHER
                       ? "Other: " + item.getTypeOtherDetails()
                       : EXPENSE_TYPE_LIP_RESPONSE.get(item.getType()))
-            .amountPounds(getAmountPounds(item.getAmount()))
-            .frequency(item.getFrequency().getDashboardLabel())
-            .build();
+            .setAmountPounds(getAmountPounds(item.getAmount()))
+            .setFrequency(item.getFrequency().getDashboardLabel());
     }
 
     private static BigDecimal getAmountPounds(final BigDecimal item) {

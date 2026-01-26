@@ -75,31 +75,30 @@ public class JudgmentByAdmissionOrDeterminationMapper {
 
         String totalInterest = judgementService.ccjJudgmentInterest(caseData).setScale(2).toString();
 
-        JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder builder = new JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder();
+        JudgmentByAdmissionOrDetermination form = new JudgmentByAdmissionOrDetermination();
         LocalDateTime now = LocalDateTime.now();
         ApplicantResponsePaymentPlan paymentPlan = getPaymentType(caseData);
-        return builder
-            .formHeader(getFormHeader(caseData, caseEvent))
-            .formName(getFormName(caseData))
-            .claimant(claimant)
-            .defendant(defendant)
-            .claimReferenceNumber(caseData.getLegacyCaseReference())
-            .totalClaimAmount(totalClaimAmount)
-            .totalInterestAmount(totalInterest)
-            .paymentType(paymentPlan)
-            .paymentTypeDisplayValue(paymentPlan != null ? paymentPlan.getDisplayedValue() : null)
-            .payBy(setPayByDate(caseData))
-            .repaymentPlan(addRepaymentPlan(caseData))
-            .ccjJudgmentAmount(judgementService.ccjJudgmentClaimAmount(caseData).setScale(2).toString())
-            .ccjInterestToDate(totalInterest)
-            .claimFee(getClaimFee(caseData).toString())
-            .ccjSubtotal(judgementService.ccjJudgementSubTotal(caseData).setScale(2).toString())
-            .ccjAlreadyPaidAmount(getAlreadyPaidAmount(caseData))
-            .ccjFinalTotal(judgementService.ccjJudgmentFinalTotal(caseData).setScale(2).toString())
-            .defendantResponse(caseData.getRespondent1ClaimResponseTypeForSpec())
-            .generationDate(now.toLocalDate())
-            .generationDateTime(now.format(formatter))
-            .build();
+        return form
+            .setFormHeader(getFormHeader(caseData, caseEvent))
+            .setFormName(getFormName(caseData))
+            .setClaimant(claimant)
+            .setDefendant(defendant)
+            .setClaimReferenceNumber(caseData.getLegacyCaseReference())
+            .setTotalClaimAmount(totalClaimAmount)
+            .setTotalInterestAmount(totalInterest)
+            .setPaymentType(paymentPlan)
+            .setPaymentTypeDisplayValue(paymentPlan != null ? paymentPlan.getDisplayedValue() : null)
+            .setPayBy(setPayByDate(caseData))
+            .setRepaymentPlan(addRepaymentPlan(caseData))
+            .setCcjJudgmentAmount(judgementService.ccjJudgmentClaimAmount(caseData).setScale(2).toString())
+            .setCcjInterestToDate(totalInterest)
+            .setClaimFee(getClaimFee(caseData).toString())
+            .setCcjSubtotal(judgementService.ccjJudgementSubTotal(caseData).setScale(2).toString())
+            .setCcjAlreadyPaidAmount(getAlreadyPaidAmount(caseData))
+            .setCcjFinalTotal(judgementService.ccjJudgmentFinalTotal(caseData).setScale(2).toString())
+            .setDefendantResponse(caseData.getRespondent1ClaimResponseTypeForSpec())
+            .setGenerationDate(now.toLocalDate())
+            .setGenerationDateTime(now.format(formatter));
     }
 
     private BigDecimal getClaimFee(CaseData caseData) {
@@ -150,13 +149,11 @@ public class JudgmentByAdmissionOrDeterminationMapper {
     }
 
     private static RepaymentPlanTemplateData addRepaymentPlan(CaseData caseData) {
-        RepaymentPlanTemplateData.RepaymentPlanTemplateDataBuilder builder = RepaymentPlanTemplateData.builder();
         if (caseData.getApplicant1RepaymentOptionForDefendantSpec().equals(PaymentType.REPAYMENT_PLAN)) {
-            return builder
-                .firstRepaymentDate(caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec())
-                .paymentAmount(caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec().setScale(2))
-                .paymentFrequencyDisplay(caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec().getLabel())
-                .build();
+            return new RepaymentPlanTemplateData()
+                .setFirstRepaymentDate(caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec())
+                .setPaymentAmount(caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec().setScale(2))
+                .setPaymentFrequencyDisplay(caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec().getLabel());
         }
         return null;
     }
@@ -213,32 +210,31 @@ public class JudgmentByAdmissionOrDeterminationMapper {
 
         LocalDate payByDate = getPayByDate(caseData);
 
-        JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder builder = new JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder();
-        return builder
-            .claimReferenceNumber(caseData.getLegacyCaseReference())
-            .respondent1Name(caseData.getRespondent1().getPartyName())
-            .respondent2Name(isNull(caseData.getRespondent2()) ? null : caseData.getRespondent2().getPartyName())
-            .respondent1Ref(getRespondent1SolicitorRef(caseData))
-            .respondent2Ref(getRespondent2SolicitorRef(caseData))
-            .applicantReference(getApplicantSolicitorRef(caseData))
-            .applicant(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
-            .applicants(getApplicant(caseData.getApplicant1(), caseData.getApplicant2()))
-            .respondent(getRespondentLROrLipDetails(caseData))
-            .totalClaimAmount(totalClaimAmount)
-            .totalInterestAmount(totalInterest)
-            .paymentPlan(getPaymentTypeForNonDivergent(caseData))
-            .payByDate(payByDate != null
+        JudgmentByAdmissionOrDetermination form = new JudgmentByAdmissionOrDetermination();
+        return form
+            .setClaimReferenceNumber(caseData.getLegacyCaseReference())
+            .setRespondent1Name(caseData.getRespondent1().getPartyName())
+            .setRespondent2Name(isNull(caseData.getRespondent2()) ? null : caseData.getRespondent2().getPartyName())
+            .setRespondent1Ref(getRespondent1SolicitorRef(caseData))
+            .setRespondent2Ref(getRespondent2SolicitorRef(caseData))
+            .setApplicantReference(getApplicantSolicitorRef(caseData))
+            .setApplicant(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
+            .setApplicants(getApplicant(caseData.getApplicant1(), caseData.getApplicant2()))
+            .setRespondent(getRespondentLROrLipDetails(caseData))
+            .setTotalClaimAmount(totalClaimAmount)
+            .setTotalInterestAmount(totalInterest)
+            .setPaymentPlan(getPaymentTypeForNonDivergent(caseData))
+            .setPayByDate(payByDate != null
                            ? DateFormatHelper.formatLocalDate(payByDate, DateFormatHelper.DATE) : null)
-            .paymentStr(getPaymentStr(caseData))
-            .repaymentFrequency(getRepaymentFrequencyStr(caseData))
-            .repaymentDate(getRepaymentDate(caseData))
-            .installmentAmount(getInstalmentAmount(caseData))
-            .ccjJudgmentAmount(getJudgmentAmount(caseData).setScale(2).toString())
-            .ccjInterestToDate(totalInterest)
-            .claimFee(getClaimCosts(caseData))
-            .ccjSubtotal(judgementService.ccjJudgementSubTotal(caseData).setScale(2).toString())
-            .ccjFinalTotal(judgementService.ccjJudgmentFinalTotal(caseData).setScale(2).toString())
-            .build();
+            .setPaymentStr(getPaymentStr(caseData))
+            .setRepaymentFrequency(getRepaymentFrequencyStr(caseData))
+            .setRepaymentDate(getRepaymentDate(caseData))
+            .setInstallmentAmount(getInstalmentAmount(caseData))
+            .setCcjJudgmentAmount(getJudgmentAmount(caseData).setScale(2).toString())
+            .setCcjInterestToDate(totalInterest)
+            .setClaimFee(getClaimCosts(caseData))
+            .setCcjSubtotal(judgementService.ccjJudgementSubTotal(caseData).setScale(2).toString())
+            .setCcjFinalTotal(judgementService.ccjJudgmentFinalTotal(caseData).setScale(2).toString());
     }
 
     private BigDecimal getJudgmentAmount(CaseData caseData) {
@@ -249,15 +245,14 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         return judgementService.ccjJudgmentClaimAmount(caseData);
     }
 
-    public JudgmentByAdmissionOrDetermination toNonDivergentWelshDocs(CaseData caseData, JudgmentByAdmissionOrDetermination builder) {
-        return builder.toBuilder()
-            .welshDate(formatDateInWelsh(LocalDate.now(), false))
-            .welshPayByDate(getWelshPayByDate(caseData))
-            .welshRepaymentDate(getWelshRepaymentDate(caseData))
-            .welshRepaymentFrequency(caseData.isPayByInstallment()
+    public JudgmentByAdmissionOrDetermination toNonDivergentWelshDocs(CaseData caseData, JudgmentByAdmissionOrDetermination form) {
+        return form
+            .setWelshDate(formatDateInWelsh(LocalDate.now(), false))
+            .setWelshPayByDate(getWelshPayByDate(caseData))
+            .setWelshRepaymentDate(getWelshRepaymentDate(caseData))
+            .setWelshRepaymentFrequency(caseData.isPayByInstallment()
                                          ? getRepaymentFrequencyInWelsh(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null)
-            .welshPaymentStr(caseData.isPayByInstallment() ? getRepaymentWelshString(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null)
-            .build();
+            .setWelshPaymentStr(caseData.isPayByInstallment() ? getRepaymentWelshString(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null);
     }
 
     private String getWelshPayByDate(CaseData caseData) {
