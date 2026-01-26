@@ -78,7 +78,6 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
-import uk.gov.hmcts.reform.civil.model.sdo.PPI;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.ClientContext;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
@@ -257,8 +256,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private  LocalDate respondentSolicitor1AgreedDeadlineExtension;
     private  LocalDate respondentSolicitor2AgreedDeadlineExtension;
-    private PPI smallClaimsPPI;
-    private PPI fastTrackPPI;
     private  ResponseIntention respondent1ClaimResponseIntentionType;
     private  ResponseIntention respondent2ClaimResponseIntentionType;
     private  ResponseIntention respondent1ClaimResponseIntentionTypeApplicant2;
