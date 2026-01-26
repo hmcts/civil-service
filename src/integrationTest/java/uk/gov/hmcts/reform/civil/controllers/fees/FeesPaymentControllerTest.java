@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.PaymentRequestUpdateCallbackService;
+import uk.gov.hmcts.reform.civil.service.PaymentStatusRetryService;
 import uk.gov.hmcts.reform.payments.client.PaymentsClient;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.client.models.StatusHistoryDto;
@@ -52,7 +52,7 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
     @MockBean
     private CoreCaseDataService coreCaseDataService;
     @MockBean
-    private PaymentRequestUpdateCallbackService paymentRequestUpdateCallbackService;
+    private PaymentStatusRetryService paymentStatusRetryService;
     @MockBean
     private GaCoreCaseDataService gaCoreCaseDataService;
     @MockBean
@@ -108,7 +108,7 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
         PaymentDto response = buildGovPayCardPaymentStatusResponse(status);
         when(paymentsClient.getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN))
                 .thenReturn(response);
-        doThrow(new CaseDataUpdateException()).when(paymentRequestUpdateCallbackService).updatePaymentStatus(any(), any(), any(CardPaymentStatusResponse.class));
+        doThrow(new CaseDataUpdateException()).when(paymentStatusRetryService).updatePaymentStatus(any(), any(), any(CardPaymentStatusResponse.class));
         doGet(BEARER_TOKEN, FEES_PAYMENT_STATUS_URL, HEARING.name(), "123", "RC-1701-0909-0602-0418")
                 .andExpect(content().json(toJson(expectedResponse(status))))
                 .andExpect(status().isOk());

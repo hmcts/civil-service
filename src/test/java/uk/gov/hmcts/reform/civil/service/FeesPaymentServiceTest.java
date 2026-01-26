@@ -83,7 +83,7 @@ class FeesPaymentServiceTest {
     @MockBean
     private FeatureToggleService featureToggleService;
     @MockBean
-    private PaymentRequestUpdateCallbackService paymentRequestUpdateCallbackService;
+    private PaymentStatusRetryService paymentStatusRetryService;
 
     @BeforeEach
     void before() {
@@ -245,7 +245,7 @@ class FeesPaymentServiceTest {
         );
 
         assertThat(govPaymentRequestStatus).isEqualTo(expectedResponse(status));
-        verify(paymentRequestUpdateCallbackService, times(1)).updatePaymentStatus(any(), any(), any(CardPaymentStatusResponse.class));
+        verify(paymentStatusRetryService, times(1)).updatePaymentStatus(any(), any(), any(CardPaymentStatusResponse.class));
     }
 
     @Test
@@ -295,13 +295,13 @@ class FeesPaymentServiceTest {
                 .thenReturn(response);
 
         doThrow(new CaseDataUpdateException())
-                .when(paymentRequestUpdateCallbackService)
+                .when(paymentStatusRetryService)
                 .updatePaymentStatus(any(), any(), any(CardPaymentStatusResponse.class));
 
         CardPaymentStatusResponse result =
                 feesPaymentService.getGovPaymentRequestStatus(HEARING, "123", "RC-1701-0909-0602-0418", BEARER_TOKEN);
 
-        verify(paymentRequestUpdateCallbackService)
+        verify(paymentStatusRetryService)
                 .updatePaymentStatus(eq(HEARING), eq("123"), any(CardPaymentStatusResponse.class));
 
         assertThat(result).isEqualTo(expectedResponse("Success"));
