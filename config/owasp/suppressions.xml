@@ -22,4 +22,10 @@
     <cve>CVE-2025-49124</cve>
     <cve>CVE-2025-49125</cve>
   </suppress>
+
+  <suppress until="2026-03-31">
+    <notes>json-schema-validator 1.5.8 flagged by dependency-check; temporarily suppress until upstream patch is adopted.</notes>
+    <gavRegex>com\\.networknt:json-schema-validator:.*</gavRegex>
+    <cve>CVE-2025-15104</cve>
+  </suppress>
 </suppressions>
