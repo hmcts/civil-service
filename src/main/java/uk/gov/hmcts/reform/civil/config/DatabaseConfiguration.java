@@ -10,8 +10,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
-import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
-import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.repositories.CasemanReferenceNumberRepository;
 
 import javax.sql.DataSource;
 
@@ -44,13 +43,8 @@ public class DatabaseConfiguration {
     }
 
     @Bean
-    public ReferenceNumberRepository referenceNumberRepository(Jdbi dbi) {
-        return dbi.onDemand(ReferenceNumberRepository.class);
-    }
-
-    @Bean
-    public SpecReferenceNumberRepository specReferenceNumberRepository(Jdbi dbi) {
-        return dbi.onDemand(SpecReferenceNumberRepository.class);
+    public CasemanReferenceNumberRepository referenceNumberRepository(Jdbi dbi) {
+        return dbi.onDemand(CasemanReferenceNumberRepository.class);
     }
 
 }
