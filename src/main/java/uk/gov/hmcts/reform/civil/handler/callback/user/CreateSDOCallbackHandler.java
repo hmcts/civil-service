@@ -962,6 +962,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
     }
 
+
     private void populatePpiFields(CaseData caseData, boolean isSmallClaimsTrack, boolean isFastTrack) {
         if (isSmallClaimsTrack) {
             if (SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimPPI")) {
