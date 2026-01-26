@@ -134,7 +134,7 @@ class RespondToQueryDashboardServiceTest {
     void shouldNotRecordWhenNoLipParty() {
         CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(CASE_REFERENCE)
-            .businessProcess(BusinessProcess.builder().processInstanceId("process").build())
+            .businessProcess(businessProcess())
             .applicant1Represented(YesOrNo.YES)
             .respondent1Represented(YesOrNo.YES)
             .build();
@@ -147,9 +147,13 @@ class RespondToQueryDashboardServiceTest {
     private CaseData lipCaseData(boolean applicantLip, boolean defendantLip) {
         CaseDataBuilder builder = CaseDataBuilder.builder()
             .ccdCaseReference(CASE_REFERENCE)
-            .businessProcess(BusinessProcess.builder().processInstanceId("process").build());
+            .businessProcess(businessProcess());
         builder.applicant1Represented(applicantLip ? YesOrNo.NO : YesOrNo.YES);
         builder.respondent1Represented(defendantLip ? YesOrNo.NO : YesOrNo.YES);
         return builder.build();
+    }
+
+    private BusinessProcess businessProcess() {
+        return new BusinessProcess().setProcessInstanceId("process");
     }
 }
