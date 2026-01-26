@@ -533,14 +533,11 @@ hmcsb:
     topics:
       - name: civil
         fullName: hmc-to-cft-aat
-        create: false
+        create: true
         subscriptionNeeded: yes
         ignoreSubscriptionDeletion: true
         rules:
           - name: "servicefilter"
-            filterType: CorrelationFilter
-            correlationFilter:
-              - name: "hmctsServiceId"
-                value: "AAA7"
-              - name: "hmctsDeploymentId"
-                value: "civil-${CHANGE_ID}"
+            filterType: SqlFilter
+            sqlFilter:
+              sqlExpression: "hmctsServiceId IN ('AAA7','AAA6') AND hmctsDeploymentId = 'civil-${CHANGE_ID}'"
