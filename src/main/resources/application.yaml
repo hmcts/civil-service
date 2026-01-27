@@ -107,6 +107,12 @@ fees:
       fastTrackHrg: FastTrackHrg
       multiTrackHrg: MultiTrackHrg
       smallClaimHrg: HearingSmallClaims
+      anyOtherRemedy: AnyOtherRemedy
+
+otherRemediesFees:
+  api:
+    service: other
+    jurisdiction2: civil
 
 location:
   api:
