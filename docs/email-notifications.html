@@ -2,26 +2,28 @@
 <html lang='en'>
 <head>
   <meta charset='utf-8'>
-  <title>Email notification matrix</title>
+  <title>Notification matrix</title>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 1.5rem; }
-    table { border-collapse: collapse; width: 100%; font-size: 0.85rem; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.85rem; margin-bottom: 2rem; }
     th, td { border: 1px solid #ddd; padding: 0.4rem; vertical-align: top; }
     th { position: sticky; top: 0; background: #f5f5f5; text-align: left; }
     tr:nth-child(even) { background: #fafafa; }
-    .filter-panel { margin-bottom: 1rem; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+    .filter-panel { margin: 0.75rem 0; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
     .filter-panel label { font-weight: 600; }
     select { min-width: 18rem; padding: 0.2rem; }
     button { padding: 0.2rem 0.6rem; }
     .counts { font-size: 0.85rem; color: #555; }
+    h2 { margin-top: 2.5rem; }
   </style>
 </head>
 <body>
-  <h1>Email notification matrix</h1>
-  <p>The table mirrors <code>docs/email-notifications.md</code> but adds an interactive filter on the CCD event column. Use the dropdown below to focus on a single event. Each CCD entry shows the process name followed by the CCD event ID.</p>
+  <h1>Notification matrix</h1>
+  <p>The tables mirror <code>docs/email-notifications.md</code> and add CCD event filters for both email and dashboard notifications. Each CCD entry shows the process name followed by the CCD event ID.</p>
+  <h2>Email notification matrix</h2>
   <div class='filter-panel'>
-    <label for='ccd-filter'>CCD event:</label>
-    <select id='ccd-filter'>
+    <label for='email-ccd-filter'>CCD event:</label>
+    <select id='email-ccd-filter'>
       <option value=''>All CCD events</option>
       <option value='acknowledge_claim'>ACKNOWLEDGE_CLAIM</option>
       <option value='add_defendant_litigation_friend'>ADD_DEFENDANT_LITIGATION_FRIEND</option>
@@ -73,10 +75,10 @@
       <option value='upload_translated_document_settlement_agreement'>UPLOAD_TRANSLATED_DOCUMENT_SETTLEMENT_AGREEMENT</option>
       <option value='validate_discontinue_claim_claimant'>VALIDATE_DISCONTINUE_CLAIM_CLAIMANT</option>
     </select>
-    <button type='button' id='reset-filter'>Reset</button>
-    <span class='counts'><span id='visible-count'>0</span> rows shown</span>
+    <button type='button' id='email-reset-filter'>Reset</button>
+    <span class='counts'><span id='email-visible-count'>0</span> rows shown</span>
   </div>
-  <table id='notifications-table'>
+  <table id='email-notifications-table'>
     <thead>
       <tr>
         <th>Camunda task</th>
@@ -2730,6 +2732,126 @@
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/add_defendant_litigation_friend.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/add_defendant_litigation_friend.png'>diagram</a></td>
         <td>Add defendant litigation friend (ADD_DEFENDANT_LITIGATION_FRIEND)</td>
       </tr>
+      <tr data-ccd-events=''>
+        <td><code>OtherPartyQueryRaisedNotifier</code></td>
+        <td><code>OtherPartyQueryRaisedNotifier</code></td>
+        <td><code>OtherPartyQueryRaisedAllPartiesEmailGenerator</code></td>
+        <td>Applicant solicitor (LR)</td>
+        <td><code>OtherPartyQueryRaisedAppSolOneEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/0d2c9b47-a84f-4ea2-a4b6-52c1db909076'>0d2c9b47-a84f-4ea2-a4b6-52c1db909076</a></td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td><code>OtherPartyQueryRaisedNotifier</code></td>
+        <td><code>OtherPartyQueryRaisedNotifier</code></td>
+        <td><code>OtherPartyQueryRaisedAllPartiesEmailGenerator</code></td>
+        <td>Respondent 1 solicitor (LR)</td>
+        <td><code>OtherPartyQueryRaisedRespSolOneEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/0d2c9b47-a84f-4ea2-a4b6-52c1db909076'>0d2c9b47-a84f-4ea2-a4b6-52c1db909076</a></td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td><code>OtherPartyQueryRaisedNotifier</code></td>
+        <td><code>OtherPartyQueryRaisedNotifier</code></td>
+        <td><code>OtherPartyQueryRaisedAllPartiesEmailGenerator</code></td>
+        <td>Claimant (LiP)</td>
+        <td><code>OtherPartyQueryRaisedClaimantEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/5bced03b-b3ce-49bc-8efb-b5ab35ef21eb'>5bced03b-b3ce-49bc-8efb-b5ab35ef21eb</a></td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td><code>OtherPartyQueryRaisedNotifier</code></td>
+        <td><code>OtherPartyQueryRaisedNotifier</code></td>
+        <td><code>OtherPartyQueryRaisedAllPartiesEmailGenerator</code></td>
+        <td>Claimant (LiP)</td>
+        <td><code>OtherPartyQueryRaisedClaimantEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/0b9b41cc-d30f-44c2-8901-f34e1e19e623'>0b9b41cc-d30f-44c2-8901-f34e1e19e623</a></td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td><code>OtherPartyQueryRaisedNotifier</code></td>
+        <td><code>OtherPartyQueryRaisedNotifier</code></td>
+        <td><code>OtherPartyQueryRaisedAllPartiesEmailGenerator</code></td>
+        <td>Defendant 1 (LiP)</td>
+        <td><code>OtherPartyQueryRaisedDefendantEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/5bced03b-b3ce-49bc-8efb-b5ab35ef21eb'>5bced03b-b3ce-49bc-8efb-b5ab35ef21eb</a></td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td><code>OtherPartyQueryRaisedNotifier</code></td>
+        <td><code>OtherPartyQueryRaisedNotifier</code></td>
+        <td><code>OtherPartyQueryRaisedAllPartiesEmailGenerator</code></td>
+        <td>Defendant 1 (LiP)</td>
+        <td><code>OtherPartyQueryRaisedDefendantEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/0b9b41cc-d30f-44c2-8901-f34e1e19e623'>0b9b41cc-d30f-44c2-8901-f34e1e19e623</a></td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td><code>RaiseQueryNotifier</code></td>
+        <td><code>RaiseQueryNotifier</code></td>
+        <td><code>RaiseQueryAllPartiesEmailGenerator</code></td>
+        <td>Applicant solicitor (LR)</td>
+        <td><code>RaiseQueryAppSolOneEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/dc16db17-4db4-4c3d-a9b1-bf36aa0d1fc7'>dc16db17-4db4-4c3d-a9b1-bf36aa0d1fc7</a></td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td><code>RaiseQueryNotifier</code></td>
+        <td><code>RaiseQueryNotifier</code></td>
+        <td><code>RaiseQueryAllPartiesEmailGenerator</code></td>
+        <td>Respondent 1 solicitor (LR)</td>
+        <td><code>RaiseQueryRespSolOneEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/dc16db17-4db4-4c3d-a9b1-bf36aa0d1fc7'>dc16db17-4db4-4c3d-a9b1-bf36aa0d1fc7</a></td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td><code>RaiseQueryNotifier</code></td>
+        <td><code>RaiseQueryNotifier</code></td>
+        <td><code>RaiseQueryAllPartiesEmailGenerator</code></td>
+        <td>Claimant (LiP)</td>
+        <td><code>RaiseQueryClaimantEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/5712694e-d86c-4852-83fc-5e43dbe27d22'>5712694e-d86c-4852-83fc-5e43dbe27d22</a></td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td><code>RaiseQueryNotifier</code></td>
+        <td><code>RaiseQueryNotifier</code></td>
+        <td><code>RaiseQueryAllPartiesEmailGenerator</code></td>
+        <td>Claimant (LiP)</td>
+        <td><code>RaiseQueryClaimantEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/53f14739-c463-4ac2-b5da-137bc9599c06'>53f14739-c463-4ac2-b5da-137bc9599c06</a></td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td><code>RaiseQueryNotifier</code></td>
+        <td><code>RaiseQueryNotifier</code></td>
+        <td><code>RaiseQueryAllPartiesEmailGenerator</code></td>
+        <td>Defendant 1 (LiP)</td>
+        <td><code>RaiseQueryDefendantEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/5712694e-d86c-4852-83fc-5e43dbe27d22'>5712694e-d86c-4852-83fc-5e43dbe27d22</a></td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td><code>RaiseQueryNotifier</code></td>
+        <td><code>RaiseQueryNotifier</code></td>
+        <td><code>RaiseQueryAllPartiesEmailGenerator</code></td>
+        <td>Defendant 1 (LiP)</td>
+        <td><code>RaiseQueryDefendantEmailDTOGenerator</code></td>
+        <td><a href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/53f14739-c463-4ac2-b5da-137bc9599c06'>53f14739-c463-4ac2-b5da-137bc9599c06</a></td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
       <tr data-ccd-events='create_claim_spec_after_payment'>
         <td><code>RaisingClaimAgainstSpecLitigantInPersonForNotifier</code></td>
         <td><code>RaisingClaimAgainstLitigantInPersonForSpecNotifier</code></td>
@@ -3192,28 +3314,774 @@
       </tr>
     </tbody>
   </table>
+  <h2>Dashboard notification matrix</h2>
+  <div class='filter-panel'>
+    <label for='dashboard-ccd-filter'>CCD event:</label>
+    <select id='dashboard-ccd-filter'>
+      <option value=''>All CCD events</option>
+      <option value='amend_restitch_bundle'>AMEND_RESTITCH_BUNDLE</option>
+      <option value='applicant_trial_ready_notify_others'>APPLICANT_TRIAL_READY_NOTIFY_OTHERS</option>
+      <option value='bundle_creation_notification'>BUNDLE_CREATION_NOTIFICATION</option>
+      <option value='case_proceeds_in_caseman'>CASE_PROCEEDS_IN_CASEMAN</option>
+      <option value='citizen_hearing_fee_payment'>CITIZEN_HEARING_FEE_PAYMENT</option>
+      <option value='claimant_response_cui'>CLAIMANT_RESPONSE_CUI</option>
+      <option value='create_claim_spec_after_payment'>CREATE_CLAIM_SPEC_AFTER_PAYMENT</option>
+      <option value='create_lip_claim'>CREATE_LIP_CLAIM</option>
+      <option value='decision_on_reconsideration_request'>DECISION_ON_RECONSIDERATION_REQUEST</option>
+      <option value='default_judgement_spec'>DEFAULT_JUDGEMENT_SPEC</option>
+      <option value='defendant_response_cui'>DEFENDANT_RESPONSE_CUI</option>
+      <option value='defendant_response_deadline_check'>DEFENDANT_RESPONSE_DEADLINE_CHECK</option>
+      <option value='defendant_response_spec'>DEFENDANT_RESPONSE_SPEC</option>
+      <option value='discontinue_claim_claimant'>DISCONTINUE_CLAIM_CLAIMANT</option>
+      <option value='dismiss_case'>DISMISS_CASE</option>
+      <option value='evidence_uploaded'>EVIDENCE_UPLOADED</option>
+      <option value='generate_trial_ready_document_applicant'>GENERATE_TRIAL_READY_DOCUMENT_APPLICANT</option>
+      <option value='generate_trial_ready_document_respondent1'>GENERATE_TRIAL_READY_DOCUMENT_RESPONDENT1</option>
+      <option value='hearing_fee_unpaid'>HEARING_FEE_UNPAID</option>
+      <option value='inform_agreed_extension_date_spec'>INFORM_AGREED_EXTENSION_DATE_SPEC</option>
+      <option value='initiate_cosc_application_after_payment'>INITIATE_COSC_APPLICATION_AFTER_PAYMENT</option>
+      <option value='judgment_paid_in_full'>JUDGMENT_PAID_IN_FULL</option>
+      <option value='lip_claim_settled'>LIP_CLAIM_SETTLED</option>
+      <option value='mediation_successful'>MEDIATION_SUCCESSFUL</option>
+      <option value='mediation_unsuccessful'>MEDIATION_UNSUCCESSFUL</option>
+      <option value='move_to_decision_outcome'>MOVE_TO_DECISION_OUTCOME</option>
+      <option value='notify_lip_claimant_hwf_outcome'>NOTIFY_LIP_CLAIMANT_HWF_OUTCOME</option>
+      <option value='request_for_reconsideration_notification_cui_claimant'>REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_CLAIMANT</option>
+      <option value='request_for_reconsideration_notification_cui_defendant'>REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_DEFENDANT</option>
+      <option value='request_judgement_admission_spec'>REQUEST_JUDGEMENT_ADMISSION_SPEC</option>
+      <option value='respondent1_trial_ready_notify_others'>RESPONDENT1_TRIAL_READY_NOTIFY_OTHERS</option>
+      <option value='settle_claim_marked_paid_in_full'>SETTLE_CLAIM_MARKED_PAID_IN_FULL</option>
+      <option value='stay_case'>STAY_CASE</option>
+      <option value='stay_lifted'>STAY_LIFTED</option>
+      <option value='take_case_offline'>TAKE_CASE_OFFLINE</option>
+      <option value='trial_ready_check'>TRIAL_READY_CHECK</option>
+      <option value='upload_translated_defendant_sealed_form'>UPLOAD_TRANSLATED_DEFENDANT_SEALED_FORM</option>
+      <option value='upload_translated_discontinuance_doc'>UPLOAD_TRANSLATED_DISCONTINUANCE_DOC</option>
+      <option value='upload_translated_document'>UPLOAD_TRANSLATED_DOCUMENT</option>
+      <option value='upload_translated_document_claimant_intention'>UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_INTENTION</option>
+      <option value='upload_translated_document_claimant_rejects_repayment_plan'>UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_REJECTS_REPAYMENT_PLAN</option>
+      <option value='upload_translated_document_claim_issue'>UPLOAD_TRANSLATED_DOCUMENT_CLAIM_ISSUE</option>
+      <option value='validate_discontinue_claim_claimant'>VALIDATE_DISCONTINUE_CLAIM_CLAIMANT</option>
+    </select>
+    <button type='button' id='dashboard-reset-filter'>Reset</button>
+    <span class='counts'><span id='dashboard-visible-count'>0</span> rows shown</span>
+  </div>
+  <table id='dashboard-notifications-table'>
+    <thead>
+      <tr>
+        <th>Framework</th>
+        <th>Camunda task</th>
+        <th>Handler / task</th>
+        <th>Party</th>
+        <th>Details</th>
+        <th>BPMN file(s)</th>
+        <th>CCD event(s)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr data-ccd-events='notify_lip_claimant_hwf_outcome'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>Claimant1HwFDashboardNotification</code></td>
+        <td><code>HwFDashboardNotificationsHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/notify_claimant_hwf_outcome.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/notify_claimant_hwf_outcome.png'>diagram</a></td>
+        <td>Notify lip claimant hwf outcome (NOTIFY_LIP_CLAIMANT_HWF_OUTCOME)</td>
+      </tr>
+      <tr data-ccd-events='initiate_cosc_application_after_payment'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>ClaimantDashboardNotificationMarkNotPaidInFull</code></td>
+        <td><code>CoScNotificationForCaseNotMarkPaidInFullClaimantHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/initiate_cosc_application_after_payment.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/initiate_cosc_application_after_payment.png'>diagram</a></td>
+        <td>COSC initiate after payment process (INITIATE_COSC_APPLICATION_AFTER_PAYMENT)</td>
+      </tr>
+      <tr data-ccd-events='amend_restitch_bundle'>
+        <td>CaseProgressionDashboardCallbackHandler</td>
+        <td><code>CreateAmendRestitchBundleDashboardNotificationsForClaimant</code></td>
+        <td><code>BundleUpdatedClaimantNotificationHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/amend_restitch_bundle.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/amend_restitch_bundle.png'>diagram</a></td>
+        <td>Amend Restitch Bundle (AMEND_RESTITCH_BUNDLE)</td>
+      </tr>
+      <tr data-ccd-events='amend_restitch_bundle'>
+        <td>CaseProgressionDashboardCallbackHandler</td>
+        <td><code>CreateAmendRestitchBundleDashboardNotificationsForDefendant</code></td>
+        <td><code>BundleUpdatedDefendantNotificationHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/amend_restitch_bundle.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/amend_restitch_bundle.png'>diagram</a></td>
+        <td>Amend Restitch Bundle (AMEND_RESTITCH_BUNDLE)</td>
+      </tr>
+      <tr data-ccd-events='bundle_creation_notification'>
+        <td>CaseProgressionDashboardCallbackHandler</td>
+        <td><code>CreateBundleCreatedDashboardNotificationsForClaimant1</code></td>
+        <td><code>BundleCreationClaimantNotificationHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/bundle_creation_notification.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/bundle_creation_notification.png'>diagram</a></td>
+        <td>Bundle creation notification (BUNDLE_CREATION_NOTIFICATION)</td>
+      </tr>
+      <tr data-ccd-events='bundle_creation_notification'>
+        <td>CaseProgressionDashboardCallbackHandler</td>
+        <td><code>CreateBundleCreatedDashboardNotificationsForDefendant1</code></td>
+        <td><code>BundleCreationDefendantNotificationHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/bundle_creation_notification.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/bundle_creation_notification.png'>diagram</a></td>
+        <td>Bundle creation notification (BUNDLE_CREATION_NOTIFICATION)</td>
+      </tr>
+      <tr data-ccd-events='lip_claim_settled'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>CreateClaimSettledDashboardNotificationsForClaimant1</code></td>
+        <td><code>ClaimSettledDashboardNotificationHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/claim_settled_lip.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/claim_settled_lip.png'>diagram</a></td>
+        <td>Lip claim settled (LIP_CLAIM_SETTLED)</td>
+      </tr>
+      <tr data-ccd-events='lip_claim_settled'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>CreateClaimSettledDashboardNotificationsForDefendant1</code></td>
+        <td><code>ClaimSettledDefendantDashboardNotificationHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/claim_settled_lip.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/claim_settled_lip.png'>diagram</a></td>
+        <td>Lip claim settled (LIP_CLAIM_SETTLED)</td>
+      </tr>
+      <tr data-ccd-events='settle_claim_marked_paid_in_full'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>CreateDefendantDashboardNotificationSettleClaimPaidInFull</code></td>
+        <td><code>SettleClaimPaidInFullDefendantDashboardNotificationHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/settle_claim_paid_in_full_notification.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/settle_claim_paid_in_full_notification.png'>diagram</a></td>
+        <td>Settle Claim Marked As Paid In Full notification (SETTLE_CLAIM_MARKED_PAID_IN_FULL)</td>
+      </tr>
+      <tr data-ccd-events='discontinue_claim_claimant upload_translated_discontinuance_doc validate_discontinue_claim_claimant'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>CreateDefendantDashboardNotificationsForDiscontinuance</code></td>
+        <td><code>DefendantNotifyDiscontinuanceDashboardNotificationHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/discontinue_claim_claimant.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/discontinue_claim_claimant.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_discontinuance_doc.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/upload_translated_discontinuance_doc.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/validate_discontinue_claim_claimant.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/validate_discontinue_claim_claimant.png'>diagram</a></td>
+        <td>Discontinue Claim Claimant  (DISCONTINUE_CLAIM_CLAIMANT)<br>Upload translated discontinuance doc (UPLOAD_TRANSLATED_DISCONTINUANCE_DOC)<br>Validate Discontinue Claim Claimant (VALIDATE_DISCONTINUE_CLAIM_CLAIMANT)</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td>CaseProgressionDashboardCallbackHandler</td>
+        <td><code>CreateHearingFeeUnpaidDashboardNotificationsForClaimant</code></td>
+        <td><code>HearingFeeUnpaidClaimantNotificationHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events='hearing_fee_unpaid'>
+        <td>CaseProgressionDashboardCallbackHandler</td>
+        <td><code>CreateHearingFeeUnpaidDashboardNotificationsForDefendant1</code></td>
+        <td><code>HearingFeeUnpaidDefendantNotificationHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/hearing_fee_unpaid.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/hearing_fee_unpaid.png'>diagram</a></td>
+        <td>Hearing fee unpaid (HEARING_FEE_UNPAID)</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td>CaseProgressionDashboardCallbackHandler</td>
+        <td><code>CreateHelpWithFeeInReviewNotificationForClaimant</code></td>
+        <td><code>HelpWithFeeDashboardNoticeHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events='create_claim_spec_after_payment upload_translated_document_claim_issue'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>CreateIssueClaimDashboardNotificationsForApplicant1</code></td>
+        <td><code>CreateClaimIssueNotificationsHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/create_claim_spec_after_payment.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/create_claim_spec_after_payment.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_document_claim_issue_notify.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/upload_translated_document_claim_issue_notify.png'>diagram</a></td>
+        <td>Create claim process after payment spec (CREATE_CLAIM_SPEC_AFTER_PAYMENT)<br>Upload translated document lip (UPLOAD_TRANSLATED_DOCUMENT_CLAIM_ISSUE)</td>
+      </tr>
+      <tr data-ccd-events='create_claim_spec_after_payment upload_translated_document_claim_issue'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>CreateIssueClaimDashboardNotificationsForApplicant1</code></td>
+        <td><code>MessageTaskCategoryCallbackHandler</code></td>
+        <td>—</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/create_claim_spec_after_payment.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/create_claim_spec_after_payment.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_document_claim_issue_notify.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/upload_translated_document_claim_issue_notify.png'>diagram</a></td>
+        <td>Create claim process after payment spec (CREATE_CLAIM_SPEC_AFTER_PAYMENT)<br>Upload translated document lip (UPLOAD_TRANSLATED_DOCUMENT_CLAIM_ISSUE)</td>
+      </tr>
+      <tr data-ccd-events='create_claim_spec_after_payment upload_translated_document_claim_issue'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>CreateIssueClaimDashboardNotificationsForDefendant1</code></td>
+        <td><code>ClaimIssueNotificationsHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/create_claim_spec_after_payment.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/create_claim_spec_after_payment.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_document_claim_issue_notify.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/upload_translated_document_claim_issue_notify.png'>diagram</a></td>
+        <td>Create claim process after payment spec (CREATE_CLAIM_SPEC_AFTER_PAYMENT)<br>Upload translated document lip (UPLOAD_TRANSLATED_DOCUMENT_CLAIM_ISSUE)</td>
+      </tr>
+      <tr data-ccd-events='request_for_reconsideration_notification_cui_defendant'>
+        <td>CaseProgressionDashboardCallbackHandler</td>
+        <td><code>CreateNotificationRequestForReconsiderationClaimant</code></td>
+        <td><code>RequestForReconsiderationRequestedByOtherPartyClaimantNotificationHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/request_for_reconsideration_cui_defendant.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/request_for_reconsideration_cui_defendant.png'>diagram</a></td>
+        <td>Request for Reconsideration Notification CUI Defendant (REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_DEFENDANT)</td>
+      </tr>
+      <tr data-ccd-events='request_for_reconsideration_notification_cui_claimant'>
+        <td>CaseProgressionDashboardCallbackHandler</td>
+        <td><code>CreateNotificationRequestForReconsiderationDefendant</code></td>
+        <td><code>RequestForReconsiderationRequestedByOtherPartyDefendantNotificationHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/request_for_reconsideration_cui_claimant.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/request_for_reconsideration_cui_claimant.png'>diagram</a></td>
+        <td>Request for Reconsideration Notification CUI Claimant (REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_CLAIMANT)</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td>CaseProgressionDashboardCallbackHandler</td>
+        <td><code>CreateUploadHearingDocumentNotificationForClaimant</code></td>
+        <td><code>UploadHearingDocumentsClaimantHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td>CaseProgressionDashboardCallbackHandler</td>
+        <td><code>CreateUploadHearingDocumentNotificationForDefendant</code></td>
+        <td><code>UploadHearingDocumentsDefendantHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events='stay_lifted'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>DashboardNotificationStayLiftedClaimant</code></td>
+        <td><code>StayLiftedClaimantNotificationHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/stay_lifted.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/stay_lifted.png'>diagram</a></td>
+        <td>Stay Lifted (STAY_LIFTED)</td>
+      </tr>
+      <tr data-ccd-events='stay_lifted'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>DashboardNotificationStayLiftedDefendant</code></td>
+        <td><code>StayLiftedDefendantNotificationHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/stay_lifted.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/stay_lifted.png'>diagram</a></td>
+        <td>Stay Lifted (STAY_LIFTED)</td>
+      </tr>
+      <tr data-ccd-events='claimant_response_cui upload_translated_document_claimant_intention upload_translated_document_claimant_rejects_repayment_plan'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateClaimantCCJDashboardNotificationClaimantResponse</code></td>
+        <td><code>ClaimantCCJResponseNotificationHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/claimant_response_cui.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/claimant_response_cui.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_claimant_intention_document_notify.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/upload_translated_claimant_intention_document_notify.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_document_claimant_rejects_repayment_plan.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/upload_translated_document_claimant_rejects_repayment_plan.png'>diagram</a></td>
+        <td>Claimant response cui process (CLAIMANT_RESPONSE_CUI)<br>Upload translated document claimant intention (UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_INTENTION)<br>Upload translated claimant rejects repayment plan (UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_REJECTS_REPAYMENT_PLAN)</td>
+      </tr>
+      <tr data-ccd-events='take_case_offline'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateClaimantDashboardNotificationCaseProceedOffline</code></td>
+        <td><code>CaseProceedOfflineClaimantNotificationHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/take_case_offline.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/take_case_offline.png'>diagram</a></td>
+        <td>Take case offline (TAKE_CASE_OFFLINE)</td>
+      </tr>
+      <tr data-ccd-events='claimant_response_cui upload_translated_document_claimant_intention upload_translated_document_claimant_rejects_repayment_plan'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateClaimantDashboardNotificationClaimantResponse</code></td>
+        <td><code>ClaimantResponseNotificationHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/claimant_response_cui.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/claimant_response_cui.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_claimant_intention_document_notify.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/upload_translated_claimant_intention_document_notify.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_document_claimant_rejects_repayment_plan.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/upload_translated_document_claimant_rejects_repayment_plan.png'>diagram</a></td>
+        <td>Claimant response cui process (CLAIMANT_RESPONSE_CUI)<br>Upload translated document claimant intention (UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_INTENTION)<br>Upload translated claimant rejects repayment plan (UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_REJECTS_REPAYMENT_PLAN)</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateClaimantDashboardNotificationCourtOfficerOrder</code></td>
+        <td><code>CourtOfficerOrderClaimantNotificationHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events='defendant_response_cui defendant_response_spec upload_translated_defendant_sealed_form upload_translated_document'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateClaimantDashboardNotificationDefendantResponse</code></td>
+        <td><code>DefendantResponseClaimantNotificationHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/defendant_response_cui.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/defendant_response_cui.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/defendant_response_spec.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/defendant_response_spec.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_defendant_sealed_form.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/upload_translated_defendant_sealed_form.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_document_notify.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/upload_translated_document_notify.png'>diagram</a></td>
+        <td>Defendant response process cui (DEFENDANT_RESPONSE_CUI)<br>Defendant response process spec (DEFENDANT_RESPONSE_SPEC)<br>Upload translated defendant sealed claim form (UPLOAD_TRANSLATED_DEFENDANT_SEALED_FORM)<br>Upload translated document (UPLOAD_TRANSLATED_DOCUMENT)</td>
+      </tr>
+      <tr data-ccd-events='defendant_response_deadline_check'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateClaimantDashboardNotificationDefendantResponseDeadlineCheck</code></td>
+        <td><code>DefendantResponseDeadlineDashboardNotificationHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/defendant_response_deadline_check.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/defendant_response_deadline_check.png'>diagram</a></td>
+        <td>Defendant response deadline check (DEFENDANT_RESPONSE_DEADLINE_CHECK)</td>
+      </tr>
+      <tr data-ccd-events='defendant_response_cui'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateClaimantDashboardNotificationDefendantResponseWelsh</code></td>
+        <td><code>DefendantResponseWelshClaimantDashboardNotificationHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/defendant_response_cui.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/defendant_response_cui.png'>diagram</a></td>
+        <td>Defendant response process cui (DEFENDANT_RESPONSE_CUI)</td>
+      </tr>
+      <tr data-ccd-events='generate_trial_ready_document_respondent1 respondent1_trial_ready_notify_others'>
+        <td>CaseProgressionDashboardCallbackHandler</td>
+        <td><code>GenerateClaimantDashboardNotificationTrialArrangementsNotifyParty</code></td>
+        <td><code>TrialArrangementsNotifyOtherPartyNotificationHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/generate_trial_ready_document_respondent1.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/generate_trial_ready_document_respondent1.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/respondent1_trial_ready_notify_others.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/respondent1_trial_ready_notify_others.png'>diagram</a></td>
+        <td>Generate trial ready document respondent1 (GENERATE_TRIAL_READY_DOCUMENT_RESPONDENT1)<br>Respondent1 trial ready notify others (RESPONDENT1_TRIAL_READY_NOTIFY_OTHERS)</td>
+      </tr>
+      <tr data-ccd-events='move_to_decision_outcome'>
+        <td>CaseProgressionDashboardCallbackHandler</td>
+        <td><code>GenerateDashboardClaimantDecisionOutcome</code></td>
+        <td><code>ClaimantDecisionOutcomeDashboardHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/decision_outcome.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/decision_outcome.png'>diagram</a></td>
+        <td>Move to decision outcome (MOVE_TO_DECISION_OUTCOME)</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td>CaseProgressionDashboardCallbackHandler</td>
+        <td><code>GenerateDashboardClaimantNotificationTrialArrangements</code></td>
+        <td><code>TrialArrangementsClaimantNotificationHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events='move_to_decision_outcome'>
+        <td>CaseProgressionDashboardCallbackHandler</td>
+        <td><code>GenerateDashboardDefendantDecisionOutcome</code></td>
+        <td><code>DefendantDecisionOutcomeDashboardHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/decision_outcome.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/decision_outcome.png'>diagram</a></td>
+        <td>Move to decision outcome (MOVE_TO_DECISION_OUTCOME)</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td>CaseProgressionDashboardCallbackHandler</td>
+        <td><code>GenerateDashboardDefendantNotificationTrialArrangements</code></td>
+        <td><code>TrialArrangementsDefendantNotificationHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events='create_lip_claim'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateDashboardNotificationClaimFeeRequired</code></td>
+        <td><code>GenerateDashboardNotificationClaimFeeRequiredHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/create_lip_claim.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/create_lip_claim.png'>diagram</a></td>
+        <td>Create lip claim process (CREATE_LIP_CLAIM)</td>
+      </tr>
+      <tr data-ccd-events='create_lip_claim'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateDashboardNotificationClaimIssueHwfClaimant1</code></td>
+        <td><code>GenerateDashboardNotificationHwfHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/create_lip_claim.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/create_lip_claim.png'>diagram</a></td>
+        <td>Create lip claim process (CREATE_LIP_CLAIM)</td>
+      </tr>
+      <tr data-ccd-events='default_judgement_spec request_judgement_admission_spec'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateDashboardNotificationClaimantIntentCCJRequestedForApplicant1</code></td>
+        <td><code>CCJRequestedDashboardNotificationHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/generate_spec_DJ_form.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/generate_spec_DJ_form.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/request_judgement_by_admission.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/request_judgement_by_admission.png'>diagram</a></td>
+        <td>Generate dj form spec (DEFAULT_JUDGEMENT_SPEC)<br>Request judgement admission spec (REQUEST_JUDGEMENT_ADMISSION_SPEC)</td>
+      </tr>
+      <tr data-ccd-events='request_judgement_admission_spec'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateDashboardNotificationClaimantIntentCCJRequestedForRespondent1</code></td>
+        <td><code>CCJRequestedDashboardNotificationDefendantHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/request_judgement_by_admission.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/request_judgement_by_admission.png'>diagram</a></td>
+        <td>Request judgement admission spec (REQUEST_JUDGEMENT_ADMISSION_SPEC)</td>
+      </tr>
+      <tr data-ccd-events='mediation_successful'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateDashboardNotificationClaimantMediationSuccessful</code></td>
+        <td><code>ClaimantMediationSuccessfulDashboardNotificationHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/mediation_successful.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/mediation_successful.png'>diagram</a></td>
+        <td>Mediation successful (MEDIATION_SUCCESSFUL)</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateDashboardNotificationCoSCCertificateGenerated</code></td>
+        <td><code>CoscCertificateGeneratedDefendantNotificationHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateDashboardNotificationCoSCProcessedDefendant</code></td>
+        <td><code>CoscFeePaidCaseNotMarkedFullPaidDefendantNotificationHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events='decision_on_reconsideration_request'>
+        <td>CaseProgressionDashboardCallbackHandler</td>
+        <td><code>GenerateDashboardNotificationDecisionReconsiderationClaimant</code></td>
+        <td><code>DecisionOnRequestForReconsiderationClaimantHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/notify_decision_on_reconsideration_request.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/notify_decision_on_reconsideration_request.png'>diagram</a></td>
+        <td>Decision on reconsideration request (DECISION_ON_RECONSIDERATION_REQUEST)</td>
+      </tr>
+      <tr data-ccd-events='decision_on_reconsideration_request'>
+        <td>CaseProgressionDashboardCallbackHandler</td>
+        <td><code>GenerateDashboardNotificationDecisionReconsiderationDefendant</code></td>
+        <td><code>DecisionOnRequestForReconsiderationDefendantHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/notify_decision_on_reconsideration_request.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/notify_decision_on_reconsideration_request.png'>diagram</a></td>
+        <td>Decision on reconsideration request (DECISION_ON_RECONSIDERATION_REQUEST)</td>
+      </tr>
+      <tr data-ccd-events='mediation_successful'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateDashboardNotificationDefendantMediationSuccessful</code></td>
+        <td><code>DefendantMediationSuccessfulDashboardNotificationHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/mediation_successful.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/mediation_successful.png'>diagram</a></td>
+        <td>Mediation successful (MEDIATION_SUCCESSFUL)</td>
+      </tr>
+      <tr data-ccd-events='mediation_unsuccessful'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateDashboardNotificationDefendantMediationUnsuccessful</code></td>
+        <td><code>MediationUnsuccessfulDashboardNotificationDefendantHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/mediation_unsuccessful.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/mediation_unsuccessful.png'>diagram</a></td>
+        <td>Mediation unsuccessful (MEDIATION_UNSUCCESSFUL)</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateDashboardNotificationEvidenceUploadedClaimant</code></td>
+        <td><code>EvidenceUploadedClaimantNotificationHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateDashboardNotificationEvidenceUploadedDefendant</code></td>
+        <td><code>EvidenceUploadedDefendantNotificationHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events='citizen_hearing_fee_payment'>
+        <td>CaseProgressionDashboardCallbackHandler</td>
+        <td><code>GenerateDashboardNotificationHearingFeePaidClaimant</code></td>
+        <td><code>HearingFeePaidClaimantNotificationHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/notify_lip_generic_template.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/notify_lip_generic_template.png'>diagram</a></td>
+        <td>Notify lip generic template (CITIZEN_HEARING_FEE_PAYMENT)</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateDashboardNotificationMediationUnsuccessfulForApplicant1</code></td>
+        <td><code>ClaimantIntentMediationUnsuccessfulHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events='inform_agreed_extension_date_spec'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateDashboardNotificationMoreTimeRequestedForRespondent1</code></td>
+        <td><code>MoreTimeRequestedDashboardNotificationDefendantHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/inform_agreed_extension_date_spec.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/inform_agreed_extension_date_spec.png'>diagram</a></td>
+        <td>Inform agreed extension date spec process (INFORM_AGREED_EXTENSION_DATE_SPEC)</td>
+      </tr>
+      <tr data-ccd-events='stay_case'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateDashboardNotificationStayCaseClaimant</code></td>
+        <td><code>StayCaseClaimantNotificationHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/stay_case.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/stay_case.png'>diagram</a></td>
+        <td>Stay Case (STAY_CASE)</td>
+      </tr>
+      <tr data-ccd-events='stay_case'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateDashboardNotificationStayCaseDefendant</code></td>
+        <td><code>StayCaseDefendantNotificationHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/stay_case.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/stay_case.png'>diagram</a></td>
+        <td>Stay Case (STAY_CASE)</td>
+      </tr>
+      <tr data-ccd-events='case_proceeds_in_caseman'>
+        <td>DashboardNotificationHandler</td>
+        <td><code>GenerateDashboardNotificationsCaseProceedsInCaseman</code></td>
+        <td><code>ApplicationsProceedOfflineClaimantDashboardTask</code></td>
+        <td>Claimant</td>
+        <td>Contributor: `CaseProceedsInCasemanGaDashboardTaskContributor`<br>Service: `ApplicationsProceedOfflineClaimantDashboardService`</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/case_proceeds_in_caseman.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/case_proceeds_in_caseman.png'>diagram</a></td>
+        <td>Case proceeds in caseman (CASE_PROCEEDS_IN_CASEMAN)</td>
+      </tr>
+      <tr data-ccd-events='case_proceeds_in_caseman'>
+        <td>DashboardNotificationHandler</td>
+        <td><code>GenerateDashboardNotificationsCaseProceedsInCaseman</code></td>
+        <td><code>ApplicationsProceedOfflineDefendantDashboardTask</code></td>
+        <td>Defendant</td>
+        <td>Contributor: `CaseProceedsInCasemanGaDashboardTaskContributor`<br>Service: `ApplicationsProceedOfflineDefendantDashboardService`</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/case_proceeds_in_caseman.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/case_proceeds_in_caseman.png'>diagram</a></td>
+        <td>Case proceeds in caseman (CASE_PROCEEDS_IN_CASEMAN)</td>
+      </tr>
+      <tr data-ccd-events='case_proceeds_in_caseman'>
+        <td>DashboardNotificationHandler</td>
+        <td><code>GenerateDashboardNotificationsCaseProceedsInCaseman</code></td>
+        <td><code>CaseProceedOfflineClaimantDashboardTask</code></td>
+        <td>Claimant</td>
+        <td>Contributor: `CaseProceedsInCasemanDashboardTaskContributor`<br>Service: `CaseProceedOfflineClaimantDashboardService`</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/case_proceeds_in_caseman.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/case_proceeds_in_caseman.png'>diagram</a></td>
+        <td>Case proceeds in caseman (CASE_PROCEEDS_IN_CASEMAN)</td>
+      </tr>
+      <tr data-ccd-events='case_proceeds_in_caseman'>
+        <td>DashboardNotificationHandler</td>
+        <td><code>GenerateDashboardNotificationsCaseProceedsInCaseman</code></td>
+        <td><code>CaseProceedOfflineDefendantDashboardTask</code></td>
+        <td>Defendant</td>
+        <td>Contributor: `CaseProceedsInCasemanDashboardTaskContributor`<br>Service: `CaseProceedOfflineDefendantDashboardService`</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/case_proceeds_in_caseman.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/case_proceeds_in_caseman.png'>diagram</a></td>
+        <td>Case proceeds in caseman (CASE_PROCEEDS_IN_CASEMAN)</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td>DashboardNotificationHandler</td>
+        <td><code>GenerateDashboardNotificationsCourtOfficerOrder</code></td>
+        <td><code>CourtOfficerOrderClaimantDashboardTask</code></td>
+        <td>Claimant</td>
+        <td>Contributor: `CourtOfficerOrderDashboardTaskContributor`<br>Service: `CourtOfficerOrderClaimantDashboardService`</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td>DashboardNotificationHandler</td>
+        <td><code>GenerateDashboardNotificationsCourtOfficerOrder</code></td>
+        <td><code>CourtOfficerOrderDefendantDashboardTask</code></td>
+        <td>Defendant</td>
+        <td>Contributor: `CourtOfficerOrderDashboardTaskContributor`<br>Service: `CourtOfficerOrderDefendantDashboardService`</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events='dismiss_case'>
+        <td>DashboardNotificationHandler</td>
+        <td><code>GenerateDashboardNotificationsDismissCase</code></td>
+        <td><code>DismissCaseClaimantDashboardTask</code></td>
+        <td>Claimant</td>
+        <td>Contributor: `DismissCaseDashboardTaskContributor`<br>Service: `DismissCaseClaimantDashboardService`</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/dismiss_case.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/dismiss_case.png'>diagram</a></td>
+        <td>Dismiss case (DISMISS_CASE)</td>
+      </tr>
+      <tr data-ccd-events='dismiss_case'>
+        <td>DashboardNotificationHandler</td>
+        <td><code>GenerateDashboardNotificationsDismissCase</code></td>
+        <td><code>DismissCaseDefendantDashboardTask</code></td>
+        <td>Defendant</td>
+        <td>Contributor: `DismissCaseDashboardTaskContributor`<br>Service: `DismissCaseDefendantDashboardService`</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/dismiss_case.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/dismiss_case.png'>diagram</a></td>
+        <td>Dismiss case (DISMISS_CASE)</td>
+      </tr>
+      <tr data-ccd-events='evidence_uploaded'>
+        <td>DashboardNotificationHandler</td>
+        <td><code>GenerateDashboardNotificationsEvidenceUploaded</code></td>
+        <td><code>EvidenceUploadedClaimantDashboardTask</code></td>
+        <td>Claimant</td>
+        <td>Contributor: `EvidenceUploadedDashboardTaskContributor`<br>Service: `EvidenceUploadedClaimantDashboardService`</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/evidence_uploaded.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/evidence_uploaded.png'>diagram</a></td>
+        <td>Evidence Uploaded Process (EVIDENCE_UPLOADED)</td>
+      </tr>
+      <tr data-ccd-events='evidence_uploaded'>
+        <td>DashboardNotificationHandler</td>
+        <td><code>GenerateDashboardNotificationsEvidenceUploaded</code></td>
+        <td><code>EvidenceUploadedDefendantDashboardTask</code></td>
+        <td>Defendant</td>
+        <td>Contributor: `EvidenceUploadedDashboardTaskContributor`<br>Service: `EvidenceUploadedDefendantDashboardService`</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/evidence_uploaded.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/evidence_uploaded.png'>diagram</a></td>
+        <td>Evidence Uploaded Process (EVIDENCE_UPLOADED)</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td>DashboardNotificationHandler</td>
+        <td><code>GenerateDashboardNotificationsTrailReadyCheck</code></td>
+        <td><code>TrailReadyCheckClaimantDashboardTask</code></td>
+        <td>Claimant</td>
+        <td>Contributor: `TrailReadyCheckDashboardTaskContributor`<br>Service: `TrailReadyCheckClaimantDashboardService`</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td>DashboardNotificationHandler</td>
+        <td><code>GenerateDashboardNotificationsTrailReadyCheck</code></td>
+        <td><code>TrailReadyCheckDefendantDashboardTask</code></td>
+        <td>Defendant</td>
+        <td>Contributor: `TrailReadyCheckDashboardTaskContributor`<br>Service: `TrailReadyCheckDefendantDashboardService`</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events='claimant_response_cui upload_translated_document_claimant_intention upload_translated_document_claimant_rejects_repayment_plan'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateDefendantCCJDashboardNotificationForClaimantResponse</code></td>
+        <td><code>ClaimantCCJResponseDefendantNotificationHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/claimant_response_cui.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/claimant_response_cui.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_claimant_intention_document_notify.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/upload_translated_claimant_intention_document_notify.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_document_claimant_rejects_repayment_plan.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/upload_translated_document_claimant_rejects_repayment_plan.png'>diagram</a></td>
+        <td>Claimant response cui process (CLAIMANT_RESPONSE_CUI)<br>Upload translated document claimant intention (UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_INTENTION)<br>Upload translated claimant rejects repayment plan (UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_REJECTS_REPAYMENT_PLAN)</td>
+      </tr>
+      <tr data-ccd-events='take_case_offline'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateDefendantDashboardNotificationCaseProceedOffline</code></td>
+        <td><code>CaseProceedOfflineDefendantNotificationHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/take_case_offline.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/take_case_offline.png'>diagram</a></td>
+        <td>Take case offline (TAKE_CASE_OFFLINE)</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateDefendantDashboardNotificationClaimantResponse</code></td>
+        <td><code>ClaimantResponseDefendantNotificationHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events=''>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateDefendantDashboardNotificationCourtOfficerOrder</code></td>
+        <td><code>CourtOfficerOrderDefendantNotificationHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>—</td>
+        <td>—</td>
+      </tr>
+      <tr data-ccd-events='defendant_response_cui upload_translated_document'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateDefendantDashboardNotificationDefendantResponse</code></td>
+        <td><code>DefendantResponseDefendantNotificationHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/defendant_response_cui.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/defendant_response_cui.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_document_notify.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/upload_translated_document_notify.png'>diagram</a></td>
+        <td>Defendant response process cui (DEFENDANT_RESPONSE_CUI)<br>Upload translated document (UPLOAD_TRANSLATED_DOCUMENT)</td>
+      </tr>
+      <tr data-ccd-events='defendant_response_deadline_check'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>GenerateDefendantDashboardNotificationRespondentResponseDeadlineCheck</code></td>
+        <td><code>DefendantResponseDeadlinePassedNotificationHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/defendant_response_deadline_check.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/defendant_response_deadline_check.png'>diagram</a></td>
+        <td>Defendant response deadline check (DEFENDANT_RESPONSE_DEADLINE_CHECK)</td>
+      </tr>
+      <tr data-ccd-events='applicant_trial_ready_notify_others generate_trial_ready_document_applicant'>
+        <td>CaseProgressionDashboardCallbackHandler</td>
+        <td><code>GenerateDefendantDashboardNotificationTrialArrangementsNotifyParty</code></td>
+        <td><code>TrialArrangementsNotifyOtherPartyDefendantNotificationHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/applicant_trial_ready_notify_others.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/applicant_trial_ready_notify_others.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/generate_trial_ready_document_applicant.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/generate_trial_ready_document_applicant.png'>diagram</a></td>
+        <td>Applicant trial ready notify others (APPLICANT_TRIAL_READY_NOTIFY_OTHERS)<br>Generate trial ready document applicant (GENERATE_TRIAL_READY_DOCUMENT_APPLICANT)</td>
+      </tr>
+      <tr data-ccd-events='trial_ready_check'>
+        <td>CaseProgressionDashboardCallbackHandler</td>
+        <td><code>TrialReadyCheckDashboardNotificationsForClaimant1</code></td>
+        <td><code>TrialReadyCheckClaimantNotificationHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/trial_ready_check.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/trial_ready_check.png'>diagram</a></td>
+        <td>Trial Ready Check (TRIAL_READY_CHECK)</td>
+      </tr>
+      <tr data-ccd-events='trial_ready_check'>
+        <td>CaseProgressionDashboardCallbackHandler</td>
+        <td><code>TrialReadyCheckDashboardNotificationsForDefendant1</code></td>
+        <td><code>TrialReadyCheckDefendantNotificationHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/trial_ready_check.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/trial_ready_check.png'>diagram</a></td>
+        <td>Trial Ready Check (TRIAL_READY_CHECK)</td>
+      </tr>
+      <tr data-ccd-events='judgment_paid_in_full'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>UpdateJudgmentPaidDashboardNotificationsClaimant</code></td>
+        <td><code>JudgmentPaidClaimantNotificationHandler</code></td>
+        <td>Claimant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/judgement_paid_in_full.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/judgement_paid_in_full.png'>diagram</a></td>
+        <td>Judgment Paid In Full (JUDGMENT_PAID_IN_FULL)</td>
+      </tr>
+      <tr data-ccd-events='judgment_paid_in_full'>
+        <td>DashboardCallbackHandler</td>
+        <td><code>UpdateJudgmentPaidDashboardNotificationsDefendant</code></td>
+        <td><code>JudgmentPaidDefendantNotificationHandler</code></td>
+        <td>Defendant</td>
+        <td>—</td>
+        <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/judgement_paid_in_full.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/judgement_paid_in_full.png'>diagram</a></td>
+        <td>Judgment Paid In Full (JUDGMENT_PAID_IN_FULL)</td>
+      </tr>
+    </tbody>
+  </table>
   <script>
     (function() {
-      const select = document.getElementById('ccd-filter');
-      const reset = document.getElementById('reset-filter');
-      const rows = Array.from(document.querySelectorAll('#notifications-table tbody tr'));
-      const counter = document.getElementById('visible-count');
-      function applyFilter() {
-        const value = (select.value || '').trim();
-        let visible = 0;
-        rows.forEach(row => {
-          if (!value || (row.dataset.ccdEvents || '').includes(value)) {
-            row.style.display = '';
-            visible += 1;
-          } else {
-            row.style.display = 'none';
-          }
-        });
-        counter.textContent = visible;
+      function wireFilter(selectId, resetId, tableId, counterId) {
+        const select = document.getElementById(selectId);
+        const reset = document.getElementById(resetId);
+        const rows = Array.from(document.querySelectorAll(`#${tableId} tbody tr`));
+        const counter = document.getElementById(counterId);
+        function applyFilter() {
+          const value = (select.value || '').trim();
+          let visible = 0;
+          rows.forEach(row => {
+            if (!value || (row.dataset.ccdEvents || '').includes(value)) {
+              row.style.display = '';
+              visible += 1;
+            } else {
+              row.style.display = 'none';
+            }
+          });
+          counter.textContent = visible;
+        }
+        select.addEventListener('change', applyFilter);
+        reset.addEventListener('click', () => { select.value = ''; applyFilter(); });
+        applyFilter();
       }
-      select.addEventListener('change', applyFilter);
-      reset.addEventListener('click', () => { select.value = ''; applyFilter(); });
-      applyFilter();
+      wireFilter('email-ccd-filter', 'email-reset-filter', 'email-notifications-table', 'email-visible-count');
+      wireFilter('dashboard-ccd-filter', 'dashboard-reset-filter', 'dashboard-notifications-table', 'dashboard-visible-count');
     })();
   </script>
 </body>
