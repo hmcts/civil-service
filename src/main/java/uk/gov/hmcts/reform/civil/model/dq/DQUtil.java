@@ -10,20 +10,18 @@ import java.util.List;
 public class DQUtil {
 
     public Hearing buildFastTrackHearing(Hearing hearingLRspec) {
-        return Hearing.builder()
-            .hearingLength(hearingLRspec.getHearingLength())
-            .hearingLengthDays(hearingLRspec.getHearingLengthDays())
-            .hearingLengthHours(hearingLRspec.getHearingLengthHours())
-            .unavailableDatesRequired(hearingLRspec.getUnavailableDatesRequired())
-            .unavailableDates(mapDates(hearingLRspec.getUnavailableDates()))
-            .build();
+        return new Hearing()
+            .setHearingLength(hearingLRspec.getHearingLength())
+            .setHearingLengthDays(hearingLRspec.getHearingLengthDays())
+            .setHearingLengthHours(hearingLRspec.getHearingLengthHours())
+            .setUnavailableDatesRequired(hearingLRspec.getUnavailableDatesRequired())
+            .setUnavailableDates(mapDates(hearingLRspec.getUnavailableDates()));
     }
 
     public Hearing buildSmallClaimHearing(SmallClaimHearing small) {
-        return Hearing.builder()
-            .unavailableDatesRequired(small.getUnavailableDatesRequired())
-            .unavailableDates(mapDates(small.getSmallClaimUnavailableDate()))
-            .build();
+        return new Hearing()
+            .setUnavailableDatesRequired(small.getUnavailableDatesRequired())
+            .setUnavailableDates(mapDates(small.getSmallClaimUnavailableDate()));
     }
 
     private List<Element<UnavailableDate>> mapDates(List<Element<UnavailableDate>> lrDates) {

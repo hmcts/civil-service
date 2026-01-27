@@ -27,11 +27,11 @@ public class WitnessUtils {
         List<Witness> witnessList = unwrapElements(witnesses.getDetails());
         List<Element<Witness>> updatedWitnessDetails = new ArrayList<>();
         for (Witness witness : witnessList) {
-            updatedWitnessDetails.addAll(wrapElements(witness.toBuilder()
-                                                          .eventAdded(eventAdded)
-                                                          .dateAdded(dateAdded).build()));
+            updatedWitnessDetails.addAll(wrapElements(witness.copy()
+                                                          .setEventAdded(eventAdded)
+                                                          .setDateAdded(dateAdded)));
         }
-        return witnesses.toBuilder().details(updatedWitnessDetails).build();
+        return witnesses.copy().setDetails(updatedWitnessDetails);
     }
 
     public static void addEventAndDateAddedToRespondentWitnesses(CaseData caseData) {
@@ -46,20 +46,19 @@ public class WitnessUtils {
                 caseData.getRespondent1ResponseDate().toLocalDate(),
                 DEFENDANT_RESPONSE_EVENT.getValue()
             );
-            caseData.setRespondent1DQ(caseData.getRespondent1DQ().toBuilder()
-                                      .respondent1DQWitnesses(updatedRespondent1Witnesses).build());
+            caseData.setRespondent1DQ(caseData.getRespondent1DQ().copy()
+                                      .setRespondent1DQWitnesses(updatedRespondent1Witnesses));
 
             // copy in respondent2 for 1v2SS single response
             if (caseData.getRespondent2() != null
                 && YES.equals(caseData.getRespondent2SameLegalRepresentative())
                 && YES.equals(caseData.getRespondentResponseIsSame())) {
                 if (caseData.getRespondent2DQ() == null) {
-                    caseData.setRespondent2DQ(Respondent2DQ.builder()
-                                              .respondent2DQWitnesses(updatedRespondent1Witnesses)
-                                              .build());
+                    caseData.setRespondent2DQ(new Respondent2DQ()
+                                              .setRespondent2DQWitnesses(updatedRespondent1Witnesses));
                 } else {
-                    caseData.setRespondent2DQ(caseData.getRespondent2DQ().toBuilder()
-                                              .respondent2DQWitnesses(updatedRespondent1Witnesses).build());
+                    caseData.setRespondent2DQ(caseData.getRespondent2DQ().copy()
+                                              .setRespondent2DQWitnesses(updatedRespondent1Witnesses));
                 }
             }
         }
@@ -75,8 +74,8 @@ public class WitnessUtils {
                 caseData.getRespondent2ResponseDate().toLocalDate(),
                 DEFENDANT_RESPONSE_EVENT.getValue()
             );
-            caseData.setRespondent2DQ(caseData.getRespondent2DQ().toBuilder()
-                                          .respondent2DQWitnesses(updatedRespondent2Witnesses).build());
+            caseData.setRespondent2DQ(caseData.getRespondent2DQ().copy()
+                                          .setRespondent2DQWitnesses(updatedRespondent2Witnesses));
         }
     }
 
@@ -92,8 +91,8 @@ public class WitnessUtils {
                 caseData.getApplicant1ResponseDate().toLocalDate(),
                 CLAIMANT_INTENTION_EVENT.getValue()
             );
-            caseData.setApplicant1DQ(caseData.getApplicant1DQ().toBuilder()
-                                         .applicant1DQWitnesses(updatedApplicant1Witnesses).build());
+            caseData.setApplicant1DQ(caseData.getApplicant1DQ().copy()
+                                         .setApplicant1DQWitnesses(updatedApplicant1Witnesses));
 
             // copy in applicant 2 for single response
             if (caseData.getApplicant2() != null
@@ -101,12 +100,11 @@ public class WitnessUtils {
                 && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1()))
                 || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1()))) {
                 if (caseData.getApplicant2DQ() == null) {
-                    caseData.setApplicant2DQ(Applicant2DQ.builder()
-                                             .applicant2DQWitnesses(updatedApplicant1Witnesses)
-                                             .build());
+                    caseData.setApplicant2DQ(new Applicant2DQ()
+                                             .setApplicant2DQWitnesses(updatedApplicant1Witnesses));
                 } else {
-                    caseData.setApplicant2DQ(caseData.getApplicant2DQ().toBuilder()
-                                             .applicant2DQWitnesses(updatedApplicant1Witnesses).build());
+                    caseData.setApplicant2DQ(caseData.getApplicant2DQ().copy()
+                                             .setApplicant2DQWitnesses(updatedApplicant1Witnesses));
                 }
             }
         }
@@ -122,8 +120,8 @@ public class WitnessUtils {
                 caseData.getApplicant2ResponseDate().toLocalDate(),
                 CLAIMANT_INTENTION_EVENT.getValue()
             );
-            caseData.setApplicant2DQ(caseData.getApplicant2DQ().toBuilder()
-                                         .applicant2DQWitnesses(updatedApplicant2Witnesses).build());
+            caseData.setApplicant2DQ(caseData.getApplicant2DQ().copy()
+                                         .setApplicant2DQWitnesses(updatedApplicant2Witnesses));
         }
     }
 }

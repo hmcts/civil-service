@@ -102,9 +102,9 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
                 .thenReturn(caseDocument);
 
         CaseData caseData = getCaseData().toBuilder()
-            .respondent1DQ(Respondent1DQ.builder()
-                               .respondent1DQLanguage(WelshLanguageRequirements.builder().court(Language.WELSH).build())
-                               .build())
+            .respondent1DQ(new Respondent1DQ()
+                               .setRespondent1DQLanguage(new WelshLanguageRequirements()
+                                                             .setCourt(Language.WELSH)))
             .build();
 
         CaseDocument caseDoc = formGenerator.generateDocs(caseData,

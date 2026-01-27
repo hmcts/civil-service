@@ -109,7 +109,7 @@ public class PredicateUtilsTest {
                 .atState(FlowState.Main.FULL_DEFENCE)
                 .respondent2Responds1v2SameSol(FULL_DEFENCE)
                 .respondentResponseIsSame(YES)
-                .respondent2DQ(Respondent2DQ.builder().build())
+                .respondent2DQ(new Respondent2DQ())
                 .respondent2ClaimResponseIntentionType(null)
                 .build();
             assertTrue(defendant1ResponseExists.test(caseData));
@@ -122,7 +122,7 @@ public class PredicateUtilsTest {
                 .atState(FlowState.Main.FULL_DEFENCE)
                 .respondent2Responds1v2SameSol(FULL_DEFENCE)
                 .respondentResponseIsSame(YES)
-                .respondent2DQ(Respondent2DQ.builder().build())
+                .respondent2DQ(new Respondent2DQ())
                 .respondent2ClaimResponseIntentionType(ResponseIntention.FULL_DEFENCE)
                 .build();
             assertTrue(defendant1v2SameSolicitorSameResponse.test(caseData));

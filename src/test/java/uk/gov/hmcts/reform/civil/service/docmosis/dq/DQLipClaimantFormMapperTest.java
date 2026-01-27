@@ -97,51 +97,47 @@ class DQLipClaimantFormMapperTest {
     @Test
     void shouldPopulateLipDQ_whenDQIsNotNullMinti() {
         //Given
-        given(caseData.getApplicant1DQ()).willReturn(Applicant1DQ.builder()
-                                                         .applicant1DQFixedRecoverableCostsIntermediate(FixedRecoverableCosts.builder()
-                                                                                                            .isSubjectToFixedRecoverableCostRegime(YesOrNo.YES)
-                                                                                                            .complexityBandingAgreed(YesOrNo.YES)
-                                                                                                            .band(ComplexityBand.BAND_1)
-                                                                                                            .reasons("reasons")
-                                                                                                            .build())
-                                                         .specApplicant1DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
-                                                                                                               .reachedAgreement(YesOrNo.YES)
-                                                                                                               .build())
-                                                         .specApplicant1DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
-                                                                                                                 .bespokeDirections("directions")
-                                                                                                                 .build())
-                                                         .applicant1DQDefendantDocumentsToBeConsidered(DocumentsToBeConsidered.builder()
-                                                                                                           .hasDocumentsToBeConsidered(YesOrNo.YES)
-                                                                                                           .details("details")
-                                                                                                           .build())
-                                                         .build());
+        given(caseData.getApplicant1DQ()).willReturn(new Applicant1DQ()
+                                                         .setApplicant1DQFixedRecoverableCostsIntermediate(new FixedRecoverableCosts()
+                                                                                                              .setIsSubjectToFixedRecoverableCostRegime(YesOrNo.YES)
+                                                                                                              .setComplexityBandingAgreed(YesOrNo.YES)
+                                                                                                              .setBand(ComplexityBand.BAND_1)
+                                                                                                              .setReasons("reasons"))
+                                                         .setSpecApplicant1DQDisclosureOfElectronicDocuments(new DisclosureOfElectronicDocuments()
+                                                                                                                 .setReachedAgreement(YesOrNo.YES))
+                                                         .setSpecApplicant1DQDisclosureOfNonElectronicDocuments(new DisclosureOfNonElectronicDocuments()
+                                                                                                                   .setBespokeDirections("directions"))
+                                                         .setApplicant1DQDefendantDocumentsToBeConsidered(new DocumentsToBeConsidered()
+                                                                                                              .setHasDocumentsToBeConsidered(YesOrNo.YES)
+                                                                                                              .setDetails("details")));
         //When
-        FixedRecoverableCostsSection expectedFrc = dqLipClaimantFormMapper.getFixedRecoverableCostsIntermediate(caseData);
-        DisclosureOfElectronicDocuments expectedEletronicDisclosure = dqLipClaimantFormMapper.getDisclosureOfElectronicDocuments(caseData);
-        DisclosureOfNonElectronicDocuments expectedNonEletronicDisclosure = dqLipClaimantFormMapper.getDisclosureOfNonElectronicDocuments(caseData);
-        DocumentsToBeConsideredSection expectedDocsToBeConsidered = dqLipClaimantFormMapper.getDocumentsToBeConsidered(caseData);
+        final FixedRecoverableCostsSection expectedFrc = dqLipClaimantFormMapper.getFixedRecoverableCostsIntermediate(caseData);
+        final DisclosureOfElectronicDocuments expectedEletronicDisclosure = dqLipClaimantFormMapper.getDisclosureOfElectronicDocuments(caseData);
+        final DisclosureOfNonElectronicDocuments expectedNonEletronicDisclosure = dqLipClaimantFormMapper.getDisclosureOfNonElectronicDocuments(caseData);
+        final DocumentsToBeConsideredSection expectedDocsToBeConsidered = dqLipClaimantFormMapper.getDocumentsToBeConsidered(caseData);
         //Then
-        assertThat(expectedFrc).isEqualTo(FixedRecoverableCostsSection.builder()
-                                              .isSubjectToFixedRecoverableCostRegime(YesOrNo.YES)
-                                              .complexityBandingAgreed(YesOrNo.YES)
-                                              .reasons("reasons")
-                                              .band(ComplexityBand.BAND_1)
-                                              .bandText("Band 1")
-                                              .build());
+        FixedRecoverableCostsSection expectedFrcValue = new FixedRecoverableCostsSection();
+        expectedFrcValue.setIsSubjectToFixedRecoverableCostRegime(YesOrNo.YES);
+        expectedFrcValue.setComplexityBandingAgreed(YesOrNo.YES);
+        expectedFrcValue.setReasons("reasons");
+        expectedFrcValue.setBand(ComplexityBand.BAND_1);
+        expectedFrcValue.setBandText("Band 1");
+        assertThat(expectedFrc).isEqualTo(expectedFrcValue);
 
-        assertThat(expectedEletronicDisclosure).isEqualTo(DisclosureOfElectronicDocuments.builder()
-                                                                          .reachedAgreement(YesOrNo.YES).build());
+        assertThat(expectedEletronicDisclosure).isEqualTo(new DisclosureOfElectronicDocuments()
+                                                              .setReachedAgreement(YesOrNo.YES));
 
-        assertThat(expectedNonEletronicDisclosure).isEqualTo(DisclosureOfNonElectronicDocuments.builder()
-                                                                 .bespokeDirections("directions")
-                                                                 .build());
+        assertThat(expectedNonEletronicDisclosure).isEqualTo(new DisclosureOfNonElectronicDocuments()
+                                                                 .setBespokeDirections("directions"));
 
-        assertThat(expectedDocsToBeConsidered).isEqualTo(DocumentsToBeConsideredSection.builder()
-                                                             .hasDocumentsToBeConsidered(YesOrNo.YES)
-                                                             .details("details")
-                                                             .sectionHeading("Defendants documents to be considered")
-                                                             .question("Are there any documents the defendants have that you want the court to consider?")
-                                                             .build());
+        DocumentsToBeConsideredSection expectedDocsToBeConsideredValue = new DocumentsToBeConsideredSection();
+        expectedDocsToBeConsideredValue.setHasDocumentsToBeConsidered(YesOrNo.YES);
+        expectedDocsToBeConsideredValue.setDetails("details");
+        expectedDocsToBeConsideredValue.setSectionHeading("Defendants documents to be considered");
+        expectedDocsToBeConsideredValue.setQuestion(
+            "Are there any documents the defendants have that you want the court to consider?"
+        );
+        assertThat(expectedDocsToBeConsidered).isEqualTo(expectedDocsToBeConsideredValue);
     }
 
     @Test

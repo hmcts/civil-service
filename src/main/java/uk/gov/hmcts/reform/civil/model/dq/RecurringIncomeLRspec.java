@@ -2,8 +2,9 @@ package uk.gov.hmcts.reform.civil.model.dq;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.dq.IncomeTypeLRspec;
 
@@ -11,7 +12,8 @@ import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
-@Builder
+@NoArgsConstructor
+@Accessors(chain = true)
 public class RecurringIncomeLRspec {
 
     private IncomeTypeLRspec type;

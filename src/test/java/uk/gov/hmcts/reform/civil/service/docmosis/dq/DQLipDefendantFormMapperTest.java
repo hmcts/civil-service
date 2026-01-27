@@ -74,55 +74,50 @@ class DQLipDefendantFormMapperTest {
     @Test
     void shouldPopulateLipDQ_whenDQIsNotNullMinti() {
         //Given
-        given(caseData.getRespondent1DQ()).willReturn(Respondent1DQ.builder()
-                                                         .respondent1DQFixedRecoverableCostsIntermediate(
-                                                             FixedRecoverableCosts.builder()
-                                                                 .isSubjectToFixedRecoverableCostRegime(YesOrNo.NO)
-                                                                 .reasons("reasons")
-                                                                 .build())
-                                                         .specRespondent1DQDisclosureOfElectronicDocuments(
-                                                             DisclosureOfElectronicDocuments.builder()
-                                                                 .reachedAgreement(YesOrNo.NO)
-                                                                 .agreementLikely(YesOrNo.NO)
-                                                                 .reasonForNoAgreement("no")
-                                                                 .build())
-                                                         .specRespondent1DQDisclosureOfNonElectronicDocuments(
-                                                             DisclosureOfNonElectronicDocuments.builder()
-                                                                 .bespokeDirections("directions")
-                                                                 .build())
-                                                         .respondent1DQClaimantDocumentsToBeConsidered(
-                                                             DocumentsToBeConsidered.builder()
-                                                                 .hasDocumentsToBeConsidered(YesOrNo.NO)
-                                                                 .details("details")
-                                                                 .build())
-                                                         .build());
+        given(caseData.getRespondent1DQ()).willReturn(new Respondent1DQ()
+                                                         .setRespondent1DQFixedRecoverableCostsIntermediate(
+                                                             new FixedRecoverableCosts()
+                                                                 .setIsSubjectToFixedRecoverableCostRegime(YesOrNo.NO)
+                                                                 .setReasons("reasons"))
+                                                         .setSpecRespondent1DQDisclosureOfElectronicDocuments(
+                                                             new DisclosureOfElectronicDocuments()
+                                                                 .setReachedAgreement(YesOrNo.NO)
+                                                                 .setAgreementLikely(YesOrNo.NO)
+                                                                 .setReasonForNoAgreement("no"))
+                                                         .setSpecRespondent1DQDisclosureOfNonElectronicDocuments(
+                                                             new DisclosureOfNonElectronicDocuments()
+                                                                 .setBespokeDirections("directions"))
+                                                         .setRespondent1DQClaimantDocumentsToBeConsidered(
+                                                             new DocumentsToBeConsidered()
+                                                                 .setHasDocumentsToBeConsidered(YesOrNo.NO)
+                                                                 .setDetails("details")));
         //When
-        FixedRecoverableCostsSection expectedFrc = dqLipDefendantFormMapper.getFixedRecoverableCostsIntermediate(caseData);
-        DisclosureOfElectronicDocuments expectedEletronicDisclosure = dqLipDefendantFormMapper.getDisclosureOfElectronicDocuments(caseData);
-        DisclosureOfNonElectronicDocuments expectedNonEletronicDisclosure = dqLipDefendantFormMapper.getDisclosureOfNonElectronicDocuments(caseData);
-        DocumentsToBeConsideredSection expectedDocsToBeConsidered = dqLipDefendantFormMapper.getDocumentsToBeConsidered(caseData);
+        final FixedRecoverableCostsSection expectedFrc = dqLipDefendantFormMapper.getFixedRecoverableCostsIntermediate(caseData);
+        final DisclosureOfElectronicDocuments expectedEletronicDisclosure = dqLipDefendantFormMapper.getDisclosureOfElectronicDocuments(caseData);
+        final DisclosureOfNonElectronicDocuments expectedNonEletronicDisclosure = dqLipDefendantFormMapper.getDisclosureOfNonElectronicDocuments(caseData);
+        final DocumentsToBeConsideredSection expectedDocsToBeConsidered = dqLipDefendantFormMapper.getDocumentsToBeConsidered(caseData);
         //Then
-        assertThat(expectedFrc).isEqualTo(FixedRecoverableCostsSection.builder()
-                                              .isSubjectToFixedRecoverableCostRegime(YesOrNo.NO)
-                                              .reasons("reasons")
-                                              .build());
+        FixedRecoverableCostsSection expectedFrcValue = new FixedRecoverableCostsSection();
+        expectedFrcValue.setIsSubjectToFixedRecoverableCostRegime(YesOrNo.NO);
+        expectedFrcValue.setReasons("reasons");
+        assertThat(expectedFrc).isEqualTo(expectedFrcValue);
 
-        assertThat(expectedEletronicDisclosure).isEqualTo(DisclosureOfElectronicDocuments.builder()
-                                                              .reachedAgreement(YesOrNo.NO)
-                                                              .agreementLikely(YesOrNo.NO)
-                                                              .reasonForNoAgreement("no")
-                                                              .build());
+        assertThat(expectedEletronicDisclosure).isEqualTo(new DisclosureOfElectronicDocuments()
+                                                              .setReachedAgreement(YesOrNo.NO)
+                                                              .setAgreementLikely(YesOrNo.NO)
+                                                              .setReasonForNoAgreement("no"));
 
-        assertThat(expectedNonEletronicDisclosure).isEqualTo(DisclosureOfNonElectronicDocuments.builder()
-                                                                 .bespokeDirections("directions")
-                                                                 .build());
+        assertThat(expectedNonEletronicDisclosure).isEqualTo(new DisclosureOfNonElectronicDocuments()
+                                                                 .setBespokeDirections("directions"));
 
-        assertThat(expectedDocsToBeConsidered).isEqualTo(DocumentsToBeConsideredSection.builder()
-                                                             .hasDocumentsToBeConsidered(YesOrNo.NO)
-                                                             .details("details")
-                                                             .sectionHeading("Claimants documents to be considered")
-                                                             .question("Are there any documents the claimants have that you want the court to consider?")
-                                                             .build());
+        DocumentsToBeConsideredSection expectedDocsToBeConsideredValue = new DocumentsToBeConsideredSection();
+        expectedDocsToBeConsideredValue.setHasDocumentsToBeConsidered(YesOrNo.NO);
+        expectedDocsToBeConsideredValue.setDetails("details");
+        expectedDocsToBeConsideredValue.setSectionHeading("Claimants documents to be considered");
+        expectedDocsToBeConsideredValue.setQuestion(
+            "Are there any documents the claimants have that you want the court to consider?"
+        );
+        assertThat(expectedDocsToBeConsidered).isEqualTo(expectedDocsToBeConsideredValue);
     }
 
     @Test

@@ -32,9 +32,9 @@ public class DefendantAttendsOrRepresentedTextBuilderTest {
             FinalOrdersClaimantDefendantNotAttending.values())) {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderRecitals(null)
-                .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationComplex(
-                    ClaimantAndDefendantHeard.builder().trialProcedureComplex(TrialNoticeProcedure.builder().listDef(
-                        finalOrdersClaimantDefendantNotAttending).build()).build()).build())
+                .finalOrderRepresentation(new FinalOrderRepresentation().setTypeRepresentationComplex(
+                    new ClaimantAndDefendantHeard().setTrialProcedureComplex(new TrialNoticeProcedure().setListDef(
+                        finalOrdersClaimantDefendantNotAttending))))
                 .build();
             String name = caseData.getRespondent1().getPartyName();
             FinalOrdersDefendantRepresentationList finalOrdersDefendantRepresentationList = DEFENDANT_NOT_ATTENDING;
@@ -66,9 +66,9 @@ public class DefendantAttendsOrRepresentedTextBuilderTest {
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(YES)
                 .finalOrderRecitals(null)
-                .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationComplex(
-                    ClaimantAndDefendantHeard.builder().trialProcedureDefTwoComplex(TrialNoticeProcedure.builder().listDefTwo(
-                        finalOrdersClaimantDefendantNotAttending).build()).build()).build())
+                .finalOrderRepresentation(new FinalOrderRepresentation().setTypeRepresentationComplex(
+                    new ClaimantAndDefendantHeard().setTrialProcedureDefTwoComplex(new TrialNoticeProcedure().setListDefTwo(
+                        finalOrdersClaimantDefendantNotAttending))))
                 .build();
             String name = caseData.getRespondent2().getPartyName();
             FinalOrdersDefendantRepresentationList finalOrdersDefendantRepresentationList = DEFENDANT_NOT_ATTENDING;
@@ -97,9 +97,9 @@ public class DefendantAttendsOrRepresentedTextBuilderTest {
             FinalOrdersDefendantRepresentationList.values())) {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderRecitals(null)
-                .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationComplex(
-                    ClaimantAndDefendantHeard.builder().typeRepresentationDefendantList(
-                        finalOrdersDefendantRepresentationList).build()).build())
+                .finalOrderRepresentation(new FinalOrderRepresentation().setTypeRepresentationComplex(
+                    new ClaimantAndDefendantHeard().setTypeRepresentationDefendantList(
+                        finalOrdersDefendantRepresentationList)))
                 .build();
             String name = caseData.getRespondent1().getPartyName();
             String response = defendantAttendsOrRepresentedTextBuilder.defendantBuilder(caseData, false);
@@ -124,9 +124,9 @@ public class DefendantAttendsOrRepresentedTextBuilderTest {
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(YES)
                 .finalOrderRecitals(null)
-                .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationComplex(
-                    ClaimantAndDefendantHeard.builder().typeRepresentationDefendantTwoList(
-                        finalOrdersDefendantRepresentationList).build()).build())
+                .finalOrderRepresentation(new FinalOrderRepresentation().setTypeRepresentationComplex(
+                    new ClaimantAndDefendantHeard().setTypeRepresentationDefendantTwoList(
+                        finalOrdersDefendantRepresentationList)))
                 .build();
             String name = caseData.getRespondent2().getPartyName();
             String response = defendantAttendsOrRepresentedTextBuilder.defendantBuilder(caseData, true);

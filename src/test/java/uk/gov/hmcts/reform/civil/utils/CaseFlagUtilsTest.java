@@ -166,22 +166,17 @@ class CaseFlagUtilsTest {
                 .multiPartyClaimTwoDefendantSolicitors()
                 .build();
 
-            Expert expert1 = Expert.builder().partyID("partyId1").firstName("First").lastName("Name").build();
-            Expert expert2 = Expert.builder().partyID("partyId2").firstName("Second").lastName("expert").build();
-            Expert expert3 = Expert.builder().partyID("partyId3").firstName("Third").lastName("experto").build();
+            Expert expert1 = new Expert().setPartyID("partyId1").setFirstName("First").setLastName("Name");
+            Expert expert2 = new Expert().setPartyID("partyId2").setFirstName("Second").setLastName("expert");
+            Expert expert3 = new Expert().setPartyID("partyId3").setFirstName("Third").setLastName("experto");
 
             CaseData updatedCaseData = caseData.toBuilder()
-                .respondent1DQ(Respondent1DQ.builder()
-                                   .respondent1DQExperts(Experts
-                                                             .builder()
-                                                             .details(wrapElements(expert1, expert2))
-                                                             .build())
-                                   .build())
-                .respondent2DQ(Respondent2DQ.builder()
-                                   .respondent2DQExperts(Experts.builder()
-                                                             .details(wrapElements(expert3))
-                                                             .build())
-                                   .build())
+                .respondent1DQ(new Respondent1DQ()
+                                   .setRespondent1DQExperts(new Experts()
+                                                                .setDetails(wrapElements(expert1, expert2))))
+                .respondent2DQ(new Respondent2DQ()
+                                   .setRespondent2DQExperts(new Experts()
+                                                                .setDetails(wrapElements(expert3))))
                 .build();
 
             addRespondentDQPartiesFlagStructure(updatedCaseData);
@@ -230,23 +225,17 @@ class CaseFlagUtilsTest {
                 .multiPartyClaimTwoDefendantSolicitors()
                 .build();
 
-            Witness witness1 = Witness.builder().partyID("partyId1").firstName("First").lastName("Name").build();
-            Witness witness2 = Witness.builder().partyID("partyId2").firstName("Second").lastName("witness").build();
-            Witness witness3 = Witness.builder().partyID("partyId3").firstName("Third").lastName("witnessy").build();
+            Witness witness1 = new Witness().setPartyID("partyId1").setFirstName("First").setLastName("Name");
+            Witness witness2 = new Witness().setPartyID("partyId2").setFirstName("Second").setLastName("witness");
+            Witness witness3 = new Witness().setPartyID("partyId3").setFirstName("Third").setLastName("witnessy");
 
             CaseData updatedCaseData = caseData.toBuilder()
-                .respondent1DQ(Respondent1DQ.builder()
-                                   .respondent1DQWitnesses(Witnesses
-                                                               .builder()
-                                                               .details(wrapElements(witness1, witness2))
-                                                               .build())
-                                   .build())
-                .respondent2DQ(Respondent2DQ.builder()
-                                   .respondent2DQWitnesses(Witnesses
-                                                               .builder()
-                                                               .details(wrapElements(witness3))
-                                                               .build())
-                                   .build())
+                .respondent1DQ(new Respondent1DQ()
+                                   .setRespondent1DQWitnesses(new Witnesses()
+                                                                  .setDetails(wrapElements(witness1, witness2))))
+                .respondent2DQ(new Respondent2DQ()
+                                   .setRespondent2DQWitnesses(new Witnesses()
+                                                                  .setDetails(wrapElements(witness3))))
                 .build();
 
             addRespondentDQPartiesFlagStructure(updatedCaseData);
@@ -295,23 +284,17 @@ class CaseFlagUtilsTest {
                 .multiPartyClaimTwoApplicants()
                 .build();
 
-            Witness witness1 = Witness.builder().partyID("partyId1").firstName("First").lastName("Name").build();
-            Witness witness2 = Witness.builder().partyID("partyId2").firstName("Second").lastName("witness").build();
-            Witness witness3 = Witness.builder().partyID("partyId3").firstName("Third").lastName("witnessy").build();
+            Witness witness1 = new Witness().setPartyID("partyId1").setFirstName("First").setLastName("Name");
+            Witness witness2 = new Witness().setPartyID("partyId2").setFirstName("Second").setLastName("witness");
+            Witness witness3 = new Witness().setPartyID("partyId3").setFirstName("Third").setLastName("witnessy");
 
             CaseData updatedCaseData = caseData.toBuilder()
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQWitnesses(Witnesses
-                                                             .builder()
-                                                             .details(wrapElements(witness1, witness2))
-                                                             .build())
-                                  .build())
-                .applicant2DQ(Applicant2DQ.builder()
-                                  .applicant2DQWitnesses(Witnesses
-                                                             .builder()
-                                                             .details(wrapElements(witness3))
-                                                             .build())
-                                  .build())
+                .applicant1DQ(new Applicant1DQ()
+                                  .setApplicant1DQWitnesses(new Witnesses()
+                                                                .setDetails(wrapElements(witness1, witness2))))
+                .applicant2DQ(new Applicant2DQ()
+                                  .setApplicant2DQWitnesses(new Witnesses()
+                                                                .setDetails(wrapElements(witness3))))
                 .build();
 
             addApplicantExpertAndWitnessFlagsStructure(updatedCaseData);
@@ -356,23 +339,17 @@ class CaseFlagUtilsTest {
                 .multiPartyClaimTwoApplicants()
                 .build();
 
-            Expert expert1 = Expert.builder().partyID("partyId1").firstName("First").lastName("Name").build();
-            Expert expert2 = Expert.builder().partyID("partyId2").firstName("Second").lastName("expert").build();
-            Expert expert3 = Expert.builder().partyID("partyId3").firstName("Third").lastName("expert").build();
+            Expert expert1 = new Expert().setPartyID("partyId1").setFirstName("First").setLastName("Name");
+            Expert expert2 = new Expert().setPartyID("partyId2").setFirstName("Second").setLastName("expert");
+            Expert expert3 = new Expert().setPartyID("partyId3").setFirstName("Third").setLastName("expert");
 
             CaseData updatedCaseData = caseData.toBuilder()
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQExperts(Experts
-                                                           .builder()
-                                                           .details(wrapElements(expert1, expert2))
-                                                           .build())
-                                  .build())
-                .applicant2DQ(Applicant2DQ.builder()
-                                  .applicant2DQExperts(Experts
-                                                           .builder()
-                                                           .details(wrapElements(expert3))
-                                                           .build())
-                                  .build())
+                .applicant1DQ(new Applicant1DQ()
+                                  .setApplicant1DQExperts(new Experts()
+                                                              .setDetails(wrapElements(expert1, expert2))))
+                .applicant2DQ(new Applicant2DQ()
+                                  .setApplicant2DQExperts(new Experts()
+                                                              .setDetails(wrapElements(expert3))))
                 .build();
 
             addApplicantExpertAndWitnessFlagsStructure(updatedCaseData);

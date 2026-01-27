@@ -118,18 +118,15 @@ class RespondentTemplateForDQGeneratorTest {
 
     @Test
     void shouldDefaultExpertCostToZeroWhenEstimatedCostMissing() {
-        Expert expertWithNullCost = Expert.builder()
-            .firstName("John")
-            .lastName("Doe")
-            .estimatedCost(null)
-            .build();
+        Expert expertWithNullCost = new Expert()
+            .setFirstName("John")
+            .setLastName("Doe")
+            .setEstimatedCost(null);
 
-        Respondent1DQ dq = Respondent1DQ.builder()
-            .respondent1DQExperts(Experts.builder()
-                                       .expertRequired(YES)
-                                       .details(List.of(element(expertWithNullCost)))
-                                       .build())
-            .build();
+        Respondent1DQ dq = new Respondent1DQ()
+            .setRespondent1DQExperts(new Experts()
+                                         .setExpertRequired(YES)
+                                         .setDetails(List.of(element(expertWithNullCost))));
 
         List<uk.gov.hmcts.reform.civil.model.docmosis.dq.Expert> experts = respondentTemplateForDQGenerator.getExpertsDetails(dq);
 

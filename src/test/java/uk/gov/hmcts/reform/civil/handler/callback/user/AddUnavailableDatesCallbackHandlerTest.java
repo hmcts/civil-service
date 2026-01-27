@@ -326,11 +326,9 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                                          .unavailableDates(new ArrayList<>(existingDates))
                                          .build())
                         .respondent1ResponseDate(issueDate.atStartOfDay())
-                        .respondent1DQ(Respondent1DQ.builder()
-                                           .respondent1DQHearing(Hearing.builder()
-                                                                     .unavailableDatesRequired(YES)
-                                                                     .build())
-                                           .build())
+                        .respondent1DQ(new Respondent1DQ()
+                                           .setRespondent1DQHearing(new Hearing()
+                                                                     .setUnavailableDatesRequired(YES)))
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -383,11 +381,9 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                                          .unavailableDates(new ArrayList<>(existingDates))
                                          .build())
                         .applicant1ResponseDate(issueDate.atStartOfDay())
-                        .applicant1DQ(Applicant1DQ.builder()
-                                           .applicant1DQHearing(Hearing.builder()
-                                                                     .unavailableDatesRequired(YES)
-                                                                     .build())
-                                           .build())
+                        .applicant1DQ(new Applicant1DQ()
+                                           .setApplicant1DQHearing(new Hearing()
+                                                                     .setUnavailableDatesRequired(YES)))
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -518,11 +514,9 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                                         .unavailableDates(new ArrayList<>(existingTopLevelDates))
                                         .build())
                         .applicant1ResponseDate(issueDate.atStartOfDay())
-                        .applicant1DQ(Applicant1DQ.builder()
-                                          .applicant1DQHearing(Hearing.builder()
-                                                                   .unavailableDatesRequired(YES)
-                                                                   .build())
-                                          .build())
+                        .applicant1DQ(new Applicant1DQ()
+                                          .setApplicant1DQHearing(new Hearing()
+                                                                   .setUnavailableDatesRequired(YES)))
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -684,11 +678,9 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                                          .unavailableDates(new ArrayList<>(existingDates))
                                          .build())
                         .respondent2ResponseDate(issueDate.atStartOfDay())
-                        .respondent2DQ(Respondent2DQ.builder()
-                                           .respondent2DQHearing(Hearing.builder()
-                                                                     .unavailableDatesRequired(YES)
-                                                                     .build())
-                                           .build())
+                        .respondent2DQ(new Respondent2DQ()
+                                           .setRespondent2DQHearing(new Hearing()
+                                                                     .setUnavailableDatesRequired(YES)))
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -792,11 +784,9 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                                         .unavailableDates(new ArrayList<>(existingDates))
                                         .build())
                         .applicant1ResponseDate(issueDate.atStartOfDay())
-                        .applicant1DQ(Applicant1DQ.builder()
-                                          .applicant1DQHearing(Hearing.builder()
-                                                                   .unavailableDatesRequired(YES)
-                                                                   .build())
-                                          .build())
+                        .applicant1DQ(new Applicant1DQ()
+                                          .setApplicant1DQHearing(new Hearing()
+                                                                   .setUnavailableDatesRequired(YES)))
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 

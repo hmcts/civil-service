@@ -1,13 +1,15 @@
 package uk.gov.hmcts.reform.civil.model.documents;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 
-import static java.util.Objects.requireNonNull;
-
-@EqualsAndHashCode
-@ToString
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
 public class DocumentMetaData {
 
     private Document document;
@@ -15,44 +17,10 @@ public class DocumentMetaData {
     private String dateUploaded;
     private String suppliedBy;
 
-    private DocumentMetaData() {
-        // noop -- for deserializer
-    }
-
     public DocumentMetaData(
         Document document,
         String description,
         String dateUploaded) {
         this(document, description, dateUploaded, null);
-    }
-
-    public DocumentMetaData(
-        Document document,
-        String description,
-        String dateUploaded,
-        String suppliedBy) {
-        this.document = document;
-        this.description = description;
-        this.dateUploaded = dateUploaded;
-
-        this.suppliedBy = suppliedBy;
-    }
-
-    public Document getDocument() {
-        requireNonNull(document);
-        return document;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getDateUploaded() {
-        requireNonNull(dateUploaded);
-        return dateUploaded;
-    }
-
-    public String getSuppliedBy() {
-        return suppliedBy;
     }
 }

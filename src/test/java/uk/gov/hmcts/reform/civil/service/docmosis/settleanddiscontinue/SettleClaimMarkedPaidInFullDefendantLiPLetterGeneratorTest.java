@@ -178,9 +178,9 @@ class SettleClaimMarkedPaidInFullDefendantLiPLetterGeneratorTest {
             .applicant1(applicant)
             .respondent1(defendant)
             .legacyCaseReference("100DC001")
-            .respondent1DQ(Respondent1DQ.builder().respondent1DQLanguage(WelshLanguageRequirements.builder()
-                                                                             .court(Language.WELSH)
-                                                                             .build()).build())
+            .respondent1DQ(new Respondent1DQ()
+                               .setRespondent1DQLanguage(new WelshLanguageRequirements()
+                                                             .setCourt(Language.WELSH)))
             .build();
 
         //When

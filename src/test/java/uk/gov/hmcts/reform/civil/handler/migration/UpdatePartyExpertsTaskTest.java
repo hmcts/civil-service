@@ -100,20 +100,20 @@ class UpdatePartyExpertsTaskTest {
 
     @Test
     void shouldUpdateDQExpertsWithTBCForApplicantsAndRespondents() {
-        Expert expert1 = Expert.builder().firstName(null).lastName("Doe").build();
-        Expert expert2 = Expert.builder().firstName("Jane").lastName(null).build();
+        Expert expert1 = new Expert().setFirstName(null).setLastName("Doe");
+        Expert expert2 = new Expert().setFirstName("Jane").setLastName(null);
 
         List<Element<Expert>> dqExpertElements = List.of(
             Element.<Expert>builder().value(expert1).build(),
             Element.<Expert>builder().value(expert2).build()
         );
-        Experts dqExperts = Experts.builder().details(dqExpertElements).build();
+        Experts dqExperts = new Experts().setDetails(dqExpertElements);
 
         CaseData caseData = CaseData.builder()
-            .applicant1DQ(Applicant1DQ.builder().applicant1DQExperts(dqExperts).build())
-            .applicant2DQ(Applicant2DQ.builder().applicant2DQExperts(dqExperts).build())
-            .respondent1DQ(Respondent1DQ.builder().respondent1DQExperts(dqExperts).build())
-            .respondent2DQ(Respondent2DQ.builder().respondent2DQExperts(dqExperts).build())
+            .applicant1DQ(new Applicant1DQ().setApplicant1DQExperts(dqExperts))
+            .applicant2DQ(new Applicant2DQ().setApplicant2DQExperts(dqExperts))
+            .respondent1DQ(new Respondent1DQ().setRespondent1DQExperts(dqExperts))
+            .respondent2DQ(new Respondent2DQ().setRespondent2DQExperts(dqExperts))
             .build();
 
         CaseReference ref = CaseReference.builder().caseReference("999").build();
