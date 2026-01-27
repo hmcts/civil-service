@@ -104,6 +104,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingWindow;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsImpNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsMediation;
+import uk.gov.hmcts.reform.civil.model.sdo.PPI;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsPPI;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsRestrictPages;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsRestrictWitness;
@@ -797,6 +798,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         caseData.setSmallClaimsPenalNoticeToggle(new ArrayList<>());
         caseData.setFastTrackPenalNoticeToggle(new ArrayList<>());
 
+        populatePpiFields(caseData);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
@@ -959,6 +962,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             mediationStatement.setInput(SdoR2UiConstantSmallClaim.CARM_MEDIATION_TEXT);
             updatedData.setSdoR2SmallClaimsMediationSectionStatement(mediationStatement);
         }
+    }
+
+    private void populatePpiFields(CaseData caseData) {
+        PPI ppi = new PPI();
+        ppi.setPpiDate(LocalDate.now().plusDays(28));
+        ppi.setText(SdoR2UiConstantSmallClaim.PPI_DESCRIPTION);
+        caseData.setSmallClaimsPPI(ppi);
+        caseData.setFastTrackPPI(ppi);
     }
 
     private void resetPpiFields(CaseData caseData, boolean isSmallClaimsTrack, boolean isFastTrack) {
