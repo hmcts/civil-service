@@ -47,7 +47,7 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
         );
     }
 
-    public byte[] downloadLetter(CaseData caseData, String authorisation) {
+    public byte[] downloadLetter(CaseData caseData, String authorisation, List<String> bulkPrintFileNames) {
         Long caseId = caseData.getCcdCaseReference();
         log.info("Generating PiPLetter document for caseId {}", caseId);
         DocmosisDocument pipLetter = generate(caseData);
@@ -60,7 +60,7 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
             )
         );
 
-        List<DocumentMetaData> documentMetaDataList = fetchDocumentsFromCaseData(caseData, pipLetterCaseDocument);
+        List<DocumentMetaData> documentMetaDataList = fetchDocumentsFromCaseData(caseData, pipLetterCaseDocument, bulkPrintFileNames);
         log.info("Calling civil stitch service from pip letter generation for caseId {}", caseId);
         CaseDocument stitchedDocument =
             civilStitchService.generateStitchedCaseDocument(documentMetaDataList,
@@ -97,8 +97,11 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
             .setIssueDate(LocalDate.now());
     }
 
-    private List<DocumentMetaData> fetchDocumentsFromCaseData(CaseData caseData, CaseDocument caseDocument) {
+    private List<DocumentMetaData> fetchDocumentsFromCaseData(CaseData caseData,
+                                                              CaseDocument caseDocument,
+                                                              List<String> bulkPrintFileNames) {
         List<DocumentMetaData> documentMetaDataList = new ArrayList<>();
+        bulkPrintFileNames.add(caseDocument.getDocumentLink().getDocumentFileName());
 
         documentMetaDataList.add(new DocumentMetaData(caseDocument.getDocumentLink(),
                                                       "PiP Letter",
@@ -108,11 +111,14 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
             .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
                 .getDocumentType().equals(DocumentType.SEALED_CLAIM)).findAny();
 
-        optionalSealedDocument.ifPresent(caseDocumentElement -> documentMetaDataList.add(new DocumentMetaData(
-            caseDocumentElement.getValue().getDocumentLink(),
-            "Sealed Claim form",
-            LocalDate.now().toString()
-        )));
+        optionalSealedDocument.ifPresent(caseDocumentElement -> {
+            bulkPrintFileNames.add(caseDocumentElement.getValue().getDocumentLink().getDocumentFileName());
+            documentMetaDataList.add(new DocumentMetaData(
+                caseDocumentElement.getValue().getDocumentLink(),
+                "Sealed Claim form",
+                LocalDate.now().toString()
+            ));
+        });
 
         return documentMetaDataList;
     }

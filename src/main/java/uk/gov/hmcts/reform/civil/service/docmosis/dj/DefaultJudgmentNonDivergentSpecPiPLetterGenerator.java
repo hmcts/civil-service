@@ -54,10 +54,11 @@ public class DefaultJudgmentNonDivergentSpecPiPLetterGenerator {
                 DocumentType.DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER
             )
         );
-
+        List<String> bulkPrintFileNames = new ArrayList<>();
         CaseDocument pinInPostLetterWithDjDoc = getDefendantDjDocStitchedToPinAndPostDoc(
             caseData,
             defaultJudgmentNonDivergentPinInLetterCaseDocument,
+            bulkPrintFileNames,
             authorisation
         );
 
@@ -74,7 +75,10 @@ public class DefaultJudgmentNonDivergentSpecPiPLetterGenerator {
 
         List<String> recipients = getRecipientsList(caseData);
         bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
-                                     caseData.getLegacyCaseReference(), DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER_REF, recipients);
+                                     caseData.getLegacyCaseReference(),
+                                     DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER_REF,
+                                     recipients,
+                                     bulkPrintFileNames);
         return letterContent;
     }
 
@@ -103,7 +107,10 @@ public class DefaultJudgmentNonDivergentSpecPiPLetterGenerator {
             .setCertifOfSatisfactionFee(String.valueOf(generalAppFeesService.getFeeForJOWithApplicationType(OTHER).formData()));
     }
 
-    private CaseDocument getDefendantDjDocStitchedToPinAndPostDoc(CaseData caseData, CaseDocument pinAndPostLetterDoc, String authorisation) {
+    private CaseDocument getDefendantDjDocStitchedToPinAndPostDoc(CaseData caseData, CaseDocument pinAndPostLetterDoc,
+                                                                  List<String> bulkPrintFileNames,
+                                                                  String authorisation) {
+        bulkPrintFileNames.add(pinAndPostLetterDoc.getDocumentLink().getDocumentFileName());
         if (caseData.getDefaultJudgmentDocuments() != null) {
             CaseDocument defendantDjDoc = caseData.getDefaultJudgmentDocuments().stream()
                 .map(Element::getValue)
@@ -111,6 +118,7 @@ public class DefaultJudgmentNonDivergentSpecPiPLetterGenerator {
                 .findFirst()
                 .orElse(null);
             if (defendantDjDoc != null) {
+                bulkPrintFileNames.add(defendantDjDoc.getDocumentLink().getDocumentFileName());
                 List<DocumentMetaData> documentMetaDataList = appendDefendantDjDocToPinAndPostDoc(
                     pinAndPostLetterDoc,
                     defendantDjDoc

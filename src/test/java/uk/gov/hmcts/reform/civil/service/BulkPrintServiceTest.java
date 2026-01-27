@@ -20,6 +20,7 @@ import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.service.BulkPrintService.ADDITIONAL_DATA_CASE_IDENTIFIER_KEY;
 import static uk.gov.hmcts.reform.civil.service.BulkPrintService.ADDITIONAL_DATA_CASE_REFERENCE_NUMBER_KEY;
 import static uk.gov.hmcts.reform.civil.service.BulkPrintService.ADDITIONAL_DATA_LETTER_TYPE_KEY;
+import static uk.gov.hmcts.reform.civil.service.BulkPrintService.FILE_NAMES;
 import static uk.gov.hmcts.reform.civil.service.BulkPrintService.XEROX_TYPE_PARAMETER;
 import static uk.gov.hmcts.reform.civil.service.BulkPrintService.RECIPIENTS;
 
@@ -33,28 +34,31 @@ class BulkPrintServiceTest {
     @InjectMocks
     private BulkPrintService bulkPrintService;
 
-    private final String authentication = "Authentication";
     private final String letterType = "Letter type";
     private final String claimId = "1";
     private final List<String> recipients = Arrays.asList("person one", "person two");
+    private final List<String> filenames = List.of("test.pdf");
 
     private final Map<String, Object> additionalInformation =
         Map.of(ADDITIONAL_DATA_LETTER_TYPE_KEY, letterType,
                ADDITIONAL_DATA_CASE_IDENTIFIER_KEY, claimId,
                ADDITIONAL_DATA_CASE_REFERENCE_NUMBER_KEY, claimId,
-               RECIPIENTS, recipients
+               RECIPIENTS, recipients,
+               FILE_NAMES, filenames
         );
+
     private final byte[] letterTemplate = new byte[]{1, 2, 3};
-    private final LetterWithPdfsRequest letter =
+
+    private final LetterWithPdfsRequest letterWithFilenames =
         new LetterWithPdfsRequest(List.of(Base64.getEncoder().encodeToString(letterTemplate)),
                                   XEROX_TYPE_PARAMETER, additionalInformation
         );
 
     @Test
-    void shouldSendLetterToBulkPrintSuccessfully() {
+    void shouldSendLetterToBulkPrintWithFilenamesSuccessfully() {
+        final String authentication = "Authentication";
         given(authTokenGenerator.generate()).willReturn(authentication);
-        bulkPrintService.printLetter(letterTemplate, claimId, claimId, letterType, recipients);
-        verify(sendLetterApi).sendLetter(refEq(authentication), refEq(letter));
+        bulkPrintService.printLetter(letterTemplate, claimId, claimId, letterType, recipients, List.of("test.pdf"));
+        verify(sendLetterApi).sendLetter(refEq(authentication), refEq(letterWithFilenames));
     }
-
 }
