@@ -99,6 +99,7 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void given_isEligibleForCCJ_whenGetStatus_thenReturnEligibleForCCJStatus() {
         CaseData claim = CaseData.builder()
+            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ResponseDeadline(LocalDateTime.of(2022, 2, 2, 16, 0))
             .build();
@@ -111,6 +112,7 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void given_respondentDeadlineHasPassed_whenGetStatus_thenReturnEligibleForCCJStatus() {
         CaseData claim = CaseData.builder()
+            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
             .respondent1ResponseDeadline(LocalDate.now().minusDays(1).atTime(16, 0, 0))
             .build();
 

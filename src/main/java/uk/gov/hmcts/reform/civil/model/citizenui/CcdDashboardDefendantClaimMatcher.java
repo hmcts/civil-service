@@ -106,7 +106,8 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         if (isCasedDiscontinued() || isPaperResponse()) {
             return false;
         }
-        return (caseData.getRespondent1ResponseDeadline() != null
+        return (CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.equals(caseData.getCcdState())
+            && caseData.getRespondent1ResponseDeadline() != null
             && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
             && caseData.getPaymentTypeSelection() == null
             && caseData.getDefaultJudgmentDocuments().isEmpty());
