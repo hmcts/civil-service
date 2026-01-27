@@ -193,23 +193,23 @@ public class HearingScheduledHandler extends CallbackHandler {
 
         CaseState caseState = caseData.getCcdState();
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-            caseState = determinePostState(caseState, caseData);
-            calculateHearingFeeAndDueDate(caseData, claimTrack);
-        } else {
-            // If hearing notice type if FAST or SMALL and it is a first time being listed, calculate fee and fee due date.
-            // If relisted, do not recalculate fee and fee due date, and move state to PREPARE_FOR_HEARING_CONDUCT_HEARING
-            if (!caseData.getHearingNoticeList().equals(HearingNoticeList.OTHER)) {
-                if (ListingOrRelisting.LISTING.equals(caseData.getListingOrRelisting())) {
-                    calculateHearingFeeAndDueDate(caseData, claimTrack);
-                    caseState = caseState.equals(CASE_PROGRESSION) ? HEARING_READINESS : caseState;
-                } else {
-                    caseState = caseState.equals(CASE_PROGRESSION) ? PREPARE_FOR_HEARING_CONDUCT_HEARING : caseState;
-                }
-                // If hearing notice type is OTHER and is being listed, do not calculate fee and fee due date
-                // If relisted, again do not calculate fee and fee due date, but move state to PREPARE_FOR_HEARING_CONDUCT_HEARING
-            } else if (caseData.getHearingNoticeList().equals(HearingNoticeList.OTHER)) {
+            //  if a MINTI case is in DECISION_OUTCOME when the create a hearing notice event is run,
+            //  move the case state to HEARING_READINESS.
+            caseState = updateMintiPostState(caseState, caseData);
+        }
+        // If hearing notice type if FAST or SMALL and it is a first time being listed, calculate fee and fee due date.
+        // If relisted, do not recalculate fee and fee due date, and move state to PREPARE_FOR_HEARING_CONDUCT_HEARING
+        if (!caseData.getHearingNoticeList().equals(HearingNoticeList.OTHER)) {
+            if (ListingOrRelisting.LISTING.equals(caseData.getListingOrRelisting())) {
+                calculateHearingFeeAndDueDate(caseData, claimTrack);
+                caseState = caseState.equals(CASE_PROGRESSION) ? HEARING_READINESS : caseState;
+            } else {
                 caseState = caseState.equals(CASE_PROGRESSION) ? PREPARE_FOR_HEARING_CONDUCT_HEARING : caseState;
             }
+            // If hearing notice type is OTHER and is being listed, do not calculate fee and fee due date
+            // If relisted, again do not calculate fee and fee due date, but move state to PREPARE_FOR_HEARING_CONDUCT_HEARING
+        } else if (caseData.getHearingNoticeList().equals(HearingNoticeList.OTHER)) {
+            caseState = caseState.equals(CASE_PROGRESSION) ? PREPARE_FOR_HEARING_CONDUCT_HEARING : caseState;
         }
 
         caseData.setBusinessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
@@ -220,18 +220,9 @@ public class HearingScheduledHandler extends CallbackHandler {
             .build();
     }
 
-    private CaseState determinePostState(CaseState caseState, CaseData caseData) {
-        if (isClaimMultiOrIntermediate(caseData)) {
-            if (!caseState.equals(PREPARE_FOR_HEARING_CONDUCT_HEARING)
-                && !caseState.equals(HEARING_READINESS)) {
-                caseState = HEARING_READINESS;
-            }
-        } else {
-            if (!caseState.equals(PREPARE_FOR_HEARING_CONDUCT_HEARING)
-                && !caseState.equals(HEARING_READINESS)
-                && !caseState.equals(DECISION_OUTCOME)) {
-                caseState = HEARING_READINESS;
-            }
+    private CaseState updateMintiPostState(CaseState caseState, CaseData caseData) {
+        if (isClaimMultiOrIntermediate(caseData) && caseState.equals(DECISION_OUTCOME)) {
+            caseState = HEARING_READINESS;
         }
         return caseState;
     }
