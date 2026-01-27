@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 
 compare_ft_groups() {
   local ft_groups_csv pr_ft_groups_csv
@@ -47,7 +47,7 @@ run_functional_test_groups() {
 }
 
 run_functional_tests() {
-  echo "Running all functional tests on ${ENVIRONMENT} env"
+  echo "Running functional tests on ${ENVIRONMENT} env"
   if [ "$ENVIRONMENT" = "aat" ]; then
     yarn test:api-prod 
   elif [ -z "$PR_FT_GROUPS" ]; then
