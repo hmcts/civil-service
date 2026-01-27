@@ -104,7 +104,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingWindow;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsImpNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsMediation;
-import uk.gov.hmcts.reform.civil.model.sdo.PPI;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsPPI;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsRestrictPages;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsRestrictWitness;
@@ -964,20 +963,17 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private void resetPpiFields(CaseData caseData, boolean isSmallClaimsTrack, boolean isFastTrack) {
         if (isSmallClaimsTrack && !SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimPPI")) {
-                caseData.setSmallClaimsPPI(null);
-            }
+            caseData.setSmallClaimsPPI(null);
+        }
 
         if (isFastTrack && !SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimPPI")) {
-                caseData.setFastTrackPPI(null);
-            }
-
+            caseData.setFastTrackPPI(null);
+        }
     }
-
 
     private void prePopulateNihlFields(CaseData updatedData, DynamicList hearingMethodList,
                                        Optional<RequestedCourt> preferredCourt,
                                        List<LocationRefData> locationRefDataList) {
-
         DynamicListElement hearingMethodInPerson = hearingMethodList.getListItems().stream().filter(elem -> elem.getLabel()
             .equals(HearingMethod.IN_PERSON.getLabel())).findFirst().orElse(null);
         hearingMethodList.setValue(hearingMethodInPerson);
