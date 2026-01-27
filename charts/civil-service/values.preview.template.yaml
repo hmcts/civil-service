@@ -30,7 +30,7 @@ java:
     HMC_DEPLOYMENT_ID: "civil-${CHANGE_ID}"
     RD_PROFESSIONAL_API_URL: http://${SERVICE_NAME}-wiremock
     DOCMOSIS_TORNADO_URL: http://${SERVICE_NAME}-wiremock
-    ROLE_ASSIGNMENT_URL: https://am-role-assignment-service-${SERVICE_FQDN}
+    ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
     ROLE_INITIALISATION_ENABLED: true
     CASE_FLAGS_LOGGING_ENABLED: true
     COURT_LOCATION_WA_DMN_ENABLED: true
