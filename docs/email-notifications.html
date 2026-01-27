@@ -3374,6 +3374,7 @@
         <th>Handler / task</th>
         <th>Party</th>
         <th>Details</th>
+        <th>Template JSON</th>
         <th>BPMN file(s)</th>
         <th>CCD event(s)</th>
       </tr>
@@ -3385,6 +3386,7 @@
         <td><code>HwFDashboardNotificationsHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.HearingFee.HWF.FullRemission.json'>Notice.AAA6.CP.HearingFee.HWF.FullRemission</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.HearingFee.HWF.InfoRequired.json'>Notice.AAA6.CP.HearingFee.HWF.InfoRequired</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.HearingFee.HWF.InvalidRef.json'>Notice.AAA6.CP.HearingFee.HWF.InvalidRef</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.HearingFee.HWF.PartRemission.json'>Notice.AAA6.CP.HearingFee.HWF.PartRemission</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.HearingFee.HWF.Rejected.json'>Notice.AAA6.CP.HearingFee.HWF.Rejected</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.HearingFee.HWF.Updated.json'>Notice.AAA6.CP.HearingFee.HWF.Updated</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimIssue.HWF.FullRemission.json'>Notice.AAA6.ClaimIssue.HWF.FullRemission</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimIssue.HWF.InfoRequired.json'>Notice.AAA6.ClaimIssue.HWF.InfoRequired</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimIssue.HWF.InvalidRef.json'>Notice.AAA6.ClaimIssue.HWF.InvalidRef</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimIssue.HWF.PartRemission.json'>Notice.AAA6.ClaimIssue.HWF.PartRemission</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimIssue.HWF.Rejected.json'>Notice.AAA6.ClaimIssue.HWF.Rejected</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimIssue.HWF.Updated.json'>Notice.AAA6.ClaimIssue.HWF.Updated</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/notify_claimant_hwf_outcome.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/notify_claimant_hwf_outcome.png'>diagram</a></td>
         <td>Notify lip claimant hwf outcome (NOTIFY_LIP_CLAIMANT_HWF_OUTCOME)</td>
       </tr>
@@ -3394,6 +3396,7 @@
         <td><code>CoScNotificationForCaseNotMarkPaidInFullClaimantHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ProofofDebtPayment.Application.Claimant.json'>Notice.AAA6.ProofofDebtPayment.Application.Claimant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/initiate_cosc_application_after_payment.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/initiate_cosc_application_after_payment.png'>diagram</a></td>
         <td>COSC initiate after payment process (INITIATE_COSC_APPLICATION_AFTER_PAYMENT)</td>
       </tr>
@@ -3402,6 +3405,7 @@
         <td><code>CreateAmendRestitchBundleDashboardNotificationsForClaimant</code></td>
         <td><code>BundleUpdatedClaimantNotificationHandler</code></td>
         <td>Claimant</td>
+        <td>—</td>
         <td>—</td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/amend_restitch_bundle.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/amend_restitch_bundle.png'>diagram</a></td>
         <td>Amend Restitch Bundle (AMEND_RESTITCH_BUNDLE)</td>
@@ -3412,6 +3416,7 @@
         <td><code>BundleUpdatedDefendantNotificationHandler</code></td>
         <td>Defendant</td>
         <td>—</td>
+        <td>—</td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/amend_restitch_bundle.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/amend_restitch_bundle.png'>diagram</a></td>
         <td>Amend Restitch Bundle (AMEND_RESTITCH_BUNDLE)</td>
       </tr>
@@ -3420,6 +3425,7 @@
         <td><code>CreateBundleCreatedDashboardNotificationsForClaimant1</code></td>
         <td><code>BundleCreationClaimantNotificationHandler</code></td>
         <td>Claimant</td>
+        <td>—</td>
         <td>—</td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/bundle_creation_notification.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/bundle_creation_notification.png'>diagram</a></td>
         <td>Bundle creation notification (BUNDLE_CREATION_NOTIFICATION)</td>
@@ -3430,6 +3436,7 @@
         <td><code>BundleCreationDefendantNotificationHandler</code></td>
         <td>Defendant</td>
         <td>—</td>
+        <td>—</td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/bundle_creation_notification.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/bundle_creation_notification.png'>diagram</a></td>
         <td>Bundle creation notification (BUNDLE_CREATION_NOTIFICATION)</td>
       </tr>
@@ -3439,6 +3446,7 @@
         <td><code>ClaimSettledDashboardNotificationHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.ClaimSettledEvent.Claimant.json'>Notice.AAA6.ClaimantIntent.ClaimSettledEvent.Claimant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/claim_settled_lip.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/claim_settled_lip.png'>diagram</a></td>
         <td>Lip claim settled (LIP_CLAIM_SETTLED)</td>
       </tr>
@@ -3448,6 +3456,7 @@
         <td><code>ClaimSettledDefendantDashboardNotificationHandler</code></td>
         <td>Defendant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.ClaimSettleEvent.Defendant.json'>Notice.AAA6.ClaimantIntent.ClaimSettleEvent.Defendant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/claim_settled_lip.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/claim_settled_lip.png'>diagram</a></td>
         <td>Lip claim settled (LIP_CLAIM_SETTLED)</td>
       </tr>
@@ -3457,6 +3466,7 @@
         <td><code>SettleClaimPaidInFullDefendantDashboardNotificationHandler</code></td>
         <td>Defendant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.Settle.ClaimPaidInFull.Defendant.json'>Notice.AAA6.Settle.ClaimPaidInFull.Defendant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/settle_claim_paid_in_full_notification.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/settle_claim_paid_in_full_notification.png'>diagram</a></td>
         <td>Settle Claim Marked As Paid In Full notification (SETTLE_CLAIM_MARKED_PAID_IN_FULL)</td>
       </tr>
@@ -3466,6 +3476,7 @@
         <td><code>DefendantNotifyDiscontinuanceDashboardNotificationHandler</code></td>
         <td>Defendant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.Discontinue.NoticeOfDiscontinuanceIssued.Defendant.json'>Notice.AAA6.Discontinue.NoticeOfDiscontinuanceIssued.Defendant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/discontinue_claim_claimant.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/discontinue_claim_claimant.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_discontinuance_doc.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/upload_translated_discontinuance_doc.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/validate_discontinue_claim_claimant.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/validate_discontinue_claim_claimant.png'>diagram</a></td>
         <td>Discontinue Claim Claimant  (DISCONTINUE_CLAIM_CLAIMANT)<br>Upload translated discontinuance doc (UPLOAD_TRANSLATED_DISCONTINUANCE_DOC)<br>Validate Discontinue Claim Claimant (VALIDATE_DISCONTINUE_CLAIM_CLAIMANT)</td>
       </tr>
@@ -3475,6 +3486,7 @@
         <td><code>HearingFeeUnpaidClaimantNotificationHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.StrikeOut.HearingFeeUnpaid.Claimant.json'>Notice.AAA6.CP.StrikeOut.HearingFeeUnpaid.Claimant</a></td>
         <td>—</td>
         <td>—</td>
       </tr>
@@ -3484,6 +3496,7 @@
         <td><code>HearingFeeUnpaidDefendantNotificationHandler</code></td>
         <td>Defendant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.StrikeOut.HearingFeeUnpaid.Defendant.json'>Notice.AAA6.CP.StrikeOut.HearingFeeUnpaid.Defendant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/hearing_fee_unpaid.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/hearing_fee_unpaid.png'>diagram</a></td>
         <td>Hearing fee unpaid (HEARING_FEE_UNPAID)</td>
       </tr>
@@ -3493,6 +3506,7 @@
         <td><code>HelpWithFeeDashboardNoticeHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.HearingFee.HWF.AppliedFor.Claimant.json'>Notice.AAA6.CP.HearingFee.HWF.AppliedFor.Claimant</a></td>
         <td>—</td>
         <td>—</td>
       </tr>
@@ -3502,6 +3516,7 @@
         <td><code>CreateClaimIssueNotificationsHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimIssue.HWF.PhonePayment.json'>Notice.AAA6.ClaimIssue.HWF.PhonePayment</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimIssue.Response.Await.json'>Notice.AAA6.ClaimIssue.Response.Await</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/create_claim_spec_after_payment.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/create_claim_spec_after_payment.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_document_claim_issue_notify.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/upload_translated_document_claim_issue_notify.png'>diagram</a></td>
         <td>Create claim process after payment spec (CREATE_CLAIM_SPEC_AFTER_PAYMENT)<br>Upload translated document lip (UPLOAD_TRANSLATED_DOCUMENT_CLAIM_ISSUE)</td>
       </tr>
@@ -3509,6 +3524,7 @@
         <td>DashboardCallbackHandler</td>
         <td><code>CreateIssueClaimDashboardNotificationsForApplicant1</code></td>
         <td><code>MessageTaskCategoryCallbackHandler</code></td>
+        <td>—</td>
         <td>—</td>
         <td>—</td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/create_claim_spec_after_payment.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/create_claim_spec_after_payment.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_document_claim_issue_notify.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/upload_translated_document_claim_issue_notify.png'>diagram</a></td>
@@ -3520,6 +3536,7 @@
         <td><code>ClaimIssueNotificationsHandler</code></td>
         <td>Defendant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimIssue.Response.Required.json'>Notice.AAA6.ClaimIssue.Response.Required</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/create_claim_spec_after_payment.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/create_claim_spec_after_payment.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_document_claim_issue_notify.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/upload_translated_document_claim_issue_notify.png'>diagram</a></td>
         <td>Create claim process after payment spec (CREATE_CLAIM_SPEC_AFTER_PAYMENT)<br>Upload translated document lip (UPLOAD_TRANSLATED_DOCUMENT_CLAIM_ISSUE)</td>
       </tr>
@@ -3529,6 +3546,7 @@
         <td><code>RequestForReconsiderationRequestedByOtherPartyClaimantNotificationHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.ReviewOrderRequestedbyOtherParty.Claimant.json'>Notice.AAA6.CP.ReviewOrderRequestedbyOtherParty.Claimant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/request_for_reconsideration_cui_defendant.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/request_for_reconsideration_cui_defendant.png'>diagram</a></td>
         <td>Request for Reconsideration Notification CUI Defendant (REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_DEFENDANT)</td>
       </tr>
@@ -3538,6 +3556,7 @@
         <td><code>RequestForReconsiderationRequestedByOtherPartyDefendantNotificationHandler</code></td>
         <td>Defendant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.ReviewOrderRequestedbyOtherParty.Defendant.json'>Notice.AAA6.CP.ReviewOrderRequestedbyOtherParty.Defendant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/request_for_reconsideration_cui_claimant.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/request_for_reconsideration_cui_claimant.png'>diagram</a></td>
         <td>Request for Reconsideration Notification CUI Claimant (REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_CLAIMANT)</td>
       </tr>
@@ -3547,6 +3566,7 @@
         <td><code>UploadHearingDocumentsClaimantHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.HearingDocuments.Upload.Claimant.json'>Notice.AAA6.CP.HearingDocuments.Upload.Claimant</a></td>
         <td>—</td>
         <td>—</td>
       </tr>
@@ -3556,6 +3576,7 @@
         <td><code>UploadHearingDocumentsDefendantHandler</code></td>
         <td>Defendant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.HearingDocuments.Upload.Defendant.json'>Notice.AAA6.CP.HearingDocuments.Upload.Defendant</a></td>
         <td>—</td>
         <td>—</td>
       </tr>
@@ -3565,6 +3586,7 @@
         <td><code>StayLiftedClaimantNotificationHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.Stay.Lifted.Claimant.json'>Notice.AAA6.CP.Stay.Lifted.Claimant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/stay_lifted.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/stay_lifted.png'>diagram</a></td>
         <td>Stay Lifted (STAY_LIFTED)</td>
       </tr>
@@ -3574,6 +3596,7 @@
         <td><code>StayLiftedDefendantNotificationHandler</code></td>
         <td>Defendant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.Stay.Lifted.Defendant.json'>Notice.AAA6.CP.Stay.Lifted.Defendant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/stay_lifted.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/stay_lifted.png'>diagram</a></td>
         <td>Stay Lifted (STAY_LIFTED)</td>
       </tr>
@@ -3583,6 +3606,7 @@
         <td><code>ClaimantCCJResponseNotificationHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.RequestedCCJ.Claimant.json'>Notice.AAA6.ClaimantIntent.RequestedCCJ.Claimant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/claimant_response_cui.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/claimant_response_cui.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_claimant_intention_document_notify.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/upload_translated_claimant_intention_document_notify.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_document_claimant_rejects_repayment_plan.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/upload_translated_document_claimant_rejects_repayment_plan.png'>diagram</a></td>
         <td>Claimant response cui process (CLAIMANT_RESPONSE_CUI)<br>Upload translated document claimant intention (UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_INTENTION)<br>Upload translated claimant rejects repayment plan (UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_REJECTS_REPAYMENT_PLAN)</td>
       </tr>
@@ -3592,6 +3616,7 @@
         <td><code>CaseProceedOfflineClaimantNotificationHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.LiPQM.CaseOffline.OpenQueries.Claimant.json'>Notice.AAA6.LiPQM.CaseOffline.OpenQueries.Claimant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/take_case_offline.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/take_case_offline.png'>diagram</a></td>
         <td>Take case offline (TAKE_CASE_OFFLINE)</td>
       </tr>
@@ -3601,6 +3626,7 @@
         <td><code>ClaimantResponseNotificationHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.ClaimSettled.Claimant.json'>Notice.AAA6.ClaimantIntent.ClaimSettled.Claimant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.ClaimantEndsClaim.Claimant.json'>Notice.AAA6.ClaimantIntent.ClaimantEndsClaim.Claimant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.Defendant.OrgLtdCo.Claimant.json'>Notice.AAA6.ClaimantIntent.Defendant.OrgLtdCo.Claimant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.Defendant.OrgLtdCo.JO.Claimant.json'>Notice.AAA6.ClaimantIntent.Defendant.OrgLtdCo.JO.Claimant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.GoToHearing.Claimant.json'>Notice.AAA6.ClaimantIntent.GoToHearing.Claimant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.Mediation.CARM.Claimant.json'>Notice.AAA6.ClaimantIntent.Mediation.CARM.Claimant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.Mediation.Claimant.json'>Notice.AAA6.ClaimantIntent.Mediation.Claimant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.Multi.Int.Await.Claimant.json'>Notice.AAA6.ClaimantIntent.Multi.Int.Await.Claimant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.PartAdmit.Claimant.json'>Notice.AAA6.ClaimantIntent.PartAdmit.Claimant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.SettlementAgreement.AcceptOrRejectDefPlan.Claimant.json'>Notice.AAA6.ClaimantIntent.SettlementAgreement.AcceptOrRejectDefPlan.Claimant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/claimant_response_cui.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/claimant_response_cui.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_claimant_intention_document_notify.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/upload_translated_claimant_intention_document_notify.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_document_claimant_rejects_repayment_plan.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/upload_translated_document_claimant_rejects_repayment_plan.png'>diagram</a></td>
         <td>Claimant response cui process (CLAIMANT_RESPONSE_CUI)<br>Upload translated document claimant intention (UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_INTENTION)<br>Upload translated claimant rejects repayment plan (UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_REJECTS_REPAYMENT_PLAN)</td>
       </tr>
@@ -3610,6 +3636,7 @@
         <td><code>CourtOfficerOrderClaimantNotificationHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.Court.Officer.Order.Claimant.json'>Notice.AAA6.CP.Court.Officer.Order.Claimant</a></td>
         <td>—</td>
         <td>—</td>
       </tr>
@@ -3619,6 +3646,7 @@
         <td><code>DefendantResponseClaimantNotificationHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.DefResponse.FullAdmit.PayImmediately.Claimant.json'>Notice.AAA6.DefResponse.FullAdmit.PayImmediately.Claimant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.DefResponse.FullDefence.AlreadyPaid.Claimant.json'>Notice.AAA6.DefResponse.FullDefence.AlreadyPaid.Claimant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.DefResponse.FullDefence.FullDispute.CARM.Claimant.json'>Notice.AAA6.DefResponse.FullDefence.FullDispute.CARM.Claimant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.DefResponse.FullDefence.FullDispute.Multi.Int.Fast.Claimant.json'>Notice.AAA6.DefResponse.FullDefence.FullDispute.Multi.Int.Fast.Claimant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.DefResponse.FullDefence.FullDispute.RefusedMediation.Claimant.json'>Notice.AAA6.DefResponse.FullDefence.FullDispute.RefusedMediation.Claimant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Claimant.json'>Notice.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Claimant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.DefResponse.FullOrPartAdmit.PayByInstalments.Claimant.json'>Notice.AAA6.DefResponse.FullOrPartAdmit.PayByInstalments.Claimant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Claimant.json'>Notice.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Claimant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayByInstallments.Claimant.json'>Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayByInstallments.Claimant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayBySetDate.Claimant.json'>Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayBySetDate.Claimant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.DefResponse.PartAdmit.AlreadyPaid.Claimant.json'>Notice.AAA6.DefResponse.PartAdmit.AlreadyPaid.Claimant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.DefResponse.PartAdmit.PayImmediately.Claimant.json'>Notice.AAA6.DefResponse.PartAdmit.PayImmediately.Claimant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.DefendantNoticeOfChange.ClaimMovesOffline.Claimant.json'>Notice.AAA6.DefendantNoticeOfChange.ClaimMovesOffline.Claimant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/defendant_response_cui.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/defendant_response_cui.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/defendant_response_spec.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/defendant_response_spec.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_defendant_sealed_form.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/upload_translated_defendant_sealed_form.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_document_notify.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/upload_translated_document_notify.png'>diagram</a></td>
         <td>Defendant response process cui (DEFENDANT_RESPONSE_CUI)<br>Defendant response process spec (DEFENDANT_RESPONSE_SPEC)<br>Upload translated defendant sealed claim form (UPLOAD_TRANSLATED_DEFENDANT_SEALED_FORM)<br>Upload translated document (UPLOAD_TRANSLATED_DOCUMENT)</td>
       </tr>
@@ -3628,6 +3656,7 @@
         <td><code>DefendantResponseDeadlineDashboardNotificationHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.DefResponse.ResponseTimeElapsed.Claimant.json'>Notice.AAA6.DefResponse.ResponseTimeElapsed.Claimant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/defendant_response_deadline_check.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/defendant_response_deadline_check.png'>diagram</a></td>
         <td>Defendant response deadline check (DEFENDANT_RESPONSE_DEADLINE_CHECK)</td>
       </tr>
@@ -3637,6 +3666,7 @@
         <td><code>DefendantResponseWelshClaimantDashboardNotificationHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.DefResponse.BilingualFlagSet.Claimant.json'>Notice.AAA6.DefResponse.BilingualFlagSet.Claimant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/defendant_response_cui.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/defendant_response_cui.png'>diagram</a></td>
         <td>Defendant response process cui (DEFENDANT_RESPONSE_CUI)</td>
       </tr>
@@ -3646,6 +3676,7 @@
         <td><code>TrialArrangementsNotifyOtherPartyNotificationHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Claimant.json'>Notice.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Claimant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/generate_trial_ready_document_respondent1.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/generate_trial_ready_document_respondent1.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/respondent1_trial_ready_notify_others.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/respondent1_trial_ready_notify_others.png'>diagram</a></td>
         <td>Generate trial ready document respondent1 (GENERATE_TRIAL_READY_DOCUMENT_RESPONDENT1)<br>Respondent1 trial ready notify others (RESPONDENT1_TRIAL_READY_NOTIFY_OTHERS)</td>
       </tr>
@@ -3654,6 +3685,7 @@
         <td><code>GenerateDashboardClaimantDecisionOutcome</code></td>
         <td><code>ClaimantDecisionOutcomeDashboardHandler</code></td>
         <td>Claimant</td>
+        <td>—</td>
         <td>—</td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/decision_outcome.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/decision_outcome.png'>diagram</a></td>
         <td>Move to decision outcome (MOVE_TO_DECISION_OUTCOME)</td>
@@ -3664,6 +3696,7 @@
         <td><code>TrialArrangementsClaimantNotificationHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.Trial.Arrangements.Required.Claimant.json'>Notice.AAA6.CP.Trial.Arrangements.Required.Claimant</a></td>
         <td>—</td>
         <td>—</td>
       </tr>
@@ -3672,6 +3705,7 @@
         <td><code>GenerateDashboardDefendantDecisionOutcome</code></td>
         <td><code>DefendantDecisionOutcomeDashboardHandler</code></td>
         <td>Defendant</td>
+        <td>—</td>
         <td>—</td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/decision_outcome.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/decision_outcome.png'>diagram</a></td>
         <td>Move to decision outcome (MOVE_TO_DECISION_OUTCOME)</td>
@@ -3682,6 +3716,7 @@
         <td><code>TrialArrangementsDefendantNotificationHandler</code></td>
         <td>Defendant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.Trial.Arrangements.Required.Defendant.json'>Notice.AAA6.CP.Trial.Arrangements.Required.Defendant</a></td>
         <td>—</td>
         <td>—</td>
       </tr>
@@ -3691,6 +3726,7 @@
         <td><code>GenerateDashboardNotificationClaimFeeRequiredHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimIssue.ClaimFee.Required.json'>Notice.AAA6.ClaimIssue.ClaimFee.Required</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/create_lip_claim.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/create_lip_claim.png'>diagram</a></td>
         <td>Create lip claim process (CREATE_LIP_CLAIM)</td>
       </tr>
@@ -3700,6 +3736,7 @@
         <td><code>GenerateDashboardNotificationHwfHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimIssue.HWF.Requested.json'>Notice.AAA6.ClaimIssue.HWF.Requested</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/create_lip_claim.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/create_lip_claim.png'>diagram</a></td>
         <td>Create lip claim process (CREATE_LIP_CLAIM)</td>
       </tr>
@@ -3709,6 +3746,7 @@
         <td><code>CCJRequestedDashboardNotificationHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.CCJ.Requested.Claimant.json'>Notice.AAA6.ClaimantIntent.CCJ.Requested.Claimant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.RequestedCCJ.Claimant.json'>Notice.AAA6.ClaimantIntent.RequestedCCJ.Claimant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/generate_spec_DJ_form.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/generate_spec_DJ_form.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/request_judgement_by_admission.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/request_judgement_by_admission.png'>diagram</a></td>
         <td>Generate dj form spec (DEFAULT_JUDGEMENT_SPEC)<br>Request judgement admission spec (REQUEST_JUDGEMENT_ADMISSION_SPEC)</td>
       </tr>
@@ -3718,6 +3756,7 @@
         <td><code>CCJRequestedDashboardNotificationDefendantHandler</code></td>
         <td>Defendant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.CCJ.Requested.Defendant.json'>Notice.AAA6.ClaimantIntent.CCJ.Requested.Defendant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/request_judgement_by_admission.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/request_judgement_by_admission.png'>diagram</a></td>
         <td>Request judgement admission spec (REQUEST_JUDGEMENT_ADMISSION_SPEC)</td>
       </tr>
@@ -3727,6 +3766,7 @@
         <td><code>ClaimantMediationSuccessfulDashboardNotificationHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.MediationSuccessful.Claimant.json'>Notice.AAA6.ClaimantIntent.MediationSuccessful.Claimant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.MediationSuccessful.CARM.Claimant.json'>Notice.AAA6.MediationSuccessful.CARM.Claimant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/mediation_successful.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/mediation_successful.png'>diagram</a></td>
         <td>Mediation successful (MEDIATION_SUCCESSFUL)</td>
       </tr>
@@ -3736,6 +3776,7 @@
         <td><code>CoscCertificateGeneratedDefendantNotificationHandler</code></td>
         <td>Defendant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ProofofDebtPayment.ApplicationProcessed.Defendant.json'>Notice.AAA6.ProofofDebtPayment.ApplicationProcessed.Defendant</a></td>
         <td>—</td>
         <td>—</td>
       </tr>
@@ -3745,6 +3786,7 @@
         <td><code>CoscFeePaidCaseNotMarkedFullPaidDefendantNotificationHandler</code></td>
         <td>Defendant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ProofofDebtPayment.Application.Defendant.json'>Notice.AAA6.ProofofDebtPayment.Application.Defendant</a></td>
         <td>—</td>
         <td>—</td>
       </tr>
@@ -3754,6 +3796,7 @@
         <td><code>DecisionOnRequestForReconsiderationClaimantHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.ReconDecisionMade.Claimant.json'>Notice.AAA6.CP.ReconDecisionMade.Claimant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/notify_decision_on_reconsideration_request.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/notify_decision_on_reconsideration_request.png'>diagram</a></td>
         <td>Decision on reconsideration request (DECISION_ON_RECONSIDERATION_REQUEST)</td>
       </tr>
@@ -3763,6 +3806,7 @@
         <td><code>DecisionOnRequestForReconsiderationDefendantHandler</code></td>
         <td>Defendant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.ReconDecisionMade.Defendant.json'>Notice.AAA6.CP.ReconDecisionMade.Defendant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/notify_decision_on_reconsideration_request.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/notify_decision_on_reconsideration_request.png'>diagram</a></td>
         <td>Decision on reconsideration request (DECISION_ON_RECONSIDERATION_REQUEST)</td>
       </tr>
@@ -3772,6 +3816,7 @@
         <td><code>DefendantMediationSuccessfulDashboardNotificationHandler</code></td>
         <td>Defendant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.MediationSuccessful.CARM.Defendant.json'>Notice.AAA6.MediationSuccessful.CARM.Defendant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/mediation_successful.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/mediation_successful.png'>diagram</a></td>
         <td>Mediation successful (MEDIATION_SUCCESSFUL)</td>
       </tr>
@@ -3781,6 +3826,7 @@
         <td><code>MediationUnsuccessfulDashboardNotificationDefendantHandler</code></td>
         <td>Defendant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.MediationUnsuccessful.Defendant.json'>Notice.AAA6.ClaimantIntent.MediationUnsuccessful.Defendant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.MediationUnsuccessful.Defendant1NonAttendance.CARM.Defendant.json'>Notice.AAA6.MediationUnsuccessful.Defendant1NonAttendance.CARM.Defendant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.MediationUnsuccessful.NOTDefendant1NonContactable.CARM.Defendant.json'>Notice.AAA6.MediationUnsuccessful.NOTDefendant1NonContactable.CARM.Defendant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/mediation_unsuccessful.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/mediation_unsuccessful.png'>diagram</a></td>
         <td>Mediation unsuccessful (MEDIATION_UNSUCCESSFUL)</td>
       </tr>
@@ -3789,6 +3835,7 @@
         <td><code>GenerateDashboardNotificationEvidenceUploadedClaimant</code></td>
         <td><code>EvidenceUploadedClaimantNotificationHandler</code></td>
         <td>Claimant</td>
+        <td>—</td>
         <td>—</td>
         <td>—</td>
         <td>—</td>
@@ -3801,6 +3848,7 @@
         <td>—</td>
         <td>—</td>
         <td>—</td>
+        <td>—</td>
       </tr>
       <tr data-ccd-events='citizen_hearing_fee_payment'>
         <td>CaseProgressionDashboardCallbackHandler</td>
@@ -3808,6 +3856,7 @@
         <td><code>HearingFeePaidClaimantNotificationHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.HearingFee.Paid.Claimant.json'>Notice.AAA6.CP.HearingFee.Paid.Claimant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/notify_lip_generic_template.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/notify_lip_generic_template.png'>diagram</a></td>
         <td>Notify lip generic template (CITIZEN_HEARING_FEE_PAYMENT)</td>
       </tr>
@@ -3817,6 +3866,7 @@
         <td><code>ClaimantIntentMediationUnsuccessfulHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.MediationUnsuccessful.Claimant.json'>Notice.AAA6.ClaimantIntent.MediationUnsuccessful.Claimant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.MediationUnsuccessful.Claimant1NonAttendance.CARM.Claimant.json'>Notice.AAA6.MediationUnsuccessful.Claimant1NonAttendance.CARM.Claimant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.MediationUnsuccessful.NOTClaimant1NonContactable.CARM.Claimant.json'>Notice.AAA6.MediationUnsuccessful.NOTClaimant1NonContactable.CARM.Claimant</a></td>
         <td>—</td>
         <td>—</td>
       </tr>
@@ -3826,6 +3876,7 @@
         <td><code>MoreTimeRequestedDashboardNotificationDefendantHandler</code></td>
         <td>Defendant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.DefResponse.MoreTimeRequested.Defendant.json'>Notice.AAA6.DefResponse.MoreTimeRequested.Defendant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/inform_agreed_extension_date_spec.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/inform_agreed_extension_date_spec.png'>diagram</a></td>
         <td>Inform agreed extension date spec process (INFORM_AGREED_EXTENSION_DATE_SPEC)</td>
       </tr>
@@ -3835,6 +3886,7 @@
         <td><code>StayCaseClaimantNotificationHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.Case.Stayed.Claimant.json'>Notice.AAA6.CP.Case.Stayed.Claimant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/stay_case.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/stay_case.png'>diagram</a></td>
         <td>Stay Case (STAY_CASE)</td>
       </tr>
@@ -3844,6 +3896,7 @@
         <td><code>StayCaseDefendantNotificationHandler</code></td>
         <td>Defendant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.Case.Stayed.Defendant.json'>Notice.AAA6.CP.Case.Stayed.Defendant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/stay_case.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/stay_case.png'>diagram</a></td>
         <td>Stay Case (STAY_CASE)</td>
       </tr>
@@ -3853,6 +3906,7 @@
         <td><code>ApplicationsProceedOfflineClaimantDashboardTask</code></td>
         <td>Claimant</td>
         <td>Contributor: `CaseProceedsInCasemanGaDashboardTaskContributor`<br>Service: `ApplicationsProceedOfflineClaimantDashboardService`</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CaseProceedsInCaseman.Claimant.json'>Notice.AAA6.CaseProceedsInCaseman.Claimant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/case_proceeds_in_caseman.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/case_proceeds_in_caseman.png'>diagram</a></td>
         <td>Case proceeds in caseman (CASE_PROCEEDS_IN_CASEMAN)</td>
       </tr>
@@ -3862,6 +3916,7 @@
         <td><code>ApplicationsProceedOfflineDefendantDashboardTask</code></td>
         <td>Defendant</td>
         <td>Contributor: `CaseProceedsInCasemanGaDashboardTaskContributor`<br>Service: `ApplicationsProceedOfflineDefendantDashboardService`</td>
+        <td>—</td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/case_proceeds_in_caseman.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/case_proceeds_in_caseman.png'>diagram</a></td>
         <td>Case proceeds in caseman (CASE_PROCEEDS_IN_CASEMAN)</td>
       </tr>
@@ -3871,6 +3926,7 @@
         <td><code>CaseProceedOfflineClaimantDashboardTask</code></td>
         <td>Claimant</td>
         <td>Contributor: `CaseProceedsInCasemanDashboardTaskContributor`<br>Service: `CaseProceedOfflineClaimantDashboardService`</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.LiPQM.CaseOffline.OpenQueries.Claimant.json'>Notice.AAA6.LiPQM.CaseOffline.OpenQueries.Claimant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/case_proceeds_in_caseman.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/case_proceeds_in_caseman.png'>diagram</a></td>
         <td>Case proceeds in caseman (CASE_PROCEEDS_IN_CASEMAN)</td>
       </tr>
@@ -3880,6 +3936,7 @@
         <td><code>CaseProceedOfflineDefendantDashboardTask</code></td>
         <td>Defendant</td>
         <td>Contributor: `CaseProceedsInCasemanDashboardTaskContributor`<br>Service: `CaseProceedOfflineDefendantDashboardService`</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.LiPQM.CaseOffline.OpenQueries.Defendant.json'>Notice.AAA6.LiPQM.CaseOffline.OpenQueries.Defendant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/case_proceeds_in_caseman.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/case_proceeds_in_caseman.png'>diagram</a></td>
         <td>Case proceeds in caseman (CASE_PROCEEDS_IN_CASEMAN)</td>
       </tr>
@@ -3889,6 +3946,7 @@
         <td><code>CourtOfficerOrderClaimantDashboardTask</code></td>
         <td>Claimant</td>
         <td>Contributor: `CourtOfficerOrderDashboardTaskContributor`<br>Service: `CourtOfficerOrderClaimantDashboardService`</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.Court.Officer.Order.Claimant.json'>Notice.AAA6.CP.Court.Officer.Order.Claimant</a></td>
         <td>—</td>
         <td>—</td>
       </tr>
@@ -3898,6 +3956,7 @@
         <td><code>CourtOfficerOrderDefendantDashboardTask</code></td>
         <td>Defendant</td>
         <td>Contributor: `CourtOfficerOrderDashboardTaskContributor`<br>Service: `CourtOfficerOrderDefendantDashboardService`</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.Court.Officer.Order.Defendant.json'>Notice.AAA6.CP.Court.Officer.Order.Defendant</a></td>
         <td>—</td>
         <td>—</td>
       </tr>
@@ -3907,6 +3966,7 @@
         <td><code>DismissCaseClaimantDashboardTask</code></td>
         <td>Claimant</td>
         <td>Contributor: `DismissCaseDashboardTaskContributor`<br>Service: `DismissCaseClaimantDashboardService`</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.Case.Dismissed.Claimant.json'>Notice.AAA6.CP.Case.Dismissed.Claimant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.LiPQM.CaseOffline.OpenQueries.Claimant.json'>Notice.AAA6.LiPQM.CaseOffline.OpenQueries.Claimant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/dismiss_case.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/dismiss_case.png'>diagram</a></td>
         <td>Dismiss case (DISMISS_CASE)</td>
       </tr>
@@ -3916,6 +3976,7 @@
         <td><code>DismissCaseDefendantDashboardTask</code></td>
         <td>Defendant</td>
         <td>Contributor: `DismissCaseDashboardTaskContributor`<br>Service: `DismissCaseDefendantDashboardService`</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.Case.Dismissed.Defendant.json'>Notice.AAA6.CP.Case.Dismissed.Defendant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.LiPQM.CaseOffline.OpenQueries.Defendant.json'>Notice.AAA6.LiPQM.CaseOffline.OpenQueries.Defendant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/dismiss_case.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/dismiss_case.png'>diagram</a></td>
         <td>Dismiss case (DISMISS_CASE)</td>
       </tr>
@@ -3925,6 +3986,7 @@
         <td><code>EvidenceUploadedClaimantDashboardTask</code></td>
         <td>Claimant</td>
         <td>Contributor: `EvidenceUploadedDashboardTaskContributor`<br>Service: `EvidenceUploadedClaimantDashboardService`</td>
+        <td>—</td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/evidence_uploaded.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/evidence_uploaded.png'>diagram</a></td>
         <td>Evidence Uploaded Process (EVIDENCE_UPLOADED)</td>
       </tr>
@@ -3934,6 +3996,7 @@
         <td><code>EvidenceUploadedDefendantDashboardTask</code></td>
         <td>Defendant</td>
         <td>Contributor: `EvidenceUploadedDashboardTaskContributor`<br>Service: `EvidenceUploadedDefendantDashboardService`</td>
+        <td>—</td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/evidence_uploaded.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/evidence_uploaded.png'>diagram</a></td>
         <td>Evidence Uploaded Process (EVIDENCE_UPLOADED)</td>
       </tr>
@@ -3945,6 +4008,7 @@
         <td>Contributor: `TrailReadyCheckDashboardTaskContributor`<br>Service: `TrailReadyCheckClaimantDashboardService`</td>
         <td>—</td>
         <td>—</td>
+        <td>—</td>
       </tr>
       <tr data-ccd-events=''>
         <td>DashboardNotificationHandler</td>
@@ -3954,6 +4018,7 @@
         <td>Contributor: `TrailReadyCheckDashboardTaskContributor`<br>Service: `TrailReadyCheckDefendantDashboardService`</td>
         <td>—</td>
         <td>—</td>
+        <td>—</td>
       </tr>
       <tr data-ccd-events='claimant_response_cui upload_translated_document_claimant_intention upload_translated_document_claimant_rejects_repayment_plan'>
         <td>DashboardCallbackHandler</td>
@@ -3961,6 +4026,7 @@
         <td><code>ClaimantCCJResponseDefendantNotificationHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.RequestCCJ.ClaimantRejectsDefPlan.CourtAgreesWithClaimant.Defendant.json'>Notice.AAA6.ClaimantIntent.RequestCCJ.ClaimantRejectsDefPlan.CourtAgreesWithClaimant.Defendant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/claimant_response_cui.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/claimant_response_cui.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_claimant_intention_document_notify.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/upload_translated_claimant_intention_document_notify.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_document_claimant_rejects_repayment_plan.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/upload_translated_document_claimant_rejects_repayment_plan.png'>diagram</a></td>
         <td>Claimant response cui process (CLAIMANT_RESPONSE_CUI)<br>Upload translated document claimant intention (UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_INTENTION)<br>Upload translated claimant rejects repayment plan (UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_REJECTS_REPAYMENT_PLAN)</td>
       </tr>
@@ -3970,6 +4036,7 @@
         <td><code>CaseProceedOfflineDefendantNotificationHandler</code></td>
         <td>Defendant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.LiPQM.CaseOffline.OpenQueries.Defendant.json'>Notice.AAA6.LiPQM.CaseOffline.OpenQueries.Defendant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/take_case_offline.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/take_case_offline.png'>diagram</a></td>
         <td>Take case offline (TAKE_CASE_OFFLINE)</td>
       </tr>
@@ -3979,6 +4046,7 @@
         <td><code>ClaimantResponseDefendantNotificationHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.ClaimSettled.Defendant.json'>Notice.AAA6.ClaimantIntent.ClaimSettled.Defendant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.ClaimantEndsClaim.Defendant.json'>Notice.AAA6.ClaimantIntent.ClaimantEndsClaim.Defendant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.ClaimantRejectsPlan.DefendantOrgLtdCo.Defendant.json'>Notice.AAA6.ClaimantIntent.ClaimantRejectsPlan.DefendantOrgLtdCo.Defendant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.Defendant.json'>Notice.AAA6.ClaimantIntent.GoToHearing.DefFullDefence.ClaimantDisputes.Defendant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.Defendant.json'>Notice.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.Defendant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.PartOrFull.ClaimantDisputes.Defendant.json'>Notice.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.PartOrFull.ClaimantDisputes.Defendant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.Mediation.CARM.Defendant.json'>Notice.AAA6.ClaimantIntent.Mediation.CARM.Defendant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.Mediation.Defendant.json'>Notice.AAA6.ClaimantIntent.Mediation.Defendant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.Multi.Int.Await.Defendant.json'>Notice.AAA6.ClaimantIntent.Multi.Int.Await.Defendant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.PartAdmit.Defendant.json'>Notice.AAA6.ClaimantIntent.PartAdmit.Defendant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.ClaimantIntent.SettlementAgreement.ClaimantAcceptsPlan.Defendant.json'>Notice.AAA6.ClaimantIntent.SettlementAgreement.ClaimantAcceptsPlan.Defendant</a></td>
         <td>—</td>
         <td>—</td>
       </tr>
@@ -3988,6 +4056,7 @@
         <td><code>CourtOfficerOrderDefendantNotificationHandler</code></td>
         <td>Defendant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.Court.Officer.Order.Defendant.json'>Notice.AAA6.CP.Court.Officer.Order.Defendant</a></td>
         <td>—</td>
         <td>—</td>
       </tr>
@@ -3997,6 +4066,7 @@
         <td><code>DefendantResponseDefendantNotificationHandler</code></td>
         <td>Defendant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.DefResponse.FullDefence.FullDispute.CARM.Defendant.json'>Notice.AAA6.DefResponse.FullDefence.FullDispute.CARM.Defendant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.DefResponse.FullDefence.FullDispute.Multi.Int.Fast.Defendant.json'>Notice.AAA6.DefResponse.FullDefence.FullDispute.Multi.Int.Fast.Defendant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.DefResponse.FullDefence.FullDispute.RefusedMediation.Defendant.json'>Notice.AAA6.DefResponse.FullDefence.FullDispute.RefusedMediation.Defendant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Defendant.json'>Notice.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Defendant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.DefResponse.FullDefenceOrPartAdmin.AlreadyPaid.Defendant.json'>Notice.AAA6.DefResponse.FullDefenceOrPartAdmin.AlreadyPaid.Defendant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Defendant.json'>Notice.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Defendant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.DefResponse.FullOrPartAdmit.PayImmediately.Defendant.json'>Notice.AAA6.DefResponse.FullOrPartAdmit.PayImmediately.Defendant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayByInstallments.Defendant.json'>Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayByInstallments.Defendant</a><br><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayBySetDate.Defendant.json'>Notice.AAA6.DefResponse.OrgOrLtdCompany.FullOrPartAdmit.PayBySetDate.Defendant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/defendant_response_cui.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/defendant_response_cui.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/upload_translated_document_notify.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/upload_translated_document_notify.png'>diagram</a></td>
         <td>Defendant response process cui (DEFENDANT_RESPONSE_CUI)<br>Upload translated document (UPLOAD_TRANSLATED_DOCUMENT)</td>
       </tr>
@@ -4006,6 +4076,7 @@
         <td><code>DefendantResponseDeadlinePassedNotificationHandler</code></td>
         <td>Defendant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.DefResponse.ResponseTimeElapsed.Defendant.json'>Notice.AAA6.DefResponse.ResponseTimeElapsed.Defendant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/defendant_response_deadline_check.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/defendant_response_deadline_check.png'>diagram</a></td>
         <td>Defendant response deadline check (DEFENDANT_RESPONSE_DEADLINE_CHECK)</td>
       </tr>
@@ -4015,6 +4086,7 @@
         <td><code>TrialArrangementsNotifyOtherPartyDefendantNotificationHandler</code></td>
         <td>Defendant</td>
         <td>—</td>
+        <td><a href='dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Defendant.json'>Notice.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Defendant</a></td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/applicant_trial_ready_notify_others.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/applicant_trial_ready_notify_others.png'>diagram</a><br>../civil-camunda-bpmn-definition/src/main/resources/camunda/generate_trial_ready_document_applicant.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/generate_trial_ready_document_applicant.png'>diagram</a></td>
         <td>Applicant trial ready notify others (APPLICANT_TRIAL_READY_NOTIFY_OTHERS)<br>Generate trial ready document applicant (GENERATE_TRIAL_READY_DOCUMENT_APPLICANT)</td>
       </tr>
@@ -4023,6 +4095,7 @@
         <td><code>TrialReadyCheckDashboardNotificationsForClaimant1</code></td>
         <td><code>TrialReadyCheckClaimantNotificationHandler</code></td>
         <td>Claimant</td>
+        <td>—</td>
         <td>—</td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/trial_ready_check.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/trial_ready_check.png'>diagram</a></td>
         <td>Trial Ready Check (TRIAL_READY_CHECK)</td>
@@ -4033,6 +4106,7 @@
         <td><code>TrialReadyCheckDefendantNotificationHandler</code></td>
         <td>Defendant</td>
         <td>—</td>
+        <td>—</td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/trial_ready_check.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/trial_ready_check.png'>diagram</a></td>
         <td>Trial Ready Check (TRIAL_READY_CHECK)</td>
       </tr>
@@ -4042,6 +4116,7 @@
         <td><code>JudgmentPaidClaimantNotificationHandler</code></td>
         <td>Claimant</td>
         <td>—</td>
+        <td>—</td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/judgement_paid_in_full.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/judgement_paid_in_full.png'>diagram</a></td>
         <td>Judgment Paid In Full (JUDGMENT_PAID_IN_FULL)</td>
       </tr>
@@ -4050,6 +4125,7 @@
         <td><code>UpdateJudgmentPaidDashboardNotificationsDefendant</code></td>
         <td><code>JudgmentPaidDefendantNotificationHandler</code></td>
         <td>Defendant</td>
+        <td>—</td>
         <td>—</td>
         <td>../civil-camunda-bpmn-definition/src/main/resources/camunda/judgement_paid_in_full.bpmn<br><a href='https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/judgement_paid_in_full.png'>diagram</a></td>
         <td>Judgment Paid In Full (JUDGMENT_PAID_IN_FULL)</td>

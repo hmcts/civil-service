@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import html
+import json
 import os
 import re
 import sys
@@ -18,6 +19,8 @@ JAVA_ROOT = REPO_ROOT / "src" / "main" / "java"
 RESOURCE_ROOT = REPO_ROOT / "src" / "main" / "resources"
 APPLICATION_YAML = RESOURCE_ROOT / "application.yaml"
 DASHBOARD_TASK_IDS_PATH = JAVA_ROOT / 'uk' / 'gov' / 'hmcts' / 'reform' / 'civil' / 'handler' / 'callback' / 'camunda' / 'dashboardnotifications' / 'DashboardTaskIds.java'
+DASHBOARD_SCENARIOS_PATH = JAVA_ROOT / 'uk' / 'gov' / 'hmcts' / 'reform' / 'civil' / 'handler' / 'callback' / 'camunda' / 'dashboardnotifications' / 'DashboardScenarios.java'
+TEMPLATE_DIR = REPO_ROOT / 'dashboard-notifications' / 'src' / 'main' / 'resources' / 'notification-templates'
 DIAGRAM_BASE_URL = "https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/"
 
 # Regex helpers
@@ -38,6 +41,8 @@ EVENTS_DEF_RE = re.compile(
     r"EVENTS\s*=\s*(?:List\\.of|Collections\\.singletonList|Arrays\\.asList)\s*\((?P<body>.*?)\)\s*;",
     re.S
 )
+SCENARIO_CONST_RE = re.compile(r"SCENARIO_[A-Z0-9_]+")
+SCENARIO_LITERAL_RE = re.compile(r'"(Scenario\.[A-Za-z0-9_.]+)"')
 
 BASE_PARTY_DESC = {
     "AppSolOneEmailDTOGenerator": "Applicant solicitor (LR)",
@@ -390,6 +395,31 @@ def load_dashboard_task_ids() -> Dict[str, str]:
     return mapping
 
 
+def load_dashboard_scenarios() -> Dict[str, str]:
+    mapping = {}
+    if not DASHBOARD_SCENARIOS_PATH.exists():
+        return mapping
+    text = DASHBOARD_SCENARIOS_PATH.read_text(encoding='utf-8')
+    pattern = re.compile(r"(SCENARIO_[A-Z0-9_]+)\s*\(\"([^\"]+)\"\)")
+    for const, value in pattern.findall(text):
+        mapping[const] = value
+    return mapping
+
+
+def load_template_paths() -> Dict[str, str]:
+    template_map = {}
+    if not TEMPLATE_DIR.exists():
+        return template_map
+    for path in sorted(TEMPLATE_DIR.glob('*.json')):
+        try:
+            data = json.loads(path.read_text(encoding='utf-8'))
+        except json.JSONDecodeError:
+            continue
+        name = data.get('name') or path.stem
+        template_map[name] = os.path.relpath(path, REPO_ROOT)
+    return template_map
+
+
 def constructor_param_map(java_class: JavaClass, class_name: str) -> Dict[str, str]:
     params = {}
     pattern = re.compile(rf"(?:public|protected)\s+{re.escape(class_name)}\s*\((.*?)\)\s*\{{", re.S)
@@ -449,8 +479,92 @@ def split_arguments(arg_text: str) -> List[str]:
     return args
 
 
+def field_types(java_class: JavaClass) -> Dict[str, str]:
+    types = {}
+    for field_type, field_name in FIELD_DEF_RE.findall(java_class.text):
+        simple = field_type.split('.')[-1]
+        simple = simple.split('<')[-1].replace('>', '')
+        types[field_name] = simple
+    return types
+
+
+def scenario_names_for_class(index: SourceIndex,
+                             class_name: Optional[str],
+                             scenario_map: Dict[str, str],
+                             cache: Dict[str, Set[str]],
+                             visited: Optional[Set[str]] = None) -> Set[str]:
+    if not class_name:
+        return set()
+    if class_name in cache:
+        return cache[class_name]
+    visited = visited or set()
+    if class_name in visited:
+        return set()
+    visited.add(class_name)
+    java_class = index.get(class_name)
+    if not java_class:
+        visited.remove(class_name)
+        cache[class_name] = set()
+        return set()
+    scenarios = set()
+    for const in SCENARIO_CONST_RE.findall(java_class.text):
+        scenario = scenario_map.get(const)
+        if scenario:
+            scenarios.add(scenario)
+    for literal in SCENARIO_LITERAL_RE.findall(java_class.text):
+        scenarios.add(literal)
+    dependencies = set()
+    base = java_class.base_class()
+    if base:
+        dependencies.add(base)
+    for simple_type in field_types(java_class).values():
+        if any(keyword in simple_type for keyword in ('ScenarioService', 'DashboardService', 'ScenarioHelper')):
+            dependencies.add(simple_type)
+    for dep in dependencies:
+        scenarios |= scenario_names_for_class(index, dep, scenario_map, cache, visited)
+    visited.remove(class_name)
+    cache[class_name] = scenarios
+    return scenarios
+
+
+def template_links_for_scenarios(scenarios: Set[str], template_map: Dict[str, str]) -> List[Dict[str, str]]:
+    links = []
+    for scenario in sorted(filter(None, scenarios)):
+        if not scenario.startswith('Scenario.'):
+            continue
+        template_name = 'Notice.' + scenario.split('Scenario.', 1)[1]
+        path = template_map.get(template_name)
+        if path:
+            links.append({'name': template_name, 'path': path})
+    return links
+
+
+def split_arguments(arg_text: str) -> List[str]:
+    args = []
+    depth = 0
+    current = []
+    for ch in arg_text:
+        if ch == ',' and depth == 0:
+            token = ''.join(current).strip()
+            if token:
+                args.append(token)
+            current = []
+            continue
+        current.append(ch)
+        if ch in '([':
+            depth += 1
+        elif ch in ')]':
+            depth = max(depth - 1, 0)
+    if current:
+        token = ''.join(current).strip()
+        if token:
+            args.append(token)
+    return args
+
+
 def collect_dashboard_contributions(index: SourceIndex, service_tasks, start_events,
-                                    start_event_labels) -> List[Dict[str, object]]:
+                                    start_event_labels, scenario_map: Dict[str, str],
+                                    template_map: Dict[str, str], scenario_cache: Dict[str, Set[str]]) -> List[Dict[str, object]]:
     task_ids_map = load_dashboard_task_ids()
     rows = []
     for class_name, java_class in index.classes.items():
@@ -483,6 +597,8 @@ def collect_dashboard_contributions(index: SourceIndex, service_tasks, start_eve
             if service:
                 details.append(f"Service: `{service}`")
             bpmn_files, ccd_display, ccd_ids = lookup_bpmn(task_id, service_tasks, start_events, start_event_labels)
+            scenarios = scenario_names_for_class(index, handler_type, scenario_map, scenario_cache)
+            templates = template_links_for_scenarios(scenarios, template_map)
             rows.append({
                 'framework': 'DashboardNotificationHandler',
                 'camunda_task': task_id,
@@ -492,6 +608,7 @@ def collect_dashboard_contributions(index: SourceIndex, service_tasks, start_eve
                 'bpmn_files': bpmn_files or ['—'],
                 'ccd_events': ccd_display or ['—'],
                 'ccd_event_ids': ccd_ids,
+                'templates': templates,
             })
     return rows
 
@@ -540,7 +657,8 @@ def extract_case_events(java_class: JavaClass) -> List[str]:
 
 
 def collect_dashboard_callback_rows(index: SourceIndex, service_tasks, start_events,
-                                    start_event_labels) -> List[Dict[str, object]]:
+                                    start_event_labels, scenario_map: Dict[str, str],
+                                    template_map: Dict[str, str], scenario_cache: Dict[str, Set[str]]) -> List[Dict[str, object]]:
     rows = []
     for class_name, java_class in index.classes.items():
         if ('extends DashboardCallbackHandler' not in java_class.text
@@ -561,6 +679,8 @@ def collect_dashboard_callback_rows(index: SourceIndex, service_tasks, start_eve
         if events:
             details.append('Case events: ' + ', '.join(f'`{evt}`' for evt in events))
         bpmn_files, ccd_display, ccd_ids = lookup_bpmn(task_id, service_tasks, start_events, start_event_labels)
+        scenarios = scenario_names_for_class(index, class_name, scenario_map, scenario_cache)
+        templates = template_links_for_scenarios(scenarios, template_map)
         rows.append({
             'framework': framework,
             'camunda_task': task_id,
@@ -570,13 +690,18 @@ def collect_dashboard_callback_rows(index: SourceIndex, service_tasks, start_eve
             'bpmn_files': bpmn_files or ['—'],
             'ccd_events': ccd_display or ['—'],
             'ccd_event_ids': ccd_ids,
+            'templates': templates,
         })
     return rows
 
 
-def build_dashboard_rows(index: SourceIndex, service_tasks, start_events, start_event_labels):
-    contribution_rows = collect_dashboard_contributions(index, service_tasks, start_events, start_event_labels)
-    callback_rows = collect_dashboard_callback_rows(index, service_tasks, start_events, start_event_labels)
+def build_dashboard_rows(index: SourceIndex, service_tasks, start_events, start_event_labels,
+                         scenario_map: Dict[str, str], template_map: Dict[str, str]):
+    scenario_cache: Dict[str, Set[str]] = {}
+    contribution_rows = collect_dashboard_contributions(
+        index, service_tasks, start_events, start_event_labels, scenario_map, template_map, scenario_cache)
+    callback_rows = collect_dashboard_callback_rows(
+        index, service_tasks, start_events, start_event_labels, scenario_map, template_map, scenario_cache)
     all_rows = contribution_rows + callback_rows
     return sorted(all_rows, key=lambda row: (row['camunda_task'], row['framework'], row['handler']))
 
@@ -633,6 +758,7 @@ def render_dashboard_markdown(rows: List[Dict[str, object]]) -> str:
         "Handler / task",
         "Party",
         "Details",
+        "Template JSON",
         "BPMN file(s)",
         "CCD event(s)"
     ]
@@ -640,13 +766,18 @@ def render_dashboard_markdown(rows: List[Dict[str, object]]) -> str:
         Dashboard notifications are produced by two frameworks: service task contributions dispatched via
         `DashboardNotificationHandler`, and per-event callbacks implemented through `DashboardCallbackHandler`
         (including the case progression specialisation). Each row links the Camunda service task ID to the
-        dashboard task or handler class that records citizen scenarios.
+        dashboard task or handler class that records citizen scenarios and surfaces the underlying
+        `dashboard-notifications` JSON template(s).
     """).strip()
     lines = ["## Dashboard notification matrix", "", intro, ""]
     lines.append('|' + '|'.join(header) + '|')
     lines.append('|' + '|'.join(['---'] * len(header)) + '|')
     for row in rows:
         details = '<br>'.join(row.get('details') or ['—'])
+        template_links = row.get('templates') or []
+        template_cell = '<br>'.join(
+            f"[`{tpl['name']}`]({tpl['path']})" for tpl in template_links
+        ) or '—'
         formatted_bpmn = []
         for path in row['bpmn_files']:
             if path == '—':
@@ -660,6 +791,7 @@ def render_dashboard_markdown(rows: List[Dict[str, object]]) -> str:
             f"`{row['handler']}`",
             row.get('party') or '—',
             details or '—',
+            template_cell,
             '<br>'.join(formatted_bpmn),
             '<br>'.join(row['ccd_events'] or ['—'])
         ]) + '|')
@@ -685,6 +817,7 @@ def render_html(email_rows: List[Dict[str, str]], dashboard_rows: List[Dict[str,
         "Handler / task",
         "Party",
         "Details",
+        "Template JSON",
         "BPMN file(s)",
         "CCD event(s)"
     ]
@@ -802,6 +935,10 @@ def render_html(email_rows: List[Dict[str, str]], dashboard_rows: List[Dict[str,
                 name = Path(path).stem
                 formatted_bpmn.append(f"{html.escape(path)}<br><a href='{DIAGRAM_BASE_URL}{name}.png'>diagram</a>")
         details = '<br>'.join(html.escape(detail) for detail in (row.get('details') or ['—']))
+        template_links = row.get('templates') or []
+        template_cell = '<br>'.join(
+            f"<a href='{html.escape(link['path'])}'>{html.escape(link['name'])}</a>" for link in template_links
+        ) or '—'
         lines.extend([
             f"      <tr data-ccd-events='{ccd_attr}'>",
             f"        <td>{html.escape(row['framework'])}</td>",
@@ -809,6 +946,7 @@ def render_html(email_rows: List[Dict[str, str]], dashboard_rows: List[Dict[str,
             f"        <td><code>{html.escape(row['handler'])}</code></td>",
             f"        <td>{html.escape(row.get('party') or '—')}</td>",
             f"        <td>{details}</td>",
+            f"        <td>{template_cell}</td>",
             f"        <td>{'<br>'.join(formatted_bpmn)}</td>",
             f"        <td>{'<br>'.join(html.escape(event) for event in row['ccd_events'])}</td>",
             "      </tr>",
@@ -876,9 +1014,11 @@ def main(argv: Optional[List[str]] = None) -> int:
     index = SourceIndex(JAVA_ROOT)
     camunda_root = bpmn_root / 'src' / 'main' / 'resources' / 'camunda' if (bpmn_root / 'src').exists() else bpmn_root
     service_tasks, start_events, start_event_labels = index_bpmn(camunda_root)
+    scenario_map = load_dashboard_scenarios()
+    template_map = load_template_paths()
     email_rows = build_email_rows(index, notifications, camunda_root, service_tasks, start_events, start_event_labels)
     filtered_email_rows = filter_rows_by_ccd_event(email_rows, args.ccd_event_filters)
-    dashboard_rows = build_dashboard_rows(index, service_tasks, start_events, start_event_labels)
+    dashboard_rows = build_dashboard_rows(index, service_tasks, start_events, start_event_labels, scenario_map, template_map)
     filtered_dashboard_rows = filter_rows_by_ccd_event(dashboard_rows, args.ccd_event_filters)
     markdown_sections = [
         "# Notification matrix",
