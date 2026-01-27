@@ -152,15 +152,13 @@ class DirectionsQuestionnaireLipGeneratorTest {
                             HearingSupportLip
                                 .builder()
                                 .requirementsLip(wrapElements(List.of(
-                                    RequirementsLip
-                                        .builder()
-                                        .name("Name")
-                                        .requirements(
+                                    new RequirementsLip()
+                                        .setName("Name")
+                                        .setRequirements(
                                             List.of(
                                                 DISABLED_ACCESS
                                             )
                                         )
-                                        .build()
                                 )))
                                 .build())
                         .build())

@@ -39,4 +39,19 @@ public class Expert {
             .setWhyRequired(expertDetails.getWhyRequired())
             .setEstimatedCost(expertDetails.getEstimatedCost());
     }
+
+    public Expert copy() {
+        return new Expert()
+            .setPartyID(partyID)
+            .setName(name)
+            .setFirstName(firstName)
+            .setLastName(lastName)
+            .setPhoneNumber(phoneNumber)
+            .setEmailAddress(emailAddress)
+            .setFieldOfExpertise(fieldOfExpertise)
+            .setWhyRequired(whyRequired)
+            .setEstimatedCost(estimatedCost)
+            .setEventAdded(eventAdded)
+            .setDateAdded(dateAdded);
+    }
 }

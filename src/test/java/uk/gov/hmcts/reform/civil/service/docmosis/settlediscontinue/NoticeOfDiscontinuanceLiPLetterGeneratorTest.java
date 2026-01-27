@@ -72,9 +72,9 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
             .caseDataLiP(CaseDataLiP.builder()
                              .respondent1LiPResponse(RespondentLiPResponse.builder()
                                                          .respondent1ResponseLanguage("ENGLISH").build()).build())
-            .respondent1DQ(Respondent1DQ.builder()
-                               .respondent1DQLanguage(WelshLanguageRequirements.builder()
-                                                          .documents(Language.ENGLISH).build()).build())
+            .respondent1DQ(new Respondent1DQ()
+                               .setRespondent1DQLanguage(new WelshLanguageRequirements()
+                                                             .setDocuments(Language.ENGLISH)))
             .respondent1(respondent1)
             .respondent1NoticeOfDiscontinueAllPartyViewDoc(caseDocument).build();
 
@@ -99,9 +99,9 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
             .caseDataLiP(CaseDataLiP.builder()
                              .respondent1LiPResponse(RespondentLiPResponse.builder()
                                                          .respondent1ResponseLanguage("ENGLISH").build()).build())
-            .respondent1DQ(Respondent1DQ.builder()
-                               .respondent1DQLanguage(WelshLanguageRequirements.builder()
-                                                          .documents(Language.WELSH).build()).build())
+            .respondent1DQ(new Respondent1DQ()
+                               .setRespondent1DQLanguage(new WelshLanguageRequirements()
+                                                             .setDocuments(Language.WELSH)))
             .respondent1(respondent1)
             .respondent1NoticeOfDiscontinueAllPartyViewDoc(caseDocument)
             .respondent1NoticeOfDiscontinueAllPartyTranslatedDoc(caseDocument).build();
@@ -126,9 +126,9 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
             .caseDataLiP(CaseDataLiP.builder()
                              .respondent1LiPResponse(RespondentLiPResponse.builder()
                                                          .respondent1ResponseLanguage("ENGLISH").build()).build())
-            .respondent1DQ(Respondent1DQ.builder()
-                               .respondent1DQLanguage(WelshLanguageRequirements.builder()
-                                                          .documents(Language.BOTH).build()).build())
+            .respondent1DQ(new Respondent1DQ()
+                               .setRespondent1DQLanguage(new WelshLanguageRequirements()
+                                                             .setDocuments(Language.BOTH)))
             .respondent1(respondent1)
             .respondent1NoticeOfDiscontinueAllPartyViewDoc(caseDocument)
             .respondent1NoticeOfDiscontinueAllPartyTranslatedDoc(caseDocument).build();

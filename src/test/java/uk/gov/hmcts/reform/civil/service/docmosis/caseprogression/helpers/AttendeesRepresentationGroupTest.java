@@ -80,10 +80,10 @@ public class AttendeesRepresentationGroupTest {
     void shouldReturnCorrectOtherRepresentedText_WhenDetailsArePresent() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged().build().toBuilder()
-            .finalOrderRepresentation(FinalOrderRepresentation.builder()
-                                          .typeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT)
-                                          .typeRepresentationOtherComplex(ClaimantAndDefendantHeard
-                                                                              .builder().detailsRepresentationText("Test").build()).build())
+            .finalOrderRepresentation(new FinalOrderRepresentation()
+                                          .setTypeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT)
+                                          .setTypeRepresentationOtherComplex(new ClaimantAndDefendantHeard()
+                                                                              .setDetailsRepresentationText("Test")))
             .build();
 
         String result = attendeesRepresentationPopulator.getOtherRepresentedText(caseData);

@@ -4,20 +4,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.Accessors;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.DeterWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.account.AccountSimple;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-@Setter
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -252,5 +250,46 @@ public class Respondent1DQ implements DQ {
     @JsonProperty("respondent1DQClaimantDocumentsToBeConsidered")
     public DocumentsToBeConsidered getDocumentsToBeConsidered() {
         return respondent1DQClaimantDocumentsToBeConsidered;
+    }
+
+    public Respondent1DQ copy() {
+        return new Respondent1DQ()
+            .setRespondent1DQFileDirectionsQuestionnaire(respondent1DQFileDirectionsQuestionnaire)
+            .setRespondent1DQFixedRecoverableCosts(respondent1DQFixedRecoverableCosts)
+            .setRespondent1DQFixedRecoverableCostsIntermediate(respondent1DQFixedRecoverableCostsIntermediate)
+            .setRespondent1DQDisclosureOfElectronicDocuments(respondent1DQDisclosureOfElectronicDocuments)
+            .setSpecRespondent1DQDisclosureOfElectronicDocuments(specRespondent1DQDisclosureOfElectronicDocuments)
+            .setRespondent1DQDisclosureOfNonElectronicDocuments(respondent1DQDisclosureOfNonElectronicDocuments)
+            .setSpecRespondent1DQDisclosureOfNonElectronicDocuments(specRespondent1DQDisclosureOfNonElectronicDocuments)
+            .setRespondent1DQDisclosureReport(respondent1DQDisclosureReport)
+            .setRespondent1DQExperts(respondent1DQExperts)
+            .setRespondToClaimExperts(respondToClaimExperts)
+            .setRespondent1DQWitnesses(respondent1DQWitnesses)
+            .setRespondent1DQHearing(respondent1DQHearing)
+            .setRespondent1DQHearingSmallClaim(respondent1DQHearingSmallClaim)
+            .setRespondent1DQHearingFastClaim(respondent1DQHearingFastClaim)
+            .setRespondent1DQDraftDirections(respondent1DQDraftDirections)
+            .setRespondent1DQRequestedCourt(respondent1DQRequestedCourt)
+            .setRespondent1DQRemoteHearing(respondent1DQRemoteHearing)
+            .setRespondent1DQRemoteHearingLRspec(respondent1DQRemoteHearingLRspec)
+            .setRespondent1DQHearingSupport(respondent1DQHearingSupport)
+            .setRespondent1DQFurtherInformation(respondent1DQFurtherInformation)
+            .setRespondent1DQLanguage(respondent1DQLanguage)
+            .setRespondent1DQLanguageLRspec(respondent1DQLanguageLRspec)
+            .setRespondent1DQStatementOfTruth(respondent1DQStatementOfTruth)
+            .setRespondent1DQFutureApplications(respondent1DQFutureApplications)
+            .setRespondent1BankAccountList(respondent1BankAccountList)
+            .setRespondent1DQHomeDetails(respondent1DQHomeDetails)
+            .setRespondent1DQCarerAllowanceCredit(respondent1DQCarerAllowanceCredit)
+            .setRespondent1DQCarerAllowanceCreditFullAdmission(respondent1DQCarerAllowanceCreditFullAdmission)
+            .setRespondent1DQRecurringIncome(respondent1DQRecurringIncome)
+            .setRespondent1DQRecurringIncomeFA(respondent1DQRecurringIncomeFA)
+            .setRespondent1DQRecurringExpenses(respondent1DQRecurringExpenses)
+            .setRespondent1DQRecurringExpensesFA(respondent1DQRecurringExpensesFA)
+            .setResponseClaimCourtLocationRequired(responseClaimCourtLocationRequired)
+            .setRespondToCourtLocation(respondToCourtLocation)
+            .setRespondent1DQVulnerabilityQuestions(respondent1DQVulnerabilityQuestions)
+            .setRespondent1DQClaimantDocumentsToBeConsidered(respondent1DQClaimantDocumentsToBeConsidered)
+            .setDeterWithoutHearingRespondent1(deterWithoutHearingRespondent1);
     }
 }

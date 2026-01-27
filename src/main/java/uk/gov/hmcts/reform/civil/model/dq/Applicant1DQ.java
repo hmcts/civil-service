@@ -214,4 +214,35 @@ public class Applicant1DQ implements DQ {
     public DocumentsToBeConsidered getDocumentsToBeConsidered() {
         return applicant1DQDefendantDocumentsToBeConsidered;
     }
+
+    public Applicant1DQ copy() {
+        return new Applicant1DQ()
+            .setApplicant1DQFileDirectionsQuestionnaire(applicant1DQFileDirectionsQuestionnaire)
+            .setApplicant1DQFixedRecoverableCosts(applicant1DQFixedRecoverableCosts)
+            .setApplicant1DQFixedRecoverableCostsIntermediate(applicant1DQFixedRecoverableCostsIntermediate)
+            .setApplicant1DQDisclosureOfElectronicDocuments(applicant1DQDisclosureOfElectronicDocuments)
+            .setSpecApplicant1DQDisclosureOfElectronicDocuments(specApplicant1DQDisclosureOfElectronicDocuments)
+            .setApplicant1DQDisclosureOfNonElectronicDocuments(applicant1DQDisclosureOfNonElectronicDocuments)
+            .setSpecApplicant1DQDisclosureOfNonElectronicDocuments(specApplicant1DQDisclosureOfNonElectronicDocuments)
+            .setApplicant1DQDisclosureReport(applicant1DQDisclosureReport)
+            .setApplicant1DQExperts(applicant1DQExperts)
+            .setApplicant1RespondToClaimExperts(applicant1RespondToClaimExperts)
+            .setApplicant1DQWitnesses(applicant1DQWitnesses)
+            .setApplicant1DQHearing(applicant1DQHearing)
+            .setApplicant1DQHearingLRspec(applicant1DQHearingLRspec)
+            .setApplicant1DQSmallClaimHearing(applicant1DQSmallClaimHearing)
+            .setApplicant1DQDraftDirections(applicant1DQDraftDirections)
+            .setApplicant1DQRequestedCourt(applicant1DQRequestedCourt)
+            .setApplicant1DQHearingSupport(applicant1DQHearingSupport)
+            .setApplicant1DQFurtherInformation(applicant1DQFurtherInformation)
+            .setApplicant1DQLanguage(applicant1DQLanguage)
+            .setApplicant1DQRemoteHearingLRspec(applicant1DQRemoteHearingLRspec)
+            .setApplicant1DQStatementOfTruth(applicant1DQStatementOfTruth)
+            .setApplicant1DQVulnerabilityQuestions(applicant1DQVulnerabilityQuestions)
+            .setApplicant1DQFutureApplications(applicant1DQFutureApplications)
+            .setApplicant1DQLanguageLRspec(applicant1DQLanguageLRspec)
+            .setApplicant1DQDefendantDocumentsToBeConsidered(applicant1DQDefendantDocumentsToBeConsidered)
+            .setDeterWithoutHearing(deterWithoutHearing)
+            .setRemoteHearing(remoteHearing);
+    }
 }

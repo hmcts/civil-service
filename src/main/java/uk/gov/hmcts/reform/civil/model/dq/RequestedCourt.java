@@ -21,4 +21,15 @@ public class RequestedCourt {
     private DynamicList responseCourtLocations;
     private CaseLocationCivil caseLocation;
     private String responseCourtName;
+
+    public RequestedCourt copy() {
+        return new RequestedCourt()
+            .setRequestHearingAtSpecificCourt(requestHearingAtSpecificCourt)
+            .setOtherPartyPreferredSite(otherPartyPreferredSite)
+            .setResponseCourtCode(responseCourtCode)
+            .setReasonForHearingAtSpecificCourt(reasonForHearingAtSpecificCourt)
+            .setResponseCourtLocations(responseCourtLocations)
+            .setCaseLocation(caseLocation)
+            .setResponseCourtName(responseCourtName);
+    }
 }
