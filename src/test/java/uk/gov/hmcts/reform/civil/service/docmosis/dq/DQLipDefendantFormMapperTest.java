@@ -50,7 +50,7 @@ class DQLipDefendantFormMapperTest {
 
     @BeforeEach
     void setUp() {
-        form = DirectionsQuestionnaireForm.builder().build();
+        form = new DirectionsQuestionnaireForm();
     }
 
     @Test
@@ -91,21 +91,20 @@ class DQLipDefendantFormMapperTest {
                                                                  .bespokeDirections("directions")
                                                                  .build())
                                                          .respondent1DQClaimantDocumentsToBeConsidered(
-                                                             DocumentsToBeConsidered.builder()
-                                                                 .hasDocumentsToBeConsidered(YesOrNo.NO)
-                                                                 .details("details")
-                                                                 .build())
+                                                             new DocumentsToBeConsidered()
+                                                                .setHasDocumentsToBeConsidered(YesOrNo.NO)
+                                                                .setDetails("details"))
                                                          .build());
         //When
-        FixedRecoverableCostsSection expectedFrc = dqLipDefendantFormMapper.getFixedRecoverableCostsIntermediate(caseData);
-        DisclosureOfElectronicDocuments expectedEletronicDisclosure = dqLipDefendantFormMapper.getDisclosureOfElectronicDocuments(caseData);
-        DisclosureOfNonElectronicDocuments expectedNonEletronicDisclosure = dqLipDefendantFormMapper.getDisclosureOfNonElectronicDocuments(caseData);
-        DocumentsToBeConsideredSection expectedDocsToBeConsidered = dqLipDefendantFormMapper.getDocumentsToBeConsidered(caseData);
+        final FixedRecoverableCostsSection expectedFrc = dqLipDefendantFormMapper.getFixedRecoverableCostsIntermediate(caseData);
+        final DisclosureOfElectronicDocuments expectedEletronicDisclosure = dqLipDefendantFormMapper.getDisclosureOfElectronicDocuments(caseData);
+        final DisclosureOfNonElectronicDocuments expectedNonEletronicDisclosure = dqLipDefendantFormMapper.getDisclosureOfNonElectronicDocuments(caseData);
+        final DocumentsToBeConsideredSection expectedDocsToBeConsidered = dqLipDefendantFormMapper.getDocumentsToBeConsidered(caseData);
         //Then
-        assertThat(expectedFrc).isEqualTo(FixedRecoverableCostsSection.builder()
-                                              .isSubjectToFixedRecoverableCostRegime(YesOrNo.NO)
-                                              .reasons("reasons")
-                                              .build());
+        FixedRecoverableCostsSection expectedFrcSection = new FixedRecoverableCostsSection();
+        expectedFrcSection.setIsSubjectToFixedRecoverableCostRegime(YesOrNo.NO);
+        expectedFrcSection.setReasons("reasons");
+        assertThat(expectedFrc).isEqualTo(expectedFrcSection);
 
         assertThat(expectedEletronicDisclosure).isEqualTo(DisclosureOfElectronicDocuments.builder()
                                                               .reachedAgreement(YesOrNo.NO)
@@ -117,12 +116,12 @@ class DQLipDefendantFormMapperTest {
                                                                  .bespokeDirections("directions")
                                                                  .build());
 
-        assertThat(expectedDocsToBeConsidered).isEqualTo(DocumentsToBeConsideredSection.builder()
-                                                             .hasDocumentsToBeConsidered(YesOrNo.NO)
-                                                             .details("details")
-                                                             .sectionHeading("Claimants documents to be considered")
-                                                             .question("Are there any documents the claimants have that you want the court to consider?")
-                                                             .build());
+        DocumentsToBeConsideredSection expected = new DocumentsToBeConsideredSection();
+        expected.setHasDocumentsToBeConsidered(YesOrNo.NO);
+        expected.setDetails("details");
+        expected.setSectionHeading("Claimants documents to be considered");
+        expected.setQuestion("Are there any documents the claimants have that you want the court to consider?");
+        assertThat(expectedDocsToBeConsidered).isEqualTo(expected);
     }
 
     @Test

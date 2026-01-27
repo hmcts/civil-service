@@ -33,15 +33,14 @@ class DocumentQueryMessageTest {
             .name("Solicitor")
             .build();
 
-        DocumentQueryMessage expected = DocumentQueryMessage.builder()
-            .messageType("Query")
-            .id(PARENT_QUERY_ID)
-            .name("Solicitor")
-            .subject("initial query")
-            .createdOn("15-05-2025 13:00")
-            .isHearingRelated(YES)
-            .hearingDate("15-03-2025")
-            .build();
+        DocumentQueryMessage expected = new DocumentQueryMessage()
+            .setMessageType("Query")
+            .setId(PARENT_QUERY_ID)
+            .setName("Solicitor")
+            .setSubject("initial query")
+            .setCreatedOn("15-05-2025 13:00")
+            .setIsHearingRelated(YES)
+            .setHearingDate("15-03-2025");
 
         DocumentQueryMessage actual = DocumentQueryMessage.from(initialQuery, false);
         assertEquals(expected, actual);
@@ -59,12 +58,11 @@ class DocumentQueryMessageTest {
             .name("Hearing admin")
             .build();
 
-        DocumentQueryMessage expected = DocumentQueryMessage.builder()
-            .messageType("Caseworker response")
-            .id(QUERY_ID)
-            .name("Caseworker")
-            .createdOn("16-05-2025 13:00")
-            .build();
+        DocumentQueryMessage expected = new DocumentQueryMessage()
+            .setMessageType("Caseworker response")
+            .setId(QUERY_ID)
+            .setName("Caseworker")
+            .setCreatedOn("16-05-2025 13:00");
 
         DocumentQueryMessage actual = DocumentQueryMessage.from(queryResponse, true);
         assertEquals(expected, actual);
@@ -82,12 +80,11 @@ class DocumentQueryMessageTest {
             .name("Solicitor")
             .build();
 
-        DocumentQueryMessage expected = DocumentQueryMessage.builder()
-            .messageType("Follow up")
-            .id(QUERY_ID)
-            .name("Solicitor")
-            .createdOn("17-05-2025 13:00")
-            .build();
+        DocumentQueryMessage expected = new DocumentQueryMessage()
+            .setMessageType("Follow up")
+            .setId(QUERY_ID)
+            .setName("Solicitor")
+            .setCreatedOn("17-05-2025 13:00");
 
         DocumentQueryMessage actual = DocumentQueryMessage.from(queryFollowUp, false);
 

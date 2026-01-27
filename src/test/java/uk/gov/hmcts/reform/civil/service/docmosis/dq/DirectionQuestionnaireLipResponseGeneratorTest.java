@@ -107,50 +107,50 @@ class DirectionQuestionnaireLipResponseGeneratorTest {
                                                        .type(Party.Type.COMPANY)
                                                        .build());
         given(caseData.getRespondent1()).willReturn(Party.builder()
-                                                       .partyName("res1")
-                                                       .type(Party.Type.COMPANY)
-                                                       .build());
+                                                        .partyName("res1")
+                                                        .type(Party.Type.COMPANY)
+                                                        .build());
         given(caseData.getResponseClaimTrack()).willReturn(AllocatedTrack.INTERMEDIATE_CLAIM.name());
         given(caseData.getRespondent1DQ()).willReturn(Respondent1DQ.builder()
-                                                         .respondent1DQFixedRecoverableCostsIntermediate(
-                                                             fixedRecoverableCosts)
-                                                         .specRespondent1DQDisclosureOfElectronicDocuments(
-                                                             DisclosureOfElectronicDocuments.builder()
-                                                                 .reachedAgreement(YesOrNo.YES)
-                                                                 .build()
-                                                         )
-                                                         .specRespondent1DQDisclosureOfNonElectronicDocuments(
-                                                             DisclosureOfNonElectronicDocuments.builder()
-                                                                 .bespokeDirections("directions")
-                                                                 .build()
-                                                         )
-                                                         .respondent1DQClaimantDocumentsToBeConsidered(
-                                                             DocumentsToBeConsidered.builder()
-                                                                 .hasDocumentsToBeConsidered(YesOrNo.YES)
-                                                                 .details("details")
-                                                                 .build())
-                                                         .build());
-        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder formBuilder = DirectionsQuestionnaireForm.builder();
-        when(dqGeneratorFormBuilder.getDirectionsQuestionnaireFormBuilder(any(CaseData.class), anyString()))
-            .thenReturn(formBuilder);
+                                                          .respondent1DQFixedRecoverableCostsIntermediate(
+                                                              fixedRecoverableCosts)
+                                                          .specRespondent1DQDisclosureOfElectronicDocuments(
+                                                              DisclosureOfElectronicDocuments.builder()
+                                                                  .reachedAgreement(YesOrNo.YES)
+                                                                  .build()
+                                                          )
+                                                          .specRespondent1DQDisclosureOfNonElectronicDocuments(
+                                                              DisclosureOfNonElectronicDocuments.builder()
+                                                                  .bespokeDirections("directions")
+                                                                  .build()
+                                                          )
+                                                          .respondent1DQClaimantDocumentsToBeConsidered(
+                                                              new DocumentsToBeConsidered()
+                                                                  .setHasDocumentsToBeConsidered(YesOrNo.YES)
+                                                                  .setDetails("details"))
+                                                          .build());
+        DirectionsQuestionnaireForm form = new DirectionsQuestionnaireForm();
+        when(dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(any(CaseData.class), anyString()))
+            .thenReturn(form);
         //When
         DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, AUTH);
 
         //Then
         assertThat(templateData.getAllocatedTrack()).isEqualTo("INTERMEDIATE_CLAIM");
-        assertThat(templateData.getFixedRecoverableCosts()).isEqualTo(FixedRecoverableCostsSection.from(fixedRecoverableCosts));
+        assertThat(templateData.getFixedRecoverableCosts()).isEqualTo(FixedRecoverableCostsSection.from(
+            fixedRecoverableCosts));
         assertThat(templateData.getDisclosureOfElectronicDocuments()).isEqualTo(DisclosureOfElectronicDocuments.builder()
                                                                                     .reachedAgreement(YesOrNo.YES)
                                                                                     .build());
         assertThat(templateData.getDisclosureOfNonElectronicDocuments()).isEqualTo(DisclosureOfNonElectronicDocuments.builder()
                                                                                        .bespokeDirections("directions")
                                                                                        .build());
-        assertThat(templateData.getDocumentsToBeConsidered()).isEqualTo(DocumentsToBeConsideredSection.builder()
-                                                                            .hasDocumentsToBeConsidered(YesOrNo.YES)
-                                                                            .details("details")
-                                                                            .sectionHeading("Claimants documents to be considered")
-                                                                            .question("Are there any documents the claimants have that you want the court to consider?")
-                                                                            .build());
+        DocumentsToBeConsideredSection expected = new DocumentsToBeConsideredSection();
+        expected.setHasDocumentsToBeConsidered(YesOrNo.YES);
+        expected.setDetails("details");
+        expected.setSectionHeading("Claimants documents to be considered");
+        expected.setQuestion("Are there any documents the claimants have that you want the court to consider?");
+        assertThat(templateData.getDocumentsToBeConsidered()).isEqualTo(expected);
     }
 
     @Test
@@ -176,14 +176,13 @@ class DirectionQuestionnaireLipResponseGeneratorTest {
                                                                   .build()
                                                           )
                                                           .respondent1DQClaimantDocumentsToBeConsidered(
-                                                              DocumentsToBeConsidered.builder()
-                                                                  .hasDocumentsToBeConsidered(YesOrNo.YES)
-                                                                  .details("details")
-                                                                  .build())
+                                                              new DocumentsToBeConsidered()
+                                                                  .setHasDocumentsToBeConsidered(YesOrNo.YES)
+                                                                  .setDetails("details"))
                                                           .build());
-        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder formBuilder = DirectionsQuestionnaireForm.builder();
-        when(dqGeneratorFormBuilder.getDirectionsQuestionnaireFormBuilder(any(CaseData.class), anyString()))
-            .thenReturn(formBuilder);
+        DirectionsQuestionnaireForm form = new DirectionsQuestionnaireForm();
+        when(dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(any(CaseData.class), anyString()))
+            .thenReturn(form);
         //When
         DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, AUTH);
 
@@ -195,11 +194,11 @@ class DirectionQuestionnaireLipResponseGeneratorTest {
         assertThat(templateData.getDisclosureOfNonElectronicDocuments()).isEqualTo(DisclosureOfNonElectronicDocuments.builder()
                                                                                        .bespokeDirections("directions")
                                                                                        .build());
-        assertThat(templateData.getDocumentsToBeConsidered()).isEqualTo(DocumentsToBeConsideredSection.builder()
-                                                                            .hasDocumentsToBeConsidered(YesOrNo.YES)
-                                                                            .details("details")
-                                                                            .sectionHeading("Claimants documents to be considered")
-                                                                            .question("Are there any documents the claimants have that you want the court to consider?")
-                                                                            .build());
+        DocumentsToBeConsideredSection expected = new DocumentsToBeConsideredSection();
+        expected.setHasDocumentsToBeConsidered(YesOrNo.YES);
+        expected.setDetails("details");
+        expected.setSectionHeading("Claimants documents to be considered");
+        expected.setQuestion("Are there any documents the claimants have that you want the court to consider?");
+        assertThat(templateData.getDocumentsToBeConsidered()).isEqualTo(expected);
     }
 }

@@ -45,7 +45,7 @@ class DocumentGeneratorServiceTest {
 
     @Test
     void shouldInvokeTornado() {
-        SealedClaimForm sealedClaimForm = SealedClaimForm.builder().issueDate(LocalDate.now()).build();
+        SealedClaimForm sealedClaimForm = new SealedClaimForm().setIssueDate(LocalDate.now());
 
         byte[] expectedResponse = {1, 2, 3};
         when(docmosisApiClient.createDocument(argumentCaptor.capture())).thenReturn(expectedResponse);
@@ -59,7 +59,7 @@ class DocumentGeneratorServiceTest {
 
     @Test
     void shouldInvokeTornado_whenDocx() {
-        SealedClaimForm sealedClaimForm = SealedClaimForm.builder().issueDate(LocalDate.now()).build();
+        SealedClaimForm sealedClaimForm = new SealedClaimForm().setIssueDate(LocalDate.now());
 
         byte[] expectedResponse = {1, 2, 3};
         when(docmosisApiClient.createDocument(argumentCaptor.capture())).thenReturn(expectedResponse);

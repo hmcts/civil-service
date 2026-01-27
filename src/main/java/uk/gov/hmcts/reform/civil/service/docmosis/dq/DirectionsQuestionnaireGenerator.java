@@ -220,12 +220,10 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
 
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData, String authorisation) {
-        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = dqGeneratorFormBuilder.getDirectionsQuestionnaireFormBuilder(
+        return dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(
             caseData,
             authorisation
         );
-
-        return builder.build();
     }
 
     public static boolean isClaimantResponse(CaseData caseData) {

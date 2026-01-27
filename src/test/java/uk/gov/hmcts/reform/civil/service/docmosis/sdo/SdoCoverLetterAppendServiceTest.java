@@ -66,10 +66,9 @@ class SdoCoverLetterAppendServiceTest {
                 .build())
         .setName("Mr.John White");
 
-    private static final SdoCoverLetter PARTY_LETTER_TEMPLATE_DATA = SdoCoverLetter.builder()
-        .party(partyDetails)
-        .claimReferenceNumber("MC0001")
-        .build();
+    private static final SdoCoverLetter PARTY_LETTER_TEMPLATE_DATA = new SdoCoverLetter()
+        .setParty(partyDetails)
+        .setClaimReferenceNumber("MC0001");
 
     private static final CaseDocument caseDocument = CaseDocument.builder()
         .documentType(SDO_ORDER)
@@ -86,7 +85,7 @@ class SdoCoverLetterAppendServiceTest {
     @BeforeEach
     void setup() {
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
-                .willReturn(DocmosisDocument.builder().bytes(new byte[]{1, 2, 3, 4, 5, 6}).build());
+                .willReturn(new DocmosisDocument().setBytes(new byte[]{1, 2, 3, 4, 5, 6}));
         given(documentManagementService.uploadDocument(any(), any(PDF.class))).willReturn(caseDocument);
         byte[] bytes = new ByteArrayResource(STITCHED_DOC_BYTES).getByteArray();
         given(documentDownloadService.downloadDocument(

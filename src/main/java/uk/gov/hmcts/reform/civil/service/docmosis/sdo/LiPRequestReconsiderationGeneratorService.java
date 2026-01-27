@@ -58,21 +58,17 @@ public class LiPRequestReconsiderationGeneratorService {
         LocationRefData locationData = locationHelper.getHearingLocation(null, caseData, authorisation);
         String venueName = nonNull(locationData) ? locationData.getVenueName() : "Online Civil Claims";
 
-        LiPRequestForReconsiderationForm.LiPRequestForReconsiderationFormBuilder
-            liPRequestForReconsiderationFormBuilder = LiPRequestForReconsiderationForm.builder()
-            .currentDate(LocalDate.now())
-            .caseNumber(caseData.getLegacyCaseReference())
-            .countyCourt(venueName)
-            .partyName(isApplicant
-                           ? caseData.getApplicant1().getPartyName()
-                           : caseData.getRespondent1().getPartyName())
-            .partyAddress(isApplicant
-                              ? caseData.getApplicant1().getPrimaryAddress()
-                              : caseData.getRespondent1().getPrimaryAddress())
-            .requestReason(getReasonForReconsiderationClaimant(caseData, isApplicant));
-
-        return liPRequestForReconsiderationFormBuilder
-            .build();
+        return new LiPRequestForReconsiderationForm()
+        .setCurrentDate(LocalDate.now())
+        .setCaseNumber(caseData.getLegacyCaseReference())
+        .setCountyCourt(venueName)
+        .setPartyName(isApplicant
+                       ? caseData.getApplicant1().getPartyName()
+                       : caseData.getRespondent1().getPartyName())
+        .setPartyAddress(isApplicant
+                          ? caseData.getApplicant1().getPrimaryAddress()
+                          : caseData.getRespondent1().getPrimaryAddress())
+        .setRequestReason(getReasonForReconsiderationClaimant(caseData, isApplicant));
     }
 
     private String getReasonForReconsiderationClaimant(CaseData caseData, boolean isApplicant) {

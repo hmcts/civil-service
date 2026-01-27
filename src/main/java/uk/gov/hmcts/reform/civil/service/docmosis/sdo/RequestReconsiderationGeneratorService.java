@@ -63,26 +63,23 @@ public class RequestReconsiderationGeneratorService {
     }
 
     private DesicionOnReconsiderationDocumentForm getTemplateData(CaseData caseData, String judgeName, boolean isJudge) {
-        DesicionOnReconsiderationDocumentForm.DesicionOnReconsiderationDocumentFormBuilder
-            desicionOnReconsiderationDocumentFormBuilder = DesicionOnReconsiderationDocumentForm.builder()
-            .writtenByJudge(isJudge)
-            .currentDate(LocalDate.now())
-            .judgeName(judgeName)
-            .caseNumber(caseData.getLegacyCaseReference())
-            .applicant1(caseData.getApplicant1())
-            .hasApplicant2(
-                SdoHelper.hasSharedVariable(caseData, "applicant2")
-            )
-            .applicant2(caseData.getApplicant2())
-            .respondent1(caseData.getRespondent1())
-            .hasRespondent2(
-                SdoHelper.hasSharedVariable(caseData, "respondent2")
-            )
-            .respondent2(caseData.getRespondent2())
-            .upholdingPreviousOrderReason(caseData.getUpholdingPreviousOrderReason());
 
-        return desicionOnReconsiderationDocumentFormBuilder
-            .build();
+        return new DesicionOnReconsiderationDocumentForm()
+        .setWrittenByJudge(isJudge)
+        .setCurrentDate(LocalDate.now())
+        .setJudgeName(judgeName)
+        .setCaseNumber(caseData.getLegacyCaseReference())
+        .setApplicant1(caseData.getApplicant1())
+        .setHasApplicant2(
+            SdoHelper.hasSharedVariable(caseData, "applicant2")
+        )
+        .setApplicant2(caseData.getApplicant2())
+        .setRespondent1(caseData.getRespondent1())
+        .setHasRespondent2(
+            SdoHelper.hasSharedVariable(caseData, "respondent2")
+        )
+        .setRespondent2(caseData.getRespondent2())
+        .setUpholdingPreviousOrderReason(caseData.getUpholdingPreviousOrderReason());
     }
 
 }

@@ -45,13 +45,11 @@ public class StatementOfTruthPopulatorTest {
             .respondent1ResponseDate(LocalDateTime.now())
             .build();
 
-        SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder = SealedClaimResponseFormForSpec.builder();
+        SealedClaimResponseFormForSpec form = new SealedClaimResponseFormForSpec();
 
         given(featureToggleService.isCarmEnabledForCase(caseData)).willReturn(false);
 
-        statementOfTruthPopulator.populateStatementOfTruthDetails(builder, caseData);
-
-        SealedClaimResponseFormForSpec form = builder.build();
+        statementOfTruthPopulator.populateStatementOfTruthDetails(form, caseData);
         assertEquals(respondent1StatementOfTruth, form.getStatementOfTruth());
         assertFalse(form.isCheckCarmToggle());
         verify(featureToggleService).isCarmEnabledForCase(caseData);
@@ -76,13 +74,11 @@ public class StatementOfTruthPopulatorTest {
             .respondent1ResponseDate(LocalDateTime.now().minusDays(1))
             .build();
 
-        SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder = SealedClaimResponseFormForSpec.builder();
+        SealedClaimResponseFormForSpec form = new SealedClaimResponseFormForSpec();
 
         given(featureToggleService.isCarmEnabledForCase(caseData)).willReturn(true);
 
-        statementOfTruthPopulator.populateStatementOfTruthDetails(builder, caseData);
-
-        SealedClaimResponseFormForSpec form = builder.build();
+        statementOfTruthPopulator.populateStatementOfTruthDetails(form, caseData);
         assertEquals(respondent2StatementOfTruth, form.getStatementOfTruth());
         assertTrue(form.isCheckCarmToggle());
         verify(featureToggleService).isCarmEnabledForCase(caseData);
@@ -104,13 +100,11 @@ public class StatementOfTruthPopulatorTest {
             .respondent2ResponseDate(LocalDateTime.now().plusDays(1))
             .build();
 
-        SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder = SealedClaimResponseFormForSpec.builder();
+        SealedClaimResponseFormForSpec form = new SealedClaimResponseFormForSpec();
 
         given(featureToggleService.isCarmEnabledForCase(caseData)).willReturn(false);
 
-        statementOfTruthPopulator.populateStatementOfTruthDetails(builder, caseData);
-
-        SealedClaimResponseFormForSpec form = builder.build();
+        statementOfTruthPopulator.populateStatementOfTruthDetails(form, caseData);
         assertNull(form.getStatementOfTruth());
         assertFalse(form.isCheckCarmToggle());
         verify(featureToggleService).isCarmEnabledForCase(caseData);
@@ -125,13 +119,11 @@ public class StatementOfTruthPopulatorTest {
             .respondent1DQ(respondent1DQ)
             .build();
 
-        SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder = SealedClaimResponseFormForSpec.builder();
+        SealedClaimResponseFormForSpec form = new SealedClaimResponseFormForSpec();
 
         given(featureToggleService.isCarmEnabledForCase(caseData)).willReturn(true);
 
-        statementOfTruthPopulator.populateStatementOfTruthDetails(builder, caseData);
-
-        SealedClaimResponseFormForSpec form = builder.build();
+        statementOfTruthPopulator.populateStatementOfTruthDetails(form, caseData);
         Assertions.assertTrue(form.isCheckCarmToggle());
         verify(featureToggleService).isCarmEnabledForCase(caseData);
     }

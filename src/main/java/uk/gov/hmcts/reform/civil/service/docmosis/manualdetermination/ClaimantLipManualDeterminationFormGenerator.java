@@ -47,21 +47,19 @@ public class ClaimantLipManualDeterminationFormGenerator implements TemplateData
 
     @Override
     public ClaimantLipManualDeterminationForm getTemplateData(CaseData caseData) {
-        ClaimantLipManualDeterminationForm.ClaimantLipManualDeterminationFormBuilder
-                manualDeterminationForm = ClaimantLipManualDeterminationForm.builder()
-                .referenceNumber(caseData.getLegacyCaseReference())
-                .claimIssueDate(caseData.getIssueDate())
-                .claimantResponseSubmitDate(caseData.getApplicant1ResponseDate())
-                .defendantAdmittedAmount(caseData.getRespondToAdmittedClaimOwingAmountPounds())
-                .claimantRequestRepaymentBy(claimantResponseUtils.getClaimantRepaymentType(caseData))
-                .claimResponseType(caseData.getRespondent1ClaimResponseTypeForSpec())
-                .regularPaymentAmount(caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec())
-                .repaymentFrequency(getRepaymentFrequency(caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec()))
-                .repaymentType(caseData.getApplicant1RepaymentOptionForDefendantSpec())
-                .firstRepaymentDate(caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec())
-                .lastRepaymentDate(claimantResponseUtils.getClaimantFinalRepaymentDate(caseData))
-                .paymentSetDateForDefendant(getRepaymentSetByDate(caseData.getApplicant1RequestedPaymentDateForDefendantSpec()));
-        return manualDeterminationForm.build();
+        return new ClaimantLipManualDeterminationForm()
+        .setReferenceNumber(caseData.getLegacyCaseReference())
+        .setClaimIssueDate(caseData.getIssueDate())
+        .setClaimantResponseSubmitDate(caseData.getApplicant1ResponseDate())
+        .setDefendantAdmittedAmount(caseData.getRespondToAdmittedClaimOwingAmountPounds())
+        .setClaimantRequestRepaymentBy(claimantResponseUtils.getClaimantRepaymentType(caseData))
+        .setClaimResponseType(caseData.getRespondent1ClaimResponseTypeForSpec())
+        .setRegularPaymentAmount(caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec())
+        .setRepaymentFrequency(getRepaymentFrequency(caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec()))
+        .setRepaymentType(caseData.getApplicant1RepaymentOptionForDefendantSpec())
+        .setFirstRepaymentDate(caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec())
+        .setLastRepaymentDate(claimantResponseUtils.getClaimantFinalRepaymentDate(caseData))
+        .setPaymentSetDateForDefendant(getRepaymentSetByDate(caseData.getApplicant1RequestedPaymentDateForDefendantSpec()));
     }
 
     private DocmosisTemplates getDocmosisTemplate() {

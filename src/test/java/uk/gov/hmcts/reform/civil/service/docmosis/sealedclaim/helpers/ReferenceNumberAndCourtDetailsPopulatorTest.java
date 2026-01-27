@@ -68,10 +68,8 @@ public class ReferenceNumberAndCourtDetailsPopulatorTest {
 
         given(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).willReturn(LOCATIONS);
 
-        SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder = SealedClaimResponseFormForSpec.builder();
-        referenceNumberPopulator.populateReferenceNumberDetails(builder, caseData, "authorisation");
-
-        SealedClaimResponseFormForSpec form = builder.build();
+        SealedClaimResponseFormForSpec form = new SealedClaimResponseFormForSpec();
+        referenceNumberPopulator.populateReferenceNumberDetails(form, caseData, "authorisation");
         assertEquals("12345", form.getReferenceNumber());
         assertEquals("1234567890123456", form.getCcdCaseReference());
         assertEquals("Dispute details", form.getWhyDisputeTheClaim());
@@ -122,10 +120,8 @@ public class ReferenceNumberAndCourtDetailsPopulatorTest {
 
         given(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).willReturn(LOCATIONS);
 
-        SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder = SealedClaimResponseFormForSpec.builder();
-        referenceNumberPopulator.populateReferenceNumberDetails(builder, caseData, "authorisation");
-
-        SealedClaimResponseFormForSpec form = builder.build();
+        SealedClaimResponseFormForSpec form = new SealedClaimResponseFormForSpec();
+        referenceNumberPopulator.populateReferenceNumberDetails(form, caseData, "authorisation");
         assertEquals("12345", form.getReferenceNumber());
         assertEquals("Dispute details", form.getWhyDisputeTheClaim());
         assertEquals("Court Name", form.getHearingCourtLocation());
@@ -160,10 +156,8 @@ public class ReferenceNumberAndCourtDetailsPopulatorTest {
 
         given(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).willReturn(Collections.emptyList());
 
-        SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder = SealedClaimResponseFormForSpec.builder();
-        referenceNumberPopulator.populateReferenceNumberDetails(builder, caseData, "authorisation");
-
-        SealedClaimResponseFormForSpec form = builder.build();
+        SealedClaimResponseFormForSpec form = new SealedClaimResponseFormForSpec();
+        referenceNumberPopulator.populateReferenceNumberDetails(form, caseData, "authorisation");
         assertNull(form.getHearingCourtLocation());
     }
 
@@ -194,10 +188,8 @@ public class ReferenceNumberAndCourtDetailsPopulatorTest {
             .build();
         caseData.setDetailsOfWhyDoesYouDisputeTheClaim("Dispute details");
 
-        SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder = SealedClaimResponseFormForSpec.builder();
-        referenceNumberPopulator.populateReferenceNumberDetails(builder, caseData, "authorisation");
-
-        SealedClaimResponseFormForSpec form = builder.build();
+        SealedClaimResponseFormForSpec form = new SealedClaimResponseFormForSpec();
+        referenceNumberPopulator.populateReferenceNumberDetails(form, caseData, "authorisation");
         assertEquals("12345", form.getReferenceNumber());
         assertNull(form.getHearingCourtLocation());
     }

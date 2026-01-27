@@ -38,13 +38,12 @@ public class DocumentGeneratorService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        DocmosisRequest requestBody = DocmosisRequest.builder()
-            .templateName(template.getTemplate())
-            .data(templateData)
-            .outputFormat(outputFormat)
-            .outputName("IGNORED")
-            .accessKey(configuration.getAccessKey())
-            .build();
+        DocmosisRequest requestBody = new DocmosisRequest()
+            .setTemplateName(template.getTemplate())
+            .setData(templateData)
+            .setOutputFormat(outputFormat)
+            .setOutputName("IGNORED")
+            .setAccessKey(configuration.getAccessKey());
 
         byte[] response;
 

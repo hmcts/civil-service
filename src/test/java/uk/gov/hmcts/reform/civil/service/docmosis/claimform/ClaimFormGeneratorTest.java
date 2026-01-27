@@ -51,7 +51,7 @@ class ClaimFormGeneratorTest {
         CaseData caseData = CaseData.builder().build();
         ClaimForm claimForm = new ClaimForm();
         given(claimFormMapper.toClaimForm(any())).willReturn(claimForm);
-        DocmosisDocument docmosisDocument = DocmosisDocument.builder().build();
+        DocmosisDocument docmosisDocument = new DocmosisDocument();
         given(documentGeneratorService.generateDocmosisDocument(any(ClaimForm.class), any())).willReturn(
             docmosisDocument);
 
@@ -74,7 +74,7 @@ class ClaimFormGeneratorTest {
         CaseData caseData = CaseData.builder().build();
         ClaimForm claimForm = new ClaimForm();
         given(claimFormMapper.toClaimForm(any())).willReturn(claimForm);
-        DocmosisDocument docmosisDocument = DocmosisDocument.builder().build();
+        DocmosisDocument docmosisDocument = new DocmosisDocument();
         given(documentGeneratorService.generateDocmosisDocument(any(ClaimForm.class), any())).willReturn(
             docmosisDocument);
 
@@ -97,7 +97,7 @@ class ClaimFormGeneratorTest {
         CaseData caseData = CaseData.builder().build();
         ClaimForm claimForm = new ClaimForm();
         given(claimFormMapper.toClaimForm(any())).willReturn(claimForm);
-        DocmosisDocument docmosisDocument = DocmosisDocument.builder().build();
+        DocmosisDocument docmosisDocument = new DocmosisDocument();
         given(documentGeneratorService.generateDocmosisDocument(any(ClaimForm.class), any())).willReturn(
             docmosisDocument);
 

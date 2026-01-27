@@ -1,20 +1,18 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.hearing;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 
 import java.time.LocalDate;
 
-@Getter
-@Builder
-@AllArgsConstructor
-@EqualsAndHashCode
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Accessors(chain = true)
 public class HearingNoticeHmc implements MappableObject {
 
     private String title;

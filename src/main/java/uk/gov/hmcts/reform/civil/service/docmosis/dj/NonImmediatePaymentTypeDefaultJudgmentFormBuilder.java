@@ -26,16 +26,16 @@ public class NonImmediatePaymentTypeDefaultJudgmentFormBuilder extends DefaultJu
                                                       boolean addReferenceOfSecondRes) {
 
         return super.getDefaultJudgmentForm(caseData, respondent, event, addReferenceOfSecondRes)
-            .toBuilder().paymentPlan(caseData.getPaymentTypeSelection().name())
-            .payByDate(Objects.isNull(caseData.getPaymentSetDate()) ? null :
+            .copy()
+            .setPaymentPlan(caseData.getPaymentTypeSelection().name())
+            .setPayByDate(Objects.isNull(caseData.getPaymentSetDate()) ? null :
                 DateFormatHelper.formatLocalDate(caseData.getPaymentSetDate(), DateFormatHelper.DATE))
-            .repaymentFrequency(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentFrequency(caseData.getRepaymentFrequency(),
+            .setRepaymentFrequency(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentFrequency(caseData.getRepaymentFrequency(),
                                                                                                                 false))
-            .paymentStr(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentString(caseData.getRepaymentFrequency(),
+            .setPaymentStr(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentString(caseData.getRepaymentFrequency(),
                                                                                                      false))
-            .installmentAmount(Objects.isNull(caseData.getRepaymentSuggestion()) ? null : getInstallmentAmount(caseData.getRepaymentSuggestion()))
-            .repaymentDate(Objects.isNull(caseData.getRepaymentDate()) ? null :
-                DateFormatHelper.formatLocalDate(caseData.getRepaymentDate(), DateFormatHelper.DATE))
-            .build();
+            .setInstallmentAmount(Objects.isNull(caseData.getRepaymentSuggestion()) ? null : getInstallmentAmount(caseData.getRepaymentSuggestion()))
+            .setRepaymentDate(Objects.isNull(caseData.getRepaymentDate()) ? null :
+                DateFormatHelper.formatLocalDate(caseData.getRepaymentDate(), DateFormatHelper.DATE));
     }
 }

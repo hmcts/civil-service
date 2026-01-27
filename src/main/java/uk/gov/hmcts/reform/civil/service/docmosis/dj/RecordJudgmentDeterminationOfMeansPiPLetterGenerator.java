@@ -41,7 +41,7 @@ public class RecordJudgmentDeterminationOfMeansPiPLetterGenerator {
 
     public byte[] generateAndPrintRecordJudgmentDeterminationOfMeansLetter(CaseData caseData, String authorisation) {
         DocmosisDocument recordJudgmentDeterminationOfMeansLetter = generate(caseData);
-        CaseDocument recordJudgmentDeterminationOfMeansLetterCaseDocument =  documentManagementService.uploadDocument(
+        CaseDocument recordJudgmentDeterminationOfMeansLetterCaseDocument = documentManagementService.uploadDocument(
             authorisation,
             new PDF(
                 RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LIP_DEFENDANT_LETTER.getDocumentTitle(),
@@ -54,10 +54,16 @@ public class RecordJudgmentDeterminationOfMeansPiPLetterGenerator {
 
         byte[] letterContent;
         try {
-            letterContent = documentDownloadService.downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
+            letterContent = documentDownloadService.downloadDocument(
+                authorisation,
+                documentId
+            ).file().getInputStream().readAllBytes();
         } catch (IOException e) {
             log.error("Failed getting letter content for Record Judgment Determination Of Means LiP Letter ");
-            throw new DocumentDownloadException(recordJudgmentDeterminationOfMeansLetterCaseDocument.getDocumentLink().getDocumentFileName(), e);
+            throw new DocumentDownloadException(
+                recordJudgmentDeterminationOfMeansLetterCaseDocument.getDocumentLink().getDocumentFileName(),
+                e
+            );
         }
 
         List<String> recipients = getRecipientsList(caseData);
@@ -81,16 +87,14 @@ public class RecordJudgmentDeterminationOfMeansPiPLetterGenerator {
     }
 
     public RecordJudgmentDeterminationOfMeansLiPDefendantLetter getTemplateData(CaseData caseData) {
-        return RecordJudgmentDeterminationOfMeansLiPDefendantLetter
-            .builder()
-            .claimReferenceNumber(caseData.getLegacyCaseReference())
-            .claimantName(caseData.getApplicant1().getPartyName())
-            .defendant(caseData.getRespondent1())
-            .letterIssueDate(LocalDate.now())
-            .pin(caseData.getRespondent1PinToPostLRspec().getAccessCode())
-            .respondToClaimUrl(pipInPostConfiguration.getRespondToClaimUrl())
-            .varyJudgmentFee(String.valueOf(generalAppFeesService.getFeeForJOWithApplicationType(VARY_ORDER).formData()))
-            .certifOfSatisfactionFee(String.valueOf(generalAppFeesService.getFeeForJOWithApplicationType(OTHER).formData()))
-            .build();
+        return new RecordJudgmentDeterminationOfMeansLiPDefendantLetter()
+            .setClaimReferenceNumber(caseData.getLegacyCaseReference())
+            .setClaimantName(caseData.getApplicant1().getPartyName())
+            .setDefendant(caseData.getRespondent1())
+            .setLetterIssueDate(LocalDate.now())
+            .setPin(caseData.getRespondent1PinToPostLRspec().getAccessCode())
+            .setRespondToClaimUrl(pipInPostConfiguration.getRespondToClaimUrl())
+            .setVaryJudgmentFee(String.valueOf(generalAppFeesService.getFeeForJOWithApplicationType(VARY_ORDER).formData()))
+            .setCertifOfSatisfactionFee(String.valueOf(generalAppFeesService.getFeeForJOWithApplicationType(OTHER).formData()));
     }
 }

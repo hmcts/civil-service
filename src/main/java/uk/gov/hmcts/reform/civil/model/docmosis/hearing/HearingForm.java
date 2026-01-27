@@ -1,17 +1,16 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.hearing;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 
-@Getter
-@Builder
+@Data
 @AllArgsConstructor
-@EqualsAndHashCode
+@NoArgsConstructor
+@Accessors(chain = true)
 public class HearingForm implements MappableObject {
 
     private String caseNumber;

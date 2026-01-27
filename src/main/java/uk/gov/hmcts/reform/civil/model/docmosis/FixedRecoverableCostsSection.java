@@ -1,14 +1,17 @@
 package uk.gov.hmcts.reform.civil.model.docmosis;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.SuperBuilder;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
-@SuperBuilder(toBuilder = true)
-
 public class FixedRecoverableCostsSection extends FixedRecoverableCosts {
 
     private String bandText;
@@ -17,12 +20,12 @@ public class FixedRecoverableCostsSection extends FixedRecoverableCosts {
         if (fixedrecoverableCosts == null) {
             return null;
         }
-        return FixedRecoverableCostsSection.builder()
-            .isSubjectToFixedRecoverableCostRegime(fixedrecoverableCosts.getIsSubjectToFixedRecoverableCostRegime())
-            .complexityBandingAgreed(fixedrecoverableCosts.getComplexityBandingAgreed())
-            .band(fixedrecoverableCosts.getBand())
-            .bandText(fixedrecoverableCosts.getBand() != null ? fixedrecoverableCosts.getBand().getLabel() : null)
-            .reasons(fixedrecoverableCosts.getReasons())
-            .build();
+        FixedRecoverableCostsSection section = new FixedRecoverableCostsSection();
+        section.setIsSubjectToFixedRecoverableCostRegime(fixedrecoverableCosts.getIsSubjectToFixedRecoverableCostRegime());
+        section.setComplexityBandingAgreed(fixedrecoverableCosts.getComplexityBandingAgreed());
+        section.setBand(fixedrecoverableCosts.getBand());
+        section.setBandText(fixedrecoverableCosts.getBand() != null ? fixedrecoverableCosts.getBand().getLabel() : null);
+        section.setReasons(fixedrecoverableCosts.getReasons());
+        return section;
     }
 }

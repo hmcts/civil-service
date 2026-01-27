@@ -40,20 +40,20 @@ public class DirectionQuestionnaireLipResponseGenerator extends DirectionsQuesti
 
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData, String authorisation) {
-        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = dqGeneratorFormBuilder.getDirectionsQuestionnaireFormBuilder(
+        DirectionsQuestionnaireForm form = dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(
             caseData,
             authorisation
         );
         DQLipFormMapper mapper = MAPPER_FACTORY.getDQLipFormMapper(caseData);
-        builder.lipStatementOfTruthName(mapper.getStatementOfTruthName(caseData))
-            .applicant(Party.toLipParty(caseData.getApplicant1()))
-            .respondent1LiPCorrespondenceAddress(caseData.getRespondent1CorrespondenceAddress())
-            .allocatedTrack(caseData.getResponseClaimTrack())
-            .fixedRecoverableCosts(mapper.getFixedRecoverableCostsIntermediate(caseData))
-            .disclosureOfElectronicDocuments(mapper.getDisclosureOfElectronicDocuments(caseData))
-            .disclosureOfNonElectronicDocuments(mapper.getDisclosureOfNonElectronicDocuments(caseData))
-            .documentsToBeConsidered(mapper.getDocumentsToBeConsidered(caseData));
-        return mapper.addLipDQs(builder.build(), Optional.ofNullable(caseData.getCaseDataLiP()));
+        form.setLipStatementOfTruthName(mapper.getStatementOfTruthName(caseData))
+            .setApplicant(Party.toLipParty(caseData.getApplicant1()))
+            .setRespondent1LiPCorrespondenceAddress(caseData.getRespondent1CorrespondenceAddress())
+            .setAllocatedTrack(caseData.getResponseClaimTrack())
+            .setFixedRecoverableCosts(mapper.getFixedRecoverableCostsIntermediate(caseData))
+            .setDisclosureOfElectronicDocuments(mapper.getDisclosureOfElectronicDocuments(caseData))
+            .setDisclosureOfNonElectronicDocuments(mapper.getDisclosureOfNonElectronicDocuments(caseData))
+            .setDocumentsToBeConsidered(mapper.getDocumentsToBeConsidered(caseData));
+        return mapper.addLipDQs(form, Optional.ofNullable(caseData.getCaseDataLiP()));
     }
 
     @Override

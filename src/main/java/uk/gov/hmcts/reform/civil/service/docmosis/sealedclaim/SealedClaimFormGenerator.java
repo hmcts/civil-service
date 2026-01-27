@@ -69,32 +69,32 @@ public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<S
             caseData, authorisation, false);
         List<Party> applicants = getApplicants(caseData, multiPartyScenario);
 
-        SealedClaimForm.SealedClaimFormBuilder sealedClaimFormBuilder = SealedClaimForm.builder()
-            .applicants(applicants)
-            .respondents(getRespondents(caseData, multiPartyScenario))
-            .claimValue(caseData.getClaimValue().formData())
-            .statementOfTruth(caseData.getApplicantSolicitor1ClaimStatementOfTruth())
-            .claimDetails(caseData.getDetailsOfClaim())
-            .hearingCourtLocation(hearingCourtLocation)
-            .referenceNumber(caseData.getLegacyCaseReference())
-            .ccdCaseReference(formatCcdCaseReference(caseData))
-            .issueDate(caseData.getIssueDate())
-            .submittedOn(caseData.getSubmittedDate().toLocalDate())
-            .applicantExternalReference(solicitorReferences
-                                            .map(SolicitorReferences::getApplicantSolicitor1Reference)
-                                            .orElse(""))
-            .respondent1ExternalReference(solicitorReferences
-                                              .map(SolicitorReferences::getRespondentSolicitor1Reference)
-                                              .orElse(""))
-            .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
-            .applicantRepresentativeOrganisationName(applicants.get(0).getRepresentative().getOrganisationName())
-            .courtFee(caseData.getClaimFee().formData());
+        SealedClaimForm sealedClaimForm = new SealedClaimForm()
+            .setApplicants(applicants)
+            .setRespondents(getRespondents(caseData, multiPartyScenario))
+            .setClaimValue(caseData.getClaimValue().formData())
+            .setStatementOfTruth(caseData.getApplicantSolicitor1ClaimStatementOfTruth())
+            .setClaimDetails(caseData.getDetailsOfClaim())
+            .setHearingCourtLocation(hearingCourtLocation)
+            .setReferenceNumber(caseData.getLegacyCaseReference())
+            .setCcdCaseReference(formatCcdCaseReference(caseData))
+            .setIssueDate(caseData.getIssueDate())
+            .setSubmittedOn(caseData.getSubmittedDate().toLocalDate())
+            .setApplicantExternalReference(solicitorReferences
+                                               .map(SolicitorReferences::getApplicantSolicitor1Reference)
+                                               .orElse(""))
+            .setRespondent1ExternalReference(solicitorReferences
+                                                 .map(SolicitorReferences::getRespondentSolicitor1Reference)
+                                                 .orElse(""))
+            .setCaseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
+            .setApplicantRepresentativeOrganisationName(applicants.get(0).getRepresentative().getOrganisationName())
+            .setCourtFee(caseData.getClaimFee().formData());
 
         if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
-            sealedClaimFormBuilder.respondent2ExternalReference(caseData.getRespondentSolicitor2Reference());
+            sealedClaimForm.setRespondent2ExternalReference(caseData.getRespondentSolicitor2Reference());
         }
 
-        return sealedClaimFormBuilder.build();
+        return sealedClaimForm;
     }
 
     private DocmosisTemplates getDocmosisTemplate(CaseData caseData) {

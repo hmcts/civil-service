@@ -64,13 +64,12 @@ public class DocmosisApiConsumerTest extends BaseContractTest {
     }
 
     private DocmosisRequest getDocmosisRequest() {
-        return DocmosisRequest.builder()
-            .accessKey("accessKey")
-            .templateName("templateName")
-            .outputFormat("outputFormat")
-            .outputName("outputName")
-            .data(Map.of("data", "dataV"))
-            .build();
+        return new DocmosisRequest()
+            .setAccessKey("accessKey")
+            .setTemplateName("templateName")
+            .setOutputFormat("outputFormat")
+            .setOutputName("outputName")
+            .setData(Map.of("data", "dataV"));
     }
 
 }
