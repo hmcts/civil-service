@@ -34,6 +34,7 @@ class CasemanReferenceNumberRepositoryIT {
         Flyway.configure()
             .dataSource(dataSource)
             .locations("classpath:db/migration")
+            .placeholderReplacement(false)
             .load()
             .migrate();
 
