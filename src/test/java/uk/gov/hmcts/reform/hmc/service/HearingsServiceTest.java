@@ -90,8 +90,7 @@ class HearingsServiceTest {
             when(hearingNoticeApi.getHearingRequest(
                 eq(USER_TOKEN), eq(SERVICE_TOKEN),
                 eq(HEARING_ID),
-                isNull(), isNull(), isNull(),
-                isNull()))
+                isNull(), isNull(), isNull()))
                 .thenReturn(response);
 
             HearingGetResponse actualResponse =
@@ -105,8 +104,7 @@ class HearingsServiceTest {
             when(hearingNoticeApi.getHearingRequest(
                 eq(USER_TOKEN), eq(SERVICE_TOKEN),
                 eq(HEARING_ID),
-                isNull(), isNull(), isNull(),
-                isNull()))
+                isNull(), isNull(), isNull()))
                 .thenThrow(notFoundFeignException);
 
             Exception exception = assertThrows(
@@ -143,7 +141,7 @@ class HearingsServiceTest {
         void shouldGetPartiesResponses_whenInvoked() {
             when(hearingNoticeApi.getPartiesNotifiedRequest(
                 eq(USER_TOKEN), eq(SERVICE_TOKEN),
-                isNull(), isNull(), isNull(),
+                isNull(), isNull(),
                 eq(HEARING_ID)))
                 .thenReturn(getPartiesNotifiedResponse());
             PartiesNotifiedResponses result = hearingNoticeService
@@ -157,7 +155,7 @@ class HearingsServiceTest {
         void shouldThrowException_whenExceptionError() {
             when(hearingNoticeApi.getPartiesNotifiedRequest(
                 eq(USER_TOKEN), eq(SERVICE_TOKEN),
-                isNull(), isNull(), isNull(),
+                isNull(), isNull(),
                 eq(HEARING_ID)))
                 .thenThrow(notFoundFeignException);
 
@@ -186,7 +184,7 @@ class HearingsServiceTest {
             //then
             verify(hearingNoticeApi).updatePartiesNotifiedRequest(
                 eq(USER_TOKEN), eq(SERVICE_TOKEN),
-                isNull(), isNull(), isNull(),
+                isNull(), isNull(),
                 eq(partiesNotified), eq(HEARING_ID), eq(VERSION_NUMBER), eq(time));
         }
 
@@ -195,7 +193,7 @@ class HearingsServiceTest {
 
             when(hearingNoticeApi.updatePartiesNotifiedRequest(
                 eq(USER_TOKEN), eq(SERVICE_TOKEN),
-                isNull(), isNull(), isNull(),
+                isNull(), isNull(),
                 eq(partiesNotified), eq(HEARING_ID), eq(VERSION_NUMBER), eq(time)))
                 .thenThrow(notFoundFeignException);
 
@@ -225,7 +223,7 @@ class HearingsServiceTest {
         void shouldGetNotifiedHearingResponses_whenInvoked() {
             when(hearingNoticeApi.getUnNotifiedHearingRequest(
                 eq(USER_TOKEN), eq(SERVICE_TOKEN),
-                isNull(), isNull(), isNull(),
+                isNull(), isNull(),
                 eq(HMCTS_SERVICE_CODE), eq(dateFrom), eq(dateTo)))
                 .thenReturn(getUnNotifiedParties());
 
@@ -240,7 +238,7 @@ class HearingsServiceTest {
         void shouldThrowException_whenExceptionError() {
             when(hearingNoticeApi.getUnNotifiedHearingRequest(
                 eq(USER_TOKEN), eq(SERVICE_TOKEN),
-                isNull(), isNull(), isNull(),
+                isNull(), isNull(),
                 eq(HMCTS_SERVICE_CODE), eq(dateFrom), eq(dateTo)))
                 .thenThrow(notFoundFeignException);
 
@@ -268,7 +266,7 @@ class HearingsServiceTest {
 
             when(hearingNoticeApi.getHearings(
                 eq(USER_TOKEN), eq(SERVICE_TOKEN),
-                isNull(), isNull(), isNull(),
+                isNull(), isNull(),
                 eq(CASE_ID), eq(HMC_STATUS)))
                 .thenReturn(hearings);
 
@@ -282,7 +280,7 @@ class HearingsServiceTest {
         void shouldThrowException_whenExceptionError() {
             when(hearingNoticeApi.getHearings(
                 eq(SERVICE_TOKEN), eq(SERVICE_TOKEN),
-                isNull(), isNull(), isNull(),
+                isNull(), isNull(),
                 eq(CASE_ID), eq(HMC_STATUS)))
                 .thenThrow(notFoundFeignException);
 
