@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -48,10 +49,16 @@ class PostDJNonDivergentCoverLetterLiPClaimantHandlerTest {
     private CoverLetterService coverLetterService;
     @Mock
     private ObjectMapper objectMapper;
+    private AutoCloseable autoCloseable;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        autoCloseable = MockitoAnnotations.openMocks(this);
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        autoCloseable.close();
     }
 
     @Test
@@ -89,7 +96,8 @@ class PostDJNonDivergentCoverLetterLiPClaimantHandlerTest {
             "001MC001",
             "001MC001",
             "default-judgment-non-divergent-spec-cover_letter",
-            List.of("Mr. John Rambo")
+            List.of("Mr. John Rambo"),
+            List.of("dj.pdf", "default_judgment_cover_letter.pdf")
         );
     }
 
