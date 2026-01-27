@@ -13,9 +13,9 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.docmosis.PostOrderCoverLetter;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
-import uk.gov.hmcts.reform.civil.ga.model.docmosis.PostOrderCoverLetter;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -87,10 +87,11 @@ public class SendFinalOrderPrintService {
             recipients.add(caseData.getPartyName(parentClaimantIsApplicant, lipUserType, civilCaseData));
         }
 
+        List<String> bulkPrintFileNames = new ArrayList<>();
+        bulkPrintFileNames.add(postJudgeOrderDocument.getDocumentFileName());
         bulkPrintService.printLetter(letterContent, caseData.getGeneralAppParentCaseLink().getCaseReference(),
                 civilCaseData.getLegacyCaseReference(),
-                SendFinalOrderPrintService.FINAL_ORDER_PACK_LETTER_TYPE, recipients);
-
+                SendFinalOrderPrintService.FINAL_ORDER_PACK_LETTER_TYPE, recipients, bulkPrintFileNames);
     }
 
     public void sendJudgeTranslatedOrderToPrintForLIP(String authorisation,
@@ -151,7 +152,11 @@ public class SendFinalOrderPrintService {
             throw new DocumentDownloadException(stitchedDocument.getDocumentLink().getDocumentFileName(), e);
         }
         List<String> recipients = getRecipients(caseData, caseEvent, civilCaseData);
-        sendBulkPrint(letterContent, caseData, civilCaseData, recipients);
+        List<String> bulkPrintFilenames = new ArrayList<>();
+        bulkPrintFilenames.add(stitchedDocument.getDocumentLink().getDocumentFileName());
+        bulkPrintService.printLetter(letterContent, caseData.getGeneralAppParentCaseLink().getCaseReference(),
+                                     civilCaseData.getLegacyCaseReference(),
+                                     SendFinalOrderPrintService.TRANSLATED_ORDER_PACK_LETTER_TYPE, recipients, bulkPrintFilenames);
     }
 
     private List<String> getRecipients(GeneralApplicationCaseData caseData, CaseEvent caseEvent, GeneralApplicationCaseData civilCaseData) {
@@ -170,13 +175,6 @@ public class SendFinalOrderPrintService {
             recipients.add(respondent);
         }
         return recipients;
-    }
-
-    private void sendBulkPrint(byte[] letterContent, GeneralApplicationCaseData caseData, GeneralApplicationCaseData civilCaseData, List<String> recipients) {
-
-        bulkPrintService.printLetter(letterContent, caseData.getGeneralAppParentCaseLink().getCaseReference(),
-                civilCaseData.getLegacyCaseReference(),
-                SendFinalOrderPrintService.TRANSLATED_ORDER_PACK_LETTER_TYPE, recipients);
     }
 
     private List<DocumentMetaData> stitchCoverLetterAndOrderDocuments(CaseDocument coverLetterCaseDocument, Document originalDocument, Document translatedDocument) {
