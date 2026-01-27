@@ -158,13 +158,13 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
 
     private LocalDate getCosDateDeemedServedForDefendantOrNotificationDate(CaseData caseData, CaseRole caseRole) {
         if (RESPONDENTSOLICITORONE.equals(caseRole)) {
-            CertificateOfService cosNotifyClaimDefendant1 = caseData.getCosNotifyClaimDefendant1();
+            CertificateOfService cosNotifyClaimDefendant1 = caseData.getCosNotifyClaimDetails1();
             if (cosNotifyClaimDefendant1 != null && cosNotifyClaimDefendant1.getCosDateDeemedServedForDefendant() != null) {
                 return cosNotifyClaimDefendant1.getCosDateDeemedServedForDefendant();
             }
         }
         if (RESPONDENTSOLICITORTWO.equals(caseRole)) {
-            CertificateOfService cosNotifyClaimDefendant2 = caseData.getCosNotifyClaimDefendant2();
+            CertificateOfService cosNotifyClaimDefendant2 = caseData.getCosNotifyClaimDetails2();
             if (cosNotifyClaimDefendant2 != null && cosNotifyClaimDefendant2.getCosDateDeemedServedForDefendant() != null) {
                 return cosNotifyClaimDefendant2.getCosDateDeemedServedForDefendant();
             }

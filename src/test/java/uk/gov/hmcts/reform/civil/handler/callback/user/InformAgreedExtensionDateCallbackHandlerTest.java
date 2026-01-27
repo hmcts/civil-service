@@ -129,8 +129,8 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             caseData.setAddRespondent2(NO);
             CertificateOfService cos = new CertificateOfService();
-            cos.setCosDateDeemedServedForDefendant(LocalDate.now().plusDays(3L));
-            caseData.setCosNotifyClaimDefendant1(cos);
+            cos.setCosDateDeemedServedForDefendant(LocalDate.of(2026, 1, 27).plusDays(3L));
+            caseData.setCosNotifyClaimDetails1(cos);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             // When
@@ -147,7 +147,7 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
             // Then
             assertThat(response.getErrors()).isNull();
             assertThat(response.getData()).extracting("respondentSolicitor1AgreedDeadlineExtension")
-                .isEqualTo(caseData.getCosNotifyClaimDefendant1().getCosDateDeemedServedForDefendant().plusDays(42).toString());
+                .isEqualTo(caseData.getCosNotifyClaimDetails1().getCosDateDeemedServedForDefendant().plusDays(42).toString());
         }
 
         @Test
