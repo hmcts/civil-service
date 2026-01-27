@@ -70,7 +70,6 @@ docmosis:
 hmc:
   api:
     url: ${HMC_API_URL:http://localhost:8765}
-    deployment-id: ${HMC_DEPLOYMENT_ID:}
 
 serviceRequest:
   api:
