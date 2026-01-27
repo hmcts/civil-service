@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadServ
 import uk.gov.hmcts.reform.civil.utils.LanguageUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -21,19 +22,21 @@ import java.util.Objects;
 @Service
 public class NoticeOfDiscontinuanceLiPLetterGenerator {
 
-    private final BulkPrintService bulkPrintService;
     private static final String NOTICE_OF_DISCONTINUANCE_LETTER = "notice-of-discontinuance";
+    private final BulkPrintService bulkPrintService;
     private final DocumentDownloadService documentDownloadService;
     private final FeatureToggleService featureToggleService;
 
     public void printNoticeOfDiscontinuanceLetter(CaseData caseData, String authorisation) {
         CaseDocument discontinuanceCaseDocument = caseData.getRespondent1NoticeOfDiscontinueAllPartyViewDoc();
         if (Objects.nonNull(discontinuanceCaseDocument)) {
-            Language language = LanguageUtils.determineLanguageForBulkPrint(caseData, false, featureToggleService.isWelshEnabledForMainCase());
-            if (language.equals(Language.WELSH) || language.equals(Language.BOTH)) {
-                if (Objects.nonNull(caseData.getRespondent1NoticeOfDiscontinueAllPartyTranslatedDoc())) {
-                    discontinuanceCaseDocument = caseData.getRespondent1NoticeOfDiscontinueAllPartyTranslatedDoc();
-                }
+            Language language = LanguageUtils.determineLanguageForBulkPrint(
+                caseData, false,
+                featureToggleService.isWelshEnabledForMainCase()
+            );
+            if ((Language.WELSH.equals(language) || Language.BOTH.equals(language))
+                && Objects.nonNull(caseData.getRespondent1NoticeOfDiscontinueAllPartyTranslatedDoc())) {
+                discontinuanceCaseDocument = caseData.getRespondent1NoticeOfDiscontinueAllPartyTranslatedDoc();
             }
 
             List<String> recipient = getRecipientsList(caseData);
@@ -41,13 +44,23 @@ public class NoticeOfDiscontinuanceLiPLetterGenerator {
             try {
                 String documentUrl = discontinuanceCaseDocument.getDocumentLink().getDocumentUrl();
                 String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
-                letterContent = documentDownloadService.downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
+                letterContent = documentDownloadService.downloadDocument(
+                    authorisation,
+                    documentId
+                ).file().getInputStream().readAllBytes();
             } catch (IOException e) {
                 log.error("Failed getting letter content for Notice of Discontinuance LiP Letter ");
-                throw new DocumentDownloadException(discontinuanceCaseDocument.getDocumentLink().getDocumentFileName(), e);
+                throw new DocumentDownloadException(
+                    discontinuanceCaseDocument.getDocumentLink().getDocumentFileName(),
+                    e
+                );
             }
-            bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
-                    caseData.getLegacyCaseReference(), NOTICE_OF_DISCONTINUANCE_LETTER, recipient);
+            List<String> bulkPrintFileNames = new ArrayList<>();
+            bulkPrintFileNames.add(discontinuanceCaseDocument.getDocumentLink().getDocumentFileName());
+            bulkPrintService.printLetter(
+                letterContent, caseData.getLegacyCaseReference(),
+                caseData.getLegacyCaseReference(), NOTICE_OF_DISCONTINUANCE_LETTER, recipient, bulkPrintFileNames
+            );
         }
     }
 
