@@ -962,32 +962,17 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
     }
 
-    private void populatePpiFields(CaseData caseData, boolean isSmallClaimsTrack, boolean isFastTrack) {
-        if (isSmallClaimsTrack) {
-            if (SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimPPI")) {
-                caseData.setSmallClaimsPPI(getOrCreatePpi(caseData.getSmallClaimsPPI()));
-            } else {
+    private void resetPpiFields(CaseData caseData, boolean isSmallClaimsTrack, boolean isFastTrack) {
+        if (isSmallClaimsTrack && !SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimPPI")) {
                 caseData.setSmallClaimsPPI(null);
             }
-        }
 
-        if (isFastTrack) {
-            if (SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimPPI")) {
-                caseData.setFastTrackPPI(getOrCreatePpi(caseData.getFastTrackPPI()));
-            } else {
+        if (isFastTrack && !SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimPPI")) {
                 caseData.setFastTrackPPI(null);
             }
-        }
+
     }
 
-    private PPI getOrCreatePpi(PPI existingPpi) {
-        PPI ppi = existingPpi != null ? existingPpi : new PPI();
-        if (ppi.getPpiDate() == null) {
-            ppi.setPpiDate(LocalDate.now().plusDays(28));
-        }
-        ppi.setText(SdoR2UiConstantSmallClaim.PPI_DESCRIPTION);
-        return ppi;
-    }
 
     private void prePopulateNihlFields(CaseData updatedData, DynamicList hearingMethodList,
                                        Optional<RequestedCourt> preferredCourt,
@@ -1269,7 +1254,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             }
         }
 
-        populatePpiFields(caseData, isSmallClaimsTrack, isFastTrack);
+        resetPpiFields(caseData, isSmallClaimsTrack, isFastTrack);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
