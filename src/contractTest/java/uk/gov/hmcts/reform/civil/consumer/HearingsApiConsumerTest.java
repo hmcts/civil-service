@@ -41,8 +41,7 @@ import static org.mockito.Mockito.when;
 @TestPropertySource(properties = {
     "hmc.api.url=http://localhost:8991",
     "core_case_data.api.url=" + BaseContractTest.DATA_STORE_URL,
-    "role-assignment.api.url=" + BaseContractTest.ROLE_ASSIGNMENT_URL,
-    "hmc.deployment-id=" + BaseContractTest.HMCTS_DEPLOYMENT_ID
+    "role-assignment.api.url=" + BaseContractTest.ROLE_ASSIGNMENT_URL
 })
 public class HearingsApiConsumerTest extends BaseContractTest {
 
@@ -76,8 +75,7 @@ public class HearingsApiConsumerTest extends BaseContractTest {
             .headers(AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN,
                 SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN,
                 DATA_STORE_URL_HEADER, DATA_STORE_URL,
-                ROLE_ASSIGNMENT_URL_HEADER, ROLE_ASSIGNMENT_URL,
-                HMCTS_DEPLOYMENT_ID_HEADER, HMCTS_DEPLOYMENT_ID)
+                ROLE_ASSIGNMENT_URL_HEADER, ROLE_ASSIGNMENT_URL)
             .willRespondWith()
             .status(HttpStatus.SC_OK)
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -95,8 +93,7 @@ public class HearingsApiConsumerTest extends BaseContractTest {
             .headers(AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN,
                 SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN,
                 DATA_STORE_URL_HEADER, DATA_STORE_URL,
-                ROLE_ASSIGNMENT_URL_HEADER, ROLE_ASSIGNMENT_URL,
-                HMCTS_DEPLOYMENT_ID_HEADER, HMCTS_DEPLOYMENT_ID)
+                ROLE_ASSIGNMENT_URL_HEADER, ROLE_ASSIGNMENT_URL)
             .willRespondWith()
             .status(HttpStatus.SC_OK)
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -116,8 +113,7 @@ public class HearingsApiConsumerTest extends BaseContractTest {
                 AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN,
                 SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN,
                 DATA_STORE_URL_HEADER, DATA_STORE_URL,
-                ROLE_ASSIGNMENT_URL_HEADER, ROLE_ASSIGNMENT_URL,
-                HMCTS_DEPLOYMENT_ID_HEADER, HMCTS_DEPLOYMENT_ID)
+                ROLE_ASSIGNMENT_URL_HEADER, ROLE_ASSIGNMENT_URL)
             .matchQuery("version", "1", "1")
             .matchQuery("received", receivedQueryValue, receivedQueryValue)
             .body(createJsonObject(getPartiesNotifiedPayload()))
@@ -137,8 +133,7 @@ public class HearingsApiConsumerTest extends BaseContractTest {
             .headers(AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN,
                 SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN,
                 DATA_STORE_URL_HEADER, DATA_STORE_URL,
-                ROLE_ASSIGNMENT_URL_HEADER, ROLE_ASSIGNMENT_URL,
-                HMCTS_DEPLOYMENT_ID_HEADER, HMCTS_DEPLOYMENT_ID)
+                ROLE_ASSIGNMENT_URL_HEADER, ROLE_ASSIGNMENT_URL)
             .matchQuery("hearing_start_date_from", fromParam, fromParam)
             .willRespondWith()
             .status(HttpStatus.SC_OK)
@@ -157,8 +152,7 @@ public class HearingsApiConsumerTest extends BaseContractTest {
             .headers(AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN,
                 SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN,
                 DATA_STORE_URL_HEADER, DATA_STORE_URL,
-                ROLE_ASSIGNMENT_URL_HEADER, ROLE_ASSIGNMENT_URL,
-                HMCTS_DEPLOYMENT_ID_HEADER, HMCTS_DEPLOYMENT_ID)
+                ROLE_ASSIGNMENT_URL_HEADER, ROLE_ASSIGNMENT_URL)
             .matchQuery("status", "LISTED", "LISTED")
             .willRespondWith()
             .status(HttpStatus.SC_OK)
