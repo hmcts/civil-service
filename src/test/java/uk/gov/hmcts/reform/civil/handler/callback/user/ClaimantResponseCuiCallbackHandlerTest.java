@@ -221,10 +221,10 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                     RequestedCourt.builder()
                         .responseCourtCode("court1")
                         .caseLocation(
-                            CaseLocationCivil.builder()
-                                .region(courtLocation)
-                                .baseLocation(courtLocation)
-                                .build()
+                            new CaseLocationCivil()
+                                .setRegion(courtLocation)
+                                .setBaseLocation(courtLocation)
+                                
                         )
                         .build()
 
@@ -243,10 +243,10 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             Respondent1DQ respondent1DQ = Respondent1DQ.builder()
                 .respondent1DQRequestedCourt(RequestedCourt.builder()
                                                  .responseCourtCode("court2")
-                                                 .caseLocation(CaseLocationCivil.builder()
-                                                                   .region(courtLocation)
-                                                                   .baseLocation(courtLocation)
-                                                                   .build())
+                                                 .caseLocation(new CaseLocationCivil()
+                                                                   .setRegion(courtLocation)
+                                                                   .setBaseLocation(courtLocation)
+                                                                   )
                                                  .build())
                 .build();
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
@@ -296,13 +296,13 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldOnlyUpdateClaimStatus_whenPartAdmitNotSettled_NoMediation_NoBaseCourt() {
             Applicant1DQ applicant1DQ =
                 Applicant1DQ.builder().applicant1DQRequestedCourt(RequestedCourt.builder()
-                                                                      .caseLocation(CaseLocationCivil.builder()
-                                                                                        .build())
+                                                                      .caseLocation(new CaseLocationCivil()
+                                                                                        )
                                                                       .build()).build();
             Respondent1DQ respondent1DQ =
                 Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder()
-                                                                        .caseLocation(CaseLocationCivil.builder()
-                                                                                          .build())
+                                                                        .caseLocation(new CaseLocationCivil()
+                                                                                          )
                                                                         .build()).build();
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(NO);
@@ -619,7 +619,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                                        .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(10))
                                        .ccjJudgmentTotalStillOwed(BigDecimal.valueOf(150))
                                        .build())
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

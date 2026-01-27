@@ -84,10 +84,10 @@ public class ServiceHearingsCaseLevelMapperTest {
     @Test
     void shouldReturnCaseManagementLocationCode_whenInvoked() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation("0123")
-                                        .region("region")
-                                        .build())
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation("0123")
+                                        .setRegion("region")
+                                        )
             .build();
         assertThat(ServiceHearingsCaseLevelMapper.getCaseManagementLocationCode(caseData))
             .isEqualTo("0123");

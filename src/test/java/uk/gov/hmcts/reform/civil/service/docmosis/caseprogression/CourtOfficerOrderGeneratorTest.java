@@ -58,7 +58,7 @@ class CourtOfficerOrderGeneratorTest {
         .externalShortName("Court Name Short")
         .courtTypeId("10").courtLocationCode("121")
         .epimmsId("123456").build();
-    private static final CaseLocationCivil caseManagementLocation = CaseLocationCivil.builder().baseLocation("123456").build();
+    private static final CaseLocationCivil caseManagementLocation = new CaseLocationCivil().setBaseLocation("123456");
 
     @MockBean
     private SecuredDocumentManagementService documentManagementService;
@@ -151,7 +151,7 @@ class CourtOfficerOrderGeneratorTest {
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenThrow(IllegalArgumentException.class);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("1111111").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("1111111"))
             .build();
 
         assertThrows(IllegalArgumentException.class, () -> generator.generate(caseData, "BEARER_TOKEN"));

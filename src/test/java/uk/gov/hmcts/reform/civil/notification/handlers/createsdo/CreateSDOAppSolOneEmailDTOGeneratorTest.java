@@ -34,7 +34,7 @@ public class CreateSDOAppSolOneEmailDTOGeneratorTest {
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenSpec() {
         String baseLocation = "base location";
-        CaseLocationCivil caseLocation = CaseLocationCivil.builder().baseLocation(baseLocation).build();
+        CaseLocationCivil caseLocation = new CaseLocationCivil().setBaseLocation(baseLocation);
         CaseData caseData = CaseData.builder().caseAccessCategory(SPEC_CLAIM).caseManagementLocation(caseLocation).build();
 
         String expectedTemplateId = "template-id";
@@ -49,7 +49,7 @@ public class CreateSDOAppSolOneEmailDTOGeneratorTest {
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenSpecAndEA() {
         String baseLocation = "base location";
-        CaseLocationCivil caseLocation = CaseLocationCivil.builder().baseLocation(baseLocation).build();
+        CaseLocationCivil caseLocation = new CaseLocationCivil().setBaseLocation(baseLocation);
         CaseData caseData = CaseData.builder().caseAccessCategory(SPEC_CLAIM).caseManagementLocation(caseLocation).build();
 
         String expectedTemplateId = "template-id";

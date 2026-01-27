@@ -90,9 +90,9 @@ class DefaultJudgmentOrderFormGeneratorTest {
         FILE_NAME_DISPOSAL_HNL = LocalDate.now() + "_Judge Dredd" + ".pdf";
 
         when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
-                                                                    .forename("Judge")
-                                                                    .surname("Dredd")
-                                                                    .roles(Collections.emptyList()).build());
+                                                                     .forename("Judge")
+                                                                     .surname("Dredd")
+                                                                     .roles(Collections.emptyList()).build());
     }
 
     @Test
@@ -161,8 +161,10 @@ class DefaultJudgmentOrderFormGeneratorTest {
 
     @Test
     void shouldDefaultJudgementDisposalFormGenerator_HnlFieldsWhenToggled() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class),
-                                                               eq(DJ_SDO_R2_DISPOSAL)))
+        when(documentGeneratorService.generateDocmosisDocument(
+            any(MappableObject.class),
+            eq(DJ_SDO_R2_DISPOSAL)
+        ))
             .thenReturn(new DocmosisDocument(DJ_SDO_R2_DISPOSAL.getDocumentTitle(), bytes));
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DISPOSAL_HNL, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
@@ -186,8 +188,8 @@ class DefaultJudgmentOrderFormGeneratorTest {
             .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DISPOSAL_HNL, bytes, DEFAULT_JUDGMENT_SDO_ORDER));
         verify(documentGeneratorService).generateDocmosisDocument(
             argThat((MappableObject arg) ->
-                arg instanceof DefaultJudgmentSDOOrderForm
-                    && locationRefData.equals(((DefaultJudgmentSDOOrderForm) arg).getHearingLocation())
+                        arg instanceof DefaultJudgmentSDOOrderForm
+                            && locationRefData.equals(((DefaultJudgmentSDOOrderForm) arg).getHearingLocation())
             ),
             any(DocmosisTemplates.class)
         );
@@ -267,10 +269,9 @@ class DefaultJudgmentOrderFormGeneratorTest {
                 DisposalHearingBundleType.SUMMARY
             );
 
-            DisposalHearingBundleDJ disposalHearingBundle = DisposalHearingBundleDJ.builder()
-                .input("test")
-                .type(disposalHearingBundleTypes)
-                .build();
+            DisposalHearingBundleDJ disposalHearingBundle = new DisposalHearingBundleDJ()
+                .setInput("test")
+                .setType(disposalHearingBundleTypes);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
@@ -293,10 +294,9 @@ class DefaultJudgmentOrderFormGeneratorTest {
                 DisposalHearingBundleType.ELECTRONIC
             );
 
-            DisposalHearingBundleDJ disposalHearingBundle = DisposalHearingBundleDJ.builder()
-                .input("test")
-                .type(disposalHearingBundleTypes)
-                .build();
+            DisposalHearingBundleDJ disposalHearingBundle = new DisposalHearingBundleDJ()
+                .setInput("test")
+                .setType(disposalHearingBundleTypes);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
@@ -318,10 +318,9 @@ class DefaultJudgmentOrderFormGeneratorTest {
                 DisposalHearingBundleType.SUMMARY
             );
 
-            DisposalHearingBundleDJ disposalHearingBundle = DisposalHearingBundleDJ.builder()
-                .input("test")
-                .type(disposalHearingBundleTypes)
-                .build();
+            DisposalHearingBundleDJ disposalHearingBundle = new DisposalHearingBundleDJ()
+                .setInput("test")
+                .setType(disposalHearingBundleTypes);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
@@ -343,10 +342,9 @@ class DefaultJudgmentOrderFormGeneratorTest {
                 DisposalHearingBundleType.SUMMARY
             );
 
-            DisposalHearingBundleDJ disposalHearingBundle = DisposalHearingBundleDJ.builder()
-                .input("test")
-                .type(disposalHearingBundleTypes)
-                .build();
+            DisposalHearingBundleDJ disposalHearingBundle = new DisposalHearingBundleDJ()
+                .setInput("test")
+                .setType(disposalHearingBundleTypes);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
@@ -367,10 +365,9 @@ class DefaultJudgmentOrderFormGeneratorTest {
                 DisposalHearingBundleType.DOCUMENTS
             );
 
-            DisposalHearingBundleDJ disposalHearingBundle = DisposalHearingBundleDJ.builder()
-                .input("test")
-                .type(disposalHearingBundleTypes)
-                .build();
+            DisposalHearingBundleDJ disposalHearingBundle = new DisposalHearingBundleDJ()
+                .setInput("test")
+                .setType(disposalHearingBundleTypes);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
@@ -390,10 +387,9 @@ class DefaultJudgmentOrderFormGeneratorTest {
                 DisposalHearingBundleType.ELECTRONIC
             );
 
-            DisposalHearingBundleDJ disposalHearingBundle = DisposalHearingBundleDJ.builder()
-                .input("test")
-                .type(disposalHearingBundleTypes)
-                .build();
+            DisposalHearingBundleDJ disposalHearingBundle = new DisposalHearingBundleDJ()
+                .setInput("test")
+                .setType(disposalHearingBundleTypes);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
@@ -413,10 +409,9 @@ class DefaultJudgmentOrderFormGeneratorTest {
                 DisposalHearingBundleType.SUMMARY
             );
 
-            DisposalHearingBundleDJ disposalHearingBundle = DisposalHearingBundleDJ.builder()
-                .input("test")
-                .type(disposalHearingBundleTypes)
-                .build();
+            DisposalHearingBundleDJ disposalHearingBundle = new DisposalHearingBundleDJ()
+                .setInput("test")
+                .setType(disposalHearingBundleTypes);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()

@@ -39,7 +39,7 @@ public class CreateSDORespSolOneEmailDTOGeneratorTest {
         String baseLocation = "base location";
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(baseLocation).build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(baseLocation))
             .build();
 
         String expectedTemplateId = "template-id";
@@ -70,7 +70,7 @@ public class CreateSDORespSolOneEmailDTOGeneratorTest {
         String baseLocation = "base location";
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(baseLocation).build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(baseLocation))
             .build();
 
         String expectedTemplateId = "template-id";

@@ -33,12 +33,12 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 class LocationHelperTest {
 
     private LocationHelper helper;
-    private final CaseLocationCivil claimantPreferredCourt = CaseLocationCivil.builder()
-        .baseLocation("123456").region("region 1").build();
-    private final CaseLocationCivil defendant1PreferredCourt = CaseLocationCivil.builder()
-        .baseLocation("987456").region("region 1").build();
-    private final CaseLocationCivil defendant2PreferredCourt = CaseLocationCivil.builder()
-        .baseLocation("101010").region("region 3").build();
+    private final CaseLocationCivil claimantPreferredCourt = new CaseLocationCivil()
+        .setBaseLocation("123456").setRegion("region 1");
+    private final CaseLocationCivil defendant1PreferredCourt = new CaseLocationCivil()
+        .setBaseLocation("987456").setRegion("region 1");
+    private final CaseLocationCivil defendant2PreferredCourt = new CaseLocationCivil()
+        .setBaseLocation("101010").setRegion("region 3");
 
     @BeforeEach
     void setup() {
@@ -55,15 +55,15 @@ class LocationHelperTest {
                                                       .epimmsId("99999")
                                                       .build());
         RequestedCourt requestedCourt = RequestedCourt.builder()
-            .caseLocation(CaseLocationCivil.builder().baseLocation("99999").build())
+            .caseLocation(new CaseLocationCivil().setBaseLocation("99999"))
             .build();
         helper.updateCaseManagementLocation(updatedData, requestedCourt, () -> locations);
         Assertions.assertThat(updatedData.getCaseManagementLocation())
             .isNotNull()
-            .isEqualTo(CaseLocationCivil.builder()
-                           .region("regionId")
-                           .baseLocation("99999")
-                           .build());
+            .isEqualTo(new CaseLocationCivil()
+                           .setRegion("regionId")
+                           .setBaseLocation("99999")
+            );
     }
 
     @Test
@@ -130,7 +130,7 @@ class LocationHelperTest {
 
         Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
         Assertions.assertThat(court.orElseThrow().getCaseLocation())
-            .isEqualTo(CaseLocationCivil.builder().baseLocation("987456").region("region 1").build());
+            .isEqualTo(new CaseLocationCivil().setBaseLocation("987456").setRegion("region 1"));
     }
 
     @Test

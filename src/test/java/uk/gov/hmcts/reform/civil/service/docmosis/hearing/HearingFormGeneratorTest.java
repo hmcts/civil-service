@@ -81,7 +81,7 @@ public class HearingFormGeneratorTest {
         .documentName(fileName_application)
         .documentType(DEFAULT_JUDGMENT)
         .build();
-    private static final CaseLocationCivil caseManagementLocation = CaseLocationCivil.builder().baseLocation("000000").build();
+    private static final CaseLocationCivil caseManagementLocation = new CaseLocationCivil().setBaseLocation("000000");
     private static LocationRefData locationRefData = LocationRefData.builder()
         .siteName("SiteName")
         .externalShortName("ExternalShortName")

@@ -48,8 +48,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
-
- class TriggerGenAppLocationUpdateCallbackHandlerTest extends BaseCallbackHandlerTest {
+class TriggerGenAppLocationUpdateCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
     TriggerGenAppLocationUpdateCallbackHandler handler;
@@ -75,11 +74,12 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
         @Test
         void shouldTriggerGeneralApplicationEvent_whenCaseHasGeneralApplication() {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),
-                                            true,
-                                            true,
-                                            true, true,
-                                            getOriginalStatusOfGeneralApplication()
+                .getTestCaseDataWithDetails(
+                    CaseDataBuilder.builder().build(),
+                    true,
+                    true,
+                    true, true,
+                    getOriginalStatusOfGeneralApplication()
                 );
 
             when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
@@ -101,11 +101,12 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
         @Test
         void shouldTriggerGeneralApplicationEvent_whenCaseHasGeneralApplicationNotRepresented() {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithLocationDetailsLip(CaseDataBuilder.builder().build(),
-                                            true,
-                                            true,
-                                            true, true,
-                                            getOriginalStatusOfGeneralApplication()
+                .getTestCaseDataWithLocationDetailsLip(
+                    CaseDataBuilder.builder().build(),
+                    true,
+                    true,
+                    true, true,
+                    getOriginalStatusOfGeneralApplication()
                 );
 
             when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
@@ -127,11 +128,12 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
         @Test
         void shouldTriggerGeneralApplicationEvent_whenCaseHasGeneralApplicationNotRepresentedAndNotInEa() {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithLocationDetailsLip(CaseDataBuilder.builder().build(),
-                                                       true,
-                                                       true,
-                                                       true, true,
-                                                       getOriginalStatusOfGeneralApplication()
+                .getTestCaseDataWithLocationDetailsLip(
+                    CaseDataBuilder.builder().build(),
+                    true,
+                    true,
+                    true, true,
+                    getOriginalStatusOfGeneralApplication()
                 );
             when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
             when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
@@ -153,11 +155,12 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
         @Test
         void shouldTriggerGeneralApplicationEvent_whenCaseHasGeneralApplicationRepresentedAndNotInEa() {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),
-                                                       true,
-                                                       true,
-                                                       true, true,
-                                                       getOriginalStatusOfGeneralApplication()
+                .getTestCaseDataWithDetails(
+                    CaseDataBuilder.builder().build(),
+                    true,
+                    true,
+                    true, true,
+                    getOriginalStatusOfGeneralApplication()
                 );
             when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
             when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
@@ -244,8 +247,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
         void shouldNotTriggerGeneralApplicationEvent_whenCaseHasNoGeneralApplicationLip() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
                 .caseManagementLocation(
-                CaseLocationCivil.builder().baseLocation("00000")
-                    .region("2").build()).build();
+                    new CaseLocationCivil().setBaseLocation("00000")
+                        .setRegion("2")).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -257,8 +260,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
         @Test
         void shouldNotTriggerGeneralApplicationEvent_whenCaseHasNoGeneralApplication() {
             CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnrepresentedDefendant().caseManagementLocation(
-                CaseLocationCivil.builder().baseLocation("00000")
-                    .region("2").build()).build();
+                new CaseLocationCivil().setBaseLocation("00000")
+                    .setRegion("2")).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -270,8 +273,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
         @Test
         void shouldTriggerCivilServiceEvent_whenLocationIsNotInEaRegion() {
             CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnrepresentedDefendant().caseManagementLocation(
-                CaseLocationCivil.builder().baseLocation("00000")
-                    .region("2").build()).build();
+                new CaseLocationCivil().setBaseLocation("00000")
+                    .setRegion("2")).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -284,11 +287,12 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
             CaseData baseCaseData = CaseDataBuilder.builder().build();
             baseCaseData.setCcdCaseReference(1234L);
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(baseCaseData,
-                                            true,
-                                            true,
-                                            true, true,
-                                            getOriginalStatusOfGeneralApplication()
+                .getTestCaseDataWithDetails(
+                    baseCaseData,
+                    true,
+                    true,
+                    true, true,
+                    getOriginalStatusOfGeneralApplication()
                 );
             String expectedErrorMessage = "Could not trigger event to update location on application under case: "
                 + caseData.getCcdCaseReference();
@@ -304,11 +308,12 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
         @Test
         void shouldTriggerReconfigureWhenCallbackEventIsReconfigGA() {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),
-                                            true,
-                                            true,
-                                            true, true,
-                                            getOriginalStatusOfGeneralApplication()
+                .getTestCaseDataWithDetails(
+                    CaseDataBuilder.builder().build(),
+                    true,
+                    true,
+                    true, true,
+                    getOriginalStatusOfGeneralApplication()
                 );
             when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
             CallbackParams callbackParams = CallbackParamsBuilder.builder()

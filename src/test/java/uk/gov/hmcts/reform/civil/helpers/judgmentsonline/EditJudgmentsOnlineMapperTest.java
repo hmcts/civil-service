@@ -246,7 +246,7 @@ public class EditJudgmentsOnlineMapperTest {
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
                 .whenWillThisAmountBePaid(LocalDate.now().plusDays(5)).build())
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
             .ccjPaymentDetails(ccjPaymentDetails)
             .respondent1(PartyBuilder.builder().organisation().build())
             .build();
