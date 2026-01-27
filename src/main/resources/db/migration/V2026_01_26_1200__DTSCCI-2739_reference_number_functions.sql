@@ -77,8 +77,8 @@ BEGIN
 
   RETURN regexp_replace(
     to_char(v_counter, 'FM000000'),
-    '(\\d{3})(\\d{3})',
-    '\\1' || v_prefix || '\\2'
+    '(\d{3})(\d{3})',
+    '\1' || v_prefix || '\2'
   );
 END;
 $$;
