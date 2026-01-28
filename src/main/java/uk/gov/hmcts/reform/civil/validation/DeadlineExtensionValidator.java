@@ -90,11 +90,17 @@ public class DeadlineExtensionValidator {
     }
 
     public LocalDate getMaxDate(LocalDate cosDateDeemedServedForDefendantOrNotificationDate, LocalDateTime ackNotificationDate) {
-        LocalDate date = cosDateDeemedServedForDefendantOrNotificationDate
-            .plusDays(
-                AGREED_EXTENSION
-                    + INITIAL_DEADLINE
-                    + (ackNotificationDate == null ? 0L : ACK_EXTENSION));
+        LocalDate date = cosDateDeemedServedForDefendantOrNotificationDate.plusDays(INITIAL_DEADLINE);
+        while (!workingDayIndicator.isWorkingDay(date)) {
+            date = date.plusDays(1L);
+        }
+
+        date = date.plusDays(ackNotificationDate == null ? 0L : ACK_EXTENSION);
+        while (!workingDayIndicator.isWorkingDay(date)) {
+            date = date.plusDays(1L);
+        }
+
+        date = date.plusDays(AGREED_EXTENSION);
         while (!workingDayIndicator.isWorkingDay(date)) {
             date = date.plusDays(1L);
         }
