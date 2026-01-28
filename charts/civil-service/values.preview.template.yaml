@@ -30,7 +30,7 @@ java:
     HMC_DEPLOYMENT_ID: "civil-${CHANGE_ID}"
     RD_PROFESSIONAL_API_URL: http://${SERVICE_NAME}-wiremock
     DOCMOSIS_TORNADO_URL: http://${SERVICE_NAME}-wiremock
-    ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
+    ROLE_ASSIGNMENT_URL: https://am-role-assignment-service-${SERVICE_FQDN}
     ROLE_INITIALISATION_ENABLED: true
     CASE_FLAGS_LOGGING_ENABLED: true
     COURT_LOCATION_WA_DMN_ENABLED: true
@@ -240,7 +240,7 @@ ccd:
         CCD_MULTIPARTY_LOG_LEVEL: DEBUG
         CCD_MULTIPARTY_CASE_TYPES: CIVIL
         CCD_MULTIPARTY_EVENTS: DEFENDANT_RESPONSE,ACKNOWLEDGE_CLAIM,CLAIMANT_RESPONSE,queryManagementRaiseQuery,queryManagementRespondQuery
-        ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
+        ROLE_ASSIGNMENT_URL: https://am-role-assignment-service-${SERVICE_FQDN}
       secrets:
         DATA_STORE_DB_PASSWORD:
           secretRef: "{{ .Values.global.postgresSecret }}"
@@ -248,23 +248,6 @@ ccd:
           disabled: true
       keyVaults: []
       ingressHost: ccd-data-store-api-${SERVICE_FQDN}
-  am-role-assignment-service:
-    java:
-      releaseNameOverride: ${SERVICE_NAME}-am-role-assignment-service
-      imagePullPolicy: Always
-      image: hmctspublic.azurecr.io/am/role-assignment-service:latest
-      ingressHost: am-role-assignment-${SERVICE_FQDN}
-      environment:
-        RELEASE_REVISION: "{{ .Release.Revision }}"
-        ROLE_ASSIGNMENT_DB_PASSWORD: ${POSTGRES_PASSWORD}
-        ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified"
-        ORM_ENV: pr
-        CCD_DATA_STORE_URL: http://${SERVICE_NAME}-ccd-data-store-api
-      keyVaults:
-        am:
-          secrets:
-            - name: role-assignment-service-LD-SDK-KEY
-              alias: LD_SDK_KEY
   ccd-definition-store-api:
     java:
       imagePullPolicy: Always

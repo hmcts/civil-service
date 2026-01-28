@@ -23,9 +23,13 @@ dependencies:
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: camunda-bpm.enabled
   - name: aac-manage-case-assignment
-    version: 0.2.20
+    version: ~0.2.20
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: aac-manage-case-assignment.enabled
+  - name: am-org-role-mapping-service
+    version: 0.0.72
+    repository: 'oci://hmctspublic.azurecr.io/helm'
+    condition: am-org-role-mapping-service.enabled
   - name: wiremock
     version: 0.0.5
     repository: 'oci://hmctspublic.azurecr.io/helm'
