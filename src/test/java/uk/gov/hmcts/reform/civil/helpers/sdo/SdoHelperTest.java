@@ -352,6 +352,10 @@ public class SdoHelperTest {
                 .isEqualTo(SmallTrack.smallClaimDisputeResolutionHearing);
             assertThat(SdoHelper.getSmallClaimsAdditionalDirectionEnum("smallClaimFlightDelay"))
                 .isEqualTo(SmallTrack.smallClaimFlightDelay);
+            assertThat(SdoHelper.getSmallClaimsAdditionalDirectionEnum("smallClaimHousingDisrepair"))
+                .isEqualTo(SmallTrack.smallClaimHousingDisrepair);
+            assertThat(SdoHelper.getSmallClaimsAdditionalDirectionEnum("smallClaimPPI"))
+                .isEqualTo(SmallTrack.smallClaimPPI);
         }
 
         @Test
@@ -437,6 +441,38 @@ public class SdoHelperTest {
                 .build();
 
             assertThat(SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimFlightDelay"))
+                .isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_ifHasHousingDisrepair() {
+            List<SmallTrack> directions = List.of(SmallTrack.smallClaimHousingDisrepair);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .drawDirectionsOrderRequired(NO)
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .smallClaims(directions)
+                .build();
+
+            assertThat(SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimHousingDisrepair"))
+                .isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_ifHasPPI() {
+            List<SmallTrack> directions = List.of(SmallTrack.smallClaimPPI);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .drawDirectionsOrderRequired(NO)
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .smallClaims(directions)
+                .build();
+
+            assertThat(SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimPPI"))
                 .isTrue();
         }
     }
@@ -856,6 +892,7 @@ public class SdoHelperTest {
                 .smallClaimsDocumentsToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .smallClaimsWitnessStatementToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .smallClaimsFlightDelayToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
+                .smallClaimsPenalNoticeToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .build();
 
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsHearingToggle")).isTrue();
@@ -864,6 +901,8 @@ public class SdoHelperTest {
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsWitnessStatementToggle"))
                 .isTrue();
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsFlightDelayToggle"))
+                .isTrue();
+            assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsPenalNoticeToggle"))
                 .isTrue();
         }
 
@@ -921,6 +960,8 @@ public class SdoHelperTest {
                 .isEqualTo(FastTrack.fastClaimPersonalInjury);
             assertThat(SdoHelper.getFastTrackAdditionalDirectionEnum("fastClaimRoadTrafficAccident"))
                 .isEqualTo(FastTrack.fastClaimRoadTrafficAccident);
+            assertThat(SdoHelper.getFastTrackAdditionalDirectionEnum("fastClaimPPI"))
+                .isEqualTo(FastTrack.fastClaimPPI);
         }
 
         @Test
@@ -1056,6 +1097,22 @@ public class SdoHelperTest {
             assertThat(SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimBuildingDispute"))
                 .isFalse();
         }
+
+        @Test
+        void shouldReturnTrue_ifHasPPI() {
+            List<FastTrack> directions = List.of(FastTrack.fastClaimPPI);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .drawDirectionsOrderRequired(NO)
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .fastClaims(directions)
+                .build();
+
+            assertThat(SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimPPI"))
+                .isTrue();
+        }
     }
 
     @Nested
@@ -1075,6 +1132,7 @@ public class SdoHelperTest {
                 .fastTrackCostsToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .fastTrackMethodToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .fastTrackTrialToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
+                .fastTrackPenalNoticeToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .build();
 
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackAltDisputeResolutionToggle"))
@@ -1089,6 +1147,7 @@ public class SdoHelperTest {
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackCostsToggle")).isTrue();
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialToggle")).isTrue();
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackMethodToggle")).isTrue();
+            assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackPenalNoticeToggle")).isTrue();
         }
 
         @Test

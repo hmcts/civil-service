@@ -184,6 +184,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_1v1;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_1v2;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_2v1;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.DEFAULT_PENAL_NOTICE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MINTI_DISPOSAL_NOT_ALLOWED;
@@ -2404,6 +2405,52 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("date3")
                 .isEqualTo(nextWorkingDayDate.toString());
 
+        }
+
+        @Test
+        void shouldSetPenalNoticesInPrePopulateOrderDetailsPages() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build();
+            given(locationRefDataService.getHearingCourtLocations(anyString())).willReturn(Collections.emptyList());
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
+                "Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
+                categorySearchResult));
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(data.getSmallClaimsPenalNotice()).isEqualTo(DEFAULT_PENAL_NOTICE);
+            assertThat(data.getFastTrackPenalNotice()).isEqualTo(DEFAULT_PENAL_NOTICE);
+            // Empty lists may be serialized as null during JSON conversion, both are acceptable for "default/false" state
+            assertThat(data.getSmallClaimsPenalNoticeToggle() == null || data.getSmallClaimsPenalNoticeToggle().isEmpty()).isTrue();
+            assertThat(data.getFastTrackPenalNoticeToggle() == null || data.getFastTrackPenalNoticeToggle().isEmpty()).isTrue();
+        }
+
+        @Test
+        void shouldSetPenalNoticeTogglesToEmptyListByDefault() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build();
+            given(locationRefDataService.getHearingCourtLocations(anyString())).willReturn(Collections.emptyList());
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
+                "Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
+                categorySearchResult));
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            // Empty lists may be serialized as null during JSON conversion, both are acceptable for "default/false" state
+            assertThat(data.getSmallClaimsPenalNoticeToggle() == null || data.getSmallClaimsPenalNoticeToggle().isEmpty()).isTrue();
+            assertThat(data.getFastTrackPenalNoticeToggle() == null || data.getFastTrackPenalNoticeToggle().isEmpty()).isTrue();
         }
 
         @Test

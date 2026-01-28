@@ -233,18 +233,15 @@ public class SdoHelper {
     }
 
     public static SmallTrack getSmallClaimsAdditionalDirectionEnum(String additionalDirection) {
-        switch (additionalDirection) {
-            case "smallClaimCreditHire":
-                return SmallTrack.smallClaimCreditHire;
-            case "smallClaimRoadTrafficAccident":
-                return SmallTrack.smallClaimRoadTrafficAccident;
-            case "smallClaimDisputeResolutionHearing":
-                return SmallTrack.smallClaimDisputeResolutionHearing;
-            case "smallClaimFlightDelay":
-                return SmallTrack.smallClaimFlightDelay;
-            default:
-                return null;
-        }
+        return switch (additionalDirection) {
+            case "smallClaimCreditHire" -> SmallTrack.smallClaimCreditHire;
+            case "smallClaimRoadTrafficAccident" -> SmallTrack.smallClaimRoadTrafficAccident;
+            case "smallClaimDisputeResolutionHearing" -> SmallTrack.smallClaimDisputeResolutionHearing;
+            case "smallClaimFlightDelay" -> SmallTrack.smallClaimFlightDelay;
+            case "smallClaimHousingDisrepair" -> SmallTrack.smallClaimHousingDisrepair;
+            case "smallClaimPPI" -> SmallTrack.smallClaimPPI;
+            default -> null;
+        };
     }
 
     public static boolean hasSmallAdditionalDirections(CaseData caseData, String additionalDirection) {
@@ -420,30 +417,25 @@ public class SdoHelper {
                 return caseData.getSmallClaimsMediationSectionStatement() != null;
             case "sdoR2SmallClaimsUseOfWelshToggle":
                 return caseData.getSdoR2SmallClaimsUseOfWelshToggle() != null;
+            case "smallClaimsPenalNoticeToggle":
+                return caseData.getSmallClaimsPenalNoticeToggle() != null;
             default:
                 return false;
         }
     }
 
     public static FastTrack getFastTrackAdditionalDirectionEnum(String additionalDirection) {
-        switch (additionalDirection) {
-            case "fastClaimBuildingDispute":
-                return FastTrack.fastClaimBuildingDispute;
-            case "fastClaimClinicalNegligence":
-                return FastTrack.fastClaimClinicalNegligence;
-            case "fastClaimCreditHire":
-                return FastTrack.fastClaimCreditHire;
-            case "fastClaimEmployersLiability":
-                return FastTrack.fastClaimEmployersLiability;
-            case "fastClaimHousingDisrepair":
-                return FastTrack.fastClaimHousingDisrepair;
-            case "fastClaimPersonalInjury":
-                return FastTrack.fastClaimPersonalInjury;
-            case "fastClaimRoadTrafficAccident":
-                return FastTrack.fastClaimRoadTrafficAccident;
-            default:
-                return null;
-        }
+        return switch (additionalDirection) {
+            case "fastClaimBuildingDispute" -> FastTrack.fastClaimBuildingDispute;
+            case "fastClaimClinicalNegligence" -> FastTrack.fastClaimClinicalNegligence;
+            case "fastClaimCreditHire" -> FastTrack.fastClaimCreditHire;
+            case "fastClaimEmployersLiability" -> FastTrack.fastClaimEmployersLiability;
+            case "fastClaimHousingDisrepair" -> FastTrack.fastClaimHousingDisrepair;
+            case "fastClaimPersonalInjury" -> FastTrack.fastClaimPersonalInjury;
+            case "fastClaimRoadTrafficAccident" -> FastTrack.fastClaimRoadTrafficAccident;
+            case "fastClaimPPI" -> FastTrack.fastClaimPPI;
+            default -> null;
+        };
     }
 
     public static boolean hasFastAdditionalDirections(CaseData caseData, String additionalDirection) {
@@ -491,6 +483,8 @@ public class SdoHelper {
                 return caseData.getSdoR2FastTrackUseOfWelshToggle() != null;
             case "fastTrackTrialBundleToggle":
                 return caseData.getFastTrackTrialBundleToggle() != null;
+            case "fastTrackPenalNoticeToggle":
+                return caseData.getFastTrackPenalNoticeToggle() != null;
             default:
                 return false;
         }

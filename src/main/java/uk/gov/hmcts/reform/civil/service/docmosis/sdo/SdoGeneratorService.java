@@ -220,6 +220,7 @@ public class SdoGeneratorService {
     }
 
     private SdoDocumentFormFast getTemplateDataFast(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
+        boolean hasPpi = SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimPPI");
         var sdoDocumentFormBuilder = SdoDocumentFormFast.builder()
             .writtenByJudge(isJudge)
             .currentDate(LocalDate.now())
@@ -265,6 +266,7 @@ public class SdoGeneratorService {
             .hasRoadTrafficAccident(
                 SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimRoadTrafficAccident")
             )
+            .hasPaymentProtectionInsurance(hasPpi)
             .fastTrackJudgesRecital(caseData.getFastTrackJudgesRecital())
             .fastTrackDisclosureOfDocuments(caseData.getFastTrackDisclosureOfDocuments())
             .fastTrackSchedulesOfLoss(caseData.getFastTrackSchedulesOfLoss())
@@ -282,6 +284,7 @@ public class SdoGeneratorService {
             .fastTrackHousingDisrepair(caseData.getFastTrackHousingDisrepair())
             .fastTrackPersonalInjury(caseData.getFastTrackPersonalInjury())
             .fastTrackRoadTrafficAccident(caseData.getFastTrackRoadTrafficAccident())
+            .fastTrackPPI(hasPpi ? caseData.getFastTrackPPI() : null)
             .hasNewDirections(
                 SdoHelper.hasFastTrackVariable(caseData, "fastTrackAddNewDirections")
             )
@@ -338,6 +341,8 @@ public class SdoGeneratorService {
                 SdoHelper.hasFastTrackVariable(caseData, "sdoR2FastTrackUseOfWelshToggle"))
             .welshLanguageDescription(caseData.getSdoR2FastTrackUseOfWelshLanguage() != null
                                           ? caseData.getSdoR2FastTrackUseOfWelshLanguage().getDescription() : null);
+        sdoDocumentFormBuilder.showPenalNotice(SdoHelper.hasFastTrackVariable(caseData, "fastTrackPenalNoticeToggle"))
+            .penalNoticeText(caseData.getFastTrackPenalNotice());
         sdoDocumentFormBuilder.sdoR2WitnessesOfFact(caseData.getSdoR2FastTrackWitnessOfFact())
             .sdoR2FastTrackCreditHire(caseData.getSdoR2FastTrackCreditHire());
 
@@ -433,6 +438,7 @@ public class SdoGeneratorService {
 
     private SdoDocumentFormSmall getTemplateDataSmall(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
         boolean carmEnabled = featureToggleService.isCarmEnabledForCase(caseData);
+        boolean hasPpi = SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimPPI");
         SdoDocumentFormSmall.SdoDocumentFormSmallBuilder sdoDocumentFormBuilder = SdoDocumentFormSmall.builder()
             .writtenByJudge(isJudge)
             .currentDate(LocalDate.now())
@@ -458,6 +464,7 @@ public class SdoGeneratorService {
             .hasRoadTrafficAccident(
                 SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimRoadTrafficAccident")
             )
+            .hasPaymentProtectionInsurance(hasPpi)
             .smallClaimsJudgesRecital(caseData.getSmallClaimsJudgesRecital())
             .smallClaimsHearing(caseData.getSmallClaimsHearing())
             .smallClaimsHearingTime(
@@ -476,6 +483,7 @@ public class SdoGeneratorService {
             .smallClaimsDocuments(caseData.getSmallClaimsDocuments())
             .smallClaimsCreditHire(caseData.getSmallClaimsCreditHire())
             .smallClaimsRoadTrafficAccident(caseData.getSmallClaimsRoadTrafficAccident())
+            .smallClaimsPPI(hasPpi ? caseData.getSmallClaimsPPI() : null)
             .hasNewDirections(
                 SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsAddNewDirections")
             )
@@ -506,7 +514,9 @@ public class SdoGeneratorService {
             .smallClaimsFlightDelay(caseData.getSmallClaimsFlightDelay())
             .smallClaimsWelshLanguageToggle(SdoHelper.hasSmallClaimsVariable(caseData, "sdoR2SmallClaimsUseOfWelshToggle"))
             .welshLanguageDescription(caseData.getSdoR2SmallClaimsUseOfWelshLanguage() != null ? caseData.getSdoR2SmallClaimsUseOfWelshLanguage().getDescription() : null)
-            .sdoR2SmallClaimsWitnessStatements(caseData.getSdoR2SmallClaimsWitnessStatementOther());
+            .sdoR2SmallClaimsWitnessStatements(caseData.getSdoR2SmallClaimsWitnessStatementOther())
+            .showPenalNotice(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsPenalNoticeToggle"))
+            .penalNoticeText(caseData.getSmallClaimsPenalNotice());
 
         sdoDocumentFormBuilder.hearingLocation(
                 locationHelper.getHearingLocation(
