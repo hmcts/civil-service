@@ -18,7 +18,7 @@ INSERT INTO claim_ref_prefix (series_key, idx, prefix) VALUES
   ('spec', 3, 'JG'),
   ('spec', 4, 'JH'),
   ('spec', 5, 'JJ'),
-  ('spec', 6, 'JK');
+  ('spec', 6, 'JL');
 
 INSERT INTO claim_ref_prefix (series_key, idx, prefix) VALUES
   ('unspec', 1, 'KA'),
