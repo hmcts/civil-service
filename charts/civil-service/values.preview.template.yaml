@@ -437,7 +437,7 @@ am-org-role-mapping-service:
       JRD_TOPIC_NAME: "{{ .Release.Name}}-servicebus-jrd-topic"
       AMQP_CRD_SHARED_ACCESS_KEY_VALUE: "$(SB_ACCESS_KEY)"
       AMQP_JRD_SHARED_ACCESS_KEY_VALUE: "$(SB_ACCESS_KEY)"
-      ORG_ROLE_MAPPING_DB_HOST: ${SERVICE_NAME}-postgresql
+      ORG_ROLE_MAPPING_DB_HOST: "{{ .Release.Name }}-postgresql"
       ORG_ROLE_MAPPING_DB_NAME: "org_role_mapping"
       ORG_ROLE_MAPPING_DB_USERNAME: ${POSTGRES_USER}
       ORG_ROLE_MAPPING_DB_PASSWORD: ${POSTGRES_PASSWORD}
