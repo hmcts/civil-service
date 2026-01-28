@@ -24,7 +24,6 @@ def copyPrevFailedAndNotExecutedTestFilesJson() {
   while (!buildFound && buildNumber > minBuildNumber) {
     try {
       copyArtifacts projectName: env.JOB_NAME, selector: specific("${buildNumber}"), filter: "test-results/functional/testFilesReport.json"
-      copyArtifacts projectName: env.JOB_NAME, selector: specific("${buildNumber}"), filter: "test-results/functional/prevFtType.txt"
       buildFound = true
     } catch (Exception error) {
       echo "artifact not found: " + error.toString()
