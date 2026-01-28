@@ -73,14 +73,14 @@ public class CasesControllerTest extends BaseIntegrationTest {
     private static final String SUBMIT_EVENT_URL = "/cases/{caseId}/citizen/{submitterId}/event";
     private static final String CASEWORKER_SUBMIT_EVENT_URL = "/cases/caseworkers/create-case/{userId}";
     private static final String CASEWORKER_SEARCH_CASE_URL = "/cases/caseworker/searchCaseForSDT/{userId}?sdtRequestId=isUnique";
-    private static final String VALIDATE_POSTCODE_URL = "/cases/caseworker/validatePin/?postCode=rfft";
+    private static final String VALIDATE_POSTCODE_URL = "/cases/caseworker/validatePin?postCode=rfft";
 
     private static final String CALCULATE_DEADLINE_URL = "/cases/response/deadline";
     private static final String AGREED_RESPONSE_DEADLINE_DATE_URL = "/cases/response/agreeddeadline/{claimId}";
     private static final String USER_CASE_ROLES = "/cases/{caseId}/userCaseRoles";
     private static final String COURT_DECISION_URL = "/cases/{caseId}/courtDecision";
 
-    private static final String GA_CLAIMS_LIST_URL = "/cases/ga/";
+    private static final String GA_CLAIMS_LIST_URL = "/cases/ga";
     private static final String GA_SUBMIT_EVENT_URL = "/cases/{caseId}/ga/citizen/{submitterId}/event";
     private static final String GA_CASE_APP_URL = "/cases/{caseId}/ga/applications";
 

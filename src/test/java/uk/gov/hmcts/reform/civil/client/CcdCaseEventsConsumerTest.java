@@ -131,6 +131,7 @@ public class CcdCaseEventsConsumerTest {
         when(receiverClient.receiveMessages(1)).thenReturn(new IterableStream<>(Flux.empty()));
 
         Thread consumer = new Thread(ccdCaseEventsConsumer);
+        consumer.setDaemon(true);
         consumer.start();
 
         await()
@@ -140,16 +141,19 @@ public class CcdCaseEventsConsumerTest {
                 verify(receiverClient, atLeastOnce()).receiveMessages(1);
             });
         ccdCaseEventsConsumer.stop();
+        joinConsumer(consumer);
     }
 
     @Test
     void should_stop_consume_messages_when_consumer_stop_is_called() {
         ccdCaseEventsConsumer.stop();
         Thread consumer = new Thread(ccdCaseEventsConsumer);
+        consumer.setDaemon(true);
         consumer.start();
 
         verify(sessionReceiverClient, never()).acceptNextSession();
         verify(receiverClient, never()).receiveMessages(1);
+        joinConsumer(consumer);
     }
 
     private void publishMessageToReceiver() {
@@ -177,4 +181,12 @@ public class CcdCaseEventsConsumerTest {
 
     }
 
+    private void joinConsumer(Thread consumer) {
+        try {
+            consumer.join(TimeUnit.SECONDS.toMillis(1));
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new AssertionError("Consumer thread interrupted", ex);
+        }
+    }
 }

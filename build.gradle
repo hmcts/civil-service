@@ -5,7 +5,7 @@ plugins {
   id 'checkstyle'
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.1.7'
-  id 'org.springframework.boot' version '2.7.18'
+  id 'org.springframework.boot' version '3.3.7'
   id 'org.owasp.dependencycheck' version '12.1.3'
   id 'com.github.ben-manes.versions' version '0.52.0'
   id 'org.sonarqube' version '6.2.0.5505'
@@ -20,26 +20,24 @@ group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
 
 def versions = [
-  junit             : '5.11.4',
-  junitPlatform     : '1.11.4',
+  junit             : '5.12.2',
+  junitPlatform     : '1.12.2',
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.0',
   lombok            : '1.18.38',
-  springSecurity    : '5.8.16',
   camunda           : '7.20.0',
-  jackson           : '2.19.2',
   testcontainers    : '1.21.3',
   pdfbox            : '3.0.5',
   tika              : '3.2.2'
 ]
 
 allprojects {
-  sourceCompatibility = JavaVersion.VERSION_17
-  targetCompatibility = JavaVersion.VERSION_17
+  sourceCompatibility = JavaVersion.VERSION_21
+  targetCompatibility = JavaVersion.VERSION_21
 
   java {
     toolchain {
-      languageVersion = JavaLanguageVersion.of(17)
+      languageVersion = JavaLanguageVersion.of(21)
     }
   }
 
@@ -58,7 +56,7 @@ allprojects {
   }
 
   jacoco {
-    toolVersion = '0.8.8' // jacocoMavenPluginVersion
+    toolVersion = '0.8.12' // jacocoMavenPluginVersion
     reportsDirectory = file("$buildDir/reports/jacoco")
   }
 
@@ -100,48 +98,19 @@ allprojects {
         entry 'guava'
       }
 
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.9.25'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.9.25'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.9.25'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.9.25'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.9.25'
-
       dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '5.2.1'
-
-      //Solves CVE-2023-34034
-      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.5.2'
-
-      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
-      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
-      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: versions.jackson
-      dependency group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: versions.jackson
 
       // To prevent other libraries using conflicting versions
       dependency group: 'org.slf4j', name: 'slf4j-nop', version: '2.0.17'
 
-      // solves CVE-2022-25857
-      dependencySet(
-        group: 'org.yaml',
-        version: '2.4'
-      ) {
-        entry 'snakeyaml'
-      }
-
-      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.43') {
-        entry 'tomcat-embed-core'
-        entry 'tomcat-embed-el'
-        entry 'tomcat-embed-websocket'
-      }
-
-      //Solves CVE-2023-6481
-      dependencySet(group: 'ch.qos.logback', version: '1.2.13') {
-        entry 'logback-core'
-        entry 'logback-classic'
+      dependencySet(group: 'org.apache.httpcomponents.core5', version: '5.3.6') {
+        entry 'httpcore5'
+        entry 'httpcore5-h2'
       }
 
     }
     imports {
-      mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.9'
+      mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2023.0.3'
       mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.23.0"
     }
   }
@@ -180,12 +149,13 @@ sourceSets {
 }
 
 tasks.withType(JavaCompile) {
-  options.compilerArgs << "-Xlint:unchecked" << "-Werror"
+  options.compilerArgs << "-Xlint:unchecked" << "-Xlint:-removal" << "-Werror"
 }
 
 tasks.withType(Test) {
   useJUnitPlatform()
   maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+  jvmArgs '-Xshare:off'
   testLogging {
     exceptionFormat = 'full'
   }
@@ -378,16 +348,16 @@ dependencies {
 
   // CVE-2025-48734 force update of commons-beanutils.
   implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'
-  implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.8.0'
+  implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.6.0'
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.7'
-  implementation group: 'javax.persistence', name: 'javax.persistence-api'
+  implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.1.0'
 
   implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.49.5'
-  implementation group: 'org.jdbi', name: 'jdbi3-spring4', version: '3.19.0'
+  implementation group: 'org.jdbi', name: 'jdbi3-spring5', version: '3.49.5'
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
 
-  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.10.RELEASE'
+  implementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '10.22.0'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-openfeign-core'
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.2'
@@ -395,9 +365,10 @@ dependencies {
   implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.6'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
-  implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.9'
-  implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: '6.1.9'
+  implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '7.0.0'
+  implementation group: 'com.microsoft.azure', name: 'applicationinsights-web', version: '3.6.2'
 
+  implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
   implementation group: 'com.github.hmcts', name: 'core-case-data-store-client', version: '5.1.1'
   implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
   implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '3.0.23.1'
@@ -419,13 +390,13 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
   implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.2'
 
-  implementation group: 'org.springframework.security', name: 'spring-security-web', version: versions.springSecurity
-  implementation group: 'org.springframework.security', name: 'spring-security-config', version: versions.springSecurity
-  implementation group: 'org.springframework.security', name: 'spring-security-core', version: versions.springSecurity
-  implementation group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server', version: versions.springSecurity
-  implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: versions.springSecurity
-  implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose', version: versions.springSecurity
-  implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core', version: versions.springSecurity
+  implementation group: 'org.springframework.security', name: 'spring-security-web'
+  implementation group: 'org.springframework.security', name: 'spring-security-config'
+  implementation group: 'org.springframework.security', name: 'spring-security-core'
+  implementation group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server'
+  implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client'
+  implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose'
+  implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core'
   implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.5'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.12.6'
   implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.2'
@@ -437,14 +408,12 @@ dependencies {
     }
   }
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.1'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.107'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.43'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.29'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.8'
 
-  implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: versions.jackson
-  implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
-  implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-csv', version: versions.jacksonDatabind
+  implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin'
+  implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310'
+  implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-csv'
 
   implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: versions.camunda
   implementation group: 'org.camunda.community.rest', name: 'camunda-platform-7-rest-client-spring-boot-starter', version: versions.camunda
@@ -453,9 +422,11 @@ dependencies {
   implementation group: 'org.apiguardian', name: 'apiguardian-api', version: '1.1.2'
 
   // JAX-B dependencies for JDK 9+
-  implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
   implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.2'
   implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.5'
+  implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+  runtimeOnly group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.8'
+  runtimeOnly group: 'com.sun.activation', name: 'javax.activation', version: '1.2.0'
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
@@ -465,10 +436,11 @@ dependencies {
   implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: versions.pdfbox
   implementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox
 
-  implementation group: 'com.github.hmcts', name: 'auth-checker-lib', version: '2.1.5'
+  implementation group: 'com.github.hmcts', name: 'auth-checker-lib', version: '3.1.1'
 
   implementation 'org.apache.poi:poi:5.4.0'
   implementation 'org.apache.poi:poi-ooxml:5.4.0'
+  implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.5.1'
 
   testImplementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox
   testImplementation group: 'org.apache.pdfbox', name: 'preflight', version: versions.pdfbox, withoutJunit4
@@ -482,6 +454,7 @@ dependencies {
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
   testImplementation libraries.junit5
+  testRuntimeOnly "org.junit.platform:junit-platform-launcher:${versions.junitPlatform}"
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
   testImplementation group: 'io.rest-assured', name: 'rest-assured'
@@ -643,13 +616,26 @@ tasks.register('runProviderPactVerification') {
 }
 
 tasks.withType(Test).configureEach { t ->
+  useJUnitPlatform()
+
+  // Pipeline-stable settings with JaCoCo enabled
+  maxParallelForks = 1
+  forkEvery = 50
+
+  // Keep within typical Jenkins container limits
+  minHeapSize = "256m"
+  maxHeapSize = "1536m"
+  jvmArgs "-XX:MaxMetaspaceSize=512m"
+  // Temurin 21.0.7 occasionally crashes in C2 (BoolNode::Ideal SIGSEGV); stay on C1 until upstream fix.
+  jvmArgs "-XX:TieredStopAtLevel=1"
+
   testLogging {
     exceptionFormat = 'full'
     showCauses = true
     showExceptions = true
     showStackTraces = true
-    showStandardStreams = true
-    events "passed", "skipped", "failed", "standard_out", "standard_error"
+    showStandardStreams = false
+    events "failed", "skipped"
   }
 
   if (project.hasProperty('pact.verifier.publishResults')) {
