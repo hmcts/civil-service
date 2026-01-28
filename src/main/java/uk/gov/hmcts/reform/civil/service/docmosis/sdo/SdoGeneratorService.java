@@ -220,6 +220,7 @@ public class SdoGeneratorService {
     }
 
     private SdoDocumentFormFast getTemplateDataFast(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
+        boolean hasPpi = SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimPPI");
         var sdoDocumentFormBuilder = SdoDocumentFormFast.builder()
             .writtenByJudge(isJudge)
             .currentDate(LocalDate.now())
@@ -265,6 +266,7 @@ public class SdoGeneratorService {
             .hasRoadTrafficAccident(
                 SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimRoadTrafficAccident")
             )
+            .hasPaymentProtectionInsurance(hasPpi)
             .fastTrackJudgesRecital(caseData.getFastTrackJudgesRecital())
             .fastTrackDisclosureOfDocuments(caseData.getFastTrackDisclosureOfDocuments())
             .fastTrackSchedulesOfLoss(caseData.getFastTrackSchedulesOfLoss())
@@ -282,6 +284,7 @@ public class SdoGeneratorService {
             .fastTrackHousingDisrepair(caseData.getFastTrackHousingDisrepair())
             .fastTrackPersonalInjury(caseData.getFastTrackPersonalInjury())
             .fastTrackRoadTrafficAccident(caseData.getFastTrackRoadTrafficAccident())
+            .fastTrackPPI(hasPpi ? caseData.getFastTrackPPI() : null)
             .hasNewDirections(
                 SdoHelper.hasFastTrackVariable(caseData, "fastTrackAddNewDirections")
             )
@@ -435,6 +438,7 @@ public class SdoGeneratorService {
 
     private SdoDocumentFormSmall getTemplateDataSmall(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
         boolean carmEnabled = featureToggleService.isCarmEnabledForCase(caseData);
+        boolean hasPpi = SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimPPI");
         SdoDocumentFormSmall.SdoDocumentFormSmallBuilder sdoDocumentFormBuilder = SdoDocumentFormSmall.builder()
             .writtenByJudge(isJudge)
             .currentDate(LocalDate.now())
@@ -460,6 +464,7 @@ public class SdoGeneratorService {
             .hasRoadTrafficAccident(
                 SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimRoadTrafficAccident")
             )
+            .hasPaymentProtectionInsurance(hasPpi)
             .smallClaimsJudgesRecital(caseData.getSmallClaimsJudgesRecital())
             .smallClaimsHearing(caseData.getSmallClaimsHearing())
             .smallClaimsHearingTime(
@@ -478,6 +483,7 @@ public class SdoGeneratorService {
             .smallClaimsDocuments(caseData.getSmallClaimsDocuments())
             .smallClaimsCreditHire(caseData.getSmallClaimsCreditHire())
             .smallClaimsRoadTrafficAccident(caseData.getSmallClaimsRoadTrafficAccident())
+            .smallClaimsPPI(hasPpi ? caseData.getSmallClaimsPPI() : null)
             .hasNewDirections(
                 SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsAddNewDirections")
             )
