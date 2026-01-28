@@ -32,9 +32,11 @@ import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -125,27 +127,30 @@ class PiPLetterGeneratorTest {
     void shouldGenerateAndDownloadLetterSuccessfully() {
         // Given
         CaseData caseData = buildCaseData(YesOrNo.NO, null);
-
+        List<String> filenames = new ArrayList<>();
         // When
-        byte[] downloadedLetter = piPLetterGenerator.downloadLetter(caseData, BEARER_TOKEN);
+        byte[] downloadedLetter = piPLetterGenerator.downloadLetter(caseData, BEARER_TOKEN, filenames);
 
         // Then
         assertThat(downloadedLetter).isEqualTo(STITCHED_DOC_BYTES);
         verify(documentGeneratorService).generateDocmosisDocument(LETTER_TEMPLATE_DATA, PIN_IN_THE_POST_LETTER);
+        assertEquals(2, filenames.size());
     }
 
     @Test
     void shouldGenerateClaimFormWithClaimTimeLineDocs_whenUploadedByApplicant() {
         // Given
         CaseData caseData = buildCaseData(YES, setupParticularsOfClaimDocs());
+        List<String> filenames = new ArrayList<>();
 
         // When
-        piPLetterGenerator.downloadLetter(caseData, BEARER_TOKEN);
+        piPLetterGenerator.downloadLetter(caseData, BEARER_TOKEN, filenames);
 
         // Then
         verify(documentGeneratorService).generateDocmosisDocument(LETTER_TEMPLATE_DATA, PIN_IN_THE_POST_LETTER);
         verify(civilStitchService).generateStitchedCaseDocument(eq(specClaimTimelineDocuments),
                                                                 anyString(), anyLong(), eq(PIP_LETTER), anyString());
+        assertEquals(2, filenames.size());
     }
 
     private CaseData buildCaseData(YesOrNo respondent1Represented, ServedDocumentFiles servedDocumentFiles) {

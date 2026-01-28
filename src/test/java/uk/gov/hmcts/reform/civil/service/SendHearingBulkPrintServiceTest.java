@@ -28,8 +28,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DECISION_MADE_ON_APPLICATIONS_TRANSLATED;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DECISION_MADE_ON_APPLICATIONS;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DECISION_MADE_ON_APPLICATIONS_TRANSLATED;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_FORM;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -66,22 +66,22 @@ class SendHearingBulkPrintServiceTest {
         CaseDocument caseDocument = new CaseDocument();
         caseDocument.setDocumentType(documentType);
         caseDocument.setDocumentLink(DOCUMENT_LINK);
-        
+
         RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
         respondentLiPResponse.setRespondent1ResponseLanguage(respondentResponse);
         CaseDataLiP caseDataLiP = new CaseDataLiP();
         caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
-        
+
         WelshLanguageRequirements appWelshLang = new WelshLanguageRequirements();
         appWelshLang.setDocuments(appDocLang);
         Applicant1DQ applicant1DQ = new Applicant1DQ();
         applicant1DQ.setApplicant1DQLanguage(appWelshLang);
-        
+
         WelshLanguageRequirements defWelshLang = new WelshLanguageRequirements();
         defWelshLang.setDocuments(defDocLang);
         Respondent1DQ respondent1DQ = new Respondent1DQ();
         respondent1DQ.setRespondent1DQLanguage(defWelshLang);
-        
+
         CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(caseDocument))
             .respondent1(party)
@@ -99,13 +99,14 @@ class SendHearingBulkPrintServiceTest {
         return caseData;
     }
 
-    private void verifyPrintLetter(CaseData caseData, Party party) {
+    private void verifyPrintLetter(CaseData caseData, Party party, List<String> fileNames) {
         verify(bulkPrintService).printLetter(
             LETTER_CONTENT,
             caseData.getLegacyCaseReference(),
             caseData.getLegacyCaseReference(),
             SDO_HEARING_PACK_LETTER_TYPE,
-            List.of(party.getPartyName())
+            List.of(party.getPartyName()),
+            fileNames
         );
     }
 
@@ -115,7 +116,8 @@ class SendHearingBulkPrintServiceTest {
             caseData.getLegacyCaseReference(),
             caseData.getLegacyCaseReference(),
             DECISION_PACK_LETTER_TYPE,
-            List.of(party.getPartyName())
+            List.of(party.getPartyName()),
+            List.of("test")
         );
     }
 
@@ -131,7 +133,7 @@ class SendHearingBulkPrintServiceTest {
         sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT, false);
 
         // then
-        verifyPrintLetter(caseData, respondent1);
+        verifyPrintLetter(caseData, respondent1, List.of("test"));
     }
 
     @Test
@@ -146,7 +148,7 @@ class SendHearingBulkPrintServiceTest {
         sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT_HMC, false);
 
         // then
-        verifyPrintLetter(caseData, respondent1);
+        verifyPrintLetter(caseData, respondent1, List.of("test"));
     }
 
     @Test
@@ -161,7 +163,7 @@ class SendHearingBulkPrintServiceTest {
         sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT, false);
 
         // then
-        verifyPrintLetter(caseData, claimant);
+        verifyPrintLetter(caseData, claimant, List.of("test"));
     }
 
     @Test
@@ -243,7 +245,7 @@ class SendHearingBulkPrintServiceTest {
         sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT, true);
 
         // then
-        verifyPrintLetter(caseData, claimant);
+        verifyPrintLetter(caseData, claimant, List.of("test", "test"));
     }
 
     @Test
@@ -259,7 +261,7 @@ class SendHearingBulkPrintServiceTest {
         sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT, true);
 
         // then
-        verifyPrintLetter(caseData, claimant);
+        verifyPrintLetter(caseData, claimant, List.of("test"));
     }
 
     @Test
@@ -275,7 +277,7 @@ class SendHearingBulkPrintServiceTest {
         sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT, false);
 
         // then
-        verifyPrintLetter(caseData, claimant);
+        verifyPrintLetter(caseData, claimant, List.of("test"));
     }
 
     @Test
@@ -291,7 +293,7 @@ class SendHearingBulkPrintServiceTest {
         sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT, true);
 
         // then
-        verifyPrintLetter(caseData, claimant);
+        verifyPrintLetter(caseData, claimant, List.of("test", "test"));
     }
 
     @Test
@@ -307,7 +309,7 @@ class SendHearingBulkPrintServiceTest {
         sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT, true);
 
         // then
-        verifyPrintLetter(caseData, claimant);
+        verifyPrintLetter(caseData, claimant, List.of("test", "test"));
     }
 
     @Test
@@ -323,7 +325,7 @@ class SendHearingBulkPrintServiceTest {
         sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT, true);
 
         // then
-        verifyPrintLetter(caseData, claimant);
+        verifyPrintLetter(caseData, claimant, List.of("test"));
     }
 
     @Test

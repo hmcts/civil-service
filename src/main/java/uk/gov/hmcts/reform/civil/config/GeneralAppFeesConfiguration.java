@@ -19,6 +19,7 @@ public class GeneralAppFeesConfiguration {
     private final String consentedOrWithoutNoticeKeyword;
     private final String appnToVaryOrSuspend;
     private final String certificateOfSatisfaction;
+    private final String applicationUncloakAdditionalFee;
 
     public GeneralAppFeesConfiguration(
             @Value("${fees.api.url}") String url,
@@ -31,7 +32,8 @@ public class GeneralAppFeesConfiguration {
             @Value("${genApp.fee.keywords.withNotice}") String withNoticeKeyword,
             @Value("${genApp.fee.keywords.consentedOrWithoutNotice}") String consentedOrWithoutNoticeKeyword,
             @Value("${genApp.fee.keywords.appnToVaryOrSuspend}") String appnToVaryOrSuspend,
-            @Value("${genApp.fee.keywords.certificateOfSatisfaction}") String certificateOfSatisfaction) {
+            @Value("${genApp.fee.keywords.certificateOfSatisfaction}") String certificateOfSatisfaction,
+            @Value("${genApp.fee.keywords.uncloakFee}") String applicationUncloakAdditionalFee) {
         this.url = url;
         this.endpoint = endpoint;
         this.service = service;
@@ -43,5 +45,6 @@ public class GeneralAppFeesConfiguration {
         this.consentedOrWithoutNoticeKeyword = consentedOrWithoutNoticeKeyword;
         this.appnToVaryOrSuspend = appnToVaryOrSuspend;
         this.certificateOfSatisfaction = certificateOfSatisfaction;
+        this.applicationUncloakAdditionalFee = applicationUncloakAdditionalFee;
     }
 }
