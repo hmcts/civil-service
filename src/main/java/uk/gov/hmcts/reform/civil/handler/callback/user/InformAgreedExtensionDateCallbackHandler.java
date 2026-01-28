@@ -141,22 +141,31 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
 
     private void setMaxAllowedExtensionDate(CallbackParams callbackParams, CaseData caseData) {
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        Long ccdCaseReference = caseData.getCcdCaseReference();
 
         if (isUserHasCaseRole(caseData, userInfo, CaseRole.RESPONDENTSOLICITORONE)) {
+            LocalDate notificationDate = getDeemedServedDate(caseData, RESPONDENTSOLICITORONE);
+            log.info("Setting max allowed extension date base on notification date {} and respondent1 for caseID {}",
+                     notificationDate, ccdCaseReference
+            );
             caseData.setRespondentSolicitor1AgreedDeadlineExtension(validator.getMaxDate(
-                getCosDateDeemedServedForDefendantOrNotificationDate(caseData, CaseRole.RESPONDENTSOLICITORONE),
+                notificationDate,
                 caseData.getRespondent1AcknowledgeNotificationDate()
             ));
         }
         if (isUserHasCaseRole(caseData, userInfo, CaseRole.RESPONDENTSOLICITORTWO)) {
+            LocalDate notificationDate = getDeemedServedDate(caseData, RESPONDENTSOLICITORTWO);
+            log.info("Setting max allowed extension date base on notification date {} and respondent2 for caseID {}",
+                     notificationDate, ccdCaseReference
+            );
             caseData.setRespondentSolicitor2AgreedDeadlineExtension(validator.getMaxDate(
-                getCosDateDeemedServedForDefendantOrNotificationDate(caseData, CaseRole.RESPONDENTSOLICITORTWO),
+                notificationDate,
                 caseData.getRespondent2AcknowledgeNotificationDate()
             ));
         }
     }
 
-    private LocalDate getCosDateDeemedServedForDefendantOrNotificationDate(CaseData caseData, CaseRole caseRole) {
+    private LocalDate getDeemedServedDate(CaseData caseData, CaseRole caseRole) {
         if (RESPONDENTSOLICITORONE.equals(caseRole)) {
             CertificateOfService cosNotifyClaimDefendant1 = caseData.getCosNotifyClaimDetails1();
             if (cosNotifyClaimDefendant1 != null && cosNotifyClaimDefendant1.getCosDateDeemedServedForDefendant() != null) {
