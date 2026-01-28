@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardNotificationHelper;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardTasksHelper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
@@ -34,6 +35,8 @@ class FinalOrderDefendantDashboardServiceTest {
     private FeatureToggleService featureToggleService;
     @Mock
     private DashboardNotificationHelper dashboardDecisionHelper;
+    @Mock
+    private DashboardTasksHelper dashboardTasksHelper;
 
     @InjectMocks
     private FinalOrderDefendantDashboardService finalOrderDefendantDashboardService;
@@ -57,6 +60,7 @@ class FinalOrderDefendantDashboardServiceTest {
             caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(new HashMap<>()).build()
         );
+        verify(dashboardTasksHelper).makeTasksInactiveForDefendant(caseData);
     }
 
     @Test
@@ -79,6 +83,7 @@ class FinalOrderDefendantDashboardServiceTest {
             caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(new HashMap<>()).build()
         );
+        verify(dashboardTasksHelper).makeTasksInactiveForDefendant(caseData);
     }
 
     @Test
@@ -94,6 +99,7 @@ class FinalOrderDefendantDashboardServiceTest {
         finalOrderDefendantDashboardService.notifyFinalOrder(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
+        verify(dashboardTasksHelper).makeTasksInactiveForDefendant(caseData);
     }
 
     @Test
@@ -110,6 +116,7 @@ class FinalOrderDefendantDashboardServiceTest {
         finalOrderDefendantDashboardService.notifyFinalOrder(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
+        verify(dashboardTasksHelper).makeTasksInactiveForDefendant(caseData);
     }
 
     @Test
@@ -127,5 +134,6 @@ class FinalOrderDefendantDashboardServiceTest {
         finalOrderDefendantDashboardService.notifyFinalOrder(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
+        verify(dashboardTasksHelper).makeTasksInactiveForDefendant(caseData);
     }
 }

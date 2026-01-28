@@ -3,9 +3,10 @@ package uk.gov.hmcts.reform.civil.service.dashboardnotifications.createsdo;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardNotificationHelper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardNotificationHelper;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardTasksHelper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
@@ -27,16 +28,21 @@ public class CreateSdoClaimantDashboardService extends DashboardScenarioService 
     private final FeatureToggleService featureToggleService;
     private final DashboardNotificationHelper dashboardDecisionHelper;
     private final CreateSdoDashboardDate createSdoDashboardDate;
+    private final DashboardTasksHelper dashboardTasksHelper;
+
+    private String selectedScenario;
 
     public CreateSdoClaimantDashboardService(DashboardScenariosService dashboardScenariosService,
                                              DashboardNotificationsParamsMapper mapper,
                                              FeatureToggleService featureToggleService,
                                              DashboardNotificationHelper dashboardDecisionHelper,
-                                             CreateSdoDashboardDate createSdoDashboardDate) {
+                                             CreateSdoDashboardDate createSdoDashboardDate,
+                                             DashboardTasksHelper dashboardTasksHelper) {
         super(dashboardScenariosService, mapper);
         this.featureToggleService = featureToggleService;
         this.dashboardDecisionHelper = dashboardDecisionHelper;
         this.createSdoDashboardDate = createSdoDashboardDate;
+        this.dashboardTasksHelper = dashboardTasksHelper;
     }
 
     public void notifySdoCreated(CaseData caseData, String authToken) {
@@ -46,27 +52,27 @@ public class CreateSdoClaimantDashboardService extends DashboardScenarioService 
     @Override
     protected String getScenario(CaseData caseData) {
 
-        final String scenario;
-
         if (dashboardDecisionHelper.isEligibleForReconsideration(caseData)
             && Objects.isNull(caseData.getIsReferToJudgeClaim())) {
-            scenario = SCENARIO_AAA6_CP_SDO_MADE_BY_LA_CLAIMANT.getScenario();
+            dashboardTasksHelper.makeTasksInactiveForClaimant(caseData);
+            selectedScenario = SCENARIO_AAA6_CP_SDO_MADE_BY_LA_CLAIMANT.getScenario();
         } else if (dashboardDecisionHelper.isCarmApplicableCase(caseData)
             && dashboardDecisionHelper.isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(caseData)
             && dashboardDecisionHelper.hasTrackChanged(caseData)) {
 
             if (dashboardDecisionHelper.hasUploadDocuments(caseData)) {
-                scenario = SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_CLAIMANT_CARM.getScenario();
+                selectedScenario = SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_CLAIMANT_CARM.getScenario();
             } else {
-                scenario = SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_CLAIMANT_WITHOUT_UPLOAD_FILES_CARM.getScenario();
+                selectedScenario = SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_CLAIMANT_WITHOUT_UPLOAD_FILES_CARM.getScenario();
             }
         } else if (dashboardDecisionHelper.isSDODrawnPreCPRelease(caseData)) {
-            scenario = SCENARIO_AAA6_CLAIMANT_SDO_DRAWN_PRE_CASE_PROGRESSION.getScenario();
+            selectedScenario = SCENARIO_AAA6_CLAIMANT_SDO_DRAWN_PRE_CASE_PROGRESSION.getScenario();
         } else {
-            scenario = SCENARIO_AAA6_CP_ORDER_MADE_CLAIMANT.getScenario();
+            dashboardTasksHelper.makeTasksInactiveForClaimant(caseData);
+            selectedScenario = SCENARIO_AAA6_CP_ORDER_MADE_CLAIMANT.getScenario();
         }
 
-        return scenario;
+        return selectedScenario;
     }
 
     @Override
@@ -88,7 +94,7 @@ public class CreateSdoClaimantDashboardService extends DashboardScenarioService 
             SCENARIO_AAA6_CP_ORDER_MADE_CLAIMANT.getScenario()
         );
         return caseData.isLipvLROneVOne()
-            && addNocNotificationScenarios.contains(getScenario(caseData))
+            && addNocNotificationScenarios.contains(selectedScenario)
             && featureToggleService.isLipVLipEnabled()
             && dashboardDecisionHelper.isDashBoardEnabledForCase(caseData);
     }
