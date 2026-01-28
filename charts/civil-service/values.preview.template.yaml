@@ -360,7 +360,7 @@ am-org-role-mapping-service:
       ORG_ROLE_MAPPING_DB_USERNAME: ${POSTGRES_USER}
       ORG_ROLE_MAPPING_DB_PASSWORD: ${POSTGRES_PASSWORD}
       ORG_ROLE_MAPPING_DB_PORT: 5432
-      ORG_ROLE_MAPPING_DB_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
+      ORG_ROLE_MAPPING_DB_OPTIONS: "?stringtype=unspecified"
       TESTING_SUPPORT_ENABLED: true
       JUDICIAL_REF_APP_V2_ACTIVE: true
       JUDICIAL_REF_APP_V2_FILTER_AUTHS_BY_APP_ID: true
