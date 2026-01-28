@@ -13,6 +13,7 @@ import xml.etree.ElementTree as ET
 from collections import defaultdict, OrderedDict
 from pathlib import Path
 from typing import Dict, List, Optional, Set
+from uuid import uuid4
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 JAVA_ROOT = REPO_ROOT / "src" / "main" / "java"
@@ -38,7 +39,7 @@ FIELD_DEF_RE = re.compile(r"(?:private|protected|public)\s+final\s+([A-Za-z0-9_<
 DASHBOARD_TASK_ID_CONST_RE = re.compile(r"public\s+static\s+final\s+String\s+(\w+)\s*=\s*\"([^\"]+)\";")
 TASK_ID_RE = re.compile(r"(?:public|protected|private)\s+static\s+final\s+String\s+TASK_ID\s*=\s*\"([^\"]+)\"")
 EVENTS_DEF_RE = re.compile(
-    r"EVENTS\s*=\s*(?:List\\.of|Collections\\.singletonList|Arrays\\.asList)\s*\((?P<body>.*?)\)\s*;",
+    r"EVENTS\s*=\s*(?:List\.of|Collections\.singletonList|Arrays\.asList)\s*\((?P<body>.*?)\)\s*;",
     re.S
 )
 SCENARIO_CONST_RE = re.compile(r"SCENARIO_[A-Z0-9_]+")
@@ -310,9 +311,11 @@ def describe_party(index: SourceIndex, class_name: str) -> str:
 
 def index_bpmn(bpmn_root: Path):
     ns = {'bpmn': 'http://www.omg.org/spec/BPMN/20100524/MODEL'}
+    camunda_ns = {'camunda': 'http://camunda.org/schema/1.0/bpmn'}
     service_map = defaultdict(list)
     ccd_events = {}
     ccd_event_labels = {}
+    case_event_map = defaultdict(list)
     for bpmn_file in sorted(bpmn_root.glob('*.bpmn')):
         try:
             tree = ET.parse(bpmn_file)
@@ -341,7 +344,10 @@ def index_bpmn(bpmn_root: Path):
         ccd_event_labels[bpmn_file] = start_labels
         for task in root.findall('.//bpmn:serviceTask', ns):
             service_map[task.attrib.get('id')].append(bpmn_file)
-    return service_map, ccd_events, ccd_event_labels
+            for input_param in task.findall('.//camunda:inputParameter', camunda_ns):
+                if input_param.attrib.get('name') == 'caseEvent' and input_param.text:
+                    case_event_map[input_param.text.strip()].append(bpmn_file)
+    return service_map, ccd_events, ccd_event_labels, case_event_map
 
 
 def build_email_rows(index: SourceIndex, notifications: Dict[str, str], bpmn_root: Path,
@@ -385,6 +391,32 @@ def lookup_bpmn(task_id: str, service_tasks, start_events, start_event_labels):
     return rel_paths, ccd_display, ccd_ids
 
 
+def augment_with_case_events(events: List[str], case_event_map, start_events, start_event_labels,
+                             bpmn_files: List[str], ccd_display: List[str], ccd_ids: List[str]):
+    files = list(bpmn_files)
+    displays = list(ccd_display)
+    ids = list(ccd_ids)
+    seen_files = set(files)
+    seen_ids = set(ids)
+    seen_displays = set(displays)
+    for event in events or []:
+        for file in case_event_map.get(event, []):
+            rel_path = os.path.relpath(file, REPO_ROOT)
+            if rel_path not in seen_files:
+                files.append(rel_path)
+                seen_files.add(rel_path)
+            labels = start_event_labels.get(file, {})
+            for event_name in start_events.get(file, []):
+                label = labels.get(event_name, event_name)
+                if label not in seen_displays:
+                    displays.append(label)
+                    seen_displays.add(label)
+                if event_name not in seen_ids:
+                    ids.append(event_name)
+                    seen_ids.add(event_name)
+    return files, displays, ids
+
+
 def load_dashboard_task_ids() -> Dict[str, str]:
     mapping = {}
     if not DASHBOARD_TASK_IDS_PATH.exists():
@@ -406,7 +438,7 @@ def load_dashboard_scenarios() -> Dict[str, str]:
     return mapping
 
 
-def load_template_paths() -> Dict[str, str]:
+def load_template_paths() -> Dict[str, Dict[str, str]]:
     template_map = {}
     if not TEMPLATE_DIR.exists():
         return template_map
@@ -416,8 +448,26 @@ def load_template_paths() -> Dict[str, str]:
         except json.JSONDecodeError:
             continue
         name = data.get('name') or path.stem
-        template_map[name] = os.path.relpath(path, REPO_ROOT)
+        template_map[name] = {
+            'path': os.path.relpath(path, REPO_ROOT),
+            'content': json.dumps(data, indent=2, ensure_ascii=False),
+            'table': build_template_table(data)
+        }
     return template_map
+
+
+def build_template_table(data: dict) -> str:
+    rows = []
+    for key, value in data.items():
+        if isinstance(value, (dict, list)):
+            display = json.dumps(value, ensure_ascii=False, indent=2)
+            display = html.escape(display).replace('\n', '<br>')
+            cell = f"<pre>{display}</pre>"
+        else:
+            display = html.escape(str(value)).replace('\n', '<br>')
+            cell = display
+        rows.append(f"<tr><th>{html.escape(str(key))}</th><td>{cell}</td></tr>")
+    return "<table class='template-preview'>" + ''.join(rows) + "</table>"
 
 
 def constructor_param_map(java_class: JavaClass, class_name: str) -> Dict[str, str]:
@@ -527,16 +577,55 @@ def scenario_names_for_class(index: SourceIndex,
     return scenarios
 
 
-def template_links_for_scenarios(scenarios: Set[str], template_map: Dict[str, str]) -> List[Dict[str, str]]:
+def template_links_for_scenarios(scenarios: Set[str], template_map: Dict[str, Dict[str, str]]) -> List[Dict[str, str]]:
+    if not scenarios:
+        return []
     links = []
     for scenario in sorted(filter(None, scenarios)):
         if not scenario.startswith('Scenario.'):
             continue
         template_name = 'Notice.' + scenario.split('Scenario.', 1)[1]
-        path = template_map.get(template_name)
-        if path:
-            links.append({'name': template_name, 'path': path})
+        template_entry = template_map.get(template_name)
+        if template_entry:
+            html_id = f"tpl-{uuid4().hex}"
+            links.append({
+                'label': template_name,
+                'path': template_entry['path'],
+                'preview': template_entry['content'],
+                'table': template_entry['table'],
+                'html_id': html_id
+            })
+    if not links:
+        links.append({'label': 'No template — task list only'})
     return links
+
+
+def extends_dashboard_callback(index: SourceIndex, class_name: str,
+                               cache: Dict[str, bool]) -> bool:
+    if not class_name:
+        return False
+    if class_name in cache:
+        return cache[class_name]
+    java_class = index.get(class_name)
+    if not java_class:
+        cache[class_name] = False
+        return False
+    base = java_class.base_class()
+    if not base:
+        cache[class_name] = False
+        return False
+    dashboard_bases = {
+        'DashboardCallbackHandler',
+        'CaseProgressionDashboardCallbackHandler',
+        'DashboardWithParamsCallbackHandler',
+        'OrderCallbackHandler'
+    }
+    if base in dashboard_bases:
+        cache[class_name] = True
+        return True
+    result = extends_dashboard_callback(index, base, cache)
+    cache[class_name] = result
+    return result
 
 
 def split_arguments(arg_text: str) -> List[str]:
@@ -593,9 +682,6 @@ def collect_dashboard_contributions(index: SourceIndex, service_tasks, start_eve
             handler_class = index.get(handler_type)
             party = infer_party_from_class(handler_class)
             service = find_dashboard_service(handler_class)
-            details = [f"Contributor: `{class_name}`"]
-            if service:
-                details.append(f"Service: `{service}`")
             bpmn_files, ccd_display, ccd_ids = lookup_bpmn(task_id, service_tasks, start_events, start_event_labels)
             scenarios = scenario_names_for_class(index, handler_type, scenario_map, scenario_cache)
             templates = template_links_for_scenarios(scenarios, template_map)
@@ -604,7 +690,6 @@ def collect_dashboard_contributions(index: SourceIndex, service_tasks, start_eve
                 'camunda_task': task_id,
                 'handler': handler_type,
                 'party': party,
-                'details': details,
                 'bpmn_files': bpmn_files or ['—'],
                 'ccd_events': ccd_display or ['—'],
                 'ccd_event_ids': ccd_ids,
@@ -657,12 +742,14 @@ def extract_case_events(java_class: JavaClass) -> List[str]:
 
 
 def collect_dashboard_callback_rows(index: SourceIndex, service_tasks, start_events,
-                                    start_event_labels, scenario_map: Dict[str, str],
-                                    template_map: Dict[str, str], scenario_cache: Dict[str, Set[str]]) -> List[Dict[str, object]]:
+                                    start_event_labels, case_event_map,
+                                    scenario_map: Dict[str, str],
+                                    template_map: Dict[str, Dict[str, str]],
+                                    scenario_cache: Dict[str, Set[str]]) -> List[Dict[str, object]]:
     rows = []
+    inheritance_cache: Dict[str, bool] = {}
     for class_name, java_class in index.classes.items():
-        if ('extends DashboardCallbackHandler' not in java_class.text
-                and 'extends CaseProgressionDashboardCallbackHandler' not in java_class.text):
+        if not extends_dashboard_callback(index, class_name, inheritance_cache):
             continue
         if re.search(r'abstract\s+class\s+' + re.escape(class_name), java_class.text):
             continue
@@ -675,10 +762,11 @@ def collect_dashboard_callback_rows(index: SourceIndex, service_tasks, start_eve
         if 'extends CaseProgressionDashboardCallbackHandler' in java_class.text:
             framework = 'CaseProgressionDashboardCallbackHandler'
         party = infer_party_from_class(java_class)
-        details = []
-        if events:
-            details.append('Case events: ' + ', '.join(f'`{evt}`' for evt in events))
         bpmn_files, ccd_display, ccd_ids = lookup_bpmn(task_id, service_tasks, start_events, start_event_labels)
+        bpmn_files, ccd_display, ccd_ids = augment_with_case_events(
+            events, case_event_map, start_events, start_event_labels,
+            bpmn_files, ccd_display, ccd_ids
+        )
         scenarios = scenario_names_for_class(index, class_name, scenario_map, scenario_cache)
         templates = template_links_for_scenarios(scenarios, template_map)
         rows.append({
@@ -686,7 +774,6 @@ def collect_dashboard_callback_rows(index: SourceIndex, service_tasks, start_eve
             'camunda_task': task_id,
             'handler': class_name,
             'party': party,
-            'details': details,
             'bpmn_files': bpmn_files or ['—'],
             'ccd_events': ccd_display or ['—'],
             'ccd_event_ids': ccd_ids,
@@ -696,133 +783,176 @@ def collect_dashboard_callback_rows(index: SourceIndex, service_tasks, start_eve
 
 
 def build_dashboard_rows(index: SourceIndex, service_tasks, start_events, start_event_labels,
-                         scenario_map: Dict[str, str], template_map: Dict[str, str]):
+                         case_event_map, scenario_map: Dict[str, str], template_map: Dict[str, Dict[str, str]]):
     scenario_cache: Dict[str, Set[str]] = {}
     contribution_rows = collect_dashboard_contributions(
         index, service_tasks, start_events, start_event_labels, scenario_map, template_map, scenario_cache)
     callback_rows = collect_dashboard_callback_rows(
-        index, service_tasks, start_events, start_event_labels, scenario_map, template_map, scenario_cache)
+        index, service_tasks, start_events, start_event_labels, case_event_map,
+        scenario_map, template_map, scenario_cache)
     all_rows = contribution_rows + callback_rows
     return sorted(all_rows, key=lambda row: (row['camunda_task'], row['framework'], row['handler']))
 
 
-def render_email_markdown(rows: List[Dict[str, str]], notify_service_id: Optional[str]) -> str:
-    header = [
-        "Camunda task",
-        "Handler",
-        "Parties selector",
-        "Party",
-        "Email DTO generator",
-        "Gov.Notify template ID",
-        "BPMN file(s)",
-        "CCD event(s)"
-    ]
-    lines = ["## Email notification matrix", "", textwrap.dedent("""
-        The table below lists every Camunda notification task handled by `NotificationHandler`, the parties contacted, and the exact Gov.Notify templates configured in `src/main/resources/application.yaml`.
-        It also links each task to the BPMN model (from `civil-camunda-bpmn-definition`) and shows the CCD events that start those BPMN flows, combining the process name with the CCD event ID.
-    """).strip(), ""]
-    lines.append('|' + '|'.join(header) + '|')
-    lines.append('|' + '|'.join(['---'] * len(header)) + '|')
-    for row in rows:
-        template_id_cell = f"`{row['template_id']}`"
-        if notify_service_id and row['template_id'] not in ('—', ''):
-            template_id_cell = (
-                f"[`{row['template_id']}`](https://www.notifications.service.gov.uk/"
-                f"services/{notify_service_id}/templates/{row['template_id']})"
-            )
-        formatted_bpmn = []
-        for path in row['bpmn_files']:
-            if path == '—':
-                formatted_bpmn.append('—')
+def format_bpmn_markdown(paths: List[str]) -> str:
+    formatted = []
+    for path in paths:
+        if path == '—':
+            formatted.append('—')
+        else:
+            name = Path(path).stem
+            formatted.append(f"{path} ([diagram]({DIAGRAM_BASE_URL}{name}.png))")
+    return '<br>'.join(formatted)
+
+
+def format_bpmn_html(paths: List[str]) -> str:
+    formatted = []
+    for path in paths:
+        if path == '—':
+            formatted.append('—')
+        else:
+            name = Path(path).stem
+            formatted.append(f"{html.escape(path)}<br><a href='{DIAGRAM_BASE_URL}{name}.png'>diagram</a>")
+    return '<br>'.join(formatted)
+
+
+def format_templates_markdown(entries: List[Dict[str, str]], notify_service_id: Optional[str]) -> str:
+    if not entries:
+        return '—'
+    parts = []
+    for entry in entries:
+        if entry.get('gov_id'):
+            label = entry['label']
+            if notify_service_id:
+                link = (
+                    f"[`{label}`](https://www.notifications.service.gov.uk/services/"
+                    f"{notify_service_id}/templates/{entry['gov_id']})"
+                )
             else:
-                name = Path(path).stem
-                formatted_bpmn.append(f"{path} ([diagram]({DIAGRAM_BASE_URL}{name}.png))")
-        lines.append('|' + '|'.join([
-            f"`{row['event']}`",
-            f"`{row['handler']}`",
-            f"`{row['aggregator']}`",
-            row['party'],
-            f"`{row['generator']}`",
-            template_id_cell,
-            '<br>'.join(formatted_bpmn),
-            '<br>'.join(row['ccd_events'])
-        ]) + '|')
-    lines.append('')
-    return '\n'.join(lines)
+                link = f"`{label}`"
+        elif entry.get('path'):
+            link = f"`{entry['label']}`<br><small>{entry['path']}</small>"
+        else:
+            link = f"`{entry['label']}`"
+        if entry.get('table'):
+            link += (
+                "\n\n<details><summary>Preview</summary>\n\n"
+                + entry['table']
+                + "\n</details>"
+            )
+        parts.append(link)
+    return '<br>'.join(parts)
 
 
-def render_dashboard_markdown(rows: List[Dict[str, object]]) -> str:
+def format_templates_html(entries: List[Dict[str, str]], notify_service_id: Optional[str]) -> str:
+    if not entries:
+        return '—'
+    parts = []
+    for entry in entries:
+        if entry.get('gov_id'):
+            label = html.escape(entry['label'])
+            if notify_service_id:
+                link = (
+                    f"<a href='https://www.notifications.service.gov.uk/services/{notify_service_id}/templates/"
+                    f"{html.escape(entry['gov_id'])}'>{label}</a>"
+                )
+            else:
+                link = f"<code>{label}</code>"
+        elif entry.get('path'):
+            link = f"<code>{html.escape(entry['label'])}</code><br><small>{html.escape(entry['path'])}</small>"
+        else:
+            link = f"<code>{html.escape(entry['label'])}</code>"
+        if entry.get('table'):
+            target = entry.get('html_id') or f"tpl-{uuid4().hex}"
+            link += (
+                f"<br><button type='button' class='template-preview-toggle' data-target='{target}'>Preview</button>"
+                f"<div id='{target}' class='template-preview-panel'>{entry['table']}</div>"
+            )
+        parts.append(link)
+    return '<br>'.join(parts)
+
+
+def combine_rows(email_rows: List[Dict[str, object]], dashboard_rows: List[Dict[str, object]]) -> List[Dict[str, object]]:
+    combined = []
+    for row in email_rows:
+        templates = []
+        template_id = row['template_id']
+        if template_id not in ('—', ''):
+            templates.append({'label': template_id, 'gov_id': template_id})
+        combined.append({
+            'ccd_events': row['ccd_events'],
+            'ccd_event_ids': row['ccd_event_ids'],
+            'camunda_task': row['event'],
+            'channel': 'Email',
+            'party': row['party'],
+            'templates': templates,
+            'bpmn_files': row['bpmn_files']
+        })
+    for row in dashboard_rows:
+        templates = row.get('templates') or []
+        combined.append({
+            'ccd_events': row['ccd_events'],
+            'ccd_event_ids': row['ccd_event_ids'],
+            'camunda_task': row['camunda_task'],
+            'channel': 'Dashboard',
+            'party': row.get('party'),
+            'templates': templates,
+            'bpmn_files': row['bpmn_files']
+        })
+    channel_priority = {'Email': 0, 'Dashboard': 1}
+    combined.sort(key=lambda r: ((r['ccd_events'] or [''])[0].lower(), channel_priority.get(r['channel'], 99), r['camunda_task']))
+    return combined
+
+
+def render_combined_markdown(rows: List[Dict[str, object]], notify_service_id: Optional[str]) -> str:
     header = [
-        "Framework",
+        "CCD event(s)",
         "Camunda task",
-        "Handler / task",
-        "Party",
-        "Details",
-        "Template JSON",
         "BPMN file(s)",
-        "CCD event(s)"
+        "Channel",
+        "Party",
+        "Template(s)"
     ]
     intro = textwrap.dedent("""
-        Dashboard notifications are produced by two frameworks: service task contributions dispatched via
-        `DashboardNotificationHandler`, and per-event callbacks implemented through `DashboardCallbackHandler`
-        (including the case progression specialisation). Each row links the Camunda service task ID to the
-        dashboard task or handler class that records citizen scenarios and surfaces the underlying
-        `dashboard-notifications` JSON template(s).
+        The table below lists every citizen-facing notification triggered from CCD events. It combines the
+        Gov.Notify emails and dashboard notices, grouping them by the CCD events that kick off the relevant
+        Camunda flow. Use the template column to jump straight to the Gov.Notify template or the dashboard
+        JSON housed in `dashboard-notifications`.
     """).strip()
-    lines = ["## Dashboard notification matrix", "", intro, ""]
+    lines = [intro, ""]
     lines.append('|' + '|'.join(header) + '|')
     lines.append('|' + '|'.join(['---'] * len(header)) + '|')
     for row in rows:
-        details = '<br>'.join(row.get('details') or ['—'])
-        template_links = row.get('templates') or []
-        template_cell = '<br>'.join(
-            f"[`{tpl['name']}`]({tpl['path']})" for tpl in template_links
-        ) or '—'
-        formatted_bpmn = []
-        for path in row['bpmn_files']:
-            if path == '—':
-                formatted_bpmn.append('—')
-            else:
-                name = Path(path).stem
-                formatted_bpmn.append(f"{path} ([diagram]({DIAGRAM_BASE_URL}{name}.png))")
         lines.append('|' + '|'.join([
-            row['framework'],
+            '<br>'.join(row['ccd_events'] or ['—']),
             f"`{row['camunda_task']}`",
-            f"`{row['handler']}`",
+            format_bpmn_markdown(row['bpmn_files']),
+            row['channel'],
             row.get('party') or '—',
-            details or '—',
-            template_cell,
-            '<br>'.join(formatted_bpmn),
-            '<br>'.join(row['ccd_events'] or ['—'])
+            format_templates_markdown(row.get('templates') or [], notify_service_id)
         ]) + '|')
     lines.append('')
     return '\n'.join(lines)
 
 
-def render_html(email_rows: List[Dict[str, str]], dashboard_rows: List[Dict[str, object]],
-                notify_service_id: Optional[str]) -> str:
-    email_header = [
+def render_combined_html(rows: List[Dict[str, object]], notify_service_id: Optional[str]) -> str:
+    header = [
+        "CCD event(s)",
         "Camunda task",
-        "Handler",
-        "Parties selector",
-        "Party",
-        "Email DTO generator",
-        "Gov.Notify template ID",
         "BPMN file(s)",
-        "CCD event(s)"
-    ]
-    dashboard_header = [
-        "Framework",
-        "Camunda task",
-        "Handler / task",
+        "Channel",
         "Party",
-        "Details",
-        "Template JSON",
-        "BPMN file(s)",
-        "CCD event(s)"
+        "Template(s)"
     ]
-    email_events = sorted({event for row in email_rows for event in row.get('ccd_event_ids', []) if event not in ('—', '')})
-    dashboard_events = sorted({event for row in dashboard_rows for event in row.get('ccd_event_ids', []) if event not in ('—', '')})
+    event_map = OrderedDict()
+    for row in rows:
+        ids = row.get('ccd_event_ids', []) or []
+        labels = row.get('ccd_events', []) or []
+        for event_id, label in zip(ids, labels):
+            if event_id in ('—', ''):
+                continue
+            event_map.setdefault(event_id, label)
+    unique_events = sorted(event_map.items(), key=lambda item: (item[1] or item[0]).lower())
     lines = [
         "<!DOCTYPE html>",
         "<html lang='en'>",
@@ -840,115 +970,50 @@ def render_html(email_rows: List[Dict[str, str]], dashboard_rows: List[Dict[str,
         "    select { min-width: 18rem; padding: 0.2rem; }",
         "    button { padding: 0.2rem 0.6rem; }",
         "    .counts { font-size: 0.85rem; color: #555; }",
-        "    h2 { margin-top: 2.5rem; }",
+        "    h1 { margin-bottom: 0.25rem; }",
+        "    .template-preview { border-collapse: collapse; width: 100%; font-size: 0.75rem; margin-top: 0.25rem; }",
+        "    .template-preview th, .template-preview td { border: 1px solid #ddd; padding: 0.2rem; vertical-align: top; text-align: left; }",
+        "    .template-preview-panel { display: none; margin-top: 0.3rem; }",
+        "    .template-preview-toggle { margin-top: 0.25rem; padding: 0.2rem 0.4rem; font-size: 0.75rem; }",
         "  </style>",
         "</head>",
         "<body>",
         "  <h1>Notification matrix</h1>",
-        "  <p>The tables mirror <code>docs/email-notifications.md</code> and add CCD event filters for both email and dashboard notifications." 
-        " Each CCD entry shows the process name followed by the CCD event ID.</p>",
-        "  <h2>Email notification matrix</h2>",
+        "  <p>This single table combines the email and dashboard notifications for every CCD event trigger."
+        " Use the CCD event filter to focus on one workflow.</p>",
         "  <div class='filter-panel'>",
-        "    <label for='email-ccd-filter'>CCD event:</label>",
-        "    <select id='email-ccd-filter'>",
+        "    <label for='ccd-filter'>CCD event:</label>",
+        "    <select id='ccd-filter'>",
         "      <option value=''>All CCD events</option>",
     ]
-    for event in email_events:
-        lines.append(f"      <option value='{html.escape(event.lower())}'>{html.escape(event)}</option>")
+    for event_id, label in unique_events:
+        lines.append(f"      <option value='{html.escape(event_id.lower())}'>{html.escape(label or event_id)}</option>")
     lines.extend([
         "    </select>",
-        "    <button type='button' id='email-reset-filter'>Reset</button>",
-        "    <span class='counts'><span id='email-visible-count'>0</span> rows shown</span>",
+        "    <button type='button' id='reset-filter'>Reset</button>",
+        "    <span class='counts'><span id='visible-count'>0</span> rows shown</span>",
         "  </div>",
-        "  <table id='email-notifications-table'>",
+        "  <table id='notifications-table'>",
         "    <thead>",
         "      <tr>",
     ])
-    for col in email_header:
+    for col in header:
         lines.append(f"        <th>{html.escape(col)}</th>")
     lines.extend([
         "      </tr>",
         "    </thead>",
         "    <tbody>",
     ])
-    for row in email_rows:
+    for row in rows:
         ccd_attr = ' '.join(event.lower() for event in row.get('ccd_event_ids', []) if event not in ('—', ''))
-        template_id_cell = html.escape(row['template_id'])
-        if notify_service_id and row['template_id'] not in ('—', ''):
-            template_id_cell = (
-                f"<a href='https://www.notifications.service.gov.uk/services/{notify_service_id}/templates/"
-                f"{html.escape(row['template_id'])}'>{html.escape(row['template_id'])}</a>"
-            )
-        formatted_bpmn = []
-        for path in row['bpmn_files']:
-            if path == '—':
-                formatted_bpmn.append('—')
-            else:
-                name = Path(path).stem
-                formatted_bpmn.append(f"{html.escape(path)}<br><a href='{DIAGRAM_BASE_URL}{name}.png'>diagram</a>")
         lines.extend([
             f"      <tr data-ccd-events='{ccd_attr}'>",
-            f"        <td><code>{html.escape(row['event'])}</code></td>",
-            f"        <td><code>{html.escape(row['handler'])}</code></td>",
-            f"        <td><code>{html.escape(row['aggregator'])}</code></td>",
-            f"        <td>{html.escape(row['party'])}</td>",
-            f"        <td><code>{html.escape(row['generator'])}</code></td>",
-            f"        <td>{template_id_cell}</td>",
-            f"        <td>{'<br>'.join(formatted_bpmn)}</td>",
             f"        <td>{'<br>'.join(html.escape(event) for event in row['ccd_events'])}</td>",
-            "      </tr>",
-        ])
-    lines.extend([
-        "    </tbody>",
-        "  </table>",
-        "  <h2>Dashboard notification matrix</h2>",
-        "  <div class='filter-panel'>",
-        "    <label for='dashboard-ccd-filter'>CCD event:</label>",
-        "    <select id='dashboard-ccd-filter'>",
-        "      <option value=''>All CCD events</option>",
-    ])
-    for event in dashboard_events:
-        lines.append(f"      <option value='{html.escape(event.lower())}'>{html.escape(event)}</option>")
-    lines.extend([
-        "    </select>",
-        "    <button type='button' id='dashboard-reset-filter'>Reset</button>",
-        "    <span class='counts'><span id='dashboard-visible-count'>0</span> rows shown</span>",
-        "  </div>",
-        "  <table id='dashboard-notifications-table'>",
-        "    <thead>",
-        "      <tr>",
-    ])
-    for col in dashboard_header:
-        lines.append(f"        <th>{html.escape(col)}</th>")
-    lines.extend([
-        "      </tr>",
-        "    </thead>",
-        "    <tbody>",
-    ])
-    for row in dashboard_rows:
-        ccd_attr = ' '.join(event.lower() for event in row.get('ccd_event_ids', []) if event not in ('—', ''))
-        formatted_bpmn = []
-        for path in row['bpmn_files']:
-            if path == '—':
-                formatted_bpmn.append('—')
-            else:
-                name = Path(path).stem
-                formatted_bpmn.append(f"{html.escape(path)}<br><a href='{DIAGRAM_BASE_URL}{name}.png'>diagram</a>")
-        details = '<br>'.join(html.escape(detail) for detail in (row.get('details') or ['—']))
-        template_links = row.get('templates') or []
-        template_cell = '<br>'.join(
-            f"<a href='{html.escape(link['path'])}'>{html.escape(link['name'])}</a>" for link in template_links
-        ) or '—'
-        lines.extend([
-            f"      <tr data-ccd-events='{ccd_attr}'>",
-            f"        <td>{html.escape(row['framework'])}</td>",
             f"        <td><code>{html.escape(row['camunda_task'])}</code></td>",
-            f"        <td><code>{html.escape(row['handler'])}</code></td>",
+            f"        <td>{format_bpmn_html(row['bpmn_files'])}</td>",
+            f"        <td>{html.escape(row['channel'])}</td>",
             f"        <td>{html.escape(row.get('party') or '—')}</td>",
-            f"        <td>{details}</td>",
-            f"        <td>{template_cell}</td>",
-            f"        <td>{'<br>'.join(formatted_bpmn)}</td>",
-            f"        <td>{'<br>'.join(html.escape(event) for event in row['ccd_events'])}</td>",
+            f"        <td>{format_templates_html(row.get('templates') or [], notify_service_id)}</td>",
             "      </tr>",
         ])
     lines.extend([
@@ -956,30 +1021,63 @@ def render_html(email_rows: List[Dict[str, str]], dashboard_rows: List[Dict[str,
         "  </table>",
         "  <script>",
         "    (function() {",
-        "      function wireFilter(selectId, resetId, tableId, counterId) {",
-        "        const select = document.getElementById(selectId);",
-        "        const reset = document.getElementById(resetId);",
-        "        const rows = Array.from(document.querySelectorAll(`#${tableId} tbody tr`));",
-        "        const counter = document.getElementById(counterId);",
-        "        function applyFilter() {",
-        "          const value = (select.value || '').trim();",
-        "          let visible = 0;",
-        "          rows.forEach(row => {",
-        "            if (!value || (row.dataset.ccdEvents || '').includes(value)) {",
-        "              row.style.display = '';",
-        "              visible += 1;",
-        "            } else {",
-        "              row.style.display = 'none';",
-        "            }",
-        "          });",
-        "          counter.textContent = visible;",
+        "      const select = document.getElementById('ccd-filter');",
+        "      const reset = document.getElementById('reset-filter');",
+        "      const rows = Array.from(document.querySelectorAll('#notifications-table tbody tr'));",
+        "      const counter = document.getElementById('visible-count');",
+        "      const previewButtons = Array.from(document.querySelectorAll('.template-preview-toggle'));",
+        "      previewButtons.forEach(button => {",
+        "        const targetId = button.dataset.target;",
+        "        const panel = document.getElementById(targetId);",
+        "        if (!panel) {",
+        "          return;",
         "        }",
-        "        select.addEventListener('change', applyFilter);",
-        "        reset.addEventListener('click', () => { select.value = ''; applyFilter(); });",
-        "        applyFilter();",
+        "        button.addEventListener('click', () => {",
+        "          const isVisible = panel.style.display === 'block';",
+        "          panel.style.display = isVisible ? 'none' : 'block';",
+        "          button.textContent = isVisible ? 'Preview' : 'Hide preview';",
+        "        });",
+        "      });",
+        "      function applyFilter() {",
+        "        const value = (select.value || '').trim();",
+        "        let visible = 0;",
+        "        rows.forEach(row => {",
+        "          const tokens = (row.dataset.ccdEvents || '').split(/\s+/).filter(Boolean);",
+        "          if (!value || tokens.some(token => token === value)) {",
+        "            row.style.display = '';",
+        "            visible += 1;",
+        "          } else {",
+        "            row.style.display = 'none';",
+        "          }",
+        "        });",
+        "        counter.textContent = visible;",
+        "        window.sessionStorage.setItem('ccdFilter', value);",
+        "        if (value) {",
+        "          window.location.hash = encodeURIComponent(value);",
+        "        } else {",
+        "          history.replaceState(null, document.title, window.location.pathname + window.location.search);",
+        "        }",
         "      }",
-        "      wireFilter('email-ccd-filter', 'email-reset-filter', 'email-notifications-table', 'email-visible-count');",
-        "      wireFilter('dashboard-ccd-filter', 'dashboard-reset-filter', 'dashboard-notifications-table', 'dashboard-visible-count');",
+        "      const saved = window.sessionStorage.getItem('ccdFilter') || (window.location.hash ? decodeURIComponent(window.location.hash.substring(1)) : '');",
+        "      if (saved) {",
+        "        select.value = saved;",
+        "      }",
+        "      const previewButtons = Array.from(document.querySelectorAll('.template-preview-toggle'));",
+        "      previewButtons.forEach(button => {",
+        "        const targetId = button.dataset.target;",
+        "        const panel = document.getElementById(targetId);",
+        "        if (!panel) {",
+        "          return;",
+        "        }",
+        "        button.addEventListener('click', () => {",
+        "          const isVisible = panel.style.display === 'block';",
+        "          panel.style.display = isVisible ? 'none' : 'block';",
+        "          button.textContent = isVisible ? 'Preview' : 'Hide preview';",
+        "        });",
+        "      });",
+        "      select.addEventListener('change', applyFilter);",
+        "      reset.addEventListener('click', () => { select.value = ''; applyFilter(); });",
+        "      applyFilter();",
         "    })();",
         "  </script>",
         "</body>",
@@ -1013,25 +1111,20 @@ def main(argv: Optional[List[str]] = None) -> int:
     notifications = parse_notifications_config(APPLICATION_YAML)
     index = SourceIndex(JAVA_ROOT)
     camunda_root = bpmn_root / 'src' / 'main' / 'resources' / 'camunda' if (bpmn_root / 'src').exists() else bpmn_root
-    service_tasks, start_events, start_event_labels = index_bpmn(camunda_root)
+    service_tasks, start_events, start_event_labels, case_event_map = index_bpmn(camunda_root)
     scenario_map = load_dashboard_scenarios()
     template_map = load_template_paths()
     email_rows = build_email_rows(index, notifications, camunda_root, service_tasks, start_events, start_event_labels)
-    filtered_email_rows = filter_rows_by_ccd_event(email_rows, args.ccd_event_filters)
-    dashboard_rows = build_dashboard_rows(index, service_tasks, start_events, start_event_labels, scenario_map, template_map)
-    filtered_dashboard_rows = filter_rows_by_ccd_event(dashboard_rows, args.ccd_event_filters)
-    markdown_sections = [
-        "# Notification matrix",
-        render_email_markdown(filtered_email_rows, args.notify_service_id),
-        render_dashboard_markdown(filtered_dashboard_rows)
-    ]
-    markdown = '\n\n'.join(markdown_sections)
+    dashboard_rows = build_dashboard_rows(index, service_tasks, start_events, start_event_labels, case_event_map, scenario_map, template_map)
+    combined_rows = combine_rows(email_rows, dashboard_rows)
+    filtered_rows = filter_rows_by_ccd_event(combined_rows, args.ccd_event_filters)
+    markdown = '\n\n'.join(["# Notification matrix", render_combined_markdown(filtered_rows, args.notify_service_id)])
     output_path = Path(args.output)
     output_path.write_text(markdown + "\n", encoding="utf-8")
-    print(f"Wrote {len(filtered_email_rows)} email rows and {len(filtered_dashboard_rows)} dashboard rows to {output_path}")
+    print(f"Wrote {len(filtered_rows)} combined rows to {output_path}")
     html_output = (args.html_output or '').strip()
     if html_output:
-        html_markup = render_html(filtered_email_rows, filtered_dashboard_rows, args.notify_service_id)
+        html_markup = render_combined_html(filtered_rows, args.notify_service_id)
         html_path = Path(html_output)
         html_path.write_text(html_markup + "\n", encoding="utf-8")
         print(f"Wrote interactive HTML table to {html_path}")
