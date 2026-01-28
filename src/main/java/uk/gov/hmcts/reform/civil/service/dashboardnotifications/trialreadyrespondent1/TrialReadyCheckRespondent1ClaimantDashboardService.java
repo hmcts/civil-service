@@ -6,9 +6,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
-import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
-import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_CHECK_CLAIMANT;
@@ -16,16 +14,10 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 @Service
 public class TrialReadyCheckRespondent1ClaimantDashboardService extends DashboardScenarioService {
 
-    private final DashboardNotificationService dashboardNotificationService;
-    private final TaskListService taskListService;
-
     public TrialReadyCheckRespondent1ClaimantDashboardService(DashboardScenariosService dashboardScenariosService,
-                                                              DashboardNotificationService dashboardNotificationService,
-                                                              DashboardNotificationsParamsMapper mapper,
-                                                              TaskListService taskListService) {
+                                                              DashboardNotificationsParamsMapper mapper) {
         super(dashboardScenariosService, mapper);
-        this.dashboardNotificationService = dashboardNotificationService;
-        this.taskListService = taskListService;
+
     }
 
     public void notifyTrialReadyCheckRespondent1(CaseData caseData, String authToken) {
@@ -44,10 +36,4 @@ public class TrialReadyCheckRespondent1ClaimantDashboardService extends Dashboar
             && AllocatedTrack.FAST_CLAIM.name().equals(caseData.getAssignedTrack());
     }
 
-    @Override
-    protected void beforeRecordScenario(CaseData caseData, String authToken) {
-        String caseId = String.valueOf(caseData.getCcdCaseReference());
-        dashboardNotificationService.deleteByReferenceAndCitizenRole(caseId, CLAIMANT_ROLE);
-        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(caseId, CLAIMANT_ROLE);
-    }
 }
