@@ -104,6 +104,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingWindow;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsImpNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsMediation;
+import uk.gov.hmcts.reform.civil.model.sdo.PPI;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsPPI;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsRestrictPages;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsRestrictWitness;
@@ -167,6 +168,10 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle.SHOW;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper.isFastTrack;
+import static uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper.isNihlFastTrack;
+import static uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper.isSDOR2ScreenForDRHSmallClaim;
+import static uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper.isSmallClaimsTrack;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicListElement.dynamicElementFromCode;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
@@ -799,6 +804,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         caseData.setSmallClaimsPenalNoticeToggle(new ArrayList<>());
         caseData.setFastTrackPenalNoticeToggle(new ArrayList<>());
 
+        populatePpiFields(caseData);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
@@ -963,10 +970,27 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
     }
 
+    private void populatePpiFields(CaseData caseData) {
+        PPI ppi = new PPI();
+        ppi.setPpiDate(LocalDate.now().plusDays(28));
+        ppi.setText(SdoR2UiConstantSmallClaim.PPI_DESCRIPTION);
+        caseData.setSmallClaimsPPI(ppi);
+        caseData.setFastTrackPPI(ppi);
+    }
+
+    private void resetPpiFields(CaseData caseData, boolean isSmallClaimsTrack, boolean isFastTrack) {
+        if (isSmallClaimsTrack && !SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimPPI")) {
+            caseData.setSmallClaimsPPI(null);
+        }
+
+        if (isFastTrack && !SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimPPI")) {
+            caseData.setFastTrackPPI(null);
+        }
+    }
+
     private void prePopulateNihlFields(CaseData updatedData, DynamicList hearingMethodList,
                                        Optional<RequestedCourt> preferredCourt,
                                        List<LocationRefData> locationRefDataList) {
-
         DynamicListElement hearingMethodInPerson = hearingMethodList.getListItems().stream().filter(elem -> elem.getLabel()
             .equals(HearingMethod.IN_PERSON.getLabel())).findFirst().orElse(null);
         hearingMethodList.setValue(hearingMethodInPerson);
@@ -1228,17 +1252,22 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         caseData.setSetFastTrackFlag(NO);
         caseData.setIsSdoR2NewScreen(NO);
 
-        if (SdoHelper.isSmallClaimsTrack(caseData)) {
+        boolean isSmallClaimsTrack = isSmallClaimsTrack(caseData);
+        boolean isFastTrack = isFastTrack(caseData);
+
+        if (isSmallClaimsTrack) {
             caseData.setSetSmallClaimsFlag(YES);
-            if (SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
+            if (isSDOR2ScreenForDRHSmallClaim(caseData)) {
                 caseData.setIsSdoR2NewScreen(YES);
             }
-        } else if (SdoHelper.isFastTrack(caseData)) {
+        } else if (isFastTrack) {
             caseData.setSetFastTrackFlag(YES);
-            if (SdoHelper.isNihlFastTrack(caseData)) {
+            if (isNihlFastTrack(caseData)) {
                 caseData.setIsSdoR2NewScreen(YES);
             }
         }
+
+        resetPpiFields(caseData, isSmallClaimsTrack, isFastTrack);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
@@ -1403,11 +1432,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             if (!witnessValidationErrorMessage.isEmpty()) {
                 errors.add(witnessValidationErrorMessage);
             }
-        } else if (SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
+        } else if (isSDOR2ScreenForDRHSmallClaim(caseData)) {
             errors.addAll(validateDRHFields(caseData));
         }
 
-        if (SdoHelper.isNihlFastTrack(caseData)) {
+        if (isNihlFastTrack(caseData)) {
             List<String> errorsNihl;
             errorsNihl = validateFieldsNihl(caseData);
             if (!errorsNihl.isEmpty()) {
@@ -1551,7 +1580,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             caseData.getFastTrackMethodInPerson()));
         caseData.setSmallClaimsMethodInPerson(deleteLocationList(
             caseData.getSmallClaimsMethodInPerson()));
-        if (SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)
+        if (isSDOR2ScreenForDRHSmallClaim(caseData)
             && caseData.getSdoR2SmallClaimsHearing() != null) {
             caseData.setSdoR2SmallClaimsHearing(updateHearingAfterDeletingLocationList(caseData.getSdoR2SmallClaimsHearing()));
         }
@@ -1608,16 +1637,16 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         CaseCategory caseAccessCategory = caseData.getCaseAccessCategory();
         switch (caseAccessCategory) {
             case UNSPEC_CLAIM:// unspec use allocatedTrack to hold claims track value
-                if (SdoHelper.isSmallClaimsTrack(caseData)) {
+                if (isSmallClaimsTrack(caseData)) {
                     caseData.setAllocatedTrack(SMALL_CLAIM);
-                } else if (SdoHelper.isFastTrack(caseData)) {
+                } else if (isFastTrack(caseData)) {
                     caseData.setAllocatedTrack(FAST_CLAIM);
                 }
                 break;
             case SPEC_CLAIM:// spec claims use responseClaimTrack to hold claims track value
-                if (SdoHelper.isSmallClaimsTrack(caseData)) {
+                if (isSmallClaimsTrack(caseData)) {
                     caseData.setResponseClaimTrack(SMALL_CLAIM.name());
-                } else if (SdoHelper.isFastTrack(caseData)) {
+                } else if (isFastTrack(caseData)) {
                     caseData.setResponseClaimTrack(FAST_CLAIM.name());
                 }
                 break;
