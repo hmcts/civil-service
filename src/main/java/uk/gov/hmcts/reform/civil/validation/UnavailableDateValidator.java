@@ -12,9 +12,9 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.IsPresentOrEqualToOrLessT
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.Validator;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.Validator;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
