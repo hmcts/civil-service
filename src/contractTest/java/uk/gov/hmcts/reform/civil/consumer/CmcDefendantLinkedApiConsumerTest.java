@@ -24,8 +24,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 @PactTestFor(providerName = "cmc_defendantLinked")
-@TestPropertySource(properties = "cmc-claim-store.api.url=http://localhost:6665")
-@MockServerConfig(hostInterface = "localhost", port = "6665")
+@TestPropertySource(properties = "cmc-claim-store.api.url=http://localhost:6671")
+@MockServerConfig(hostInterface = "localhost", port = "6671")
 public class CmcDefendantLinkedApiConsumerTest extends BaseContractTest {
 
     public static final String ENDPOINT_PREFIX = "/claims/";
