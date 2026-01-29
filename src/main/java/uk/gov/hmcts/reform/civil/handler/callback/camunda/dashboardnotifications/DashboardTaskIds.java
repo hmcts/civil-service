@@ -14,4 +14,5 @@ public final class DashboardTaskIds {
     public static final String DECISION_RECONSIDERATION = "GenerateDashboardNotificationsDecisionReconsideration";
     public static final String COURT_OFFICER_ORDER = "GenerateDashboardNotificationsCourtOfficerOrder";
     public static final String JUDGEMENT_PAID_IN_FULL = "GenerateDashboardNotificationsJudgmentPaidInFull";
+    public static final String TRIAL_ARRANGEMENTS_NOTIFY_PARTY = "GenerateDashboardNotificationsTrialArrangementsNotifyParty";
 }
