@@ -1,9 +1,11 @@
 # Notification matrix
 
 The table below lists every citizen-facing notification triggered from CCD events. It combines the
-Gov.Notify emails and dashboard notices, grouping them by the CCD events that kick off the relevant
-Camunda flow. Use the template column to jump straight to the Gov.Notify template or the dashboard
-JSON housed in `dashboard-notifications`.
+        Gov.Notify emails and dashboard notices, grouping them by the CCD events that kick off the relevant
+        Camunda flow. Use the template column to jump straight to the Gov.Notify template or the dashboard
+        JSON housed in `dashboard-notifications`.
+
+**Tip:** To focus on a single CCD event, re-run the generator locally with `--ccd-event EVENT_ID`.
 
 |CCD event(s)|Camunda task|BPMN file(s)|Channel|Party|Template(s)|
 |---|---|---|---|---|---|
