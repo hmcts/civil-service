@@ -13,7 +13,6 @@ import xml.etree.ElementTree as ET
 from collections import defaultdict, OrderedDict
 from pathlib import Path
 from typing import Dict, List, Optional, Set
-from uuid import uuid4
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 JAVA_ROOT = REPO_ROOT / "src" / "main" / "java"
@@ -450,24 +449,9 @@ def load_template_paths() -> Dict[str, Dict[str, str]]:
         name = data.get('name') or path.stem
         template_map[name] = {
             'path': os.path.relpath(path, REPO_ROOT),
-            'content': json.dumps(data, indent=2, ensure_ascii=False),
-            'table': build_template_table(data)
+            'content': json.dumps(data, indent=2, ensure_ascii=False)
         }
     return template_map
-
-
-def build_template_table(data: dict) -> str:
-    rows = []
-    for key, value in data.items():
-        if isinstance(value, (dict, list)):
-            display = json.dumps(value, ensure_ascii=False, indent=2)
-            display = html.escape(display).replace('\n', '<br>')
-            cell = f"<pre>{display}</pre>"
-        else:
-            display = html.escape(str(value)).replace('\n', '<br>')
-            cell = display
-        rows.append(f"<tr><th>{html.escape(str(key))}</th><td>{cell}</td></tr>")
-    return "<table class='template-preview'>" + ''.join(rows) + "</table>"
 
 
 def constructor_param_map(java_class: JavaClass, class_name: str) -> Dict[str, str]:
@@ -587,13 +571,10 @@ def template_links_for_scenarios(scenarios: Set[str], template_map: Dict[str, Di
         template_name = 'Notice.' + scenario.split('Scenario.', 1)[1]
         template_entry = template_map.get(template_name)
         if template_entry:
-            html_id = f"tpl-{uuid4().hex}"
             links.append({
                 'label': template_name,
                 'path': template_entry['path'],
-                'preview': template_entry['content'],
-                'table': template_entry['table'],
-                'html_id': html_id
+                'preview': template_entry['content']
             })
     if not links:
         links.append({'label': 'No template — task list only'})
@@ -834,10 +815,11 @@ def format_templates_markdown(entries: List[Dict[str, str]], notify_service_id: 
             link = f"`{entry['label']}`<br><small>{entry['path']}</small>"
         else:
             link = f"`{entry['label']}`"
-        if entry.get('table'):
+        preview = entry.get('content')
+        if preview:
             link += (
-                "\n\n<details><summary>Preview</summary>\n\n"
-                + entry['table']
+                "\n\n<details><summary>Preview</summary>\n\n" \
+                + "```json\n" + preview + "\n```" \
                 + "\n</details>"
             )
         parts.append(link)
@@ -862,11 +844,10 @@ def format_templates_html(entries: List[Dict[str, str]], notify_service_id: Opti
             link = f"<code>{html.escape(entry['label'])}</code><br><small>{html.escape(entry['path'])}</small>"
         else:
             link = f"<code>{html.escape(entry['label'])}</code>"
-        if entry.get('table'):
-            target = entry.get('html_id') or f"tpl-{uuid4().hex}"
+        preview = entry.get('content')
+        if preview:
             link += (
-                f"<br><button type='button' class='template-preview-toggle' data-target='{target}'>Preview</button>"
-                f"<div id='{target}' class='template-preview-panel'>{entry['table']}</div>"
+                f"<br><details><summary>Preview</summary><pre>{html.escape(preview)}</pre></details>"
             )
         parts.append(link)
     return '<br>'.join(parts)
@@ -918,6 +899,7 @@ def render_combined_markdown(rows: List[Dict[str, object]], notify_service_id: O
         Gov.Notify emails and dashboard notices, grouping them by the CCD events that kick off the relevant
         Camunda flow. Use the template column to jump straight to the Gov.Notify template or the dashboard
         JSON housed in `dashboard-notifications`.
+        \n**Tip:** To focus on a single CCD event, re-run the generator locally with `--ccd-event EVENT_ID`.
     """).strip()
     lines = [intro, ""]
     lines.append('|' + '|'.join(header) + '|')
@@ -971,10 +953,8 @@ def render_combined_html(rows: List[Dict[str, object]], notify_service_id: Optio
         "    button { padding: 0.2rem 0.6rem; }",
         "    .counts { font-size: 0.85rem; color: #555; }",
         "    h1 { margin-bottom: 0.25rem; }",
-        "    .template-preview { border-collapse: collapse; width: 100%; font-size: 0.75rem; margin-top: 0.25rem; }",
-        "    .template-preview th, .template-preview td { border: 1px solid #ddd; padding: 0.2rem; vertical-align: top; text-align: left; }",
-        "    .template-preview-panel { display: none; margin-top: 0.3rem; }",
-        "    .template-preview-toggle { margin-top: 0.25rem; padding: 0.2rem 0.4rem; font-size: 0.75rem; }",
+        "    details { margin-top: 0.25rem; }",
+        "    details pre { background: #f8f8f8; padding: 0.5rem; overflow-x: auto; }",
         "  </style>",
         "</head>",
         "<body>",
@@ -1025,19 +1005,6 @@ def render_combined_html(rows: List[Dict[str, object]], notify_service_id: Optio
         "      const reset = document.getElementById('reset-filter');",
         "      const rows = Array.from(document.querySelectorAll('#notifications-table tbody tr'));",
         "      const counter = document.getElementById('visible-count');",
-        "      const previewButtons = Array.from(document.querySelectorAll('.template-preview-toggle'));",
-        "      previewButtons.forEach(button => {",
-        "        const targetId = button.dataset.target;",
-        "        const panel = document.getElementById(targetId);",
-        "        if (!panel) {",
-        "          return;",
-        "        }",
-        "        button.addEventListener('click', () => {",
-        "          const isVisible = panel.style.display === 'block';",
-        "          panel.style.display = isVisible ? 'none' : 'block';",
-        "          button.textContent = isVisible ? 'Preview' : 'Hide preview';",
-        "        });",
-        "      });",
         "      function applyFilter() {",
         "        const value = (select.value || '').trim();",
         "        let visible = 0;",
@@ -1062,19 +1029,6 @@ def render_combined_html(rows: List[Dict[str, object]], notify_service_id: Optio
         "      if (saved) {",
         "        select.value = saved;",
         "      }",
-        "      const previewButtons = Array.from(document.querySelectorAll('.template-preview-toggle'));",
-        "      previewButtons.forEach(button => {",
-        "        const targetId = button.dataset.target;",
-        "        const panel = document.getElementById(targetId);",
-        "        if (!panel) {",
-        "          return;",
-        "        }",
-        "        button.addEventListener('click', () => {",
-        "          const isVisible = panel.style.display === 'block';",
-        "          panel.style.display = isVisible ? 'none' : 'block';",
-        "          button.textContent = isVisible ? 'Preview' : 'Hide preview';",
-        "        });",
-        "      });",
         "      select.addEventListener('change', applyFilter);",
         "      reset.addEventListener('click', () => { select.value = ''; applyFilter(); });",
         "      applyFilter();",
