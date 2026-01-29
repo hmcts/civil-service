@@ -6,8 +6,8 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.validation.groups.DateOfBirthGroup;
 
 import java.util.List;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 
 import static java.util.stream.Collectors.toList;
 
