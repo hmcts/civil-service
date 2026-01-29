@@ -115,9 +115,9 @@ def checkForEnableHelmLabel(branch_name) {
 def getCivilCcdDefinitionBranch() {
   def githubApi = new GithubAPI(this)
   for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "civilDefinitionBranch:")) {
-    return label.minus("civilDefinitionBranch:").trim()
+    return "feature/DTSCCI-3489"
   }
-  return "master"
+  return "feature/DTSCCI-3489"
 }
 
 def getGenAppsCcdDefinitionBranch() {
