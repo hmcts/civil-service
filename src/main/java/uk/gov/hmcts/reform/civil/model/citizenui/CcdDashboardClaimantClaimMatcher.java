@@ -146,6 +146,9 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isPaperResponse() {
+        if (!featureToggleService.isLipVLipEnabled()) {
+            return false;
+        }
         return CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.equals(caseData.getCcdState());
     }
 
