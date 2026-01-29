@@ -22,6 +22,7 @@ DASHBOARD_TASK_IDS_PATH = JAVA_ROOT / 'uk' / 'gov' / 'hmcts' / 'reform' / 'civil
 DASHBOARD_SCENARIOS_PATH = JAVA_ROOT / 'uk' / 'gov' / 'hmcts' / 'reform' / 'civil' / 'handler' / 'callback' / 'camunda' / 'dashboardnotifications' / 'DashboardScenarios.java'
 TEMPLATE_DIR = REPO_ROOT / 'dashboard-notifications' / 'src' / 'main' / 'resources' / 'notification-templates'
 RAW_GITHUB_BASE_URL = "https://raw.githubusercontent.com/hmcts/civil-service/master/"
+TEMPLATE_VIEWER_PATH = "dashboard-template.html"
 DIAGRAM_BASE_URL = "https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/"
 
 # Regex helpers
@@ -927,10 +928,10 @@ def format_templates_markdown(entries: List[Dict[str, str]], notify_service_id: 
             else:
                 link = f"`{label}`"
         elif entry.get('path'):
-            raw_url = f"{RAW_GITHUB_BASE_URL}{entry['path']}"
+            viewer_url = f"{TEMPLATE_VIEWER_PATH}?path={entry['path']}"
             link = (
                 f"`{entry['label']}`<br>"
-                f"<small><a href='{raw_url}'>{entry['path']}</a></small>"
+                f"<small><a href='{viewer_url}'>{entry['path']}</a></small>"
             )
         else:
             link = f"`{entry['label']}`"
@@ -960,10 +961,10 @@ def format_templates_html(entries: List[Dict[str, str]], notify_service_id: Opti
             else:
                 link = f"<code>{label}</code>"
         elif entry.get('path'):
-            raw_url = f"{RAW_GITHUB_BASE_URL}{entry['path']}"
+            viewer_url = f"{TEMPLATE_VIEWER_PATH}?path={html.escape(entry['path'])}"
             link = (
                 f"<code>{html.escape(entry['label'])}</code><br>"
-                f"<small><a href='{raw_url}'>{html.escape(entry['path'])}</a></small>"
+                f"<small><a href='{viewer_url}'>{html.escape(entry['path'])}</a></small>"
             )
         else:
             link = f"<code>{html.escape(entry['label'])}</code>"
