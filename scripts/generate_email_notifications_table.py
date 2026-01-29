@@ -929,10 +929,7 @@ def format_templates_markdown(entries: List[Dict[str, str]], notify_service_id: 
                 link = f"`{label}`"
         elif entry.get('path'):
             viewer_url = f"{TEMPLATE_VIEWER_PATH}?path={entry['path']}"
-            link = (
-                f"`{entry['label']}`<br>"
-                f"<small><a href='{viewer_url}'>{entry['path']}</a></small>"
-            )
+            link = f"[`{entry['label']}`]({viewer_url})"
         else:
             link = f"`{entry['label']}`"
         preview = entry.get('content')
@@ -962,10 +959,7 @@ def format_templates_html(entries: List[Dict[str, str]], notify_service_id: Opti
                 link = f"<code>{label}</code>"
         elif entry.get('path'):
             viewer_url = f"{TEMPLATE_VIEWER_PATH}?path={html.escape(entry['path'])}"
-            link = (
-                f"<code>{html.escape(entry['label'])}</code><br>"
-                f"<small><a href='{viewer_url}'>{html.escape(entry['path'])}</a></small>"
-            )
+            link = f"<a href='{viewer_url}'><code>{html.escape(entry['label'])}</code></a>"
         else:
             link = f"<code>{html.escape(entry['label'])}</code>"
         preview = entry.get('content')
