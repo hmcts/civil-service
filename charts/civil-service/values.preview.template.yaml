@@ -334,7 +334,6 @@ ccd:
       devcpuRequests: 2000m
       devmemoryLimits: 4096Mi
       devcpuLimits: 4000m
-      releaseNameOverride: ${SERVICE_NAME}-am-role-assignment-service
       imagePullPolicy: Always
       image: hmctspublic.azurecr.io/am/role-assignment-service:latest
       ingressHost: am-role-assignment-service-${SERVICE_FQDN}
