@@ -894,8 +894,9 @@ def format_bpmn_markdown(paths: List[str]) -> str:
         if path == '—':
             formatted.append('—')
         else:
-            name = Path(path).stem
-            formatted.append(f"{path} ([diagram]({DIAGRAM_BASE_URL}{name}.png))")
+            name = Path(path).name
+            diagram = f"{DIAGRAM_BASE_URL}{Path(path).stem}.png"
+            formatted.append(f"[{name}]({diagram})")
     return '<br>'.join(formatted)
 
 
@@ -905,8 +906,9 @@ def format_bpmn_html(paths: List[str]) -> str:
         if path == '—':
             formatted.append('—')
         else:
-            name = Path(path).stem
-            formatted.append(f"{html.escape(path)}<br><a href='{DIAGRAM_BASE_URL}{name}.png'>diagram</a>")
+            name = Path(path).name
+            diagram = f"{DIAGRAM_BASE_URL}{Path(path).stem}.png"
+            formatted.append(f"<a href='{diagram}'>{html.escape(name)}</a>")
     return '<br>'.join(formatted)
 
 
