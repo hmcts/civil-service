@@ -340,6 +340,7 @@ ccd:
       ingressHost: am-role-assignment-service-${SERVICE_FQDN}
       environment:
         RELEASE_REVISION: "{{ .Release.Revision }}"
+        ROLE_ASSIGNMENT_DB_HOST: ${SERVICE_NAME}-postgresql
         ROLE_ASSIGNMENT_DB_PASSWORD: ${POSTGRES_PASSWORD}
         ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified"
         CCD_DATA_STORE_URL: http://${SERVICE_NAME}-ccd-data-store-api
