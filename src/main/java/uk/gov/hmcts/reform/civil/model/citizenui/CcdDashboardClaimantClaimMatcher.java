@@ -146,8 +146,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isPaperResponse() {
-        return Objects.nonNull(caseData.getCcdState())
-            && caseData.getCcdState().equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
+        return CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.equals(caseData.getCcdState());
     }
 
     @Override
