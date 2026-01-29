@@ -348,6 +348,50 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldPopulateLocationListsWhenTransferredOnlineHearingLocationShouldBeNewCaseManagementLocaion() {
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
+                "Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            String preSelectedCourt = "214320";
+            List<LocationRefData> locations = List.of(
+                LocationRefData.builder().epimmsId("00001").courtLocationCode("00001")
+                    .siteName("court 1").courtAddress("1 address").postcode("Y01 7RB").build(),
+                LocationRefData.builder().epimmsId(preSelectedCourt).courtLocationCode(preSelectedCourt)
+                    .siteName("court 2").courtAddress("2 address").postcode("Y02 7RB").build(),
+                LocationRefData.builder().epimmsId("00003").courtLocationCode("00003")
+                    .siteName("court 3").courtAddress("3 address").postcode("Y03 7RB").build()
+            );
+            when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
+                categorySearchResult));
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedDisposalHearingSDOInPersonHearing()
+                .reasonForTransfer("Court Closed")
+                .transferCourtLocationList(DynamicList.builder()
+                                               .value(DynamicListElement.builder()
+                                                          .code("97c6385d-dc61-4a46-b58f-2992e5ecb4f4")
+                                                          .label("Central London County Court - Thomas More Building, Royal Courts of Justice, Strand, London - WC2A 2LL")
+                                                          .build()).build())
+                .caseManagementLocation(CaseLocationCivil.builder().region("1").baseLocation("214320").build())
+                .caseAccessCategory(UNSPEC_CLAIM)
+                .build();
+
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
+            CaseDocument order = createCaseDocument("url");
+            when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            DynamicList expected = createStandardCourtList(preSelectedCourt);
+
+            assertThat(responseCaseData.getDisposalHearingMethodInPerson()).isEqualTo(expected);
+            assertThat(responseCaseData.getFastTrackMethodInPerson()).isEqualTo(expected);
+            assertThat(responseCaseData.getSmallClaimsMethodInPerson()).isEqualTo(expected);
+        }
+
+        @Test
         void shouldPopulateLocationListsWithPreselectedCourtAndEnableWelshFlagWithClaimantLanguagePreference() {
             Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
                 "Y").build();

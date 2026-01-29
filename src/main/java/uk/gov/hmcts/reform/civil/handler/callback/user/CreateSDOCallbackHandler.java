@@ -283,7 +283,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
          * Update case management location to preferred logic and return preferred location when legal advisor SDO,
          * otherwise return preferred location only.
          */
-        Optional<RequestedCourt> preferredCourt = updateCaseManagementLocationIfLegalAdvisorSdo(callbackParams, caseData);
+        Optional<RequestedCourt> preferredCourt = updateCaseManagementLocationIfLegalAdvisorSdo(
+            callbackParams,
+            caseData
+        );
 
         DynamicList hearingMethodList = getDynamicHearingMethodList(callbackParams, caseData);
 
@@ -295,9 +298,16 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             caseData.setHearingMethodValuesDisposalHearing(hearingMethodList);
             caseData.setHearingMethodValuesSmallClaims(hearingMethodList);
         }
-
         List<LocationRefData> locationRefDataList = getAllLocationFromRefData(callbackParams);
-        DynamicList locationsList = getLocationList(preferredCourt.orElse(null), false, locationRefDataList);
+        DynamicList locationsList;
+        if (caseData.getReasonForTransfer() != null && caseData.getTransferCourtLocationList() != null) {
+            RequestedCourt requestedCourt = new RequestedCourt();
+            requestedCourt.setCaseLocation(caseData.getCaseManagementLocation());
+            Optional<RequestedCourt> optionalRequestedCourt = Optional.of(requestedCourt);
+            locationsList = getLocationList(optionalRequestedCourt.orElse(null), false, locationRefDataList);
+        } else {
+            locationsList = getLocationList(preferredCourt.orElse(null), false, locationRefDataList);
+        }
         caseData.setDisposalHearingMethodInPerson(locationsList);
         caseData.setFastTrackMethodInPerson(locationsList);
         caseData.setSmallClaimsMethodInPerson(locationsList);
