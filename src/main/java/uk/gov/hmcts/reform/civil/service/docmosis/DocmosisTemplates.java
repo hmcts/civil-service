@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis;
 
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 
 public enum DocmosisTemplates {
     N1("CV-UNS-CLM-ENG-01126.docx", "sealed_claim_form_%s.pdf"),

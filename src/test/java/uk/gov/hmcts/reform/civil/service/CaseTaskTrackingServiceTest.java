@@ -7,7 +7,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.ObjectProvider;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class CaseTaskTrackingServiceTest {
@@ -26,20 +24,16 @@ class CaseTaskTrackingServiceTest {
     @Mock
     private TelemetryClient telemetryClient;
 
-    @Mock
-    private ObjectProvider<TelemetryClient> telemetryClientProvider;
-
     @InjectMocks
     private CaseTaskTrackingService caseTaskTrackingService;
 
     @Test
     @SuppressWarnings("unchecked")
     void trackCaseTask_withNullAdditionalProperties_shouldOnlyAddCaseAndEventProperties() {
-        Map<String, String> additionalProperties = null;
-        org.mockito.Mockito.when(telemetryClientProvider.getIfAvailable()).thenReturn(telemetryClient);
         final String caseId = "111";
         final String eventType = "serviceBusMessage";
         final String eventName = "NotifyRobotics";
+        Map<String, String> additionalProperties = null;
         caseTaskTrackingService.trackCaseTask(caseId, eventType, eventName, additionalProperties);
 
         ArgumentCaptor<Map<String, String>> propertiesCaptor = ArgumentCaptor.forClass(Map.class);
@@ -54,14 +48,13 @@ class CaseTaskTrackingServiceTest {
     @Test
     @SuppressWarnings("unchecked")
     void trackCaseTask_withAdditionalProperties_shouldMergeAllProperties() {
-        final String caseId = "222";
-        final String eventType = "update";
-        final String eventName = "CaseUpdated";
+        String caseId = "222";
+        String eventType = "update";
+        String eventName = "CaseUpdated";
         Map<String, String> additionalProperties = new HashMap<>();
         additionalProperties.put("someKey", "someValue");
         additionalProperties.put("anotherKey", "anotherValue");
 
-        org.mockito.Mockito.when(telemetryClientProvider.getIfAvailable()).thenReturn(telemetryClient);
         caseTaskTrackingService.trackCaseTask(caseId, eventType, eventName, additionalProperties);
 
         ArgumentCaptor<Map<String, String>> propertiesCaptor = ArgumentCaptor.forClass(Map.class);
@@ -83,11 +76,10 @@ class CaseTaskTrackingServiceTest {
         additionalProperties.put("caseId", "OVERRIDDEN");
         additionalProperties.put("eventType", "OVERRIDE_TYPE");
         additionalProperties.put("extra", "x");
-        org.mockito.Mockito.when(telemetryClientProvider.getIfAvailable()).thenReturn(telemetryClient);
 
+        String caseId = "333";
         String eventType = "originalType";
         String eventName = "EventWithOverrides";
-        String caseId = "333";
         caseTaskTrackingService.trackCaseTask(caseId, eventType, eventName, additionalProperties);
 
         ArgumentCaptor<Map<String, String>> propertiesCaptor = ArgumentCaptor.forClass(Map.class);
@@ -99,15 +91,6 @@ class CaseTaskTrackingServiceTest {
         assertEquals("OVERRIDDEN", captured.get("caseId"));
         assertEquals("OVERRIDE_TYPE", captured.get("eventType"));
         assertEquals("x", captured.get("extra"));
-    }
-
-    @Test
-    void trackCaseTask_whenTelemetryClientNotAvailable_skipsTracking() {
-        org.mockito.Mockito.when(telemetryClientProvider.getIfAvailable()).thenReturn(null);
-
-        caseTaskTrackingService.trackCaseTask("444", "type", "name", null);
-
-        verifyNoInteractions(telemetryClient);
     }
 
     @Test

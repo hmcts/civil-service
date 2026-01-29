@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -74,7 +73,7 @@ public class SecurityConfiguration {
                 .hasAnyAuthority(AUTHORITIES)
                 .anyRequest().authenticated()
             )
-            .oauth2Client(Customizer.withDefaults());
+            .oauth2Client();
 
         return http.build();
     }
@@ -83,3 +82,4 @@ public class SecurityConfiguration {
         return Arrays.copyOf(AUTH_WHITELIST, AUTH_WHITELIST.length);
     }
 }
+

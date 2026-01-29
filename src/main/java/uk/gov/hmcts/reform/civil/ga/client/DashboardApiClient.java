@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 
 @FeignClient(name = "dashboard-api", url = "${dashboard.api.url}/dashboard", configuration =
     FeignClientProperties.FeignClientConfiguration.class)

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 
 import java.time.LocalDate;
-import jakarta.validation.constraints.Future;
+import javax.validation.constraints.Future;
 
 @Data
 @Builder(toBuilder = true)

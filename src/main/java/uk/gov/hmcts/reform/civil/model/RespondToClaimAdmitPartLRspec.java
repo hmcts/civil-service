@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.validation.groups.PaymentDateGroup;
 
 import java.time.LocalDate;
-import jakarta.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.FutureOrPresent;
 
 @Data
 @Builder(toBuilder = true)

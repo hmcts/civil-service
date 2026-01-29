@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 
 import java.time.LocalDate;
 import java.util.List;
-import jakarta.validation.constraints.Future;
+import javax.validation.constraints.Future;
 
 @Data
 @Builder(toBuilder = true)

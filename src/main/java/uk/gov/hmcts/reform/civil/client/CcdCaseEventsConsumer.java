@@ -18,7 +18,7 @@ public class CcdCaseEventsConsumer implements Runnable {
 
     private final CcdEventServiceBusConfiguration ccdEventServiceBusConfiguration;
     private final CcdEventMessageReceiverService eventMessageReceiverService;
-    private volatile boolean keepRun = true;
+    private boolean keepRun = true;
 
     public CcdCaseEventsConsumer(CcdEventServiceBusConfiguration ccdEventServiceBusConfiguration,
                                  CcdEventMessageReceiverService eventMessageReceiverService) {

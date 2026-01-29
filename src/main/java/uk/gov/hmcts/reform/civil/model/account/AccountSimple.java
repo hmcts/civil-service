@@ -6,8 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import jakarta.validation.constraints.NotNull;
 
 @Data
 @NoArgsConstructor

@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import jakarta.validation.constraints.Future;
+import javax.validation.constraints.Future;
 import java.time.LocalDate;
 
 @Data

@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.validation.groups.DateOfBirthGroup;
 
-import jakarta.validation.constraints.PastOrPresent;
+import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;

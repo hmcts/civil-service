@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.validation.groups.PaymentDateGroup;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import jakarta.validation.constraints.PastOrPresent;
+import javax.validation.constraints.PastOrPresent;
 
 @Data
 @Builder
