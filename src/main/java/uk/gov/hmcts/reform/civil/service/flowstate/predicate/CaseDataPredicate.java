@@ -4,7 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -45,7 +47,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.predicate.util.Predica
  */
 @SuppressWarnings("java:S1214")
 sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, DismissedPredicate, DivergencePredicate,
-    HearingPredicate, LanguagePredicate, LipPredicate, NotificationPredicate, OutOfTimePredicate, PaymentPredicate,
+    HearingPredicate, LanguagePredicate, LipPredicate, MediationPredicate, NotificationPredicate, OutOfTimePredicate, PaymentPredicate,
     RepaymentPredicate, ResponsePredicate, TakenOfflinePredicate {
 
     interface Applicant {
@@ -57,6 +59,15 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         )
         Predicate<CaseData> isRepresented =
             nullSafe(c -> !c.isApplicantNotRepresented());
+
+        @BusinessRule(
+            group = "Applicant",
+            summary = "Applicant 1 is unrepresented",
+            description = "Returns true when applicant 1 is marked as not legally represented / self-represented (the applicant1Represented field is set to No)."
+        )
+        Predicate<CaseData> isUnrepresentedApplicant1 =
+            nullSafe(c -> c.getApplicant1Represented() != null
+                && NO.equals(c.getApplicant1Represented()));
 
         @BusinessRule(
             group = "Applicant",
@@ -187,6 +198,14 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         Predicate<CaseData> willProceedApplicant2Multi_2v1 =
             nullSafe(c -> YES.equals(c.getApplicant2ProceedWithClaimMultiParty2v1()));
 
+        @BusinessRule(
+            group = "Applicant",
+            summary = "Applicant correspondence address not required (Spec)",
+            description = "True when applicant correspondence address is not required (Spec) — field `specAoSApplicantCorrespondenceAddressRequired` = No."
+        )
+        Predicate<CaseData> isNotCorrespondenceAddressRequiredSpec =
+            nullSafe(c -> NO.equals(c.getSpecAoSApplicantCorrespondenceAddressRequired()));
+
     }
 
     interface Claim {
@@ -209,12 +228,46 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
 
         @BusinessRule(
             group = "Claim",
+            summary = "Case is small claims track",
+            description = "True when the case is on the small claims track (field `responseClaimTrack` indicates small claims)."
+        )
+        Predicate<CaseData> isSmallClaim =
+            nullSafe(c -> SMALL_CLAIM.name().equals(c.getResponseClaimTrack()));
+
+        @BusinessRule(
+            group = "Claim",
+            summary = "Allocated track is multi-track",
+            description = "True when the case is allocated to the multi-track (field `allocatedTrack` = MULTI_CLAIM)."
+        )
+        Predicate<CaseData> isMultiClaim =
+            nullSafe(c -> MULTI_CLAIM.equals(c.getAllocatedTrack()));
+
+        @BusinessRule(
+            group = "Claim",
+            summary = "Defendant has not paid (full defence)",
+            description = "True when the case is in a 'full defence not paid' situation (case data indicates the " +
+                "defendant has not paid as required following a full defence outcome)."
+        )
+        Predicate<CaseData> isFullDefenceNotPaid =
+            nullSafe(CaseData::isFullDefenceNotPaid);
+
+        @BusinessRule(
+            group = "Claim",
             summary = "Case is Multi Party Scenario",
-            description = "Case has two applicants or respondents"
+            description = "True when the case has multiple parties (either `applicant2` or `respondent2` is present)."
         )
         Predicate<CaseData> isMultiParty =
             nullSafe(c -> c.getApplicant2() != null
             || c.getRespondent2() != null);
+
+        @BusinessRule(
+            group = "Claim",
+            summary = "Claimant indicates the claim has been settled (part admission)",
+            description = "True when a part admission case is treated as settled based on the recorded settlement " +
+                "indicators (e.g. claimant intention to settle and, where applicable, confirmation of payment)."
+        )
+        Predicate<CaseData> isPartAdmitSettled =
+            nullSafe(CaseData::isPartAdmitClaimSettled);
 
         @BusinessRule(
             group = "Claim",
@@ -269,7 +322,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Claim",
             summary = "Claim notification options present",
-            description = "Defendant claim-notification options exist"
+            description = "True when defendant claim-notification options are present (dynamic list non-null)."
         )
         Predicate<CaseData> hasNotifyOptions =
             nullSafe(c -> c.getDefendantSolicitorNotifyClaimOptions() != null);
@@ -277,7 +330,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Claim",
             summary = "Claim notify option is 'Both'",
-            description = "Defendant claim-notification option value is 'Both'"
+            description = "Defendant claim-notification option value equals 'Both' (compared against the dynamic list label)."
         )
         Predicate<CaseData> isNotifyOptionsBoth =
             nullSafe(c -> "Both".equals(c.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel()));
@@ -298,24 +351,6 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         Predicate<CaseData> hasPassedDismissalDeadline =
             nullSafe(c -> c.getClaimDismissedDeadline() != null
                 && c.getClaimDismissedDeadline().isBefore(LocalDateTime.now()));
-
-        @BusinessRule(
-            group = "Claim",
-            summary = "1v1 response flag present",
-            description = "Flag used to indicate a one-v-one response was provided (LR ITP update)"
-        )
-        Predicate<CaseData> hasOneVOneResponseFlag =
-            nullSafe(c -> c.getShowResponseOneVOneFlag() != null);
-
-        @BusinessRule(
-            group = "Claim",
-            summary = "One‑v‑one response flag equals specified type",
-            description = "Checks the one‑v‑one response flag equals the provided ResponseOneVOneShowTag"
-        )
-        static Predicate<CaseData> isType(ResponseOneVOneShowTag responseType) {
-            return nullSafe(c -> c.getShowResponseOneVOneFlag() != null
-            && c.getShowResponseOneVOneFlag().equals(responseType));
-        }
 
         @BusinessRule(
             group = "Claim",
@@ -358,7 +393,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "ClaimDetails",
             summary = "Claim details notification options present",
-            description = "Notification options for claim details were sent to defendant solicitor"
+            description = "True when claim-details notification options are present for the defendant solicitor (dynamic list non-null)."
         )
         Predicate<CaseData> hasNotifyOptions =
             nullSafe(c -> c.getDefendantSolicitorNotifyClaimDetailsOptions() != null);
@@ -366,7 +401,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "ClaimDetails",
             summary = "Claim details notify option is 'Both'",
-            description = "The dynamic list for claim details notify options was set to 'Both'"
+            description = "Claim details notify option equals 'Both' (compared against the dynamic list label)."
         )
         Predicate<CaseData> isNotifyOptionsBoth =
             nullSafe(c -> Optional.ofNullable(c.getDefendantSolicitorNotifyClaimDetailsOptions())
@@ -400,10 +435,46 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Claimant",
             summary = "Claimant agreed to mediation",
-            description = "Claimant has opted into free mediation"
+            description = "True when the claimant has opted into free mediation."
         )
         Predicate<CaseData> agreedToMediation =
             nullSafe(CaseData::hasClaimantAgreedToFreeMediation);
+
+        @BusinessRule(
+            group = "Claimant",
+            summary = "Claimant has declined free mediation",
+            description = "True when the claimant has opted out of free mediation (field indicates the claimant has not " +
+                "agreed to free mediation)."
+        )
+        Predicate<CaseData> declinedMediation =
+            nullSafe(CaseData::hasClaimantNotAgreedToFreeMediation);
+
+        @BusinessRule(
+            group = "Claimant",
+            summary = "Claimant indicates they will not settle (part admission)",
+            description = "True when, in a part admission scenario, the claimant's recorded decision indicates they will " +
+                "not settle the claim on the defendant's part-admission terms."
+        )
+        Predicate<CaseData> isNotSettlePartAdmit =
+            nullSafe(CaseData::isClaimantNotSettlePartAdmitClaim);
+
+        @BusinessRule(
+            group = "Claimant",
+            summary = "Claimant intends to settle (part admission)",
+            description = "True when, in a part admission scenario, the claimant's recorded intention is to settle the " +
+                "claim (intention-to-settle flag is Yes)."
+        )
+        Predicate<CaseData> isIntentionSettlePartAdmit =
+            nullSafe(CaseData::isClaimantIntentionSettlePartAdmit);
+
+        @BusinessRule(
+            group = "Claimant",
+            summary = "Claimant intends not to settle (part admission)",
+            description = "True when, in a part admission scenario, the claimant's recorded intention is not to settle " +
+                "the claim (intention-to-settle flag is No)."
+        )
+        Predicate<CaseData> isIntentionNotSettlePartAdmit =
+            nullSafe(CaseData::isClaimantIntentionNotSettlePartAdmit);
 
         @BusinessRule(
             group = "Claimant",
@@ -430,7 +501,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Hearing",
             summary = "Hearing reference present",
-            description = "A hearing reference number is recorded for the case"
+            description = "True when a hearing reference number is recorded for the case."
         )
         Predicate<CaseData> hasReference =
             nullSafe(c -> c.getHearingReferenceNumber() != null);
@@ -438,7 +509,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Hearing",
             summary = "Hearing is listed",
-            description = "The case has a hearing listing (listing status is LISTING)"
+            description = "True when the case has a hearing listing (listing status is LISTING)."
         )
         Predicate<CaseData> isListed =
             nullSafe(c -> c.getListingOrRelisting() != null
@@ -447,7 +518,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Hearing",
             summary = "Hearing dismissed fee due date present",
-            description = "A hearing fee due date (dismissed) is recorded on the case"
+            description = "True when a hearing fee due date (dismissed) is recorded on the case."
         )
         Predicate<CaseData> hasDismissedFeeDueDate =
             nullSafe(c -> c.getCaseDismissedHearingFeeDueDate() != null);
@@ -459,7 +530,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Judgment",
             summary = "Active judgment is by admission",
-            description = "An active judgment exists and its type is 'judgment by admission'"
+            description = "True when an active judgment exists and its type is 'judgment by admission'."
         )
         Predicate<CaseData> isByAdmission =
             nullSafe(c -> c.getActiveJudgment() != null
@@ -472,7 +543,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "MultiParty",
             summary = "Multi-party scenario: 1v1",
-            description = "Case multi-party scenario equals ONE_V_ONE"
+            description = "True when the multi-party scenario equals ONE_V_ONE."
         )
         Predicate<CaseData> isOneVOne =
             nullSafe(c -> MultiPartyScenario.ONE_V_ONE.equals(getMultiPartyScenario(c)));
@@ -480,7 +551,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "MultiParty",
             summary = "Multi-party scenario: 1v2 (one legal rep)",
-            description = "Case multi-party scenario equals ONE_V_TWO_ONE_LEGAL_REP"
+            description = "True when the multi-party scenario equals ONE_V_TWO_ONE_LEGAL_REP."
         )
         Predicate<CaseData> isOneVTwoOneLegalRep =
             nullSafe(c -> MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(c)));
@@ -488,18 +559,10 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "MultiParty",
             summary = "Multi-party scenario: 1v2 (two legal reps)",
-            description = "Case multi-party scenario equals ONE_V_TWO_TWO_LEGAL_REP"
+            description = "True when the multi-party scenario equals ONE_V_TWO_TWO_LEGAL_REP."
         )
         Predicate<CaseData> isOneVTwoTwoLegalRep =
             nullSafe(c -> MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(c)));
-
-        @BusinessRule(
-            group = "MultiParty",
-            summary = "Multi-party scenario: 2v1",
-            description = "Case multi-party scenario equals TWO_V_ONE"
-        )
-        Predicate<CaseData> isTwoVOne =
-            nullSafe(c -> MultiPartyScenario.TWO_V_ONE.equals(getMultiPartyScenario(c)));
     }
 
     interface RepaymentPlan {
@@ -507,7 +570,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Repayment",
             summary = "Repayment plan accepted",
-            description = "Applicant has accepted the proposed repayment plan"
+            description = "True when the applicant has accepted the proposed repayment plan."
         )
         Predicate<CaseData> accepted =
             nullSafe(CaseData::hasApplicantAcceptedRepaymentPlan);
@@ -515,7 +578,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Repayment",
             summary = "Repayment plan rejected",
-            description = "Applicant has rejected the proposed repayment plan"
+            description = "True when the applicant has rejected the proposed repayment plan."
         )
         Predicate<CaseData> rejected =
             nullSafe(CaseData::hasApplicantRejectedRepaymentPlan);
@@ -527,7 +590,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Respondent",
             summary = "Respondent 1 is represented",
-            description = "Respondent 1 is represented"
+            description = "True when respondent 1 is legally represented (`respondent1Represented` = Yes)."
         )
         Predicate<CaseData> isRepresentedRespondent1 =
             nullSafe(c -> c.getRespondent1Represented() != null
@@ -536,7 +599,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Respondent",
             summary = "Respondent 1 is unrepresented",
-            description = "Respondent 1 is unrepresented"
+            description = "True when respondent 1 is not legally represented (`respondent1Represented` = No)."
         )
         Predicate<CaseData> isUnrepresentedRespondent1 =
             nullSafe(c -> c.getRespondent1Represented() != null
@@ -545,7 +608,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Respondent",
             summary = "Respondent 2 is represented",
-            description = "Respondent 2 is represented"
+            description = "True when respondent 2 is legally represented (`respondent2Represented` = Yes)."
         )
         Predicate<CaseData> isRepresentedRespondent2 =
             nullSafe(c -> c.getRespondent2Represented() != null
@@ -554,7 +617,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Respondent",
             summary = "Respondent 2 is unrepresented",
-            description = "Respondent 2 is unrepresented"
+            description = "True when respondent 2 is not legally represented (`respondent2Represented` = No)."
         )
         Predicate<CaseData> isUnrepresentedRespondent2 =
             nullSafe(c -> c.getRespondent2Represented() != null
@@ -563,7 +626,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Respondent",
             summary = "Respondent 1 is a registered organisation",
-            description = "Checks if respondent 1 is a registered organisation."
+            description = "True when respondent 1 is a registered organisation (`respondent1OrgRegistered` = Yes)."
         )
         Predicate<CaseData> isOrgRegisteredRespondent1 =
             nullSafe(c -> c.getRespondent1OrgRegistered() != null
@@ -572,7 +635,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Respondent",
             summary = "Respondent 1 is not a registered organisation",
-            description = "Checks if respondent 1 is not a registered organisation."
+            description = "True when respondent 1 is not a registered organisation (`respondent1OrgRegistered` = No)."
         )
         Predicate<CaseData> isNotOrgRegisteredRespondent1 =
             nullSafe(c -> c.getRespondent1OrgRegistered() != null
@@ -580,8 +643,9 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
 
         @BusinessRule(
             group = "Respondent",
-            summary = "Respondent 1 is not a registered organisation",
-            description = "Checks if respondent 1 is not a registered organisation."
+            summary = "Respondent 1 represented and not a registered organisation",
+            description = "True when respondent 1 is legally represented and is not a registered organisation " +
+                "(`respondent1Represented` = Yes AND `respondent1OrgRegistered` = No)."
         )
         Predicate<CaseData> isRepresentedNotOrgRegisteredRespondent1 =
             nullSafe(c -> YES.equals(c.getRespondent1Represented())
@@ -589,8 +653,8 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
 
         @BusinessRule(
             group = "Respondent",
-            summary = "Respondent 2 is a registered organisation (YES)",
-            description = "Checks if respondent 2 is a registered organisation."
+            summary = "Respondent 2 is a registered organisation",
+            description = "True when respondent 2 is a registered organisation (`respondent2OrgRegistered` = Yes)."
         )
         Predicate<CaseData> isOrgRegisteredRespondent2 =
             nullSafe(c -> c.getRespondent2OrgRegistered() != null
@@ -598,8 +662,8 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
 
         @BusinessRule(
             group = "Respondent",
-            summary = "Respondent 2 is not a registered organisation (NO)",
-            description = "Checks if respondent 2 is not a registered organisation."
+            summary = "Respondent 2 is not a registered organisation",
+            description = "True when respondent 2 is not a registered organisation (`respondent2OrgRegistered` = No)."
         )
         Predicate<CaseData> isNotOrgRegisteredRespondent2 =
             nullSafe(c -> c.getRespondent2OrgRegistered() != null
@@ -607,8 +671,9 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
 
         @BusinessRule(
             group = "Respondent",
-            summary = "Respondent 2 is not a registered organisation",
-            description = "Checks if respondent 2 is not a registered organisation."
+            summary = "Respondent 2 represented and not a registered organisation",
+            description = "True when respondent 2 is legally represented and is not a registered organisation " +
+                "(`respondent2Represented` = Yes AND `respondent2OrgRegistered` = No or null)."
         )
         Predicate<CaseData> isRepresentedNotOrgRegisteredRespondent2 =
             nullSafe(c -> YES.equals(c.getRespondent2Represented())
@@ -624,8 +689,8 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
 
         @BusinessRule(
             group = "Respondent",
-            summary = "Case has add second respondent",
-            description = "Checks if add respondent 2 is present in the case data."
+            summary = "Add respondent 2 flag present",
+            description = "True when field `addRespondent2` is present (non-null)."
         )
         Predicate<CaseData> hasAddRespondent2 =
             nullSafe(c -> c.getAddRespondent2() != null);
@@ -633,7 +698,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Respondent",
             summary = "Add respondent 2 (YES)",
-            description = "Checks if add respondent 2 is equal to YES"
+            description = "True when `addRespondent2` = Yes."
         )
         Predicate<CaseData> isAddRespondent2 =
             nullSafe(c -> YES.equals(c.getAddRespondent2()));
@@ -641,15 +706,15 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Respondent",
             summary = "Add respondent 2 (NO)",
-            description = "Checks if add respondent 2 is equal to NO"
+            description = "True when `addRespondent2` = No."
         )
         Predicate<CaseData> isNotAddRespondent2 =
             nullSafe(c -> NO.equals(c.getAddRespondent2()));
 
         @BusinessRule(
             group = "Respondent",
-            summary = "Respondent same legal representative present",
-            description = "Checks if respondent 2 is represented by the same legal representative as respondent 1."
+            summary = "Same legal representative flag present",
+            description = "Field `respondent2SameLegalRepresentative` present (non-null)."
         )
         Predicate<CaseData> hasSameLegalRepresentative =
             nullSafe(c -> c.getRespondent2SameLegalRepresentative() != null);
@@ -657,7 +722,8 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Respondent",
             summary = "Respondents have the same legal representative (YES)",
-            description = "Checks if respondent 2 is represented by the same legal representative as respondent 1."
+            description = "True when respondents are recorded as having the same legal representative " +
+                "(`respondent2SameLegalRepresentative` = Yes)."
         )
         Predicate<CaseData> isSameLegalRepresentative =
             nullSafe(c -> YES.equals(c.getRespondent2SameLegalRepresentative()));
@@ -665,7 +731,8 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Respondent",
             summary = "Respondents do not have the same legal representative (NO)",
-            description = "Checks if respondent 2 is represented by the same legal representative as respondent 1."
+            description = "True when respondents are recorded as not having the same legal representative " +
+                "(`respondent2SameLegalRepresentative` = No)."
         )
         Predicate<CaseData> isNotSameLegalRepresentative =
             nullSafe(c -> NO.equals(c.getRespondent2SameLegalRepresentative()));
@@ -721,7 +788,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Respondent",
             summary = "Respondent 1 has response type",
-            description = "Respondent 1 has a non-null response type enum"
+            description = "True when respondent 1 has a non-null response type enum."
         )
         Predicate<CaseData> hasResponseTypeRespondent1 =
             nullSafe(c -> c.getRespondent1ClaimResponseType() != null);
@@ -729,7 +796,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Respondent",
             summary = "Respondent 1 has response type (SPEC)",
-            description = "Respondent 1 has a non-null response type enum"
+            description = "True when respondent 1 has a non-null SPEC response type enum."
         )
         Predicate<CaseData> hasResponseTypeSpecRespondent1 =
             nullSafe(c -> c.getRespondent1ClaimResponseTypeForSpec() != null);
@@ -737,7 +804,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Respondent",
             summary = "Respondent 2 has response type",
-            description = "Respondent 2 has a non-null response type enum"
+            description = "True when respondent 2 has a non-null response type enum."
         )
         Predicate<CaseData> hasResponseTypeRespondent2 =
             nullSafe(c -> c.getRespondent2ClaimResponseType() != null);
@@ -745,7 +812,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Respondent",
             summary = "Respondent 2 has response type (SPEC)",
-            description = "Respondent 2 has a non-null response type enum"
+            description = "True when respondent 2 has a non-null SPEC response type enum."
         )
         Predicate<CaseData> hasResponseTypeSpecRespondent2 =
             nullSafe(c -> c.getRespondent2ClaimResponseTypeForSpec() != null);
@@ -769,7 +836,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Respondent",
             summary = "Respondents have same-response flag",
-            description = "Yes/No flag indicating respondents marked their responses as the same"
+            description = "True when `respondentResponseIsSame` = Yes (respondents marked their responses as the same)."
         )
         Predicate<CaseData> isSameResponseFlag =
             nullSafe(c -> YES.equals(c.getRespondentResponseIsSame()));
@@ -797,7 +864,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Respondent",
             summary = "Respondent 1 response after respondent 2",
-            description = "Respondent 1 response timestamp is after respondent 2 response timestamp"
+            description = "True when respondent 1 response timestamp is after respondent 2 response timestamp."
         )
         Predicate<CaseData> respondent1ResponseAfterRespondent2 =
             nullSafe(c -> c.getRespondent1ResponseDate().isAfter(c.getRespondent2ResponseDate()));
@@ -805,7 +872,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Respondent",
             summary = "Respondent 2 response after respondent 1",
-            description = "Respondent 2 response timestamp is after respondent 1 response timestamp"
+            description = "True when respondent 2 response timestamp is after respondent 1 response timestamp."
         )
         Predicate<CaseData> respondent2ResponseAfterRespondent1 =
             nullSafe(c -> c.getRespondent2ResponseDate().isAfter(c.getRespondent1ResponseDate()));
@@ -852,7 +919,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Respondent",
             summary = "Respondent 2 response is of type (SPEC)",
-            description = "Factory: checks respondent 2's non-SPEC response enum equals the provided RespondentResponseType"
+            description = "Factory: checks respondent 2's SPEC response enum equals the provided `RespondentResponseTypeSpec`."
         )
         static Predicate<CaseData> isTypeSpecRespondent2(RespondentResponseTypeSpec responseType) {
             return nullSafe(c -> c.getRespondent2ClaimResponseTypeForSpec() != null
@@ -873,8 +940,17 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
 
         @BusinessRule(
             group = "Payment",
+            summary = "Defendant offered to pay immediately and claimant accepted (part admission)",
+            description = "True when the defendant has proposed to pay the part-admitted amount immediately and the " +
+                "claimant has accepted that immediate payment option (determined from the SPEC pay-immediately acceptance flag/tag)."
+        )
+        Predicate<CaseData> isPartAdmitPayImmediately =
+            nullSafe(CaseData::isPartAdmitPayImmediatelyAccepted);
+
+        @BusinessRule(
+            group = "Payment",
             summary = "When to be paid (text present)",
-            description = "When To Be Paid exists on the case"
+            description = "True when the 'When To Be Paid' text exists on the case."
         )
         Predicate<CaseData> hasWhenToBePaid =
             nullSafe(c -> c.getWhenToBePaidText() != null);
@@ -882,7 +958,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Payment",
             summary = "Payment successful (date present)",
-            description = "A successful payment timestamp exists on the case"
+            description = "True when a successful payment timestamp exists on the case."
         )
         Predicate<CaseData> hasPaymentSuccessfulDate =
             nullSafe(c -> c.getPaymentSuccessfulDate() != null);
@@ -890,7 +966,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Payment",
             summary = "Claim-issue payment succeeded",
-            description = "Claim-issue payment details exist and payment status equals SUCCESS"
+            description = "True when claim-issue payment details exist and payment status equals SUCCESS."
         )
         Predicate<CaseData> claimIssuedPaymentSucceeded =
             nullSafe(c -> c.getClaimIssuedPaymentDetails() != null
@@ -899,7 +975,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Payment",
             summary = "Payment details failed",
-            description = "Claim-issue payment details exist and payment status equals FAILED"
+            description = "True when general payment details exist and payment status equals FAILED."
         )
         Predicate<CaseData> paymentDetailsFailed =
             nullSafe(c -> c.getPaymentDetails() != null
@@ -908,7 +984,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Payment",
             summary = "Claim-issue payment failed",
-            description = "Claim-issue payment details exist and payment status equals FAILED"
+            description = "True when claim-issue payment details exist and payment status equals FAILED."
         )
         Predicate<CaseData> claimIssuedPaymentFailed =
             nullSafe(c -> c.getClaimIssuedPaymentDetails() != null
@@ -921,7 +997,8 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "TakenOffline",
             summary = "Not suitable for SDO reason provided",
-            description = "A reason explaining why the case is not suitable for a standard directions order (SDO) was provided"
+            description = "True when a reason explaining why the case is not suitable for a standard directions order " +
+                "(SDO) has been provided."
         )
         Predicate<CaseData> hasSdoReasonNotSuitable =
             nullSafe(c -> c.getReasonNotSuitableSDO() != null
@@ -930,7 +1007,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "TakenOffline",
             summary = "Case taken offline (date present)",
-            description = "The case has been marked as taken offline (offline date recorded)"
+            description = "True when the case has been marked as taken offline (offline date recorded)."
         )
         Predicate<CaseData> dateExists =
             nullSafe(c -> c.getTakenOfflineDate() != null);
@@ -938,7 +1015,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "TakenOffline",
             summary = "Case taken offline by staff",
-            description = "HMCTS staff recorded that the case was taken offline"
+            description = "True when HMCTS staff recorded that the case was taken offline."
         )
         Predicate<CaseData> byStaffDateExists =
             nullSafe(c -> c.getTakenOfflineByStaffDate() != null);
@@ -946,7 +1023,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "TakenOffline",
             summary = "Draw directions order required",
-            description = "The case has been marked as requiring a 'draw directions order'"
+            description = "True when the case has been marked as requiring a 'draw directions order'."
         )
         Predicate<CaseData> hasDrawDirectionsOrderRequired =
             nullSafe(c -> c.getDrawDirectionsOrderRequired() != null);
@@ -958,7 +1035,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Language",
             summary = "Change of language preference present",
-            description = "The case records a change in language preference"
+            description = "True when the case records a change in language preference."
         )
         Predicate<CaseData> hasChangePreference =
             nullSafe(c -> c.getChangeLanguagePreference() != null);
@@ -966,7 +1043,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Language",
             summary = "Respondent response marked bilingual",
-            description = "Respondent indicated their response is bilingual (translated documents may be present)"
+            description = "True when the respondent indicated their response is bilingual (translated documents may be present)."
         )
         Predicate<CaseData> isRespondentBilingual =
             nullSafe(CaseData::isRespondentResponseBilingual);
@@ -974,7 +1051,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Language",
             summary = "Claimant marked bilingual",
-            description = "Claimant has bilingual language preference"
+            description = "True when the claimant has a bilingual language preference."
         )
         Predicate<CaseData> isClaimantBilingual =
             nullSafe(CaseData::isClaimantBilingual);
@@ -994,7 +1071,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Lip",
             summary = "Lip v Lip one-v-one variant",
-            description = "Case is a Lip v Lip one-v-one variant"
+            description = "True when the case is a LiP v LiP one-v-one variant."
         )
         Predicate<CaseData> isLiPvLipCase =
             nullSafe(CaseData::isLipvLipOneVOne);
@@ -1002,7 +1079,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Lip",
             summary = "Lip v LR one-v-one variant",
-            description = "Case is a Lip v LR one-v-one variant"
+            description = "True when the case is a LiP v LR one-v-one variant."
         )
         Predicate<CaseData> isLiPvLRCase =
             nullSafe(CaseData::isLipvLROneVOne);
@@ -1010,7 +1087,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Lip",
             summary = "LiP Help With Fee",
-            description = "Case is a LiP with Help With Fee"
+            description = "True when the case is a LiP with Help With Fees."
         )
         Predicate<CaseData> isHelpWithFees =
             nullSafe(CaseData::isHelpWithFees);
@@ -1018,7 +1095,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Lip",
             summary = "Translated response document uploaded",
-            description = "A translated response document has been uploaded to system documents"
+            description = "True when a translated response document has been uploaded to system documents."
         )
         Predicate<CaseData> translatedDocumentUploaded =
             nullSafe(CaseData::isTranslatedDocumentUploaded);
@@ -1026,7 +1103,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Lip",
             summary = "CCJ requested by admission",
-            description = "Applicant has requested a County Court Judgment (CCJ) by admission"
+            description = "True when the applicant has requested a County Court Judgment (CCJ) by admission."
         )
         Predicate<CaseData> ccjRequestByAdmissionFlag =
             nullSafe(CaseData::isCcjRequestJudgmentByAdmission);
@@ -1034,7 +1111,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Lip",
             summary = "Respondent signed settlement agreement",
-            description = "Respondent has signed the digital settlement agreement"
+            description = "True when the respondent has signed the digital settlement agreement."
         )
         Predicate<CaseData> respondentSignedSettlementAgreement =
             nullSafe(CaseData::isRespondentRespondedToSettlementAgreement);
@@ -1042,7 +1119,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Lip",
             summary = "NOC submitted for LiP claimant",
-            description = "A Notice of Change for a LiP claimant was submitted"
+            description = "True when a Notice of Change for a LiP claimant was submitted."
         )
         Predicate<CaseData> nocApplyForLiPClaimant =
             nullSafe(CaseData::nocApplyForLiPClaimant);
@@ -1050,7 +1127,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Lip",
             summary = "NOC submitted for LiP defendant before offline",
-            description = "A Notice of Change for a LiP defendant was submitted prior to the case being taken offline"
+            description = "True when a Notice of Change for a LiP defendant was submitted prior to the case being taken offline."
         )
         Predicate<CaseData> nocSubmittedForLiPDefendantBeforeOffline =
             nullSafe(CaseData::nocApplyForLiPDefendantBeforeOffline);
@@ -1058,7 +1135,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Lip",
             summary = "NOC submitted for LiP defendant",
-            description = "A Notice of Change for a LiP defendant was submitted"
+            description = "True when a Notice of Change for a LiP defendant was submitted."
         )
         Predicate<CaseData> nocSubmittedForLiPDefendant =
             nullSafe(CaseData::nocApplyForLiPDefendant);
@@ -1066,7 +1143,7 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Lip",
             summary = "Case contains LiP participant",
-            description = "At least one party on the case is a LiP (applicant or respondent)"
+            description = "True when at least one party on the case is a LiP (applicant or respondent)."
         )
         Predicate<CaseData> caseContainsLiP =
             nullSafe(c -> c.isRespondent1LiP()
@@ -1075,8 +1152,19 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
 
         @BusinessRule(
             group = "Lip",
+            summary = "At least one LiP defendant is at claim issued",
+            description = "True when at least one defendant is a litigant in person and is flagged as being 'at claim " +
+                "issued' (either `defendant1LIPAtClaimIssued` or `defendant2LIPAtClaimIssued` = Yes)."
+        )
+        Predicate<CaseData> isClaimIssued =
+            nullSafe(c -> YES.equals(c.getDefendant1LIPAtClaimIssued())
+            || YES.equals(c.getDefendant2LIPAtClaimIssued())
+            );
+
+        @BusinessRule(
+            group = "Lip",
             summary = "Applicant 1 has not settled claim (NO)",
-            description = "Applicant 1 has not indicated they will settle the claim"
+            description = "True when applicant 1 has not indicated they will settle the claim."
         )
         Predicate<CaseData> isNotSettleClaimApplicant1 =
             nullSafe(c -> NO.equals(c.getCaseDataLiP().getApplicant1SettleClaim()));
@@ -1084,11 +1172,127 @@ sealed interface CaseDataPredicate permits ClaimantPredicate, ClaimPredicate, Di
         @BusinessRule(
             group = "Lip",
             summary = "Respondent 1 has Pin-In-Post enabled (SPEC)",
-            description = "Respondent 1 has Pin-In-Post enabled and LiP (LR,SPEC)"
+            description = "True when respondent 1 has PIN-in-post enabled (LR, SPEC)."
         )
         Predicate<CaseData> hasPinInPost =
             nullSafe(c -> c.getRespondent1PinToPostLRspec() != null);
 
+    }
+
+    interface Mediation {
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "Applicant MP has not agreed to free mediation",
+            description = "True when the multi-party applicant is recorded as not having agreed to free mediation in the " +
+                "SPEC small-claims mediation fields (`hasAgreedFreeMediation` = No)."
+        )
+        Predicate<CaseData> isNotRequiredApplicantMPSpec =
+            nullSafe(c -> c.getApplicantMPClaimMediationSpecRequired() != null
+                && YesOrNo.NO.equals(c.getApplicantMPClaimMediationSpecRequired().getHasAgreedFreeMediation()));
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "Applicant 1 has not agreed to free mediation",
+            description = "True when applicant 1 is recorded as not having agreed to free mediation in the SPEC " +
+                "small-claims mediation fields (`hasAgreedFreeMediation` = No)."
+        )
+        Predicate<CaseData> isNotAgreedFreeMediationApplicant1Spec =
+            nullSafe(c -> c.getApplicant1ClaimMediationSpecRequired() != null
+                && YesOrNo.NO.equals(c.getApplicant1ClaimMediationSpecRequired().getHasAgreedFreeMediation()));
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "Respondent 1 has agreed to free mediation",
+            description = "True when respondent 1 is recorded as having agreed to free mediation for SPEC " +
+                "(`responseClaimMediationSpecRequired` = Yes)."
+        )
+        Predicate<CaseData> isRequiredRespondent1Spec =
+            nullSafe(c -> YES.equals(c.getResponseClaimMediationSpecRequired()));
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "Respondent 2 has not agreed to free mediation",
+            description = "True when respondent 2 is recorded as not having agreed to free mediation for SPEC " +
+                "(`responseClaimMediationSpec2Required` = No)."
+        )
+        Predicate<CaseData> isNotRequiredRespondent2Spec =
+            nullSafe(c -> NO.equals(c.getResponseClaimMediationSpec2Required()));
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "Applicant 1 mediation contact information present",
+            description = "True when applicant 1's mediation contact information has been provided on the case " +
+                "(contact info object present)."
+        )
+        Predicate<CaseData> hasContactInfoApplicant1 =
+            nullSafe(c -> c.getApp1MediationContactInfo() != null);
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "Respondent 1 mediation contact information present",
+            description = "True when respondent 1's mediation contact information has been provided on the case " +
+                "(contact info object present)."
+        )
+        Predicate<CaseData> hasContactInfoRespondent1 =
+            nullSafe(c -> c.getResp1MediationContactInfo() != null);
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "Respondent 2 mediation contact information present",
+            description = "True when respondent 2's mediation contact information has been provided on the case " +
+                "(contact info object present)."
+        )
+        Predicate<CaseData> hasContactInfoRespondent2 =
+            nullSafe(c -> c.getResp2MediationContactInfo() != null);
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "LiP applicant 1 CARM response present",
+            description = "True when the LiP applicant 1 CARM response value is present in the LiP case data " +
+                "(field answered)."
+        )
+        Predicate<CaseData> hasResponseCarmLiPApplicant1 =
+            nullSafe(c -> c.getCaseDataLiP() != null
+                     && c.getCaseDataLiP().getApplicant1LiPResponseCarm() != null);
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "LiP respondent 1 CARM response present",
+            description = "True when the LiP respondent 1 CARM response value is present in the LiP case data " +
+                "(field answered)."
+        )
+        Predicate<CaseData> hasResponseCarmLiPRespondent1 =
+            nullSafe(c -> c.getCaseDataLiP() != null
+                && c.getCaseDataLiP().getRespondent1MediationLiPResponseCarm() != null);
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "Unsuccessful mediation reason present",
+            description = "True when an unsuccessful mediation reason has been recorded for the case (single " +
+                "'unsuccessful reason' value present)."
+        )
+        Predicate<CaseData> hasReasonUnsuccessful =
+            nullSafe(c -> c.getMediation().getUnsuccessfulMediationReason() != null);
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "Unsuccessful mediation reasons selected (multi-select present)",
+            description = "True when the multi-select list of unsuccessful mediation reasons is present on the case " +
+                "(list field exists, even if nothing is selected yet)."
+        )
+        Predicate<CaseData> hasReasonUnsuccessfulMultiSelect =
+            nullSafe(c -> c.getMediation().getMediationUnsuccessfulReasonsMultiSelect() != null);
+
+        @BusinessRule(
+            group = "Mediation",
+            summary = "Unsuccessful mediation reasons selected (multi-select has values)",
+            description = "True when at least one unsuccessful mediation reason has been selected in the multi-select " +
+                "list (list exists and contains one or more values)."
+        )
+        Predicate<CaseData> hasReasonUnsuccessfulMultiSelectValue =
+            nullSafe(c -> c.getMediation().getMediationUnsuccessfulReasonsMultiSelect() != null
+            && !c.getMediation().getMediationUnsuccessfulReasonsMultiSelect().isEmpty());
     }
 
 }
