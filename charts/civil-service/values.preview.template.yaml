@@ -27,7 +27,6 @@ java:
     HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-aat"
     HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "${SERVICE_NAME}-hmcsb-civil"
     HMC_HEARINGS_TOPIC_NAMESPACE: "hmc-servicebus-aat"
-    HMC_DEPLOYMENT_ID: "civil-${CHANGE_ID}"
     RD_PROFESSIONAL_API_URL: http://${SERVICE_NAME}-wiremock
     DOCMOSIS_TORNADO_URL: http://${SERVICE_NAME}-wiremock
     ROLE_ASSIGNMENT_URL: https://am-role-assignment-service-${SERVICE_FQDN}
@@ -139,6 +138,13 @@ java:
     auth:
       username: ${POSTGRES_USER}
       password: ${POSTGRES_PASSWORD}
+
+idam-pr:
+  releaseNameOverride: ${SERVICE_NAME}-xui-idam-pr
+  enabled: true
+  redirect_uris:
+    XUI:
+      - https://xui-${SERVICE_NAME}.preview.platform.hmcts.net/oauth2/callback
 
 xui-webapp:
   enabled: true

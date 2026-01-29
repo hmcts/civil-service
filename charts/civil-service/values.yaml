@@ -1,3 +1,5 @@
+idam-pr:
+  enabled: false
 servicebus:
   enabled: false
 xui-webapp:
