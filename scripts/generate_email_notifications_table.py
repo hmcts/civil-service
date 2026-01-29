@@ -21,6 +21,7 @@ APPLICATION_YAML = RESOURCE_ROOT / "application.yaml"
 DASHBOARD_TASK_IDS_PATH = JAVA_ROOT / 'uk' / 'gov' / 'hmcts' / 'reform' / 'civil' / 'handler' / 'callback' / 'camunda' / 'dashboardnotifications' / 'DashboardTaskIds.java'
 DASHBOARD_SCENARIOS_PATH = JAVA_ROOT / 'uk' / 'gov' / 'hmcts' / 'reform' / 'civil' / 'handler' / 'callback' / 'camunda' / 'dashboardnotifications' / 'DashboardScenarios.java'
 TEMPLATE_DIR = REPO_ROOT / 'dashboard-notifications' / 'src' / 'main' / 'resources' / 'notification-templates'
+RAW_GITHUB_BASE_URL = "https://raw.githubusercontent.com/hmcts/civil-service/master/"
 DIAGRAM_BASE_URL = "https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/"
 
 # Regex helpers
@@ -37,6 +38,9 @@ NOTIFICATION_GETTER_RE = re.compile(r"notificationsProperties\s*\.\s*get([A-Za-z
 FIELD_DEF_RE = re.compile(r"(?:private|protected|public)\s+final\s+([A-Za-z0-9_<>]+)\s+(\w+)\s*;")
 DASHBOARD_TASK_ID_CONST_RE = re.compile(r"public\s+static\s+final\s+String\s+(\w+)\s*=\s*\"([^\"]+)\";")
 TASK_ID_RE = re.compile(r"(?:public|protected|private)\s+static\s+final\s+String\s+TASK_ID\s*=\s*\"([^\"]+)\"")
+TASK_ID_CONST_RE = re.compile(
+    r"(?:public|protected|private)\s+static\s+final\s+String\s+[A-Za-z0-9_]*TASK_ID[A-Za-z0-9_]*\s*=\s*\"([^\"]+)\""
+)
 EVENTS_DEF_RE = re.compile(
     r"EVENTS\s*=\s*(?:List\.of|Collections\.singletonList|Arrays\.asList)\s*\((?P<body>.*?)\)\s*;",
     re.S
@@ -153,6 +157,42 @@ def resolve_notifier_event(java_class: JavaClass) -> Optional[str]:
         if const_name in const_map:
             return const_map[const_name]
     return None
+
+
+def extends_callback_handler(index: SourceIndex, class_name: str, cache: Dict[str, bool]) -> bool:
+    if class_name in cache:
+        return cache[class_name]
+    java_class = index.get(class_name)
+    if not java_class:
+        cache[class_name] = False
+        return False
+    if "extends CallbackHandler" in java_class.text:
+        cache[class_name] = True
+        return True
+    base = java_class.base_class()
+    if base:
+        cache[class_name] = extends_callback_handler(index, base, cache)
+        return cache[class_name]
+    cache[class_name] = False
+    return False
+
+
+def extends_notification_data(index: SourceIndex, class_name: str, cache: Dict[str, bool]) -> bool:
+    if class_name in cache:
+        return cache[class_name]
+    java_class = index.get(class_name)
+    if not java_class:
+        cache[class_name] = False
+        return False
+    if "implements NotificationData" in java_class.text:
+        cache[class_name] = True
+        return True
+    base = java_class.base_class()
+    if base:
+        cache[class_name] = extends_notification_data(index, base, cache)
+        return cache[class_name]
+    cache[class_name] = False
+    return False
 
 
 def is_parties_generator(text: str) -> bool:
@@ -350,7 +390,7 @@ def index_bpmn(bpmn_root: Path):
 
 
 def build_email_rows(index: SourceIndex, notifications: Dict[str, str], bpmn_root: Path,
-                     service_tasks, start_events, start_event_labels):
+                     service_tasks, start_events, start_event_labels, case_event_map):
     notifiers = find_notifiers(index)
     aggregator_map = map_aggregators_to_generators(index, {n['aggregator'] for n in notifiers})
     rows = []
@@ -358,6 +398,11 @@ def build_email_rows(index: SourceIndex, notifications: Dict[str, str], bpmn_roo
         event = notifier['event'] or 'UNKNOWN'
         generators = aggregator_map.get(notifier['aggregator'] or '', [])
         bpmn_files, ccd_display, ccd_ids = lookup_bpmn(event, service_tasks, start_events, start_event_labels)
+        bpmn_files, ccd_display, ccd_ids = augment_with_case_events(
+            [event] if event not in (None, 'UNKNOWN') else [],
+            case_event_map, start_events, start_event_labels,
+            bpmn_files, ccd_display, ccd_ids
+        )
         for generator in generators:
             templates = collect_templates(index, generator, notifications)
             if not templates:
@@ -369,6 +414,41 @@ def build_email_rows(index: SourceIndex, notifications: Dict[str, str], bpmn_roo
                     "aggregator": notifier['aggregator'] or '—',
                     "party": describe_party(index, generator),
                     "generator": generator,
+                    "template_id": tpl['id'] or '—',
+                    "bpmn_files": bpmn_files or ['—'],
+                    "ccd_events": ccd_display or ['—'],
+                    "ccd_event_ids": ccd_ids
+                })
+    notification_data_cache: Dict[str, bool] = {}
+    callback_handler_cache: Dict[str, bool] = {}
+    for class_name, java_class in index.classes.items():
+        if '/handler/callback/camunda/notification/' not in str(java_class.path):
+            continue
+        if re.search(r'abstract\s+class\s+' + re.escape(class_name), java_class.text):
+            continue
+        if not extends_callback_handler(index, class_name, callback_handler_cache):
+            continue
+        if not extends_notification_data(index, class_name, notification_data_cache):
+            continue
+        events = extract_case_events_including_base(index, class_name)
+        task_ids = extract_task_ids_including_base(index, class_name) or ['UNKNOWN']
+        templates = collect_templates(index, class_name, notifications)
+        if not templates:
+            templates = [{"id": None}]
+        party = infer_party_from_class(java_class)
+        for task_id in task_ids:
+            bpmn_files, ccd_display, ccd_ids = lookup_bpmn(task_id, service_tasks, start_events, start_event_labels)
+            bpmn_files, ccd_display, ccd_ids = augment_with_case_events(
+                events, case_event_map, start_events, start_event_labels,
+                bpmn_files, ccd_display, ccd_ids
+            )
+            for tpl in templates:
+                rows.append({
+                    "event": task_id,
+                    "handler": class_name,
+                    "aggregator": '—',
+                    "party": party,
+                    "generator": class_name,
                     "template_id": tpl['id'] or '—',
                     "bpmn_files": bpmn_files or ['—'],
                     "ccd_events": ccd_display or ['—'],
@@ -722,6 +802,39 @@ def extract_case_events(java_class: JavaClass) -> List[str]:
     return events
 
 
+def extract_case_events_including_base(index: SourceIndex, class_name: str) -> List[str]:
+    current = class_name
+    seen = set()
+    while current and current not in seen:
+        seen.add(current)
+        java_class = index.get(current)
+        if not java_class:
+            break
+        events = extract_case_events(java_class)
+        if events:
+            return events
+        current = java_class.base_class()
+    return []
+
+
+def extract_task_ids_including_base(index: SourceIndex, class_name: str) -> List[str]:
+    current = class_name
+    seen = set()
+    task_ids: List[str] = []
+    while current and current not in seen:
+        seen.add(current)
+        java_class = index.get(current)
+        if not java_class:
+            break
+        task_ids.extend(TASK_ID_CONST_RE.findall(java_class.text))
+        if not task_ids:
+            match = TASK_ID_RE.search(java_class.text)
+            if match:
+                task_ids.append(match.group(1))
+        current = java_class.base_class()
+    return list(dict.fromkeys(task_ids))
+
+
 def collect_dashboard_callback_rows(index: SourceIndex, service_tasks, start_events,
                                     start_event_labels, case_event_map,
                                     scenario_map: Dict[str, str],
@@ -812,7 +925,11 @@ def format_templates_markdown(entries: List[Dict[str, str]], notify_service_id: 
             else:
                 link = f"`{label}`"
         elif entry.get('path'):
-            link = f"`{entry['label']}`<br><small>{entry['path']}</small>"
+            raw_url = f"{RAW_GITHUB_BASE_URL}{entry['path']}"
+            link = (
+                f"`{entry['label']}`<br>"
+                f"<small><a href='{raw_url}'>{entry['path']}</a></small>"
+            )
         else:
             link = f"`{entry['label']}`"
         preview = entry.get('content')
@@ -841,7 +958,11 @@ def format_templates_html(entries: List[Dict[str, str]], notify_service_id: Opti
             else:
                 link = f"<code>{label}</code>"
         elif entry.get('path'):
-            link = f"<code>{html.escape(entry['label'])}</code><br><small>{html.escape(entry['path'])}</small>"
+            raw_url = f"{RAW_GITHUB_BASE_URL}{entry['path']}"
+            link = (
+                f"<code>{html.escape(entry['label'])}</code><br>"
+                f"<small><a href='{raw_url}'>{html.escape(entry['path'])}</a></small>"
+            )
         else:
             link = f"<code>{html.escape(entry['label'])}</code>"
         preview = entry.get('content')
@@ -1068,7 +1189,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     service_tasks, start_events, start_event_labels, case_event_map = index_bpmn(camunda_root)
     scenario_map = load_dashboard_scenarios()
     template_map = load_template_paths()
-    email_rows = build_email_rows(index, notifications, camunda_root, service_tasks, start_events, start_event_labels)
+    email_rows = build_email_rows(index, notifications, camunda_root, service_tasks, start_events, start_event_labels, case_event_map)
     dashboard_rows = build_dashboard_rows(index, service_tasks, start_events, start_event_labels, case_event_map, scenario_map, template_map)
     combined_rows = combine_rows(email_rows, dashboard_rows)
     filtered_rows = filter_rows_by_ccd_event(combined_rows, args.ccd_event_filters)
