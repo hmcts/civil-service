@@ -80,7 +80,7 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
         String hearingId = camundaVariables.getHearingId();
         int requestVersion = camundaVariables.getRequestVersion().intValue();
 
-        PartiesNotifiedResponse latestPartiesNotifiedResponse = getLatestPartiesNotifiedResponse(hearingId);
+        PartiesNotifiedResponse latestPartiesNotifiedResponse = getLatestPartiesNotifiedResponse(hearingId, requestVersion);
         if (latestPartiesNotifiedResponse != null && latestPartiesNotifiedResponse.getResponseReceivedDateTime() != null) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
@@ -113,10 +113,10 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    private PartiesNotifiedResponse getLatestPartiesNotifiedResponse(String hearingId) {
+    private PartiesNotifiedResponse getLatestPartiesNotifiedResponse(String hearingId, int requestVersion) {
         var partiesNotified = hearingsService.getPartiesNotifiedResponses(
             getSystemUpdateUser().getUserToken(), hearingId);
-        return HmcDataUtils.getLatestHearingNoticeDetails(partiesNotified);
+        return HmcDataUtils.getLatestHearingNoticeDetails(partiesNotified, requestVersion);
     }
 
     private UserAuthContent getSystemUpdateUser() {

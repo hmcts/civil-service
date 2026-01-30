@@ -58,7 +58,7 @@ class HmcDataUtilsTest {
     void getLatestPartiesNotifiedResponse_WhenEmptyList_ReturnsNull() {
         PartiesNotifiedResponses partiesNotified = PartiesNotifiedResponses.builder().responses(List.of()).build();
 
-        PartiesNotifiedResponse result = HmcDataUtils.getLatestHearingNoticeDetails(partiesNotified);
+        PartiesNotifiedResponse result = HmcDataUtils.getLatestHearingNoticeDetails(partiesNotified, 1);
 
         assertNull(result);
     }
@@ -68,17 +68,17 @@ class HmcDataUtilsTest {
         LocalDateTime now = LocalDateTime.now();
 
         var res1 = PartiesNotifiedResponse.builder().serviceData(PartiesNotifiedServiceData.builder().hearingLocation("loc-3").build())
-            .responseReceivedDateTime(now.minusDays(3)).build();
+            .responseReceivedDateTime(now.minusDays(3)).requestVersion(1).build();
         var res2 = PartiesNotifiedResponse.builder().serviceData(PartiesNotifiedServiceData.builder().hearingLocation("loc-2").build())
-            .responseReceivedDateTime(now.minusDays(2)).build();
+            .responseReceivedDateTime(now.minusDays(2)).requestVersion(2).build();
         var expected = PartiesNotifiedResponse.builder().serviceData(PartiesNotifiedServiceData.builder().hearingLocation("loc-1").build())
-            .responseReceivedDateTime(now.minusDays(1)).build();
+            .responseReceivedDateTime(now.minusDays(1)).requestVersion(3).build();
 
         PartiesNotifiedResponses partiesNotified = PartiesNotifiedResponses.builder()
             .responses(List.of(res1, expected, res2))
             .build();
 
-        PartiesNotifiedResponse result = HmcDataUtils.getLatestHearingNoticeDetails(partiesNotified);
+        PartiesNotifiedResponse result = HmcDataUtils.getLatestHearingNoticeDetails(partiesNotified, 3);
 
         assertEquals(result, expected);
     }
