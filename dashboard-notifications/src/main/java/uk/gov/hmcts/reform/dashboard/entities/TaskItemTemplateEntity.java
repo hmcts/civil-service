@@ -2,15 +2,17 @@ package uk.gov.hmcts.reform.dashboard.entities;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.hibernate.annotations.Immutable;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @lombok.Data
 @lombok.Builder(toBuilder = true)
@@ -70,7 +72,8 @@ public class TaskItemTemplateEntity implements Serializable {
     @Schema(name = "created_at")
     private OffsetDateTime createdAt;
 
-    @Type(type = "com.vladmihalcea.hibernate.type.array.IntArrayType")
     @Schema(name = "task_status_sequence")
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Column(name = "task_status_sequence", columnDefinition = "integer[]")
     private int[] taskStatusSequence;
 }
