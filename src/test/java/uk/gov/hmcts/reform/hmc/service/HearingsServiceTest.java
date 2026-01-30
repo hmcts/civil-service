@@ -135,11 +135,10 @@ class HearingsServiceTest {
 
         @Test
         void shouldGetPartiesResponses_whenInvoked() {
-            Long requestVersion = 2L;
-            when(hearingNoticeApi.getPartiesNotifiedRequest(USER_TOKEN, SERVICE_TOKEN, HEARING_ID, requestVersion))
+            when(hearingNoticeApi.getPartiesNotifiedRequest(USER_TOKEN, SERVICE_TOKEN, HEARING_ID))
                 .thenReturn(getPartiesNotifiedResponse());
             PartiesNotifiedResponses result = hearingNoticeService
-                .getPartiesNotifiedResponses(USER_TOKEN, HEARING_ID, 2L);
+                .getPartiesNotifiedResponses(USER_TOKEN, HEARING_ID);
 
             Assertions.assertThat(result.getHearingID()).isEqualTo(HEARING_ID);
             Assertions.assertThat(result.getResponses()).isEqualTo(listOfPartiesNotifiedResponses);
@@ -147,12 +146,11 @@ class HearingsServiceTest {
 
         @Test
         void shouldThrowException_whenExceptionError() {
-            Long requestVersion = 3L;
-            when(hearingNoticeApi.getPartiesNotifiedRequest(USER_TOKEN, SERVICE_TOKEN, HEARING_ID, requestVersion))
+            when(hearingNoticeApi.getPartiesNotifiedRequest(USER_TOKEN, SERVICE_TOKEN, HEARING_ID))
                 .thenThrow(notFoundFeignException);
 
             Exception exception = assertThrows(HmcException.class, () -> hearingNoticeService
-                .getPartiesNotifiedResponses(USER_TOKEN, HEARING_ID, 3L)
+                .getPartiesNotifiedResponses(USER_TOKEN, HEARING_ID)
             );
 
             String expectedMessage = "Failed to retrieve data from HMC";

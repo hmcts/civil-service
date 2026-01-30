@@ -78,9 +78,9 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
 
         Long ccdCaseReference = caseData.getCcdCaseReference();
         String hearingId = camundaVariables.getHearingId();
-        Long requestVersion = camundaVariables.getRequestVersion();
+        int requestVersion = camundaVariables.getRequestVersion().intValue();
 
-        PartiesNotifiedResponse latestPartiesNotifiedResponse = getLatestPartiesNotifiedResponse(hearingId, requestVersion);
+        PartiesNotifiedResponse latestPartiesNotifiedResponse = getLatestPartiesNotifiedResponse(hearingId);
         if (latestPartiesNotifiedResponse != null && latestPartiesNotifiedResponse.getResponseReceivedDateTime() != null) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
@@ -91,7 +91,7 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
 
             ResponseEntity<?> responseEntity = hearingsService.updatePartiesNotifiedResponse(
                 callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                hearingId, camundaVariables.getRequestVersion().intValue(),
+                hearingId, requestVersion,
                 camundaVariables.getResponseDateTime(), partiesNotified
             );
 
@@ -113,9 +113,9 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    private PartiesNotifiedResponse getLatestPartiesNotifiedResponse(String hearingId, Long requestVersion) {
+    private PartiesNotifiedResponse getLatestPartiesNotifiedResponse(String hearingId) {
         var partiesNotified = hearingsService.getPartiesNotifiedResponses(
-            getSystemUpdateUser().getUserToken(), hearingId, requestVersion);
+            getSystemUpdateUser().getUserToken(), hearingId);
         return HmcDataUtils.getLatestHearingNoticeDetails(partiesNotified);
     }
 
