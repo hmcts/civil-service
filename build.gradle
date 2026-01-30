@@ -154,7 +154,7 @@ tasks.withType(JavaCompile) {
 
 tasks.withType(Test) {
   useJUnitPlatform()
-  maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+  maxParallelForks = Runtime.runtime.availableProcessors() ?: 1
   jvmArgs '-Xshare:off'
   testLogging {
     exceptionFormat = 'full'
@@ -618,7 +618,7 @@ tasks.register('runProviderPactVerification') {
 tasks.withType(Test).configureEach { t ->
   useJUnitPlatform()
 
-  // Pipeline-stable settings with JaCoCo enabled
+/*  // Pipeline-stable settings with JaCoCo enabled
   maxParallelForks = 1
   forkEvery = 50
 
@@ -627,7 +627,7 @@ tasks.withType(Test).configureEach { t ->
   maxHeapSize = "1536m"
   jvmArgs "-XX:MaxMetaspaceSize=512m"
   // Temurin 21.0.7 occasionally crashes in C2 (BoolNode::Ideal SIGSEGV); stay on C1 until upstream fix.
-  jvmArgs "-XX:TieredStopAtLevel=1"
+  jvmArgs "-XX:TieredStopAtLevel=1"*/
 
   testLogging {
     exceptionFormat = 'full'
