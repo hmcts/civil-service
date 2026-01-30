@@ -37,15 +37,16 @@ public class HearingsService {
         }
     }
 
-    public PartiesNotifiedResponses getPartiesNotifiedResponses(String authToken, String hearingId) {
+    public PartiesNotifiedResponses getPartiesNotifiedResponses(String authToken, String hearingId, Long requestVersion) {
         log.debug("Requesting Get Parties Notified with Hearing ID {}", hearingId);
         try {
             return hearingNoticeApi.getPartiesNotifiedRequest(
                 authToken,
                 authTokenGenerator.generate(),
-                hearingId);
+                hearingId,
+                requestVersion);
         } catch (FeignException e) {
-            log.error("Failed to retrieve patries notified with Id: %s from HMC", hearingId);
+            log.error("Failed to retrieve patries notified with Id: {} from HMC with request version {}", hearingId, requestVersion);
             throw new HmcException(e);
         }
     }

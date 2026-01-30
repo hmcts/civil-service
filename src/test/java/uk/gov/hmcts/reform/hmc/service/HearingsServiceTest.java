@@ -118,7 +118,7 @@ class HearingsServiceTest {
     @Nested
     class GetPartiesNotifiedResponses {
         private final LocalDateTime time = LocalDateTime.of(2023, 5, 1, 15, 0);
-        private List<PartiesNotifiedResponse> listOfPartiesNotifiedResponses =
+        private final List<PartiesNotifiedResponse> listOfPartiesNotifiedResponses =
             List.of(getPartiesNotified(time.minusDays(2), 1, time, null),
                     getPartiesNotified(time.minusDays(3), 2, time, null));
 
@@ -135,10 +135,11 @@ class HearingsServiceTest {
 
         @Test
         void shouldGetPartiesResponses_whenInvoked() {
-            when(hearingNoticeApi.getPartiesNotifiedRequest(USER_TOKEN, SERVICE_TOKEN, HEARING_ID))
+            Long requestVersion = 2L;
+            when(hearingNoticeApi.getPartiesNotifiedRequest(USER_TOKEN, SERVICE_TOKEN, HEARING_ID, requestVersion))
                 .thenReturn(getPartiesNotifiedResponse());
             PartiesNotifiedResponses result = hearingNoticeService
-                .getPartiesNotifiedResponses(USER_TOKEN, HEARING_ID);
+                .getPartiesNotifiedResponses(USER_TOKEN, HEARING_ID, 2L);
 
             Assertions.assertThat(result.getHearingID()).isEqualTo(HEARING_ID);
             Assertions.assertThat(result.getResponses()).isEqualTo(listOfPartiesNotifiedResponses);
@@ -146,13 +147,13 @@ class HearingsServiceTest {
 
         @Test
         void shouldThrowException_whenExceptionError() {
-            when(hearingNoticeApi.getPartiesNotifiedRequest(USER_TOKEN, SERVICE_TOKEN, HEARING_ID))
+            Long requestVersion = 3L;
+            when(hearingNoticeApi.getPartiesNotifiedRequest(USER_TOKEN, SERVICE_TOKEN, HEARING_ID, requestVersion))
                 .thenThrow(notFoundFeignException);
 
-            Exception exception = assertThrows(HmcException.class, () -> {
-                hearingNoticeService
-                    .getPartiesNotifiedResponses(USER_TOKEN, HEARING_ID);
-            });
+            Exception exception = assertThrows(HmcException.class, () -> hearingNoticeService
+                .getPartiesNotifiedResponses(USER_TOKEN, HEARING_ID, 3L)
+            );
 
             String expectedMessage = "Failed to retrieve data from HMC";
             String actualMessage = exception.getMessage();
@@ -181,10 +182,9 @@ class HearingsServiceTest {
             when(hearingNoticeApi.updatePartiesNotifiedRequest(USER_TOKEN, SERVICE_TOKEN, partiesNotified, HEARING_ID, VERSION_NUMBER, time))
                 .thenThrow(notFoundFeignException);
 
-            Exception exception = assertThrows(HmcException.class, () -> {
-                hearingNoticeService
-                    .updatePartiesNotifiedResponse(USER_TOKEN, HEARING_ID, VERSION_NUMBER, time, partiesNotified);
-            });
+            Exception exception = assertThrows(HmcException.class, () -> hearingNoticeService
+                .updatePartiesNotifiedResponse(USER_TOKEN, HEARING_ID, VERSION_NUMBER, time, partiesNotified)
+            );
 
             String expectedMessage = "Failed to retrieve data from HMC";
             String actualMessage = exception.getMessage();
@@ -195,7 +195,7 @@ class HearingsServiceTest {
 
     @Nested
     class GetUnNotifiedHearingResponses {
-        private List<String> listOfIds = List.of(HEARING_ID, HEARING_ID_2);
+        private final List<String> listOfIds = List.of(HEARING_ID, HEARING_ID_2);
         private final LocalDateTime dateFrom = LocalDateTime.of(2023, 5, 1, 15, 0);
         private final LocalDateTime dateTo = LocalDateTime.of(2023, 5, 6, 15, 0);
 
@@ -220,9 +220,7 @@ class HearingsServiceTest {
             when(hearingNoticeApi.getUnNotifiedHearingRequest(USER_TOKEN, SERVICE_TOKEN, HMCTS_SERVICE_CODE, dateFrom, dateTo))
                 .thenThrow(notFoundFeignException);
 
-            Exception exception = assertThrows(HmcException.class, () -> {
-                hearingNoticeService.getUnNotifiedHearingResponses(USER_TOKEN, HMCTS_SERVICE_CODE, dateFrom, dateTo);
-            });
+            Exception exception = assertThrows(HmcException.class, () -> hearingNoticeService.getUnNotifiedHearingResponses(USER_TOKEN, HMCTS_SERVICE_CODE, dateFrom, dateTo));
 
             String expectedMessage = "Failed to retrieve data from HMC";
             String actualMessage = exception.getMessage();
@@ -256,9 +254,7 @@ class HearingsServiceTest {
             when(hearingNoticeApi.getHearings(SERVICE_TOKEN, SERVICE_TOKEN, CASE_ID, HMC_STATUS))
                 .thenThrow(notFoundFeignException);
 
-            Exception exception = assertThrows(HmcException.class, () -> {
-                hearingNoticeService.getHearings(SERVICE_TOKEN, CASE_ID, HMC_STATUS);
-            });
+            Exception exception = assertThrows(HmcException.class, () -> hearingNoticeService.getHearings(SERVICE_TOKEN, CASE_ID, HMC_STATUS));
 
             String expectedMessage = "Failed to retrieve data from HMC";
             String actualMessage = exception.getMessage();
