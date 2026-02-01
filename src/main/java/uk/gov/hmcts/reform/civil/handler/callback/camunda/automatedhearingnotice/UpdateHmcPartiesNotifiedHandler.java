@@ -69,7 +69,8 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
 
         try {
             log.info(
-                "Calling updatePartiesNotifiedResponse: hearingId={}, version={}, responseDateTime={}",
+                "Calling updatePartiesNotifiedResponse for caseId {}: hearingId={}, version={}, responseDateTime={}",
+                ccdCaseReference,
                 hearingId,
                 camundaVariables.getRequestVersion(),
                 camundaVariables.getResponseDateTime()
@@ -81,9 +82,14 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
             );
 
         } catch (HttpClientErrorException.BadRequest e) {
-            log.error("Bad request updating notified response for case {}: {}, status {}",
-                      ccdCaseReference,
-                      e.getResponseBodyAsString(), e.getStatusCode());
+            log.info(
+                "hearing for caseId {} with hearingId={}, version={}, responseDateTime={} already notified and http status {}",
+                ccdCaseReference,
+                hearingId,
+                camundaVariables.getRequestVersion(),
+                camundaVariables.getResponseDateTime(),
+                e.getStatusCode()
+            );
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
