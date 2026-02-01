@@ -97,14 +97,12 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
             if (isHearingResponseNotifiedForRequestVersion(hearingId, requestVersion)) {
                 log.info("Update succeeded despite exception for caseId {}, hearingId {}, requestVersion {}",
                          ccdCaseReference, hearingId, requestVersion);
-                return AboutToStartOrSubmitCallbackResponse.builder().build();
+            } else {
+                log.error("HearingsService.updatePartiesNotifiedResponse failed for caseId {}, hearingId {}, requestVersion {}",
+                          ccdCaseReference, hearingId, requestVersion, ex);
+                throw ex;
             }
-
-            log.error("HearingsService.updatePartiesNotifiedResponse failed for caseId {}, hearingId {}, requestVersion {}",
-                      ccdCaseReference, hearingId, requestVersion, ex);
-            throw ex;
         }
-
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
