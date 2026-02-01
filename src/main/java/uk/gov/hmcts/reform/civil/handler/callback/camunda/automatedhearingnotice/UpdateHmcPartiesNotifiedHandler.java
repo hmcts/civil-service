@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.automatedhearingnotic
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -81,7 +82,7 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
                 camundaVariables.getResponseDateTime(), partiesNotified
             );
 
-        } catch (HttpClientErrorException.BadRequest e) {
+        } catch (HttpClientErrorException e) {
             log.info(
                 "hearing for caseId {} with hearingId={}, version={}, responseDateTime={} already notified and http status {}",
                 ccdCaseReference,
@@ -90,7 +91,19 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
                 camundaVariables.getResponseDateTime(),
                 e.getStatusCode()
             );
-            return AboutToStartOrSubmitCallbackResponse.builder().build();
+            if (HttpStatus.BAD_REQUEST.equals(e.getStatusCode())) {
+                return AboutToStartOrSubmitCallbackResponse.builder().build();
+            } else {
+                log.info(
+                    "hearing hasn't notified for caseId {} with hearingId={}, version={}, responseDateTime={} and http status {}",
+                    ccdCaseReference,
+                    hearingId,
+                    camundaVariables.getRequestVersion(),
+                    camundaVariables.getResponseDateTime(),
+                    e.getStatusCode()
+                );
+                throw e;
+            }
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }

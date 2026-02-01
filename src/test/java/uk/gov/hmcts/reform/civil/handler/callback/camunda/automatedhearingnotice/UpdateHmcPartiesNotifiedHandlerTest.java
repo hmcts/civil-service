@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -25,7 +26,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -143,7 +146,7 @@ class UpdateHmcPartiesNotifiedHandlerTest extends BaseCallbackHandlerTest {
         HearingNoticeVariables camundaVars = sampleCamundaVars();
 
         when(hearingNoticeCamundaService.getProcessVariables(any())).thenReturn(camundaVars);
-        doThrow(HttpClientErrorException.BadRequest.create(
+        doThrow(HttpClientErrorException.create(
             HttpStatus.BAD_REQUEST,
             "Bad Request",
             HttpHeaders.EMPTY,
@@ -157,4 +160,27 @@ class UpdateHmcPartiesNotifiedHandlerTest extends BaseCallbackHandlerTest {
         assertNotNull(callbackResponse);
         verify(hearingsService).updatePartiesNotifiedResponse(anyString(), anyString(), anyInt(), any(), any());
     }
+
+    @Test
+    void shouldThrow502Exception() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(12345L);
+        BusinessProcess businessProcess = new BusinessProcess();
+        businessProcess.setProcessInstanceId("");
+        caseData.setBusinessProcess(businessProcess);
+        CallbackParams params = buildCallbackParams(caseData);
+        HearingNoticeVariables camundaVars = sampleCamundaVars();
+        when(hearingNoticeCamundaService.getProcessVariables(any())).thenReturn(camundaVars);
+        when(hearingsService.updatePartiesNotifiedResponse(
+                anyString(), anyString(), anyInt(), any(), any()))
+            .thenThrow(new HttpServerErrorException(HttpStatus.BAD_GATEWAY));
+
+        HttpServerErrorException ex = assertThrows(
+            HttpServerErrorException.class,
+            () -> handler.handle(params)
+        );
+
+        assertEquals(HttpStatus.BAD_GATEWAY, ex.getStatusCode());
+    }
+
 }
