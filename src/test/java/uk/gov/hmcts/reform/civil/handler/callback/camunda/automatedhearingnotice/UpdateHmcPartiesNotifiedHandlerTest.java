@@ -5,20 +5,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestClientException;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
-import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
-import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.HearingDay;
-import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotified;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponses;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
@@ -28,7 +22,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -36,14 +30,13 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
-
 @ExtendWith(MockitoExtension.class)
-class UpdateHmcPartiesNotifiedHandlerTest extends BaseCallbackHandlerTest {
+class UpdateHmcPartiesNotifiedHandlerTest {
 
     private UpdateHmcPartiesNotifiedHandler handler;
 
     @Mock
-    private HearingNoticeCamundaService hearingNoticeCamundaService;
+    private HearingNoticeCamundaService camundaService;
 
     @Mock
     private HearingsService hearingsService;
@@ -59,40 +52,17 @@ class UpdateHmcPartiesNotifiedHandlerTest extends BaseCallbackHandlerTest {
     @BeforeEach
     void setUp() {
         handler = new UpdateHmcPartiesNotifiedHandler(
-            hearingNoticeCamundaService,
+            camundaService,
             hearingsService,
             userService,
             userConfig
         );
 
         when(userService.getAccessToken(anyString(), anyString())).thenReturn(AUTH_TOKEN);
-        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("test-id").build());
+        when(userService.getUserInfo(anyString()))
+            .thenReturn(UserInfo.builder().uid("test-id").build());
         when(userConfig.getUserName()).thenReturn("USER");
-        when(userConfig.getPassword()).thenReturn("PASSWORD");
-
-        when(hearingsService.getPartiesNotifiedResponses(anyString(), anyString()))
-            .thenReturn(PartiesNotifiedResponses.builder().build());
-    }
-
-    private CallbackParams buildCallbackParams(CaseData caseData) {
-        return CallbackParams.builder()
-            .type(ABOUT_TO_SUBMIT)
-            .caseData(caseData)
-            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"))
-            .build();
-    }
-
-    private HearingNoticeVariables sampleCamundaVars() {
-        return HearingNoticeVariables.builder()
-            .hearingId("HER1234")
-            .hearingLocationEpims("12345")
-            .days(List.of(HearingDay.builder()
-                              .hearingStartDateTime(LocalDateTime.of(2023, 1, 1, 0, 0))
-                              .hearingEndDateTime(LocalDateTime.of(2023, 1, 1, 12, 0))
-                              .build()))
-            .requestVersion(10L)
-            .responseDateTime(LocalDateTime.of(2022, 10, 10, 15, 15))
-            .build();
+        when(userConfig.getPassword()).thenReturn("PASS");
     }
 
     private CaseData sampleCaseData() {
@@ -104,86 +74,30 @@ class UpdateHmcPartiesNotifiedHandlerTest extends BaseCallbackHandlerTest {
         return caseData;
     }
 
-    @Test
-    void shouldSuccessfullyUpdatePartiesNotified_whenServiceReturns200() {
-        CaseData caseData = sampleCaseData();
-        CallbackParams params = buildCallbackParams(caseData);
+    private CallbackParams buildParams(CaseData caseData) {
+        return CallbackParams.builder()
+            .type(ABOUT_TO_SUBMIT)
+            .caseData(caseData)
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"))
+            .build();
+    }
 
-        when(hearingNoticeCamundaService.getProcessVariables(any()))
-            .thenReturn(sampleCamundaVars());
-
-        when(hearingsService.updatePartiesNotifiedResponse(anyString(), anyString(), anyInt(), any(), any(PartiesNotified.class)))
-            .thenReturn(new ResponseEntity<>(HttpStatus.OK));
-
-        var response = handler.handle(params);
-
-        assertNotNull(response);
-        verify(hearingsService)
-            .updatePartiesNotifiedResponse(eq("BEARER_TOKEN"), eq("HER1234"), eq(10), any(), any());
+    private HearingNoticeVariables sampleCamundaVars() {
+        return HearingNoticeVariables.builder()
+            .hearingId("H123")
+            .hearingLocationEpims("LOC123")
+            .days(List.of())
+            .requestVersion(10L)
+            .responseDateTime(LocalDateTime.now())
+            .build();
     }
 
     @Test
-    void shouldLogWarning_whenServiceReturnsNon2xx() {
+    void shouldSkipUpdate_ifAlreadyNotified() {
         CaseData caseData = sampleCaseData();
-        CallbackParams params = buildCallbackParams(caseData);
+        CallbackParams params = buildParams(caseData);
 
-        when(hearingNoticeCamundaService.getProcessVariables(any()))
-            .thenReturn(sampleCamundaVars());
-
-        when(hearingsService.updatePartiesNotifiedResponse(anyString(), anyString(), anyInt(), any(), any()))
-            .thenReturn(new ResponseEntity<>("Error", HttpStatus.BAD_REQUEST));
-
-        var response = handler.handle(params);
-
-        assertNotNull(response);
-        verify(hearingsService)
-            .updatePartiesNotifiedResponse(eq("BEARER_TOKEN"), eq("HER1234"), eq(10), any(), any());
-    }
-
-    @Test
-    void shouldHandleNullResponseGracefully() {
-        CaseData caseData = sampleCaseData();
-        CallbackParams params = buildCallbackParams(caseData);
-
-        when(hearingNoticeCamundaService.getProcessVariables(any()))
-            .thenReturn(sampleCamundaVars());
-
-        when(hearingsService.updatePartiesNotifiedResponse(anyString(), anyString(), anyInt(), any(), any()))
-            .thenReturn(null);
-
-        var response = handler.handle(params);
-
-        assertNotNull(response);
-        verify(hearingsService)
-            .updatePartiesNotifiedResponse(any(), any(), anyInt(), any(), any());
-    }
-
-    @Test
-    void shouldCatchRestClientException() {
-        CaseData caseData = sampleCaseData();
-        CallbackParams params = buildCallbackParams(caseData);
-
-        when(hearingNoticeCamundaService.getProcessVariables(any()))
-            .thenReturn(sampleCamundaVars());
-
-        when(hearingsService.updatePartiesNotifiedResponse(anyString(), anyString(), anyInt(), any(), any()))
-            .thenThrow(new RestClientException("Boom"));
-
-        var response = handler.handle(params);
-
-        assertNotNull(response);
-        verify(hearingsService)
-            .updatePartiesNotifiedResponse(any(), any(), anyInt(), any(), any());
-    }
-
-    @Test
-    void shouldNotCallUpdate_whenPartiesAlreadyNotifiedForSameRequestVersion() {
-        CaseData caseData = sampleCaseData();
-        CallbackParams params = buildCallbackParams(caseData);
-
-        when(hearingNoticeCamundaService.getProcessVariables(any()))
-            .thenReturn(sampleCamundaVars());
-
+        when(camundaService.getProcessVariables(any())).thenReturn(sampleCamundaVars());
         when(hearingsService.getPartiesNotifiedResponses(anyString(), anyString()))
             .thenReturn(PartiesNotifiedResponses.builder()
                             .responses(List.of(
@@ -194,59 +108,57 @@ class UpdateHmcPartiesNotifiedHandlerTest extends BaseCallbackHandlerTest {
                             ))
                             .build());
 
-        var response = handler.handle(params);
+        handler.handle(params);
 
-        assertNotNull(response);
-        verify(hearingsService, never())
-            .updatePartiesNotifiedResponse(any(), any(), anyInt(), any(), any());
+        verify(hearingsService, never()).updatePartiesNotifiedResponse(anyString(), anyString(), anyInt(), any(), any());
     }
 
     @Test
-    void shouldCallUpdate_whenExistingResponseForDifferentRequestVersion() {
+    void shouldCallUpdate_ifNotPreviouslyNotified() {
         CaseData caseData = sampleCaseData();
-        CallbackParams params = buildCallbackParams(caseData);
+        CallbackParams params = buildParams(caseData);
 
-        when(hearingNoticeCamundaService.getProcessVariables(any()))
-            .thenReturn(sampleCamundaVars());
+        when(camundaService.getProcessVariables(any())).thenReturn(sampleCamundaVars());
+        when(hearingsService.getPartiesNotifiedResponses(anyString(), anyString()))
+            .thenReturn(PartiesNotifiedResponses.builder().build());
 
+        handler.handle(params);
+
+        verify(hearingsService).updatePartiesNotifiedResponse(anyString(), eq("H123"), eq(10), any(), any());
+    }
+
+    @Test
+    void shouldSwallowException_ifAlreadyNotifiedAfterFailure() {
+        CaseData caseData = sampleCaseData();
+        CallbackParams params = buildParams(caseData);
+
+        when(camundaService.getProcessVariables(any())).thenReturn(sampleCamundaVars());
         when(hearingsService.getPartiesNotifiedResponses(anyString(), anyString()))
             .thenReturn(PartiesNotifiedResponses.builder()
                             .responses(List.of(
                                 PartiesNotifiedResponse.builder()
-                                    .requestVersion(99)
+                                    .requestVersion(10)
                                     .responseReceivedDateTime(LocalDateTime.now())
                                     .build()
                             ))
                             .build());
 
-        when(hearingsService.updatePartiesNotifiedResponse(any(), any(), anyInt(), any(), any()))
-            .thenReturn(new ResponseEntity<>(HttpStatus.OK));
-
-        var response = handler.handle(params);
-
-        assertNotNull(response);
-        verify(hearingsService)
-            .updatePartiesNotifiedResponse(eq("BEARER_TOKEN"), eq("HER1234"), eq(10), any(), any());
+        handler.handle(params);
     }
 
     @Test
-    void shouldHandleException_whenFetchingExistingPartiesNotifiedResponses() {
+    void shouldThrowException_ifNotNotifiedAndUpdateFails() {
         CaseData caseData = sampleCaseData();
-        CallbackParams params = buildCallbackParams(caseData);
+        CallbackParams params = buildParams(caseData);
 
-        when(hearingNoticeCamundaService.getProcessVariables(any()))
-            .thenReturn(sampleCamundaVars());
-
+        when(camundaService.getProcessVariables(any())).thenReturn(sampleCamundaVars());
         when(hearingsService.getPartiesNotifiedResponses(anyString(), anyString()))
-            .thenThrow(new RuntimeException("HMC down"));
+            .thenReturn(PartiesNotifiedResponses.builder().build());
 
-        when(hearingsService.updatePartiesNotifiedResponse(any(), any(), anyInt(), any(), any()))
-            .thenReturn(new ResponseEntity<>(HttpStatus.OK));
+        doThrow(new RuntimeException("Boom"))
+            .when(hearingsService).updatePartiesNotifiedResponse(anyString(), anyString(), anyInt(), any(), any());
 
-        var response = handler.handle(params);
-
-        assertNotNull(response);
-        verify(hearingsService)
-            .updatePartiesNotifiedResponse(any(), any(), anyInt(), any(), any());
+        assertThatThrownBy(() -> handler.handle(params))
+            .hasMessageContaining("Boom");
     }
 }

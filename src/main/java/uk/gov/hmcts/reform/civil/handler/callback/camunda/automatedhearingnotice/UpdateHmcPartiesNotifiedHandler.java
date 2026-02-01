@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -66,62 +65,83 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
 
     private CallbackResponse updatePartiesNotified(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        HearingNoticeVariables camundaVariables = camundaService.getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId());
+        HearingNoticeVariables camundaVariables =
+            camundaService.getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId());
 
-        PartiesNotified partiesNotified = PartiesNotified.builder()
+        Long ccdCaseReference = caseData.getCcdCaseReference();
+        String hearingId = camundaVariables.getHearingId();
+        int requestVersion = camundaVariables.getRequestVersion().intValue();
+
+        if (isHearingResponseNotifiedForRequestVersion(hearingId, requestVersion)) {
+            log.info("Parties already notified for caseId {}, hearingId {}, requestVersion {}",
+                     ccdCaseReference, hearingId, requestVersion);
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
+
+        PartiesNotified partiesNotified = buildPartiesNotified(camundaVariables);
+        logRequestPayload(partiesNotified, ccdCaseReference, hearingId);
+
+        try {
+            hearingsService.updatePartiesNotifiedResponse(
+                callbackParams.getParams().get(BEARER_TOKEN).toString(),
+                hearingId,
+                requestVersion,
+                camundaVariables.getResponseDateTime(),
+                partiesNotified
+            );
+
+            log.info("Successfully updated parties notified for caseId {}, hearingId {}, requestVersion {}",
+                     ccdCaseReference, hearingId, requestVersion);
+
+        } catch (Exception ex) {
+            if (isHearingResponseNotifiedForRequestVersion(hearingId, requestVersion)) {
+                log.info("Update succeeded despite exception for caseId {}, hearingId {}, requestVersion {}",
+                         ccdCaseReference, hearingId, requestVersion);
+                return AboutToStartOrSubmitCallbackResponse.builder().build();
+            }
+
+            log.error("HearingsService.updatePartiesNotifiedResponse failed for caseId {}, hearingId {}, requestVersion {}",
+                      ccdCaseReference, hearingId, requestVersion, ex);
+            throw ex;
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private PartiesNotified buildPartiesNotified(HearingNoticeVariables camundaVariables) {
+        return PartiesNotified.builder()
             .serviceData(PartiesNotifiedServiceData.builder()
                              .hearingNoticeGenerated(true)
                              .hearingLocation(camundaVariables.getHearingLocationEpims())
                              .days(camundaVariables.getDays())
                              .build())
             .build();
-
-        Long ccdCaseReference = caseData.getCcdCaseReference();
-        String hearingId = camundaVariables.getHearingId();
-        int requestVersion = camundaVariables.getRequestVersion().intValue();
-
-        PartiesNotifiedResponse partiesNotifiedResponse = getHearingResponseForRequestVersion(hearingId, requestVersion);
-        if (partiesNotifiedResponse != null && partiesNotifiedResponse.getResponseReceivedDateTime() != null) {
-            return AboutToStartOrSubmitCallbackResponse.builder().build();
-        }
-
-        try {
-            log.info("Request payload {}, for caseId {} and hearingId {}",
-                     mapper.writeValueAsString(partiesNotified), ccdCaseReference, hearingId);
-
-            ResponseEntity<?> responseEntity = hearingsService.updatePartiesNotifiedResponse(
-                callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                hearingId, requestVersion,
-                camundaVariables.getResponseDateTime(), partiesNotified
-            );
-
-            if (responseEntity == null) {
-                log.error("Null response received from HearingsService for caseId {}, hearingId {}", ccdCaseReference, hearingId);
-            } else if (!responseEntity.getStatusCode().is2xxSuccessful()) {
-                log.info("Non-success status from HearingsService for caseId {}, hearingId {}: {} error [{}]",
-                         ccdCaseReference, hearingId, responseEntity.getStatusCode(), responseEntity.getBody());
-            } else {
-                log.info("Successfully updated parties notified for caseId {}, hearingId {} with status {}",
-                         ccdCaseReference, hearingId, responseEntity.getStatusCode());
-            }
-        } catch (org.springframework.web.client.RestClientException | JsonProcessingException ex) {
-            log.error("Failed to call HearingsService.updatePartiesNotifiedResponse for caseId {}, hearingId {}: {}",
-                      ccdCaseReference, hearingId, ex.getMessage(), ex);
-            return AboutToStartOrSubmitCallbackResponse.builder().build();
-        }
-
-        return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    private PartiesNotifiedResponse getHearingResponseForRequestVersion(String hearingId, int requestVersion) {
+    private void logRequestPayload(PartiesNotified payload, Long caseId, String hearingId) {
+        try {
+            log.info("Request payload {}, for caseId {} and hearingId {}",
+                     mapper.writeValueAsString(payload), caseId, hearingId);
+        } catch (JsonProcessingException ex) {
+            log.warn("Failed to serialize PartiesNotified payload for caseId {}, hearingId {}",
+                     caseId, hearingId, ex);
+        }
+    }
+
+    private boolean isHearingResponseNotifiedForRequestVersion(String hearingId, int requestVersion) {
         try {
             var partiesNotified = hearingsService.getPartiesNotifiedResponses(
                 getSystemUpdateUser().getUserToken(), hearingId);
-            return HmcDataUtils.getHearingResponseForRequestVersion(partiesNotified, requestVersion);
+
+            PartiesNotifiedResponse response =
+                HmcDataUtils.getHearingResponseForRequestVersion(partiesNotified, requestVersion);
+
+            return response != null && response.getResponseReceivedDateTime() != null;
+
         } catch (Exception ex) {
-            log.error("Failed to fetch parties notified responses from HMC for hearingId {}: request versopm{}:  {}",
-                      hearingId,requestVersion,  ex.getMessage(), ex);
-            return null;
+            log.error("Failed to fetch parties notified responses from HMC for hearingId {}, requestVersion {}",
+                      hearingId, requestVersion, ex);
+            return false;
         }
     }
 
