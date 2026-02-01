@@ -72,10 +72,11 @@ public class HearingNoticeSchedulerEventHandler {
     private void processHearing(String hearingId) {
         HearingGetResponse hearing = hearingsService.getHearingResponse(getSystemUpdateUser().getUserToken(), hearingId);
         ListAssistCaseStatus hearingStatus = hearing.getHearingResponse().getLaCaseStatus();
-        log.info("Processing hearing id: [{}] status: [{}]", hearingId, hearingStatus);
+        int requestedHearingVersion = hearing.getRequestDetails().getVersionNumber().intValue();
+        log.info("Processing hearing id: [{}] status: [{}] and requested version: [{}]", hearingId, hearingStatus, requestedHearingVersion);
 
         if (hearingStatus.equals(ListAssistCaseStatus.LISTED)) {
-            PartiesNotifiedResponse partiesNotified = getLatestPartiesNotifiedResponse(hearingId, hearing.getRequestDetails().getVersionNumber().intValue());
+            PartiesNotifiedResponse partiesNotified = getLatestPartiesNotifiedResponse(hearingId);
             String caseReference = hearing.getCaseDetails().getCaseRef();
             CaseDetails caseDetails = coreCaseDataService.getCase(Long.parseLong(caseReference));
 
@@ -135,9 +136,9 @@ public class HearingNoticeSchedulerEventHandler {
         );
     }
 
-    private PartiesNotifiedResponse getLatestPartiesNotifiedResponse(String hearingId, int requestVersion) {
+    private PartiesNotifiedResponse getLatestPartiesNotifiedResponse(String hearingId) {
         var partiesNotified = hearingsService.getPartiesNotifiedResponses(
             getSystemUpdateUser().getUserToken(), hearingId);
-        return HmcDataUtils.getLatestHearingNoticeDetails(partiesNotified, requestVersion);
+        return HmcDataUtils.getLatestHearingNoticeDetails(partiesNotified);
     }
 }

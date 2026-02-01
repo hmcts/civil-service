@@ -74,12 +74,20 @@ public class HmcDataUtils {
             : new ArrayList<>();
     }
 
-    public static PartiesNotifiedResponse getLatestHearingNoticeDetails(
+
+    public static PartiesNotifiedResponse getLatestHearingNoticeDetails(PartiesNotifiedResponses partiesNotified) {
+        return Optional.ofNullable(partiesNotified.getResponses()).orElse(List.of())
+            .stream().max(Comparator.comparing(PartiesNotifiedResponse::getResponseReceivedDateTime))
+            .orElse(null);
+    }
+
+    public static PartiesNotifiedResponse getHearingResponseForRequestVersion(
         PartiesNotifiedResponses partiesNotified, int requestVersion) {
 
         return Optional.ofNullable(partiesNotified.getResponses())
             .orElse(List.of())
             .stream()
+            .filter(r -> r.getRequestVersion() <= requestVersion)
             .max(Comparator.comparing(PartiesNotifiedResponse::getRequestVersion))
             .orElse(null);
     }
@@ -195,8 +203,8 @@ public class HmcDataUtils {
      */
     public static Integer getTotalHearingDurationInMinutes(HearingGetResponse hearing) {
         return hearing.getHearingResponse().getHearingDaySchedule().stream()
-            .map(day -> getHearingDayMinutesDuration(day))
-            .reduce((aac, day) -> aac + day).orElse(null);
+            .map(HmcDataUtils::getHearingDayMinutesDuration)
+            .reduce(Integer::sum).orElse(null);
     }
 
     /**

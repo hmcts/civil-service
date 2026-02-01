@@ -80,8 +80,8 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
         String hearingId = camundaVariables.getHearingId();
         int requestVersion = camundaVariables.getRequestVersion().intValue();
 
-        PartiesNotifiedResponse latestPartiesNotifiedResponse = getLatestPartiesNotifiedResponse(hearingId, requestVersion);
-        if (latestPartiesNotifiedResponse != null && latestPartiesNotifiedResponse.getResponseReceivedDateTime() != null) {
+        PartiesNotifiedResponse partiesNotifiedResponse = getHearingResponseForRequestVersion(hearingId, requestVersion);
+        if (partiesNotifiedResponse != null && partiesNotifiedResponse.getResponseReceivedDateTime() != null) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
 
@@ -113,10 +113,16 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    private PartiesNotifiedResponse getLatestPartiesNotifiedResponse(String hearingId, int requestVersion) {
-        var partiesNotified = hearingsService.getPartiesNotifiedResponses(
-            getSystemUpdateUser().getUserToken(), hearingId);
-        return HmcDataUtils.getLatestHearingNoticeDetails(partiesNotified, requestVersion);
+    private PartiesNotifiedResponse getHearingResponseForRequestVersion(String hearingId, int requestVersion) {
+        try {
+            var partiesNotified = hearingsService.getPartiesNotifiedResponses(
+                getSystemUpdateUser().getUserToken(), hearingId);
+            return HmcDataUtils.getHearingResponseForRequestVersion(partiesNotified, requestVersion);
+        } catch (Exception ex) {
+            log.error("Failed to fetch parties notified responses from HMC for hearingId {}: request versopm{}:  {}",
+                      hearingId,requestVersion,  ex.getMessage(), ex);
+            return null;
+        }
     }
 
     private UserAuthContent getSystemUpdateUser() {
