@@ -21,4 +21,5 @@ public final class DashboardTaskIds {
     public static final String DEFENDANT_RESPONSE = "GenerateDashboardNotificationsDefendantResponse";
     public static final String CLAIM_ISSUE = "GenerateDashboardNotificationsClaimIssue";
     public static final String SETTLE_CLAIM_MARKED_PAID_IN_FULL = "GenerateDashboardNotificationsSettleClaimPaidInFull";
+    public static final String SET_ASIDE_JUDGMENT = "GenerateDashboardNotificationsSetAsideJudgement";
 }
