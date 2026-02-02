@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.model.docmosis.lip;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Builder;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Party;
 
@@ -10,7 +9,6 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-@Builder
 public record LipFormPartyDefence(String name, boolean isIndividual,
                                   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy") LocalDate dateOfBirth,
                                   String phone, String email, Address primaryAddress, Address correspondenceAddress) {
@@ -20,7 +18,7 @@ public record LipFormPartyDefence(String name, boolean isIndividual,
         if (party == null) {
             return null;
         }
-        return getLipDefenceFormPartyBuilderWithPartyData(party).build();
+        return getLipDefenceFormPartyWithPartyData(party, null);
     }
 
     @JsonIgnore
@@ -28,22 +26,22 @@ public record LipFormPartyDefence(String name, boolean isIndividual,
         if (party == null) {
             return null;
         }
-        LipFormPartyDefenceBuilder builder = getLipDefenceFormPartyBuilderWithPartyData(party);
-        builder.correspondenceAddress(correspondenceAddress);
-        return builder.build();
+        return getLipDefenceFormPartyWithPartyData(party, correspondenceAddress);
     }
 
-    private static LipFormPartyDefenceBuilder getLipDefenceFormPartyBuilderWithPartyData(Party party) {
-        LipFormPartyDefenceBuilder builder = LipFormPartyDefence.builder()
-            .name(party.getPartyName())
-            .phone(party.getPartyPhone())
-            .email(party.getPartyEmail())
-            .primaryAddress(party.getPrimaryAddress())
-            .isIndividual(party.isIndividual() || party.isSoleTrader());
-        Stream.of(party.getIndividualDateOfBirth(), party.getSoleTraderDateOfBirth())
+    private static LipFormPartyDefence getLipDefenceFormPartyWithPartyData(Party party, Address correspondenceAddress) {
+        LocalDate dateOfBirth = Stream.of(party.getIndividualDateOfBirth(), party.getSoleTraderDateOfBirth())
             .filter(Objects::nonNull)
             .findFirst()
-            .ifPresent(builder::dateOfBirth);
-        return builder;
+            .orElse(null);
+        return new LipFormPartyDefence(
+            party.getPartyName(),
+            party.isIndividual() || party.isSoleTrader(),
+            dateOfBirth,
+            party.getPartyPhone(),
+            party.getPartyEmail(),
+            party.getPrimaryAddress(),
+            correspondenceAddress
+        );
     }
 }
