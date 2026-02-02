@@ -31,4 +31,7 @@ public final class DashboardTaskIds {
         "GenerateDashboardNotificationsUploadTranslatedDocumentClaimantRejectsRepaymentPlan";
     public static final String TRAIL_READY_CHECK = "GenerateDashboardNotificationsTrailReadyCheck";
     public static final String COURT_OFFICER_ORDER = "GenerateDashboardNotificationsCourtOfficerOrder";
+    public static final String CREATE_LIP_CLAIM = "GenerateDashboardNotificationsCreateLipClaim";
+    public static final String MOVE_TO_DECISION_OUTCOME = "GenerateDashboardNotificationsDecisionOutcome";
+    public static final String DEFENDANT_RESPONSE = "GenerateDashboardNotificationsDefendantResponse";
 }
