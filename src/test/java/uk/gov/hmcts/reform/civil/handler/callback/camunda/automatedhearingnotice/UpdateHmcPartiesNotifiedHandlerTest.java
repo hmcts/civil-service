@@ -27,7 +27,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @ExtendWith(MockitoExtension.class)
@@ -105,7 +108,6 @@ class UpdateHmcPartiesNotifiedHandlerTest {
     @Test
     void shouldSwallowException_ifAlreadyNotifiedAfterFailure() {
         CaseData caseData = sampleCaseData();
-        CallbackParams params = buildParams(caseData);
 
         when(camundaService.getProcessVariables(any())).thenReturn(sampleCamundaVars());
 
@@ -128,6 +130,7 @@ class UpdateHmcPartiesNotifiedHandlerTest {
         when(userConfig.getUserName()).thenReturn("USER");
         when(userConfig.getPassword()).thenReturn("PASS");
 
+        CallbackParams params = buildParams(caseData);
         handler.handle(params);
     }
 
