@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class FeesControllerTest extends BaseIntegrationTest {
 
-    private static final String FEES_RANGES_URL = "/fees/ranges/";
+    private static final String FEES_RANGES_URL = "/fees/ranges";
     private static final String FEES_CLAIM_URL = "/fees/claim/{claimAmount}";
     private static final String FEES_CLAIM_CALCULATE_INTEREST_URL = "/fees/claim/calculate-interest";
     private static final String FEES_HEARING_URL = "/fees/hearing/{claimAmount}";
