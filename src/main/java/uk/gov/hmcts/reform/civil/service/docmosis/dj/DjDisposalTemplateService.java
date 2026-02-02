@@ -29,65 +29,67 @@ public class DjDisposalTemplateService {
         boolean writtenByJudge = authorisationFieldService.isJudge(userDetails);
         String courtLocation = disposalTemplateFieldService.getCourtLocation(caseData);
 
-        DefaultJudgmentSDOOrderForm.DefaultJudgmentSDOOrderFormBuilder builder = DefaultJudgmentSDOOrderForm.builder()
-            .writtenByJudge(writtenByJudge)
-            .judgeNameTitle(caseData.getDisposalHearingJudgesRecitalDJ().getJudgeNameTitle())
-            .caseNumber(caseData.getLegacyCaseReference())
-            .disposalHearingBundleDJ(caseData.getDisposalHearingBundleDJ())
-            .disposalHearingBundleDJAddSection(nonNull(caseData.getDisposalHearingBundleDJ()))
-            .typeBundleInfo(bundleFieldService.buildBundleInfo(caseData))
-            .disposalHearingDisclosureOfDocumentsDJ(caseData.getDisposalHearingDisclosureOfDocumentsDJ())
-            .disposalHearingDisclosureOfDocumentsDJAddSection(
+        DefaultJudgmentSDOOrderForm template = new DefaultJudgmentSDOOrderForm()
+            .setWrittenByJudge(writtenByJudge)
+            .setJudgeNameTitle(caseData.getDisposalHearingJudgesRecitalDJ().getJudgeNameTitle())
+            .setCaseNumber(caseData.getLegacyCaseReference())
+            .setDisposalHearingBundleDJ(caseData.getDisposalHearingBundleDJ())
+            .setDisposalHearingBundleDJAddSection(nonNull(caseData.getDisposalHearingBundleDJ()))
+            .setTypeBundleInfo(bundleFieldService.buildBundleInfo(caseData))
+            .setDisposalHearingDisclosureOfDocumentsDJ(caseData.getDisposalHearingDisclosureOfDocumentsDJ())
+            .setDisposalHearingDisclosureOfDocumentsDJAddSection(
                 nonNull(caseData.getDisposalHearingDisclosureOfDocumentsDJ()))
-            .disposalHearingWitnessOfFactDJ(caseData.getDisposalHearingWitnessOfFactDJ())
-            .disposalHearingWitnessOfFactDJAddSection(nonNull(caseData.getDisposalHearingWitnessOfFactDJ()))
-            .disposalHearingFinalDisposalHearingDJ(caseData.getDisposalHearingFinalDisposalHearingDJ())
-            .disposalHearingMethodDJ(caseData.getDisposalHearingMethodDJ())
-            .disposalHearingAttendance(disposalTemplateFieldService.getAttendanceLabel(caseData.getDisposalHearingMethodDJ()))
-            .disposalHearingFinalDisposalHearingDJAddSection(nonNull(caseData.getDisposalHearingFinalDisposalHearingDJ()))
-            .disposalHearingFinalDisposalHearingDJAddSection(nonNull(caseData.getDisposalHearingMethodDJ()))
-            .disposalHearingFinalDisposalHearingDJAddSection(
+            .setDisposalHearingWitnessOfFactDJ(caseData.getDisposalHearingWitnessOfFactDJ())
+            .setDisposalHearingWitnessOfFactDJAddSection(nonNull(caseData.getDisposalHearingWitnessOfFactDJ()))
+            .setDisposalHearingFinalDisposalHearingDJ(caseData.getDisposalHearingFinalDisposalHearingDJ())
+            .setDisposalHearingMethodDJ(caseData.getDisposalHearingMethodDJ())
+            .setDisposalHearingAttendance(disposalTemplateFieldService.getAttendanceLabel(caseData.getDisposalHearingMethodDJ()))
+            .setDisposalHearingFinalDisposalHearingDJAddSection(nonNull(caseData.getDisposalHearingFinalDisposalHearingDJ()))
+            .setDisposalHearingFinalDisposalHearingDJAddSection(nonNull(caseData.getDisposalHearingMethodDJ()))
+            .setDisposalHearingFinalDisposalHearingDJAddSection(
                 nonNull(disposalTemplateFieldService.getAttendanceLabel(caseData.getDisposalHearingMethodDJ())))
-            .courtLocation(courtLocation)
-            .telephoneOrganisedBy(hearingMethodFieldService.resolveTelephoneOrganisedBy(caseData))
-            .videoConferenceOrganisedBy(hearingMethodFieldService.resolveVideoOrganisedBy(caseData))
-            .disposalHearingTime(
+            .setCourtLocation(courtLocation)
+            .setTelephoneOrganisedBy(hearingMethodFieldService.resolveTelephoneOrganisedBy(caseData))
+            .setVideoConferenceOrganisedBy(hearingMethodFieldService.resolveVideoOrganisedBy(caseData))
+            .setDisposalHearingTime(
                 disposalTemplateFieldService.getHearingDuration(caseData)
             )
-            .disposalHearingJudgesRecitalDJ(caseData.getDisposalHearingJudgesRecitalDJ())
-            .disposalHearingMedicalEvidenceDJ(caseData.getDisposalHearingMedicalEvidenceDJ())
-            .disposalHearingMedicalEvidenceDJAddSection(nonNull(caseData.getDisposalHearingMedicalEvidenceDJ()))
-            .disposalHearingNotesDJ(caseData.getDisposalHearingNotesDJ())
-            .hasNewDirections(directionsToggleService.hasAdditionalDirections(caseData))
-            .disposalHearingAddNewDirectionsDJ(caseData.getDisposalHearingAddNewDirectionsDJ())
-            .disposalHearingQuestionsToExpertsDJ(caseData.getDisposalHearingQuestionsToExpertsDJ())
-            .disposalHearingQuestionsToExpertsDJAddSection(nonNull(caseData.getDisposalHearingQuestionsToExpertsDJ()))
-            .disposalHearingSchedulesOfLossDJ(caseData.getDisposalHearingSchedulesOfLossDJ())
-            .disposalHearingSchedulesOfLossDJAddSection(nonNull(caseData.getDisposalHearingSchedulesOfLossDJ()))
-            .disposalHearingClaimSettlingAddSection(
+            .setDisposalHearingJudgesRecitalDJ(caseData.getDisposalHearingJudgesRecitalDJ())
+            .setDisposalHearingMedicalEvidenceDJ(caseData.getDisposalHearingMedicalEvidenceDJ())
+            .setDisposalHearingMedicalEvidenceDJAddSection(nonNull(caseData.getDisposalHearingMedicalEvidenceDJ()))
+            .setDisposalHearingNotesDJ(caseData.getDisposalHearingNotesDJ())
+            .setHasNewDirections(directionsToggleService.hasAdditionalDirections(caseData))
+            .setDisposalHearingAddNewDirectionsDJ(caseData.getDisposalHearingAddNewDirectionsDJ())
+            .setDisposalHearingQuestionsToExpertsDJ(caseData.getDisposalHearingQuestionsToExpertsDJ())
+            .setDisposalHearingQuestionsToExpertsDJAddSection(nonNull(caseData.getDisposalHearingQuestionsToExpertsDJ()))
+            .setDisposalHearingSchedulesOfLossDJ(caseData.getDisposalHearingSchedulesOfLossDJ())
+            .setDisposalHearingSchedulesOfLossDJAddSection(nonNull(caseData.getDisposalHearingSchedulesOfLossDJ()))
+            .setDisposalHearingClaimSettlingAddSection(
                 directionsToggleService.isToggleEnabled(caseData.getDisposalHearingClaimSettlingDJToggle()))
-            .disposalHearingCostsAddSection(
+            .setDisposalHearingCostsAddSection(
                 directionsToggleService.isToggleEnabled(caseData.getDisposalHearingCostsDJToggle()))
-            .applicant(partyFieldService.hasApplicantPartyName(caseData)
+            .setApplicant(partyFieldService.hasApplicantPartyName(caseData)
                            ? caseData.getApplicant1().getPartyName().toUpperCase() : null)
-            .respondent(partyFieldService.resolveRespondent(caseData).toUpperCase())
-            .caseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
+            .setRespondent(partyFieldService.resolveRespondent(caseData).toUpperCase())
+            .setCaseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
 
-        builder.disposalHearingOrderMadeWithoutHearingDJ(caseData.getDisposalHearingOrderMadeWithoutHearingDJ())
-            .disposalHearingFinalDisposalHearingTimeDJ(caseData.getDisposalHearingFinalDisposalHearingTimeDJ())
-            .disposalHearingTimeEstimateDJ(getDisposalHearingTimeEstimateDJ(caseData.getDisposalHearingFinalDisposalHearingTimeDJ()));
+        template
+            .setDisposalHearingOrderMadeWithoutHearingDJ(caseData.getDisposalHearingOrderMadeWithoutHearingDJ())
+            .setDisposalHearingFinalDisposalHearingTimeDJ(caseData.getDisposalHearingFinalDisposalHearingTimeDJ())
+            .setDisposalHearingTimeEstimateDJ(getDisposalHearingTimeEstimateDJ(caseData.getDisposalHearingFinalDisposalHearingTimeDJ()));
 
-        builder.hearingLocation(locationHelper.getHearingLocation(courtLocation, caseData, authorisation));
-        builder.hasDisposalHearingWelshSectionDJ(
-            directionsToggleService.isToggleEnabled(caseData.getSdoR2DisposalHearingUseOfWelshLangToggleDJ())
-        );
-        builder.welshLanguageDescriptionDJ(
-            caseData.getSdoR2DisposalHearingWelshLanguageDJ() != null
-                ? caseData.getSdoR2DisposalHearingWelshLanguageDJ().getDescription()
-                : null
-        );
+        template
+            .setHearingLocation(locationHelper.getHearingLocation(courtLocation, caseData, authorisation))
+            .setHasDisposalHearingWelshSectionDJ(
+                directionsToggleService.isToggleEnabled(caseData.getSdoR2DisposalHearingUseOfWelshLangToggleDJ())
+            )
+            .setWelshLanguageDescriptionDJ(
+                caseData.getSdoR2DisposalHearingWelshLanguageDJ() != null
+                    ? caseData.getSdoR2DisposalHearingWelshLanguageDJ().getDescription()
+                    : null
+            );
 
-        return builder.build();
+        return template;
     }
 
 }

@@ -43,71 +43,65 @@ public class DjTrialNarrativeService {
     private final DjDeadlineService deadlineService;
 
     public TrialHearingJudgesRecital buildJudgesRecital(String judgeNameTitle) {
-        return TrialHearingJudgesRecital.builder()
-            .judgeNameTitle(judgeNameTitle)
-            .input(judgeNameTitle + ",")
-            .build();
+        return new TrialHearingJudgesRecital()
+            .setJudgeNameTitle(judgeNameTitle)
+            .setInput(judgeNameTitle + ",");
     }
 
     public TrialHearingDisclosureOfDocuments buildDisclosureOfDocuments() {
-        return TrialHearingDisclosureOfDocuments.builder()
-            .input1(FAST_TRACK_DISCLOSURE_STANDARD_DJ)
-            .date1(deadlineService.nextWorkingDayInWeeks(4))
-            .input2(FAST_TRACK_DISCLOSURE_INSPECTION)
-            .date2(deadlineService.nextWorkingDayInWeeks(6))
-            .input3(FAST_TRACK_DISCLOSURE_REQUESTS_WITHIN_SEVEN_DAYS_DJ)
-            .input4(FAST_TRACK_DISCLOSURE_UPLOAD_PREFIX)
-            .input5(FAST_TRACK_DISCLOSURE_UPLOAD_DEADLINE)
-            .date3(deadlineService.nextWorkingDayInWeeks(8))
-            .build();
+        return new TrialHearingDisclosureOfDocuments()
+            .setInput1(FAST_TRACK_DISCLOSURE_STANDARD_DJ)
+            .setDate1(deadlineService.nextWorkingDayInWeeks(4))
+            .setInput2(FAST_TRACK_DISCLOSURE_INSPECTION)
+            .setDate2(deadlineService.nextWorkingDayInWeeks(6))
+            .setInput3(FAST_TRACK_DISCLOSURE_REQUESTS_WITHIN_SEVEN_DAYS_DJ)
+            .setInput4(FAST_TRACK_DISCLOSURE_UPLOAD_PREFIX)
+            .setInput5(FAST_TRACK_DISCLOSURE_UPLOAD_DEADLINE)
+            .setDate3(deadlineService.nextWorkingDayInWeeks(8));
     }
 
     public TrialHearingDisclosureOfDocuments buildUpdatedDisclosureOfDocuments() {
-        return TrialHearingDisclosureOfDocuments.builder()
-            .input1(FAST_TRACK_DISCLOSURE_STANDARD_DJ)
-            .date1(deadlineService.nextWorkingDayInWeeks(4))
-            .input2(FAST_TRACK_DISCLOSURE_INSPECTION)
-            .date2(deadlineService.nextWorkingDayInWeeks(5))
-            .input3(FAST_TRACK_DISCLOSURE_REQUESTS_WITHIN_SEVEN_DAYS_DJ)
-            .input4(FAST_TRACK_DISCLOSURE_UPLOAD_PREFIX)
-            .input5(FAST_TRACK_DISCLOSURE_UPLOAD_DEADLINE)
-            .date3(deadlineService.nextWorkingDayInWeeks(8))
-            .build();
+        return new TrialHearingDisclosureOfDocuments()
+            .setInput1(FAST_TRACK_DISCLOSURE_STANDARD_DJ)
+            .setDate1(deadlineService.nextWorkingDayInWeeks(4))
+            .setInput2(FAST_TRACK_DISCLOSURE_INSPECTION)
+            .setDate2(deadlineService.nextWorkingDayInWeeks(5))
+            .setInput3(FAST_TRACK_DISCLOSURE_REQUESTS_WITHIN_SEVEN_DAYS_DJ)
+            .setInput4(FAST_TRACK_DISCLOSURE_UPLOAD_PREFIX)
+            .setInput5(FAST_TRACK_DISCLOSURE_UPLOAD_DEADLINE)
+            .setDate3(deadlineService.nextWorkingDayInWeeks(8));
     }
 
     public TrialHearingWitnessOfFact buildWitnessOfFact() {
-        return TrialHearingWitnessOfFact.builder()
-            .input1(TRIAL_WITNESS_STATEMENT_UPLOAD_NOTICE)
-            .input2("3")
-            .input3("3")
-            .input4(WITNESS_COUNT_LIMIT_NOTE_DJ)
-            .input5(WITNESS_PAGE_LIMIT_PREFIX)
-            .input6("10")
-            .input7(WITNESS_PAGE_LIMIT_SUFFIX_DJ)
-            .input8(SMALL_CLAIMS_WITNESS_DEADLINE)
-            .date1(deadlineService.nextWorkingDayInWeeks(8))
-            .input9(SMALL_CLAIMS_WITNESS_LATE_WARNING)
-            .build();
+        return new TrialHearingWitnessOfFact()
+            .setInput1(TRIAL_WITNESS_STATEMENT_UPLOAD_NOTICE)
+            .setInput2("3")
+            .setInput3("3")
+            .setInput4(WITNESS_COUNT_LIMIT_NOTE_DJ)
+            .setInput5(WITNESS_PAGE_LIMIT_PREFIX)
+            .setInput6("10")
+            .setInput7(WITNESS_PAGE_LIMIT_SUFFIX_DJ)
+            .setInput8(SMALL_CLAIMS_WITNESS_DEADLINE)
+            .setDate1(deadlineService.nextWorkingDayInWeeks(8))
+            .setInput9(SMALL_CLAIMS_WITNESS_LATE_WARNING);
     }
 
     public TrialHearingSchedulesOfLoss buildSchedulesOfLoss() {
-        return TrialHearingSchedulesOfLoss.builder()
-            .input1(FAST_TRACK_SCHEDULE_CLAIMANT_UPLOAD)
-            .date1(deadlineService.nextWorkingDayInWeeks(10))
-            .input2(FAST_TRACK_SCHEDULE_DEFENDANT_UPLOAD)
-            .date2(deadlineService.nextWorkingDayInWeeks(12))
-            .input3(FAST_TRACK_SCHEDULE_FUTURE_LOSS_DJ)
-            .build();
+        return new TrialHearingSchedulesOfLoss()
+            .setInput1(FAST_TRACK_SCHEDULE_CLAIMANT_UPLOAD)
+            .setDate1(deadlineService.nextWorkingDayInWeeks(10))
+            .setInput2(FAST_TRACK_SCHEDULE_DEFENDANT_UPLOAD)
+            .setDate2(deadlineService.nextWorkingDayInWeeks(12))
+            .setInput3(FAST_TRACK_SCHEDULE_FUTURE_LOSS_DJ);
     }
 
     public TrialHearingTrial buildTrialHearingTrial() {
-        return TrialHearingTrial.builder()
-            .input1(FAST_TRACK_TRIAL_TIME_ALLOWED_DJ)
-            .date1(deadlineService.weeksFromNow(22))
-            .date2(deadlineService.weeksFromNow(34))
-            .input2(FAST_TRACK_TRIAL_TIME_WARNING_DJ)
-            .input3(FAST_TRACK_TRIAL_BUNDLE_NOTICE + " ")
-            .build();
+        return new TrialHearingTrial()
+            .setInput1(FAST_TRACK_TRIAL_TIME_ALLOWED_DJ)
+            .setDate1(deadlineService.weeksFromNow(22))
+            .setDate2(deadlineService.weeksFromNow(34))
+            .setInput2(FAST_TRACK_TRIAL_TIME_WARNING_DJ)
+            .setInput3(FAST_TRACK_TRIAL_BUNDLE_NOTICE + " ");
     }
 
     public TrialHearingTimeDJ buildTrialHearingTime() {
@@ -121,9 +115,8 @@ public class DjTrialNarrativeService {
     }
 
     public TrialHearingNotes buildTrialHearingNotes() {
-        return TrialHearingNotes.builder()
-            .input(ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_LOWERCASE)
-            .date(deadlineService.nextWorkingDayInWeeks(1))
-            .build();
+        return new TrialHearingNotes()
+            .setInput(ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_LOWERCASE)
+            .setDate(deadlineService.nextWorkingDayInWeeks(1));
     }
 }

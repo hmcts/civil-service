@@ -6,11 +6,11 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormSmallDrh;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoR2SmallClaimsDirectionsService;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsDirectionsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsTemplateFieldService;
 
 import java.time.LocalDate;
@@ -23,7 +23,6 @@ public class SdoSmallClaimsDrhTemplateService {
     private final DocumentHearingLocationHelper locationHelper;
     private final SdoCaseClassificationService caseClassificationService;
     private final SdoR2SmallClaimsDirectionsService r2SmallClaimsDirectionsService;
-    private final SdoSmallClaimsDirectionsService smallClaimsDirectionsService;
     private final FeatureToggleService featureToggleService;
     private final SdoSmallClaimsTemplateFieldService smallClaimsTemplateFieldService;
 
@@ -35,45 +34,45 @@ public class SdoSmallClaimsDrhTemplateService {
     ) {
         boolean carmEnabled = featureToggleService.isCarmEnabledForCase(caseData);
 
-        SdoDocumentFormSmallDrh.SdoDocumentFormSmallDrhBuilder builder = SdoDocumentFormSmallDrh.builder()
-            .writtenByJudge(isJudge)
-            .currentDate(LocalDate.now())
-            .judgeName(judgeName)
-            .caseNumber(caseData.getLegacyCaseReference())
-            .applicant1(caseData.getApplicant1())
-            .hasApplicant2(caseClassificationService.hasApplicant2(caseData))
-            .applicant2(caseData.getApplicant2())
-            .respondent1(caseData.getRespondent1())
-            .hasRespondent2(caseClassificationService.hasRespondent2(caseData))
-            .respondent2(caseData.getRespondent2())
-            .hasPaymentProtectionInsurance(caseData.getSdoR2SmallClaimsPPIToggle() != null)
-            .hasHearingToggle(caseData.getSdoR2SmallClaimsHearingToggle() != null)
-            .hasWitnessStatement(caseData.getSdoR2SmallClaimsWitnessStatements() != null)
-            .hasUploadDocToggle(caseData.getSdoR2SmallClaimsUploadDocToggle() != null)
-            .hasDRHWelshLangToggle(caseData.getSdoR2DrhUseOfWelshIncludeInOrderToggle() != null)
-            .hasSdoR2HearingTrialWindow(r2SmallClaimsDirectionsService.hasHearingTrialWindow(caseData))
-            .hasNewDirections(caseData.getSdoR2SmallClaimsAddNewDirection() != null)
-            .sdoR2SmallClaimsPhysicalTrialBundleTxt(r2SmallClaimsDirectionsService.getPhysicalTrialBundleText(caseData))
-            .sdoR2SmallClaimsJudgesRecital(caseData.getSdoR2SmallClaimsJudgesRecital())
-            .sdoR2SmallClaimsHearing(caseData.getSdoR2SmallClaimsHearing())
-            .sdoR2SmallClaimsWitnessStatements(caseData.getSdoR2SmallClaimsWitnessStatements())
-            .sdoR2SmallClaimsPPI(caseData.getSdoR2SmallClaimsPPI())
-            .sdoR2SmallClaimsUploadDoc(caseData.getSdoR2SmallClaimsUploadDoc())
-            .smallClaimsMethod(r2SmallClaimsDirectionsService.getHearingMethod(caseData))
-            .hearingTime(r2SmallClaimsDirectionsService.getHearingTime(caseData))
-            .sdoR2SmallClaimsImpNotes(caseData.getSdoR2SmallClaimsImpNotes())
-            .sdoR2SmallClaimsAddNewDirection(caseData.getSdoR2SmallClaimsAddNewDirection())
-            .welshLanguageDescription(Optional.ofNullable(caseData.getSdoR2DrhUseOfWelshLanguage())
-                                              .map(value -> value.getDescription()).orElse(null))
-            .carmEnabled(carmEnabled)
-            .sdoR2SmallClaimMediationSectionInput(smallClaimsTemplateFieldService.getMediationTextDrh(caseData))
-            .caseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation))
-            .sdoR2SmallClaimsMediationSectionToggle(
+        SdoDocumentFormSmallDrh template = new SdoDocumentFormSmallDrh()
+            .setWrittenByJudge(isJudge)
+            .setCurrentDate(LocalDate.now())
+            .setJudgeName(judgeName)
+            .setCaseNumber(caseData.getLegacyCaseReference())
+            .setApplicant1(caseData.getApplicant1())
+            .setHasApplicant2(caseClassificationService.hasApplicant2(caseData))
+            .setApplicant2(caseData.getApplicant2())
+            .setRespondent1(caseData.getRespondent1())
+            .setHasRespondent2(caseClassificationService.hasRespondent2(caseData))
+            .setRespondent2(caseData.getRespondent2())
+            .setHasPaymentProtectionInsurance(caseData.getSdoR2SmallClaimsPPIToggle() != null)
+            .setHasHearingToggle(caseData.getSdoR2SmallClaimsHearingToggle() != null)
+            .setHasWitnessStatement(caseData.getSdoR2SmallClaimsWitnessStatements() != null)
+            .setHasUploadDocToggle(caseData.getSdoR2SmallClaimsUploadDocToggle() != null)
+            .setHasDRHWelshLangToggle(caseData.getSdoR2DrhUseOfWelshIncludeInOrderToggle() != null)
+            .setHasSdoR2HearingTrialWindow(r2SmallClaimsDirectionsService.hasHearingTrialWindow(caseData))
+            .setHasNewDirections(caseData.getSdoR2SmallClaimsAddNewDirection() != null)
+            .setSdoR2SmallClaimsPhysicalTrialBundleTxt(r2SmallClaimsDirectionsService.getPhysicalTrialBundleText(caseData))
+            .setSdoR2SmallClaimsJudgesRecital(caseData.getSdoR2SmallClaimsJudgesRecital())
+            .setSdoR2SmallClaimsHearing(caseData.getSdoR2SmallClaimsHearing())
+            .setSdoR2SmallClaimsWitnessStatements(caseData.getSdoR2SmallClaimsWitnessStatements())
+            .setSdoR2SmallClaimsPPI(caseData.getSdoR2SmallClaimsPPI())
+            .setSdoR2SmallClaimsUploadDoc(caseData.getSdoR2SmallClaimsUploadDoc())
+            .setSmallClaimsMethod(r2SmallClaimsDirectionsService.getHearingMethod(caseData))
+            .setHearingTime(r2SmallClaimsDirectionsService.getHearingTime(caseData))
+            .setSdoR2SmallClaimsImpNotes(caseData.getSdoR2SmallClaimsImpNotes())
+            .setSdoR2SmallClaimsAddNewDirection(caseData.getSdoR2SmallClaimsAddNewDirection())
+            .setWelshLanguageDescription(Optional.ofNullable(caseData.getSdoR2DrhUseOfWelshLanguage())
+                                              .map(SdoR2WelshLanguageUsage::getDescription).orElse(null))
+            .setCarmEnabled(carmEnabled)
+            .setSdoR2SmallClaimMediationSectionInput(smallClaimsTemplateFieldService.getMediationTextDrh(caseData))
+            .setCaseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation))
+            .setSdoR2SmallClaimsMediationSectionToggle(
                 smallClaimsTemplateFieldService.showMediationSectionDrh(caseData, carmEnabled)
             );
 
         if (caseData.getSdoR2SmallClaimsHearing() != null) {
-            builder.hearingLocation(
+            template.setHearingLocation(
                 locationHelper.getHearingLocation(
                     Optional.ofNullable(r2SmallClaimsDirectionsService.getHearingLocation(caseData))
                         .map(DynamicList::getValue)
@@ -85,6 +84,6 @@ public class SdoSmallClaimsDrhTemplateService {
             );
         }
 
-        return builder.build();
+        return template;
     }
 }

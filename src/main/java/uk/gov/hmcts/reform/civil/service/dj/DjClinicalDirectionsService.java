@@ -21,24 +21,22 @@ public class DjClinicalDirectionsService {
     private final DjDeadlineService deadlineService;
 
     public TrialClinicalNegligence buildTrialClinicalNegligence() {
-        return TrialClinicalNegligence.builder()
-            .input1(CLINICAL_DOCUMENTS_HEADING)
-            .input2(CLINICAL_PARTIES_DJ)
-            .input3(CLINICAL_NOTES_DJ)
-            .input4(CLINICAL_BUNDLE_DJ)
-            .build();
+        return new TrialClinicalNegligence()
+            .setInput1(CLINICAL_DOCUMENTS_HEADING)
+            .setInput2(CLINICAL_PARTIES_DJ)
+            .setInput3(CLINICAL_NOTES_DJ)
+            .setInput4(CLINICAL_BUNDLE_DJ);
     }
 
     public TrialPersonalInjury buildTrialPersonalInjury() {
-        return TrialPersonalInjury.builder()
-            .input1(PERSONAL_INJURY_PERMISSION_DJ)
-            .date1(deadlineService.nextWorkingDayInWeeks(4))
-            .input2(PERSONAL_INJURY_QUESTIONS)
-            .date2(deadlineService.nextWorkingDayInWeeks(8))
-            .input3(PERSONAL_INJURY_ANSWERS)
-            .date3(deadlineService.nextWorkingDayInWeeks(4))
-            .input4(PERSONAL_INJURY_UPLOAD)
-            .date4(deadlineService.nextWorkingDayInWeeks(8))
-            .build();
+        return new TrialPersonalInjury()
+            .setInput1(PERSONAL_INJURY_PERMISSION_DJ)
+            .setDate1(deadlineService.nextWorkingDayInWeeks(4))
+            .setInput2(PERSONAL_INJURY_QUESTIONS)
+            .setDate2(deadlineService.nextWorkingDayInWeeks(8))
+            .setInput3(PERSONAL_INJURY_ANSWERS)
+            .setDate3(deadlineService.nextWorkingDayInWeeks(4))
+            .setInput4(PERSONAL_INJURY_UPLOAD)
+            .setDate4(deadlineService.nextWorkingDayInWeeks(8));
     }
 }

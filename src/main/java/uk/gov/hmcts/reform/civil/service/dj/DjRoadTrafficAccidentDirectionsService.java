@@ -13,9 +13,8 @@ public class DjRoadTrafficAccidentDirectionsService {
     private final DjDeadlineService deadlineService;
 
     public TrialRoadTrafficAccident buildTrialRoadTrafficAccident() {
-        return TrialRoadTrafficAccident.builder()
-            .input(ROAD_TRAFFIC_ACCIDENT_UPLOAD_DJ)
-            .date1(deadlineService.nextWorkingDayInWeeks(4))
-            .build();
+        return new TrialRoadTrafficAccident()
+            .setInput(ROAD_TRAFFIC_ACCIDENT_UPLOAD_DJ)
+            .setDate1(deadlineService.nextWorkingDayInWeeks(4));
     }
 }

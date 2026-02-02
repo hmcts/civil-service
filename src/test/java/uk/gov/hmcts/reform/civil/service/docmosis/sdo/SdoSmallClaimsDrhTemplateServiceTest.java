@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoR2SmallClaimsDirectionsService;
-import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsDirectionsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsTemplateFieldService;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,7 +23,6 @@ class SdoSmallClaimsDrhTemplateServiceTest {
 
     private final DocumentHearingLocationHelper locationHelper = Mockito.mock(DocumentHearingLocationHelper.class);
     private final SdoR2SmallClaimsDirectionsService r2Directions = Mockito.mock(SdoR2SmallClaimsDirectionsService.class);
-    private final SdoSmallClaimsDirectionsService smallDirections = Mockito.mock(SdoSmallClaimsDirectionsService.class);
     private final SdoSmallClaimsTemplateFieldService templateFieldService = Mockito.mock(SdoSmallClaimsTemplateFieldService.class);
     private final FeatureToggleService featureToggleService = Mockito.mock(FeatureToggleService.class);
     private final SdoCaseClassificationService classificationService = new SdoCaseClassificationService();
@@ -32,7 +30,6 @@ class SdoSmallClaimsDrhTemplateServiceTest {
         locationHelper,
         classificationService,
         r2Directions,
-        smallDirections,
         featureToggleService,
         templateFieldService
     );

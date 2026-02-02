@@ -63,7 +63,7 @@ class DjWelshDocumentServiceTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
             .claimantBilingualLanguagePreference(Language.ENGLISH.toString())
             .build();
-        DefaultJudgmentForm defaultJudgmentForm = DefaultJudgmentForm.builder().build();
+        DefaultJudgmentForm defaultJudgmentForm = new DefaultJudgmentForm();
         CaseDocument englishDocument = CaseDocumentBuilder.builder().documentType(DEFAULT_JUDGMENT_CLAIMANT1).build();
 
         CaseDocument result = djWelshDocumentService.attachWelshDocumentIfRequired(
@@ -86,7 +86,7 @@ class DjWelshDocumentServiceTest {
             .ccdCaseReference(1234567890L)
             .legacyCaseReference("000LR001")
             .build();
-        DefaultJudgmentForm defaultJudgmentForm = DefaultJudgmentForm.builder().build();
+        DefaultJudgmentForm defaultJudgmentForm = new DefaultJudgmentForm();
         CaseDocument englishDocument = CaseDocumentBuilder.builder()
             .documentName("english.pdf")
             .documentType(DEFAULT_JUDGMENT_CLAIMANT1)

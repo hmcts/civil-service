@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormSmall;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
@@ -34,60 +35,61 @@ public class SdoSmallClaimsTemplateService {
         String authorisation
     ) {
         boolean carmEnabled = featureToggleService.isCarmEnabledForCase(caseData);
-        SdoDocumentFormSmall.SdoDocumentFormSmallBuilder builder = SdoDocumentFormSmall.builder()
-            .writtenByJudge(isJudge)
-            .currentDate(LocalDate.now())
-            .judgeName(judgeName)
-            .caseNumber(caseData.getLegacyCaseReference())
-            .applicant1(caseData.getApplicant1())
-            .hasApplicant2(caseClassificationService.hasApplicant2(caseData))
-            .applicant2(caseData.getApplicant2())
-            .respondent1(caseData.getRespondent1())
-            .hasRespondent2(caseClassificationService.hasRespondent2(caseData))
-            .respondent2(caseData.getRespondent2())
-            .drawDirectionsOrderRequired(caseData.getDrawDirectionsOrderRequired())
-            .drawDirectionsOrder(caseData.getDrawDirectionsOrder())
-            .claimsTrack(caseData.getClaimsTrack())
-            .smallClaims(caseData.getSmallClaims())
-            .hasCreditHire(hasAdditionalDirection(caseData, SmallTrack.smallClaimCreditHire))
-            .hasRoadTrafficAccident(hasAdditionalDirection(caseData, SmallTrack.smallClaimRoadTrafficAccident))
-            .smallClaimsJudgesRecital(caseData.getSmallClaimsJudgesRecital())
-            .smallClaimsHearing(caseData.getSmallClaimsHearing())
-            .smallClaimsHearingTime(smallClaimsTemplateFieldService.getHearingTimeLabel(caseData))
-            .smallClaimsMethod(caseData.getSmallClaimsMethod())
-            .smallClaimsMethodInPerson(caseData.getSmallClaimsMethodInPerson())
-            .smallClaimsMethodTelephoneHearing(smallClaimsTemplateFieldService.getMethodTelephoneHearingLabel(caseData))
-            .smallClaimsMethodVideoConferenceHearing(
+        SdoDocumentFormSmall template = new SdoDocumentFormSmall()
+            .setWrittenByJudge(isJudge)
+            .setCurrentDate(LocalDate.now())
+            .setJudgeName(judgeName)
+            .setCaseNumber(caseData.getLegacyCaseReference())
+            .setApplicant1(caseData.getApplicant1())
+            .setHasApplicant2(caseClassificationService.hasApplicant2(caseData))
+            .setApplicant2(caseData.getApplicant2())
+            .setRespondent1(caseData.getRespondent1())
+            .setHasRespondent2(caseClassificationService.hasRespondent2(caseData))
+            .setRespondent2(caseData.getRespondent2())
+            .setDrawDirectionsOrderRequired(caseData.getDrawDirectionsOrderRequired())
+            .setDrawDirectionsOrder(caseData.getDrawDirectionsOrder())
+            .setClaimsTrack(caseData.getClaimsTrack())
+            .setSmallClaims(caseData.getSmallClaims())
+            .setHasCreditHire(hasAdditionalDirection(caseData, SmallTrack.smallClaimCreditHire))
+            .setHasRoadTrafficAccident(hasAdditionalDirection(caseData, SmallTrack.smallClaimRoadTrafficAccident))
+            .setSmallClaimsJudgesRecital(caseData.getSmallClaimsJudgesRecital())
+            .setSmallClaimsHearing(caseData.getSmallClaimsHearing())
+            .setSmallClaimsHearingTime(smallClaimsTemplateFieldService.getHearingTimeLabel(caseData))
+            .setSmallClaimsMethod(caseData.getSmallClaimsMethod())
+            .setSmallClaimsMethodInPerson(caseData.getSmallClaimsMethodInPerson())
+            .setSmallClaimsMethodTelephoneHearing(smallClaimsTemplateFieldService.getMethodTelephoneHearingLabel(caseData))
+            .setSmallClaimsMethodVideoConferenceHearing(
                 smallClaimsTemplateFieldService.getMethodVideoConferenceHearingLabel(caseData)
             )
-            .smallClaimsDocuments(caseData.getSmallClaimsDocuments())
-            .smallClaimsCreditHire(caseData.getSmallClaimsCreditHire())
-            .smallClaimsRoadTrafficAccident(caseData.getSmallClaimsRoadTrafficAccident())
-            .hasNewDirections(hasVariable(caseData, SmallClaimsVariable.ADD_NEW_DIRECTIONS))
-            .smallClaimsAddNewDirections(caseData.getSmallClaimsAddNewDirections())
-            .smallClaimsNotes(caseData.getSmallClaimsNotes())
-            .smallClaimsHearingToggle(hasVariable(caseData, SmallClaimsVariable.HEARING_TOGGLE))
-            .smallClaimsMethodToggle(true)
-            .smallClaimMediationSectionInput(smallClaimsTemplateFieldService.getMediationText(caseData))
-            .smallClaimsDocumentsToggle(hasVariable(caseData, SmallClaimsVariable.DOCUMENTS_TOGGLE))
-            .smallClaimsWitnessStatementToggle(hasVariable(caseData, SmallClaimsVariable.WITNESS_STATEMENT_TOGGLE))
-            .smallClaimsNumberOfWitnessesToggle(hasVariable(caseData, SmallClaimsVariable.NUMBER_OF_WITNESSES_TOGGLE))
-            .smallClaimsMediationSectionToggle(
+            .setSmallClaimsDocuments(caseData.getSmallClaimsDocuments())
+            .setSmallClaimsCreditHire(caseData.getSmallClaimsCreditHire())
+            .setSmallClaimsRoadTrafficAccident(caseData.getSmallClaimsRoadTrafficAccident())
+            .setHasNewDirections(hasVariable(caseData, SmallClaimsVariable.ADD_NEW_DIRECTIONS))
+            .setSmallClaimsAddNewDirections(caseData.getSmallClaimsAddNewDirections())
+            .setSmallClaimsNotes(caseData.getSmallClaimsNotes())
+            .setSmallClaimsHearingToggle(hasVariable(caseData, SmallClaimsVariable.HEARING_TOGGLE))
+            .setSmallClaimsMethodToggle(true)
+            .setSmallClaimMediationSectionInput(smallClaimsTemplateFieldService.getMediationText(caseData))
+            .setSmallClaimsDocumentsToggle(hasVariable(caseData, SmallClaimsVariable.DOCUMENTS_TOGGLE))
+            .setSmallClaimsWitnessStatementToggle(hasVariable(caseData, SmallClaimsVariable.WITNESS_STATEMENT_TOGGLE))
+            .setSmallClaimsNumberOfWitnessesToggle(hasVariable(caseData, SmallClaimsVariable.NUMBER_OF_WITNESSES_TOGGLE))
+            .setSmallClaimsMediationSectionToggle(
                 smallClaimsTemplateFieldService.showMediationSection(caseData, carmEnabled)
             )
-            .caseAccessCategory(caseData.getCaseAccessCategory().toString())
-            .carmEnabled(carmEnabled)
-            .smallClaimsFlightDelayToggle(hasVariable(caseData, SmallClaimsVariable.FLIGHT_DELAY_TOGGLE))
-            .smallClaimsFlightDelay(caseData.getSmallClaimsFlightDelay())
-            .smallClaimsWelshLanguageToggle(hasVariable(caseData, SmallClaimsVariable.WELSH_TOGGLE))
-            .welshLanguageDescription(
+            .setCaseAccessCategory(caseData.getCaseAccessCategory().toString())
+            .setCarmEnabled(carmEnabled)
+            .setSmallClaimsFlightDelayToggle(hasVariable(caseData, SmallClaimsVariable.FLIGHT_DELAY_TOGGLE))
+            .setSmallClaimsFlightDelay(caseData.getSmallClaimsFlightDelay())
+            .setSmallClaimsWelshLanguageToggle(hasVariable(caseData, SmallClaimsVariable.WELSH_TOGGLE))
+            .setWelshLanguageDescription(
                 Optional.ofNullable(caseData.getSdoR2SmallClaimsUseOfWelshLanguage())
-                    .map(value -> value.getDescription())
+                    .map(SdoR2WelshLanguageUsage::getDescription)
                     .orElse(null)
             )
-            .sdoR2SmallClaimsWitnessStatements(caseData.getSdoR2SmallClaimsWitnessStatementOther());
+            .setSdoR2SmallClaimsWitnessStatements(caseData.getSdoR2SmallClaimsWitnessStatementOther());
 
-        builder.hearingLocation(
+        template
+            .setHearingLocation(
                 locationHelper.getHearingLocation(
                     Optional.ofNullable(caseData.getSmallClaimsMethodInPerson())
                         .map(DynamicList::getValue)
@@ -96,9 +98,9 @@ public class SdoSmallClaimsTemplateService {
                     caseData,
                     authorisation
                 ))
-            .caseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
+            .setCaseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
 
-        return builder.build();
+        return template;
     }
 
     private boolean hasAdditionalDirection(CaseData caseData, SmallTrack track) {

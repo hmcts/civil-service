@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormDisposal;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoDisposalDirectionsService;
@@ -29,89 +30,90 @@ public class SdoDisposalTemplateService {
         boolean isJudge,
         String authorisation
     ) {
-        SdoDocumentFormDisposal.SdoDocumentFormDisposalBuilder builder = SdoDocumentFormDisposal.builder()
-            .writtenByJudge(isJudge)
-            .currentDate(LocalDate.now())
-            .judgeName(judgeName)
-            .caseNumber(caseData.getLegacyCaseReference())
-            .applicant1(caseData.getApplicant1())
-            .hasApplicant2(caseClassificationService.hasApplicant2(caseData))
-            .applicant2(caseData.getApplicant2())
-            .respondent1(caseData.getRespondent1())
-            .hasRespondent2(caseClassificationService.hasRespondent2(caseData))
-            .respondent2(caseData.getRespondent2())
-            .drawDirectionsOrderRequired(caseData.getDrawDirectionsOrderRequired())
-            .drawDirectionsOrder(caseData.getDrawDirectionsOrder())
-            .disposalHearingJudgesRecital(caseData.getDisposalHearingJudgesRecital())
-            .disposalHearingDisclosureOfDocuments(caseData.getDisposalHearingDisclosureOfDocuments())
-            .disposalHearingWitnessOfFact(caseData.getDisposalHearingWitnessOfFact())
-            .disposalHearingMedicalEvidence(caseData.getDisposalHearingMedicalEvidence())
-            .disposalHearingQuestionsToExperts(caseData.getDisposalHearingQuestionsToExperts())
-            .disposalHearingSchedulesOfLoss(caseData.getDisposalHearingSchedulesOfLoss())
-            .disposalHearingFinalDisposalHearing(caseData.getDisposalHearingFinalDisposalHearing())
-            .disposalHearingFinalDisposalHearingTime(disposalDirectionsService.getFinalHearingTimeLabel(caseData))
-            .disposalHearingMethod(caseData.getDisposalHearingMethod())
-            .disposalHearingMethodInPerson(caseData.getDisposalHearingMethodInPerson())
-            .disposalHearingMethodTelephoneHearing(disposalDirectionsService.getTelephoneHearingLabel(caseData))
-            .disposalHearingMethodVideoConferenceHearing(
+        SdoDocumentFormDisposal template = new SdoDocumentFormDisposal()
+            .setWrittenByJudge(isJudge)
+            .setCurrentDate(LocalDate.now())
+            .setJudgeName(judgeName)
+            .setCaseNumber(caseData.getLegacyCaseReference())
+            .setApplicant1(caseData.getApplicant1())
+            .setHasApplicant2(caseClassificationService.hasApplicant2(caseData))
+            .setApplicant2(caseData.getApplicant2())
+            .setRespondent1(caseData.getRespondent1())
+            .setHasRespondent2(caseClassificationService.hasRespondent2(caseData))
+            .setRespondent2(caseData.getRespondent2())
+            .setDrawDirectionsOrderRequired(caseData.getDrawDirectionsOrderRequired())
+            .setDrawDirectionsOrder(caseData.getDrawDirectionsOrder())
+            .setDisposalHearingJudgesRecital(caseData.getDisposalHearingJudgesRecital())
+            .setDisposalHearingDisclosureOfDocuments(caseData.getDisposalHearingDisclosureOfDocuments())
+            .setDisposalHearingWitnessOfFact(caseData.getDisposalHearingWitnessOfFact())
+            .setDisposalHearingMedicalEvidence(caseData.getDisposalHearingMedicalEvidence())
+            .setDisposalHearingQuestionsToExperts(caseData.getDisposalHearingQuestionsToExperts())
+            .setDisposalHearingSchedulesOfLoss(caseData.getDisposalHearingSchedulesOfLoss())
+            .setDisposalHearingFinalDisposalHearing(caseData.getDisposalHearingFinalDisposalHearing())
+            .setDisposalHearingFinalDisposalHearingTime(disposalDirectionsService.getFinalHearingTimeLabel(caseData))
+            .setDisposalHearingMethod(caseData.getDisposalHearingMethod())
+            .setDisposalHearingMethodInPerson(caseData.getDisposalHearingMethodInPerson())
+            .setDisposalHearingMethodTelephoneHearing(disposalDirectionsService.getTelephoneHearingLabel(caseData))
+            .setDisposalHearingMethodVideoConferenceHearing(
                 disposalDirectionsService.getVideoConferenceHearingLabel(caseData)
             )
-            .disposalHearingBundle(caseData.getDisposalHearingBundle())
-            .disposalHearingBundleTypeText(disposalDirectionsService.getBundleTypeText(caseData))
-            .hasNewDirections(disposalDirectionsService.hasDisposalVariable(caseData, "disposalHearingAddNewDirections"))
-            .disposalHearingAddNewDirections(caseData.getDisposalHearingAddNewDirections())
-            .disposalHearingNotes(caseData.getDisposalHearingNotes())
-            .disposalHearingDisclosureOfDocumentsToggle(
+            .setDisposalHearingBundle(caseData.getDisposalHearingBundle())
+            .setDisposalHearingBundleTypeText(disposalDirectionsService.getBundleTypeText(caseData))
+            .setHasNewDirections(disposalDirectionsService.hasDisposalVariable(caseData, "disposalHearingAddNewDirections"))
+            .setDisposalHearingAddNewDirections(caseData.getDisposalHearingAddNewDirections())
+            .setDisposalHearingNotes(caseData.getDisposalHearingNotes())
+            .setDisposalHearingDisclosureOfDocumentsToggle(
                 disposalDirectionsService.hasDisposalVariable(caseData, "disposalHearingDisclosureOfDocumentsToggle")
             )
-            .disposalHearingWitnessOfFactToggle(
+            .setDisposalHearingWitnessOfFactToggle(
                 disposalDirectionsService.hasDisposalVariable(caseData, "disposalHearingWitnessOfFactToggle")
             )
-            .disposalHearingMedicalEvidenceToggle(
+            .setDisposalHearingMedicalEvidenceToggle(
                 disposalDirectionsService.hasDisposalVariable(caseData, "disposalHearingMedicalEvidenceToggle")
             )
-            .disposalHearingQuestionsToExpertsToggle(
+            .setDisposalHearingQuestionsToExpertsToggle(
                 disposalDirectionsService.hasDisposalVariable(caseData, "disposalHearingQuestionsToExpertsToggle")
             )
-            .disposalHearingSchedulesOfLossToggle(
+            .setDisposalHearingSchedulesOfLossToggle(
                 disposalDirectionsService.hasDisposalVariable(caseData, "disposalHearingSchedulesOfLossToggle")
             )
-            .disposalHearingFinalDisposalHearingToggle(
+            .setDisposalHearingFinalDisposalHearingToggle(
                 disposalDirectionsService.hasDisposalVariable(caseData, "disposalHearingFinalDisposalHearingToggle")
             )
-            .disposalHearingMethodToggle(
+            .setDisposalHearingMethodToggle(
                 disposalDirectionsService.hasDisposalVariable(caseData, "disposalHearingMethodToggle")
             )
-            .disposalHearingBundleToggle(
+            .setDisposalHearingBundleToggle(
                 disposalDirectionsService.hasDisposalVariable(caseData, "disposalHearingBundleToggle")
             )
-            .disposalHearingClaimSettlingToggle(
+            .setDisposalHearingClaimSettlingToggle(
                 disposalDirectionsService.hasDisposalVariable(caseData, "disposalHearingClaimSettlingToggle")
             )
-            .disposalHearingCostsToggle(
+            .setDisposalHearingCostsToggle(
                 disposalDirectionsService.hasDisposalVariable(caseData, "disposalHearingCostsToggle")
             )
-            .disposalOrderWithoutHearing(caseData.getDisposalOrderWithoutHearing())
-            .disposalHearingTime(caseData.getDisposalHearingHearingTime())
-            .hasDisposalWelshToggle(caseData.getSdoR2DisposalHearingUseOfWelshToggle() != null)
-            .welshLanguageDescription(
+            .setDisposalOrderWithoutHearing(caseData.getDisposalOrderWithoutHearing())
+            .setDisposalHearingTime(caseData.getDisposalHearingHearingTime())
+            .setHasDisposalWelshToggle(caseData.getSdoR2DisposalHearingUseOfWelshToggle() != null)
+            .setWelshLanguageDescription(
                 Optional.ofNullable(caseData.getSdoR2DisposalHearingUseOfWelshLanguage())
-                    .map(value -> value.getDescription())
+                    .map(SdoR2WelshLanguageUsage::getDescription)
                     .orElse(null)
             );
 
         Optional.ofNullable(caseData.getDisposalHearingHearingTime())
             .map(DisposalHearingHearingTime::getTime)
             .map(DisposalHearingFinalDisposalHearingTimeEstimate::getLabel)
-            .ifPresent(builder::disposalHearingTimeEstimate);
+            .ifPresent(template::setDisposalHearingTimeEstimate);
 
         Optional.ofNullable(caseData.getDisposalHearingHearingTime())
             .filter(hearingTime -> DisposalHearingFinalDisposalHearingTimeEstimate.OTHER.equals(hearingTime.getTime()))
-            .ifPresent(hearingTime -> builder.disposalHearingTimeEstimate(
+            .ifPresent(hearingTime -> template.setDisposalHearingTimeEstimate(
                 String.format("%s hours %s minutes", hearingTime.getOtherHours(), hearingTime.getOtherMinutes())
             ));
 
-        builder.hearingLocation(
+        template
+            .setHearingLocation(
                 locationHelper.getHearingLocation(
                     Optional.ofNullable(caseData.getDisposalHearingMethodInPerson())
                         .map(DynamicList::getValue)
@@ -120,9 +122,8 @@ public class SdoDisposalTemplateService {
                     caseData,
                     authorisation
                 ))
-            .caseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
+            .setCaseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
 
-        return builder.build();
+        return template;
     }
 }
-
