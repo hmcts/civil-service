@@ -106,9 +106,9 @@ class DirectionQuestionnaireLipResponseGeneratorTest {
                                                        .type(Party.Type.COMPANY)
                                                        .build());
         given(caseData.getRespondent1()).willReturn(Party.builder()
-                                                       .partyName("res1")
-                                                       .type(Party.Type.COMPANY)
-                                                       .build());
+                                                        .partyName("res1")
+                                                        .type(Party.Type.COMPANY)
+                                                        .build());
         given(caseData.getResponseClaimTrack()).willReturn(AllocatedTrack.INTERMEDIATE_CLAIM.name());
         given(caseData.getRespondent1DQ()).willReturn(new Respondent1DQ()
                                                          .setRespondent1DQFixedRecoverableCostsIntermediate(
@@ -125,9 +125,9 @@ class DirectionQuestionnaireLipResponseGeneratorTest {
                                                              new DocumentsToBeConsidered()
                                                                  .setHasDocumentsToBeConsidered(YesOrNo.YES)
                                                                  .setDetails("details")));
-        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder formBuilder = DirectionsQuestionnaireForm.builder();
-        when(dqGeneratorFormBuilder.getDirectionsQuestionnaireFormBuilder(any(CaseData.class), anyString()))
-            .thenReturn(formBuilder);
+        DirectionsQuestionnaireForm form = new DirectionsQuestionnaireForm();
+        when(dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(any(CaseData.class), anyString()))
+            .thenReturn(form);
         //When
         DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, AUTH);
 
@@ -170,9 +170,9 @@ class DirectionQuestionnaireLipResponseGeneratorTest {
                                                               new DocumentsToBeConsidered()
                                                                   .setHasDocumentsToBeConsidered(YesOrNo.YES)
                                                                   .setDetails("details")));
-        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder formBuilder = DirectionsQuestionnaireForm.builder();
-        when(dqGeneratorFormBuilder.getDirectionsQuestionnaireFormBuilder(any(CaseData.class), anyString()))
-            .thenReturn(formBuilder);
+        DirectionsQuestionnaireForm form = new DirectionsQuestionnaireForm();
+        when(dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(any(CaseData.class), anyString()))
+            .thenReturn(form);
         //When
         DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, AUTH);
 

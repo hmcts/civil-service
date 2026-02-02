@@ -50,7 +50,7 @@ class DQLipDefendantFormMapperTest {
 
     @BeforeEach
     void setUp() {
-        form = DirectionsQuestionnaireForm.builder().build();
+        form = new DirectionsQuestionnaireForm();
     }
 
     @Test

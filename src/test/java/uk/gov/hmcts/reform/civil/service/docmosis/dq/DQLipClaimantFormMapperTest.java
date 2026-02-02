@@ -51,7 +51,7 @@ class DQLipClaimantFormMapperTest {
 
     @BeforeEach
     void setUp() {
-        form = DirectionsQuestionnaireForm.builder().build();
+        form = new DirectionsQuestionnaireForm();
     }
 
     @Test

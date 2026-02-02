@@ -45,15 +45,15 @@ public class CostsDetailsGroupTest {
             .publicFundingCostsProtection(YES)
             .build();
 
-        JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder();
-        builder = costsDetailsGroup.populateCostsDetails(builder, caseData);
+        JudgeFinalOrderForm form = new JudgeFinalOrderForm();
+        form = costsDetailsGroup.populateCostsDetails(form, caseData);
 
-        Assertions.assertNull(builder.build().getCostsReservedText());
+        Assertions.assertNull(form.getCostsReservedText());
         Assertions.assertEquals(
             "The claimant shall pay the defendant's costs (both fixed and summarily assessed as appropriate) "
                              + "in the sum of £100.00. Such sum shall be paid by 4pm on",
-            builder.build().getSummarilyAssessed());
-        Assertions.assertEquals(LocalDate.of(2023, 12, 31), builder.build().getSummarilyAssessedDate());
+            form.getSummarilyAssessed());
+        Assertions.assertEquals(LocalDate.of(2023, 12, 31), form.getSummarilyAssessedDate());
     }
 
     @Test
@@ -64,11 +64,11 @@ public class CostsDetailsGroupTest {
                                                   .setMakeAnOrderForCostsYesOrNo(YES))
                                                   .publicFundingCostsProtection(YES).build();
 
-        JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder();
-        builder = costsDetailsGroup.populateCostsDetails(builder, caseData);
+        JudgeFinalOrderForm form = new JudgeFinalOrderForm();
+        form = costsDetailsGroup.populateCostsDetails(form, caseData);
 
-        Assertions.assertNull(builder.build().getSummarilyAssessed());
-        Assertions.assertNull(builder.build().getSummarilyAssessedDate());
+        Assertions.assertNull(form.getSummarilyAssessed());
+        Assertions.assertNull(form.getSummarilyAssessedDate());
     }
 
     @Test

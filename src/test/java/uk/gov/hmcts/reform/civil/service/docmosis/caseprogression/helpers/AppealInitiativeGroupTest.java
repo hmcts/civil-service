@@ -34,16 +34,14 @@ public class AppealInitiativeGroupTest {
             .finalOrderAppealComplex(new FinalOrderAppeal()
                                          .setApplicationList(ApplicationAppealList.GRANTED)
                                          .setAppealGrantedDropdown(new AppealGrantedRefused()
-                                                                    .setCircuitOrHighCourtList(ApplicationAppealList.CIRCUIT_COURT)
-                                                                    .setAppealChoiceSecondDropdownA(new AppealChoiceSecondDropdown()
-                                                                                                        .setAppealGrantedRefusedDate(
-                                                                                                            LocalDate.now().plusDays(
-                                                                                                                5))))).build();
-        JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder();
-        builder = appealInitiativePopulator.populateAppealDetails(builder, caseData);
+                                                                       .setCircuitOrHighCourtList(ApplicationAppealList.CIRCUIT_COURT)
+                                                                       .setAppealChoiceSecondDropdownA(new AppealChoiceSecondDropdown()
+                                                                                                           .setAppealGrantedRefusedDate(
+                                                                                                               LocalDate.now().plusDays(
+                                                                                                                   5))))).build();
+        JudgeFinalOrderForm form = new JudgeFinalOrderForm();
+        form = appealInitiativePopulator.populateAppealDetails(form, caseData);
         LocalDate appealGrantedDate = LocalDate.now().plusDays(5);
-
-        JudgeFinalOrderForm form = builder.build();
         Assertions.assertEquals("true", form.getAppealGranted());
         Assertions.assertEquals("a", form.getTableAorB());
         Assertions.assertEquals(appealGrantedDate, form.getAppealDate());
@@ -56,15 +54,13 @@ public class AppealInitiativeGroupTest {
             .finalOrderAppealComplex(new FinalOrderAppeal()
                                          .setApplicationList(ApplicationAppealList.REFUSED)
                                          .setAppealRefusedDropdown(new AppealGrantedRefused()
-                                                                    .setCircuitOrHighCourtListRefuse(
-                                                                        ApplicationAppealList.CIRCUIT_COURT)
-                                                                    .setAppealChoiceSecondDropdownA(new AppealChoiceSecondDropdown()
-                                                                                                        .setAppealGrantedRefusedDate(
-                                                                                                            appealRefusedDate)))).build();
-        JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder();
-        builder = appealInitiativePopulator.populateAppealDetails(builder, caseData);
-
-        JudgeFinalOrderForm form = builder.build();
+                                                                       .setCircuitOrHighCourtListRefuse(
+                                                                           ApplicationAppealList.CIRCUIT_COURT)
+                                                                       .setAppealChoiceSecondDropdownA(new AppealChoiceSecondDropdown()
+                                                                                                           .setAppealGrantedRefusedDate(
+                                                                                                               appealRefusedDate)))).build();
+        JudgeFinalOrderForm form = new JudgeFinalOrderForm();
+        form = appealInitiativePopulator.populateAppealDetails(form, caseData);
         Assertions.assertNull(form.getAppealGranted());
         Assertions.assertEquals("a", form.getTableAorB());
         Assertions.assertEquals(appealRefusedDate, form.getAppealDate());
@@ -77,15 +73,13 @@ public class AppealInitiativeGroupTest {
             .finalOrderAppealComplex(new FinalOrderAppeal()
                                          .setApplicationList(ApplicationAppealList.HIGH_COURT)
                                          .setAppealRefusedDropdown(new AppealGrantedRefused()
-                                                                    .setCircuitOrHighCourtListRefuse(
-                                                                        ApplicationAppealList.HIGH_COURT)
-                                                                    .setAppealChoiceSecondDropdownA(new AppealChoiceSecondDropdown()
-                                                                                                        .setAppealGrantedRefusedDate(
-                                                                                                            appealRefusedDate)))).build();
-        JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder();
-        builder = appealInitiativePopulator.populateAppealDetails(builder, caseData);
-
-        JudgeFinalOrderForm form = builder.build();
+                                                                       .setCircuitOrHighCourtListRefuse(
+                                                                           ApplicationAppealList.HIGH_COURT)
+                                                                       .setAppealChoiceSecondDropdownA(new AppealChoiceSecondDropdown()
+                                                                                                           .setAppealGrantedRefusedDate(
+                                                                                                               appealRefusedDate)))).build();
+        JudgeFinalOrderForm form = new JudgeFinalOrderForm();
+        form = appealInitiativePopulator.populateAppealDetails(form, caseData);
         Assertions.assertNull(form.getAppealGranted());
         Assertions.assertEquals("b", form.getTableAorB());
     }
@@ -122,8 +116,8 @@ public class AppealInitiativeGroupTest {
                     .finalOrderAppealComplex(new FinalOrderAppeal()
                                                  .setApplicationList(ApplicationAppealList.REFUSED)
                                                  .setAppealRefusedDropdown(new AppealGrantedRefused()
-                                                                            .setCircuitOrHighCourtListRefuse(
-                                                                                ApplicationAppealList.CIRCUIT_COURT))).build(),
+                                                                               .setCircuitOrHighCourtListRefuse(
+                                                                                   ApplicationAppealList.CIRCUIT_COURT))).build(),
                 "a"
             ),
             Arguments.of(
@@ -131,8 +125,8 @@ public class AppealInitiativeGroupTest {
                     .finalOrderAppealComplex(new FinalOrderAppeal()
                                                  .setApplicationList(ApplicationAppealList.GRANTED)
                                                  .setAppealGrantedDropdown(new AppealGrantedRefused()
-                                                                            .setCircuitOrHighCourtList(
-                                                                                ApplicationAppealList.CIRCUIT_COURT))).build(),
+                                                                               .setCircuitOrHighCourtList(
+                                                                                   ApplicationAppealList.CIRCUIT_COURT))).build(),
                 "a"
             ),
             Arguments.of(
@@ -140,8 +134,8 @@ public class AppealInitiativeGroupTest {
                     .finalOrderAppealComplex(new FinalOrderAppeal()
                                                  .setApplicationList(ApplicationAppealList.REFUSED)
                                                  .setAppealRefusedDropdown(new AppealGrantedRefused()
-                                                                            .setCircuitOrHighCourtListRefuse(
-                                                                                ApplicationAppealList.HIGH_COURT))).build(),
+                                                                               .setCircuitOrHighCourtListRefuse(
+                                                                                   ApplicationAppealList.HIGH_COURT))).build(),
                 "b"
             ),
             Arguments.of(
@@ -149,8 +143,8 @@ public class AppealInitiativeGroupTest {
                     .finalOrderAppealComplex(new FinalOrderAppeal()
                                                  .setApplicationList(ApplicationAppealList.GRANTED)
                                                  .setAppealGrantedDropdown(new AppealGrantedRefused()
-                                                                            .setCircuitOrHighCourtList(
-                                                                                ApplicationAppealList.HIGH_COURT))).build(),
+                                                                               .setCircuitOrHighCourtList(
+                                                                                   ApplicationAppealList.HIGH_COURT))).build(),
                 "b"
             )
         );
@@ -170,12 +164,12 @@ public class AppealInitiativeGroupTest {
                     .finalOrderAppealComplex(new FinalOrderAppeal()
                                                  .setApplicationList(ApplicationAppealList.REFUSED)
                                                  .setAppealRefusedDropdown(new AppealGrantedRefused()
-                                                                            .setCircuitOrHighCourtListRefuse(
-                                                                                ApplicationAppealList.CIRCUIT_COURT)
-                                                                            .setAppealChoiceSecondDropdownA(new AppealChoiceSecondDropdown()
-                                                                                                                .setAppealGrantedRefusedDate(
-                                                                                                                    LocalDate.now().plusDays(
-                                                                                                                        1))))).build(),
+                                                                               .setCircuitOrHighCourtListRefuse(
+                                                                                   ApplicationAppealList.CIRCUIT_COURT)
+                                                                               .setAppealChoiceSecondDropdownA(new AppealChoiceSecondDropdown()
+                                                                                                                   .setAppealGrantedRefusedDate(
+                                                                                                                       LocalDate.now().plusDays(
+                                                                                                                           1))))).build(),
                 LocalDate.now().plusDays(1)
             ),
             Arguments.of(
@@ -183,12 +177,12 @@ public class AppealInitiativeGroupTest {
                     .finalOrderAppealComplex(new FinalOrderAppeal()
                                                  .setApplicationList(ApplicationAppealList.GRANTED)
                                                  .setAppealGrantedDropdown(new AppealGrantedRefused()
-                                                                            .setCircuitOrHighCourtList(
-                                                                                ApplicationAppealList.CIRCUIT_COURT)
-                                                                            .setAppealChoiceSecondDropdownA(new AppealChoiceSecondDropdown()
-                                                                                                                .setAppealGrantedRefusedDate(
-                                                                                                                    LocalDate.now().plusDays(
-                                                                                                                        10))))).build(),
+                                                                               .setCircuitOrHighCourtList(
+                                                                                   ApplicationAppealList.CIRCUIT_COURT)
+                                                                               .setAppealChoiceSecondDropdownA(new AppealChoiceSecondDropdown()
+                                                                                                                   .setAppealGrantedRefusedDate(
+                                                                                                                       LocalDate.now().plusDays(
+                                                                                                                           10))))).build(),
                 LocalDate.now().plusDays(10)
             ),
             Arguments.of(
@@ -196,12 +190,12 @@ public class AppealInitiativeGroupTest {
                     .finalOrderAppealComplex(new FinalOrderAppeal()
                                                  .setApplicationList(ApplicationAppealList.REFUSED)
                                                  .setAppealRefusedDropdown(new AppealGrantedRefused()
-                                                                            .setCircuitOrHighCourtListRefuse(
-                                                                                ApplicationAppealList.HIGH_COURT)
-                                                                            .setAppealChoiceSecondDropdownB(new AppealChoiceSecondDropdown()
-                                                                                                                .setAppealGrantedRefusedDate(
-                                                                                                                    LocalDate.now().plusDays(
-                                                                                                                        5))))).build(),
+                                                                               .setCircuitOrHighCourtListRefuse(
+                                                                                   ApplicationAppealList.HIGH_COURT)
+                                                                               .setAppealChoiceSecondDropdownB(new AppealChoiceSecondDropdown()
+                                                                                                                   .setAppealGrantedRefusedDate(
+                                                                                                                       LocalDate.now().plusDays(
+                                                                                                                           5))))).build(),
                 LocalDate.now().plusDays(5)
             ),
             Arguments.of(
@@ -209,12 +203,12 @@ public class AppealInitiativeGroupTest {
                     .finalOrderAppealComplex(new FinalOrderAppeal()
                                                  .setApplicationList(ApplicationAppealList.GRANTED)
                                                  .setAppealGrantedDropdown(new AppealGrantedRefused()
-                                                                            .setCircuitOrHighCourtList(
-                                                                                ApplicationAppealList.HIGH_COURT)
-                                                                            .setAppealChoiceSecondDropdownB(new AppealChoiceSecondDropdown()
-                                                                                                                .setAppealGrantedRefusedDate(
-                                                                                                                    LocalDate.now().plusDays(
-                                                                                                                        5))))).build(),
+                                                                               .setCircuitOrHighCourtList(
+                                                                                   ApplicationAppealList.HIGH_COURT)
+                                                                               .setAppealChoiceSecondDropdownB(new AppealChoiceSecondDropdown()
+                                                                                                                   .setAppealGrantedRefusedDate(
+                                                                                                                       LocalDate.now().plusDays(
+                                                                                                                           5))))).build(),
                 LocalDate.now().plusDays(5)
             )
         );
