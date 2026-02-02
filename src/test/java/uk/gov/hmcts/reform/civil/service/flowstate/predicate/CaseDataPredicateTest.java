@@ -1677,9 +1677,7 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_hasResponseCarmLiPApplicant1_when_present() {
-            CaseDataLiP lip = CaseDataLiP.builder()
-                .applicant1LiPResponseCarm(MediationLiPCarm.builder().build())
-                .build();
+            CaseDataLiP lip = new CaseDataLiP().setApplicant1LiPResponseCarm(new MediationLiPCarm());
             when(caseData.getCaseDataLiP()).thenReturn(lip);
             assertTrue(CaseDataPredicate.Mediation.hasResponseCarmLiPApplicant1.test(caseData));
         }
@@ -1689,16 +1687,14 @@ class CaseDataPredicateTest {
             when(caseData.getCaseDataLiP()).thenReturn(null);
             assertFalse(CaseDataPredicate.Mediation.hasResponseCarmLiPApplicant1.test(caseData));
 
-            CaseDataLiP lip = CaseDataLiP.builder().build();
+            CaseDataLiP lip = new CaseDataLiP();
             when(caseData.getCaseDataLiP()).thenReturn(lip);
             assertFalse(CaseDataPredicate.Mediation.hasResponseCarmLiPApplicant1.test(caseData));
         }
 
         @Test
         void should_return_true_for_hasResponseCarmLiPRespondent1_when_present() {
-            CaseDataLiP lip = CaseDataLiP.builder()
-                .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder().build())
-                .build();
+            CaseDataLiP lip = new CaseDataLiP().setRespondent1MediationLiPResponseCarm(new MediationLiPCarm());
             when(caseData.getCaseDataLiP()).thenReturn(lip);
             assertTrue(CaseDataPredicate.Mediation.hasResponseCarmLiPRespondent1.test(caseData));
         }
@@ -1708,7 +1704,7 @@ class CaseDataPredicateTest {
             when(caseData.getCaseDataLiP()).thenReturn(null);
             assertFalse(CaseDataPredicate.Mediation.hasResponseCarmLiPRespondent1.test(caseData));
 
-            CaseDataLiP lip = CaseDataLiP.builder().build();
+            CaseDataLiP lip = new CaseDataLiP();
             when(caseData.getCaseDataLiP()).thenReturn(lip);
             assertFalse(CaseDataPredicate.Mediation.hasResponseCarmLiPRespondent1.test(caseData));
         }

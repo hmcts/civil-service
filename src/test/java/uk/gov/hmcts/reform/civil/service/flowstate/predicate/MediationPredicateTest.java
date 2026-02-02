@@ -90,14 +90,14 @@ class MediationPredicateTest {
         @Test
         void should_return_true_for_LiP_when_any_LiP_CARM_response_present_applicant1() {
             when(caseData.getCaseDataLiP()).thenReturn(caseDataLiP);
-            when(caseDataLiP.getApplicant1LiPResponseCarm()).thenReturn(MediationLiPCarm.builder().build());
+            when(caseDataLiP.getApplicant1LiPResponseCarm()).thenReturn(new MediationLiPCarm());
             assertTrue(MediationPredicate.isCarmEnabledForCaseLiP.test(caseData));
         }
 
         @Test
         void should_return_true_for_LiP_when_any_LiP_CARM_response_present_respondent1() {
             when(caseData.getCaseDataLiP()).thenReturn(caseDataLiP);
-            when(caseDataLiP.getRespondent1MediationLiPResponseCarm()).thenReturn(MediationLiPCarm.builder().build());
+            when(caseDataLiP.getRespondent1MediationLiPResponseCarm()).thenReturn(new MediationLiPCarm());
             assertTrue(MediationPredicate.isCarmEnabledForCaseLiP.test(caseData));
         }
 
@@ -140,7 +140,7 @@ class MediationPredicateTest {
         @Test
         void should_return_true_when_spec_small_1v1_and_one_party_unrepresented_and_LiP_CARM_response_present() {
             when(caseData.getCaseDataLiP()).thenReturn(caseDataLiP);
-            when(caseDataLiP.getApplicant1LiPResponseCarm()).thenReturn(MediationLiPCarm.builder().build());
+            when(caseDataLiP.getApplicant1LiPResponseCarm()).thenReturn(new MediationLiPCarm());
             when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
             when(caseData.getResponseClaimTrack()).thenReturn(SMALL_CLAIM.name());
             // No respondent2
