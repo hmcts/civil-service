@@ -85,18 +85,16 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
 
     @Override
     public PiPLetter getTemplateData(CaseData caseData) {
-        return PiPLetter
-            .builder()
-            .pin(caseData.getRespondent1PinToPostLRspec().getAccessCode())
-            .ccdCaseNumber(String.valueOf(caseData.getCcdCaseReference()))
-            .claimReferenceNumber(caseData.getLegacyCaseReference())
-            .claimantName(caseData.getApplicant1().getPartyName())
-            .defendant(caseData.getRespondent1())
-            .responseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
-            .totalAmountOfClaim(caseData.getTotalClaimAmount())
-            .respondToClaimUrl(pipInPostConfiguration.getRespondToClaimUrl())
-            .issueDate(LocalDate.now())
-            .build();
+        return new PiPLetter()
+            .setPin(caseData.getRespondent1PinToPostLRspec().getAccessCode())
+            .setCcdCaseNumber(String.valueOf(caseData.getCcdCaseReference()))
+            .setClaimReferenceNumber(caseData.getLegacyCaseReference())
+            .setClaimantName(caseData.getApplicant1().getPartyName())
+            .setDefendant(caseData.getRespondent1())
+            .setResponseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
+            .setTotalAmountOfClaim(caseData.getTotalClaimAmount())
+            .setRespondToClaimUrl(pipInPostConfiguration.getRespondToClaimUrl())
+            .setIssueDate(LocalDate.now());
     }
 
     private List<DocumentMetaData> fetchDocumentsFromCaseData(CaseData caseData,
