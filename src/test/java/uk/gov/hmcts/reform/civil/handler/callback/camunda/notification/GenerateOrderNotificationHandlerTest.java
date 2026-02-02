@@ -204,11 +204,9 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             //given: case where respondent1 Lip has email and callback for notify respondent1 is triggered
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                             .respondent1ResponseLanguage(Language.BOTH.toString())
-                                                             .build())
-                                 .build())
+                .caseDataLiP(new CaseDataLiP()
+                                 .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                             .setRespondent1ResponseLanguage(Language.BOTH.toString())))
                 .respondent1Represented(YesOrNo.NO).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_GENERATE_ORDER.name()).build()
@@ -233,11 +231,9 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             //given: case where respondent1 Lip has email and callback for notify respondent1 is triggered
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                             .respondent1ResponseLanguage(Language.BOTH.toString())
-                                                             .build())
-                                 .build())
+                .caseDataLiP(new CaseDataLiP()
+                                 .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                             .setRespondent1ResponseLanguage(Language.BOTH.toString())))
                 .respondent1Represented(YesOrNo.NO).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_COURT_OFFICER_ORDER.name()).build()
