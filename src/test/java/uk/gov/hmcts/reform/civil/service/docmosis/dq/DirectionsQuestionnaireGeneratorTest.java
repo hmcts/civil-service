@@ -151,14 +151,12 @@ class DirectionsQuestionnaireGeneratorTest {
             .build();
 
     private final Representative defendant1Representative =
-        Representative.builder()
-            .organisationName("test org")
-            .build();
+        new Representative()
+            .setOrganisationName("test org");
 
     private final Representative defendant2Representative =
-        Representative.builder()
-            .organisationName("test org 2")
-            .build();
+        new Representative()
+            .setOrganisationName("test org 2");
 
     @MockBean
     private SecuredDocumentManagementService documentManagementService;
@@ -1406,49 +1404,45 @@ class DirectionsQuestionnaireGeneratorTest {
 
             private Experts getExperts(DQ dq) {
                 var experts = dq.getExperts();
-                return Experts.builder()
-                    .expertRequired(experts.getExpertRequired())
-                    .expertReportsSent(
+                return new Experts()
+                    .setExpertRequired(experts.getExpertRequired())
+                    .setExpertReportsSent(
                         ofNullable(experts.getExpertReportsSent())
                             .map(ExpertReportsSent::getDisplayedValue)
                             .orElse(""))
-                    .jointExpertSuitable(experts.getJointExpertSuitable())
-                    .details(getExpertsDetails(dq))
-                    .build();
+                    .setJointExpertSuitable(experts.getJointExpertSuitable())
+                    .setDetails(getExpertsDetails(dq));
             }
 
             private List<Expert> getExpertsDetails(DQ dq) {
                 return unwrapElements(dq.getExperts().getDetails())
                     .stream()
-                    .map(expert -> Expert.builder()
-                        .name(expert.getName())
-                        .firstName(expert.getFirstName())
-                        .lastName(expert.getLastName())
-                        .phoneNumber(expert.getPhoneNumber())
-                        .emailAddress(expert.getEmailAddress())
-                        .fieldOfExpertise(expert.getFieldOfExpertise())
-                        .whyRequired(expert.getWhyRequired())
-                        .formattedCost(NumberFormat.getCurrencyInstance(Locale.UK)
-                            .format(MonetaryConversions.penniesToPounds(expert.getEstimatedCost())))
-                        .build())
+                    .map(expert -> new Expert()
+                        .setName(expert.getName())
+                        .setFirstName(expert.getFirstName())
+                        .setLastName(expert.getLastName())
+                        .setPhoneNumber(expert.getPhoneNumber())
+                        .setEmailAddress(expert.getEmailAddress())
+                        .setFieldOfExpertise(expert.getFieldOfExpertise())
+                        .setWhyRequired(expert.getWhyRequired())
+                        .setFormattedCost(NumberFormat.getCurrencyInstance(Locale.UK)
+                            .format(MonetaryConversions.penniesToPounds(expert.getEstimatedCost()))))
                     .collect(toList());
             }
 
             private Witnesses getWitnesses(DQ dq) {
                 var witnesses = dq.getWitnesses();
-                return Witnesses.builder()
-                    .witnessesToAppear(witnesses.getWitnessesToAppear())
-                    .details(unwrapElements(witnesses.getDetails()))
-                    .build();
+                return new Witnesses()
+                    .setWitnessesToAppear(witnesses.getWitnessesToAppear())
+                    .setDetails(unwrapElements(witnesses.getDetails()));
             }
 
             private Hearing getHearing(DQ dq) {
                 var hearing = dq.getHearing();
-                return Hearing.builder()
-                    .hearingLength(getHearingLength(dq))
-                    .unavailableDatesRequired(hearing.getUnavailableDatesRequired())
-                    .unavailableDates(unwrapElements(hearing.getUnavailableDates()))
-                    .build();
+                return new Hearing()
+                    .setHearingLength(getHearingLength(dq))
+                    .setUnavailableDatesRequired(hearing.getUnavailableDatesRequired())
+                    .setUnavailableDates(unwrapElements(hearing.getUnavailableDates()));
             }
 
             private String getHearingLength(DQ dq) {
@@ -1499,47 +1493,44 @@ class DirectionsQuestionnaireGeneratorTest {
 
             private WelshLanguageRequirements getWelshLanguageRequirements(DQ dq) {
                 var welshLanguageRequirements = dq.getWelshLanguageRequirements();
-                return WelshLanguageRequirements.builder()
-                    .evidence(ofNullable(
+                return new WelshLanguageRequirements()
+                    .setEvidence(ofNullable(
                         welshLanguageRequirements.getEvidence()).map(Language::getDisplayedValue).orElse(""))
-                    .court(ofNullable(
+                    .setCourt(ofNullable(
                         welshLanguageRequirements.getCourt()).map(Language::getDisplayedValue).orElse(""))
-                    .documents(ofNullable(
-                        welshLanguageRequirements.getDocuments()).map(Language::getDisplayedValue).orElse(""))
-                    .build();
+                    .setDocuments(ofNullable(
+                        welshLanguageRequirements.getDocuments()).map(Language::getDisplayedValue).orElse(""));
             }
 
             private Experts applicant1ExpertsMock() {
-                return Experts.builder()
-                    .expertRequired(YES)
-                    .expertReportsSent(ExpertReportsSent.NO.getDisplayedValue())
-                    .jointExpertSuitable(NO)
-                    .details(List.of(
-                            uk.gov.hmcts.reform.civil.model.docmosis.dq.Expert.builder()
-                                .firstName("Expert")
-                                .lastName("One")
-                                .phoneNumber("01482764322")
-                                .emailAddress("fast.claim.expert1@example.com")
-                                .whyRequired("Good reasons")
-                                .fieldOfExpertise("Some field")
-                                .formattedCost("£100.00")
-                                .build()
+                return new Experts()
+                    .setExpertRequired(YES)
+                    .setExpertReportsSent(ExpertReportsSent.NO.getDisplayedValue())
+                    .setJointExpertSuitable(NO)
+                    .setDetails(List.of(
+                            new uk.gov.hmcts.reform.civil.model.docmosis.dq.Expert()
+                                .setFirstName("Expert")
+                                .setLastName("One")
+                                .setPhoneNumber("01482764322")
+                                .setEmailAddress("fast.claim.expert1@example.com")
+                                .setWhyRequired("Good reasons")
+                                .setFieldOfExpertise("Some field")
+                                .setFormattedCost("£100.00")
                         )
-                    ).build();
+                    );
             }
 
             private Witnesses applicant1WitnessesMock() {
-                return Witnesses.builder()
-                    .witnessesToAppear(YES)
-                    .details(List.of(
+                return new Witnesses()
+                    .setWitnessesToAppear(YES)
+                    .setDetails(List.of(
                         Witness.builder()
                             .firstName("Witness")
                             .lastName("One")
                             .phoneNumber("01482764322")
                             .emailAddress("witness.one@example.com")
                             .reasonForWitness("Saw something")
-                            .build()))
-                    .build();
+                            .build()));
             }
         }
     }
@@ -2379,49 +2370,45 @@ class DirectionsQuestionnaireGeneratorTest {
 
             private Experts getExperts(DQ dq) {
                 var experts = dq.getExperts();
-                return Experts.builder()
-                    .expertRequired(experts.getExpertRequired())
-                    .expertReportsSent(
+                return new Experts()
+                    .setExpertRequired(experts.getExpertRequired())
+                    .setExpertReportsSent(
                         ofNullable(experts.getExpertReportsSent())
                             .map(ExpertReportsSent::getDisplayedValue)
                             .orElse(""))
-                    .jointExpertSuitable(experts.getJointExpertSuitable())
-                    .details(getExpertsDetails(dq))
-                    .build();
+                    .setJointExpertSuitable(experts.getJointExpertSuitable())
+                    .setDetails(getExpertsDetails(dq));
             }
 
             private List<Expert> getExpertsDetails(DQ dq) {
                 return unwrapElements(dq.getExperts().getDetails())
                     .stream()
-                    .map(expert -> Expert.builder()
-                        .name(expert.getName())
-                        .firstName(expert.getFirstName())
-                        .lastName(expert.getLastName())
-                        .phoneNumber(expert.getPhoneNumber())
-                        .emailAddress(expert.getEmailAddress())
-                        .fieldOfExpertise(expert.getFieldOfExpertise())
-                        .whyRequired(expert.getWhyRequired())
-                        .formattedCost(NumberFormat.getCurrencyInstance(Locale.UK)
-                            .format(MonetaryConversions.penniesToPounds(expert.getEstimatedCost())))
-                        .build())
+                    .map(expert -> new Expert()
+                        .setName(expert.getName())
+                        .setFirstName(expert.getFirstName())
+                        .setLastName(expert.getLastName())
+                        .setPhoneNumber(expert.getPhoneNumber())
+                        .setEmailAddress(expert.getEmailAddress())
+                        .setFieldOfExpertise(expert.getFieldOfExpertise())
+                        .setWhyRequired(expert.getWhyRequired())
+                        .setFormattedCost(NumberFormat.getCurrencyInstance(Locale.UK)
+                            .format(MonetaryConversions.penniesToPounds(expert.getEstimatedCost()))))
                     .collect(toList());
             }
 
             private Witnesses getWitnesses(DQ dq) {
                 var witnesses = dq.getWitnesses();
-                return Witnesses.builder()
-                    .witnessesToAppear(witnesses.getWitnessesToAppear())
-                    .details(unwrapElements(witnesses.getDetails()))
-                    .build();
+                return new Witnesses()
+                    .setWitnessesToAppear(witnesses.getWitnessesToAppear())
+                    .setDetails(unwrapElements(witnesses.getDetails()));
             }
 
             private Hearing getHearing(DQ dq) {
                 var hearing = dq.getHearing();
-                return Hearing.builder()
-                    .hearingLength(getHearingLength(dq))
-                    .unavailableDatesRequired(hearing.getUnavailableDatesRequired())
-                    .unavailableDates(unwrapElements(hearing.getUnavailableDates()))
-                    .build();
+                return new Hearing()
+                    .setHearingLength(getHearingLength(dq))
+                    .setUnavailableDatesRequired(hearing.getUnavailableDatesRequired())
+                    .setUnavailableDates(unwrapElements(hearing.getUnavailableDates()));
             }
 
             private String getHearingLength(DQ dq) {
@@ -2464,14 +2451,13 @@ class DirectionsQuestionnaireGeneratorTest {
 
             private WelshLanguageRequirements getWelshLanguageRequirements(DQ dq) {
                 var welshLanguageRequirements = dq.getWelshLanguageRequirements();
-                return WelshLanguageRequirements.builder()
-                    .evidence(ofNullable(
+                return new WelshLanguageRequirements()
+                    .setEvidence(ofNullable(
                         welshLanguageRequirements.getEvidence()).map(Language::getDisplayedValue).orElse(""))
-                    .court(ofNullable(
+                    .setCourt(ofNullable(
                         welshLanguageRequirements.getCourt()).map(Language::getDisplayedValue).orElse(""))
-                    .documents(ofNullable(
-                        welshLanguageRequirements.getDocuments()).map(Language::getDisplayedValue).orElse(""))
-                    .build();
+                    .setDocuments(ofNullable(
+                        welshLanguageRequirements.getDocuments()).map(Language::getDisplayedValue).orElse(""));
             }
         }
     }

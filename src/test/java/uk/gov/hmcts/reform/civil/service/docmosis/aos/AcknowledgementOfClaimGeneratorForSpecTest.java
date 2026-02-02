@@ -47,7 +47,7 @@ class AcknowledgementOfClaimGeneratorForSpecTest {
         .documentType(ACKNOWLEDGEMENT_OF_SERVICE)
         .build();
 
-    private final Representative representative = Representative.builder().organisationName("test org").build();
+    private final Representative representative = new Representative().setOrganisationName("test org");
 
     @Mock
     private SecuredDocumentManagementService documentManagementService;

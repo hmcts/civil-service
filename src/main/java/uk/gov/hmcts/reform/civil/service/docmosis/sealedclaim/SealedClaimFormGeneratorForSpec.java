@@ -123,66 +123,65 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
         Optional<SolicitorReferences> solicitorReferences = ofNullable(caseData.getSolicitorReferences());
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
 
-        return SealedClaimFormForSpec.builder()
-            .ccdCaseReference(formatCcdCaseReference(caseData))
-            .referenceNumber(caseData.getLegacyCaseReference())
-            .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
-            .applicantExternalReference(solicitorReferences
+        return new SealedClaimFormForSpec()
+            .setCcdCaseReference(formatCcdCaseReference(caseData))
+            .setReferenceNumber(caseData.getLegacyCaseReference())
+            .setCaseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
+            .setApplicantExternalReference(solicitorReferences
                 .map(SolicitorReferences::getApplicantSolicitor1Reference)
                 .orElse(""))
-            .respondentExternalReference(solicitorReferences
+            .setRespondentExternalReference(solicitorReferences
                 .map(SolicitorReferences::getRespondentSolicitor1Reference)
                 .orElse(""))
-            .issueDate(caseData.getIssueDate())
-            .submittedOn(caseData.getSubmittedDate().toLocalDate())
-            .applicants(getApplicants(caseData))
-            .respondents(getRespondents(caseData))
-            .timeline(getTimeLine(caseData))
-            .sameInterestRate(caseData.getInterestClaimOptions() != null
+            .setIssueDate(caseData.getIssueDate())
+            .setSubmittedOn(caseData.getSubmittedDate().toLocalDate())
+            .setApplicants(getApplicants(caseData))
+            .setRespondents(getRespondents(caseData))
+            .setTimeline(getTimeLine(caseData))
+            .setSameInterestRate(caseData.getInterestClaimOptions() != null
                 ? caseData.getInterestClaimOptions().equals(SAME_RATE_INTEREST) + "" : null)
-            .breakdownInterestRate(caseData.getInterestClaimOptions() != null
+            .setBreakdownInterestRate(caseData.getInterestClaimOptions() != null
                 ? caseData.getInterestClaimOptions().equals(BREAK_DOWN_INTEREST) + "" : null)
-            .interestPerDayBreakdown(interestCalculator.getInterestPerDayBreakdown(caseData))
-            .totalInterestAmount(interest != null ? interest.toString() : null)
-            .howTheInterestWasCalculated(caseData.getInterestClaimOptions() != null
+            .setInterestPerDayBreakdown(interestCalculator.getInterestPerDayBreakdown(caseData))
+            .setTotalInterestAmount(interest != null ? interest.toString() : null)
+            .setHowTheInterestWasCalculated(caseData.getInterestClaimOptions() != null
                 ? caseData.getInterestClaimOptions().getDescription() : null)
-            .interestRate(caseData.getSameRateInterestSelection() != null
+            .setInterestRate(caseData.getSameRateInterestSelection() != null
                 ? caseData.getSameRateInterestSelection().getDifferentRate() != null
                 ? caseData.getSameRateInterestSelection().getDifferentRate() + "" :
                 "8" : null)
-            .interestExplanationText(caseData.getSameRateInterestSelection() != null
+            .setInterestExplanationText(caseData.getSameRateInterestSelection() != null
                 ? caseData.getSameRateInterestSelection().getDifferentRate() != null
                 ? caseData.getSameRateInterestSelection().getDifferentRateReason()
                 : "The claimant reserves the right to claim interest under "
                 + "Section 69 of the County Courts Act 1984" : null)
-            .interestFromDate(getInterestFromDate(caseData))
-            .whenAreYouClaimingInterestFrom(caseData.getInterestClaimFrom() != null
+            .setInterestFromDate(getInterestFromDate(caseData))
+            .setWhenAreYouClaimingInterestFrom(caseData.getInterestClaimFrom() != null
                 ? caseData.getInterestClaimFrom().name()
                 .equals("FROM_CLAIM_SUBMIT_DATE")
                 ? "From the date the claim was submitted"
                 : caseData.getInterestFromSpecificDateDescription() : null)
-            .interestEndDate(localDateTime.toLocalDate())
-            .interestEndDateDescription(caseData.getBreakDownInterestDescription() != null
+            .setInterestEndDate(localDateTime.toLocalDate())
+            .setInterestEndDateDescription(caseData.getBreakDownInterestDescription() != null
                 ? caseData.getBreakDownInterestDescription() + "" : null)
-            .totalClaimAmount(caseData.getTotalClaimAmount() + "")
-            .interestAmount(interest != null ? interest.toString() : null)
-            .claimAmount(getClaimAmount(caseData))
-            .claimFee(MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
+            .setTotalClaimAmount(caseData.getTotalClaimAmount() + "")
+            .setInterestAmount(interest != null ? interest.toString() : null)
+            .setClaimAmount(getClaimAmount(caseData))
+            .setClaimFee(MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
                 .toString())
             // Claim amount + interest + claim fees
-            .totalAmountOfClaim(getTotalAmountOfClaim(caseData, interest))
-            .statementOfTruth(caseData.getApplicantSolicitor1ClaimStatementOfTruth())
-            .descriptionOfClaim(caseData.getDetailsOfClaim())
-            .applicantRepresentativeOrganisationName(representativeService.getApplicantRepresentative(caseData)
+            .setTotalAmountOfClaim(getTotalAmountOfClaim(caseData, interest))
+            .setStatementOfTruth(caseData.getApplicantSolicitor1ClaimStatementOfTruth())
+            .setDescriptionOfClaim(caseData.getDetailsOfClaim())
+            .setApplicantRepresentativeOrganisationName(representativeService.getApplicantRepresentative(caseData)
                 .getOrganisationName())
-            .defendantResponseDeadlineDate(getResponseDeadline(caseData))
-            .claimFixedCosts(caseData.getFixedCosts() != null ? caseData.getFixedCosts().getClaimFixedCosts() : null)
-            .fixedCostAmount(caseData.getFixedCosts() != null && caseData.getFixedCosts().getFixedCostAmount() != null
+            .setDefendantResponseDeadlineDate(getResponseDeadline(caseData))
+            .setClaimFixedCosts(caseData.getFixedCosts() != null ? caseData.getFixedCosts().getClaimFixedCosts() : null)
+            .setFixedCostAmount(caseData.getFixedCosts() != null && caseData.getFixedCosts().getFixedCostAmount() != null
                                  ? MonetaryConversions.penniesToPounds(BigDecimal.valueOf(
                                      Integer.parseInt(caseData.getFixedCosts().getFixedCostAmount()))).toString()
                                  : (BigDecimal.valueOf(0)).toString())
-            .respondentsOrgRegistered(getRespondentsOrgRegistered(caseData))
-            .build();
+            .setRespondentsOrgRegistered(getRespondentsOrgRegistered(caseData));
     }
 
     private LocalDate getInterestFromDate(CaseData caseData) {
@@ -219,39 +218,38 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
         if (caseData.getClaimInterest() == YesOrNo.YES) {
             interest = interestCalculator.calculateBulkInterest(caseData);
         }
-        return SealedClaimFormForSpec.builder()
-            .ccdCaseReference(formatCcdCaseReference(caseData))
-            .referenceNumber(caseData.getLegacyCaseReference())
-            .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
-            .applicantExternalReference(solicitorReferences.map(SolicitorReferences::getApplicantSolicitor1Reference).orElse(""))
-            .respondentExternalReference(solicitorReferences.map(SolicitorReferences::getRespondentSolicitor1Reference).orElse(""))
-            .issueDate(caseData.getIssueDate())
-            .submittedOn(caseData.getSubmittedDate().toLocalDate())
-            .applicants(getApplicants(caseData))
-            .respondents(getRespondents(caseData))
-            .sameInterestRate(caseData.getInterestClaimOptions() != null ? caseData.getInterestClaimOptions().equals(SAME_RATE_INTEREST) + "" : null)
-            .totalInterestAmount(interest != null ? interest.toString() : null)
-            .interestRate(
+        return new SealedClaimFormForSpec()
+            .setCcdCaseReference(formatCcdCaseReference(caseData))
+            .setReferenceNumber(caseData.getLegacyCaseReference())
+            .setCaseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
+            .setApplicantExternalReference(solicitorReferences.map(SolicitorReferences::getApplicantSolicitor1Reference).orElse(""))
+            .setRespondentExternalReference(solicitorReferences.map(SolicitorReferences::getRespondentSolicitor1Reference).orElse(""))
+            .setIssueDate(caseData.getIssueDate())
+            .setSubmittedOn(caseData.getSubmittedDate().toLocalDate())
+            .setApplicants(getApplicants(caseData))
+            .setRespondents(getRespondents(caseData))
+            .setSameInterestRate(caseData.getInterestClaimOptions() != null ? caseData.getInterestClaimOptions().equals(SAME_RATE_INTEREST) + "" : null)
+            .setTotalInterestAmount(interest != null ? interest.toString() : null)
+            .setInterestRate(
                 interest != null ? "£" + caseData.getSameRateInterestSelection().getDifferentRate().toString() + " of interest per day" : null)
-            .interestExplanationText("The claimant reserves the right to claim interest under Section 69 of the County Courts Act 1984")
-            .interestFromDate(interest != null ? caseData.getInterestFromSpecificDate() : null)
-            .whenAreYouClaimingInterestFrom("null for bulk") //clarify to remove
-            .interestEndDate(interest != null ? LocalDate.now().minusDays(100) : null) //clarify to remove
-            .totalClaimAmount(caseData.getTotalClaimAmount() + "")
-            .interestAmount(interest != null ? interest.toString() : "0")
-            .claimAmount(getClaimAmountBulk(caseData))
-            .claimFee(MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence()).toString())
+            .setInterestExplanationText("The claimant reserves the right to claim interest under Section 69 of the County Courts Act 1984")
+            .setInterestFromDate(interest != null ? caseData.getInterestFromSpecificDate() : null)
+            .setWhenAreYouClaimingInterestFrom("null for bulk") //clarify to remove
+            .setInterestEndDate(interest != null ? LocalDate.now().minusDays(100) : null) //clarify to remove
+            .setTotalClaimAmount(caseData.getTotalClaimAmount() + "")
+            .setInterestAmount(interest != null ? interest.toString() : "0")
+            .setClaimAmount(getClaimAmountBulk(caseData))
+            .setClaimFee(MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence()).toString())
             // Claim amount + interest + claim fees
-            .totalAmountOfClaim(getTotalAmountOfClaim(caseData, interest))
-            .statementOfTruth(caseData.getApplicantSolicitor1ClaimStatementOfTruth())
-            .descriptionOfClaim(caseData.getDetailsOfClaim())
-            .applicantRepresentativeOrganisationName(representativeService.getApplicantRepresentative(caseData).getOrganisationName())
-            .claimFixedCosts(caseData.getFixedCosts() != null ? caseData.getFixedCosts().getClaimFixedCosts() : null)
-            .fixedCostAmount(caseData.getFixedCosts() != null && caseData.getFixedCosts().getFixedCostAmount() != null
+            .setTotalAmountOfClaim(getTotalAmountOfClaim(caseData, interest))
+            .setStatementOfTruth(caseData.getApplicantSolicitor1ClaimStatementOfTruth())
+            .setDescriptionOfClaim(caseData.getDetailsOfClaim())
+            .setApplicantRepresentativeOrganisationName(representativeService.getApplicantRepresentative(caseData).getOrganisationName())
+            .setClaimFixedCosts(caseData.getFixedCosts() != null ? caseData.getFixedCosts().getClaimFixedCosts() : null)
+            .setFixedCostAmount(caseData.getFixedCosts() != null && caseData.getFixedCosts().getFixedCostAmount() != null
                                  ? MonetaryConversions.penniesToPounds(BigDecimal.valueOf(
                 Integer.parseInt(caseData.getFixedCosts().getFixedCostAmount()))).toString()
-                                 : (BigDecimal.valueOf(0)).toString())
-            .build();
+                                 : (BigDecimal.valueOf(0)).toString());
     }
 
     private String getResponseDeadline(CaseData caseData) {

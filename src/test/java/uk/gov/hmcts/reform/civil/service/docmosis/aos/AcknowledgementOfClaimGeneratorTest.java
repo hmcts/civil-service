@@ -73,7 +73,7 @@ class AcknowledgementOfClaimGeneratorTest {
         .build();
     private LocalDateTime acknowledgementDate;
 
-    private final Representative representative = Representative.builder().organisationName("test org").build();
+    private final Representative representative = new Representative().setOrganisationName("test org");
 
     @MockBean
     private SecuredDocumentManagementService documentManagementService;
