@@ -164,7 +164,7 @@ class UpdateWaCourtLocationsServiceTest {
     void shouldNotEvaluateWALocations_andShouldClearAnyPreviousEvaluatedCourtLocations(String track) {
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").region("1").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("123456").setRegion("1"))
             .allocatedTrack(Objects.equals(track, "fast") ? AllocatedTrack.FAST_CLAIM : AllocatedTrack.SMALL_CLAIM)
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
             .taskManagementLocations(testTaskManagementLocations)
@@ -183,7 +183,7 @@ class UpdateWaCourtLocationsServiceTest {
         when(objectMapper.convertValue(emptyMap, DmnListingLocations.class)).thenReturn(null);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").region("1").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("123456").setRegion("1"))
             .build();
 
         updateWaCourtLocationsService.updateCourtListingWALocations("auth", caseData);
@@ -204,7 +204,7 @@ class UpdateWaCourtLocationsServiceTest {
         when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").region("1").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("123456").setRegion("1"))
             .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
             .build();
 
@@ -218,7 +218,7 @@ class UpdateWaCourtLocationsServiceTest {
     void shouldUpdateCourtListingWALocations_whenCourtFound_Unspec() {
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").region("1").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("123456").setRegion("1"))
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
             .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
             .build();
@@ -232,7 +232,7 @@ class UpdateWaCourtLocationsServiceTest {
     void shouldUpdateCourtListingWALocations_whenCourtFound_Spec() {
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").region("1").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("123456").setRegion("1"))
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .responseClaimTrack("INTERMEDIATE_CLAIM")
             .build();
@@ -293,7 +293,7 @@ class UpdateWaCourtLocationsServiceTest {
         when(objectMapper.convertValue(testCnbcMap, DmnListingLocations.class)).thenReturn(dmnListingLocations);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(cnbcEpimmId).region("2").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(cnbcEpimmId).setRegion("2"))
             .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
             .build();
 
@@ -353,7 +353,7 @@ class UpdateWaCourtLocationsServiceTest {
         when(objectMapper.convertValue(testCnbcMap, DmnListingLocations.class)).thenReturn(dmnListingLocations);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(ccmccEpimmId).region("4").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(ccmccEpimmId).setRegion("4"))
             .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
             .build();
 
