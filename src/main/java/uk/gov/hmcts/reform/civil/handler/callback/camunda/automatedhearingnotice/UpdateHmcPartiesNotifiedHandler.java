@@ -72,12 +72,6 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
         String hearingId = camundaVariables.getHearingId();
         int requestVersion = camundaVariables.getRequestVersion().intValue();
 
-        if (isHearingResponseNotifiedForRequestVersion(hearingId, requestVersion)) {
-            log.info("Parties already notified for caseId {}, hearingId {}, requestVersion {}",
-                     ccdCaseReference, hearingId, requestVersion);
-            return AboutToStartOrSubmitCallbackResponse.builder().build();
-        }
-
         PartiesNotified partiesNotified = buildPartiesNotified(camundaVariables);
         logRequestPayload(partiesNotified, ccdCaseReference, hearingId);
 

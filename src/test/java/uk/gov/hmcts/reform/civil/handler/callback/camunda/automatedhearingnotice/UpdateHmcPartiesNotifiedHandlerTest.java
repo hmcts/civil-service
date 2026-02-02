@@ -57,12 +57,6 @@ class UpdateHmcPartiesNotifiedHandlerTest {
             userService,
             userConfig
         );
-
-        when(userService.getAccessToken(anyString(), anyString())).thenReturn(AUTH_TOKEN);
-        when(userService.getUserInfo(anyString()))
-            .thenReturn(UserInfo.builder().uid("test-id").build());
-        when(userConfig.getUserName()).thenReturn("USER");
-        when(userConfig.getPassword()).thenReturn("PASS");
     }
 
     private CaseData sampleCaseData() {
@@ -93,38 +87,19 @@ class UpdateHmcPartiesNotifiedHandlerTest {
     }
 
     @Test
-    void shouldSkipUpdate_ifAlreadyNotified() {
-        CaseData caseData = sampleCaseData();
-        CallbackParams params = buildParams(caseData);
-
-        when(camundaService.getProcessVariables(any())).thenReturn(sampleCamundaVars());
-        when(hearingsService.getPartiesNotifiedResponses(anyString(), anyString()))
-            .thenReturn(PartiesNotifiedResponses.builder()
-                            .responses(List.of(
-                                PartiesNotifiedResponse.builder()
-                                    .requestVersion(10)
-                                    .responseReceivedDateTime(LocalDateTime.now())
-                                    .build()
-                            ))
-                            .build());
-
-        handler.handle(params);
-
-        verify(hearingsService, never()).updatePartiesNotifiedResponse(anyString(), anyString(), anyInt(), any(), any());
-    }
-
-    @Test
     void shouldCallUpdate_ifNotPreviouslyNotified() {
         CaseData caseData = sampleCaseData();
         CallbackParams params = buildParams(caseData);
 
         when(camundaService.getProcessVariables(any())).thenReturn(sampleCamundaVars());
-        when(hearingsService.getPartiesNotifiedResponses(anyString(), anyString()))
-            .thenReturn(PartiesNotifiedResponses.builder().build());
 
         handler.handle(params);
 
-        verify(hearingsService).updatePartiesNotifiedResponse(anyString(), eq("H123"), eq(10), any(), any());
+        verify(hearingsService).updatePartiesNotifiedResponse(
+            anyString(), eq("H123"), eq(10), any(), any()
+        );
+
+        verifyNoMoreInteractions(userService, userConfig);
     }
 
     @Test
@@ -133,6 +108,10 @@ class UpdateHmcPartiesNotifiedHandlerTest {
         CallbackParams params = buildParams(caseData);
 
         when(camundaService.getProcessVariables(any())).thenReturn(sampleCamundaVars());
+
+        doThrow(new RuntimeException("Boom"))
+            .when(hearingsService).updatePartiesNotifiedResponse(anyString(), anyString(), anyInt(), any(), any());
+
         when(hearingsService.getPartiesNotifiedResponses(anyString(), anyString()))
             .thenReturn(PartiesNotifiedResponses.builder()
                             .responses(List.of(
@@ -142,6 +121,12 @@ class UpdateHmcPartiesNotifiedHandlerTest {
                                     .build()
                             ))
                             .build());
+
+        when(userService.getAccessToken(anyString(), anyString())).thenReturn(AUTH_TOKEN);
+        when(userService.getUserInfo(anyString()))
+            .thenReturn(UserInfo.builder().uid("test-id").build());
+        when(userConfig.getUserName()).thenReturn("USER");
+        when(userConfig.getPassword()).thenReturn("PASS");
 
         handler.handle(params);
     }
@@ -152,11 +137,18 @@ class UpdateHmcPartiesNotifiedHandlerTest {
         CallbackParams params = buildParams(caseData);
 
         when(camundaService.getProcessVariables(any())).thenReturn(sampleCamundaVars());
-        when(hearingsService.getPartiesNotifiedResponses(anyString(), anyString()))
-            .thenReturn(PartiesNotifiedResponses.builder().build());
 
         doThrow(new RuntimeException("Boom"))
             .when(hearingsService).updatePartiesNotifiedResponse(anyString(), anyString(), anyInt(), any(), any());
+
+        when(hearingsService.getPartiesNotifiedResponses(anyString(), anyString()))
+            .thenReturn(PartiesNotifiedResponses.builder().build());
+
+        when(userService.getAccessToken(anyString(), anyString())).thenReturn(AUTH_TOKEN);
+        when(userService.getUserInfo(anyString()))
+            .thenReturn(UserInfo.builder().uid("test-id").build());
+        when(userConfig.getUserName()).thenReturn("USER");
+        when(userConfig.getPassword()).thenReturn("PASS");
 
         assertThatThrownBy(() -> handler.handle(params))
             .hasMessageContaining("Boom");
