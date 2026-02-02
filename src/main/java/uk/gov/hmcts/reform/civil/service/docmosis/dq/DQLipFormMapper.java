@@ -42,39 +42,37 @@ public abstract class DQLipFormMapper {
     protected abstract DocumentsToBeConsideredSection getDocumentsToBeConsidered(CaseData caseData);
 
     public DirectionsQuestionnaireForm addLipDQs(DirectionsQuestionnaireForm form, Optional<CaseDataLiP> caseDataLiPOptional) {
-        var builder = form.toBuilder();
-        builder.hearingLipSupportRequirements(toHearingSupportRequirements(caseDataLiPOptional));
+        var updatedForm = form.copy();
+        updatedForm.setHearingLipSupportRequirements(toHearingSupportRequirements(caseDataLiPOptional));
         var dqExtraDetails = getDQExtraDetails(caseDataLiPOptional);
         var expertLip = getExpertLip(dqExtraDetails);
         var lipExtraDQEvidenceConfirmDetails = toEvidenceConfirmDetails(caseDataLiPOptional);
         if (dqExtraDetails != null) {
-            builder.lipExtraDQ(LipExtraDQ.builder().triedToSettle(dqExtraDetails.getTriedToSettle())
-                                   .requestExtra4weeks(dqExtraDetails.getRequestExtra4weeks())
-                                   .considerClaimantDocuments(dqExtraDetails.getConsiderClaimantDocuments())
-                                   .considerClaimantDocumentsDetails(dqExtraDetails.getConsiderClaimantDocumentsDetails())
-                                   .determinationWithoutHearingRequired(dqExtraDetails.getDeterminationWithoutHearingRequired())
-                                   .determinationWithoutHearingReason(dqExtraDetails.getDeterminationWithoutHearingReason())
-                                   .giveEvidenceYourSelf(dqExtraDetails.getGiveEvidenceYourSelf())
-                                   .whyPhoneOrVideoHearing(dqExtraDetails.getWhyPhoneOrVideoHearing())
-                                   .wantPhoneOrVideoHearing(dqExtraDetails.getWantPhoneOrVideoHearing())
-                                   .giveEvidenceConfirmDetails(lipExtraDQEvidenceConfirmDetails)
-                                   .build())
-                .lipExperts(LipExperts.builder()
-                                .details(expertLip.map(ExpertLiP::getUnwrappedDetails).map(Collection::stream)
+            updatedForm.setLipExtraDQ(new LipExtraDQ()
+                                   .setTriedToSettle(dqExtraDetails.getTriedToSettle())
+                                   .setRequestExtra4weeks(dqExtraDetails.getRequestExtra4weeks())
+                                   .setConsiderClaimantDocuments(dqExtraDetails.getConsiderClaimantDocuments())
+                                   .setConsiderClaimantDocumentsDetails(dqExtraDetails.getConsiderClaimantDocumentsDetails())
+                                   .setDeterminationWithoutHearingRequired(dqExtraDetails.getDeterminationWithoutHearingRequired())
+                                   .setDeterminationWithoutHearingReason(dqExtraDetails.getDeterminationWithoutHearingReason())
+                                   .setGiveEvidenceYourSelf(dqExtraDetails.getGiveEvidenceYourSelf())
+                                   .setWhyPhoneOrVideoHearing(dqExtraDetails.getWhyPhoneOrVideoHearing())
+                                   .setWantPhoneOrVideoHearing(dqExtraDetails.getWantPhoneOrVideoHearing())
+                                   .setGiveEvidenceConfirmDetails(lipExtraDQEvidenceConfirmDetails))
+                .setLipExperts(new LipExperts()
+                                .setDetails(expertLip.map(ExpertLiP::getUnwrappedDetails).map(Collection::stream)
                                              .map(stream -> stream.map(item -> toExpertReportTemplate(item)).toList())
                                              .orElse(Collections.emptyList()))
-                                .caseNeedsAnExpert(expertLip
+                                .setCaseNeedsAnExpert(expertLip
                                                        .map(ExpertLiP::getCaseNeedsAnExpert).orElse(null))
-                                .expertCanStillExamineDetails(expertLip
+                                .setExpertCanStillExamineDetails(expertLip
                                                                   .map(ExpertLiP::getExpertCanStillExamineDetails)
                                                                   .orElse(null))
-                                .expertReportRequired(expertLip
+                                .setExpertReportRequired(expertLip
                                                           .map(ExpertLiP::getExpertReportRequired)
-                                                          .orElse(null))
-
-                                .build());
+                                                          .orElse(null)));
 
         }
-        return builder.build();
+        return updatedForm;
     }
 }
