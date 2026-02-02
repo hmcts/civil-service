@@ -49,10 +49,10 @@ class JudgmentAmountsCalculatorTest {
         CaseData caseData = CaseDataBuilder.builder()
             .hwfFeeType(FeeType.CLAIMISSUED)
             .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(1000)).build())
-            .claimIssuedHwfDetails(HelpWithFeesDetails.builder().outstandingFeeInPounds(BigDecimal.valueOf(50)).build())
+            .claimIssuedHwfDetails(new HelpWithFeesDetails().setOutstandingFeeInPounds(BigDecimal.valueOf(50)))
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
             .totalClaimAmount(new BigDecimal(2000))
-            .caseDataLip(CaseDataLiP.builder().helpWithFees(HelpWithFees.builder().helpWithFee(YesOrNo.YES).build()).build())
+            .caseDataLip(new CaseDataLiP().setHelpWithFees(new HelpWithFees().setHelpWithFee(YesOrNo.YES)))
             .build();
 
         BigDecimal claimFee = judgmentAmountsCalculator.getClaimFee(caseData);

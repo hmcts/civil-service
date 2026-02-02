@@ -79,14 +79,13 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
         void shouldRecordWhenLipApplicationIsFeePaid() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .ccdCaseReference(123456L)
-                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails
-                                              .builder()
-                                              .hwfFullRemissionGrantedForGa(YesOrNo.NO).build())
+                .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
+                                              .setHwfFullRemissionGrantedForGa(YesOrNo.NO))
                 .gaHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(NO_REMISSION_HWF_GA).build())
                 .generalAppHelpWithFees(
-                    HelpWithFees.builder()
-                        .helpWithFeesReferenceNumber("ABC-DEF-IJK")
-                        .helpWithFee(YesOrNo.YES).build()).build();
+                    new HelpWithFees()
+                        .setHelpWithFeesReferenceNumber("ABC-DEF-IJK")
+                        .setHelpWithFee(YesOrNo.YES)).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -109,9 +108,9 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .ccdCaseReference(123456L)
                 .generalAppHelpWithFees(
-                    HelpWithFees.builder()
-                        .helpWithFeesReferenceNumber("ABC-DEF-IJK")
-                        .helpWithFee(YesOrNo.YES).build()).build();
+                    new HelpWithFees()
+                        .setHelpWithFeesReferenceNumber("ABC-DEF-IJK")
+                        .setHelpWithFee(YesOrNo.YES)).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -133,14 +132,13 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
         void shouldRecordWhenLipApplicationIsFeePaidFullRemission() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .ccdCaseReference(123456L)
-                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails
-                                              .builder()
-                                              .hwfFullRemissionGrantedForGa(YesOrNo.YES).build())
+                .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
+                                              .setHwfFullRemissionGrantedForGa(YesOrNo.YES))
                 .gaHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(FULL_REMISSION_HWF_GA).build())
                 .generalAppHelpWithFees(
-                    HelpWithFees.builder()
-                        .helpWithFeesReferenceNumber("ABC-DEF-IJK")
-                        .helpWithFee(YesOrNo.YES).build()).build();
+                    new HelpWithFees()
+                        .setHelpWithFeesReferenceNumber("ABC-DEF-IJK")
+                        .setHelpWithFee(YesOrNo.YES)).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -167,14 +165,13 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
         void shouldRecordWhenLipApplicationIsFeePaidNoRemission() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .ccdCaseReference(123456L)
-                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails
-                                              .builder()
-                                              .hwfFullRemissionGrantedForGa(YesOrNo.YES).build())
+                .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
+                                              .setHwfFullRemissionGrantedForGa(YesOrNo.YES))
                 .gaHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(NO_REMISSION_HWF_GA).build())
                 .generalAppHelpWithFees(
-                    HelpWithFees.builder()
-                        .helpWithFeesReferenceNumber("ABC-DEF-IJK")
-                        .helpWithFee(YesOrNo.YES).build()).build();
+                    new HelpWithFees()
+                        .setHelpWithFeesReferenceNumber("ABC-DEF-IJK")
+                        .setHelpWithFee(YesOrNo.YES)).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -201,14 +198,13 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
         void shouldRecordWhenLipApplicationIsFeePaidFeePaymentOutCome() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .ccdCaseReference(123456L)
-                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails
-                                              .builder()
-                                              .hwfFullRemissionGrantedForGa(YesOrNo.NO).build())
+                .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
+                                              .setHwfFullRemissionGrantedForGa(YesOrNo.NO))
                 .gaHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(FEE_PAYMENT_OUTCOME_GA).build())
                 .generalAppHelpWithFees(
-                    HelpWithFees.builder()
-                        .helpWithFeesReferenceNumber("ABC-DEF-IJK")
-                        .helpWithFee(YesOrNo.YES).build()).build();
+                    new HelpWithFees()
+                        .setHelpWithFeesReferenceNumber("ABC-DEF-IJK")
+                        .setHelpWithFee(YesOrNo.YES)).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
