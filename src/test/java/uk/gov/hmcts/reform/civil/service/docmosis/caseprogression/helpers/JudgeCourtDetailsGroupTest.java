@@ -32,11 +32,11 @@ public class JudgeCourtDetailsGroupTest {
         when(userDetails.getFullName()).thenReturn(expectedJudgeName);
         when(caseManagementLocationDetails.getExternalShortName()).thenReturn(expectedCourtName);
 
-        JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder();
+        JudgeFinalOrderForm form = new JudgeFinalOrderForm();
 
-        builder = judgeCourtDetailsPopulator.populateJudgeCourtDetails(builder, userDetails, caseManagementLocationDetails, expectedCourtLocation);
+        form = judgeCourtDetailsPopulator.populateJudgeCourtDetails(form, userDetails, caseManagementLocationDetails, expectedCourtLocation);
 
-        JudgeFinalOrderForm result = builder.build();
+        JudgeFinalOrderForm result = form;
         Assertions.assertEquals(expectedJudgeName, result.getJudgeNameTitle());
         Assertions.assertEquals(expectedCourtName, result.getCourtName());
         Assertions.assertEquals(expectedCourtLocation, result.getCourtLocation());

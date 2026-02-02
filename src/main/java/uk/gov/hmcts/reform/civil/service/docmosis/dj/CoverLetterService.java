@@ -99,11 +99,9 @@ public class CoverLetterService {
     }
 
     public JudgementCoverLetter buildTemplateData(Party party, CaseData caseData) {
-        return JudgementCoverLetter
-            .builder()
-            .claimNumber(caseData.getLegacyCaseReference())
-            .address(party.getPrimaryAddress())
-            .partyName(party.getPartyName())
-            .build();
+        return new JudgementCoverLetter()
+            .setClaimNumber(caseData.getLegacyCaseReference())
+            .setAddress(party.getPrimaryAddress())
+            .setPartyName(party.getPartyName());
     }
 }
