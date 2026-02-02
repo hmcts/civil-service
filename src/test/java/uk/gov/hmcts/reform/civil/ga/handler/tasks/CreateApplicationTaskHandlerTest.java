@@ -966,7 +966,7 @@ public class CreateApplicationTaskHandlerTest {
         caseData = caseData.toBuilder()
             .claimantBilingualLanguagePreference(claimantBilingual ? "BOTH" : null)
             .respondent1LiPResponse(defendantBilingual
-            ? RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()
+            ? new RespondentLiPResponse().setRespondent1ResponseLanguage("BOTH")
             : null)
             .build();
         VariableMap variables = Variables.createVariables();

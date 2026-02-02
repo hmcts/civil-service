@@ -281,7 +281,7 @@ public class HearingFormGeneratorTest {
             Arguments.of(CaseState.HEARING_READINESS, ListingOrRelisting.LISTING, YesOrNo.NO, YesOrNo.NO,
                          PaymentDetails.builder().status(PaymentStatus.SUCCESS).build(), null, "DO_NOT_SHOW"),
             Arguments.of(CaseState.HEARING_READINESS, ListingOrRelisting.LISTING, YesOrNo.NO, YesOrNo.NO,
-                         null, FeePaymentOutcomeDetails.builder().hwfFullRemissionGrantedForHearingFee(YesOrNo.YES).build(), "DO_NOT_SHOW"),
+                         null, new FeePaymentOutcomeDetails().setHwfFullRemissionGrantedForHearingFee(YesOrNo.YES), "DO_NOT_SHOW"),
             Arguments.of(CaseState.HEARING_READINESS, ListingOrRelisting.LISTING, YesOrNo.NO, YesOrNo.NO,
                          PaymentDetails.builder().status(PaymentStatus.FAILED).build(), null, "SHOW"),
             Arguments.of(CaseState.HEARING_READINESS, ListingOrRelisting.LISTING, YesOrNo.NO, YesOrNo.NO,

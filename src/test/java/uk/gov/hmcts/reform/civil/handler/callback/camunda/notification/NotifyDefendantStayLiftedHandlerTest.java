@@ -161,15 +161,15 @@ class NotifyDefendantStayLiftedHandlerTest {
         }
 
         private CaseData getCaseData(boolean isRespondentLiP, boolean isRespondentBilingual) {
-            RespondentLiPResponse respondentLip = RespondentLiPResponse.builder()
-                .respondent1ResponseLanguage(isRespondentBilingual ? Language.BOTH.toString()
-                                                 : Language.ENGLISH.toString()).build();
+            RespondentLiPResponse respondentLip = new RespondentLiPResponse()
+                .setRespondent1ResponseLanguage(isRespondentBilingual ? Language.BOTH.toString()
+                                                 : Language.ENGLISH.toString());
             return commonCaseData()
                 .respondent1Represented(isRespondentLiP ? YesOrNo.NO : YesOrNo.YES)
 
                 .build().toBuilder()
-                .caseDataLiP(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(respondentLip).build())
+                .caseDataLiP(new CaseDataLiP()
+                                 .setRespondent1LiPResponse(respondentLip))
                 .build();
         }
 
