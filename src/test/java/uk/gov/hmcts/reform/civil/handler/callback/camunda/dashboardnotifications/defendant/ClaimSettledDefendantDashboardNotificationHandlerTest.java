@@ -81,8 +81,8 @@ class ClaimSettledDefendantDashboardNotificationHandlerTest extends BaseCallback
         void shouldRecordScenarioWhenQmLrIsOnAndIsNonOnEACourt_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimSubmittedSmallClaim()
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("test").region(
-                    "test").build())
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation("test").setRegion(
+                    "test"))
                 .caseDataLip(new CaseDataLiP().setApplicant1SettleClaim(YesOrNo.YES)
                                  .setApplicant1ClaimSettledDate(
                                      LocalDate.now())).build();
@@ -119,8 +119,8 @@ class ClaimSettledDefendantDashboardNotificationHandlerTest extends BaseCallback
             when(featureToggleService.isLocationWhiteListed(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimSubmittedSmallClaim()
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("test").region(
-                    "test").build())
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation("test").setRegion(
+                    "test"))
                 .caseDataLip(new CaseDataLiP().setApplicant1SettleClaim(YesOrNo.YES)
                                  .setApplicant1ClaimSettledDate(
                                      LocalDate.now())).build();
