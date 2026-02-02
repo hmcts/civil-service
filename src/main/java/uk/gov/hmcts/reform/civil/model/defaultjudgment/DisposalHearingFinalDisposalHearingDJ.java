@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 
-import javax.validation.constraints.Future;
+import jakarta.validation.constraints.Future;
 import java.time.LocalDate;
 
 @Data

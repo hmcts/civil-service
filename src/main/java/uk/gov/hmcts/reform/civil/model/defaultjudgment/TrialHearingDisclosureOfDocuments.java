@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.civil.model.defaultjudgment;
 
+import jakarta.validation.constraints.Future;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import javax.validation.constraints.Future;
 import java.time.LocalDate;
 
 @Data
