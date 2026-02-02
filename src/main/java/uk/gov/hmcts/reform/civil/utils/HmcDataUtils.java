@@ -74,7 +74,6 @@ public class HmcDataUtils {
             : new ArrayList<>();
     }
 
-
     public static PartiesNotifiedResponse getLatestHearingNoticeDetails(PartiesNotifiedResponses partiesNotified) {
         return Optional.ofNullable(partiesNotified.getResponses()).orElse(List.of())
             .stream().max(Comparator.comparing(PartiesNotifiedResponse::getResponseReceivedDateTime))
