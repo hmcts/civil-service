@@ -325,7 +325,7 @@ class DashboardClaimStatusFactoryTest {
             .ccdState(CaseState.CASE_PROGRESSION)
             .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
             .totalClaimAmount(BigDecimal.valueOf(1000))
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(selectedCourt.getCode()))
             .systemGeneratedCaseDocuments(List.of(Element.<CaseDocument>builder()
                                                       .value(sdoDocument).build()))
             .drawDirectionsOrderRequired(YesOrNo.NO)
@@ -551,7 +551,7 @@ class DashboardClaimStatusFactoryTest {
             .ccdState(CaseState.CASE_PROGRESSION)
             .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
             .totalClaimAmount(BigDecimal.valueOf(999))
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(selectedCourt.getCode()))
             .systemGeneratedCaseDocuments(List.of(Element.<CaseDocument>builder()
                                                       .value(sdoDocument).build()))
             .build();
@@ -860,14 +860,14 @@ class DashboardClaimStatusFactoryTest {
 
         CaseData caseData1 = CaseData.builder()
             .ccdState(CaseState.CASE_PROGRESSION)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(selectedCourt.getCode()))
             .systemGeneratedCaseDocuments(List.of(Element.<CaseDocument>builder()
                                                  .value(sdoDocumentBefore).build()))
             .build();
 
         CaseData caseData2 = CaseData.builder()
             .ccdState(CaseState.CASE_PROGRESSION)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(selectedCourt.getCode()))
             .systemGeneratedCaseDocuments(List.of(Element.<CaseDocument>builder()
                                                       .value(sdoDocumentAfter).build()))
             .build();

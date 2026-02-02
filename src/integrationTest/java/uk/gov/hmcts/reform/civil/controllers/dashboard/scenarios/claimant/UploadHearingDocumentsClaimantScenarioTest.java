@@ -43,7 +43,7 @@ public class UploadHearingDocumentsClaimantScenarioTest extends DashboardBaseInt
             .responseClaimMediationSpecRequired(YesOrNo.NO)
             .totalClaimAmount(new BigDecimal(1000))
             .ccdState(CaseState.CASE_PROGRESSION)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(selectedCourt.getCode()))
             .build();
 
         handler.handle(callbackParams(caseData));
