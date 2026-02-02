@@ -404,14 +404,13 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             .makeAppVisibleToRespondents(gaMakeApplicationAvailableCheck)
             .isGaRespondentOneLip(NO)
             .isGaApplicantLip(YES)
-            .feePaymentOutcomeDetails(FeePaymentOutcomeDetails
-                                          .builder()
-                                          .hwfFullRemissionGrantedForAdditionalFee(NO).build())
+            .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
+                                          .setHwfFullRemissionGrantedForAdditionalFee(NO))
             .additionalHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(PARTIAL_REMISSION_HWF_GA).build())
             .generalAppHelpWithFees(
-                HelpWithFees.builder()
-                    .helpWithFeesReferenceNumber("ABC-DEF-IJK")
-                    .helpWithFee(YES).build())
+                new HelpWithFees()
+                    .setHelpWithFeesReferenceNumber("ABC-DEF-IJK")
+                    .setHelpWithFee(YES))
             .ccdCaseReference(CCD_CASE_REFERENCE).build();
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -451,9 +450,9 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             .isGaApplicantLip(YES)
             .additionalHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(NO_REMISSION_HWF_GA).build())
             .generalAppHelpWithFees(
-                HelpWithFees.builder()
-                    .helpWithFeesReferenceNumber("ABC-DEF-IJK")
-                    .helpWithFee(YES).build())
+                new HelpWithFees()
+                    .setHelpWithFeesReferenceNumber("ABC-DEF-IJK")
+                    .setHelpWithFee(YES))
             .ccdCaseReference(CCD_CASE_REFERENCE).build();
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -492,9 +491,9 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             .isGaRespondentOneLip(NO)
             .isGaApplicantLip(YES)
             .generalAppHelpWithFees(
-                HelpWithFees.builder()
-                    .helpWithFeesReferenceNumber("ABC-DEF-IJK")
-                    .helpWithFee(YES).build())
+                new HelpWithFees()
+                    .setHelpWithFeesReferenceNumber("ABC-DEF-IJK")
+                    .setHelpWithFee(YES))
             .additionalHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(NO_REMISSION_HWF_GA).build())
             .ccdCaseReference(CCD_CASE_REFERENCE).build();
 
@@ -527,13 +526,12 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             .makeAppVisibleToRespondents(gaMakeApplicationAvailableCheck)
             .isGaRespondentOneLip(NO)
             .isGaApplicantLip(YES)
-            .feePaymentOutcomeDetails(FeePaymentOutcomeDetails
-                                          .builder()
-                                          .hwfFullRemissionGrantedForGa(YES).build())
+            .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
+                                          .setHwfFullRemissionGrantedForGa(YES))
             .generalAppHelpWithFees(
-                HelpWithFees.builder()
-                    .helpWithFeesReferenceNumber("ABC-DEF-IJK")
-                    .helpWithFee(YES).build())
+                new HelpWithFees()
+                    .setHelpWithFeesReferenceNumber("ABC-DEF-IJK")
+                    .setHelpWithFee(YES))
             .additionalHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(FULL_REMISSION_HWF_GA).build())
             .ccdCaseReference(CCD_CASE_REFERENCE).build();
 
