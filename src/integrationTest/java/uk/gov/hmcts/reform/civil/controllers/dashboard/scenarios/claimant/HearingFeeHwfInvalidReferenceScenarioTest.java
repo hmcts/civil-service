@@ -34,7 +34,7 @@ public class HearingFeeHwfInvalidReferenceScenarioTest extends DashboardBaseInte
             .applicant1Represented(YesOrNo.NO)
             .ccdCaseReference(Long.valueOf(caseId))
             .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(45500)).build())
-            .hearingHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(CaseEvent.INVALID_HWF_REFERENCE).build())
+            .hearingHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(CaseEvent.INVALID_HWF_REFERENCE))
             .hwfFeeType(FeeType.HEARING)
             .build();
 

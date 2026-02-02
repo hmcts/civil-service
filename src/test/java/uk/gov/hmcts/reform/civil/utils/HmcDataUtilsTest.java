@@ -1967,11 +1967,9 @@ class HmcDataUtilsTest {
         void shouldReturnTrue_whenRespondentNoRepAndRespondentResponseBilingual() {
             // Given
             // -> isRespondentResponseBilingual() = true si "BOTH" o "WELSH"
-            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-                .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                            .respondent1ResponseLanguage("BOTH") // => true
-                                            .build())
-                .build();
+            CaseDataLiP caseDataLiP = new CaseDataLiP()
+                .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                            .setRespondent1ResponseLanguage("BOTH"));
 
             CaseData caseData = CaseData.builder()
                 .applicant1Represented(YesOrNo.YES)
@@ -1995,10 +1993,9 @@ class HmcDataUtilsTest {
                 .setRespondent1DQLanguage(req);
 
             // -> isRespondentResponseBilingual() = false (ej: "ENGLISH")
-            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-                .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                            .respondent1ResponseLanguage("ENGLISH").build())
-                .build();
+            CaseDataLiP caseDataLiP = new CaseDataLiP()
+                .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                            .setRespondent1ResponseLanguage("ENGLISH"));
 
             CaseData caseData = CaseData.builder()
                 .applicant1Represented(YesOrNo.YES)
@@ -2033,10 +2030,9 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnFalse_whenApplicantNoRepButNotBilingualNotDQ_andRespondentNoRepButNotBilingualNotDQ() {
             // Given
-            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-                .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                            .respondent1ResponseLanguage("ENGLISH").build())
-                .build();
+            CaseDataLiP caseDataLiP = new CaseDataLiP()
+                .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                            .setRespondent1ResponseLanguage("ENGLISH"));
 
             CaseData caseData = CaseData.builder()
                 .applicant1Represented(YesOrNo.NO)

@@ -176,12 +176,12 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
         Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
         when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
-        RespondentLiPResponse respondentLip = RespondentLiPResponse.builder()
-            .respondent1ResponseLanguage(language).build();
+        RespondentLiPResponse respondentLip = new RespondentLiPResponse()
+            .setRespondent1ResponseLanguage(language);
         caseData = caseData.toBuilder()
             .respondent1Represented(YesOrNo.NO)
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1LiPResponse(respondentLip).build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setRespondent1LiPResponse(respondentLip))
             .build();
         CallbackParams params = CallbackParams.builder().caseData(caseData)
             .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT_STAY_UPDATE_REQUESTED.toString()).build()).build();

@@ -68,7 +68,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeOr
 @MockitoSettings(strictness = Strictness.LENIENT)
 class JudgeOrderDownloadGeneratorTest {
 
-    private static final CaseLocationCivil caseManagementLocation = CaseLocationCivil.builder().baseLocation("000000").build();
+    private static final CaseLocationCivil caseManagementLocation = new CaseLocationCivil().setBaseLocation("000000");
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final String DATE_FORMAT = "dd-MM-yyyy";

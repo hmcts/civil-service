@@ -40,12 +40,11 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantEmailDTOGeneratorTes
     void shouldReturnCorrectEmailTemplateIdWhenRespondentResponseBilingual() {
         CaseData caseData = CaseData.builder()
             .caseDataLiP(
-                CaseDataLiP.builder()
-                    .respondent1LiPResponse(
-                        RespondentLiPResponse.builder()
-                            .respondent1ResponseLanguage(BOTH.toString())
-                            .build()
-                    ).build()
+                new CaseDataLiP()
+                    .setRespondent1LiPResponse(
+                        new RespondentLiPResponse()
+                            .setRespondent1ResponseLanguage(BOTH.toString())
+                    )
             ).build();
 
         String expectedTemplateId = "template-id";

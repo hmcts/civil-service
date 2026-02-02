@@ -301,8 +301,8 @@ public class GeneralApplicationDetailsBuilder {
                                                Map<String, String> applicationIdStatus) {
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000")
-                                                   .region("2").build());
+        caseDataBuilder.caseManagementLocation(new CaseLocationCivil().setBaseLocation("00000")
+                                                   .setRegion("2"));
         caseDataBuilder.locationName("locationOfRegion2");
         caseDataBuilder.ccdCaseReference(1L);
         if (!Collections.isEmpty(applicationIdStatus)) {
@@ -348,8 +348,8 @@ public class GeneralApplicationDetailsBuilder {
                                                Map<String, String> applicationIdStatus) {
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder().baseLocation("000000")
-                                                   .region("2").build());
+        caseDataBuilder.caseManagementLocation(new CaseLocationCivil().setBaseLocation("000000")
+                                                   .setRegion("2"));
         caseDataBuilder.respondent1Represented(NO);
         caseDataBuilder.ccdCaseReference(1L);
         if (!Collections.isEmpty(applicationIdStatus)) {
@@ -483,7 +483,7 @@ public class GeneralApplicationDetailsBuilder {
     }
 
     public CaseData getTestCaseDataWithEmptyCollectionOfApps(CaseData caseData) {
-        CaseLocationCivil caseManagementLoc = CaseLocationCivil.builder().region("1").baseLocation("22222").build();
+        CaseLocationCivil caseManagementLoc = new CaseLocationCivil().setRegion("1").setBaseLocation("22222");
         return caseData.toBuilder()
             .ccdCaseReference(1234L)
             .caseAccessCategory(SPEC_CLAIM)
@@ -498,18 +498,16 @@ public class GeneralApplicationDetailsBuilder {
                 .applicant1DQ(new Applicant1DQ()
                         .setApplicant1DQRequestedCourt(new RequestedCourt()
                                 .setResponseCourtCode("applicant1DQRequestedCourt")
-                                .setCaseLocation(CaseLocationCivil.builder()
-                                                                          .region("2")
-                                                                          .baseLocation("00000")
-                                                                          .build())))
+                                .setCaseLocation(new CaseLocationCivil()
+                                                     .setRegion("2")
+                                                     .setBaseLocation("00000"))))
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent1").build())
                 .respondent1DQ(new Respondent1DQ()
                         .setRespondent1DQRequestedCourt(new RequestedCourt()
                                 .setResponseCourtCode("respondent1DQRequestedCourt")
-                                .setCaseLocation(CaseLocationCivil.builder()
-                                                                           .region("2")
-                                                                           .baseLocation("11111")
-                                                                           .build())))
+                                .setCaseLocation(new CaseLocationCivil()
+                                                     .setRegion("2")
+                                                     .setBaseLocation("11111"))))
                 .addApplicant2(YES)
                 .applicant2(Party.builder().type(Party.Type.COMPANY).companyName("Applicant2").build())
                 .addRespondent2(YES)
@@ -601,18 +599,16 @@ public class GeneralApplicationDetailsBuilder {
             .applicant1DQ(new Applicant1DQ()
                         .setApplicant1DQRequestedCourt(new RequestedCourt()
                                 .setResponseCourtCode("applicant1DQRequestedCourt")
-                                .setCaseLocation(CaseLocationCivil.builder()
-                                                                          .region("2")
-                                                                          .baseLocation("11111")
-                                                                          .build())))
+                                .setCaseLocation(new CaseLocationCivil()
+                                                     .setRegion("2")
+                                                     .setBaseLocation("11111"))))
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent1").build())
                 .respondent1DQ(new Respondent1DQ()
                         .setRespondent1DQRequestedCourt(new RequestedCourt()
                                 .setResponseCourtCode("respondent1DQRequestedCourt")
-                                .setCaseLocation(CaseLocationCivil.builder()
-                                                                           .region("2")
-                                                                           .baseLocation("00000")
-                                                                           .build())))
+                                .setCaseLocation(new CaseLocationCivil()
+                                                     .setRegion("2")
+                                                     .setBaseLocation("00000"))))
                 .addApplicant2(YES)
                 .applicant2(Party.builder().type(Party.Type.COMPANY).companyName("Applicant2").build())
                 .addRespondent2(YES)
@@ -695,8 +691,8 @@ public class GeneralApplicationDetailsBuilder {
             .ccdState(caseState)
             .ccdCaseReference(1234L)
             .respondent1Represented(NO)
-            .caseManagementLocation(CaseLocationCivil.builder().region("2")
-                                        .baseLocation("11111").build())
+            .caseManagementLocation(new CaseLocationCivil().setRegion("2")
+                                        .setBaseLocation("11111"))
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
                                                .organisation(Organisation.builder()
                                                                  .organisationID(STRING_CONSTANT).build())
@@ -706,18 +702,16 @@ public class GeneralApplicationDetailsBuilder {
             .applicant1DQ(new Applicant1DQ()
                               .setApplicant1DQRequestedCourt(new RequestedCourt()
                                                               .setResponseCourtCode("applicant1DQRequestedCourt")
-                                                              .setCaseLocation(CaseLocationCivil.builder()
-                                                                                .region("2")
-                                                                                .baseLocation("11111")
-                                                                                .build())))
+                                                              .setCaseLocation(new CaseLocationCivil()
+                                                                                   .setRegion("2")
+                                                                                   .setBaseLocation("11111"))))
             .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent1").build())
             .respondent1DQ(new Respondent1DQ()
                                .setRespondent1DQRequestedCourt(new RequestedCourt()
                                                                 .setResponseCourtCode("respondent1DQRequestedCourt")
-                                                                .setCaseLocation(CaseLocationCivil.builder()
-                                                                                  .region("2")
-                                                                                  .baseLocation("00000")
-                                                                                  .build())))
+                                                                .setCaseLocation(new CaseLocationCivil()
+                                                                                     .setRegion("2")
+                                                                                     .setBaseLocation("00000"))))
             .addApplicant2(YES)
             .applicant2(Party.builder().type(Party.Type.COMPANY).companyName("Applicant2").build())
             .addRespondent2(YES)
@@ -807,18 +801,16 @@ public class GeneralApplicationDetailsBuilder {
             .applicant1DQ(new Applicant1DQ()
                               .setApplicant1DQRequestedCourt(new RequestedCourt()
                                                               .setResponseCourtCode("applicant1DQRequestedCourt")
-                                                              .setCaseLocation(CaseLocationCivil.builder()
-                                                                                .region("2")
-                                                                                .baseLocation("11111")
-                                                                                .build())))
+                                                              .setCaseLocation(new CaseLocationCivil()
+                                                                                   .setRegion("2")
+                                                                                   .setBaseLocation("11111"))))
             .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent1").build())
             .respondent1DQ(new Respondent1DQ()
                                .setRespondent1DQRequestedCourt(new RequestedCourt()
                                                                 .setResponseCourtCode("respondent1DQRequestedCourt")
-                                                                .setCaseLocation(CaseLocationCivil.builder()
-                                                                                  .region("2")
-                                                                                  .baseLocation("00000")
-                                                                                  .build())))
+                                                                .setCaseLocation(new CaseLocationCivil()
+                                                                                     .setRegion("2")
+                                                                                     .setBaseLocation("00000"))))
             .addApplicant2(YES)
             .applicant2(Party.builder().type(Party.Type.COMPANY).companyName("Applicant2").build())
             .addRespondent2(YES)
@@ -891,16 +883,16 @@ public class GeneralApplicationDetailsBuilder {
     }
 
     public CaseData getTestCaseDataSPEC(CaseCategory claimType) {
-        CaseLocationCivil caseManagementLoc = CaseLocationCivil.builder().region("1").baseLocation("22222").build();
+        CaseLocationCivil caseManagementLoc = new CaseLocationCivil().setRegion("1").setBaseLocation("22222");
         return CaseData.builder()
             .ccdCaseReference(1234L)
             .caseAccessCategory(claimType)
             .submittedDate(LocalDateTime.of(2025, 5, 5, 0, 0, 0))
             .courtLocation(CourtLocation.builder()
-                               .caseLocation(CaseLocationCivil.builder()
-                                                 .region("2")
-                                                 .baseLocation("00000")
-                                                 .build())
+                               .caseLocation(new CaseLocationCivil()
+                                                 .setRegion("2")
+                                                 .setBaseLocation("00000")
+                                                 )
                                .build())
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
                                                .organisation(Organisation.builder()
@@ -996,14 +988,14 @@ public class GeneralApplicationDetailsBuilder {
                                                  Applicant1DQ applicant1DQ,
                                                  Respondent1DQ respondent1DQ,
                                                  Respondent2DQ respondent2DQ) {
-        CaseLocationCivil caseManagementLoc = CaseLocationCivil.builder().region("1").baseLocation("22222").build();
+        CaseLocationCivil caseManagementLoc = new CaseLocationCivil().setRegion("1").setBaseLocation("22222");
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder()
                 .caseAccessCategory(claimType)
                 .ccdCaseReference(1234L)
-                .courtLocation(CourtLocation.builder().caseLocation(CaseLocationCivil.builder()
-                                                                        .region("2")
-                                                                        .baseLocation("00000")
-                                                                        .build()).build())
+                .courtLocation(CourtLocation.builder().caseLocation(new CaseLocationCivil()
+                                                                        .setRegion("2")
+                                                                        .setBaseLocation("00000")
+                                                                        ).build())
                 .respondent2OrganisationPolicy(OrganisationPolicy.builder()
                         .organisation(Organisation.builder()
                                 .organisationID(STRING_CONSTANT).build())
@@ -1103,10 +1095,10 @@ public class GeneralApplicationDetailsBuilder {
                                                  Respondent1DQ respondent1DQ) {
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder()
             .ccdCaseReference(1234L)
-            .courtLocation(CourtLocation.builder().caseLocation(CaseLocationCivil.builder()
-                                                                    .region("2")
-                                                                    .baseLocation("00000")
-                                                                    .build()).build())
+            .courtLocation(CourtLocation.builder().caseLocation(new CaseLocationCivil()
+                                                                    .setRegion("2")
+                                                                    .setBaseLocation("00000")
+                                                                    ).build())
             .applicant1(Party.builder().type(Party.Type.SOLE_TRADER).companyName("Applicant1").build())
             .respondent1(Party.builder().type(respondent1Type).companyName("Respondent1").build())
             .addApplicant2(NO)
@@ -1196,18 +1188,16 @@ public class GeneralApplicationDetailsBuilder {
         Applicant1DQ applicant1DQ =
                 new Applicant1DQ().setApplicant1DQRequestedCourt(new RequestedCourt()
                         .setResponseCourtCode("applicant1DQRequestedCourt")
-                        .setCaseLocation(CaseLocationCivil.builder()
-                                .region("2")
-                                .baseLocation("00000")
-                                .build()));
+                        .setCaseLocation(new CaseLocationCivil()
+                                             .setRegion("2")
+                                             .setBaseLocation("00000")));
         Respondent1DQ respondent1DQ =
                 new Respondent1DQ().setRespondent1DQRequestedCourt(new RequestedCourt()
                         .setResponseCourtCode(null)
-                        .setCaseLocation(CaseLocationCivil.builder()
-                                .region("2")
-                                .baseLocation("11111")
-                                .build()));
-        CaseLocationCivil caseManagementLoc = CaseLocationCivil.builder().region("1").baseLocation("22222").build();
+                        .setCaseLocation(new CaseLocationCivil()
+                                             .setRegion("2")
+                                             .setBaseLocation("11111")));
+        CaseLocationCivil caseManagementLoc = new CaseLocationCivil().setRegion("1").setBaseLocation("22222");
         return getCaseDataForWorkAllocation1V1(null, SPEC_CLAIM, INDIVIDUAL, applicant1DQ, respondent1DQ)
                 .toBuilder().caseManagementLocation(caseManagementLoc).build();
     }
@@ -1220,10 +1210,10 @@ public class GeneralApplicationDetailsBuilder {
                                                  Respondent2DQ respondent2DQ) {
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder()
             .ccdCaseReference(1234L)
-            .courtLocation(CourtLocation.builder().caseLocation(CaseLocationCivil.builder()
-                                                                    .region("2")
-                                                                    .baseLocation("00000")
-                                                                    .build()).build())
+            .courtLocation(CourtLocation.builder().caseLocation(new CaseLocationCivil()
+                                                                    .setRegion("2")
+                                                                    .setBaseLocation("00000")
+                                                                    ).build())
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
                                                .organisation(Organisation.builder()
                                                                  .organisationID(STRING_CONSTANT).build())
@@ -1393,10 +1383,10 @@ public class GeneralApplicationDetailsBuilder {
         return builder.generalAppType(GAApplicationType.builder()
                         .types(singletonList(SUMMARY_JUDGEMENT))
                         .build())
-                .caseManagementLocation(uk.gov.hmcts.reform.civil.model.genapplication
-                                            .CaseLocationCivil.builder()
+                .caseManagementLocation(uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil.builder()
                                             .baseLocation("34567")
-                                            .region("4").build())
+                                            .region("4")
+                                            .build())
                 .isCcmccLocation(YES)
                 .caseLink(CaseLink.builder().caseReference("1234").build())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
@@ -1766,7 +1756,7 @@ public class GeneralApplicationDetailsBuilder {
     }
 
     public CaseData getVaryJudgmentWithN245TestData() {
-        CaseLocationCivil caseManagementLoc = CaseLocationCivil.builder().region("1").baseLocation("22222").build();
+        CaseLocationCivil caseManagementLoc = new CaseLocationCivil().setRegion("1").setBaseLocation("22222");
         return CaseData
                 .builder()
                 .ccdCaseReference(1L)
@@ -1776,10 +1766,10 @@ public class GeneralApplicationDetailsBuilder {
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent1").build())
                 .addRespondent2(NO)
                 .courtLocation(CourtLocation.builder()
-                        .caseLocation(CaseLocationCivil.builder()
-                                .region("2")
-                                .baseLocation("00000")
-                                .build())
+                        .caseLocation(new CaseLocationCivil()
+                                .setRegion("2")
+                                .setBaseLocation("00000")
+                                )
                         .build())
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder()
                         .organisation(Organisation.builder()

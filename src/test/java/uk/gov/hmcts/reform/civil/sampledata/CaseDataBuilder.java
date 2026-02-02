@@ -1055,9 +1055,8 @@ public class CaseDataBuilder {
                 .setResponseCourtCode("444")
                 .setResponseCourtName("Court name 444")
                 .setReasonForHearingAtSpecificCourt("Reason of Respondent 1 to choose court")
-                .setCaseLocation(CaseLocationCivil.builder()
-                    .baseLocation("dummy base").region("dummy region")
-                    .build()))
+                .setCaseLocation(new CaseLocationCivil()
+                                     .setBaseLocation("dummy base").setRegion("dummy region")))
             .setRespondent1DQHearingSupport(new HearingSupport().setRequirements(List.of()))
             .setRespondent1DQFurtherInformation(new FurtherInformation().setFutureApplications(NO))
             .setRespondent1DQLanguage(new WelshLanguageRequirements())
@@ -1084,9 +1083,8 @@ public class CaseDataBuilder {
                 .setUnavailableDatesRequired(NO))
             .setRespondent1DQRequestedCourt(new RequestedCourt()
                 .setResponseCourtCode("444")
-                .setCaseLocation(CaseLocationCivil.builder()
-                    .baseLocation("dummy base").region("dummy region")
-                    .build()))
+                .setCaseLocation(new CaseLocationCivil()
+                                     .setBaseLocation("dummy base").setRegion("dummy region")))
             .setRespondent1DQHearingSupport(new HearingSupport().setRequirements(List.of()))
             .setRespondent1DQFurtherInformation(new FurtherInformation().setFutureApplications(NO))
             .setRespondent1DQLanguage(new WelshLanguageRequirements())
@@ -1184,9 +1182,8 @@ public class CaseDataBuilder {
                 .setResponseCourtCode("444")
                 .setResponseCourtName("Court name 444")
                 .setReasonForHearingAtSpecificCourt("Reason of Respondent 2 to choose court")
-                .setCaseLocation(CaseLocationCivil.builder()
-                    .baseLocation("dummy base").region("dummy region")
-                    .build()))
+                .setCaseLocation(new CaseLocationCivil()
+                                     .setBaseLocation("dummy base").setRegion("dummy region")))
             .setRespondent2DQHearingSupport(new HearingSupport().setRequirements(List.of()))
             .setRespondent2DQFurtherInformation(new FurtherInformation().setFutureApplications(NO))
             .setRespondent2DQLanguage(new WelshLanguageRequirements())
@@ -1213,9 +1210,8 @@ public class CaseDataBuilder {
                 .setUnavailableDatesRequired(NO))
             .setRespondent2DQRequestedCourt(new RequestedCourt()
                 .setResponseCourtCode("444")
-                .setCaseLocation(CaseLocationCivil.builder()
-                    .baseLocation("dummy base").region("dummy region")
-                    .build()))
+                .setCaseLocation(new CaseLocationCivil()
+                                     .setBaseLocation("dummy base").setRegion("dummy region")))
             .setRespondent2DQHearingSupport(new HearingSupport().setRequirements(List.of()))
             .setRespondent2DQFurtherInformation(new FurtherInformation().setFutureApplications(NO))
             .setRespondent2DQLanguage(new WelshLanguageRequirements())
@@ -1511,9 +1507,8 @@ public class CaseDataBuilder {
                 .setUnavailableDatesRequired(NO))
             .setApplicant1DQRequestedCourt(new RequestedCourt()
                 .setResponseCourtCode("court4")
-                .setCaseLocation(CaseLocationCivil.builder()
-                    .baseLocation("00000").region("dummy region")
-                    .build()))
+                .setCaseLocation(new CaseLocationCivil()
+                                     .setBaseLocation("00000").setRegion("dummy region")))
             .setApplicant1DQHearingSupport(new HearingSupport().setRequirements(List.of()))
             .setApplicant1DQFurtherInformation(new FurtherInformation().setFutureApplications(NO))
             .setApplicant1DQLanguage(new WelshLanguageRequirements())
@@ -1572,9 +1567,8 @@ public class CaseDataBuilder {
                 .setUnavailableDatesRequired(NO))
             .setApplicant1DQRequestedCourt(new RequestedCourt()
                 .setResponseCourtCode("court4")
-                .setCaseLocation(CaseLocationCivil.builder()
-                    .baseLocation("dummy base").region("dummy region")
-                    .build()))
+                .setCaseLocation(new CaseLocationCivil()
+                                     .setBaseLocation("dummy base").setRegion("dummy region")))
             .setApplicant1DQHearingSupport(new HearingSupport().setRequirements(List.of()))
             .setApplicant1DQFurtherInformation(new FurtherInformation().setFutureApplications(NO))
             .setApplicant1DQLanguage(new WelshLanguageRequirements())
@@ -1601,9 +1595,8 @@ public class CaseDataBuilder {
                 .setUnavailableDatesRequired(NO))
             .setApplicant2DQRequestedCourt(new RequestedCourt()
                 .setResponseCourtCode("court4")
-                .setCaseLocation(CaseLocationCivil.builder()
-                    .baseLocation("dummy base").region("dummy region")
-                    .build()))
+                .setCaseLocation(new CaseLocationCivil()
+                                     .setBaseLocation("dummy base").setRegion("dummy region")))
             .setApplicant2DQHearingSupport(new HearingSupport().setRequirements(List.of()))
             .setApplicant2DQFurtherInformation(new FurtherInformation().setFutureApplications(NO))
             .setApplicant2DQLanguage(new WelshLanguageRequirements())
@@ -2487,24 +2480,23 @@ public class CaseDataBuilder {
     public CaseDataBuilder courtLocation() {
         this.courtLocation = CourtLocation.builder()
             .applicantPreferredCourt("127")
-            .caseLocation(CaseLocationCivil.builder()
-                .region("2")
-                .baseLocation("000000")
-                .build())
+            .caseLocation(new CaseLocationCivil()
+                .setRegion("2")
+                .setBaseLocation("000000")
+                )
             .build();
         return this;
     }
 
     public CaseDataBuilder atStateClaimDraftMock() {
         CaseDataBuilder caseDataBuilder = atStateClaimDraft();
-        caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder().region("2").baseLocation("41112").build());
+        caseDataBuilder.caseManagementLocation(new CaseLocationCivil().setRegion("2").setBaseLocation("41112"));
         caseDataBuilder.applicant1DQ(new Applicant1DQ()
                                          .setApplicant1DQRequestedCourt(new RequestedCourt()
                                                                          .setResponseCourtCode("court4")
-                                                                         .setCaseLocation(CaseLocationCivil.builder()
-                                                                                           .baseLocation("dummy base").region(
-                                                                                 "dummy region")
-                                                                                           .build())
+                                                                         .setCaseLocation(new CaseLocationCivil()
+                                                                                              .setBaseLocation("dummy base")
+                                                                                              .setRegion("dummy region"))
                                                                          .setResponseCourtName("testCourt")
                                                                          .setResponseCourtCode("0000")
                                                                          .setReasonForHearingAtSpecificCourt("reason")
@@ -2512,10 +2504,9 @@ public class CaseDataBuilder {
         caseDataBuilder.respondent1DQ(new Respondent1DQ()
                                           .setRespondent1DQRequestedCourt(new RequestedCourt()
                                                                            .setResponseCourtCode("court4")
-                                                                           .setCaseLocation(CaseLocationCivil.builder()
-                                                                                             .baseLocation("dummy base").region(
-                                                                                   "dummy region")
-                                                                                             .build())
+                                                                           .setCaseLocation(new CaseLocationCivil()
+                                                                                                .setBaseLocation("dummy base")
+                                                                                                .setRegion("dummy region"))
                                                                            .setResponseCourtName("testCourt")
                                                                            .setResponseCourtCode("0000")
                                                                            .setReasonForHearingAtSpecificCourt("reason")
@@ -2532,10 +2523,10 @@ public class CaseDataBuilder {
             .applicantPreferredCourt("214320")
             .applicantPreferredCourtLocationList(
                 DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
-            .caseLocation(CaseLocationCivil.builder()
-                .region("10")
-                .baseLocation("214320")
-                .build())
+            .caseLocation(new CaseLocationCivil()
+                .setRegion("10")
+                .setBaseLocation("214320")
+                )
             .build();
         uploadParticularsOfClaim = NO;
         claimValue = ClaimValue.builder()
@@ -2585,10 +2576,10 @@ public class CaseDataBuilder {
             .applicantPreferredCourt("214320")
             .applicantPreferredCourtLocationList(
                 DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
-            .caseLocation(CaseLocationCivil.builder()
-                .region("10")
-                .baseLocation("214320")
-                .build())
+            .caseLocation(new CaseLocationCivil()
+                .setRegion("10")
+                .setBaseLocation("214320")
+                )
             .build();
         uploadParticularsOfClaim = NO;
         claimValue = ClaimValue.builder()
@@ -2949,20 +2940,16 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateClaimIssuedDisposalHearing() {
         caseManagementOrderSelection = DISPOSAL_HEARING;
 
-        disposalHearingJudgesRecitalDJ = DisposalHearingJudgesRecitalDJ
-            .builder()
-            .judgeNameTitle("test name")
-            .build();
+        disposalHearingJudgesRecitalDJ = new DisposalHearingJudgesRecitalDJ()
+            .setJudgeNameTitle("test name");
         return this;
     }
 
     public CaseDataBuilder atStateClaimIssuedTrialHearing() {
         caseManagementOrderSelection = "TRIAL_HEARING";
 
-        trialHearingJudgesRecitalDJ = TrialHearingJudgesRecital
-            .builder()
-            .judgeNameTitle("test name")
-            .build();
+        trialHearingJudgesRecitalDJ = new TrialHearingJudgesRecital()
+            .setJudgeNameTitle("test name");
         return this;
     }
 
@@ -3096,7 +3083,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateClaimIssuedCaseManagementLocationInPerson() {
-        caseManagementLocation = CaseLocationCivil.builder().baseLocation("0123").region("0321").build();
+        caseManagementLocation = new CaseLocationCivil().setBaseLocation("0123").setRegion("0321");
         return this;
     }
 
@@ -3127,15 +3114,14 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateClaimIssuedTrialHearingInfo() {
-        trialHearingTrialDJ = TrialHearingTrial
-            .builder()
-            .input1("The time provisionally allowed for the trial is")
-            .date1(LocalDate.now().plusWeeks(22))
-            .date2(LocalDate.now().plusWeeks(34))
-            .input2("If either party considers that the time estimates is"
+        trialHearingTrialDJ = new TrialHearingTrial()
+            .setInput1("The time provisionally allowed for the trial is")
+            .setDate1(LocalDate.now().plusWeeks(22))
+            .setDate2(LocalDate.now().plusWeeks(34))
+            .setInput2("If either party considers that the time estimates is"
                 + " insufficient, they must inform the court within "
                 + "7 days of the date of this order.")
-            .input3("Not more than seven nor less than three clear days before "
+            .setInput3("Not more than seven nor less than three clear days before "
                 + "the trial, the claimant must file at court and serve an"
                 + "indexed and paginated bundle of documents which complies"
                 + " with the requirements of Rule 39.5 Civil "
@@ -3145,25 +3131,22 @@ public class CaseDataBuilder {
                 + "bundle before it is filed. "
                 + "The bundle will include a case summary"
                 + " and a chronology.")
-            .type(List.of(DisposalHearingBundleType.DOCUMENTS))
-            .build();
+            .setType(List.of(DisposalHearingBundleType.DOCUMENTS));
         return this;
     }
 
     public CaseDataBuilder atStateClaimIssuedDisposalHearingInPerson() {
-        disposalHearingBundleDJ = DisposalHearingBundleDJ.builder()
-            .input("The claimant must lodge at court at least 7 "
+        disposalHearingBundleDJ = new DisposalHearingBundleDJ()
+            .setInput("The claimant must lodge at court at least 7 "
                 + "days before the disposal")
-            .type(List.of(DisposalHearingBundleType.DOCUMENTS))
-            .build();
-        disposalHearingFinalDisposalHearingDJ = DisposalHearingFinalDisposalHearingDJ
-            .builder()
-            .input("This claim be listed for final "
+            .setType(List.of(DisposalHearingBundleType.DOCUMENTS))
+            ;
+        disposalHearingFinalDisposalHearingDJ = new DisposalHearingFinalDisposalHearingDJ()
+            .setInput("This claim be listed for final "
                 + "disposal before a Judge on the first "
                 + "available date after.")
-            .date(LocalDate.now().plusWeeks(16))
-            .time(DisposalHearingFinalDisposalHearingTimeEstimate.THIRTY_MINUTES)
-            .build();
+            .setDate(LocalDate.now().plusWeeks(16))
+            .setTime(DisposalHearingFinalDisposalHearingTimeEstimate.THIRTY_MINUTES);
         return this;
     }
 
@@ -3357,8 +3340,8 @@ public class CaseDataBuilder {
         atStateClaimIssued1v1LiP();
         this.applicant1Represented = NO;
         this.claimantBilingualLanguagePreference = Language.BOTH.toString();
-        this.caseDataLiP = CaseDataLiP.builder()
-            .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(Language.BOTH.toString()).build()).build();
+        this.caseDataLiP = new CaseDataLiP()
+            .setRespondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage(Language.BOTH.toString()));
         setClaimTypeToSpecClaim();
         return this;
     }
@@ -3883,10 +3866,9 @@ public class CaseDataBuilder {
                 new RequestedCourt()
                     .setResponseCourtCode("121")
                     .setReasonForHearingAtSpecificCourt("test")
-                    .setCaseLocation(CaseLocationCivil.builder()
-                        .region("2")
-                        .baseLocation("000000")
-                        .build()))
+                    .setCaseLocation(new CaseLocationCivil()
+                                         .setRegion("2")
+                                         .setBaseLocation("000000")))
             .setRespondent1DQHearingSupport(new HearingSupport()
                 .setRequirements(List.of(SupportRequirements.values()))
                 .setLanguageToBeInterpreted("English")
@@ -4068,7 +4050,7 @@ public class CaseDataBuilder {
             .build();
         respondent1DQ();
         respondent1ResponseDate = respondent1AcknowledgeNotificationDate.plusDays(3);
-        caseManagementLocation = CaseLocationCivil.builder().baseLocation("11111").region("2").build();
+        caseManagementLocation = new CaseLocationCivil().setBaseLocation("11111").setRegion("2");
         return this;
     }
 
@@ -4740,7 +4722,7 @@ public class CaseDataBuilder {
         applicant1DQ();
         applicant1ResponseDate = respondent1ResponseDate.plusDays(2);
         uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
-        caseManagementLocation = CaseLocationCivil.builder().baseLocation("00000").region("4").build();
+        caseManagementLocation = new CaseLocationCivil().setBaseLocation("00000").setRegion("4");
         switch (mpScenario) {
             case ONE_V_TWO_ONE_LEGAL_REP: {
                 respondent2SameLegalRepresentative = YES;
@@ -4830,10 +4812,9 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateTrialReadyApplicant() {
         atStateTrialReadyCheck();
         trialReadyApplicant = YES;
-        applicantRevisedHearingRequirements = RevisedHearingRequirements.builder()
-            .revisedHearingRequirements(YES)
-            .revisedHearingComments("Changes requested.")
-            .build();
+        applicantRevisedHearingRequirements = new RevisedHearingRequirements()
+            .setRevisedHearingRequirements(YES)
+            .setRevisedHearingComments("Changes requested.");
 
         return this;
     }
@@ -4841,10 +4822,9 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateTrialNotReadyApplicant() {
         atStateTrialReadyCheck();
         trialReadyApplicant = NO;
-        applicantRevisedHearingRequirements = RevisedHearingRequirements.builder()
-            .revisedHearingRequirements(YES)
-            .revisedHearingComments("Changes requested.")
-            .build();
+        applicantRevisedHearingRequirements = new RevisedHearingRequirements()
+            .setRevisedHearingRequirements(YES)
+            .setRevisedHearingComments("Changes requested.");
 
         return this;
     }
@@ -4852,40 +4832,36 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateTrialReadyRespondent1() {
         atStateTrialReadyCheck();
         trialReadyRespondent1 = YES;
-        respondent1RevisedHearingRequirements = RevisedHearingRequirements.builder()
-            .revisedHearingRequirements(YES)
-            .revisedHearingComments("Changes requested.")
-            .build();
+        respondent1RevisedHearingRequirements = new RevisedHearingRequirements()
+            .setRevisedHearingRequirements(YES)
+            .setRevisedHearingComments("Changes requested.");
         return this;
     }
 
     public CaseDataBuilder atStateTrialNotReadyRespondent1() {
         atStateTrialReadyCheck();
         trialReadyRespondent1 = NO;
-        respondent1RevisedHearingRequirements = RevisedHearingRequirements.builder()
-            .revisedHearingRequirements(YES)
-            .revisedHearingComments("Changes requested.")
-            .build();
+        respondent1RevisedHearingRequirements = new RevisedHearingRequirements()
+            .setRevisedHearingRequirements(YES)
+            .setRevisedHearingComments("Changes requested.");
         return this;
     }
 
     public CaseDataBuilder atStateTrialReadyRespondent2() {
         atStateTrialReadyCheck();
         trialReadyRespondent2 = YES;
-        applicantRevisedHearingRequirements = RevisedHearingRequirements.builder()
-            .revisedHearingRequirements(YES)
-            .revisedHearingComments("Changes requested.")
-            .build();
+        applicantRevisedHearingRequirements = new RevisedHearingRequirements()
+            .setRevisedHearingRequirements(YES)
+            .setRevisedHearingComments("Changes requested.");
         return this;
     }
 
     public CaseDataBuilder atStateTrialNotReadyRespondent2() {
         atStateTrialReadyCheck();
         trialReadyRespondent2 = NO;
-        applicantRevisedHearingRequirements = RevisedHearingRequirements.builder()
-            .revisedHearingRequirements(YES)
-            .revisedHearingComments("Changes requested.")
-            .build();
+        applicantRevisedHearingRequirements = new RevisedHearingRequirements()
+            .setRevisedHearingRequirements(YES)
+            .setRevisedHearingComments("Changes requested.");
         return this;
     }
 
@@ -4894,7 +4870,7 @@ public class CaseDataBuilder {
         applicant1ProceedWithClaim = NO;
         applicant1ResponseDate = respondent1ResponseDate.plusDays(1);
         uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
-        caseManagementLocation = CaseLocationCivil.builder().baseLocation("00000").region("4").build();
+        caseManagementLocation = new CaseLocationCivil().setBaseLocation("00000").setRegion("4");
         return this;
     }
 
@@ -5498,11 +5474,10 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateMediationUnsuccessful(MultiPartyScenario mpScenario) {
         atStateApplicantProceedAllMediation(mpScenario);
         applicantsProceedIntention = YES;
-        caseDataLiP = CaseDataLiP.builder()
-            .applicant1ClaimMediationSpecRequiredLip(
-                ClaimantMediationLip.builder()
-                    .hasAgreedFreeMediation(MediationDecision.Yes)
-                    .build()).build();
+        caseDataLiP = new CaseDataLiP()
+            .setApplicant1ClaimMediationSpecRequiredLip(
+                new ClaimantMediationLip()
+                    .setHasAgreedFreeMediation(MediationDecision.Yes));
 
         mediation = Mediation.builder().unsuccessfulMediationReason("Unsuccessful").build();
 
@@ -5512,11 +5487,10 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateMediationUnsuccessfulCarm(MultiPartyScenario mpScenario) {
         atStateApplicantProceedAllMediation(mpScenario);
         applicantsProceedIntention = YES;
-        caseDataLiP = CaseDataLiP.builder()
-            .applicant1ClaimMediationSpecRequiredLip(
-                ClaimantMediationLip.builder()
-                    .hasAgreedFreeMediation(MediationDecision.Yes)
-                    .build()).build();
+        caseDataLiP = new CaseDataLiP()
+            .setApplicant1ClaimMediationSpecRequiredLip(
+                new ClaimantMediationLip()
+                    .setHasAgreedFreeMediation(MediationDecision.Yes));
 
         mediation = Mediation.builder().mediationUnsuccessfulReasonsMultiSelect(
             List.of(MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE)).build();
@@ -5525,19 +5499,18 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateLipClaimantDoesNotSettle() {
-        caseDataLiP = CaseDataLiP.builder()
-            .applicant1SettleClaim(NO).build();
+        caseDataLiP = new CaseDataLiP()
+            .setApplicant1SettleClaim(NO);
         return this;
     }
 
     public CaseDataBuilder atStateMediationSuccessful(MultiPartyScenario mpScenario) {
         atStateApplicantProceedAllMediation(mpScenario);
         applicantsProceedIntention = YES;
-        caseDataLiP = CaseDataLiP.builder()
-            .applicant1ClaimMediationSpecRequiredLip(
-                ClaimantMediationLip.builder()
-                    .hasAgreedFreeMediation(MediationDecision.Yes)
-                    .build()).build();
+        caseDataLiP = new CaseDataLiP()
+            .setApplicant1ClaimMediationSpecRequiredLip(
+                new ClaimantMediationLip()
+                    .setHasAgreedFreeMediation(MediationDecision.Yes));
 
         mediation = Mediation.builder()
             .mediationSuccessful(MediationSuccessful.builder()
@@ -5717,7 +5690,7 @@ public class CaseDataBuilder {
         this.respondent2SameLegalRepresentative = NO;
         this.respondentSolicitor2Reference = "01234";
         respondent2ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
-        caseManagementLocation = CaseLocationCivil.builder().baseLocation("00000").region("4").build();
+        caseManagementLocation = new CaseLocationCivil().setBaseLocation("00000").setRegion("4");
         return this;
     }
 
@@ -6359,7 +6332,7 @@ public class CaseDataBuilder {
             .joAmountCostOrdered("1100")
             .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IN_INSTALMENTS).build())
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
             .joIsRegisteredWithRTL(YES).build();
     }
 
@@ -6393,7 +6366,7 @@ public class CaseDataBuilder {
             .joAmountCostOrdered("1100")
             .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
             .respondent1(PartyBuilder.builder().soleTrader().build())
             .joIsRegisteredWithRTL(YES).build();
     }
@@ -6406,7 +6379,7 @@ public class CaseDataBuilder {
             .joAmountCostOrdered("1100")
             .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
             .respondent1(Party.builder()
                 .type(Party.Type.INDIVIDUAL)
                 .individualTitle("Mr.")
@@ -6440,7 +6413,7 @@ public class CaseDataBuilder {
                 .paymentDeadlineDate(LocalDate.of(2023, 12, 12)).build())
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
             .joIsRegisteredWithRTL(YES)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
             .build();
     }
 
@@ -6458,7 +6431,7 @@ public class CaseDataBuilder {
                 .paymentDeadlineDate(LocalDate.of(2023, 12, 12)).build())
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
             .joIsRegisteredWithRTL(YES)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
             .build();
     }
 
@@ -6488,9 +6461,9 @@ public class CaseDataBuilder {
                 .confirmFullPaymentMade(List.of("CONFIRMED"))
                 .build())
             .joIsRegisteredWithRTL(YES)
-            .caseManagementLocation(CaseLocationCivil.builder()
-                .baseLocation("231596")
-                .region("2").build())
+            .caseManagementLocation(new CaseLocationCivil()
+                .setBaseLocation("231596")
+                .setRegion("2"))
             .legacyCaseReference("000MC015")
             .activeJudgment(JudgmentDetails.builder().issueDate(LocalDate.now()).build())
             .build();
@@ -6534,7 +6507,7 @@ public class CaseDataBuilder {
             .totalClaimAmount(BigDecimal.valueOf(1010))
             .paymentConfirmationDecisionSpec(YesOrNo.YES)
             .partialPayment(YesOrNo.YES)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
             .defendantDetailsSpec(DynamicList.builder()
                 .value(DynamicListElement.builder()
                     .label("Test User")
@@ -6556,7 +6529,7 @@ public class CaseDataBuilder {
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
             .paymentConfirmationDecisionSpec(YesOrNo.YES)
             .partialPayment(YesOrNo.YES)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
             .defendantDetailsSpec(DynamicList.builder()
                 .value(DynamicListElement.builder()
                     .label("John Smith")
@@ -6574,7 +6547,7 @@ public class CaseDataBuilder {
             .totalClaimAmount(BigDecimal.valueOf(1010))
             .paymentConfirmationDecisionSpec(YesOrNo.YES)
             .partialPayment(YesOrNo.YES)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
             .defendantDetailsSpec(DynamicList.builder()
                 .value(DynamicListElement.builder()
                     .label("Test User")
@@ -7200,8 +7173,8 @@ public class CaseDataBuilder {
         this.caseAccessCategory = SPEC_CLAIM;
         this.respondent1Represented = NO;
         this.ccdCaseReference = CASE_ID;
-        this.caseDataLiP = CaseDataLiP.builder()
-            .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(Language.BOTH.toString()).build()).build();
+        this.caseDataLiP = new CaseDataLiP()
+            .setRespondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage(Language.BOTH.toString()));
         setClaimTypeToSpecClaim();
         return this;
     }
@@ -7321,10 +7294,9 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atTrialHearingWitnessOfFactWithNegativeInputs() {
         atStateClaimNotified();
-        this.trialHearingWitnessOfFactDJ = TrialHearingWitnessOfFact.builder()
-            .input2("-3")
-            .input3("-3")
-            .build();
+        this.trialHearingWitnessOfFactDJ = new TrialHearingWitnessOfFact()
+            .setInput2("-3")
+            .setInput3("-3");
 
         return this;
     }
@@ -7461,57 +7433,48 @@ public class CaseDataBuilder {
     public CaseDataBuilder addLiPApplicant1MediationInfo(boolean alternateInfo) {
         if (alternateInfo) {
             if (this.caseDataLiP != null) {
-                this.caseDataLiP = this.caseDataLiP.toBuilder()
-                    .applicant1LiPResponseCarm(MediationLiPCarm.builder()
-                        .isMediationContactNameCorrect(NO)
-                        .alternativeMediationContactPerson("Alt contact person")
-                        .isMediationEmailCorrect(NO)
-                        .alternativeMediationEmail("altemail@mediation.com")
-                        .isMediationPhoneCorrect(NO)
-                        .alternativeMediationTelephone("07222222222")
-                        .hasUnavailabilityNextThreeMonths(YES)
-                        .unavailableDatesForMediation(getMediationUnavailableDates())
-                        .build()).build();
+                this.caseDataLiP.setApplicant1LiPResponseCarm(new MediationLiPCarm()
+                    .setIsMediationContactNameCorrect(NO)
+                    .setAlternativeMediationContactPerson("Alt contact person")
+                    .setIsMediationEmailCorrect(NO)
+                    .setAlternativeMediationEmail("altemail@mediation.com")
+                    .setIsMediationPhoneCorrect(NO)
+                    .setAlternativeMediationTelephone("07222222222")
+                    .setHasUnavailabilityNextThreeMonths(YES)
+                    .setUnavailableDatesForMediation(getMediationUnavailableDates()));
             } else {
-                this.caseDataLiP = CaseDataLiP.builder()
-                    .applicant1LiPResponseCarm(MediationLiPCarm.builder()
-                        .isMediationContactNameCorrect(NO)
-                        .alternativeMediationContactPerson("Alt contact person")
-                        .isMediationEmailCorrect(NO)
-                        .alternativeMediationEmail("altemail@mediation.com")
-                        .isMediationPhoneCorrect(NO)
-                        .alternativeMediationTelephone("07222222222")
-                        .hasUnavailabilityNextThreeMonths(YES)
-                        .unavailableDatesForMediation(getMediationUnavailableDates())
-                        .build()).build();
+                this.caseDataLiP = new CaseDataLiP()
+                    .setApplicant1LiPResponseCarm(new MediationLiPCarm()
+                        .setIsMediationContactNameCorrect(NO)
+                        .setAlternativeMediationContactPerson("Alt contact person")
+                        .setIsMediationEmailCorrect(NO)
+                        .setAlternativeMediationEmail("altemail@mediation.com")
+                        .setIsMediationPhoneCorrect(NO)
+                        .setAlternativeMediationTelephone("07222222222")
+                        .setHasUnavailabilityNextThreeMonths(YES)
+                        .setUnavailableDatesForMediation(getMediationUnavailableDates()));
             }
         } else {
             if (this.caseDataLiP != null) {
-                this.caseDataLiP = this.caseDataLiP.toBuilder()
-                    .applicant1LiPResponseCarm(MediationLiPCarm.builder()
-                        .isMediationContactNameCorrect(YES)
-                        .isMediationEmailCorrect(YES)
-                        .isMediationPhoneCorrect(YES)
-                        .hasUnavailabilityNextThreeMonths(YES)
-                        .unavailableDatesForMediation(getMediationUnavailableDates())
-                        .build())
-                    .applicant1AdditionalLipPartyDetails(AdditionalLipPartyDetails.builder()
-                        .contactPerson("Lip contact person")
-                        .build())
-                    .build();
+                this.caseDataLiP
+                    .setApplicant1LiPResponseCarm(new MediationLiPCarm()
+                        .setIsMediationContactNameCorrect(YES)
+                        .setIsMediationEmailCorrect(YES)
+                        .setIsMediationPhoneCorrect(YES)
+                        .setHasUnavailabilityNextThreeMonths(YES)
+                        .setUnavailableDatesForMediation(getMediationUnavailableDates()))
+                    .setApplicant1AdditionalLipPartyDetails(new AdditionalLipPartyDetails()
+                        .setContactPerson("Lip contact person"));
             } else {
-                this.caseDataLiP = CaseDataLiP.builder()
-                    .applicant1LiPResponseCarm(MediationLiPCarm.builder()
-                        .isMediationContactNameCorrect(YES)
-                        .isMediationEmailCorrect(YES)
-                        .isMediationPhoneCorrect(YES)
-                        .hasUnavailabilityNextThreeMonths(YES)
-                        .unavailableDatesForMediation(getMediationUnavailableDates())
-                        .build())
-                    .applicant1AdditionalLipPartyDetails(AdditionalLipPartyDetails.builder()
-                        .contactPerson("Lip contact person")
-                        .build())
-                    .build();
+                this.caseDataLiP = new CaseDataLiP()
+                    .setApplicant1LiPResponseCarm(new MediationLiPCarm()
+                        .setIsMediationContactNameCorrect(YES)
+                        .setIsMediationEmailCorrect(YES)
+                        .setIsMediationPhoneCorrect(YES)
+                        .setHasUnavailabilityNextThreeMonths(YES)
+                        .setUnavailableDatesForMediation(getMediationUnavailableDates()))
+                    .setApplicant1AdditionalLipPartyDetails(new AdditionalLipPartyDetails()
+                        .setContactPerson("Lip contact person"));
             }
         }
         return this;
@@ -7520,57 +7483,48 @@ public class CaseDataBuilder {
     public CaseDataBuilder addLiPRespondent1MediationInfo(boolean alternateInfo) {
         if (alternateInfo) {
             if (this.caseDataLiP != null) {
-                this.caseDataLiP = this.caseDataLiP.toBuilder()
-                    .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
-                        .isMediationContactNameCorrect(NO)
-                        .alternativeMediationContactPerson("Alt contact person")
-                        .isMediationEmailCorrect(NO)
-                        .alternativeMediationEmail("altemail@mediation.com")
-                        .isMediationPhoneCorrect(NO)
-                        .alternativeMediationTelephone("07222222222")
-                        .hasUnavailabilityNextThreeMonths(YES)
-                        .unavailableDatesForMediation(getMediationUnavailableDates())
-                        .build()).build();
+                this.caseDataLiP.setRespondent1MediationLiPResponseCarm(new MediationLiPCarm()
+                    .setIsMediationContactNameCorrect(NO)
+                    .setAlternativeMediationContactPerson("Alt contact person")
+                    .setIsMediationEmailCorrect(NO)
+                    .setAlternativeMediationEmail("altemail@mediation.com")
+                    .setIsMediationPhoneCorrect(NO)
+                    .setAlternativeMediationTelephone("07222222222")
+                    .setHasUnavailabilityNextThreeMonths(YES)
+                    .setUnavailableDatesForMediation(getMediationUnavailableDates()));
             } else {
-                this.caseDataLiP = CaseDataLiP.builder()
-                    .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
-                        .isMediationContactNameCorrect(NO)
-                        .alternativeMediationContactPerson("Alt contact person")
-                        .isMediationEmailCorrect(NO)
-                        .alternativeMediationEmail("altemail@mediation.com")
-                        .isMediationPhoneCorrect(NO)
-                        .alternativeMediationTelephone("07222222222")
-                        .hasUnavailabilityNextThreeMonths(YES)
-                        .unavailableDatesForMediation(getMediationUnavailableDates())
-                        .build()).build();
+                this.caseDataLiP = new CaseDataLiP()
+                    .setRespondent1MediationLiPResponseCarm(new MediationLiPCarm()
+                        .setIsMediationContactNameCorrect(NO)
+                        .setAlternativeMediationContactPerson("Alt contact person")
+                        .setIsMediationEmailCorrect(NO)
+                        .setAlternativeMediationEmail("altemail@mediation.com")
+                        .setIsMediationPhoneCorrect(NO)
+                        .setAlternativeMediationTelephone("07222222222")
+                        .setHasUnavailabilityNextThreeMonths(YES)
+                        .setUnavailableDatesForMediation(getMediationUnavailableDates()));
             }
         } else {
             if (this.caseDataLiP != null) {
-                this.caseDataLiP = this.caseDataLiP.toBuilder()
-                    .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
-                        .isMediationContactNameCorrect(YES)
-                        .isMediationEmailCorrect(YES)
-                        .isMediationPhoneCorrect(YES)
-                        .hasUnavailabilityNextThreeMonths(YES)
-                        .unavailableDatesForMediation(getMediationUnavailableDates())
-                        .build())
-                    .respondent1LiPResponse(RespondentLiPResponse.builder()
-                        .respondent1LiPContactPerson("Lip contact person")
-                        .build())
-                    .build();
+                this.caseDataLiP
+                    .setRespondent1MediationLiPResponseCarm(new MediationLiPCarm()
+                        .setIsMediationContactNameCorrect(YES)
+                        .setIsMediationEmailCorrect(YES)
+                        .setIsMediationPhoneCorrect(YES)
+                        .setHasUnavailabilityNextThreeMonths(YES)
+                        .setUnavailableDatesForMediation(getMediationUnavailableDates()))
+                    .setRespondent1LiPResponse(new RespondentLiPResponse()
+                        .setRespondent1LiPContactPerson("Lip contact person"));
             } else {
-                this.caseDataLiP = CaseDataLiP.builder()
-                    .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
-                        .isMediationContactNameCorrect(YES)
-                        .isMediationEmailCorrect(YES)
-                        .isMediationPhoneCorrect(YES)
-                        .hasUnavailabilityNextThreeMonths(YES)
-                        .unavailableDatesForMediation(getMediationUnavailableDates())
-                        .build())
-                    .respondent1LiPResponse(RespondentLiPResponse.builder()
-                        .respondent1LiPContactPerson("Lip contact person")
-                        .build())
-                    .build();
+                this.caseDataLiP = new CaseDataLiP()
+                    .setRespondent1MediationLiPResponseCarm(new MediationLiPCarm()
+                        .setIsMediationContactNameCorrect(YES)
+                        .setIsMediationEmailCorrect(YES)
+                        .setIsMediationPhoneCorrect(YES)
+                        .setHasUnavailabilityNextThreeMonths(YES)
+                        .setUnavailableDatesForMediation(getMediationUnavailableDates()))
+                    .setRespondent1LiPResponse(new RespondentLiPResponse()
+                        .setRespondent1LiPContactPerson("Lip contact person"));
             }
         }
         return this;
