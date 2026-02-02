@@ -31,7 +31,7 @@ public class CoScNotificationForCaseNotMarkPaidInFullClaimantScenarioTest extend
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
-            .certOfSC(CertOfSC.builder().defendantFinalPaymentDate(coscFullPaymentDate).build())
+            .certOfSC(new CertOfSC().setDefendantFinalPaymentDate(coscFullPaymentDate))
             .build();
 
         handler.handle(callbackParams(caseData));
