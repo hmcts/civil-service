@@ -93,19 +93,17 @@ public class SettleClaimMarkedPaidInFullDefendantLiPLetterGenerator {
     }
 
     public SettleClaimMarkedPaidInFullDefendantLiPLetter getTemplateData(CaseData caseData) {
-        return SettleClaimMarkedPaidInFullDefendantLiPLetter
-            .builder()
-            .claimReferenceNumber(caseData.getLegacyCaseReference())
-            .letterIssueDate(LocalDate.now())
-            .letterIssueDateWelsh(formatDateInWelsh(LocalDate.now(), false))
-            .defendantLipName(caseData.getRespondent1().getPartyName())
-            .addressLine1(caseData.getRespondent1().getPrimaryAddress().getAddressLine1())
-            .addressLine2(caseData.getRespondent1().getPrimaryAddress().getAddressLine2())
-            .addressLine3(caseData.getRespondent1().getPrimaryAddress().getAddressLine3())
-            .postCode(caseData.getRespondent1().getPrimaryAddress().getPostCode())
-            .dateOfEvent(LocalDate.now())
-            .dateOfEventWelsh(formatDateInWelsh(LocalDate.now(), false))
-            .build();
+        return new SettleClaimMarkedPaidInFullDefendantLiPLetter()
+            .setClaimReferenceNumber(caseData.getLegacyCaseReference())
+            .setLetterIssueDate(LocalDate.now())
+            .setLetterIssueDateWelsh(formatDateInWelsh(LocalDate.now(), false))
+            .setDefendantLipName(caseData.getRespondent1().getPartyName())
+            .setAddressLine1(caseData.getRespondent1().getPrimaryAddress().getAddressLine1())
+            .setAddressLine2(caseData.getRespondent1().getPrimaryAddress().getAddressLine2())
+            .setAddressLine3(caseData.getRespondent1().getPrimaryAddress().getAddressLine3())
+            .setPostCode(caseData.getRespondent1().getPrimaryAddress().getPostCode())
+            .setDateOfEvent(LocalDate.now())
+            .setDateOfEventWelsh(formatDateInWelsh(LocalDate.now(), false));
     }
 
     private List<DocumentMetaData> appendCoverToDocument(List<String> bulkPrintFileNames,

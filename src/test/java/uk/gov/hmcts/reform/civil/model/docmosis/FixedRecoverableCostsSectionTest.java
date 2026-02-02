@@ -20,15 +20,14 @@ class FixedRecoverableCostsSectionTest {
                 .reasons("Reasons")
                 .build();
 
-        var actual = FixedRecoverableCostsSection.from(fixedRecoverableCosts);
+        final var actual = FixedRecoverableCostsSection.from(fixedRecoverableCosts);
 
-        FixedRecoverableCostsSection expected = FixedRecoverableCostsSection.builder()
-            .isSubjectToFixedRecoverableCostRegime(YES)
-            .complexityBandingAgreed(YES)
-            .band(BAND_1)
-            .bandText(BAND_1.getLabel())
-            .reasons("Reasons")
-            .build();
+        FixedRecoverableCostsSection expected = new FixedRecoverableCostsSection();
+        expected.setIsSubjectToFixedRecoverableCostRegime(YES);
+        expected.setComplexityBandingAgreed(YES);
+        expected.setBand(BAND_1);
+        expected.setBandText(BAND_1.getLabel());
+        expected.setReasons("Reasons");
 
         assertEquals(expected, actual);
     }

@@ -1,15 +1,15 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.trialready;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 
-@Getter
-@Builder
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
+@Accessors(chain = true)
 public class TrialReadyForm implements MappableObject {
 
     private String caseNumber;
@@ -29,4 +29,19 @@ public class TrialReadyForm implements MappableObject {
     private boolean isClaimant2;
     private boolean isDefendant2;
     private boolean isDefendant2RefDiff;
+
+    public TrialReadyForm setIsClaimant2(boolean isClaimant2) {
+        this.isClaimant2 = isClaimant2;
+        return this;
+    }
+
+    public TrialReadyForm setIsDefendant2(boolean isDefendant2) {
+        this.isDefendant2 = isDefendant2;
+        return this;
+    }
+
+    public TrialReadyForm setIsDefendant2RefDiff(boolean isDefendant2RefDiff) {
+        this.isDefendant2RefDiff = isDefendant2RefDiff;
+        return this;
+    }
 }
