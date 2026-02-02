@@ -54,7 +54,11 @@ import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
         @Filter(type = FilterType.REGEX,
             pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.raisequery.*"),
         @Filter(type = FilterType.REGEX,
+            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.settleclaimmarkedpaidinfull.*"),
+        @Filter(type = FilterType.REGEX,
             pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.hearingfeeunpaid.*"),
+        @Filter(type = FilterType.REGEX,
+            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.hearingscheduled.*"),
         @Filter(type = FilterType.REGEX,
             pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.respondtoquery.*"),
         @Filter(type = FilterType.REGEX,
@@ -85,6 +89,7 @@ import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
             pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.staylifted.*"),
         @Filter(type = FilterType.REGEX,
             pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.helper.*")
+
     }
 )
 public class DashboardMapperTestConfiguration {
