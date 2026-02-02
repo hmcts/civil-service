@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
-import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -49,7 +48,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEF_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_REFUSED_MEDIATION_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_NOTICE_AAA6_DEF_LR_RESPONSE_FULL_DEFENCE_COUNTERCLAIM_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(MockitoExtension.class)
 class DefendantResponseClaimantDashboardServiceTest {
@@ -87,7 +85,7 @@ class DefendantResponseClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordEnglishScenarioWhenEligible() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(1234L)
             .applicant1Represented(YesOrNo.NO)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
@@ -110,14 +108,10 @@ class DefendantResponseClaimantDashboardServiceTest {
     void shouldDeleteDjNotificationWhenWelshEnabledAndDeadlinePassed() {
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(5678L)
             .applicant1Represented(YesOrNo.NO)
-            .caseDataLiP(CaseDataLiP.builder()
-                .respondent1LiPResponse(RespondentLiPResponse.builder()
-                    .respondent1ResponseLanguage(Language.WELSH.toString())
-                    .build())
-                .build())
+            .caseDataLip(caseDataLiPWithResponseLanguage(Language.WELSH))
             .claimantBilingualLanguagePreference(Language.WELSH.toString())
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
             .build();
@@ -141,7 +135,7 @@ class DefendantResponseClaimantDashboardServiceTest {
     void shouldRecordBilingualScenarioWhenClaimIssueBilingualAndToggleEnabled() {
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(4321L)
             .applicant1Represented(YesOrNo.NO)
             .claimantBilingualLanguagePreference(Language.WELSH.toString())
@@ -160,13 +154,10 @@ class DefendantResponseClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordBilingualScenarioWhenWelshDisabled() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(4322L)
             .applicant1Represented(YesOrNo.NO)
-            .caseDataLiP(CaseDataLiP.builder()
-                .respondent1LiPResponse(RespondentLiPResponse.builder()
-                    .respondent1ResponseLanguage(Language.WELSH.toString()).build())
-                .build())
+            .caseDataLip(caseDataLiPWithResponseLanguage(Language.WELSH))
             .build();
 
         service.notifyDefendantResponse(caseData, AUTH_TOKEN);
@@ -181,13 +172,10 @@ class DefendantResponseClaimantDashboardServiceTest {
 
     @Test
     void shouldNotRecordBilingualScenarioWhenClaimantNotLip() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(4323L)
             .applicant1Represented(YesOrNo.YES)
-            .caseDataLiP(CaseDataLiP.builder()
-                .respondent1LiPResponse(RespondentLiPResponse.builder()
-                    .respondent1ResponseLanguage(Language.BOTH.toString()).build())
-                .build())
+            .caseDataLip(caseDataLiPWithResponseLanguage(Language.BOTH))
             .build();
 
         service.notifyDefendantResponse(caseData, AUTH_TOKEN);
@@ -197,11 +185,11 @@ class DefendantResponseClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordGeneralApplicationScenariosForCounterClaimLipCase() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(9012L)
             .applicant1Represented(YesOrNo.NO)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
-            .generalApplications(List.of(element(GeneralApplication.builder().build())))
+            .getGeneralApplicationWithStrikeOut("respondent1")
             .build();
 
         service.notifyDefendantResponse(caseData, AUTH_TOKEN);
@@ -281,12 +269,9 @@ class DefendantResponseClaimantDashboardServiceTest {
 
     @Test
     void shouldRequireLipForBilingualScenario() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .applicant1Represented(YesOrNo.NO)
-            .caseDataLiP(CaseDataLiP.builder()
-                .respondent1LiPResponse(RespondentLiPResponse.builder()
-                    .respondent1ResponseLanguage(Language.BOTH.toString()).build())
-                .build())
+            .caseDataLip(caseDataLiPWithResponseLanguage(Language.BOTH))
             .build();
         boolean result = ReflectionTestUtils.invokeMethod(service, "shouldRecordScenario", caseData);
         assertThat(result).isTrue();
@@ -300,7 +285,7 @@ class DefendantResponseClaimantDashboardServiceTest {
 
     @Test
     void shouldNotCleanupDjNotificationWhenNotBilingual() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .applicant1Represented(YesOrNo.NO)
             .claimantBilingualLanguagePreference(Language.ENGLISH.toString())
             .build();
@@ -375,5 +360,11 @@ class DefendantResponseClaimantDashboardServiceTest {
             eq("3006"),
             any(ScenarioRequestParams.class)
         );
+    }
+
+    private CaseDataLiP caseDataLiPWithResponseLanguage(Language language) {
+        RespondentLiPResponse response = new RespondentLiPResponse();
+        response.setRespondent1ResponseLanguage(language.toString());
+        return new CaseDataLiP().setRespondent1LiPResponse(response);
     }
 }
