@@ -472,7 +472,7 @@ class CcdClaimStatusDashboardFactoryTest {
             .respondent1ResponseDate(LocalDateTime.now())
             .systemGeneratedCaseDocuments(List.of(document))
             .ccdState(CaseState.CASE_PROGRESSION)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(selectedCourt.getCode()))
             .build();
         DashboardClaimStatus status =
             ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
@@ -525,8 +525,8 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void givenClaimStatusInPendingCaseIssuedAndHWFNoRemission_WhenGetStatus_thenReturnHwfNoRemission() {
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-            .hwfCaseEvent(NO_REMISSION_HWF).build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+            .setHwfCaseEvent(NO_REMISSION_HWF);
         CaseData caseData = CaseData.builder()
             .ccdState(CaseState.PENDING_CASE_ISSUED)
             .claimIssuedHwfDetails(hwfeeDetails)
@@ -548,8 +548,8 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void givenClaimStatusInHearingReadinessAndHWFNoRemission_WhenGetStatus_thenReturnHwfNoRemission() {
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-            .hwfCaseEvent(NO_REMISSION_HWF).build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+            .setHwfCaseEvent(NO_REMISSION_HWF);
         CaseData caseData = CaseData.builder()
             .ccdState(CaseState.HEARING_READINESS)
             .hearingHwfDetails(hwfeeDetails)
@@ -570,8 +570,8 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void givenClaimStatusInPendingCaseIssuedAndHWFPartialRemission_WhenGetStatus_thenReturnHwfPartialRemission() {
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-            .hwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED).build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+            .setHwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED);
         CaseData caseData = CaseData.builder()
             .ccdState(CaseState.PENDING_CASE_ISSUED)
             .claimIssuedHwfDetails(hwfeeDetails)
@@ -592,8 +592,8 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void givenClaimStatusInHearingReadinessAndHWFNoRemission_WhenGetStatus_thenReturnHwfPartialRemission() {
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-            .hwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED).build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+            .setHwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED);
         CaseData caseData = CaseData.builder()
             .ccdState(CaseState.HEARING_READINESS)
             .hearingHwfDetails(hwfeeDetails)
@@ -614,8 +614,8 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void givenClaimStatusInPendingCaseIssuedAndHWFUpdateRefNumber_WhenGetStatus_thenReturnHwfUpdateRefNumber() {
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-            .hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER).build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+            .setHwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER);
         CaseData caseData = CaseData.builder()
             .ccdState(CaseState.PENDING_CASE_ISSUED)
             .claimIssuedHwfDetails(hwfeeDetails)
@@ -636,8 +636,8 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void givenClaimStatusInHearingReadinessAndHWFUpdateRefNumber_WhenGetStatus_thenReturnHwfUpdateRefNumber() {
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-            .hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER).build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+            .setHwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER);
         CaseData caseData = CaseData.builder()
             .ccdState(CaseState.HEARING_READINESS)
             .hearingHwfDetails(hwfeeDetails)
@@ -658,8 +658,8 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void givenClaimStatusInPendingCaseIssuedAndHWFInvalidRefNumber_WhenGetStatus_thenReturnHwfInvalidRefNumber() {
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-            .hwfCaseEvent(INVALID_HWF_REFERENCE).build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+            .setHwfCaseEvent(INVALID_HWF_REFERENCE);
         CaseData caseData = CaseData.builder()
             .ccdState(CaseState.PENDING_CASE_ISSUED)
             .claimIssuedHwfDetails(hwfeeDetails)
@@ -680,8 +680,8 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void givenClaimStatusInHearingReadinessAndHWFInvalidRefNumber_WhenGetStatus_thenReturnHwfInvalidRefNumber() {
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-            .hwfCaseEvent(INVALID_HWF_REFERENCE).build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+            .setHwfCaseEvent(INVALID_HWF_REFERENCE);
         CaseData caseData = CaseData.builder()
             .ccdState(CaseState.HEARING_READINESS)
             .hearingHwfDetails(hwfeeDetails)
@@ -702,8 +702,8 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void givenClaimStatusInHearingReadinessAndHWFFeePaymentOutcome_WhenGetStatus_thenReturnHearingFeePaidStatus() {
-        HelpWithFeesDetails hwfDetails = HelpWithFeesDetails.builder()
-            .hwfCaseEvent(CaseEvent.FULL_REMISSION_HWF).build();
+        HelpWithFeesDetails hwfDetails = new HelpWithFeesDetails()
+            .setHwfCaseEvent(CaseEvent.FULL_REMISSION_HWF);
         CaseData caseData = CaseData.builder()
             .ccdState(CaseState.HEARING_READINESS)
             .hearingHwfDetails(hwfDetails)
@@ -712,7 +712,7 @@ class CcdClaimStatusDashboardFactoryTest {
             .hwfFeeType(
                 FeeType.HEARING)
             .hearingHelpFeesReferenceNumber("123")
-            .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder().hwfFullRemissionGrantedForHearingFee(YesOrNo.YES).build())
+            .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails().setHwfFullRemissionGrantedForHearingFee(YesOrNo.YES))
             .build();
 
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
@@ -747,12 +747,10 @@ class CcdClaimStatusDashboardFactoryTest {
             .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .claimantResponseOnCourtDecision(
-                                                            ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE)
-                                                        .build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                                        .setClaimantResponseOnCourtDecision(
+                                                            ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE)))
             .respondent1(Party.builder()
                              .type(Party.Type.INDIVIDUAL)
                              .build()).build();

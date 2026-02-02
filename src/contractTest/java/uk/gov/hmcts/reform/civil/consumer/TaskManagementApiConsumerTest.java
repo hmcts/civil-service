@@ -28,8 +28,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
 @PactTestFor(providerName = "task_management")
-@MockServerConfig(hostInterface = "localhost", port = "6667")
-@TestPropertySource(properties = "task-management.api.url=http://localhost:6667")
+@MockServerConfig(hostInterface = "localhost", port = "6672")
+@TestPropertySource(properties = "task-management.api.url=http://localhost:6672")
 public class TaskManagementApiConsumerTest extends BaseContractTest {
 
     public static final String TASK_ID = "task-id";

@@ -75,12 +75,12 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
         void shouldUpdateTheDataBaseWithHWFRefNumber_WhenFeeType_ClaimIssue() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
-                .caseDataLip(CaseDataLiP.builder()
-                                 .helpWithFees(HelpWithFees.builder()
-                                                   .helpWithFee(YesOrNo.NO).build()).build())
-                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder().hwfNumberAvailable(YesOrNo.YES)
-                                              .hwfNumberForFeePaymentOutcome("HWF-1C4-E34")
-                                              .hwfFullRemissionGrantedForClaimIssue(YesOrNo.YES).build())
+                .caseDataLip(new CaseDataLiP()
+                                 .setHelpWithFees(new HelpWithFees()
+                                                   .setHelpWithFee(YesOrNo.NO)))
+                .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails().setHwfNumberAvailable(YesOrNo.YES)
+                                              .setHwfNumberForFeePaymentOutcome("HWF-1C4-E34")
+                                              .setHwfFullRemissionGrantedForClaimIssue(YesOrNo.YES))
                 .hwfFeeType(FeeType.CLAIMISSUED)
                 .build();
             when(hwfService.updateHwfReferenceNumber(any(CaseData.class)))
