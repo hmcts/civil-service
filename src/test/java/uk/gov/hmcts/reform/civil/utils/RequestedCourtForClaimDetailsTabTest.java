@@ -46,7 +46,7 @@ class RequestedCourtForClaimDetailsTabTest {
     void setUp() {
         requestedCourt = RequestedCourt.builder()
             .responseCourtCode("121")
-            .caseLocation(CaseLocationCivil.builder().baseLocation("00002").build())
+            .caseLocation(new CaseLocationCivil().setBaseLocation("00002"))
             .reasonForHearingAtSpecificCourt("Close to home")
             .build();
         locations = List.of(

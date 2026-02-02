@@ -15,10 +15,9 @@ public class RespondentLiPResponseTest {
     @Test
     void when_RespondentResponseLanguage_Is_Welsh_and_English() {
         CaseData caseData = CaseDataBuilder.builder()
-            .caseDataLip(CaseDataLiP.builder()
-                             .respondent1LiPResponse(RespondentLiPResponse.builder()
-                             .respondent1ResponseLanguage(Language.BOTH.toString()).build())
-                             .build())
+            .caseDataLip(new CaseDataLiP()
+                             .setRespondent1LiPResponse(new RespondentLiPResponse()
+                             .setRespondent1ResponseLanguage(Language.BOTH.toString())))
             .build();
 
         boolean isBilingualResponse = caseData.isRespondentResponseBilingual();
@@ -28,10 +27,9 @@ public class RespondentLiPResponseTest {
     @Test
     void when_RespondentResponseLanguage_Is_English() {
         CaseData caseData = CaseDataBuilder.builder()
-            .caseDataLip(CaseDataLiP.builder()
-                             .respondent1LiPResponse(RespondentLiPResponse.builder()
-                             .respondent1ResponseLanguage(Language.ENGLISH.toString()).build())
-                             .build())
+            .caseDataLip(new CaseDataLiP()
+                             .setRespondent1LiPResponse(new RespondentLiPResponse()
+                             .setRespondent1ResponseLanguage(Language.ENGLISH.toString())))
             .build();
 
         boolean isBilingualResponse = caseData.isRespondentResponseBilingual();

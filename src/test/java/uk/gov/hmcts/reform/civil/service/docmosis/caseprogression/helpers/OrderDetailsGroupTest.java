@@ -30,13 +30,13 @@ public class OrderDetailsGroupTest {
     @Test
     void shouldPopulateOrderDetails_WhenAllFieldsArePresent() {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .orderOnCourtInitiative(FreeFormOrderValues.builder().onInitiativeSelectionTextArea("On initiative text").onInitiativeSelectionDate(
-                LocalDate.now()).build())
+            .orderOnCourtInitiative(new FreeFormOrderValues().setOnInitiativeSelectionTextArea("On initiative text")
+                                     .setOnInitiativeSelectionDate(LocalDate.now()))
             .freeFormRecordedTextArea("Recorded text")
             .freeFormOrderedTextArea("Ordered text")
             .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder().ownInitiativeText("On initiative text").build())
-            .orderWithoutNotice(FreeFormOrderValues.builder().withoutNoticeSelectionTextArea("Without notice text")
-                                    .withoutNoticeSelectionDate(LocalDate.now()).build())
+            .orderWithoutNotice(new FreeFormOrderValues().setWithoutNoticeSelectionTextArea("Without notice text")
+                                .setWithoutNoticeSelectionDate(LocalDate.now()))
             .build();
         String freeFormRecordedText = "Recorded text";
         String freeFormOrderedText = "Ordered text";
