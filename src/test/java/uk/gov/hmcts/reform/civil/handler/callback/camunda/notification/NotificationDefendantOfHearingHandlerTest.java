@@ -411,11 +411,9 @@ public class NotificationDefendantOfHearingHandlerTest {
 
             // Given
             CaseData caseData = CaseDataBuilder.builder()
-                .caseDataLip(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                             .respondent1ResponseLanguage(Language.BOTH.toString())
-                                                             .build())
-                                 .build())
+                .caseDataLip(new CaseDataLiP()
+                                 .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                             .setRespondent1ResponseLanguage(Language.BOTH.toString())))
                 .atStateClaimDetailsNotified().build().toBuilder()
                 .hearingDate(LocalDate.of(2023, 05, 17))
                 .hearingTimeHourMinute("1100")
