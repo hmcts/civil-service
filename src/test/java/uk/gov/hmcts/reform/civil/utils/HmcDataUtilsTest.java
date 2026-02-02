@@ -87,7 +87,7 @@ class HmcDataUtilsTest {
     void getHearingResponseForRequestVersion_WhenEmptyList_ReturnsNull() {
         PartiesNotifiedResponses partiesNotified = PartiesNotifiedResponses.builder().responses(List.of()).build();
 
-        PartiesNotifiedResponse result = HmcDataUtils.getHearingResponseForRequestVersion(partiesNotified, 1);
+        PartiesNotifiedResponse result = HmcDataUtils.getLatestHearingResponseForRequestVersion(partiesNotified, 1);
 
         assertNull(result);
     }
@@ -107,7 +107,7 @@ class HmcDataUtilsTest {
             .responses(List.of(res3, res1, res2))
             .build();
 
-        PartiesNotifiedResponse result = HmcDataUtils.getHearingResponseForRequestVersion(partiesNotified, 3);
+        PartiesNotifiedResponse result = HmcDataUtils.getLatestHearingResponseForRequestVersion(partiesNotified, 3);
 
         assertEquals(result, res2);
     }

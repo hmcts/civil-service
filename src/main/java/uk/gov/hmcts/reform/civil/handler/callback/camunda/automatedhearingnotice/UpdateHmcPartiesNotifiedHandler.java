@@ -126,7 +126,7 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
                 getSystemUpdateUser().getUserToken(), hearingId);
 
             PartiesNotifiedResponse response =
-                HmcDataUtils.getHearingResponseForRequestVersion(partiesNotified, requestVersion);
+                HmcDataUtils.getLatestHearingResponseForRequestVersion(partiesNotified, requestVersion);
 
             return response != null && response.getResponseReceivedDateTime() != null;
 
