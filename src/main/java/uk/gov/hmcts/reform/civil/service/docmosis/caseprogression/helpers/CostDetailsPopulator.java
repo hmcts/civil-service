@@ -4,7 +4,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
-import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm.JudgeFinalOrderFormBuilder;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.time.LocalDate;
@@ -16,19 +15,19 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @Component
 public class CostDetailsPopulator {
 
-    public JudgeFinalOrderForm.JudgeFinalOrderFormBuilder populateCostsDetails(JudgeFinalOrderFormBuilder builder, CaseData caseData) {
-        return builder.costSelection(caseData.getAssistedOrderCostList().name())
-            .costsReservedText(nonNull(caseData.getAssistedOrderCostsReserved())
+    public JudgeFinalOrderForm populateCostsDetails(JudgeFinalOrderForm form, CaseData caseData) {
+        return form.setCostSelection(caseData.getAssistedOrderCostList().name())
+            .setCostsReservedText(nonNull(caseData.getAssistedOrderCostsReserved())
                                    ? caseData.getAssistedOrderCostsReserved().getDetailsRepresentationText() : null)
-            .bespokeCostText(nonNull(caseData.getAssistedOrderCostsBespoke())
+            .setBespokeCostText(nonNull(caseData.getAssistedOrderCostsBespoke())
                                  ? caseData.getAssistedOrderCostsBespoke().getBesPokeCostDetailsText() : null)
-            .summarilyAssessed(getSummarilyAssessed(caseData))
-            .summarilyAssessedDate(getSummarilyAssessedDate(caseData))
-            .detailedAssessment(getDetailedAssessment(caseData))
-            .interimPayment(getInterimPayment(caseData))
-            .interimPaymentDate(getInterimPaymentDate(caseData))
-            .qcosProtection(getQcosProtection(caseData))
-            .costsProtection(caseData.getPublicFundingCostsProtection().equals(YES) ? "true" : null);
+            .setSummarilyAssessed(getSummarilyAssessed(caseData))
+            .setSummarilyAssessedDate(getSummarilyAssessedDate(caseData))
+            .setDetailedAssessment(getDetailedAssessment(caseData))
+            .setInterimPayment(getInterimPayment(caseData))
+            .setInterimPaymentDate(getInterimPaymentDate(caseData))
+            .setQcosProtection(getQcosProtection(caseData))
+            .setCostsProtection(caseData.getPublicFundingCostsProtection().equals(YES) ? "true" : null);
     }
 
     private String getSummarilyAssessed(CaseData caseData) {

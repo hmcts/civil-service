@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoCoverLetter;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
@@ -60,24 +59,25 @@ class SdoCoverLetterAppendServiceTest {
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
 
     private static final Party partyDetails = new Party()
-        .setPrimaryAddress(buildAddress())
+        .setPrimaryAddress(Address.builder()
+                .addressLine1("456 Avenue")
+                .postTown("London")
+                .postCode("EX12RT")
+                .build())
         .setName("Mr.John White");
 
-    private static final SdoCoverLetter PARTY_LETTER_TEMPLATE_DATA = SdoCoverLetter.builder()
-        .party(partyDetails)
-        .claimReferenceNumber("MC0001")
-        .build();
+    private static final SdoCoverLetter PARTY_LETTER_TEMPLATE_DATA = new SdoCoverLetter()
+        .setParty(partyDetails)
+        .setClaimReferenceNumber("MC0001");
 
-    private static final CaseDocument caseDocument = new CaseDocument()
-        .setDocumentType(SDO_ORDER)
-        .setDocumentSize(5L)
-        .setDocumentName("DocumentName.pdf")
-        .setCreatedBy("CIVIL")
-        .setCreatedDatetime(LocalDateTime.of(2024,  1, 2,  3,  4))
-        .setDocumentLink(new Document()
-                             .setDocumentFileName("DocumentName.pdf")
-                             .setDocumentBinaryUrl("Binary/url")
-                             .setDocumentUrl("url"));
+    private static final CaseDocument caseDocument = CaseDocument.builder()
+        .documentType(SDO_ORDER)
+        .documentSize(5L)
+        .documentName("DocumentName.pdf")
+        .createdBy("CIVIL")
+        .createdDatetime(LocalDateTime.of(2024,  1, 2,  3,  4))
+        .documentLink(Document.builder().documentFileName("DocumentName.pdf").documentBinaryUrl("Binary/url").documentUrl("url").build())
+        .build();
     private static final byte[] STITCHED_DOC_BYTES = new byte[]{1, 2, 3, 4};
 
     private List<DocumentMetaData> specClaimTimelineDocuments;
@@ -85,7 +85,7 @@ class SdoCoverLetterAppendServiceTest {
     @BeforeEach
     void setup() {
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
-                .willReturn(DocmosisDocument.builder().bytes(new byte[]{1, 2, 3, 4, 5, 6}).build());
+                .willReturn(new DocmosisDocument().setBytes(new byte[]{1, 2, 3, 4, 5, 6}));
         given(documentManagementService.uploadDocument(any(), any(PDF.class))).willReturn(caseDocument);
         byte[] bytes = new ByteArrayResource(STITCHED_DOC_BYTES).getByteArray();
         given(documentDownloadService.downloadDocument(
@@ -103,10 +103,7 @@ class SdoCoverLetterAppendServiceTest {
     @Test
     void shouldGenerateMailableLetterSuccessfully() {
         // Given
-        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .ccdCaseReference(1L)
-            .legacyCaseReference("MC0001")
-            .build();
+        CaseData caseData = CaseData.builder().ccdCaseReference(1L).legacyCaseReference("MC0001").build();
 
         // When
         byte[] mailableLetter = coverLetterAppendService.makeSdoDocumentMailable(caseData, BEARER_TOKEN, partyDetails, SDO_ORDER,
@@ -121,23 +118,17 @@ class SdoCoverLetterAppendServiceTest {
     }
 
     private CaseDocument buildStitchedDocument() {
-        return new CaseDocument()
-            .setCreatedBy("John")
-            .setDocumentName("Stitched document")
-            .setDocumentSize(0L)
-            .setDocumentType(SDO_ORDER)
-            .setCreatedDatetime(LocalDateTime.now())
-            .setDocumentLink(new Document()
-                                 .setDocumentUrl("fake-url")
-                                 .setDocumentFileName("file-name")
-                                 .setDocumentBinaryUrl("binary-url"));
-    }
-
-    private static Address buildAddress() {
-        Address address = new Address();
-        address.setAddressLine1("456 Avenue");
-        address.setPostTown("London");
-        address.setPostCode("EX12RT");
-        return address;
+        return CaseDocument.builder()
+            .createdBy("John")
+            .documentName("Stitched document")
+            .documentSize(0L)
+            .documentType(SDO_ORDER)
+            .createdDatetime(LocalDateTime.now())
+            .documentLink(Document.builder()
+                              .documentUrl("fake-url")
+                              .documentFileName("file-name")
+                              .documentBinaryUrl("binary-url")
+                              .build())
+            .build();
     }
 }

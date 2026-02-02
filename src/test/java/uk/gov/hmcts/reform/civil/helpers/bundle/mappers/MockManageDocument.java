@@ -21,16 +21,15 @@ public class MockManageDocument {
                                                                             DocumentCategory docCategory) {
         return new Element<>(
             UUID.randomUUID(),
-            ManageDocument.builder()
-                .documentType(manageDocumentType)
-                .documentName("test_file")
-                .documentLink(Document.builder().documentFileName("test_file.pdf")
+            new ManageDocument()
+                .setDocumentType(manageDocumentType)
+                .setDocumentName("test_file")
+                .setDocumentLink(Document.builder().documentFileName("test_file.pdf")
                                   .documentUrl("http://localhost:9090/documents")
                                   .documentBinaryUrl("http://localhost:9090/documents/binary")
                                   .categoryID(docCategory.getCategoryId())
                                   .uploadTimestamp("2025-12-10T12:39:50.823836740")
                                   .build())
-                .build()
         );
     }
 
@@ -38,16 +37,15 @@ public class MockManageDocument {
                                                                             DocCategory docCategory) {
         return new Element<>(
             UUID.randomUUID(),
-            ManageDocument.builder()
-                .documentType(manageDocumentType)
-                .documentName("test_file")
-                .documentLink(Document.builder().documentFileName("test_file.pdf")
+            new ManageDocument()
+                .setDocumentType(manageDocumentType)
+                .setDocumentName("test_file")
+                .setDocumentLink(Document.builder().documentFileName("test_file.pdf")
                                   .documentUrl("http://localhost:9090/documents")
                                   .documentBinaryUrl("http://localhost:9090/documents/binary")
                                   .categoryID(docCategory.getValue())
                                   .uploadTimestamp("2025-12-10T12:39:50.823836740")
                                   .build())
-                .build()
         );
     }
 }

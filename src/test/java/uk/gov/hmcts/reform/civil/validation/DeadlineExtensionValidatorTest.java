@@ -165,43 +165,43 @@ class DeadlineExtensionValidatorTest {
     @Nested
     class CalculateDate {
         @Test
-        public void maxDateWhenAcknowledge() {
-            LocalDateTime now = LocalDateTime.now();
-            LocalDateTime ack = now.minusDays(5L);
+        void maxDateWhenAcknowledge() {
+            LocalDate now = LocalDate.now();
+            LocalDateTime ack = now.minusDays(5L).atTime(16, 0);
             when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
             Assertions.assertEquals(
-                now.plusDays(56).toLocalDate(),
+                now.plusDays(56),
                 validator.getMaxDate(now, ack)
             );
         }
 
         @Test
-        public void maxDateWhenAcknowledge1Holiday() {
-            LocalDateTime now = LocalDateTime.now();
-            LocalDateTime ack = now.minusDays(5L);
+        void maxDateWhenAcknowledge1Holiday() {
+            LocalDate now = LocalDate.now();
+            LocalDateTime ack = now.minusDays(5L).atTime(16, 0);
             when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(false, true);
             Assertions.assertEquals(
-                now.plusDays(57).toLocalDate(),
+                now.plusDays(57),
                 validator.getMaxDate(now, ack)
             );
         }
 
         @Test
-        public void maxDateWhenNoAcknowledge() {
-            LocalDateTime now = LocalDateTime.now();
+        void maxDateWhenNoAcknowledge() {
+            LocalDate now = LocalDate.now();
             when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
             Assertions.assertEquals(
-                now.plusDays(42).toLocalDate(),
+                now.plusDays(42),
                 validator.getMaxDate(now, null)
             );
         }
 
         @Test
-        public void maxDateWhenNoAcknowledge1Holiday() {
-            LocalDateTime now = LocalDateTime.now();
+        void maxDateWhenNoAcknowledge1Holiday() {
+            LocalDate now = LocalDate.now();
             when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(false, true);
             Assertions.assertEquals(
-                now.plusDays(43).toLocalDate(),
+                now.plusDays(43),
                 validator.getMaxDate(now, null)
             );
         }

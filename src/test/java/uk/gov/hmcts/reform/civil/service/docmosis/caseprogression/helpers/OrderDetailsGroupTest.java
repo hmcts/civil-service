@@ -30,29 +30,29 @@ public class OrderDetailsGroupTest {
     @Test
     void shouldPopulateOrderDetails_WhenAllFieldsArePresent() {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .orderOnCourtInitiative(FreeFormOrderValues.builder().onInitiativeSelectionTextArea("On initiative text").onInitiativeSelectionDate(
-                LocalDate.now()).build())
+            .orderOnCourtInitiative(new FreeFormOrderValues().setOnInitiativeSelectionTextArea("On initiative text")
+                                     .setOnInitiativeSelectionDate(LocalDate.now()))
             .freeFormRecordedTextArea("Recorded text")
             .freeFormOrderedTextArea("Ordered text")
             .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder().ownInitiativeText("On initiative text").build())
-            .orderWithoutNotice(FreeFormOrderValues.builder().withoutNoticeSelectionTextArea("Without notice text")
-                                    .withoutNoticeSelectionDate(LocalDate.now()).build())
+            .orderWithoutNotice(new FreeFormOrderValues().setWithoutNoticeSelectionTextArea("Without notice text")
+                                .setWithoutNoticeSelectionDate(LocalDate.now()))
             .build();
         String freeFormRecordedText = "Recorded text";
         String freeFormOrderedText = "Ordered text";
 
-        JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder()
-            .freeFormOrderedText("Ordered Text")
-            .freeFormRecordedText("Recorded text");
+        JudgeFinalOrderForm form = new JudgeFinalOrderForm()
+            .setFreeFormOrderedText("Ordered Text")
+            .setFreeFormRecordedText("Recorded text");
 
-        builder = orderDetailsPopulator.populateOrderDetails(builder, caseData);
+        form = orderDetailsPopulator.populateOrderDetails(form, caseData);
 
         String onInitiativeText = "On initiative text";
         LocalDate onInitiativeDate = LocalDate.now();
         String withoutNoticeText = "Without notice text";
         LocalDate withoutNoticeDate = LocalDate.now();
 
-        JudgeFinalOrderForm result = builder.build();
+        JudgeFinalOrderForm result = form;
         Assertions.assertEquals(freeFormRecordedText, result.getFreeFormRecordedText());
         Assertions.assertEquals(freeFormOrderedText, result.getFreeFormOrderedText());
         Assertions.assertEquals(onInitiativeText, result.getOnInitiativeSelectionText());

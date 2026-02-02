@@ -2,9 +2,9 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.ClaimantResponseOnCourtDecisionType;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
@@ -12,9 +12,9 @@ import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import java.time.LocalDate;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 public class ClaimantLiPResponse {
 
     private DQExtraDetailsLip applicant1DQExtraDetails;

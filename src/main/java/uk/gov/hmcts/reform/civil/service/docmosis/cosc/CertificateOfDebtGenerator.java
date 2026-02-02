@@ -63,31 +63,31 @@ public class CertificateOfDebtGenerator implements TemplateDataGenerator<Certifi
     }
 
     private CertificateOfDebtForm getCertificateOfDebtTemplateData(CaseData caseData, String authorisation) {
-        var certificateOfDebtForm = CertificateOfDebtForm.builder()
-            .claimNumber(caseData.getLegacyCaseReference())
-            .defendantFullName(caseData.getRespondent1().getPartyName())
-            .defendantAddress(AddressUtils.formatAddress(caseData.getRespondent1().getPrimaryAddress()))
-            .judgmentOrderDate(Objects.isNull(caseData.getActiveJudgment().getIssueDate()) ? null : DateFormatHelper.formatLocalDate(
+        var certificateOfDebtForm = new CertificateOfDebtForm()
+            .setClaimNumber(caseData.getLegacyCaseReference())
+            .setDefendantFullName(caseData.getRespondent1().getPartyName())
+            .setDefendantAddress(AddressUtils.formatAddress(caseData.getRespondent1().getPrimaryAddress()))
+            .setJudgmentOrderDate(Objects.isNull(caseData.getActiveJudgment().getIssueDate()) ? null : DateFormatHelper.formatLocalDate(
                 caseData.getActiveJudgment().getIssueDate(),
                 DateFormatHelper.DATE
             ))
-            .judgmentTotalAmount(getJudgmentAmount(caseData))
-            .defendantFullNameFromJudgment(caseData.getActiveJudgment().getDefendant1Name())
-            .defendantAddressFromJudgment(JudgmentsOnlineHelper
+            .setJudgmentTotalAmount(getJudgmentAmount(caseData))
+            .setDefendantFullNameFromJudgment(caseData.getActiveJudgment().getDefendant1Name())
+            .setDefendantAddressFromJudgment(JudgmentsOnlineHelper
                                               .formatAddress(caseData.getActiveJudgment().getDefendant1Address()))
-            .applicationIssuedDate(DateFormatHelper.formatLocalDate(LocalDate.now(), DateFormatHelper.DATE))
-            .dateFinalPaymentMade(Objects.isNull(caseData.getActiveJudgment().getFullyPaymentMadeDate()) ? null : DateFormatHelper.formatLocalDate(
+            .setApplicationIssuedDate(DateFormatHelper.formatLocalDate(LocalDate.now(), DateFormatHelper.DATE))
+            .setDateFinalPaymentMade(Objects.isNull(caseData.getActiveJudgment().getFullyPaymentMadeDate()) ? null : DateFormatHelper.formatLocalDate(
                 caseData.getActiveJudgment().getFullyPaymentMadeDate(),
                 DateFormatHelper.DATE
             ))
-            .judgmentStatusText(getJudgmentText(caseData.getActiveJudgment(), false))
-            .courtLocationName(getCourtName(caseData, authorisation))
-            .judgmentStatusWelshText(getJudgmentText(caseData.getActiveJudgment(), true))
-            .judgmentOrderDateWelsh(getDateInWelsh(caseData.getActiveJudgment().getIssueDate()))
-            .dateFinalPaymentMadeWelsh(getDateInWelsh(caseData.getActiveJudgment().getFullyPaymentMadeDate()))
-            .applicationIssuedDateWelsh(getDateInWelsh(LocalDate.now()));
+            .setJudgmentStatusText(getJudgmentText(caseData.getActiveJudgment(), false))
+            .setCourtLocationName(getCourtName(caseData, authorisation))
+            .setJudgmentStatusWelshText(getJudgmentText(caseData.getActiveJudgment(), true))
+            .setJudgmentOrderDateWelsh(getDateInWelsh(caseData.getActiveJudgment().getIssueDate()))
+            .setDateFinalPaymentMadeWelsh(getDateInWelsh(caseData.getActiveJudgment().getFullyPaymentMadeDate()))
+            .setApplicationIssuedDateWelsh(getDateInWelsh(LocalDate.now()));
 
-        return certificateOfDebtForm.build();
+        return certificateOfDebtForm;
     }
 
     private String getJudgmentText(JudgmentDetails activeJudgment, boolean isBilingual) {

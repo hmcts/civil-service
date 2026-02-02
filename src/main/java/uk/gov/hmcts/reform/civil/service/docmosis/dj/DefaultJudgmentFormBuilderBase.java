@@ -29,17 +29,15 @@ public abstract class DefaultJudgmentFormBuilderBase {
             .map(OrganisationPolicy::getOrganisation)
             .map(Organisation::getOrganisationID)
             .map(organisationService::findOrganisationById)
-            .flatMap(value -> value.map(o -> Party.builder()
-                .name(o.getName())
-                .primaryAddress(AddressUtils.getAddress(o.getContactInformation().get(0)))
-                .build())).orElse(null);
+            .flatMap(value -> value.map(o -> new Party()
+                .setName(o.getName())
+                .setPrimaryAddress(AddressUtils.getAddress(o.getContactInformation().get(0))))).orElse(null);
     }
 
     protected Party getPartyDetails(uk.gov.hmcts.reform.civil.model.Party party) {
-        return Party.builder()
-            .name(party.getPartyName())
-            .primaryAddress(party.getPrimaryAddress())
-            .build();
+        return new Party()
+            .setName(party.getPartyName())
+            .setPrimaryAddress(party.getPrimaryAddress());
     }
 
     protected BigDecimal getClaimFee(CaseData caseData) {

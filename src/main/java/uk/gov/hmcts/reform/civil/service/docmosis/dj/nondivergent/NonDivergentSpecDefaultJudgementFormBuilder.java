@@ -38,42 +38,42 @@ public class NonDivergentSpecDefaultJudgementFormBuilder extends DefaultJudgment
         BigDecimal debtAmount = getDebtAmount(caseData);
         BigDecimal cost = getClaimFee(caseData);
 
-        DefaultJudgmentForm.DefaultJudgmentFormBuilder builder = DefaultJudgmentForm.builder();
-        builder
-            .caseNumber(caseData.getLegacyCaseReference())
-            .formText("No response,")
-            .applicant(getApplicant(caseData.getApplicant1(), caseData.getApplicant2()))
-            .respondent(getRespondentLROrLipDetails(caseData, partyType))
-            .debt(debtAmount.toString())
-            .costs(cost.toString())
-            .totalCost(debtAmount.add(cost).setScale(2).toString())
-            .applicantReference(getApplicantSolicitorRef(caseData))
-            .respondentReference(getRespondent1SolicitorRef(caseData))
-            .respondent1Name(caseData.getRespondent1().getPartyName())
-            .respondent2Name(Objects.isNull(caseData.getRespondent2()) ? null : caseData.getRespondent2().getPartyName())
-            .respondent1Ref(getRespondent1SolicitorRef(caseData))
-            .respondent2Ref(getRespondent2SolicitorRef(caseData))
-            .claimantLR(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
-            .applicantDetails(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
-            .paymentPlan(caseData.getPaymentTypeSelection().name())
-            .payByDate(Objects.isNull(caseData.getPaymentSetDate()) ? null :
+        DefaultJudgmentForm defaultJudgmentForm = new DefaultJudgmentForm();
+        defaultJudgmentForm
+            .setCaseNumber(caseData.getLegacyCaseReference())
+            .setFormText("No response,")
+            .setApplicant(getApplicant(caseData.getApplicant1(), caseData.getApplicant2()))
+            .setRespondent(getRespondentLROrLipDetails(caseData, partyType))
+            .setDebt(debtAmount.toString())
+            .setCosts(cost.toString())
+            .setTotalCost(debtAmount.add(cost).setScale(2).toString())
+            .setApplicantReference(getApplicantSolicitorRef(caseData))
+            .setRespondentReference(getRespondent1SolicitorRef(caseData))
+            .setRespondent1Name(caseData.getRespondent1().getPartyName())
+            .setRespondent2Name(Objects.isNull(caseData.getRespondent2()) ? null : caseData.getRespondent2().getPartyName())
+            .setRespondent1Ref(getRespondent1SolicitorRef(caseData))
+            .setRespondent2Ref(getRespondent2SolicitorRef(caseData))
+            .setClaimantLR(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
+            .setApplicantDetails(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
+            .setPaymentPlan(caseData.getPaymentTypeSelection().name())
+            .setPayByDate(Objects.isNull(caseData.getPaymentSetDate()) ? null :
                            DateFormatHelper.formatLocalDate(caseData.getPaymentSetDate(), DateFormatHelper.DATE))
-            .repaymentFrequency(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentFrequency(
+            .setRepaymentFrequency(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentFrequency(
                 caseData.getRepaymentFrequency(), false))
-            .paymentStr(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentString(
+            .setPaymentStr(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentString(
                 caseData.getRepaymentFrequency(), false))
-            .welshRepaymentFrequency(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentFrequency(
+            .setWelshRepaymentFrequency(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentFrequency(
                 caseData.getRepaymentFrequency(), true))
-            .welshPaymentStr(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentString(
+            .setWelshPaymentStr(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentString(
                 caseData.getRepaymentFrequency(), true))
-            .currentDateInWelsh(getDateInWelsh(LocalDate.now()))
-            .welshPayByDate(Objects.isNull(caseData.getPaymentSetDate()) ?  null : getDateInWelsh(caseData.getPaymentSetDate()))
-            .welshRepaymentDate(Objects.isNull(caseData.getRepaymentDate()) ? null :
+            .setCurrentDateInWelsh(getDateInWelsh(LocalDate.now()))
+            .setWelshPayByDate(Objects.isNull(caseData.getPaymentSetDate()) ?  null : getDateInWelsh(caseData.getPaymentSetDate()))
+            .setWelshRepaymentDate(Objects.isNull(caseData.getRepaymentDate()) ? null :
                                     getDateInWelsh(caseData.getRepaymentDate()))
-            .installmentAmount(Objects.isNull(caseData.getRepaymentSuggestion()) ? null : getInstallmentAmount(caseData.getRepaymentSuggestion()))
-            .repaymentDate(Objects.isNull(caseData.getRepaymentDate()) ? null :
+            .setInstallmentAmount(Objects.isNull(caseData.getRepaymentSuggestion()) ? null : getInstallmentAmount(caseData.getRepaymentSuggestion()))
+            .setRepaymentDate(Objects.isNull(caseData.getRepaymentDate()) ? null :
                 DateFormatHelper.formatLocalDate(caseData.getRepaymentDate(), DateFormatHelper.DATE));
-        return builder.build();
+        return defaultJudgmentForm;
     }
 
     private Party getRespondentLROrLipDetails(CaseData caseData, String partyType) {
