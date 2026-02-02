@@ -1,10 +1,9 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.sdo;
 
-import lombok.Getter;
-import lombok.Builder;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.UpholdingPreviousOrderReason;
@@ -13,11 +12,10 @@ import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
 
 import java.time.LocalDate;
 
-@Getter
-@Builder
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
-@ToString
+@Accessors(chain = true)
 public class DesicionOnReconsiderationDocumentForm implements MappableObject {
 
     private String caseNumber;

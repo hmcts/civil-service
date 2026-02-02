@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
-import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm.JudgeFinalOrderFormBuilder;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -15,28 +14,28 @@ import static java.util.Objects.nonNull;
 @Component
 public class OrderDetailsPopulator {
 
-    public JudgeFinalOrderForm.JudgeFinalOrderFormBuilder populateOrderDetails(JudgeFinalOrderFormBuilder builder, CaseData caseData) {
-        return builder.freeFormRecordedText(caseData.getFreeFormRecordedTextArea())
-            .freeFormOrderedText(caseData.getFreeFormOrderedTextArea())
-            .orderOnCourtsList(caseData.getOrderOnCourtsList())
-            .onInitiativeSelectionText(nonNull(caseData.getOrderOnCourtInitiative())
+    public JudgeFinalOrderForm populateOrderDetails(JudgeFinalOrderForm form, CaseData caseData) {
+        return form.setFreeFormRecordedText(caseData.getFreeFormRecordedTextArea())
+            .setFreeFormOrderedText(caseData.getFreeFormOrderedTextArea())
+            .setOrderOnCourtsList(caseData.getOrderOnCourtsList())
+            .setOnInitiativeSelectionText(nonNull(caseData.getOrderOnCourtInitiative())
                                            ? caseData.getOrderOnCourtInitiative().getOnInitiativeSelectionTextArea() : null)
-            .onInitiativeSelectionDate(nonNull(caseData.getOrderOnCourtInitiative())
+            .setOnInitiativeSelectionDate(nonNull(caseData.getOrderOnCourtInitiative())
                                            ? caseData.getOrderOnCourtInitiative().getOnInitiativeSelectionDate() : null)
-            .withoutNoticeSelectionText(nonNull(caseData.getOrderWithoutNotice())
+            .setWithoutNoticeSelectionText(nonNull(caseData.getOrderWithoutNotice())
                                             ? caseData.getOrderWithoutNotice().getWithoutNoticeSelectionTextArea() : null)
-            .withoutNoticeSelectionDate(nonNull(caseData.getOrderWithoutNotice())
+            .setWithoutNoticeSelectionDate(nonNull(caseData.getOrderWithoutNotice())
                                             ? caseData.getOrderWithoutNotice().getWithoutNoticeSelectionDate() : null);
     }
 
-    public JudgeFinalOrderFormBuilder populateAssistedOrderDetails(JudgeFinalOrderFormBuilder builder, CaseData caseData) {
-        return builder.finalOrderMadeSelection(caseData.getFinalOrderMadeSelection())
-            .orderMadeDate(orderMadeDateBuilder(caseData))
-            .recordedToggle(nonNull(caseData.getFinalOrderRecitals()))
-            .recordedText(nonNull(caseData.getFinalOrderRecitalsRecorded())
+    public JudgeFinalOrderForm populateAssistedOrderDetails(JudgeFinalOrderForm form, CaseData caseData) {
+        return form.setFinalOrderMadeSelection(caseData.getFinalOrderMadeSelection())
+            .setOrderMadeDate(orderMadeDateBuilder(caseData))
+            .setRecordedToggle(nonNull(caseData.getFinalOrderRecitals()))
+            .setRecordedText(nonNull(caseData.getFinalOrderRecitalsRecorded())
                               ? caseData.getFinalOrderRecitalsRecorded().getText() : "")
-            .orderedText(caseData.getFinalOrderOrderedThatText())
-            .finalOrderJudgeHeardFrom(nonNull(caseData.getFinalOrderJudgeHeardFrom()));
+            .setOrderedText(caseData.getFinalOrderOrderedThatText())
+            .setFinalOrderJudgeHeardFrom(nonNull(caseData.getFinalOrderJudgeHeardFrom()));
     }
 
     public String orderMadeDateBuilder(CaseData caseData) {
