@@ -35,18 +35,24 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AA6_DEFENDANT_RESPONSE_PAY_BY_INSTALLMENTS_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_ADMIT_AND_PAID_PARTIAL_ALREADY_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALLMENTS_ORG_COM_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_ADMIT_PAY_IMMEDIATELY_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_PART_ADMIT_PAY_IMMEDIATELY_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_BILINGUAL_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_BILINGUAL_WELSH_ENABLED_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULLDISPUTE_MULTI_INT_FAST_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_ALREADY_PAID_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_CLAIMANT_CARM;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_MEDIATION_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEF_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_REFUSED_MEDIATION_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_ENGLISH_DEFENDANT_RESPONSE_BILINGUAL_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_ADMIT_PAY_INSTALLMENTS_ORG_COM_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULLDISPUTE_MULTI_INT_FAST_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_ALREADY_PAID_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEF_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_REFUSED_MEDIATION_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_NOTICE_AAA6_DEF_LR_RESPONSE_FULL_DEFENCE_COUNTERCLAIM_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
@@ -243,6 +249,23 @@ class DefendantResponseClaimantDashboardServiceTest {
     }
 
     @Test
+    void shouldUseIndividualInstallmentScenarioForPartAdmission() {
+        CaseData caseData = mockBaseCaseData(3007L);
+        when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.PART_ADMISSION);
+        when(caseData.isPayByInstallment()).thenReturn(true);
+        when(caseData.getRespondent1()).thenReturn(Party.builder().type(Party.Type.INDIVIDUAL).build());
+
+        service.notifyDefendantResponse(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AA6_DEFENDANT_RESPONSE_PAY_BY_INSTALLMENTS_CLAIMANT.getScenario()),
+            eq("3007"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
     void shouldUseSetDateScenarioForIndividualFullAdmission() {
         CaseData caseData = mockBaseCaseData(3002L);
         when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_ADMISSION);
@@ -255,6 +278,58 @@ class DefendantResponseClaimantDashboardServiceTest {
             eq(AUTH_TOKEN),
             eq(SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT.getScenario()),
             eq("3002"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
+    void shouldUseSetDateScenarioForOrganisationPartAdmission() {
+        CaseData caseData = mockBaseCaseData(3008L);
+        when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.PART_ADMISSION);
+        when(caseData.isPayBySetDate()).thenReturn(true);
+        when(caseData.getRespondent1()).thenReturn(Party.builder().type(Party.Type.COMPANY).build());
+
+        service.notifyDefendantResponse(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT.getScenario()),
+            eq("3008"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
+    void shouldUsePayImmediatelyScenarioForPartAdmission() {
+        CaseData caseData = mockBaseCaseData(3009L);
+        when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.PART_ADMISSION);
+        when(caseData.isPayImmediately()).thenReturn(true);
+
+        service.notifyDefendantResponse(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_DEFENDANT_PART_ADMIT_PAY_IMMEDIATELY_CLAIMANT.getScenario()),
+            eq("3009"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
+    void shouldUsePartialAlreadyPaidScenarioWhenPartPaymentAcknowledged() {
+        CaseData caseData = mockBaseCaseData(3011L);
+        when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.PART_ADMISSION);
+        when(caseData.isPayByInstallment()).thenReturn(false);
+        when(caseData.isPayBySetDate()).thenReturn(false);
+        when(caseData.isPayImmediately()).thenReturn(false);
+        when(caseData.isPaidFullAmount()).thenReturn(false);
+
+        service.notifyDefendantResponse(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_DEFENDANT_ADMIT_AND_PAID_PARTIAL_ALREADY_CLAIMANT.getScenario()),
+            eq("3011"),
             any(ScenarioRequestParams.class)
         );
     }
@@ -341,6 +416,43 @@ class DefendantResponseClaimantDashboardServiceTest {
             eq(AUTH_TOKEN),
             eq(SCENARIO_AAA6_DEF_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_REFUSED_MEDIATION_CLAIMANT.getScenario()),
             eq("3005"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
+    void shouldUseMediationScenarioWhenSmallClaimAndMediationAccepted() {
+        CaseData caseData = mockBaseCaseData(3012L);
+        when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
+        when(caseData.isClaimBeingDisputed()).thenReturn(true);
+        when(caseData.isSmallClaim()).thenReturn(true);
+        when(caseData.hasDefendantAgreedToFreeMediation()).thenReturn(true);
+        when(featureToggleService.isCarmEnabledForCase(caseData)).thenReturn(false);
+
+        service.notifyDefendantResponse(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_MEDIATION_CLAIMANT.getScenario()),
+            eq("3012"),
+            any(ScenarioRequestParams.class)
+        );
+    }
+
+    @Test
+    void shouldUseCarmScenarioWhenEnabledAndSmallClaim() {
+        CaseData caseData = mockBaseCaseData(3013L);
+        when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
+        when(caseData.isClaimBeingDisputed()).thenReturn(true);
+        when(caseData.isSmallClaim()).thenReturn(true);
+        when(featureToggleService.isCarmEnabledForCase(caseData)).thenReturn(true);
+
+        service.notifyDefendantResponse(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_CLAIMANT_CARM.getScenario()),
+            eq("3013"),
             any(ScenarioRequestParams.class)
         );
     }
