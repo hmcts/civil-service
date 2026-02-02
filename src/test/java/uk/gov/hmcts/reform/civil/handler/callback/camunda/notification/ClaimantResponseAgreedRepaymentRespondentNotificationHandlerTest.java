@@ -136,7 +136,7 @@ class ClaimantResponseAgreedRepaymentRespondentNotificationHandlerTest extends B
                 .respondent1OrgRegistered(null)
                 .specRespondent1Represented(YesOrNo.NO)
                 .respondent1Represented(YesOrNo.NO)
-                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
+                .caseDataLip(new CaseDataLiP().setRespondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage("BOTH")))
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
