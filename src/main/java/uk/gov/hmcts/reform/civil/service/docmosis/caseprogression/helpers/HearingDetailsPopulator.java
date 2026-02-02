@@ -4,7 +4,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
-import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm.JudgeFinalOrderFormBuilder;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
@@ -22,19 +21,19 @@ public class HearingDetailsPopulator {
         this.locationRefDataService = locationRefDataService;
     }
 
-    public JudgeFinalOrderForm.JudgeFinalOrderFormBuilder populateHearingDetails(JudgeFinalOrderFormBuilder builder, CaseData caseData,
-                                                                                 LocationRefData caseManagementLocationDetails) {
-        return builder.furtherHearingToggle(nonNull(caseData.getFinalOrderFurtherHearingToggle()))
-            .furtherHearingToToggle(nonNull(getFurtherHearingDate(caseData, false)))
-            .furtherHearingFromDate(getFurtherHearingDate(caseData, true))
-            .furtherHearingToDate(getFurtherHearingDate(caseData, false))
-            .furtherHearingLength(getFurtherHearingLength(caseData))
-            .datesToAvoid(getDatesToAvoid(caseData))
-            .showFurtherHearingLocationAlt(isDefaultCourt(caseData))
-            .furtherHearingLocationDefault(LocationReferenceDataService.getDisplayEntry(caseManagementLocationDetails))
-            .furtherHearingLocationAlt(getFurtherHearingLocationAlt(caseData))
-            .furtherHearingMethod(getFurtherHearingMethod(caseData))
-            .hearingNotes(getHearingNotes(caseData));
+    public JudgeFinalOrderForm populateHearingDetails(JudgeFinalOrderForm form, CaseData caseData,
+                                                      LocationRefData caseManagementLocationDetails) {
+        return form.setFurtherHearingToggle(nonNull(caseData.getFinalOrderFurtherHearingToggle()))
+            .setFurtherHearingToToggle(nonNull(getFurtherHearingDate(caseData, false)))
+            .setFurtherHearingFromDate(getFurtherHearingDate(caseData, true))
+            .setFurtherHearingToDate(getFurtherHearingDate(caseData, false))
+            .setFurtherHearingLength(getFurtherHearingLength(caseData))
+            .setDatesToAvoid(getDatesToAvoid(caseData))
+            .setShowFurtherHearingLocationAlt(isDefaultCourt(caseData))
+            .setFurtherHearingLocationDefault(LocationReferenceDataService.getDisplayEntry(caseManagementLocationDetails))
+            .setFurtherHearingLocationAlt(getFurtherHearingLocationAlt(caseData))
+            .setFurtherHearingMethod(getFurtherHearingMethod(caseData))
+            .setHearingNotes(getHearingNotes(caseData));
     }
 
     public LocalDate getFurtherHearingDate(CaseData caseData, boolean isFromDate) {

@@ -527,14 +527,9 @@ class ClaimFormMapperTest {
                              .type(Party.Type.ORGANISATION)
                              .build())
             .totalClaimAmount(TOTAL_CLAIM_AMOUNT)
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1AdditionalLipPartyDetails(AdditionalLipPartyDetails
-                                                                      .builder()
-                                                                      .build())
-                             .respondent1AdditionalLipPartyDetails(AdditionalLipPartyDetails
-                                                                       .builder()
-                                                                       .build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1AdditionalLipPartyDetails(new AdditionalLipPartyDetails())
+                             .setRespondent1AdditionalLipPartyDetails(new AdditionalLipPartyDetails()))
             .issueDate(LocalDate.now())
             .build();
     }

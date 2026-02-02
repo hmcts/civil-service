@@ -2,8 +2,10 @@ package uk.gov.hmcts.reform.civil.model.docmosis.common;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 
 import java.time.LocalDate;
@@ -12,8 +14,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-@Getter
-@Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
 public class EventTemplateData {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
@@ -25,9 +29,8 @@ public class EventTemplateData {
         return Optional.ofNullable(timelineOfEvents).map(Collection::stream)
             .orElseGet(Stream::empty)
             .map(event ->
-                     EventTemplateData.builder()
-                         .date(event.getValue().getTimelineDate())
-                         .explanation(event.getValue().getTimelineDescription())
-                         .build()).toList();
+                     new EventTemplateData()
+                         .setDate(event.getValue().getTimelineDate())
+                         .setExplanation(event.getValue().getTimelineDescription())).toList();
     }
 }

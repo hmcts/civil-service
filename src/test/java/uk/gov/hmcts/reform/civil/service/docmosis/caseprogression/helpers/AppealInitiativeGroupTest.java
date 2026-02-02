@@ -38,11 +38,9 @@ public class AppealInitiativeGroupTest {
                                                                     .appealChoiceSecondDropdownA(AppealChoiceSecondDropdown.builder()
                                                                                                      .appealGrantedRefusedDate(LocalDate.now().plusDays(5))
                                                                                                      .build()).build()).build()).build();
-        JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder();
-        builder = appealInitiativePopulator.populateAppealDetails(builder, caseData);
+        JudgeFinalOrderForm form = new JudgeFinalOrderForm();
+        form = appealInitiativePopulator.populateAppealDetails(form, caseData);
         LocalDate appealGrantedDate = LocalDate.now().plusDays(5);
-
-        JudgeFinalOrderForm form = builder.build();
         Assertions.assertEquals("true", form.getAppealGranted());
         Assertions.assertEquals("a", form.getTableAorB());
         Assertions.assertEquals(appealGrantedDate, form.getAppealDate());
@@ -59,10 +57,8 @@ public class AppealInitiativeGroupTest {
                                                                     .appealChoiceSecondDropdownA(AppealChoiceSecondDropdown.builder()
                                                                                                      .appealGrantedRefusedDate(appealRefusedDate)
                                                                                                      .build()).build()).build()).build();
-        JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder();
-        builder = appealInitiativePopulator.populateAppealDetails(builder, caseData);
-
-        JudgeFinalOrderForm form = builder.build();
+        JudgeFinalOrderForm form = new JudgeFinalOrderForm();
+        form = appealInitiativePopulator.populateAppealDetails(form, caseData);
         Assertions.assertNull(form.getAppealGranted());
         Assertions.assertEquals("a", form.getTableAorB());
         Assertions.assertEquals(appealRefusedDate, form.getAppealDate());
@@ -79,10 +75,8 @@ public class AppealInitiativeGroupTest {
                                                                     .appealChoiceSecondDropdownA(AppealChoiceSecondDropdown.builder()
                                                                                                      .appealGrantedRefusedDate(appealRefusedDate)
                                                                                                      .build()).build()).build()).build();
-        JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder();
-        builder = appealInitiativePopulator.populateAppealDetails(builder, caseData);
-
-        JudgeFinalOrderForm form = builder.build();
+        JudgeFinalOrderForm form = new JudgeFinalOrderForm();
+        form = appealInitiativePopulator.populateAppealDetails(form, caseData);
         Assertions.assertNull(form.getAppealGranted());
         Assertions.assertEquals("b", form.getTableAorB());
     }

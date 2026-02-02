@@ -49,10 +49,10 @@ public class CaseDataMaxEdgeCasesBuilder extends CaseDataBuilder {
             .applicantPreferredCourt("127")
             .applicantPreferredCourtLocationList(
                 DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
-            .caseLocation(CaseLocationCivil.builder()
-                              .region("4")
-                              .baseLocation("000000")
-                              .build())
+            .caseLocation(new CaseLocationCivil()
+                              .setRegion("4")
+                              .setBaseLocation("000000")
+                              )
             .build();
         solicitorReferences = SolicitorReferences.builder()
             .applicantSolicitor1Reference(Strings.repeat('A', 24))
