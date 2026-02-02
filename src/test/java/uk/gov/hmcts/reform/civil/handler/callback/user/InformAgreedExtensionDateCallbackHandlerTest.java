@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CertificateOfService;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
@@ -123,6 +124,33 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
         }
 
         @Test
+        void shouldSetDateWhenCosDateDeemedServedForDefendantPresent() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setAddRespondent2(NO);
+            CertificateOfService cos = new CertificateOfService();
+            cos.setCosDateDeemedServedForDefendant(LocalDate.of(2026, 1, 27).plusDays(3L));
+            caseData.setCosNotifyClaimDetails1(cos);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            // When
+            when(coreCaseUserService.userHasCaseRole(
+                caseData.getCcdCaseReference().toString(),
+                "uid",
+                RESPONDENTSOLICITORONE
+            )).thenReturn(true);
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).extracting("respondentSolicitor1AgreedDeadlineExtension")
+                .isEqualTo(caseData.getCosNotifyClaimDetails1().getCosDateDeemedServedForDefendant().plusDays(42).toString());
+        }
+
+        @Test
         void shouldSetDate() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
@@ -206,7 +234,6 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
         @Test
         void shouldReturnErrorIfAfterDeadline() {
             // Given
-            LocalDateTime timeExtensionDate = LocalDateTime.of(2022, 1, 1, 12, 0, 0);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             caseData.setAddRespondent2(NO);
             caseData.setNextDeadline(LocalDate.now().minusDays(1));
