@@ -732,8 +732,8 @@ class CaseDataTest {
         //Given
         CaseData caseData = CaseData.builder()
             .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
-            .respondent1DQ(Respondent1DQ.builder().respondent1DQRecurringIncomeFA(List.of(element(
-                RecurringIncomeLRspec.builder().build()))).build())
+            .respondent1DQ(new Respondent1DQ().setRespondent1DQRecurringIncomeFA(List.of(element(
+                new RecurringIncomeLRspec()))))
             .build();
         //When
         List<Element<RecurringIncomeLRspec>> results = caseData.getRecurringIncomeForRespondent1();
@@ -746,8 +746,8 @@ class CaseDataTest {
         //Given
         CaseData caseData = CaseData.builder()
             .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
-            .respondent1DQ(Respondent1DQ.builder().respondent1DQRecurringIncome(List.of(element(
-                RecurringIncomeLRspec.builder().build()))).build())
+            .respondent1DQ(new Respondent1DQ().setRespondent1DQRecurringIncome(List.of(element(
+                new RecurringIncomeLRspec()))))
             .build();
         //When
         List<Element<RecurringIncomeLRspec>> results = caseData.getRecurringIncomeForRespondent1();
@@ -770,8 +770,8 @@ class CaseDataTest {
         //Given
         CaseData caseData = CaseData.builder()
             .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
-            .respondent1DQ(Respondent1DQ.builder().respondent1DQRecurringExpensesFA(List.of(element(
-                RecurringExpenseLRspec.builder().build()))).build())
+            .respondent1DQ(new Respondent1DQ().setRespondent1DQRecurringExpensesFA(List.of(element(
+                new RecurringExpenseLRspec()))))
             .build();
 
         //When
@@ -785,8 +785,8 @@ class CaseDataTest {
         //Given
         CaseData caseData = CaseData.builder()
             .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
-            .respondent1DQ(Respondent1DQ.builder().respondent1DQRecurringExpenses(List.of(element(
-                RecurringExpenseLRspec.builder().build()))).build())
+            .respondent1DQ(new Respondent1DQ().setRespondent1DQRecurringExpenses(List.of(element(
+                new RecurringExpenseLRspec()))))
             .build();
 
         //When

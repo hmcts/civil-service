@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.model.dq;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -9,6 +10,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 @Accessors(chain = true)
 public class DocumentsToBeConsidered {
 
