@@ -165,7 +165,6 @@ xui-webapp:
       SERVICES_HEARINGS_COMPONENT_API_CIVIL: http://${SERVICE_NAME}-java
       SERVICES_ROLE_ASSIGNMENT_API: https://am-role-assignment-service-${SERVICE_FQDN}
       HEALTH_ROLE_ASSIGNMENT_API: http://${SERVICE_NAME}-am-role-assignment-service/health
-      SERVICES_ROLE_ASSIGNMENT_MAPPING_API: http://${SERVICE_NAME}-am-org-role-mapping-service
       JURISDICTIONS: CIVIL
       LAUNCH_DARKLY_CLIENT_ID: 5de6610b23ce5408280f2268
       SERVICES_CCD_CASE_ASSIGNMENT_API: http://${SERVICE_NAME}-aac-manage-case-assignment
@@ -326,6 +325,36 @@ ccd:
           disabled: true
       keyVaults: []
       ingressHost: ccd-definition-store-${SERVICE_FQDN}
+  am-role-assignment-service:
+    java:
+      devmemoryRequests: 2048Mi
+      devcpuRequests: 2000m
+      devmemoryLimits: 4096Mi
+      devcpuLimits: 4000m
+      imagePullPolicy: Always
+      image: hmctspublic.azurecr.io/am/role-assignment-service:latest
+      ingressHost: am-role-assignment-service-${SERVICE_FQDN}
+      environment:
+        RELEASE_REVISION: "{{ .Release.Revision }}"
+        ROLE_ASSIGNMENT_DB_HOST: ${SERVICE_NAME}-postgresql
+        ROLE_ASSIGNMENT_DB_PASSWORD: ${POSTGRES_PASSWORD}
+        ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified"
+        CCD_DATA_STORE_URL: http://${SERVICE_NAME}-ccd-data-store-api
+        ROLE_ASSIGNMENT_S2S_AUTHORISED_SERVICES: ccd_gw,am_role_assignment_service,am_org_role_mapping_service,wa_task_management_api,wa_task_configuration_api,xui_webapp,aac_manage_case_assignment,ccd_data,wa_workflow_api,wa_task_monitor,wa_case_event_handler,iac,hmc_cft_hearing_service,ccd_case_disposer,sscs,fis_hmc_api,et_cos,civil_service,civil_general_applications
+        RUN_LD_ON_STARTUP: false
+      keyVaults:
+        am:
+          secrets:
+            - name: am-role-assignment-service-s2s-secret
+              alias: AM_ROLE_ASSIGNMENT_SERVICE_SECRET
+            - name: app-insights-connection-string
+              alias: app-insights-connection-string
+            - name: role-assignment-service-IDAM-CLIENT-SECRET
+              alias: ROLE_ASSIGNMENT_IDAM_CLIENT_SECRET
+            - name: role-assignment-service-IDAM-ADMIN-SECRET
+              alias: ROLE_ASSIGNMENT_IDAM_ADMIN_PASSWORD
+            - name: role-assignment-service-LD-SDK-KEY
+              alias: LD_SDK_KEY
   postgresql:
     persistence:
       enabled: false
@@ -349,72 +378,6 @@ camunda-bpm:
       CAMUNDA_BPM_DATABASE_SCHEMA_UPDATE: true
       S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       CAMUNDA_DB_CONN_OPTIONS: ""
-
-am-org-role-mapping-service:
-  enabled: true
-  java:
-    image: 'hmctspublic.azurecr.io/am/org-role-mapping-service:latest'
-    ingressHost: orm-${SERVICE_FQDN}
-    releaseNameOverride: ${SERVICE_NAME}-am-org-role-mapping-service
-    devmemoryRequests: 1024Mi
-    devcpuRequests: 250m
-    devmemoryLimits: 2048Mi
-    devcpuLimits: 1500m
-    secrets:
-      SB_ACCESS_KEY:
-        secretRef: civil-sb-preview
-        key: primaryKey
-      SB_CONNECTION_STRING:
-        secretRef: civil-sb-preview
-        key: connectionString
-      ORG_ROLE_MAPPING_DB_PASSWORD:
-        secretRef: postgres
-        key: PASSWORD
-        disabled: false
-    keyVaults:
-      am:
-        secrets:
-          - name: app-insights-connection-string
-            alias: app-insights-connection-string
-          - name: am-org-role-mapping-service-s2s-secret
-            alias: AM_ORG_ROLE_MAPPING_SERVICE_SECRET
-          - name: orm-IDAM-CLIENT-ID
-            alias: ORM_IDAM_CLIENT_ID
-          - name: orm-IDAM-CLIENT-SECRET
-            alias: ORG_ROLE_MAPPING_IDAM_CLIENT_SECRET
-          - name: orm-IDAM-ADMIN-SECRET
-            alias: ORG_ROLE_MAPPING_IDAM_ADMIN_PASSWORD
-          - name: caseworker-topic-primary-send-listen-shared-access-key
-            alias: AMQP_CRD_SHARED_ACCESS_KEY_VALUE
-          - name: org-role-mapping-service-POSTGRES-PASS
-            alias: ORG_ROLE_MAPPING_DB_PASSWORD
-          - name: judicial-topic-primary-send-listen-shared-access-key
-            alias: AMQP_JRD_SHARED_ACCESS_KEY_VALUE
-    environment:
-      IDAM_S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
-      S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
-      CASE_WORKER_REF_APP_URL: http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal
-      JUDICIAL_REF_APP_URL: http://rd-judicial-api-aat.service.core-compute-aat.internal
-      ROLE_ASSIGNMENT_APP_URL: ${SERVICE_NAME}-am-role-assignment-service
-      JUDICIAL_BOOKING_APP_URL: http://am-judicial-booking-service-aat.service.core-compute-aat.internal
-      AMQP_SHARED_ACCESS_KEY_NAME: RootManageSharedAccessKey
-      AMQP_HOST: "civil-sb-preview.servicebus.windows.net"
-      CRD_SUBSCRIPTION_NAME: "{{ .Release.Name}}-servicebus-crd-topic"
-      JRD_SUBSCRIPTION_NAME: "{{ .Release.Name}}-servicebus-jrd-topic"
-      CRD_TOPIC_NAME: "{{ .Release.Name}}-servicebus-crd-topic"
-      JRD_TOPIC_NAME: "{{ .Release.Name}}-servicebus-jrd-topic"
-      AMQP_CRD_SHARED_ACCESS_KEY_VALUE: "$(SB_ACCESS_KEY)"
-      AMQP_JRD_SHARED_ACCESS_KEY_VALUE: "$(SB_ACCESS_KEY)"
-      ORG_ROLE_MAPPING_DB_HOST: "{{ .Release.Name }}-postgresql"
-      ORG_ROLE_MAPPING_DB_NAME: "org_role_mapping"
-      ORG_ROLE_MAPPING_DB_USERNAME: ${POSTGRES_USER}
-      ORG_ROLE_MAPPING_DB_PASSWORD: ${POSTGRES_PASSWORD}
-      ORG_ROLE_MAPPING_DB_PORT: 5432
-      ORG_ROLE_MAPPING_DB_OPTIONS: "?stringtype=unspecified"
-      TESTING_SUPPORT_ENABLED: true
-      JUDICIAL_REF_APP_V2_ACTIVE: true
-      JUDICIAL_REF_APP_V2_FILTER_AUTHS_BY_APP_ID: true
-      ORM_ENV: pr
 
 aac-manage-case-assignment:
   enabled: true
