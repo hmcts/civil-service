@@ -221,7 +221,7 @@ public class SdoGeneratorService {
 
     private SdoDocumentFormFast getTemplateDataFast(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
         boolean hasPpi = SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimPPI");
-        var sdoDocumentFormBuilder = new SdoDocumentFormFast()
+        var sdoDocumentFormFast = new SdoDocumentFormFast()
             .setWrittenByJudge(isJudge)
             .setCurrentDate(LocalDate.now())
             .setJudgeName(judgeName)
@@ -321,12 +321,12 @@ public class SdoGeneratorService {
             .setFastTrackAllocation(getFastTrackAllocation(caseData))
             .setShowBundleInfo(SdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialBundleToggle"));
 
-        sdoDocumentFormBuilder
+        sdoDocumentFormFast
             .setFastTrackOrderWithoutJudgement(caseData.getFastTrackOrderWithoutJudgement())
             .setFastTrackHearingTime(caseData.getFastTrackHearingTime())
             .setFastTrackHearingTimeEstimate(SdoHelper.getFastClaimsHearingTimeLabel(caseData));
 
-        sdoDocumentFormBuilder
+        sdoDocumentFormFast
             .setHearingLocation(locationHelper.getHearingLocation(
                 Optional.ofNullable(caseData.getFastTrackMethodInPerson())
                     .map(DynamicList::getValue)
@@ -337,16 +337,16 @@ public class SdoGeneratorService {
             ))
             .setCaseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
 
-        sdoDocumentFormBuilder.setFastTrackWelshLanguageToggle(
+        sdoDocumentFormFast.setFastTrackWelshLanguageToggle(
                 SdoHelper.hasFastTrackVariable(caseData, "sdoR2FastTrackUseOfWelshToggle"))
             .setWelshLanguageDescription(caseData.getSdoR2FastTrackUseOfWelshLanguage() != null
                                           ? caseData.getSdoR2FastTrackUseOfWelshLanguage().getDescription() : null);
-        sdoDocumentFormBuilder.showPenalNotice(SdoHelper.hasFastTrackVariable(caseData, "fastTrackPenalNoticeToggle"))
-            .penalNoticeText(caseData.getFastTrackPenalNotice());
-        sdoDocumentFormBuilder.setSdoR2WitnessesOfFact(caseData.getSdoR2FastTrackWitnessOfFact())
+        sdoDocumentFormFast.setShowPenalNotice(SdoHelper.hasFastTrackVariable(caseData, "fastTrackPenalNoticeToggle"))
+            .setPenalNoticeText(caseData.getFastTrackPenalNotice());
+        sdoDocumentFormFast.setSdoR2WitnessesOfFact(caseData.getSdoR2FastTrackWitnessOfFact())
             .setSdoR2FastTrackCreditHire(caseData.getSdoR2FastTrackCreditHire());
 
-        return sdoDocumentFormBuilder;
+        return sdoDocumentFormFast;
     }
 
     private SdoDocumentFormFastNihl getTemplateDataFastNihl(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
@@ -515,8 +515,8 @@ public class SdoGeneratorService {
             .setSmallClaimsWelshLanguageToggle(SdoHelper.hasSmallClaimsVariable(caseData, "sdoR2SmallClaimsUseOfWelshToggle"))
             .setWelshLanguageDescription(caseData.getSdoR2SmallClaimsUseOfWelshLanguage() != null ? caseData.getSdoR2SmallClaimsUseOfWelshLanguage().getDescription() : null)
             .setSdoR2SmallClaimsWitnessStatements(caseData.getSdoR2SmallClaimsWitnessStatementOther())
-            .showPenalNotice(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsPenalNoticeToggle"))
-            .penalNoticeText(caseData.getSmallClaimsPenalNotice());
+            .setShowPenalNotice(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsPenalNoticeToggle"))
+            .setPenalNoticeText(caseData.getSmallClaimsPenalNotice());
 
         sdoDocumentFormBuilder.setHearingLocation(
                 locationHelper.getHearingLocation(
