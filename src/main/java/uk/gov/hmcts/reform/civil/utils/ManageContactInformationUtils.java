@@ -173,25 +173,24 @@ public class ManageContactInformationUtils {
 
                 if (dqExpert != null && dqExpert.getPartyID() != null) {
                     // if id already exists in dq
-                    newExperts.addAll(wrapElements(dqExpert.toBuilder()
-                                                       .firstName(formExpert.getFirstName())
-                                                       .lastName(formExpert.getLastName())
-                                                       .emailAddress(formExpert.getEmailAddress())
-                                                       .phoneNumber(formExpert.getPhoneNumber())
-                                                       .fieldOfExpertise(formExpert.getFieldOfExpertise())
-                                                       .build()));
+                    newExperts.addAll(wrapElements(dqExpert.copy()
+                                                       .setFirstName(formExpert.getFirstName())
+                                                       .setLastName(formExpert.getLastName())
+                                                       .setEmailAddress(formExpert.getEmailAddress())
+                                                       .setPhoneNumber(formExpert.getPhoneNumber())
+                                                       .setFieldOfExpertise(formExpert.getFieldOfExpertise())
+                                                       ));
                 } else {
                     // if id doesn't exist in dq means it is a newly added expert
-                    newExperts.addAll(wrapElements(Expert.builder()
-                                                       .firstName(formExpert.getFirstName())
-                                                       .lastName(formExpert.getLastName())
-                                                       .emailAddress(formExpert.getEmailAddress())
-                                                       .phoneNumber(formExpert.getPhoneNumber())
-                                                       .fieldOfExpertise(formExpert.getFieldOfExpertise())
-                                                       .dateAdded(LocalDate.now())
-                                                       .eventAdded("Manage Contact Information Event")
-                                                       .partyID(createPartyId())
-                                                       .build()));
+                    newExperts.addAll(wrapElements(new Expert()
+                                                       .setFirstName(formExpert.getFirstName())
+                                                       .setLastName(formExpert.getLastName())
+                                                       .setEmailAddress(formExpert.getEmailAddress())
+                                                       .setPhoneNumber(formExpert.getPhoneNumber())
+                                                       .setFieldOfExpertise(formExpert.getFieldOfExpertise())
+                                                       .setDateAdded(LocalDate.now())
+                                                       .setEventAdded("Manage Contact Information Event")
+                                                       .setPartyID(createPartyId())));
                 }
             }
         }
@@ -236,23 +235,22 @@ public class ManageContactInformationUtils {
 
                 // if id already exists in dq
                 if (dqWitness != null && dqWitness.getPartyID() != null) {
-                    newWitnesses.addAll(wrapElements(dqWitness.toBuilder()
-                                                       .firstName(formWitness.getFirstName())
-                                                       .lastName(formWitness.getLastName())
-                                                       .emailAddress(formWitness.getEmailAddress())
-                                                       .phoneNumber(formWitness.getPhoneNumber())
-                                                       .build()));
+                    newWitnesses.addAll(wrapElements(dqWitness.copy()
+                                                       .setFirstName(formWitness.getFirstName())
+                                                       .setLastName(formWitness.getLastName())
+                                                       .setEmailAddress(formWitness.getEmailAddress())
+                                                       .setPhoneNumber(formWitness.getPhoneNumber())
+                                                       ));
                 } else {
                     // if id doesn't exist in dq means it is a newly added witness
-                    newWitnesses.addAll(wrapElements(Witness.builder()
-                                                       .firstName(formWitness.getFirstName())
-                                                       .lastName(formWitness.getLastName())
-                                                       .emailAddress(formWitness.getEmailAddress())
-                                                       .phoneNumber(formWitness.getPhoneNumber())
-                                                       .dateAdded(LocalDate.now())
-                                                       .eventAdded("Manage Contact Information Event")
-                                                       .partyID(createPartyId())
-                                                       .build()));
+                    newWitnesses.addAll(wrapElements(new Witness()
+                                                       .setFirstName(formWitness.getFirstName())
+                                                       .setLastName(formWitness.getLastName())
+                                                       .setEmailAddress(formWitness.getEmailAddress())
+                                                       .setPhoneNumber(formWitness.getPhoneNumber())
+                                                       .setDateAdded(LocalDate.now())
+                                                       .setEventAdded("Manage Contact Information Event")
+                                                       .setPartyID(createPartyId())));
                 }
             }
         }

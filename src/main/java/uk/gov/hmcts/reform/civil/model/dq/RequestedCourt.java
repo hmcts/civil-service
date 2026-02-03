@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.civil.model.dq;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder(toBuilder = true)
+@Accessors(chain = true)
 public class RequestedCourt {
 
     private YesOrNo requestHearingAtSpecificCourt;
@@ -21,4 +21,15 @@ public class RequestedCourt {
     private DynamicList responseCourtLocations;
     private CaseLocationCivil caseLocation;
     private String responseCourtName;
+
+    public RequestedCourt copy() {
+        return new RequestedCourt()
+            .setRequestHearingAtSpecificCourt(requestHearingAtSpecificCourt)
+            .setOtherPartyPreferredSite(otherPartyPreferredSite)
+            .setResponseCourtCode(responseCourtCode)
+            .setReasonForHearingAtSpecificCourt(reasonForHearingAtSpecificCourt)
+            .setResponseCourtLocations(responseCourtLocations)
+            .setCaseLocation(caseLocation)
+            .setResponseCourtName(responseCourtName);
+    }
 }
