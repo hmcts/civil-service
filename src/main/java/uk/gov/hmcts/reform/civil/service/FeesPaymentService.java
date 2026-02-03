@@ -30,7 +30,7 @@ public class FeesPaymentService {
     private final CoreCaseDataService coreCaseDataService;
     private final PinInPostConfiguration pinInPostConfiguration;
     private final PaymentStatusService paymentStatusService;
-    private final PaymentRequestUpdateCallbackService paymentRequestUpdateCallbackService;
+    private final PaymentStatusRetryService paymentStatusRetryService;
     private final FeatureToggleService featureToggleService;
 
     public CardPaymentStatusResponse createGovPaymentRequest(
@@ -95,7 +95,7 @@ public class FeesPaymentService {
 
         CardPaymentStatusResponse builtResponse = response;
         try {
-            paymentRequestUpdateCallbackService.updatePaymentStatus(feeType, caseReference, builtResponse);
+            paymentStatusRetryService.updatePaymentStatus(feeType, caseReference, builtResponse);
 
         } catch (Exception e) {
             log.error(

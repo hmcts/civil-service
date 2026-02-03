@@ -163,8 +163,8 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
                 .thenReturn(PaymentServiceResponse.builder()
                                 .serviceRequestReference(FREE_PAYMENT_REFERENCE).build());
             when(generalAppFeesService.isFreeApplication(any())).thenReturn(false);
-            caseData = caseData.toBuilder().generalAppHelpWithFees(HelpWithFees.builder()
-                                                                       .helpWithFee(YesOrNo.YES).build()).build();
+            caseData = caseData.toBuilder().generalAppHelpWithFees(new HelpWithFees()
+                                                                       .setHelpWithFee(YesOrNo.YES)).build();
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(paymentsService, never()).createServiceRequestGa(caseData, "BEARER_TOKEN");
@@ -186,15 +186,15 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
 
         @Test
         void shouldReturnHwf_True() {
-            caseData = caseData.toBuilder().generalAppHelpWithFees(HelpWithFees.builder()
-                                                                       .helpWithFee(YesOrNo.YES).build()).build();
+            caseData = caseData.toBuilder().generalAppHelpWithFees(new HelpWithFees()
+                                                                       .setHelpWithFee(YesOrNo.YES)).build();
             assertThat(handler.isHelpWithFees(caseData)).isTrue();
         }
 
         @Test
         void shouldReturnHwf_False() {
-            caseData = caseData.toBuilder().generalAppHelpWithFees(HelpWithFees.builder()
-                                                                       .helpWithFee(YesOrNo.NO).build()).build();
+            caseData = caseData.toBuilder().generalAppHelpWithFees(new HelpWithFees()
+                                                                       .setHelpWithFee(YesOrNo.NO)).build();
             assertThat(handler.isHelpWithFees(caseData)).isFalse();
         }
 

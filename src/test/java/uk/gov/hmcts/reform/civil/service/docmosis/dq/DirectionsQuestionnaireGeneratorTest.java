@@ -151,14 +151,12 @@ class DirectionsQuestionnaireGeneratorTest {
             .build();
 
     private final Representative defendant1Representative =
-        Representative.builder()
-            .organisationName("test org")
-            .build();
+        new Representative()
+            .setOrganisationName("test org");
 
     private final Representative defendant2Representative =
-        Representative.builder()
-            .organisationName("test org 2")
-            .build();
+        new Representative()
+            .setOrganisationName("test org 2");
 
     @MockBean
     private SecuredDocumentManagementService documentManagementService;
@@ -1357,101 +1355,94 @@ class DirectionsQuestionnaireGeneratorTest {
 
             private Party getApplicant(CaseData caseData) {
                 var applicant = caseData.getApplicant1();
-                return Party.builder()
-                    .name(applicant.getPartyName())
-                    .emailAddress(applicant.getPartyEmail())
-                    .phoneNumber(applicant.getPartyPhone())
-                    .primaryAddress(applicant.getPrimaryAddress())
-                    .litigationFriendName("Applicant LF")
-                    .litigationFriendFirstName("Applicant")
-                    .litigationFriendLastName("LF")
-                    .litigationFriendEmailAddress("applicantLF@email.com")
-                    .litigationFriendPhoneNumber("1234567890")
-                    .legalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
-                        ? "Name" : "Organisation name")
-                    .build();
+                return new Party()
+                    .setName(applicant.getPartyName())
+                    .setEmailAddress(applicant.getPartyEmail())
+                    .setPhoneNumber(applicant.getPartyPhone())
+                    .setPrimaryAddress(applicant.getPrimaryAddress())
+                    .setLitigationFriendName("Applicant LF")
+                    .setLitigationFriendFirstName("Applicant")
+                    .setLitigationFriendLastName("LF")
+                    .setLitigationFriendEmailAddress("applicantLF@email.com")
+                    .setLitigationFriendPhoneNumber("1234567890")
+                    .setLegalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
+                        ? "Name" : "Organisation name");
             }
 
             private Party getApplicant2(CaseData caseData) {
                 var applicant = caseData.getApplicant2();
-                return Party.builder()
-                    .name(applicant.getPartyName())
-                    .emailAddress(applicant.getPartyEmail())
-                    .phoneNumber(applicant.getPartyPhone())
-                    .primaryAddress(applicant.getPrimaryAddress())
-                    .litigationFriendName("ApplicantTwo LF")
-                    .litigationFriendFirstName("Applicant2")
-                    .litigationFriendLastName("LF")
-                    .litigationFriendEmailAddress("applicant2LF@email.com")
-                    .litigationFriendPhoneNumber("1234567890")
-                    .legalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
-                        ? "Name" : "Organisation name")
-                    .build();
+                return new Party()
+                    .setName(applicant.getPartyName())
+                    .setEmailAddress(applicant.getPartyEmail())
+                    .setPhoneNumber(applicant.getPartyPhone())
+                    .setPrimaryAddress(applicant.getPrimaryAddress())
+                    .setLitigationFriendName("ApplicantTwo LF")
+                    .setLitigationFriendFirstName("Applicant2")
+                    .setLitigationFriendLastName("LF")
+                    .setLitigationFriendEmailAddress("applicant2LF@email.com")
+                    .setLitigationFriendPhoneNumber("1234567890")
+                    .setLegalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
+                        ? "Name" : "Organisation name");
             }
 
             private List<Party> getRespondents(CaseData caseData) {
                 var respondent = caseData.getRespondent1();
-                return List.of(Party.builder()
-                    .name(respondent.getPartyName())
-                    .phoneNumber(respondent.getPartyPhone())
-                    .emailAddress(respondent.getPartyEmail())
-                    .primaryAddress(respondent.getPrimaryAddress())
-                    .representative(defendant1Representative)
-                    .litigationFriendName("Respondent LF")
-                    .litigationFriendFirstName("Respondent")
-                    .litigationFriendLastName("LF")
-                    .litigationFriendEmailAddress("respondentLF@email.com")
-                    .litigationFriendPhoneNumber("1234567890")
-                    .legalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
-                        ? "Name" : "Organisation name")
-                    .build());
+                return List.of(new Party()
+                    .setName(respondent.getPartyName())
+                    .setPhoneNumber(respondent.getPartyPhone())
+                    .setEmailAddress(respondent.getPartyEmail())
+                    .setPrimaryAddress(respondent.getPrimaryAddress())
+                    .setRepresentative(defendant1Representative)
+                    .setLitigationFriendName("Respondent LF")
+                    .setLitigationFriendFirstName("Respondent")
+                    .setLitigationFriendLastName("LF")
+                    .setLitigationFriendEmailAddress("respondentLF@email.com")
+                    .setLitigationFriendPhoneNumber("1234567890")
+                    .setLegalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
+                        ? "Name" : "Organisation name"));
             }
 
             private Experts getExperts(DQ dq) {
                 var experts = dq.getExperts();
-                return Experts.builder()
-                    .expertRequired(experts.getExpertRequired())
-                    .expertReportsSent(
+                return new Experts()
+                    .setExpertRequired(experts.getExpertRequired())
+                    .setExpertReportsSent(
                         ofNullable(experts.getExpertReportsSent())
                             .map(ExpertReportsSent::getDisplayedValue)
                             .orElse(""))
-                    .jointExpertSuitable(experts.getJointExpertSuitable())
-                    .details(getExpertsDetails(dq))
-                    .build();
+                    .setJointExpertSuitable(experts.getJointExpertSuitable())
+                    .setDetails(getExpertsDetails(dq));
             }
 
             private List<Expert> getExpertsDetails(DQ dq) {
                 return unwrapElements(dq.getExperts().getDetails())
                     .stream()
-                    .map(expert -> Expert.builder()
-                        .name(expert.getName())
-                        .firstName(expert.getFirstName())
-                        .lastName(expert.getLastName())
-                        .phoneNumber(expert.getPhoneNumber())
-                        .emailAddress(expert.getEmailAddress())
-                        .fieldOfExpertise(expert.getFieldOfExpertise())
-                        .whyRequired(expert.getWhyRequired())
-                        .formattedCost(NumberFormat.getCurrencyInstance(Locale.UK)
-                            .format(MonetaryConversions.penniesToPounds(expert.getEstimatedCost())))
-                        .build())
+                    .map(expert -> new Expert()
+                        .setName(expert.getName())
+                        .setFirstName(expert.getFirstName())
+                        .setLastName(expert.getLastName())
+                        .setPhoneNumber(expert.getPhoneNumber())
+                        .setEmailAddress(expert.getEmailAddress())
+                        .setFieldOfExpertise(expert.getFieldOfExpertise())
+                        .setWhyRequired(expert.getWhyRequired())
+                        .setFormattedCost(NumberFormat.getCurrencyInstance(Locale.UK)
+                            .format(MonetaryConversions.penniesToPounds(expert.getEstimatedCost()))))
                     .collect(toList());
             }
 
             private Witnesses getWitnesses(DQ dq) {
                 var witnesses = dq.getWitnesses();
-                return Witnesses.builder()
-                    .witnessesToAppear(witnesses.getWitnessesToAppear())
-                    .details(unwrapElements(witnesses.getDetails()))
-                    .build();
+                return new Witnesses()
+                    .setWitnessesToAppear(witnesses.getWitnessesToAppear())
+                    .setDetails(unwrapElements(witnesses.getDetails()));
             }
 
             private Hearing getHearing(DQ dq) {
                 var hearing = dq.getHearing();
-                return Hearing.builder()
-                    .hearingLength(getHearingLength(dq))
-                    .unavailableDatesRequired(hearing.getUnavailableDatesRequired())
-                    .unavailableDates(unwrapElements(hearing.getUnavailableDates()))
-                    .build();
+                return new Hearing()
+                    .setHearingLength(getHearingLength(dq))
+                    .setUnavailableDatesRequired(hearing.getUnavailableDatesRequired())
+                    .setUnavailableDates(unwrapElements(hearing.getUnavailableDates()));
             }
 
             private String getHearingLength(DQ dq) {
@@ -1502,47 +1493,43 @@ class DirectionsQuestionnaireGeneratorTest {
 
             private WelshLanguageRequirements getWelshLanguageRequirements(DQ dq) {
                 var welshLanguageRequirements = dq.getWelshLanguageRequirements();
-                return WelshLanguageRequirements.builder()
-                    .evidence(ofNullable(
+                return new WelshLanguageRequirements()
+                    .setEvidence(ofNullable(
                         welshLanguageRequirements.getEvidence()).map(Language::getDisplayedValue).orElse(""))
-                    .court(ofNullable(
+                    .setCourt(ofNullable(
                         welshLanguageRequirements.getCourt()).map(Language::getDisplayedValue).orElse(""))
-                    .documents(ofNullable(
-                        welshLanguageRequirements.getDocuments()).map(Language::getDisplayedValue).orElse(""))
-                    .build();
+                    .setDocuments(ofNullable(
+                        welshLanguageRequirements.getDocuments()).map(Language::getDisplayedValue).orElse(""));
             }
 
             private Experts applicant1ExpertsMock() {
-                return Experts.builder()
-                    .expertRequired(YES)
-                    .expertReportsSent(ExpertReportsSent.NO.getDisplayedValue())
-                    .jointExpertSuitable(NO)
-                    .details(List.of(
-                            uk.gov.hmcts.reform.civil.model.docmosis.dq.Expert.builder()
-                                .firstName("Expert")
-                                .lastName("One")
-                                .phoneNumber("01482764322")
-                                .emailAddress("fast.claim.expert1@example.com")
-                                .whyRequired("Good reasons")
-                                .fieldOfExpertise("Some field")
-                                .formattedCost("£100.00")
-                                .build()
+                return new Experts()
+                    .setExpertRequired(YES)
+                    .setExpertReportsSent(ExpertReportsSent.NO.getDisplayedValue())
+                    .setJointExpertSuitable(NO)
+                    .setDetails(List.of(
+                            new uk.gov.hmcts.reform.civil.model.docmosis.dq.Expert()
+                                .setFirstName("Expert")
+                                .setLastName("One")
+                                .setPhoneNumber("01482764322")
+                                .setEmailAddress("fast.claim.expert1@example.com")
+                                .setWhyRequired("Good reasons")
+                                .setFieldOfExpertise("Some field")
+                                .setFormattedCost("£100.00")
                         )
-                    ).build();
+                    );
             }
 
             private Witnesses applicant1WitnessesMock() {
-                return Witnesses.builder()
-                    .witnessesToAppear(YES)
-                    .details(List.of(
-                        Witness.builder()
-                            .firstName("Witness")
-                            .lastName("One")
-                            .phoneNumber("01482764322")
-                            .emailAddress("witness.one@example.com")
-                            .reasonForWitness("Saw something")
-                            .build()))
-                    .build();
+                return new Witnesses()
+                    .setWitnessesToAppear(YES)
+                    .setDetails(List.of(
+                        new Witness()
+                            .setFirstName("Witness")
+                            .setLastName("One")
+                            .setPhoneNumber("01482764322")
+                            .setEmailAddress("witness.one@example.com")
+                            .setReasonForWitness("Saw something")));
             }
         }
     }
@@ -2316,119 +2303,111 @@ class DirectionsQuestionnaireGeneratorTest {
 
             private Party getApplicant(CaseData caseData) {
                 var applicant = caseData.getApplicant1();
-                return Party.builder()
-                    .name(applicant.getPartyName())
-                    .emailAddress(applicant.getPartyEmail())
-                    .phoneNumber(applicant.getPartyPhone())
-                    .primaryAddress(applicant.getPrimaryAddress())
-                    .litigationFriendName("Applicant LF")
-                    .litigationFriendFirstName("Applicant")
-                    .litigationFriendLastName("LF")
-                    .litigationFriendEmailAddress("applicantLF@email.com")
-                    .litigationFriendPhoneNumber("1234567890")
-                    .legalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
-                        ? "Name" : "Organisation name")
-                    .build();
+                return new Party()
+                    .setName(applicant.getPartyName())
+                    .setEmailAddress(applicant.getPartyEmail())
+                    .setPhoneNumber(applicant.getPartyPhone())
+                    .setPrimaryAddress(applicant.getPrimaryAddress())
+                    .setLitigationFriendName("Applicant LF")
+                    .setLitigationFriendFirstName("Applicant")
+                    .setLitigationFriendLastName("LF")
+                    .setLitigationFriendEmailAddress("applicantLF@email.com")
+                    .setLitigationFriendPhoneNumber("1234567890")
+                    .setLegalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
+                        ? "Name" : "Organisation name");
             }
 
             private List<Party> getRespondent(CaseData caseData) {
                 var respondent = caseData.getRespondent2();
-                return List.of(Party.builder()
-                    .name(respondent.getPartyName())
-                    .primaryAddress(respondent.getPrimaryAddress())
-                    .phoneNumber(respondent.getPartyPhone())
-                    .emailAddress(respondent.getPartyEmail())
-                    .representative(defendant2Representative)
-                    .litigationFriendName("respondent 2 LF")
-                    .litigationFriendFirstName("Respondent2")
-                    .litigationFriendLastName("LF")
-                    .litigationFriendPhoneNumber("123456789")
-                    .litigationFriendEmailAddress("respondent2LF@email.com")
-                    .legalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
-                        ? "Name" : "Organisation name")
-                    .build());
+                return List.of(new Party()
+                    .setName(respondent.getPartyName())
+                    .setPrimaryAddress(respondent.getPrimaryAddress())
+                    .setPhoneNumber(respondent.getPartyPhone())
+                    .setEmailAddress(respondent.getPartyEmail())
+                    .setRepresentative(defendant2Representative)
+                    .setLitigationFriendName("respondent 2 LF")
+                    .setLitigationFriendFirstName("Respondent2")
+                    .setLitigationFriendLastName("LF")
+                    .setLitigationFriendPhoneNumber("123456789")
+                    .setLitigationFriendEmailAddress("respondent2LF@email.com")
+                    .setLegalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
+                        ? "Name" : "Organisation name"));
             }
 
             private List<Party> getRespondents(CaseData caseData) {
                 var respondent1 = caseData.getRespondent1();
                 var respondent2 = caseData.getRespondent2();
                 return List.of(
-                    Party.builder()
-                        .name(respondent1.getPartyName())
-                        .phoneNumber(respondent1.getPartyPhone())
-                        .emailAddress(respondent1.getPartyEmail())
-                        .primaryAddress(respondent1.getPrimaryAddress())
-                        .representative(defendant1Representative)
-                        .litigationFriendName("Respondent LF")
-                        .litigationFriendFirstName("Respondent")
-                        .litigationFriendLastName("LF")
-                        .litigationFriendEmailAddress("respondentLF@email.com")
-                        .litigationFriendPhoneNumber("1234567890")
-                        .legalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
+                    new Party()
+                        .setName(respondent1.getPartyName())
+                        .setPhoneNumber(respondent1.getPartyPhone())
+                        .setEmailAddress(respondent1.getPartyEmail())
+                        .setPrimaryAddress(respondent1.getPrimaryAddress())
+                        .setRepresentative(defendant1Representative)
+                        .setLitigationFriendName("Respondent LF")
+                        .setLitigationFriendFirstName("Respondent")
+                        .setLitigationFriendLastName("LF")
+                        .setLitigationFriendEmailAddress("respondentLF@email.com")
+                        .setLitigationFriendPhoneNumber("1234567890")
+                        .setLegalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
+                            ? "Name" : "Organisation name"),
+                    new Party()
+                        .setName(respondent2.getPartyName())
+                        .setPhoneNumber(respondent2.getPartyPhone())
+                        .setEmailAddress(respondent2.getPartyEmail())
+                        .setPrimaryAddress(respondent2.getPrimaryAddress())
+                        .setRepresentative(defendant2Representative)
+                        .setLitigationFriendName("respondent 2 LF")
+                        .setLitigationFriendFirstName("Respondent2")
+                        .setLitigationFriendLastName("LF")
+                        .setLitigationFriendPhoneNumber("123456789")
+                        .setLitigationFriendEmailAddress("respondent2LF@email.com")
+                        .setLegalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
                             ? "Name" : "Organisation name")
-                        .build(),
-                    Party.builder()
-                        .name(respondent2.getPartyName())
-                        .phoneNumber(respondent2.getPartyPhone())
-                        .emailAddress(respondent2.getPartyEmail())
-                        .primaryAddress(respondent2.getPrimaryAddress())
-                        .representative(defendant2Representative)
-                        .litigationFriendName("respondent 2 LF")
-                        .litigationFriendFirstName("Respondent2")
-                        .litigationFriendLastName("LF")
-                        .litigationFriendPhoneNumber("123456789")
-                        .litigationFriendEmailAddress("respondent2LF@email.com")
-                        .legalRepHeading(caseData.getCaseAccessCategory().equals(SPEC_CLAIM)
-                            ? "Name" : "Organisation name")
-                        .build()
                 );
             }
 
             private Experts getExperts(DQ dq) {
                 var experts = dq.getExperts();
-                return Experts.builder()
-                    .expertRequired(experts.getExpertRequired())
-                    .expertReportsSent(
+                return new Experts()
+                    .setExpertRequired(experts.getExpertRequired())
+                    .setExpertReportsSent(
                         ofNullable(experts.getExpertReportsSent())
                             .map(ExpertReportsSent::getDisplayedValue)
                             .orElse(""))
-                    .jointExpertSuitable(experts.getJointExpertSuitable())
-                    .details(getExpertsDetails(dq))
-                    .build();
+                    .setJointExpertSuitable(experts.getJointExpertSuitable())
+                    .setDetails(getExpertsDetails(dq));
             }
 
             private List<Expert> getExpertsDetails(DQ dq) {
                 return unwrapElements(dq.getExperts().getDetails())
                     .stream()
-                    .map(expert -> Expert.builder()
-                        .name(expert.getName())
-                        .firstName(expert.getFirstName())
-                        .lastName(expert.getLastName())
-                        .phoneNumber(expert.getPhoneNumber())
-                        .emailAddress(expert.getEmailAddress())
-                        .fieldOfExpertise(expert.getFieldOfExpertise())
-                        .whyRequired(expert.getWhyRequired())
-                        .formattedCost(NumberFormat.getCurrencyInstance(Locale.UK)
-                            .format(MonetaryConversions.penniesToPounds(expert.getEstimatedCost())))
-                        .build())
+                    .map(expert -> new Expert()
+                        .setName(expert.getName())
+                        .setFirstName(expert.getFirstName())
+                        .setLastName(expert.getLastName())
+                        .setPhoneNumber(expert.getPhoneNumber())
+                        .setEmailAddress(expert.getEmailAddress())
+                        .setFieldOfExpertise(expert.getFieldOfExpertise())
+                        .setWhyRequired(expert.getWhyRequired())
+                        .setFormattedCost(NumberFormat.getCurrencyInstance(Locale.UK)
+                            .format(MonetaryConversions.penniesToPounds(expert.getEstimatedCost()))))
                     .collect(toList());
             }
 
             private Witnesses getWitnesses(DQ dq) {
                 var witnesses = dq.getWitnesses();
-                return Witnesses.builder()
-                    .witnessesToAppear(witnesses.getWitnessesToAppear())
-                    .details(unwrapElements(witnesses.getDetails()))
-                    .build();
+                return new Witnesses()
+                    .setWitnessesToAppear(witnesses.getWitnessesToAppear())
+                    .setDetails(unwrapElements(witnesses.getDetails()));
             }
 
             private Hearing getHearing(DQ dq) {
                 var hearing = dq.getHearing();
-                return Hearing.builder()
-                    .hearingLength(getHearingLength(dq))
-                    .unavailableDatesRequired(hearing.getUnavailableDatesRequired())
-                    .unavailableDates(unwrapElements(hearing.getUnavailableDates()))
-                    .build();
+                return new Hearing()
+                    .setHearingLength(getHearingLength(dq))
+                    .setUnavailableDatesRequired(hearing.getUnavailableDatesRequired())
+                    .setUnavailableDates(unwrapElements(hearing.getUnavailableDates()));
             }
 
             private String getHearingLength(DQ dq) {
@@ -2471,14 +2450,13 @@ class DirectionsQuestionnaireGeneratorTest {
 
             private WelshLanguageRequirements getWelshLanguageRequirements(DQ dq) {
                 var welshLanguageRequirements = dq.getWelshLanguageRequirements();
-                return WelshLanguageRequirements.builder()
-                    .evidence(ofNullable(
+                return new WelshLanguageRequirements()
+                    .setEvidence(ofNullable(
                         welshLanguageRequirements.getEvidence()).map(Language::getDisplayedValue).orElse(""))
-                    .court(ofNullable(
+                    .setCourt(ofNullable(
                         welshLanguageRequirements.getCourt()).map(Language::getDisplayedValue).orElse(""))
-                    .documents(ofNullable(
-                        welshLanguageRequirements.getDocuments()).map(Language::getDisplayedValue).orElse(""))
-                    .build();
+                    .setDocuments(ofNullable(
+                        welshLanguageRequirements.getDocuments()).map(Language::getDisplayedValue).orElse(""));
             }
         }
     }
@@ -2697,13 +2675,12 @@ class DirectionsQuestionnaireGeneratorTest {
 
         @Test
         void whenIntermediateClaim_shouldUseFixedRecoverableCosts_ClaimantDQ() {
-            FixedRecoverableCosts frcIntermediate = FixedRecoverableCosts.builder()
-                .isSubjectToFixedRecoverableCostRegime(YES)
-                .frcSupportingDocument(Document.builder().build())
-                .complexityBandingAgreed(YES)
-                .band(ComplexityBand.BAND_1)
-                .reasons("Reasoning")
-                .build();
+            FixedRecoverableCosts frcIntermediate = new FixedRecoverableCosts()
+                .setIsSubjectToFixedRecoverableCostRegime(YES)
+                .setFrcSupportingDocument(Document.builder().build())
+                .setComplexityBandingAgreed(YES)
+                .setBand(ComplexityBand.BAND_1)
+                .setReasons("Reasoning");
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()

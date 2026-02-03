@@ -88,12 +88,10 @@ class CoverLetterAppendServiceTest {
         .individualLastName("Dave")
         .build();
 
-    private static final CoverLetter CLAIMANT_LETTER_TEMPLATE_DATA = CoverLetter.builder()
-        .party(CLAIMANT)
-        .build();
-    private static final CoverLetter DEFENDANT_LETTER_TEMPLATE_DATA = CoverLetter.builder()
-        .party(DEFENDANT)
-        .build();
+    private static final CoverLetter CLAIMANT_LETTER_TEMPLATE_DATA = new CoverLetter()
+        .setParty(CLAIMANT);
+    private static final CoverLetter DEFENDANT_LETTER_TEMPLATE_DATA = new CoverLetter()
+        .setParty(DEFENDANT);
 
     private static final CaseDocument caseDocument = CaseDocument.builder()
         .documentType(DocumentType.HEARING_FORM)
@@ -116,7 +114,7 @@ class CoverLetterAppendServiceTest {
                                                              anyString())).thenReturn(buildStitchedDocument());
 
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
-            .willReturn(DocmosisDocument.builder().bytes(new byte[]{1, 2, 3, 4, 5, 6}).build());
+            .willReturn(new DocmosisDocument().setBytes(new byte[]{1, 2, 3, 4, 5, 6}));
 
         specClaimTimelineDocuments = List.of(
             new DocumentMetaData(caseDocument.getDocumentLink(), "Cover letter", LocalDate.now().toString()),
