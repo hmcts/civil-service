@@ -107,10 +107,9 @@ public class HwFFeeTypeUtil {
 
         if (Objects.nonNull(caseData.getFeePaymentOutcomeDetails())
                 && caseData.getFeePaymentOutcomeDetails().getHwfNumberAvailable() == YesOrNo.YES) {
-            HelpWithFees helpWithFees = HelpWithFees.builder()
-                    .helpWithFee(YesOrNo.YES)
-                    .helpWithFeesReferenceNumber(caseData.getFeePaymentOutcomeDetails().getHwfNumberForFeePaymentOutcome())
-                    .build();
+            HelpWithFees helpWithFees = new HelpWithFees()
+                    .setHelpWithFee(YesOrNo.YES)
+                    .setHelpWithFeesReferenceNumber(caseData.getFeePaymentOutcomeDetails().getHwfNumberForFeePaymentOutcome());
             updatedData.generalAppHelpWithFees(helpWithFees);
             clearHwfReferenceProperties(updatedData);
         }
@@ -119,9 +118,9 @@ public class HwFFeeTypeUtil {
 
     private static void clearHwfReferenceProperties(GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder) {
         GeneralApplicationCaseData caseData = caseDataBuilder.build();
-        caseDataBuilder.feePaymentOutcomeDetails(caseData.getFeePaymentOutcomeDetails().toBuilder()
-                .hwfNumberAvailable(null)
-                .hwfNumberForFeePaymentOutcome(null).build());
+        caseDataBuilder.feePaymentOutcomeDetails(caseData.getFeePaymentOutcomeDetails().copy()
+                .setHwfNumberAvailable(null)
+                .setHwfNumberForFeePaymentOutcome(null));
     }
 
     public static void updateEventInHwfDetails(GeneralApplicationCaseData caseData,

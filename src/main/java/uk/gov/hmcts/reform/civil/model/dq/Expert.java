@@ -2,17 +2,17 @@ package uk.gov.hmcts.reform.civil.model.dq;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
-@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 public class Expert {
 
     private String partyID;
@@ -29,15 +29,29 @@ public class Expert {
     private LocalDate dateAdded;
 
     public static Expert fromSmallClaimExpertDetails(ExpertDetails expertDetails) {
-        return Expert.builder()
-            .name(expertDetails.getExpertName())
-            .firstName(expertDetails.getFirstName())
-            .lastName(expertDetails.getLastName())
-            .phoneNumber(expertDetails.getPhoneNumber())
-            .emailAddress(expertDetails.getEmailAddress())
-            .fieldOfExpertise(expertDetails.getFieldofExpertise())
-            .whyRequired(expertDetails.getWhyRequired())
-            .estimatedCost(expertDetails.getEstimatedCost())
-            .build();
+        return new Expert()
+            .setName(expertDetails.getExpertName())
+            .setFirstName(expertDetails.getFirstName())
+            .setLastName(expertDetails.getLastName())
+            .setPhoneNumber(expertDetails.getPhoneNumber())
+            .setEmailAddress(expertDetails.getEmailAddress())
+            .setFieldOfExpertise(expertDetails.getFieldofExpertise())
+            .setWhyRequired(expertDetails.getWhyRequired())
+            .setEstimatedCost(expertDetails.getEstimatedCost());
+    }
+
+    public Expert copy() {
+        return new Expert()
+            .setPartyID(partyID)
+            .setName(name)
+            .setFirstName(firstName)
+            .setLastName(lastName)
+            .setPhoneNumber(phoneNumber)
+            .setEmailAddress(emailAddress)
+            .setFieldOfExpertise(fieldOfExpertise)
+            .setWhyRequired(whyRequired)
+            .setEstimatedCost(estimatedCost)
+            .setEventAdded(eventAdded)
+            .setDateAdded(dateAdded);
     }
 }
