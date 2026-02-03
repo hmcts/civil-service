@@ -28,4 +28,6 @@ public final class DashboardTaskIds {
     public static final String HEARING_FEE_UNPAID = "GenerateDashboardNotificationsHearingFeeUnpaid";
     public static final String SETTLE_CLAIM_MARKED_PAID_IN_FULL = "GenerateDashboardNotificationsSettleClaimPaidInFull";
     public static final String SET_ASIDE_JUDGMENT = "GenerateDashboardNotificationsSetAsideJudgement";
+    public static final String INFORM_AGREED_EXTENSION_DATE_SPEC =
+        "GenerateDashboardNotificationsInformAgreedExtensionDateSpec";
 }

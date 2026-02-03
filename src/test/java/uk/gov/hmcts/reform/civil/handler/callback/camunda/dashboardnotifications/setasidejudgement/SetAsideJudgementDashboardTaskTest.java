@@ -9,21 +9,24 @@ import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.setasidejudgement.SetAsideJudgementClaimantDashboardService;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.setasidejudgement.SetAsideJudgementDefendantDashboardService;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class SetAsideJudgementClaimantDashboardTaskTest {
+class SetAsideJudgementDashboardTaskTest {
 
     private static final String AUTH_TOKEN = "Bearer";
 
     @Mock
-    private SetAsideJudgementClaimantDashboardService dashboardService;
+    private SetAsideJudgementClaimantDashboardService claimantService;
+    @Mock
+    private SetAsideJudgementDefendantDashboardService defendantService;
     @Mock
     private DashboardTaskContext context;
 
-    private final CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(123L).build();
+    private final CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(444L).build();
 
     @BeforeEach
     void setUp() {
@@ -32,11 +35,22 @@ class SetAsideJudgementClaimantDashboardTaskTest {
     }
 
     @Test
-    void shouldDelegateToClaimantDashboardService() {
-        SetAsideJudgementClaimantDashboardTask task = new SetAsideJudgementClaimantDashboardTask(dashboardService);
+    void claimantTaskDelegatesToService() {
+        SetAsideJudgementClaimantDashboardTask task =
+            new SetAsideJudgementClaimantDashboardTask(claimantService);
 
         task.execute(context);
 
-        verify(dashboardService).notifySetAsideJudgement(caseData, AUTH_TOKEN);
+        verify(claimantService).notifySetAsideJudgement(caseData, AUTH_TOKEN);
+    }
+
+    @Test
+    void defendantTaskDelegatesToService() {
+        SetAsideJudgementDefendantDashboardTask task =
+            new SetAsideJudgementDefendantDashboardTask(defendantService);
+
+        task.execute(context);
+
+        verify(defendantService).notifySetAsideJudgement(caseData, AUTH_TOKEN);
     }
 }
