@@ -82,6 +82,8 @@ public class TaskListService {
     }
 
     private void makeProgressAbleTasksInactiveForCaseIdentifierAndRole(String caseIdentifier, String role, String excludedCategory, String excludedTemplate) {
+        log.info("makeProgressAbleTasksInactiveForCaseIdentifierAndRole caseIdentifier:{} roel: {} excludedCategory: {} excludedTemplate: {}",
+                 caseIdentifier, role, excludedCategory, excludedTemplate);
         List<TaskListEntity> tasks = new ArrayList<>();
         if (Objects.nonNull(excludedCategory)) {
             List<TaskItemTemplateEntity> categories = taskItemTemplateRepository.findByCategoryEnAndRole(excludedCategory, role);
@@ -112,23 +114,29 @@ public class TaskListService {
                 .taskNameEn(StringUtility.removeAnchor(t.getTaskNameEn()))
                 .taskNameCy(StringUtility.removeAnchor(t.getTaskNameCy()))
                 .build();
+            log.info("{} task made inactive for claim = {}", task.getTaskNameEn(), caseIdentifier);
             taskListRepository.save(task);
         });
-        log.info("{} tasks made inactive for claim = {}", tasks.size(), caseIdentifier);
+        log.info("Total {} tasks made inactive for claim = {}", tasks.size(), caseIdentifier);
     }
 
     @Transactional
     public void makeProgressAbleTasksInactiveForCaseIdentifierAndRole(String caseIdentifier, String role) {
+        log.info("makeProgressAbleTasksInactiveForCaseIdentifierAndRole caseIdentifier: {} role: {}", caseIdentifier, role);
         makeProgressAbleTasksInactiveForCaseIdentifierAndRole(caseIdentifier, role, null, null);
     }
 
     @Transactional
     public void makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(String caseIdentifier, String role, String excludedCategory) {
+        log.info("makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory caseIdentifier:{} roel: {} excludedCategory: {}",
+                 caseIdentifier, role, excludedCategory);
         makeProgressAbleTasksInactiveForCaseIdentifierAndRole(caseIdentifier, role, excludedCategory, null);
     }
 
     @Transactional
     public void makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(String caseIdentifier, String role, String excludedTemplate) {
+        log.info("makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate caseIdentifier:{} roel: {} excludedTemplate: {}",
+                 caseIdentifier, role, excludedTemplate);
         makeProgressAbleTasksInactiveForCaseIdentifierAndRole(caseIdentifier, role, null, excludedTemplate);
     }
 }
