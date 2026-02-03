@@ -137,10 +137,9 @@ public class LocationHelper {
 
     private Optional<RequestedCourt> getUnspecClaimantRequestedCourt(CaseData caseData) {
         return Optional.ofNullable(caseData.getCourtLocation())
-            .map(courtLocation -> RequestedCourt.builder()
-                .responseCourtCode(courtLocation.getApplicantPreferredCourt())
-                .caseLocation(courtLocation.getCaseLocation())
-                .build());
+            .map(courtLocation -> new RequestedCourt()
+                .setResponseCourtCode(courtLocation.getApplicantPreferredCourt())
+                .setCaseLocation(courtLocation.getCaseLocation()));
     }
 
     /**

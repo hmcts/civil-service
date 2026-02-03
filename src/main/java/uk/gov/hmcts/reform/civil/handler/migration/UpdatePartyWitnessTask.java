@@ -53,11 +53,10 @@ public class UpdatePartyWitnessTask extends MigrationTask<CaseReference> {
             .partyID(generatePartyIdIfNull(witness.getPartyID()))
             .build();
 
-        UnaryOperator<Witness> updateWitness = witness -> witness.toBuilder()
-            .firstName(defaultIfNull(witness.getFirstName()))
-            .lastName(defaultIfNull(witness.getLastName()))
-            .partyID(generatePartyIdIfNull(witness.getPartyID()))
-            .build();
+        UnaryOperator<Witness> updateWitness = witness -> witness.copy()
+            .setFirstName(defaultIfNull(witness.getFirstName()))
+            .setLastName(defaultIfNull(witness.getLastName()))
+            .setPartyID(generatePartyIdIfNull(witness.getPartyID()));
 
         // Update applicant witness
         List<Element<PartyFlagStructure>> updatedApplicantWitness =
@@ -96,13 +95,11 @@ public class UpdatePartyWitnessTask extends MigrationTask<CaseReference> {
             return dq;
         }
 
-        Witnesses updatedWitness = dq.getApplicant1DQWitnesses().toBuilder()
-            .details(updateElements(dq.getApplicant1DQWitnesses().getDetails(), transformer))
-            .build();
+        Witnesses updatedWitness = dq.getApplicant1DQWitnesses().copy()
+            .setDetails(updateElements(dq.getApplicant1DQWitnesses().getDetails(), transformer));
 
-        return dq.toBuilder()
-            .applicant1DQWitnesses(updatedWitness)
-            .build();
+        return dq.copy()
+            .setApplicant1DQWitnesses(updatedWitness);
     }
 
     private Respondent1DQ updateRespondent1DQWitness(Respondent1DQ dq, UnaryOperator<Witness> transformer) {
@@ -110,13 +107,11 @@ public class UpdatePartyWitnessTask extends MigrationTask<CaseReference> {
             return dq;
         }
 
-        Witnesses updatedWitness = dq.getRespondent1DQWitnesses().toBuilder()
-            .details(updateElements(dq.getRespondent1DQWitnesses().getDetails(), transformer))
-            .build();
+        Witnesses updatedWitness = dq.getRespondent1DQWitnesses().copy()
+            .setDetails(updateElements(dq.getRespondent1DQWitnesses().getDetails(), transformer));
 
-        return dq.toBuilder()
-            .respondent1DQWitnesses(updatedWitness)
-            .build();
+        return dq.copy()
+            .setRespondent1DQWitnesses(updatedWitness);
     }
 
     private Respondent2DQ updateRespondent2DQWitness(Respondent2DQ dq, UnaryOperator<Witness> transformer) {
@@ -124,13 +119,11 @@ public class UpdatePartyWitnessTask extends MigrationTask<CaseReference> {
             return dq;
         }
 
-        Witnesses updatedWitness = dq.getRespondent2DQWitnesses().toBuilder()
-            .details(updateElements(dq.getRespondent2DQWitnesses().getDetails(), transformer))
-            .build();
+        Witnesses updatedWitness = dq.getRespondent2DQWitnesses().copy()
+            .setDetails(updateElements(dq.getRespondent2DQWitnesses().getDetails(), transformer));
 
-        return dq.toBuilder()
-            .respondent2DQWitnesses(updatedWitness)
-            .build();
+        return dq.copy()
+            .setRespondent2DQWitnesses(updatedWitness);
     }
 
     /**
@@ -141,12 +134,10 @@ public class UpdatePartyWitnessTask extends MigrationTask<CaseReference> {
             return dq;
         }
 
-        Witnesses updatedWitness = dq.getApplicant2DQWitnesses().toBuilder()
-            .details(updateElements(dq.getApplicant2DQWitnesses().getDetails(), transformer))
-            .build();
+        Witnesses updatedWitness = dq.getApplicant2DQWitnesses().copy()
+            .setDetails(updateElements(dq.getApplicant2DQWitnesses().getDetails(), transformer));
 
-        return dq.toBuilder()
-            .applicant2DQWitnesses(updatedWitness)
-            .build();
+        return dq.copy()
+            .setApplicant2DQWitnesses(updatedWitness);
     }
 }

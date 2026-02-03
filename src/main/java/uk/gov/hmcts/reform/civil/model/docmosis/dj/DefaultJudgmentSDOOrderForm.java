@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.dj;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -39,10 +39,10 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import java.util.List;
 
-@Getter
-@Builder
+@Data
 @AllArgsConstructor
-@EqualsAndHashCode
+@NoArgsConstructor
+@Accessors(chain = true)
 public class DefaultJudgmentSDOOrderForm implements MappableObject {
 
     private  String caseNumber;

@@ -194,12 +194,10 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldUpdateBusinessProcess() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             caseData.setCaseDataLiP(
-                CaseDataLiP.builder()
-                    .applicant1ClaimMediationSpecRequiredLip(
-                        ClaimantMediationLip.builder()
-                            .hasAgreedFreeMediation(MediationDecision.Yes)
-                            .build())
-                    .build());
+                new CaseDataLiP()
+                    .setApplicant1ClaimMediationSpecRequiredLip(
+                        new ClaimantMediationLip()
+                            .setHasAgreedFreeMediation(MediationDecision.Yes)));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -218,48 +216,39 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldOnlyUpdateClaimStatus_whenPartAdmitNotSettled_NoMediation() {
             given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                 .willReturn(getSampleCourLocationsRefObject());
-            Applicant1DQ applicant1DQ = Applicant1DQ.builder()
-                .applicant1DQRequestedCourt(
-                    RequestedCourt.builder()
-                        .responseCourtCode("court1")
-                        .caseLocation(
-                            CaseLocationCivil.builder()
-                                .region(courtLocation)
-                                .baseLocation(courtLocation)
-                                .build()
+            Applicant1DQ applicant1DQ = new Applicant1DQ()
+                .setApplicant1DQRequestedCourt(
+                    new RequestedCourt()
+                        .setResponseCourtCode("court1")
+                        .setCaseLocation(
+                            new CaseLocationCivil()
+                                .setRegion(courtLocation)
+                                .setBaseLocation(courtLocation)
                         )
-                        .build()
-
                 )
-                .applicant1DQHearing(Hearing.builder()
-                                          .hearingLength(ONE_DAY)
-                                          .unavailableDatesRequired(YES)
-                                          .unavailableDates(wrapElements(List.of(
+                .setApplicant1DQHearing(new Hearing()
+                                          .setHearingLength(ONE_DAY)
+                                          .setUnavailableDatesRequired(YES)
+                                          .setUnavailableDates(wrapElements(List.of(
                                               UnavailableDate.builder()
                                                   .date(LocalDate.of(2024, 2, 1))
                                                   .dateAdded(LocalDate.of(2024, 1, 1))
                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                  .build())))
-                                          .build())
-                .build();
-            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
-                .respondent1DQRequestedCourt(RequestedCourt.builder()
-                                                 .responseCourtCode("court2")
-                                                 .caseLocation(CaseLocationCivil.builder()
-                                                                   .region(courtLocation)
-                                                                   .baseLocation(courtLocation)
-                                                                   .build())
-                                                 .build())
-                .build();
+                                                  .build()))));
+            Respondent1DQ respondent1DQ = new Respondent1DQ()
+                .setRespondent1DQRequestedCourt(new RequestedCourt()
+                                                 .setResponseCourtCode("court2")
+                                                 .setCaseLocation(new CaseLocationCivil()
+                                                                      .setRegion(courtLocation)
+                                                                      .setBaseLocation(courtLocation)));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(NO);
             caseData.setApplicant1PartAdmitIntentionToSettleClaimSpec(NO);
             caseData.setApplicant1DQ(applicant1DQ);
             caseData.setRespondent1DQ(respondent1DQ);
             caseData.setApplicant1AcceptAdmitAmountPaidSpec(NO);
-            caseData.setCaseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
-                    MediationDecision.No).build())
-                             .build());
+            caseData.setCaseDataLiP(new CaseDataLiP().setApplicant1ClaimMediationSpecRequiredLip(new ClaimantMediationLip().setHasAgreedFreeMediation(
+                    MediationDecision.No)));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -298,24 +287,19 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldOnlyUpdateClaimStatus_whenPartAdmitNotSettled_NoMediation_NoBaseCourt() {
             Applicant1DQ applicant1DQ =
-                Applicant1DQ.builder().applicant1DQRequestedCourt(RequestedCourt.builder()
-                                                                      .caseLocation(CaseLocationCivil.builder()
-                                                                                        .build())
-                                                                      .build()).build();
+                new Applicant1DQ().setApplicant1DQRequestedCourt(new RequestedCourt()
+                                                                      .setCaseLocation(new CaseLocationCivil()));
             Respondent1DQ respondent1DQ =
-                Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder()
-                                                                        .caseLocation(CaseLocationCivil.builder()
-                                                                                          .build())
-                                                                        .build()).build();
+                new Respondent1DQ().setRespondent1DQRequestedCourt(new RequestedCourt()
+                                                                        .setCaseLocation(new CaseLocationCivil()));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(NO);
             caseData.setApplicant1PartAdmitIntentionToSettleClaimSpec(NO);
             caseData.setApplicant1DQ(applicant1DQ);
             caseData.setRespondent1DQ(respondent1DQ);
             caseData.setApplicant1AcceptAdmitAmountPaidSpec(NO);
-            caseData.setCaseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
-                    MediationDecision.No).build())
-                             .build());
+            caseData.setCaseDataLiP(new CaseDataLiP().setApplicant1ClaimMediationSpecRequiredLip(new ClaimantMediationLip().setHasAgreedFreeMediation(
+                    MediationDecision.No)));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -336,20 +320,17 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldOnlyUpdateClaimStatus_whenPartAdmitNotSettled_NoMediation_NoCourtSelected() {
             Applicant1DQ applicant1DQ =
-                Applicant1DQ.builder().applicant1DQRequestedCourt(RequestedCourt.builder()
-                                                                      .build()).build();
+                new Applicant1DQ().setApplicant1DQRequestedCourt(new RequestedCourt());
             Respondent1DQ respondent1DQ =
-                Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder()
-                                                                        .build()).build();
+                new Respondent1DQ().setRespondent1DQRequestedCourt(new RequestedCourt());
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(NO);
             caseData.setApplicant1PartAdmitIntentionToSettleClaimSpec(NO);
             caseData.setApplicant1DQ(applicant1DQ);
             caseData.setRespondent1DQ(respondent1DQ);
             caseData.setApplicant1AcceptAdmitAmountPaidSpec(NO);
-            caseData.setCaseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
-                    MediationDecision.No).build())
-                             .build());
+            caseData.setCaseDataLiP(new CaseDataLiP().setApplicant1ClaimMediationSpecRequiredLip(new ClaimantMediationLip().setHasAgreedFreeMediation(
+                    MediationDecision.No)));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -397,10 +378,9 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setApplicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_INDIVIDUAL").build());
             caseData.setRespondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("RESPONDENT_INDIVIDUAL").build());
             caseData.setCaseDataLiP(
-                CaseDataLiP.builder()
-                    .applicant1LiPResponse(ClaimantLiPResponse.builder().applicant1ChoosesHowToProceed(
-                        ChooseHowToProceed.REQUEST_A_CCJ).build())
-                    .build());
+                new CaseDataLiP()
+                    .setApplicant1LiPResponse(new ClaimantLiPResponse().setApplicant1ChoosesHowToProceed(
+                        ChooseHowToProceed.REQUEST_A_CCJ)));
             caseData.setRespondent1Represented(NO);
             caseData.setSpecRespondent1Represented(NO);
             caseData.setApplicant1Represented(NO);
@@ -437,26 +417,20 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                              .type(Party.Type.INDIVIDUAL)
                              .partyName("CLAIMANT_NAME")
                              .build());
-            caseData.setApplicant1DQ(Applicant1DQ.builder()
-                              .applicant1DQExperts(Experts.builder()
-                                                       .expertRequired(YES)
-                                                       .details(wrapElements(Expert.builder()
-                                                                                 .name(
-                                                                                     "John Smith")
-                                                                                 .firstName("Jane")
-                                                                                 .lastName("Smith")
-
-                                                                                 .build()))
-                                                       .build())
-                              .applicant1DQWitnesses(Witnesses.builder().witnessesToAppear(YES)
-                                                         .details(wrapElements(Witness.builder()
-                                                                                   .name(
-                                                                                       "John Smith")
-                                                                                   .firstName("Jane")
-                                                                                   .lastName("Smith")
-
-                                                                                   .build())).build())
-                              .build());
+            caseData.setApplicant1DQ(new Applicant1DQ()
+                              .setApplicant1DQExperts(new Experts()
+                                                       .setExpertRequired(YES)
+                                                       .setDetails(wrapElements(new Expert()
+                                                                                 .setName("John Smith")
+                                                                                 .setFirstName("Jane")
+                                                                                 .setLastName("Smith")
+                                                       )))
+                              .setApplicant1DQWitnesses(new Witnesses().setWitnessesToAppear(YES)
+                                                         .setDetails(wrapElements(new Witness()
+                                                                                   .setName("John Smith")
+                                                                                   .setFirstName("Jane")
+                                                                                   .setLastName("Smith")
+                                                         ))));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -519,26 +493,20 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                                  .type(Party.Type.INDIVIDUAL)
                                  .partyName("CLAIMANT_NAME")
                                  .build())
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQExperts(Experts.builder()
-                                                           .expertRequired(YES)
-                                                           .details(wrapElements(Expert.builder()
-                                                                                     .name(
-                                                                                         "John Smith")
-                                                                                     .firstName("Jane")
-                                                                                     .lastName("Smith")
-
-                                                                                     .build()))
-                                                           .build())
-                                  .applicant1DQWitnesses(Witnesses.builder().witnessesToAppear(YES)
-                                                             .details(wrapElements(Witness.builder()
-                                                                                       .name(
-                                                                                           "John Smith")
-                                                                                       .firstName("Jane")
-                                                                                       .lastName("Smith")
-
-                                                                                       .build())).build())
-                                  .build())
+                .applicant1DQ(new Applicant1DQ()
+                                  .setApplicant1DQExperts(new Experts()
+                                                           .setExpertRequired(YES)
+                                                           .setDetails(wrapElements(new Expert()
+                                                                                     .setName("John Smith")
+                                                                                     .setFirstName("Jane")
+                                                                                     .setLastName("Smith")
+                                                           )))
+                                  .setApplicant1DQWitnesses(new Witnesses().setWitnessesToAppear(YES)
+                                                             .setDetails(wrapElements(new Witness()
+                                                                                       .setName("John Smith")
+                                                                                       .setFirstName("Jane")
+                                                                                       .setLastName("Smith")
+                                                             ))))
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -558,13 +526,11 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetImmediateSettlementAgreementDeadLine_whenClaimantSignedSettlementAgreement() {
             CaseData caseData = CaseDataBuilder.builder()
                     .caseDataLip(
-                            CaseDataLiP.builder()
-                                    .applicant1LiPResponse(
-                                            ClaimantLiPResponse.builder()
-                                                    .applicant1SignedSettlementAgreement(YesOrNo.YES)
-                                                    .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                                                    .build())
-                                    .build())
+                            new CaseDataLiP()
+                                    .setApplicant1LiPResponse(
+                                            new ClaimantLiPResponse()
+                                                    .setApplicant1SignedSettlementAgreement(YesOrNo.YES)
+                                                    .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)))
                     .applicant1RepaymentOptionForDefendantSpec(PaymentType.IMMEDIATELY)
                     .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
                     .respondent1(Party.builder()
@@ -588,12 +554,10 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(deadlinesCalculator.getRespondToSettlementAgreementDeadline(any())).willReturn(LocalDateTime.MAX);
             CaseData caseData = CaseDataBuilder.builder()
                     .caseDataLip(
-                            CaseDataLiP.builder()
-                                    .applicant1LiPResponse(
-                                            ClaimantLiPResponse.builder()
-                                                    .applicant1SignedSettlementAgreement(YesOrNo.YES)
-                                                    .build())
-                                    .build())
+                            new CaseDataLiP()
+                                    .setApplicant1LiPResponse(
+                                            new ClaimantLiPResponse()
+                                                    .setApplicant1SignedSettlementAgreement(YesOrNo.YES)))
                     .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
                     .respondent1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
@@ -629,7 +593,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                                        .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(10))
                                        .ccjJudgmentTotalStillOwed(BigDecimal.valueOf(150))
                                        .build())
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -661,8 +625,8 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1Represented(NO)
                 .specRespondent1Represented(NO)
                 .applicant1Represented(NO)
-                .applicant1DQ(Applicant1DQ.builder().applicant1DQLanguage(WelshLanguageRequirements.builder().documents(
-                    Language.WELSH).build()).build())
+                .applicant1DQ(new Applicant1DQ().setApplicant1DQLanguage(
+                    new WelshLanguageRequirements().setDocuments(Language.WELSH)))
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -682,8 +646,8 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1Represented(NO)
                 .specRespondent1Represented(NO)
                 .applicant1Represented(NO)
-                .applicant1DQ(Applicant1DQ.builder().applicant1DQLanguage(WelshLanguageRequirements.builder().documents(
-                    Language.WELSH).build()).build())
+                .applicant1DQ(new Applicant1DQ().setApplicant1DQLanguage(
+                    new WelshLanguageRequirements().setDocuments(Language.WELSH)))
                 .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .applicant1AcceptPartAdmitPaymentPlanSpec(YES)

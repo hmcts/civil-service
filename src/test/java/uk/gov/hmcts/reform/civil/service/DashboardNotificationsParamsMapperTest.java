@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.MarkPaidConsentList;
 import uk.gov.hmcts.reform.civil.model.Bundle;
@@ -577,6 +578,24 @@ public class DashboardNotificationsParamsMapperTest {
     @ParameterizedTest
     @EnumSource(value = CaseEvent.class, names = {
         "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT",
+        "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT"
+    })
+    void shouldNotMapOrderDocument_whenWelshEnabledAndBilingual(CaseEvent caseEvent) {
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+        caseData.setClaimantBilingualLanguagePreference(Language.WELSH.toString());
+
+        List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
+        finalCaseDocuments.add(element(generateOrder(JUDGE_FINAL_ORDER)));
+        caseData.setFinalOrderDocumentCollection(finalCaseDocuments);
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData, caseEvent);
+
+        assertThat(result).doesNotContainKey("orderDocument");
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = CaseEvent.class, names = {
+        "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT",
         "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT",
         "UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT",
         "UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_DEFENDANT"
@@ -647,7 +666,8 @@ public class DashboardNotificationsParamsMapperTest {
 
         Map<String, Object> result =
             mapper.mapCaseDataToParams(caseData, CaseEvent.ADD_CASE_NOTE);
-        assertThat(result).doesNotContainEntry("orderDocument", null);
+        assertThat(result).doesNotContainKey("orderDocument");
+        assertThat(result).doesNotContainKey("hiddenOrderDocument");
     }
 
     @Test
@@ -658,7 +678,53 @@ public class DashboardNotificationsParamsMapperTest {
 
         Map<String, Object> result =
             mapper.mapCaseDataToParams(caseData, null);
-        assertThat(result).doesNotContainEntry("orderDocument", null);
+        assertThat(result).doesNotContainKey("orderDocument");
+        assertThat(result).doesNotContainKey("hiddenOrderDocument");
+    }
+
+    @Test
+    void shouldReturnEmptyMap_whenCaseDataIsNull() {
+        Map<String, Object> result = mapper.mapCaseDataToParams(null);
+        assertThat(result).isEmpty();
+
+        Map<String, Object> resultWithEvent = mapper.mapCaseDataToParams(null, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT);
+        assertThat(resultWithEvent).isEmpty();
+    }
+
+    @Test
+    void shouldNotThrowException_whenDjSdoCollectionIsEmpty() {
+        caseData.setOrderSDODocumentDJCollection(new ArrayList<>());
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT);
+        assertThat(result).doesNotContainKey("orderDocument");
+    }
+
+    @Test
+    void shouldNotThrowException_whenDjSdoCollectionIsNull() {
+        caseData.setOrderSDODocumentDJCollection(null);
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT);
+        assertThat(result).doesNotContainKey("orderDocument");
+    }
+
+    @Test
+    void shouldNotThrowException_whenSdoDocumentIsNull() {
+        caseData.setSystemGeneratedCaseDocuments(null);
+        caseData.setPreTranslationDocuments(null);
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT);
+        assertThat(result).doesNotContainKey("orderDocument");
+        assertThat(result).doesNotContainKey("hiddenOrderDocument");
+    }
+
+    @Test
+    void shouldNotThrowException_whenHiddenSdoDocumentIsNull() {
+        List<Element<CaseDocument>> systemGeneratedDocuments = new ArrayList<>();
+        systemGeneratedDocuments.add(element(generateOrder(SDO_ORDER)));
+        caseData.setSystemGeneratedCaseDocuments(systemGeneratedDocuments);
+        caseData.setPreTranslationDocuments(null);
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT);
+
+        assertThat(result).extracting("orderDocument").isEqualTo("binary-url");
+        assertThat(result).doesNotContainKey("hiddenOrderDocument");
     }
 
     @Test
@@ -728,4 +794,3 @@ public class DashboardNotificationsParamsMapperTest {
             markedPaidInFullDate, false));
     }
 }
-

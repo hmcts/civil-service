@@ -47,7 +47,7 @@ class AcknowledgementOfClaimGeneratorForSpecTest {
         .documentType(ACKNOWLEDGEMENT_OF_SERVICE)
         .build();
 
-    private final Representative representative = Representative.builder().organisationName("test org").build();
+    private final Representative representative = new Representative().setOrganisationName("test org");
 
     @Mock
     private SecuredDocumentManagementService documentManagementService;
@@ -94,23 +94,22 @@ class AcknowledgementOfClaimGeneratorForSpecTest {
     }
 
     private AcknowledgementOfClaimFormForSpec getExpectedFormData(CaseData caseData) {
-        return AcknowledgementOfClaimFormForSpec.builder()
-            .caseName("Mr. John Rambo \nvs Mr. Sole Trader T/A Sole Trader co")
-            .referenceNumber(LEGACY_CASE_REFERENCE)
-            .submittedOn(LocalDate.now())
-            .solicitorReferences(caseData.getSolicitorReferences())
-            .issueDate(caseData.getIssueDate())
-            .responseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
-            .respondent(
-                Party.builder()
-                    .name(caseData.getRespondent1().getPartyName())
-                    .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
-                    .representative(representative)
-                    .litigationFriendName(
-                        ofNullable(caseData.getRespondent1LitigationFriend())
-                            .map(LitigationFriend::getFullName)
-                            .orElse(""))
-                    .build())
-            .build();
+        return new AcknowledgementOfClaimFormForSpec(
+            "[userImage:courtseal.PNG]",
+            "Mr. John Rambo \nvs Mr. Sole Trader T/A Sole Trader co",
+            LEGACY_CASE_REFERENCE,
+            caseData.getSolicitorReferences(),
+            caseData.getIssueDate(),
+            LocalDate.now(),
+            caseData.getRespondent1ResponseDeadline().toLocalDate(),
+            new Party()
+                .setName(caseData.getRespondent1().getPartyName())
+                .setPrimaryAddress(caseData.getRespondent1().getPrimaryAddress())
+                .setRepresentative(representative)
+                .setLitigationFriendName(
+                    ofNullable(caseData.getRespondent1LitigationFriend())
+                        .map(LitigationFriend::getFullName)
+                        .orElse(""))
+        );
     }
 }
