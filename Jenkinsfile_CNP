@@ -33,31 +33,6 @@ def copyPrevFailedAndNotExecutedTestFilesJson() {
   }
 }
 
-def copyPreviousAllureHistory() {
-  def buildFound = false
-  def buildNumber = currentBuild.previousBuild ? currentBuild.previousBuild.number : 0
-  def minBuildNumber = ((buildNumber - 8) > 0) ? buildNumber - 8 : 0
-  def targetDir = "test-results/functional/allure-results/history"
-
-  while (!buildFound && buildNumber > minBuildNumber) {
-    try {
-      copyArtifacts(
-        projectName: env.JOB_NAME,
-        selector: specific("${buildNumber}"),
-        filter: "test-results/functional/allure-report/history/*",
-        target: targetDir,
-        flatten: true
-      )
-
-      buildFound = true
-      echo "Successfully imported Allure history from build ${buildNumber}"
-    } catch (Exception error) {
-      echo "Allure history artifact not found in build ${buildNumber}. Trying previous..."
-      buildNumber--
-    }
-  }
-}
-
 def getFunctionalTestsGroups() {
   def githubApi = new GithubAPI(this)
   def functionalTestGroups = []
@@ -112,9 +87,6 @@ def secrets = [
     secret('judge-default-password', 'JUDGE_DEFAULT_PASSWORD'),
     secret('iac-default-password', 'IAC_DEFAULT_PASSWORD'),
     secret('system-update-user-password', 'SYSTEM_USER_PASSWORD'),
-    secret('citizen-ui-test-username', 'CITIZEN_USERNAME'),
-    secret('citizen-ui-test-password', 'CITIZEN_PASSWORD'),
-    secret('civil-judge-password', 'JUDGE_PASSWORD'),
     secret('generic-docker-pact-broker-password', 'GENERIC_DOCKER_PACT_BROKER_YAML_PASS')
   ],
   'aac-${env}'  : [
@@ -193,7 +165,6 @@ withPipeline(type, product, component) {
     env.CIVIL_GENERAL_APPLICATIONS_URL = "https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.WIREMOCK_URL = "https://wiremock-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.FT_TYPE = getFunctionalTestsType()
-    env.ROLE_ASSIGNMENT_URL = "https://am-role-assignment-service-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
 
     retry(3) {
       sh """
@@ -207,7 +178,6 @@ withPipeline(type, product, component) {
         ./bin/pull-latest-gen-apps-ccd-files.sh ${getGenAppsCcdDefinitionBranch()}
         ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json,AuthorisationCaseType-shuttered.json"
         ./bin/import-gen-apps-ccd-definition.sh "-e *-nonprod.json"
-        ./bin/add-org-roles-to-users.sh
       """
     }
 
@@ -241,19 +211,9 @@ withPipeline(type, product, component) {
     } else {
       copyPrevFailedAndNotExecutedTestFilesJson();
     }
-    copyPreviousAllureHistory();
   }
 
   afterAlways('functionalTest:preview') {
-    steps.sh 'npx allure generate test-results/functional/allure-results --clean -o test-results/functional/allure-report'
-    publishHTML([
-      allowMissing: false,
-      alwaysLinkToLastBuild: true,
-      keepAll: true,
-      reportDir: 'test-results/functional/allure-report',
-      reportFiles: 'index.html',
-      reportName: 'Non-Prod E2E Allure Report'
-    ])
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
   }
 
@@ -289,19 +249,9 @@ withPipeline(type, product, component) {
 
   before('functionalTest:aat') {
     copyPrevFailedAndNotExecutedTestFilesJson();
-    copyPreviousAllureHistory();
   }
 
   afterAlways('functionalTest:aat') {
-    steps.sh 'npx allure generate test-results/functional/allure-results --clean -o test-results/functional/allure-report'
-    publishHTML([
-      allowMissing: false,
-      alwaysLinkToLastBuild: true,
-      keepAll: true,
-      reportDir: 'test-results/functional/allure-report',
-      reportFiles: 'index.html',
-      reportName: 'Non-Prod E2E Allure Report'
-    ])
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
   }
 }

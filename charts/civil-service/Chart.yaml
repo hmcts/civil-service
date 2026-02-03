@@ -18,12 +18,16 @@ dependencies:
     version: 1.0.31
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: xui-webapp.enabled
+  - name: idam-pr
+    version: ~2.3.0
+    repository: 'oci://hmctspublic.azurecr.io/helm'
+    condition: idam-pr.enabled
   - name: camunda-bpm
     version: 0.0.48
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: camunda-bpm.enabled
   - name: aac-manage-case-assignment
-    version: ~0.2.20
+    version: 0.2.20
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: aac-manage-case-assignment.enabled
   - name: wiremock

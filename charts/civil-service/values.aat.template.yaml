@@ -124,7 +124,12 @@ java:
     auth:
       username: ${POSTGRES_USER}
       password: ${POSTGRES_PASSWORD}
-
+idam-pr:
+  releaseNameOverride: ${SERVICE_NAME}-xui-idam-pr
+  enabled: true
+  redirect_uris:
+    XUI:
+      - https://civil-service-xui-staging.aat.platform.hmcts.net/oauth2/callback
 
 xui-webapp:
   enabled: true
