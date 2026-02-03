@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -315,16 +316,17 @@ class NoOngoingBusinessProcessAspectTest {
     @Nested
     class CamundaEvent {
 
-        @Test
+        @ParameterizedTest
+        @EnumSource(value = CaseEvent.class, names = {"INITIATE_GENERAL_APPLICATION", "APPLICATION_PROCEEDS_IN_HERITAGE"})
         @SneakyThrows
-        void shouldProceedToMethodInvocation_whenNoOngoingBusinessProcess() {
+        void shouldProceedToMethodInvocation_whenNoOngoingBusinessProcess(CaseEvent event) {
             AboutToStartOrSubmitCallbackResponse response = AboutToStartOrSubmitCallbackResponse.builder().build();
             when(proceedingJoinPoint.proceed()).thenReturn(response);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_START, GeneralApplicationCaseDataBuilder.builder().build())
                 .isGeneralApplicationCase(true)
-                .request(CallbackRequest.builder().eventId(INITIATE_GENERAL_APPLICATION.name()).build())
+                .request(CallbackRequest.builder().eventId(event.name()).build())
                 .build();
 
             Object result = aspect.checkOngoingBusinessProcess(proceedingJoinPoint, callbackParams);
