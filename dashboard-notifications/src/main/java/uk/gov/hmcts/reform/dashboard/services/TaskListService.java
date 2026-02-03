@@ -82,7 +82,7 @@ public class TaskListService {
     }
 
     private void makeProgressAbleTasksInactiveForCaseIdentifierAndRole(String caseIdentifier, String role, String excludedCategory, String excludedTemplate) {
-        log.info("makeProgressAbleTasksInactiveForCaseIdentifierAndRole caseIdentifier:{} roel: {} excludedCategory: {} excludedTemplate: {}",
+        log.info("makeProgressAbleTasksInactiveForCaseIdentifierAndRole caseIdentifier:{} role: {} excludedCategory: {} excludedTemplate: {}",
                  caseIdentifier, role, excludedCategory, excludedTemplate);
         List<TaskListEntity> tasks = new ArrayList<>();
         if (Objects.nonNull(excludedCategory)) {
@@ -128,14 +128,14 @@ public class TaskListService {
 
     @Transactional
     public void makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(String caseIdentifier, String role, String excludedCategory) {
-        log.info("makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory caseIdentifier:{} roel: {} excludedCategory: {}",
+        log.info("makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory caseIdentifier:{} role: {} excludedCategory: {}",
                  caseIdentifier, role, excludedCategory);
         makeProgressAbleTasksInactiveForCaseIdentifierAndRole(caseIdentifier, role, excludedCategory, null);
     }
 
     @Transactional
     public void makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(String caseIdentifier, String role, String excludedTemplate) {
-        log.info("makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate caseIdentifier:{} roel: {} excludedTemplate: {}",
+        log.info("makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate caseIdentifier:{} role: {} excludedTemplate: {}",
                  caseIdentifier, role, excludedTemplate);
         makeProgressAbleTasksInactiveForCaseIdentifierAndRole(caseIdentifier, role, null, excludedTemplate);
     }
