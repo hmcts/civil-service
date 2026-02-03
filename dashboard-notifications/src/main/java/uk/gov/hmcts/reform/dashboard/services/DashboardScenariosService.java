@@ -50,7 +50,7 @@ public class DashboardScenariosService {
     @SuppressWarnings("java:S1172")
     public void recordScenarios(String authorisation, String scenarioReference,
                                 String uniqueCaseIdentifier, ScenarioRequestParams scenarioRequestParams) {
-        log.info("Recording scenario {} with caseReference {}", scenarioReference, uniqueCaseIdentifier );
+        log.info("Recording scenario {} with caseReference {}", scenarioReference, uniqueCaseIdentifier);
 
         Optional<ScenarioEntity> scenarioByName = scenarioRepository.findByName(scenarioReference);
         scenarioByName.ifPresent(scenario -> {
