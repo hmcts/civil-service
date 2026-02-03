@@ -281,7 +281,8 @@ public class SdoGeneratorService {
             )
             .fastTrackBuildingDispute(caseData.getFastTrackBuildingDispute())
             .fastTrackClinicalNegligence(caseData.getFastTrackClinicalNegligence())
-            .fastTrackHousingDisrepair(caseData.getFastTrackHousingDisrepair())
+            //Todo: need to discuss with Ruben
+            //.fastTrackHousingDisrepair(caseData.getFastTrackHousingDisrepair())
             .fastTrackPersonalInjury(caseData.getFastTrackPersonalInjury())
             .fastTrackRoadTrafficAccident(caseData.getFastTrackRoadTrafficAccident())
             .fastTrackPPI(hasPpi ? caseData.getFastTrackPPI() : null)

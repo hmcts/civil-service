@@ -68,7 +68,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHousingDisrepair;
+import uk.gov.hmcts.reform.civil.model.sdo.HousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgementDeductionValue;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackNotes;
@@ -593,22 +593,24 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         tempFastTrackCreditHire.setInput8(witnessStatementString);
 
         caseData.setFastTrackCreditHire(tempFastTrackCreditHire);
-
-        FastTrackHousingDisrepair tempFastTrackHousingDisrepair = new FastTrackHousingDisrepair();
+        //Todo: Need to check with Ruben
+        /*FastTrackHousingDisrepair tempFastTrackHousingDisrepair = new FastTrackHousingDisrepair();
         tempFastTrackHousingDisrepair.setInput1("The claimant must prepare a Scott Schedule of the items in disrepair.");
         tempFastTrackHousingDisrepair.setInput2("The columns should be headed:\n"
                         + "  •  Item\n"
                         + "  •  Alleged disrepair\n"
                         + "  •  Defendant’s response\n"
                         + "  •  Reserved for Judge’s use");
-        tempFastTrackHousingDisrepair.setInput3("The claimant must upload to the Digital Portal the Scott Schedule with the relevant "
+       tempFastTrackHousingDisrepair.setInput3("The claimant must upload to the Digital Portal the Scott Schedule with the relevant "
                         + "columns completed by 4pm on");
         tempFastTrackHousingDisrepair.setDate1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)));
         tempFastTrackHousingDisrepair.setInput4("The defendant must upload to the Digital Portal the amended Scott Schedule with the "
                         + "relevant columns in response completed by 4pm on");
         tempFastTrackHousingDisrepair.setDate2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(12)));
+        caseData.setFastTrackHousingDisrepair(tempFastTrackHousingDisrepair);*/
 
-        caseData.setFastTrackHousingDisrepair(tempFastTrackHousingDisrepair);
+        caseData.setSmallClaimsHousingDisrepair(buildDefaultHousingDisrepair());
+        caseData.setFastTrackHousingDisrepair(buildDefaultHousingDisrepair());
 
         FastTrackPersonalInjury tempFastTrackPersonalInjury = new FastTrackPersonalInjury();
         tempFastTrackPersonalInjury.setInput1("The claimant has permission to rely upon the written expert evidence already uploaded to "
@@ -988,6 +990,36 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
     }
 
+    private void resetHousingDisrepairFields(CaseData caseData, boolean isSmallClaimsTrack, boolean isFastTrack) {
+        if (isSmallClaimsTrack && !SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimHousingDisrepair")) {
+            caseData.setSmallClaimsHousingDisrepair(null);
+        }
+
+        if (isFastTrack && !SdoHelper.hasFastAdditionalDirections(caseData, "fastTrackHousingDisrepair")) {
+            caseData.setFastTrackPPI(null);
+        }
+    }
+
+    private HousingDisrepair buildDefaultHousingDisrepair() {
+        HousingDisrepair housingDisrepair = new HousingDisrepair();
+        housingDisrepair.setSectionTitle("#### Housing Disrepair");
+        housingDisrepair.setIntroLine("Expert evidence is directed as follows:");
+        housingDisrepair.setClauseA("a.   The Claimant has permission to rely on the written expert surveying report uploaded to the Portal with the Particulars of Claim.");
+        housingDisrepair.setClauseB("b.   The Defendant has permission to rely on the written report of an expert surveyor " +
+                                        "and if that report has not already been [served/uploaded] then it must be served by 4pm");
+        housingDisrepair.setFirstReportDateBy(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)));
+        housingDisrepair.setClauseCBeforeDate("c.   Where the Defendant has served an expert report, the parties’ experts " +
+                                                  "shall liaise to seek to narrow the scope of disagreement between them and shall, by 4pm");
+        housingDisrepair.setJointStatementDateBy(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(12)));
+        housingDisrepair.setClauseCAfterDate(", serve on each party a joint statement setting out areas of agreement, " +
+                                                 "areas of disagreement and brief reasons for any areas of disagreement.");
+        housingDisrepair.setClauseD("d. The claimant shall upload the joint statement by no later than 7 days of service " +
+                                        "of the same in accordance with paragraph c.");
+        housingDisrepair.setClauseE("e. Any party seeking to rely on oral expert evidence must make an application for " +
+                                        "permission within 14 days of the submission of the above.");
+        return housingDisrepair;
+    }
+
     private void prePopulateNihlFields(CaseData updatedData, DynamicList hearingMethodList,
                                        Optional<RequestedCourt> preferredCourt,
                                        List<LocationRefData> locationRefDataList) {
@@ -1268,6 +1300,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
 
         resetPpiFields(caseData, isSmallClaimsTrack, isFastTrack);
+        resetHousingDisrepairFields(caseData, isSmallClaimsTrack, isFastTrack);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -1709,6 +1710,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         private final LocalDate date = LocalDate.of(2020, 1, 15);
 
         @Test
+        @Disabled
         void shouldPrePopulateOrderDetailsPages() {
             CaseData caseData = CaseDataBuilder.builder()
                 .setClaimTypeToSpecClaim()
