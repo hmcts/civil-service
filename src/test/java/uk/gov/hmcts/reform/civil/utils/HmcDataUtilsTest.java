@@ -68,11 +68,11 @@ class HmcDataUtilsTest {
         LocalDateTime now = LocalDateTime.now();
 
         var res1 = PartiesNotifiedResponse.builder().serviceData(PartiesNotifiedServiceData.builder().hearingLocation("loc-3").build())
-            .responseReceivedDateTime(now.minusDays(3)).build();
+            .responseReceivedDateTime(now.minusDays(3)).requestVersion(1).build();
         var res2 = PartiesNotifiedResponse.builder().serviceData(PartiesNotifiedServiceData.builder().hearingLocation("loc-2").build())
-            .responseReceivedDateTime(now.minusDays(2)).build();
+            .responseReceivedDateTime(now.minusDays(2)).requestVersion(2).build();
         var expected = PartiesNotifiedResponse.builder().serviceData(PartiesNotifiedServiceData.builder().hearingLocation("loc-1").build())
-            .responseReceivedDateTime(now.minusDays(1)).build();
+            .responseReceivedDateTime(now.minusDays(1)).requestVersion(3).build();
 
         PartiesNotifiedResponses partiesNotified = PartiesNotifiedResponses.builder()
             .responses(List.of(res1, expected, res2))
@@ -81,6 +81,35 @@ class HmcDataUtilsTest {
         PartiesNotifiedResponse result = HmcDataUtils.getLatestHearingNoticeDetails(partiesNotified);
 
         assertEquals(result, expected);
+    }
+
+    @Test
+    void getHearingResponseForRequestVersion_WhenEmptyList_ReturnsNull() {
+        PartiesNotifiedResponses partiesNotified = PartiesNotifiedResponses.builder().responses(List.of()).build();
+
+        PartiesNotifiedResponse result = HmcDataUtils.getLatestHearingResponseForRequestVersion(partiesNotified, 1);
+
+        assertNull(result);
+    }
+
+    @Test
+    void getHearingResponseForRequestVersion_WhenNonEmptyList_ReturnsLatestResponse() {
+        LocalDateTime now = LocalDateTime.now();
+
+        var res1 = PartiesNotifiedResponse.builder().serviceData(PartiesNotifiedServiceData.builder().hearingLocation("loc-3").build())
+            .responseReceivedDateTime(now.minusDays(3)).requestVersion(1).build();
+        var res2 = PartiesNotifiedResponse.builder().serviceData(PartiesNotifiedServiceData.builder().hearingLocation("loc-2").build())
+            .responseReceivedDateTime(now.minusDays(2)).requestVersion(3).build();
+        var res3 = PartiesNotifiedResponse.builder().serviceData(PartiesNotifiedServiceData.builder().hearingLocation("loc-1").build())
+            .responseReceivedDateTime(now.minusDays(1)).requestVersion(2).build();
+
+        PartiesNotifiedResponses partiesNotified = PartiesNotifiedResponses.builder()
+            .responses(List.of(res3, res1, res2))
+            .build();
+
+        PartiesNotifiedResponse result = HmcDataUtils.getLatestHearingResponseForRequestVersion(partiesNotified, 3);
+
+        assertEquals(result, res2);
     }
 
     @Test
@@ -234,12 +263,15 @@ class HmcDataUtilsTest {
 
         var result = HmcDataUtils.getHearingDaysText(hearing, isWelsh);
 
-        assertEquals(result, isWelsh ? "23 Rhagfyr 2023 am 10:00 am 3 awr\n" +
-            "24 Rhagfyr 2023 am 14:00 am 2 awr\n" +
-            "25 Rhagfyr 2023 am 10:00 am 6 awr"
-            : "23 December 2023 at 10:00 for 3 hours\n" +
-            "24 December 2023 at 14:00 for 2 hours\n" +
-            "25 December 2023 at 10:00 for 6 hours");
+        assertEquals(result, isWelsh ? """
+            23 Rhagfyr 2023 am 10:00 am 3 awr
+            24 Rhagfyr 2023 am 14:00 am 2 awr
+            25 Rhagfyr 2023 am 10:00 am 6 awr"""
+            : """
+            23 December 2023 at 10:00 for 3 hours
+            24 December 2023 at 14:00 for 2 hours
+            25 December 2023 at 10:00 for 6 hours"""
+        );
     }
 
     @Test
