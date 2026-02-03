@@ -31,9 +31,9 @@ public class DefendantResponseWelshTranslationScenarioTest extends DashboardBase
             .applicant1Represented(YesOrNo.NO)
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
-            .caseDataLiP(CaseDataLiP.builder()
-                        .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                    .respondent1ResponseLanguage("WELSH").build()).build())
+            .caseDataLiP(new CaseDataLiP()
+                        .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                    .setRespondent1ResponseLanguage("WELSH")))
             .build();
 
         handler.handle(callbackParams(caseData));
@@ -76,9 +76,9 @@ public class DefendantResponseWelshTranslationScenarioTest extends DashboardBase
             .respondent1ResponseDeadline(LocalDateTime.MAX)
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                         .respondent1ResponseLanguage("WELSH").build()).build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                         .setRespondent1ResponseLanguage("WELSH")))
             .build();
 
         handler.handle(callbackParams(caseData));
