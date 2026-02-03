@@ -12,9 +12,11 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CertificateOfService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -129,7 +131,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
 
         caseData.setIsRespondent1(isRespondent1);
         if (caseData.getCaseAccessCategory() == CaseCategory.UNSPEC_CLAIM) {
-            setMaxAllowedDate(callbackParams, caseData);
+            setMaxAllowedExtensionDate(callbackParams, caseData);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -137,36 +139,54 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    /**
-     * Sets the agreed deadline extension to be the maximum allowed.
-     *
-     * @param callbackParams callback parameters
-     * @param caseData       original case data
-     * @param builder        builder for new case data
-     */
-    private void setMaxAllowedDate(CallbackParams callbackParams,
-                                   CaseData caseData) {
+    private void setMaxAllowedExtensionDate(CallbackParams callbackParams, CaseData caseData) {
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        if (coreCaseUserService.userHasCaseRole(
-            caseData.getCcdCaseReference().toString(),
-            userInfo.getUid(),
-            RESPONDENTSOLICITORONE
-        )) {
+        Long ccdCaseReference = caseData.getCcdCaseReference();
+
+        if (isUserHasCaseRole(caseData, userInfo, CaseRole.RESPONDENTSOLICITORONE)) {
+            LocalDate notificationDate = getDeemedServedDate(caseData, RESPONDENTSOLICITORONE);
+            log.info("Setting max allowed extension date base on notification date {} and respondent1 for caseID {}",
+                     notificationDate, ccdCaseReference
+            );
             caseData.setRespondentSolicitor1AgreedDeadlineExtension(validator.getMaxDate(
-                caseData.getClaimDetailsNotificationDate(),
+                notificationDate,
                 caseData.getRespondent1AcknowledgeNotificationDate()
             ));
         }
-        if (coreCaseUserService.userHasCaseRole(
-            caseData.getCcdCaseReference().toString(),
-            userInfo.getUid(),
-            RESPONDENTSOLICITORTWO
-        )) {
+        if (isUserHasCaseRole(caseData, userInfo, CaseRole.RESPONDENTSOLICITORTWO)) {
+            LocalDate notificationDate = getDeemedServedDate(caseData, RESPONDENTSOLICITORTWO);
+            log.info("Setting max allowed extension date base on notification date {} and respondent2 for caseID {}",
+                     notificationDate, ccdCaseReference
+            );
             caseData.setRespondentSolicitor2AgreedDeadlineExtension(validator.getMaxDate(
-                caseData.getClaimDetailsNotificationDate(),
+                notificationDate,
                 caseData.getRespondent2AcknowledgeNotificationDate()
             ));
         }
+    }
+
+    private LocalDate getDeemedServedDate(CaseData caseData, CaseRole caseRole) {
+        if (RESPONDENTSOLICITORONE.equals(caseRole)) {
+            CertificateOfService cosNotifyClaimDefendant1 = caseData.getCosNotifyClaimDetails1();
+            if (cosNotifyClaimDefendant1 != null && cosNotifyClaimDefendant1.getCosDateDeemedServedForDefendant() != null) {
+                return cosNotifyClaimDefendant1.getCosDateDeemedServedForDefendant();
+            }
+        }
+        if (RESPONDENTSOLICITORTWO.equals(caseRole)) {
+            CertificateOfService cosNotifyClaimDefendant2 = caseData.getCosNotifyClaimDetails2();
+            if (cosNotifyClaimDefendant2 != null && cosNotifyClaimDefendant2.getCosDateDeemedServedForDefendant() != null) {
+                return cosNotifyClaimDefendant2.getCosDateDeemedServedForDefendant();
+            }
+        }
+        return caseData.getClaimDetailsNotificationDate().toLocalDate();
+    }
+
+    private boolean isUserHasCaseRole(CaseData caseData, UserInfo userInfo, CaseRole caseRole) {
+        return coreCaseUserService.userHasCaseRole(
+            caseData.getCcdCaseReference().toString(),
+            userInfo.getUid(),
+            caseRole
+        );
     }
 
     private CallbackResponse validateExtensionDate(CallbackParams callbackParams) {

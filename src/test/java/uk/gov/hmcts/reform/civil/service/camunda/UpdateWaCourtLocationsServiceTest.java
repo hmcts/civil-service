@@ -142,12 +142,11 @@ class UpdateWaCourtLocationsServiceTest {
             LocationRefData.builder().epimmsId("789654").region("west").regionId("3").siteName("stoke somewhere").build()
         );
 
-        DmnListingLocations dmnListingLocations = DmnListingLocations.builder()
-            .cmcListingLocation(DmnListingLocationsModel.builder().type("String").value("123456").valueInfo(null).build())
-            .ccmcListingLocation(DmnListingLocationsModel.builder().type("String").value("123456").valueInfo(null).build())
-            .ptrListingLocation(DmnListingLocationsModel.builder().type("String").value("654321").valueInfo(null).build())
-            .trialListingLocation(DmnListingLocationsModel.builder().type("String").value("789654").valueInfo(null).build())
-            .build();
+        DmnListingLocations dmnListingLocations = new DmnListingLocations()
+            .setCmcListingLocation(new DmnListingLocationsModel().setType("String").setValue("123456").setValueInfo(null))
+            .setCcmcListingLocation(new DmnListingLocationsModel().setType("String").setValue("123456").setValueInfo(null))
+            .setPtrListingLocation(new DmnListingLocationsModel().setType("String").setValue("654321").setValueInfo(null))
+            .setTrialListingLocation(new DmnListingLocationsModel().setType("String").setValue("789654").setValueInfo(null));
 
         when(camundaClient.getEvaluatedDmnCourtLocations(anyString(), anyString())).thenReturn(testMap);
         when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
@@ -165,7 +164,7 @@ class UpdateWaCourtLocationsServiceTest {
     void shouldNotEvaluateWALocations_andShouldClearAnyPreviousEvaluatedCourtLocations(String track) {
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").region("1").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("123456").setRegion("1"))
             .allocatedTrack(Objects.equals(track, "fast") ? AllocatedTrack.FAST_CLAIM : AllocatedTrack.SMALL_CLAIM)
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
             .taskManagementLocations(testTaskManagementLocations)
@@ -184,7 +183,7 @@ class UpdateWaCourtLocationsServiceTest {
         when(objectMapper.convertValue(emptyMap, DmnListingLocations.class)).thenReturn(null);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").region("1").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("123456").setRegion("1"))
             .build();
 
         updateWaCourtLocationsService.updateCourtListingWALocations("auth", caseData);
@@ -205,7 +204,7 @@ class UpdateWaCourtLocationsServiceTest {
         when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").region("1").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("123456").setRegion("1"))
             .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
             .build();
 
@@ -219,7 +218,7 @@ class UpdateWaCourtLocationsServiceTest {
     void shouldUpdateCourtListingWALocations_whenCourtFound_Unspec() {
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").region("1").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("123456").setRegion("1"))
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
             .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
             .build();
@@ -233,7 +232,7 @@ class UpdateWaCourtLocationsServiceTest {
     void shouldUpdateCourtListingWALocations_whenCourtFound_Spec() {
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").region("1").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("123456").setRegion("1"))
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .responseClaimTrack("INTERMEDIATE_CLAIM")
             .build();
@@ -283,19 +282,18 @@ class UpdateWaCourtLocationsServiceTest {
             LocationRefData.builder().epimmsId("789654").region("west").regionId("3").siteName("stoke somewhere").build()
         );
 
-        DmnListingLocations dmnListingLocations = DmnListingLocations.builder()
-            .cmcListingLocation(DmnListingLocationsModel.builder().type("String").value(cnbcEpimmId).valueInfo(null).build())
-            .ccmcListingLocation(DmnListingLocationsModel.builder().type("String").value(cnbcEpimmId).valueInfo(null).build())
-            .ptrListingLocation(DmnListingLocationsModel.builder().type("String").value(cnbcEpimmId).valueInfo(null).build())
-            .trialListingLocation(DmnListingLocationsModel.builder().type("String").value(cnbcEpimmId).valueInfo(null).build())
-            .build();
+        DmnListingLocations dmnListingLocations = new DmnListingLocations()
+            .setCmcListingLocation(new DmnListingLocationsModel().setType("String").setValue(cnbcEpimmId).setValueInfo(null))
+            .setCcmcListingLocation(new DmnListingLocationsModel().setType("String").setValue(cnbcEpimmId).setValueInfo(null))
+            .setPtrListingLocation(new DmnListingLocationsModel().setType("String").setValue(cnbcEpimmId).setValueInfo(null))
+            .setTrialListingLocation(new DmnListingLocationsModel().setType("String").setValue(cnbcEpimmId).setValueInfo(null));
 
         when(camundaClient.getEvaluatedDmnCourtLocations(anyString(), anyString())).thenReturn(testCnbcMap);
         when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
         when(objectMapper.convertValue(testCnbcMap, DmnListingLocations.class)).thenReturn(dmnListingLocations);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(cnbcEpimmId).region("2").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(cnbcEpimmId).setRegion("2"))
             .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
             .build();
 
@@ -344,19 +342,18 @@ class UpdateWaCourtLocationsServiceTest {
             LocationRefData.builder().epimmsId("789654").region("west").regionId("3").siteName("stoke somewhere").build()
         );
 
-        DmnListingLocations dmnListingLocations = DmnListingLocations.builder()
-            .cmcListingLocation(DmnListingLocationsModel.builder().type("String").value(ccmccEpimmId).valueInfo(null).build())
-            .ccmcListingLocation(DmnListingLocationsModel.builder().type("String").value(ccmccEpimmId).valueInfo(null).build())
-            .ptrListingLocation(DmnListingLocationsModel.builder().type("String").value(ccmccEpimmId).valueInfo(null).build())
-            .trialListingLocation(DmnListingLocationsModel.builder().type("String").value(ccmccEpimmId).valueInfo(null).build())
-            .build();
+        DmnListingLocations dmnListingLocations = new DmnListingLocations()
+            .setCmcListingLocation(new DmnListingLocationsModel().setType("String").setValue(ccmccEpimmId).setValueInfo(null))
+            .setCcmcListingLocation(new DmnListingLocationsModel().setType("String").setValue(ccmccEpimmId).setValueInfo(null))
+            .setPtrListingLocation(new DmnListingLocationsModel().setType("String").setValue(ccmccEpimmId).setValueInfo(null))
+            .setTrialListingLocation(new DmnListingLocationsModel().setType("String").setValue(ccmccEpimmId).setValueInfo(null));
 
         when(camundaClient.getEvaluatedDmnCourtLocations(anyString(), anyString())).thenReturn(testCnbcMap);
         when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
         when(objectMapper.convertValue(testCnbcMap, DmnListingLocations.class)).thenReturn(dmnListingLocations);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(ccmccEpimmId).region("4").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(ccmccEpimmId).setRegion("4"))
             .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
             .build();
 
