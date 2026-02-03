@@ -39,6 +39,8 @@ public final class DashboardTaskIds {
     public static final String HEARING_SCHEDULED = "GenerateDashboardNotificationsHearingScheduled";
     public static final String SETTLE_CLAIM_MARKED_PAID_IN_FULL = "GenerateDashboardNotificationsSettleClaimPaidInFull";
     public static final String SET_ASIDE_JUDGMENT = "GenerateDashboardNotificationsSetAsideJudgement";
+    public static final String INFORM_AGREED_EXTENSION_DATE_SPEC =
+        "GenerateDashboardNotificationsInformAgreedExtensionDateSpec";
     public static final String TRIAL_READY_CHECK = "GenerateDashboardNotificationsTrialReadyCheck";
     public static final String TRIAL_READY_CHECK_RESPONDENT1 = "GenerateDashboardNotificationsTrialReadyCheckRespondent1";
     public static final String CREATE_SDO = "GenerateDashboardNotificationCreateSDO";
