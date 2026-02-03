@@ -11,8 +11,9 @@ class AccommodationTemplateTest {
     @Test
     void shouldDisplayRentWhenPrivateRental() {
         //Given
-        AccommodationTemplate accommodationTemplate = new AccommodationTemplate(HomeDetails.builder().type(
-            HomeTypeOptionLRspec.PRIVATE_RENTAL).build());
+        AccommodationTemplate accommodationTemplate = new AccommodationTemplate(
+            new HomeDetails(HomeTypeOptionLRspec.PRIVATE_RENTAL, null)
+        );
         String expectedResult = "Rent";
         //When
         String actualResult = accommodationTemplate.getDisplayValue();
@@ -24,8 +25,9 @@ class AccommodationTemplateTest {
     void shouldDisplayOtherCustomAccommodationValueWhenOther() {
         //Given
         String expectedValue = "Mansion";
-        AccommodationTemplate accommodationTemplate = new AccommodationTemplate(HomeDetails.builder().type(
-            HomeTypeOptionLRspec.OTHER).typeOtherDetails(expectedValue).build());
+        AccommodationTemplate accommodationTemplate = new AccommodationTemplate(
+            new HomeDetails(HomeTypeOptionLRspec.OTHER, expectedValue)
+        );
         //When
         String actualResult = accommodationTemplate.getDisplayValue();
         //Then

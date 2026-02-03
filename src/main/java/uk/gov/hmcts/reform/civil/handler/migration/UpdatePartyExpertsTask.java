@@ -53,11 +53,10 @@ public class UpdatePartyExpertsTask extends MigrationTask<CaseReference> {
             .partyID(generatePartyIdIfNull(expert.getPartyID()))
             .build();
 
-        UnaryOperator<Expert> updateExpert = expert -> expert.toBuilder()
-            .firstName(defaultIfNull(expert.getFirstName()))
-            .lastName(defaultIfNull(expert.getLastName()))
-            .partyID(generatePartyIdIfNull(expert.getPartyID()))
-            .build();
+        UnaryOperator<Expert> updateExpert = expert -> expert.copy()
+            .setFirstName(defaultIfNull(expert.getFirstName()))
+            .setLastName(defaultIfNull(expert.getLastName()))
+            .setPartyID(generatePartyIdIfNull(expert.getPartyID()));
 
         // Update applicant experts
         List<Element<PartyFlagStructure>> updatedApplicantExperts =
@@ -94,13 +93,11 @@ public class UpdatePartyExpertsTask extends MigrationTask<CaseReference> {
             return dq;
         }
 
-        Experts updatedExperts = dq.getApplicant1DQExperts().toBuilder()
-            .details(updateElements(dq.getApplicant1DQExperts().getDetails(), transformer))
-            .build();
+        Experts updatedExperts = dq.getApplicant1DQExperts().copy()
+            .setDetails(updateElements(dq.getApplicant1DQExperts().getDetails(), transformer));
 
-        return dq.toBuilder()
-            .applicant1DQExperts(updatedExperts)
-            .build();
+        return dq.copy()
+            .setApplicant1DQExperts(updatedExperts);
     }
 
     private Respondent1DQ updateRespondent1DQExperts(Respondent1DQ dq, UnaryOperator<Expert> transformer) {
@@ -108,13 +105,11 @@ public class UpdatePartyExpertsTask extends MigrationTask<CaseReference> {
             return dq;
         }
 
-        Experts updatedExperts = dq.getRespondent1DQExperts().toBuilder()
-            .details(updateElements(dq.getRespondent1DQExperts().getDetails(), transformer))
-            .build();
+        Experts updatedExperts = dq.getRespondent1DQExperts().copy()
+            .setDetails(updateElements(dq.getRespondent1DQExperts().getDetails(), transformer));
 
-        return dq.toBuilder()
-            .respondent1DQExperts(updatedExperts)
-            .build();
+        return dq.copy()
+            .setRespondent1DQExperts(updatedExperts);
     }
 
     private Respondent2DQ updateRespondent2DQExperts(Respondent2DQ dq, UnaryOperator<Expert> transformer) {
@@ -122,13 +117,11 @@ public class UpdatePartyExpertsTask extends MigrationTask<CaseReference> {
             return dq;
         }
 
-        Experts updatedExperts = dq.getRespondent2DQExperts().toBuilder()
-            .details(updateElements(dq.getRespondent2DQExperts().getDetails(), transformer))
-            .build();
+        Experts updatedExperts = dq.getRespondent2DQExperts().copy()
+            .setDetails(updateElements(dq.getRespondent2DQExperts().getDetails(), transformer));
 
-        return dq.toBuilder()
-            .respondent2DQExperts(updatedExperts)
-            .build();
+        return dq.copy()
+            .setRespondent2DQExperts(updatedExperts);
     }
 
     /** Update Applicant2DQ experts. */
@@ -137,12 +130,10 @@ public class UpdatePartyExpertsTask extends MigrationTask<CaseReference> {
             return dq;
         }
 
-        Experts updatedExperts = dq.getApplicant2DQExperts().toBuilder()
-            .details(updateElements(dq.getApplicant2DQExperts().getDetails(), transformer))
-            .build();
+        Experts updatedExperts = dq.getApplicant2DQExperts().copy()
+            .setDetails(updateElements(dq.getApplicant2DQExperts().getDetails(), transformer));
 
-        return dq.toBuilder()
-            .applicant2DQExperts(updatedExperts)
-            .build();
+        return dq.copy()
+            .setApplicant2DQExperts(updatedExperts);
     }
 }
