@@ -165,18 +165,14 @@ public class CreateApplicationRespondedDashboardNotificationHandlerTest extends 
                                         .hearingPreferredLocation(dynamicListTest)
                                         .hearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON)
                                         .build())
-            .hearingDetailsResp(GAHearingDetails.builder()
-                                    .hearingPreferredLocation(dynamicListTest)
-                                    .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
-                                    .build())
-            .generalAppType(
-                GAApplicationType
-                    .builder()
-                    .types(types).build())
+            .hearingDetailsResp(new GAHearingDetails()
+                                    .setHearingPreferredLocation(dynamicListTest)
+                                    .setHearingPreferencesPreferredType(GAHearingType.IN_PERSON))
+            .generalAppType(new GAApplicationType(types))
             .parentClaimantIsApplicant(NO)
             .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
-            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                          .email("abc@gmail.com").id(APP_UID).build())
+            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec()
+                                          .setEmail("abc@gmail.com").setId(APP_UID))
             .generalAppRespondentSolicitors(getRespondentSolicitors())
             .businessProcess(BusinessProcess
                                  .builder()
@@ -192,11 +188,11 @@ public class CreateApplicationRespondedDashboardNotificationHandlerTest extends 
     private List<Element<GASolicitorDetailsGAspec>> getRespondentSolicitors() {
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-        GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id(DEF_UID)
-            .email("test@gmail.com").organisationIdentifier("org2").build();
+        GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId(DEF_UID)
+            .setEmail("test@gmail.com").setOrganisationIdentifier("org2");
 
-        GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id(DEF2_UID)
-            .email("test@gmail.com").organisationIdentifier("org3").build();
+        GASolicitorDetailsGAspec respondent2 = new GASolicitorDetailsGAspec().setId(DEF2_UID)
+            .setEmail("test@gmail.com").setOrganisationIdentifier("org3");
 
         respondentSols.add(element(respondent1));
         respondentSols.add(element(respondent2));
@@ -224,18 +220,14 @@ public class CreateApplicationRespondedDashboardNotificationHandlerTest extends 
                                         .hearingPreferredLocation(dynamicListTest)
                                         .hearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON)
                                         .build())
-            .hearingDetailsResp(GAHearingDetails.builder()
-                                    .hearingPreferredLocation(dynamicListTest)
-                                    .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
-                                    .build())
-            .generalAppType(
-                GAApplicationType
-                    .builder()
-                    .types(types).build())
+            .hearingDetailsResp(new GAHearingDetails()
+                                    .setHearingPreferredLocation(dynamicListTest)
+                                    .setHearingPreferencesPreferredType(GAHearingType.IN_PERSON))
+            .generalAppType(new GAApplicationType(types))
             .parentClaimantIsApplicant(NO)
             .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
-            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                          .email("abc@gmail.com").id(APP_UID).build())
+            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec()
+                                          .setEmail("abc@gmail.com").setId(APP_UID))
             .generalAppRespondentSolicitors(getRespondentSolicitors())
             .businessProcess(BusinessProcess
                                  .builder()

@@ -129,9 +129,8 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
             CaseDetails expectedCaseDetails = CaseDetails.builder().id(GA_CASE_REFERENCE)
                 .data(Map.of(
                     "generalAppPBADetails",
-                    GAPbaDetails.builder().serviceReqReference("2023-1701090705688")
-                        .fee(Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build())
-                        .build(),
+                    new GAPbaDetails().setServiceReqReference("2023-1701090705688")
+                        .setFee(Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build()),
                     "generalAppFee",
                     Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build(),
                     "parentCaseReference",

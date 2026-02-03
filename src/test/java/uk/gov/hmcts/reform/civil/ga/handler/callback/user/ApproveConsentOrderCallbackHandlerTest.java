@@ -219,19 +219,16 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
         return GeneralApplicationCaseData.builder()
             .generalAppDetailsOfOrder("Testing prepopulated text")
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YES).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(NO))
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YES))
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
             .createdDate(LocalDateTime.of(2022, 1, 15, 0, 0, 0))
             .applicantPartyName("ApplicantPartyName")
             .generalAppRespondent1Representative(
                 GARespondentRepresentative.builder()
                     .generalAppRespondent1Representative(YES)
                     .build())
-            .generalAppType(
-                GAApplicationType
-                    .builder()
-                    .types(types).build())
+            .generalAppType(new GAApplicationType(types))
             .businessProcess(BusinessProcess
                                  .builder()
                                  .camundaEvent(CAMUNDA_EVENT)
@@ -252,19 +249,16 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
                                      .showConsentOrderDate(showConsent)
                                      .consentOrderDateToEnd(orderDate)
                                     .build())
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YES).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(NO))
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YES))
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
             .createdDate(LocalDateTime.of(2022, 1, 15, 0, 0, 0))
             .applicantPartyName("ApplicantPartyName")
             .generalAppRespondent1Representative(
                 GARespondentRepresentative.builder()
                     .generalAppRespondent1Representative(YES)
                     .build())
-            .generalAppType(
-                GAApplicationType
-                    .builder()
-                    .types(types).build())
+            .generalAppType(new GAApplicationType(types))
             .businessProcess(BusinessProcess
                                  .builder()
                                  .camundaEvent(CAMUNDA_EVENT)
@@ -279,19 +273,16 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     public GeneralApplicationCaseData getGeneralAppCaseDataWithoutOrderDetails(List<GeneralApplicationTypes> types) {
 
         return GeneralApplicationCaseData.builder()
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YES).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(NO))
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YES))
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
             .createdDate(LocalDateTime.of(2022, 1, 15, 0, 0, 0))
             .applicantPartyName("ApplicantPartyName")
             .generalAppRespondent1Representative(
                 GARespondentRepresentative.builder()
                     .generalAppRespondent1Representative(YES)
                     .build())
-            .generalAppType(
-                GAApplicationType
-                    .builder()
-                    .types(types).build())
+            .generalAppType(new GAApplicationType(types))
             .businessProcess(BusinessProcess
                                  .builder()
                                  .camundaEvent(CAMUNDA_EVENT)

@@ -3,10 +3,8 @@ package uk.gov.hmcts.reform.civil.model.genapplication;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
@@ -24,7 +22,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@Builder(toBuilder = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 @Accessors(chain = true)
@@ -96,7 +93,7 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("generalAppType") GAApplicationType generalAppType,
                        @JsonProperty("generalAppTypeLR") GAApplicationTypeLR generalAppTypeLR,
                        @JsonProperty("generalAppRespondentAgreement")
-                           GARespondentOrderAgreement generalAppRespondentAgreement,
+                       GARespondentOrderAgreement generalAppRespondentAgreement,
                        @JsonProperty("businessProcess") BusinessProcess businessProcess,
                        @JsonProperty("generalAppPBADetails") GAPbaDetails generalAppPBADetails,
                        @JsonProperty("generalAppAskForCosts") YesOrNo generalAppAskForCosts,
@@ -208,5 +205,65 @@ public class GeneralApplication implements MappableObject {
         this.gaWaTrackLabel = gaWaTrackLabel;
         this.emailPartyReference = emailPartyReference;
         this.mainCaseSubmittedDate = mainCaseSubmittedDate;
+    }
+
+    public GeneralApplication copy() {
+        return new GeneralApplication()
+            .setGeneralApplicationState(this.generalApplicationState)
+            .setGeneralAppType(this.generalAppType)
+            .setGeneralAppTypeLR(this.generalAppTypeLR)
+            .setGeneralAppRespondentAgreement(this.generalAppRespondentAgreement)
+            .setBusinessProcess(this.businessProcess)
+            .setGeneralAppPBADetails(this.generalAppPBADetails)
+            .setGeneralAppAskForCosts(this.generalAppAskForCosts)
+            .setGeneralAppDetailsOfOrder(this.generalAppDetailsOfOrder)
+            .setGeneralAppDetailsOfOrderColl(this.generalAppDetailsOfOrderColl)
+            .setGeneralAppReasonsOfOrder(this.generalAppReasonsOfOrder)
+            .setGeneralAppReasonsOfOrderColl(this.generalAppReasonsOfOrderColl)
+            .setGeneralAppInformOtherParty(this.generalAppInformOtherParty)
+            .setGeneralAppConsentOrder(this.generalAppConsentOrder)
+            .setGeneralAppUrgencyRequirement(this.generalAppUrgencyRequirement)
+            .setGeneralAppStatementOfTruth(this.generalAppStatementOfTruth)
+            .setGeneralAppHearingDetails(this.generalAppHearingDetails)
+            .setGeneralAppApplnSolicitor(this.generalAppApplnSolicitor)
+            .setGeneralAppRespondentSolicitors(this.generalAppRespondentSolicitors)
+            .setGeneralAppApplicantAddlSolicitors(this.generalAppApplicantAddlSolicitors)
+            .setGeneralAppEvidenceDocument(this.generalAppEvidenceDocument)
+            .setGeneralAppDateDeadline(this.generalAppDateDeadline)
+            .setIsMultiParty(this.isMultiParty)
+            .setIsDocumentVisibleGA(this.isDocumentVisibleGA)
+            .setParentClaimantIsApplicant(this.parentClaimantIsApplicant)
+            .setGaApplicantDisplayName(this.gaApplicantDisplayName)
+            .setCaseLink(this.caseLink)
+            .setGeneralAppSubmittedDateGAspec(this.generalAppSubmittedDateGAspec)
+            .setCivilServiceUserRoles(this.civilServiceUserRoles)
+            .setApplicantPartyName(this.applicantPartyName)
+            .setClaimant1PartyName(this.claimant1PartyName)
+            .setClaimant2PartyName(this.claimant2PartyName)
+            .setDefendant1PartyName(this.defendant1PartyName)
+            .setDefendant2PartyName(this.defendant2PartyName)
+            .setLitigiousPartyID(this.litigiousPartyID)
+            .setGeneralAppSuperClaimType(this.generalAppSuperClaimType)
+            .setCaseManagementLocation(this.caseManagementLocation)
+            .setIsCcmccLocation(this.isCcmccLocation)
+            .setCaseManagementCategory(this.caseManagementCategory)
+            .setCaseAccessCategory(this.caseAccessCategory)
+            .setLocationName(this.locationName)
+            .setApplicationClosedDate(this.applicationClosedDate)
+            .setApplicationTakenOfflineDate(this.applicationTakenOfflineDate)
+            .setGeneralAppVaryJudgementType(this.generalAppVaryJudgementType)
+            .setGeneralAppN245FormUpload(this.generalAppN245FormUpload)
+            .setGeneralAppHearingDate(this.generalAppHearingDate)
+            .setGeneralAppParentCaseLink(this.generalAppParentCaseLink)
+            .setRespondentsResponses(this.respondentsResponses)
+            .setIsGaApplicantLip(this.isGaApplicantLip)
+            .setIsGaRespondentOneLip(this.isGaRespondentOneLip)
+            .setIsGaRespondentTwoLip(this.isGaRespondentTwoLip)
+            .setGeneralAppHelpWithFees(this.generalAppHelpWithFees)
+            .setCertOfSC(this.certOfSC)
+            .setCaseNameGaInternal(this.caseNameGaInternal)
+            .setGaWaTrackLabel(this.gaWaTrackLabel)
+            .setEmailPartyReference(this.emailPartyReference)
+            .setMainCaseSubmittedDate(this.mainCaseSubmittedDate);
     }
 }

@@ -95,7 +95,7 @@ class WrittenRepresentationConcurrentOrderGeneratorTest {
     void shouldThrowExceptionWhenNoLocationMatch() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .writtenRepresentationConcurrentApplication()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("8").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("8"))
             .build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class),
@@ -249,10 +249,10 @@ class WrittenRepresentationConcurrentOrderGeneratorTest {
                 .builder().writtenRepresentationConcurrentApplication().build()
                 .toBuilder()
                 .isMultiParty(YES)
-                .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
-                                            .address("london court")
-                                            .baseLocation("1")
-                                            .postcode("BA 117").build())
+                .caseManagementLocation(new CaseLocationCivil().setSiteName("testing")
+                                            .setAddress("london court")
+                                            .setBaseLocation("1")
+                                            .setPostcode("BA 117"))
                 .build();
             GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
             caseDataBuilder.judicialByCourtsInitiativeForWrittenRep(GAByCourtsInitiativeGAspec.OPTION_1)
@@ -301,7 +301,7 @@ class WrittenRepresentationConcurrentOrderGeneratorTest {
                 .writtenRepresentationConcurrentApplication().build()
                 .toBuilder()
                 .isMultiParty(YES)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation("3"))
                 .build();
 
             GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();

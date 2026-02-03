@@ -215,9 +215,9 @@ public class HearingScheduledNotificationServiceTest {
         when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
                                                                   + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
-        GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-            .email(DUMMY_EMAIL).surname(Optional.of("surname"))
-            .forename("forename").organisationIdentifier("2").build();
+        GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+            .setEmail(DUMMY_EMAIL).setSurname(Optional.of("surname"))
+            .setForename("forename").setOrganisationIdentifier("2");
         respondentSols.add(element(respondent1));
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.NO)

@@ -74,8 +74,7 @@ public class ApplyForHwFDashboardNotificationHandlerTest extends GeneralApplicat
         void shouldRecordApplicantScenario_ApplyForHwF_whenInvoked() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
             caseData = caseData.toBuilder()
-                .generalAppType(GAApplicationType.builder().types(List.of(GeneralApplicationTypes.VARY_ORDER))
-                                    .build())
+                .generalAppType(new GAApplicationType(List.of(GeneralApplicationTypes.VARY_ORDER)))
                 .generalAppHelpWithFees(HelpWithFees.builder().helpWithFeesReferenceNumber("HWF-234-456").build())
                 .ccdState(CaseState.AWAITING_APPLICATION_PAYMENT)
                 .isGaApplicantLip(YesOrNo.YES)
@@ -107,8 +106,7 @@ public class ApplyForHwFDashboardNotificationHandlerTest extends GeneralApplicat
         void shouldRecordApplicantScenario_ApplyForHwFAdditionalApplicationFee_whenInvoked() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
             caseData = caseData.toBuilder()
-                .generalAppType(GAApplicationType.builder().types(List.of(GeneralApplicationTypes.VARY_ORDER))
-                                    .build())
+                .generalAppType(new GAApplicationType(List.of(GeneralApplicationTypes.VARY_ORDER)))
                 .ccdState(CaseState.APPLICATION_ADD_PAYMENT)
                 .generalAppHelpWithFees(HelpWithFees.builder().helpWithFeesReferenceNumber("HWF-111-222").build())
                 .isGaApplicantLip(YesOrNo.YES)

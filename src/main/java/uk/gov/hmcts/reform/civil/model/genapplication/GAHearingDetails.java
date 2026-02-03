@@ -2,10 +2,9 @@ package uk.gov.hmcts.reform.civil.model.genapplication;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration;
 import uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements;
@@ -16,10 +15,9 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import java.time.LocalDate;
 import java.util.List;
 
-@Setter
 @Data
-@Builder(toBuilder = true)
 @NoArgsConstructor
+@Accessors(chain = true)
 public class GAHearingDetails {
 
     private YesOrNo hearingYesorNo;

@@ -223,8 +223,8 @@ public class SolicitorEmailValidationTest {
                                       String lipDefEmail) {
 
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder()
-            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id").forename("GAApplnSolicitor")
-                                          .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("id").setForename("GAApplnSolicitor")
+                                          .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
             .respondentSolicitor1EmailAddress(respondent1SolEmail)
             .respondentSolicitor2EmailAddress(respondent2SolEmail)
             .applicantSolicitor1UserDetails(IdamUserDetails.builder()
@@ -262,11 +262,11 @@ public class SolicitorEmailValidationTest {
 
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-        GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-            .email(DUMMY_EMAIL).forename("Respondent One").organisationIdentifier("2").build();
+        GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+            .setEmail(DUMMY_EMAIL).setForename("Respondent One").setOrganisationIdentifier("2");
 
-        GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id("id")
-            .email(DUMMY_EMAIL).forename("Resondent Two").organisationIdentifier("3").build();
+        GASolicitorDetailsGAspec respondent2 = new GASolicitorDetailsGAspec().setId("id")
+            .setEmail(DUMMY_EMAIL).setForename("Resondent Two").setOrganisationIdentifier("3");
 
         respondentSols.add(element(respondent1));
         respondentSols.add(element(respondent2));
@@ -276,11 +276,11 @@ public class SolicitorEmailValidationTest {
             .isGaRespondentOneLip(NO)
             .isGaApplicantLip(NO)
             .isGaRespondentTwoLip(NO)
-            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id").forename("Applicant One")
-                                          .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("id").setForename("Applicant One")
+                                          .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
             .generalAppRespondentSolicitors(respondentSols)
             .parentClaimantIsApplicant(parentClaimantIsApplicant)
-            .gaRespondentOrderAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
+            .gaRespondentOrderAgreement(new GARespondentOrderAgreement().setHasAgreed(NO))
             .build();
         var builder = caseData.toBuilder();
         if (isLipApp.equals(YES)) {

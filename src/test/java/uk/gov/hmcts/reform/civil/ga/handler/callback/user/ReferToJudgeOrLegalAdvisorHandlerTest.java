@@ -168,14 +168,10 @@ public class ReferToJudgeOrLegalAdvisorHandlerTest extends GeneralApplicationBas
                                         .hearingPreferredLocation(dynamicListTest)
                                         .hearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON)
                                         .build())
-            .hearingDetailsResp(GAHearingDetails.builder()
-                                    .hearingPreferredLocation(dynamicListTest)
-                                    .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
-                                    .build())
-            .generalAppType(
-                GAApplicationType
-                    .builder()
-                    .types(types).build())
+            .hearingDetailsResp(new GAHearingDetails()
+                                    .setHearingPreferredLocation(dynamicListTest)
+                                    .setHearingPreferencesPreferredType(GAHearingType.IN_PERSON))
+            .generalAppType(new GAApplicationType(types))
             .businessProcess(BusinessProcess
                                  .builder()
                                  .camundaEvent("INITIATE_GENERAL_APPLICATION")

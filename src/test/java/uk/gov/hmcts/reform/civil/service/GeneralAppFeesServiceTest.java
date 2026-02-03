@@ -662,18 +662,18 @@ class GeneralAppFeesServiceTest {
     private GeneralApplicationCaseData getFeeCaseGeneralApplication(List<GeneralApplicationTypes> types, YesOrNo hasAgreed,
                                                                     YesOrNo isWithNotice, LocalDate hearingScheduledDate) {
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder = GeneralApplicationCaseData.builder();
-        builder.generalAppType(GAApplicationType.builder().types(types).build());
+        builder.generalAppType(new GAApplicationType(types));
         if (Objects.nonNull(hasAgreed)) {
-            builder.generalAppRespondentAgreement(GARespondentOrderAgreement
-                                                      .builder().hasAgreed(hasAgreed).build());
+            builder.generalAppRespondentAgreement(new GARespondentOrderAgreement()
+                                                      .setHasAgreed(hasAgreed));
         }
         if (Objects.nonNull(isWithNotice)) {
             builder.generalAppInformOtherParty(
-                GAInformOtherParty.builder().isWithNotice(isWithNotice).build());
+                new GAInformOtherParty().setIsWithNotice(isWithNotice));
         }
         if (Objects.nonNull(hearingScheduledDate)) {
-            builder.generalAppHearingDate(GAHearingDateGAspec.builder()
-                                              .hearingScheduledDate(hearingScheduledDate).build());
+            builder.generalAppHearingDate(new GAHearingDateGAspec()
+                                              .setHearingScheduledDate(hearingScheduledDate));
         }
         return builder.build();
     }

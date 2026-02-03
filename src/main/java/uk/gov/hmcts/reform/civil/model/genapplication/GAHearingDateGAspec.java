@@ -2,18 +2,16 @@ package uk.gov.hmcts.reform.civil.model.genapplication;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 import java.time.LocalDate;
 
-@Setter
 @Data
 @NoArgsConstructor
-@Builder(toBuilder = true)
+@Accessors(chain = true)
 public class GAHearingDateGAspec {
 
     private YesOrNo hearingScheduledPreferenceYesNo;

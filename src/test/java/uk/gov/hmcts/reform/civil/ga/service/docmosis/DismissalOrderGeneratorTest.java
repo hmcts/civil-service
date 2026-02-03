@@ -90,7 +90,7 @@ class DismissalOrderGeneratorTest {
     @Test
     void shouldThrowExceptionWhenNoLocationMatch() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("8").build()).build();
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("8")).build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DISMISSAL_ORDER)))
             .thenReturn(new DocmosisDocument(DISMISSAL_ORDER.getDocumentTitle(), bytes));
@@ -152,7 +152,7 @@ class DismissalOrderGeneratorTest {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication().build().toBuilder()
                 .defendant2PartyName(null)
                 .claimant2PartyName(null)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation("3"))
                 .isMultiParty(NO)
                 .build();
             when(docmosisService.reasonAvailable(any())).thenReturn(YesOrNo.NO);
@@ -194,7 +194,7 @@ class DismissalOrderGeneratorTest {
         void whenJudgeMakeDecision_ShouldGetDissmisalOrderData_Option2() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication().build().toBuilder()
                 .isMultiParty(YES)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("2").build())
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation("2"))
                 .build();
 
             GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
@@ -349,7 +349,7 @@ class DismissalOrderGeneratorTest {
                 .defendant2PartyName(null)
                 .claimant2PartyName(null)
                 .parentClaimantIsApplicant(NO)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation("3"))
                 .isMultiParty(NO)
                 .build();
             when(docmosisService.reasonAvailable(any())).thenReturn(YesOrNo.NO);

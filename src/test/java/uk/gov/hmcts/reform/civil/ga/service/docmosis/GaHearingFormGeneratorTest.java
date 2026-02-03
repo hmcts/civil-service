@@ -201,7 +201,7 @@ class GaHearingFormGeneratorTest {
         )).thenReturn(caseDetails);
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(YES)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("8").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("8"))
             .build();
 
         Exception exception =

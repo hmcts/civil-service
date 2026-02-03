@@ -61,10 +61,10 @@ class ConsentOrderGeneratorTest {
     @Test
     void shouldThrowExceptionWhenNoLocationMatch() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().consentOrderApplication()
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .siteName("County Court")
-                                        .baseLocation("8")
-                                        .region("4").build()).build();
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setSiteName("County Court")
+                                        .setBaseLocation("8")
+                                        .setRegion("4")).build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(CONSENT_ORDER_FORM)))
             .thenReturn(new DocmosisDocument(CONSENT_ORDER_FORM.getDocumentTitle(), bytes));
@@ -136,7 +136,7 @@ class ConsentOrderGeneratorTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().consentOrderApplication().build().toBuilder()
             .defendant2PartyName(null)
             .claimant2PartyName(null)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("3"))
             .isMultiParty(NO)
             .build();
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))

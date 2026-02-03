@@ -93,7 +93,7 @@ public class TranslatedDocumentUploadedRespondentNotificationHandlerTest extends
                     .defendant1PartyName("respondent1")
                     .generalAppRespondentSolicitors(List.of(
                         Element.<GASolicitorDetailsGAspec>builder()
-                            .value(GASolicitorDetailsGAspec.builder().email("respondent@gmail.com").build()).build()))
+                            .value(new GASolicitorDetailsGAspec().setEmail("respondent@gmail.com")).build()))
                     .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1234567").build())
                     .generalAppConsentOrder(YES)
                     .ccdCaseReference(Long.valueOf("56786"))
@@ -133,7 +133,7 @@ public class TranslatedDocumentUploadedRespondentNotificationHandlerTest extends
                     .defendant1PartyName("respondent1")
                     .generalAppRespondentSolicitors(List.of(
                         Element.<GASolicitorDetailsGAspec>builder()
-                            .value(GASolicitorDetailsGAspec.builder().email("respondent@gmail.com").build()).build()))
+                            .value(new GASolicitorDetailsGAspec().setEmail("respondent@gmail.com")).build()))
                     .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1234567").build())
                     .generalAppConsentOrder(YES)
                     .ccdCaseReference(Long.valueOf("56786"))
@@ -175,7 +175,7 @@ public class TranslatedDocumentUploadedRespondentNotificationHandlerTest extends
                     .defendant1PartyName("respondent1")
                     .generalAppRespondentSolicitors(List.of(
                         Element.<GASolicitorDetailsGAspec>builder()
-                            .value(GASolicitorDetailsGAspec.builder().email("respondent@gmail.com").build()).build()))
+                            .value(new GASolicitorDetailsGAspec().setEmail("respondent@gmail.com")).build()))
                     .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1234567").build())
                     .generalAppConsentOrder(YES)
                     .ccdCaseReference(Long.valueOf("56786"))

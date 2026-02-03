@@ -53,10 +53,10 @@ class ApplicationsProceedOfflineClaimantDashboardServiceTest {
     @Test
     void shouldRecordScenariosWhenEligible() {
         List<Element<GeneralApplication>> applications = wrapElements(
-            GeneralApplication.builder().caseLink(CaseLink.builder().caseReference("123").build()).build()
+            new GeneralApplication().setCaseLink(new CaseLink().setCaseReference("123"))
         );
         List<Element<GeneralApplicationsDetails>> claimantDetails = wrapElements(
-            GeneralApplicationsDetails.builder().caseState("Awaiting Respondent Response").build()
+            new GeneralApplicationsDetails().setCaseState("Awaiting Respondent Response")
         );
 
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
@@ -87,10 +87,10 @@ class ApplicationsProceedOfflineClaimantDashboardServiceTest {
     @Test
     void shouldOnlyRecordInitiateScenarioWhenNoLiveApplications() {
         List<Element<GeneralApplication>> applications = wrapElements(
-            GeneralApplication.builder().caseLink(CaseLink.builder().caseReference("123").build()).build()
+            new GeneralApplication().setCaseLink(new CaseLink().setCaseReference("123"))
         );
         List<Element<GeneralApplicationsDetails>> claimantDetails = wrapElements(
-            GeneralApplicationsDetails.builder().caseState("Application Closed").build()
+            new GeneralApplicationsDetails().setCaseState("Application Closed")
         );
 
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()

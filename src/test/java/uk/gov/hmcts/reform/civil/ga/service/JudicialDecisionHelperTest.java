@@ -45,14 +45,14 @@ public class JudicialDecisionHelperTest {
         @Test
         void isApplicationCloaked_shouldReturnNoWhenRespondentAgreementHasAgreed() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().generalAppRespondentAgreement(
-                GARespondentOrderAgreement.builder().hasAgreed(YES).build()).build();
+                new GARespondentOrderAgreement().setHasAgreed(YES)).build();
             assertThat(helper.isApplicationCreatedWithoutNoticeByApplicant(caseData)).isEqualTo(YES);
         }
 
         @Test
         void isApplicationCloaked_shouldReturnNoWhenRespondentAgreementHasNotAgreedButNotificationDetailsNotSet() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().generalAppRespondentAgreement(
-                    GARespondentOrderAgreement.builder().hasAgreed(NO).build())
+                    new GARespondentOrderAgreement().setHasAgreed(NO))
                 .generalAppInformOtherParty(null).build();
             assertThat(helper.isApplicationCreatedWithoutNoticeByApplicant(caseData)).isEqualTo(NO);
         }
@@ -60,23 +60,23 @@ public class JudicialDecisionHelperTest {
         @Test
         void isApplicationCloaked_shouldReturnNoWhenRespondentAgreementHasNotAgreedAndNotified() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().generalAppRespondentAgreement(
-                    GARespondentOrderAgreement.builder().hasAgreed(NO).build())
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build()).build();
+                    new GARespondentOrderAgreement().setHasAgreed(NO))
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES)).build();
             assertThat(helper.isApplicationCreatedWithoutNoticeByApplicant(caseData)).isEqualTo(NO);
         }
 
         @Test
         void isApplicationCloaked_shouldReturnNoWhenRespondentAgreementHasNotAgreedAndUnNotified() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().generalAppRespondentAgreement(
-                    GARespondentOrderAgreement.builder().hasAgreed(NO).build())
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build()).build();
+                    new GARespondentOrderAgreement().setHasAgreed(NO))
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(NO)).build();
             assertThat(helper.isApplicationCreatedWithoutNoticeByApplicant(caseData)).isEqualTo(YES);
         }
 
         @Test
         void isLipApplicationCloaked_shouldReturnNoWhenGeneralAppInformOtherPartyIsNull() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().generalAppRespondentAgreement(
-                    GARespondentOrderAgreement.builder().hasAgreed(NO).build())
+                    new GARespondentOrderAgreement().setHasAgreed(NO))
                 .generalAppInformOtherParty(null).build();
             assertThat(helper.isLipApplicationCreatedWithoutNoticeByApplicant(caseData)).isEqualTo(YES);
         }
@@ -84,23 +84,23 @@ public class JudicialDecisionHelperTest {
         @Test
         void isLipApplicationCloaked_shouldReturnNoWhenGeneralAppInformOtherPartyIsYes() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().generalAppRespondentAgreement(
-                    GARespondentOrderAgreement.builder().hasAgreed(NO).build())
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build()).build();
+                    new GARespondentOrderAgreement().setHasAgreed(NO))
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES)).build();
             assertThat(helper.isLipApplicationCreatedWithoutNoticeByApplicant(caseData)).isEqualTo(NO);
         }
 
         @Test
         void isLipApplicationCloaked_shouldReturnNoWhenGeneralAppInformOtherPartyIsNo() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().generalAppRespondentAgreement(
-                    GARespondentOrderAgreement.builder().hasAgreed(NO).build())
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build()).build();
+                    new GARespondentOrderAgreement().setHasAgreed(NO))
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(NO)).build();
             assertThat(helper.isLipApplicationCreatedWithoutNoticeByApplicant(caseData)).isEqualTo(YES);
         }
 
         @Test
         void isLipApplicationCloaked_shouldReturnNoWhenConsentOrder() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().generalAppRespondentAgreement(
-                    GARespondentOrderAgreement.builder().hasAgreed(NO).build()).generalAppConsentOrder(YES).build();
+                    new GARespondentOrderAgreement().setHasAgreed(NO)).generalAppConsentOrder(YES).build();
             assertThat(helper.isLipApplicationCreatedWithoutNoticeByApplicant(caseData)).isEqualTo(NO);
 
         }
@@ -108,7 +108,7 @@ public class JudicialDecisionHelperTest {
         @Test
         void isLipApplicationCloaked_shouldReturnNoWhenConsentOrderIsNull() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().generalAppRespondentAgreement(
-                GARespondentOrderAgreement.builder().hasAgreed(NO).build()).build();
+                new GARespondentOrderAgreement().setHasAgreed(NO)).build();
             assertThat(helper.isLipApplicationCreatedWithoutNoticeByApplicant(caseData)).isEqualTo(YES);
 
         }
@@ -126,7 +126,7 @@ public class JudicialDecisionHelperTest {
         @Test
         void shouldReturnFalse_whenRespondentHearingDetailsNotProvided() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().generalAppHearingDetails(
-                GAHearingDetails.builder().build()).build();
+                new GAHearingDetails()).build();
             assertThat(helper.isApplicantAndRespondentLocationPrefSame(caseData)).isEqualTo(false);
         }
 
@@ -134,34 +134,34 @@ public class JudicialDecisionHelperTest {
         void shouldReturnFalse_whenLocationSelectedByApplicantAndOneOfTheRespondentIsNotSame() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .generalAppHearingDetails(
-                    GAHearingDetails.builder()
-                        .hearingPreferredLocation(
+                    new GAHearingDetails()
+                        .setHearingPreferredLocation(
                             getDynamicLocationsList("ABCD - RG0 0AL",
                                                     getDynamicLocation("ABCD - RG0 0AL"),
                                                     getDynamicLocation("PQRS - GU0 0EE"),
                                                     getDynamicLocation("WXYZ - EW0 0HE"),
-                                                    getDynamicLocation("LMNO - NE0 0BH"))).build())
+                                                    getDynamicLocation("LMNO - NE0 0BH"))))
                 .respondentsResponses(
                     wrapElements(
                         GARespondentResponse.builder()
                             .gaHearingDetails(
-                                GAHearingDetails.builder()
-                                    .hearingPreferredLocation(
+                                new GAHearingDetails()
+                                    .setHearingPreferredLocation(
                                         getDynamicLocationsList("PQRS - GU0 0EE",
                                                                 getDynamicLocation("ABCD - RG0 0AL"),
                                                                 getDynamicLocation("PQRS - GU0 0EE"),
                                                                 getDynamicLocation("WXYZ - EW0 0HE"),
-                                                                getDynamicLocation("LMNO - NE0 0BH"))).build())
+                                                                getDynamicLocation("LMNO - NE0 0BH"))))
                             .build(),
                         GARespondentResponse.builder()
                             .gaHearingDetails(
-                                GAHearingDetails.builder()
-                                    .hearingPreferredLocation(
+                                new GAHearingDetails()
+                                    .setHearingPreferredLocation(
                                         getDynamicLocationsList("ABCD - RG0 0AL",
                                                                 getDynamicLocation("ABCD - RG0 0AL"),
                                                                 getDynamicLocation("PQRS - GU0 0EE"),
                                                                 getDynamicLocation("WXYZ - EW0 0HE"),
-                                                                getDynamicLocation("LMNO - NE0 0BH"))).build())
+                                                                getDynamicLocation("LMNO - NE0 0BH"))))
                             .build()
                     )
                 )
@@ -173,34 +173,34 @@ public class JudicialDecisionHelperTest {
         void shouldReturnFalse_whenLocationSelectedByApplicantAndBothOfTheRespondentIsNotSame() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .generalAppHearingDetails(
-                    GAHearingDetails.builder()
-                        .hearingPreferredLocation(
+                    new GAHearingDetails()
+                        .setHearingPreferredLocation(
                             getDynamicLocationsList("ABCD - RG0 0AL",
                                                     getDynamicLocation("ABCD - RG0 0AL"),
                                                     getDynamicLocation("PQRS - GU0 0EE"),
                                                     getDynamicLocation("WXYZ - EW0 0HE"),
-                                                    getDynamicLocation("LMNO - NE0 0BH"))).build())
+                                                    getDynamicLocation("LMNO - NE0 0BH"))))
                 .respondentsResponses(
                     wrapElements(
                         GARespondentResponse.builder()
                             .gaHearingDetails(
-                                GAHearingDetails.builder()
-                                    .hearingPreferredLocation(
+                                new GAHearingDetails()
+                                    .setHearingPreferredLocation(
                                         getDynamicLocationsList("PQRS - GU0 0EE",
                                                                 getDynamicLocation("ABCD - RG0 0AL"),
                                                                 getDynamicLocation("PQRS - GU0 0EE"),
                                                                 getDynamicLocation("WXYZ - EW0 0HE"),
-                                                                getDynamicLocation("LMNO - NE0 0BH"))).build())
+                                                                getDynamicLocation("LMNO - NE0 0BH"))))
                             .build(),
                         GARespondentResponse.builder()
                             .gaHearingDetails(
-                                GAHearingDetails.builder()
-                                    .hearingPreferredLocation(
+                                new GAHearingDetails()
+                                    .setHearingPreferredLocation(
                                         getDynamicLocationsList("WXYZ - EW0 0HE",
                                                                 getDynamicLocation("ABCD - RG0 0AL"),
                                                                 getDynamicLocation("PQRS - GU0 0EE"),
                                                                 getDynamicLocation("WXYZ - EW0 0HE"),
-                                                                getDynamicLocation("LMNO - NE0 0BH"))).build())
+                                                                getDynamicLocation("LMNO - NE0 0BH"))))
                             .build()
                     )
                 )
@@ -212,34 +212,34 @@ public class JudicialDecisionHelperTest {
         void shouldReturnTrue_whenLocationSelectedByApplicantAndBothRespondentIsSame() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .generalAppHearingDetails(
-                    GAHearingDetails.builder()
-                        .hearingPreferredLocation(
+                    new GAHearingDetails()
+                        .setHearingPreferredLocation(
                             getDynamicLocationsList("ABCD - RG0 0AL",
                                                     getDynamicLocation("ABCD - RG0 0AL"),
                                                     getDynamicLocation("PQRS - GU0 0EE"),
                                                     getDynamicLocation("WXYZ - EW0 0HE"),
-                                                    getDynamicLocation("LMNO - NE0 0BH"))).build())
+                                                    getDynamicLocation("LMNO - NE0 0BH"))))
                 .respondentsResponses(
                     wrapElements(
                         GARespondentResponse.builder()
                             .gaHearingDetails(
-                                GAHearingDetails.builder()
-                                    .hearingPreferredLocation(
+                                new GAHearingDetails()
+                                    .setHearingPreferredLocation(
                                         getDynamicLocationsList("ABCD - RG0 0AL",
                                                                 getDynamicLocation("ABCD - RG0 0AL"),
                                                                 getDynamicLocation("PQRS - GU0 0EE"),
                                                                 getDynamicLocation("WXYZ - EW0 0HE"),
-                                                                getDynamicLocation("LMNO - NE0 0BH"))).build())
+                                                                getDynamicLocation("LMNO - NE0 0BH"))))
                             .build(),
                         GARespondentResponse.builder()
                             .gaHearingDetails(
-                                GAHearingDetails.builder()
-                                    .hearingPreferredLocation(
+                                new GAHearingDetails()
+                                    .setHearingPreferredLocation(
                                         getDynamicLocationsList("ABCD - RG0 0AL",
                                                                 getDynamicLocation("ABCD - RG0 0AL"),
                                                                 getDynamicLocation("PQRS - GU0 0EE"),
                                                                 getDynamicLocation("WXYZ - EW0 0HE"),
-                                                                getDynamicLocation("LMNO - NE0 0BH"))).build())
+                                                                getDynamicLocation("LMNO - NE0 0BH"))))
                             .build()
                         )
                 )

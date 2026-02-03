@@ -150,7 +150,7 @@ public class GaFlowPredicateTest {
     public void testIsFreeApplication() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .isGaApplicantLip(YesOrNo.YES)
-            .generalAppType(GAApplicationType.builder().types(Collections.singletonList(GeneralApplicationTypes.ADJOURN_HEARING)).build())
+            .generalAppType(new GAApplicationType(Collections.singletonList(GeneralApplicationTypes.ADJOURN_HEARING)))
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                         .paymentDetails(PaymentDetails.builder()
                                                             .status(PaymentStatus.SUCCESS).build())
@@ -166,7 +166,7 @@ public class GaFlowPredicateTest {
     public void testIsNotFreeApplication() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .isGaApplicantLip(YesOrNo.YES)
-            .generalAppType(GAApplicationType.builder().types(Collections.singletonList(GeneralApplicationTypes.ADJOURN_HEARING)).build())
+            .generalAppType(new GAApplicationType(Collections.singletonList(GeneralApplicationTypes.ADJOURN_HEARING)))
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .paymentDetails(PaymentDetails.builder()
                                                           .status(PaymentStatus.SUCCESS).build())

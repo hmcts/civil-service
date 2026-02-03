@@ -75,7 +75,7 @@ class CaseProceedOfflineDefendantDashboardServiceTest {
         @Test
         void shouldRecordScenario_whenInvokedWithoutCaseProgression() {
             List<Element<GeneralApplication>> gaApplications = wrapElements(
-                GeneralApplication.builder().caseLink(CaseLink.builder().caseReference("12345678").build()).build()
+                new GeneralApplication().setCaseLink(new CaseLink().setCaseReference("12345678"))
             );
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)

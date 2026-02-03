@@ -48,7 +48,7 @@ public class NotifyHearingNoticeDefendantHandlerTest extends GeneralApplicationB
     @Test
     void shouldThrowException_whenNotificationSendingFails() {
         var caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.NO)
-            .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
             .build();
 
         doThrow(buildNotificationException())
@@ -76,7 +76,7 @@ public class NotifyHearingNoticeDefendantHandlerTest extends GeneralApplicationB
     @Test
     void shouldSendNotificationToDefendantSuccessfullyWhenWithoutNotice() {
         var caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.YES)
-            .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(NO))
             .build();
         when(hearingScheduledNotificationService.sendNotificationForDefendant(any())).thenReturn(caseData);
         params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

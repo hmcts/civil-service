@@ -231,7 +231,7 @@ class PaymentsServiceTest {
     @Test
     void validateRequestGaShouldThrowAnError_whenPBADetailsNotProvided() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
+            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setOrganisationIdentifier("OrgId"))
             .build();
 
         Exception exception = assertThrows(
@@ -245,7 +245,7 @@ class PaymentsServiceTest {
     void validateRequestGaShouldThrowAnError_whenFeeDetailsNotProvided() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder().build())
-            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
+            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setOrganisationIdentifier("OrgId"))
             .build();
 
         Exception exception = assertThrows(
@@ -264,7 +264,7 @@ class PaymentsServiceTest {
                                                .version("1")
                                                .build())
                                       .build())
-            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
+            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setOrganisationIdentifier("OrgId"))
             .build();
 
         Exception exception = assertThrows(
@@ -283,7 +283,7 @@ class PaymentsServiceTest {
                                                .code("FEE0442")
                                                .build())
                                       .build())
-            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
+            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setOrganisationIdentifier("OrgId"))
             .build();
 
         Exception exception = assertThrows(
@@ -302,7 +302,7 @@ class PaymentsServiceTest {
                                                .version("1")
                                                .build())
                                       .build())
-            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
+            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setOrganisationIdentifier("OrgId"))
             .build();
 
         Exception exception = assertThrows(
@@ -329,7 +329,7 @@ class PaymentsServiceTest {
     void validateRequestGaShouldThrowAnError_whenApplicantSolicitorOrgDetailsAreNotSet() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().build()).build())
-            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().build())
+            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec())
             .build();
 
         Exception exception = assertThrows(
@@ -348,7 +348,7 @@ class PaymentsServiceTest {
                                                .calculatedAmountInPence(BigDecimal.TEN)
                                                .version("version")
                                                .code("code").build()).build())
-            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().build())
+            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec())
             .build();
 
         paymentsService.validateRequestGa(caseData);

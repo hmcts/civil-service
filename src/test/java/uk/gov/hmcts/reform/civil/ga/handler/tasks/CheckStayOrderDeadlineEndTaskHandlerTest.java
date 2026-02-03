@@ -274,7 +274,7 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
         return GeneralApplicationCaseDataBuilder.builder()
             .ccdCaseReference(ccdId)
             .ccdState(ORDER_MADE)
-            .generalAppType(GAApplicationType.builder().types(List.of(generalApplicationType)).build())
+            .generalAppType(new GAApplicationType().setTypes(List.of(generalApplicationType)))
             .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
                                            .makeAnOrder(APPROVE_OR_EDIT)
                                            .judgeRecitalText("Sample Text")
@@ -289,7 +289,7 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
         return GeneralApplicationCaseDataBuilder.builder()
             .ccdCaseReference(ccdId)
             .ccdState(ORDER_MADE)
-            .generalAppType(GAApplicationType.builder().types(List.of(generalApplicationType)).build())
+            .generalAppType(new GAApplicationType().setTypes(List.of(generalApplicationType)))
             .approveConsentOrder(GAApproveConsentOrder.builder()
                                      .consentOrderDescription("Testing prepopulated text")
                                      .consentOrderDateToEnd(deadline)
@@ -308,8 +308,7 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
                            .reasonForDecisionText("Sample Test")
                            .isOrderProcessedByStayScheduler(isProcessed)
                            .build(),
-                       "generalAppType", GAApplicationType.builder().types(List.of(generalApplicationType))
-                           .build()))
+                       "generalAppType", new GAApplicationType().setTypes(List.of(generalApplicationType))))
             .state(ORDER_MADE.toString()).build();
     }
 
@@ -321,8 +320,7 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
                            .consentOrderDateToEnd(deadline)
                            .isOrderProcessedByStayScheduler(isProcessed)
                            .build(),
-                       "generalAppType", GAApplicationType.builder().types(List.of(generalApplicationType))
-                           .build()))
+                       "generalAppType", new GAApplicationType().setTypes(List.of(generalApplicationType))))
             .state(ORDER_MADE.toString()).build();
     }
 }

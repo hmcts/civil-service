@@ -45,7 +45,7 @@ class CaseProceedOfflineClaimantScenarioServiceTest {
 
     @Test
     void shouldResolveAdditionalScenarios() {
-        List<Element<GeneralApplication>> generalApplications = wrapElements(GeneralApplication.builder().build());
+        List<Element<GeneralApplication>> generalApplications = wrapElements(new GeneralApplication());
         CaseData caseData = CaseData.builder()
             .generalApplications(generalApplications)
             .build();

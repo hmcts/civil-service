@@ -328,11 +328,9 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         when(gaForLipService.isLipResp(any())).thenReturn(true);
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseData =
             GeneralApplicationCaseData.builder().ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).generalAppUrgencyRequirement(
-                    GAUrgencyRequirement.builder().generalAppUrgency(YES).build()).generalAppType(
-                    GAApplicationType
-                        .builder()
-                        .types(List.of(
-                            (GeneralApplicationTypes.SUMMARY_JUDGEMENT))).build())
+                    new GAUrgencyRequirement().setGeneralAppUrgency(YES)).generalAppType(
+                    new GAApplicationType(List.of(
+                            (GeneralApplicationTypes.SUMMARY_JUDGEMENT))))
                 .parentClaimantIsApplicant(NO);
         CallbackParams params = callbackParamsOf(
             caseData.build(),
@@ -355,7 +353,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updateCaseData = caseData.toBuilder();
         List<GeneralApplicationTypes> types = List.of(SUMMARY_JUDGEMENT);
         updateCaseData.parentClaimantIsApplicant(YES)
-            .generalAppType(GAApplicationType.builder().types(types).build()).build();
+            .generalAppType(new GAApplicationType(types)).build();
 
         CallbackParams params = callbackParamsOf(updateCaseData.build(), CallbackType.ABOUT_TO_START);
         List<String> errors = new ArrayList<>();
@@ -380,7 +378,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updateCaseData = caseData.toBuilder();
         List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
         updateCaseData.parentClaimantIsApplicant(NO)
-            .generalAppType(GAApplicationType.builder().types(types).build()).build();
+            .generalAppType(new GAApplicationType(types)).build();
 
         CallbackParams params = callbackParamsOf(updateCaseData.build(), CallbackType.ABOUT_TO_START);
         List<String> errors = new ArrayList<>();
@@ -421,7 +419,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updateCaseData = caseData.toBuilder();
         List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
         updateCaseData.parentClaimantIsApplicant(NO)
-            .generalAppType(GAApplicationType.builder().types(types).build())
+            .generalAppType(new GAApplicationType(types))
             .gaRespondentDebtorOffer(
             GARespondentDebtorOfferGAspec.builder().respondentDebtorOffer(
             GARespondentDebtorOfferOptionsGAspec.DECLINE)
@@ -443,7 +441,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         GeneralApplicationCaseData caseData = getCase(AWAITING_RESPONDENT_RESPONSE);
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updateCaseData = caseData.toBuilder();
         List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
-        updateCaseData.generalAppType(GAApplicationType.builder().types(types).build())
+        updateCaseData.generalAppType(new GAApplicationType(types))
             .gaRespondentDebtorOffer(
                 GARespondentDebtorOfferGAspec.builder().respondentDebtorOffer(
                         GARespondentDebtorOfferOptionsGAspec.DECLINE)
@@ -603,11 +601,11 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-        GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-            .email(DUMMY_EMAIL).organisationIdentifier("org2").build();
+        GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+            .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("org2");
 
-        GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id("id")
-            .email("abcd2@gmail.com").organisationIdentifier("org2").build();
+        GASolicitorDetailsGAspec respondent2 = new GASolicitorDetailsGAspec().setId("id")
+            .setEmail("abcd2@gmail.com").setOrganisationIdentifier("org2");
 
         respondentSols.add(element(respondent1));
         respondentSols.add(element(respondent2));
@@ -645,11 +643,11 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-        GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-            .email(DUMMY_EMAIL).organisationIdentifier("org2").build();
+        GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+            .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("org2");
 
-        GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id("id")
-            .email(DUMMY_EMAIL).organisationIdentifier("org2").build();
+        GASolicitorDetailsGAspec respondent2 = new GASolicitorDetailsGAspec().setId("id")
+            .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("org2");
 
         respondentSols.add(element(respondent1));
         respondentSols.add(element(respondent2));
@@ -694,8 +692,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-        GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-            .email(DUMMY_EMAIL).organisationIdentifier("org2").build();
+        GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+            .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("org2");
 
         respondentSols.add(element(respondent1));
 
@@ -725,8 +723,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-        GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-            .email(DUMMY_EMAIL).organisationIdentifier("org2").build();
+        GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+            .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("org2");
 
         respondentSols.add(element(respondent1));
 
@@ -738,9 +736,9 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         when(coreCaseDataService.getCase(123L)).thenReturn(civil);
         when(caseDetailsConverter.toGeneralApplicationCaseData(civil))
             .thenReturn(new GeneralApplicationCaseDataBuilder()
-                            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
-                                                          .forename("GAApplnSolicitor")
-                                                          .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("id")
+                                                          .setForename("GAApplnSolicitor")
+                                                          .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
                             .respondentSolicitor1EmailAddress(DUMMY_EMAIL)
                             .build());
         when(gaForLipService.isLipResp(any())).thenReturn(true);
@@ -761,10 +759,10 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     void shouldReturn_Application_Submitted_Awaiting_Judicial_Decision_1Def_1Response_test() {
 
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
-        GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id(DEF_UID)
-            .email("test@gmail.com").organisationIdentifier("org2").build();
-        GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id(DEF2_UID)
-            .email(DUMMY_EMAIL).organisationIdentifier("org2").build();
+        GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId(DEF_UID)
+            .setEmail("test@gmail.com").setOrganisationIdentifier("org2");
+        GASolicitorDetailsGAspec respondent2 = new GASolicitorDetailsGAspec().setId(DEF2_UID)
+            .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("org2");
         respondentSols.add(element(respondent2));
         respondentSols.add(element(respondent1));
         GeneralApplicationCaseData caseData = getCaseWithJudicialDecision(respondentSols, respondentsResponses);
@@ -806,11 +804,11 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-        GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-            .email(DUMMY_EMAIL).organisationIdentifier("org2").build();
+        GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+            .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("org2");
 
-        GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id("id")
-            .email(DUMMY_EMAIL).organisationIdentifier("org2").build();
+        GASolicitorDetailsGAspec respondent2 = new GASolicitorDetailsGAspec().setId("id")
+            .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("org2");
 
         respondentSols.add(element(respondent1));
         respondentSols.add(element(respondent2));
@@ -866,7 +864,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         GeneralApplicationCaseData caseData = getCaseWithPreferredTypeInPersonLocationNull();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.parentClaimantIsApplicant(NO)
-            .generalAppType(GAApplicationType.builder().types(List.of(SUMMARY_JUDGEMENT)).build()).build();
+            .generalAppType(new GAApplicationType(List.of(SUMMARY_JUDGEMENT))).build();
 
         // Civil Claim CaseDate
         CaseDetails civil = CaseDetails.builder().id(123L).build();
@@ -899,9 +897,35 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         GeneralApplicationCaseData caseData = getCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION);
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.parentClaimantIsApplicant(NO)
-            .generalAppType(GAApplicationType.builder().types(List.of(SUMMARY_JUDGEMENT)).build()).build();
-        caseDataBuilder.hearingDetailsResp(caseData.getHearingDetailsResp().toBuilder()
-                                               .hearingPreferencesPreferredType(GAHearingType.VIDEO).build());
+            .generalAppType(new GAApplicationType(List.of(SUMMARY_JUDGEMENT))).build();
+        GAHearingDetails existingHearing = caseData.getHearingDetailsResp();
+        caseDataBuilder.hearingDetailsResp(new GAHearingDetails()
+                                               .setHearingYesorNo(existingHearing.getHearingYesorNo())
+                                               .setHearingDate(existingHearing.getHearingDate())
+                                               .setJudgeRequiredYesOrNo(existingHearing.getJudgeRequiredYesOrNo())
+                                               .setJudgeName(existingHearing.getJudgeName())
+                                               .setTrialRequiredYesOrNo(existingHearing.getTrialRequiredYesOrNo())
+                                               .setTrialDateFrom(existingHearing.getTrialDateFrom())
+                                               .setTrialDateTo(existingHearing.getTrialDateTo())
+                                               .setHearingPreferencesPreferredType(GAHearingType.VIDEO)
+                                               .setTelephoneHearingPreferredType(existingHearing.getTelephoneHearingPreferredType())
+                                               .setReasonForPreferredHearingType(existingHearing.getReasonForPreferredHearingType())
+                                               .setHearingPreferredLocation(existingHearing.getHearingPreferredLocation())
+                                               .setHearingDetailsTelephoneNumber(existingHearing.getHearingDetailsTelephoneNumber())
+                                               .setHearingDetailsEmailID(existingHearing.getHearingDetailsEmailID())
+                                               .setHearingDuration(existingHearing.getHearingDuration())
+                                               .setGeneralAppHearingDays(existingHearing.getGeneralAppHearingDays())
+                                               .setGeneralAppHearingHours(existingHearing.getGeneralAppHearingHours())
+                                               .setGeneralAppHearingMinutes(existingHearing.getGeneralAppHearingMinutes())
+                                               .setUnavailableTrialRequiredYesOrNo(existingHearing.getUnavailableTrialRequiredYesOrNo())
+                                               .setGeneralAppUnavailableDates(existingHearing.getGeneralAppUnavailableDates())
+                                               .setVulnerabilityQuestionsYesOrNo(existingHearing.getVulnerabilityQuestionsYesOrNo())
+                                               .setVulnerabilityQuestion(existingHearing.getVulnerabilityQuestion())
+                                               .setSupportRequirement(existingHearing.getSupportRequirement())
+                                               .setSupportRequirementSignLanguage(existingHearing.getSupportRequirementSignLanguage())
+                                               .setSupportRequirementLanguageInterpreter(existingHearing.getSupportRequirementLanguageInterpreter())
+                                               .setSupportRequirementOther(existingHearing.getSupportRequirementOther())
+                                               .setRespondentResponsePartyName(existingHearing.getRespondentResponsePartyName()));
         caseDataBuilder.isGaRespondentOneLip(YES);
 
         // Civil Claim CaseDate
@@ -946,7 +970,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             .defendant1PartyName("Defendant One")
             .claimant1PartyName("Claimant One")
             .claimant2PartyName("Claimant Two")
-            .generalAppType(GAApplicationType.builder().types(List.of(SUMMARY_JUDGEMENT)).build())
+            .generalAppType(new GAApplicationType(List.of(SUMMARY_JUDGEMENT)))
             .generalAppRespondReason("reason")
             .generalAppRespondent1Representative(GARespondentRepresentative.builder()
                                                      .generalAppRespondent1Representative(NO).build())
@@ -1002,7 +1026,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                 .defendant1PartyName("Defendant One")
                 .claimant1PartyName("Claimant One")
                 .claimant2PartyName("Claimant Two")
-                .generalAppType(GAApplicationType.builder().types(List.of(SUMMARY_JUDGEMENT)).build())
+                .generalAppType(new GAApplicationType(List.of(SUMMARY_JUDGEMENT)))
                 .generalAppRespondReason("reason")
                 .generalAppRespondent1Representative(GARespondentRepresentative.builder()
                         .generalAppRespondent1Representative(NO).build())
@@ -1043,7 +1067,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         GeneralApplicationCaseData caseData = getCaseWithPreferredTypeInPersonLocationNull();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.parentClaimantIsApplicant(NO)
-                .generalAppType(GAApplicationType.builder().types(List.of(SUMMARY_JUDGEMENT)).build())
+                .generalAppType(new GAApplicationType(List.of(SUMMARY_JUDGEMENT)))
                 .generalAppConsentOrder(YES)
                 .generalAppRespondConsentReason("reason")
                 .gaRespondentConsent(NO)
@@ -1088,7 +1112,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         LocalDate planDate = LocalDate.of(2023, 11, 29);
         caseDataBuilder.parentClaimantIsApplicant(NO)
-            .generalAppType(GAApplicationType.builder().types(List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT)).build())
+            .generalAppType(new GAApplicationType(List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT)))
             .gaRespondentDebtorOffer(
             GARespondentDebtorOfferGAspec.builder().respondentDebtorOffer(
                     GARespondentDebtorOfferOptionsGAspec.DECLINE)
@@ -1135,7 +1159,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         GeneralApplicationCaseData caseData = getCaseWithPreferredTypeInPersonLocationNull();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.parentClaimantIsApplicant(NO)
-                .generalAppType(GAApplicationType.builder().types(List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT)).build())
+                .generalAppType(new GAApplicationType(List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT)))
             .defendant2PartyName("Defendant Two")
             .defendant1PartyName("Defendant One")
             .claimant1PartyName("Claimant One")
@@ -1178,7 +1202,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         GeneralApplicationCaseData caseData = getCaseWithPreferredTypeInPersonLocationNull();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.parentClaimantIsApplicant(NO)
-            .generalAppType(GAApplicationType.builder().types(List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT)).build())
+            .generalAppType(new GAApplicationType(List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT)))
             .gaRespondentDebtorOffer(
                 GARespondentDebtorOfferGAspec.builder().respondentDebtorOffer(
                         GARespondentDebtorOfferOptionsGAspec.ACCEPT)
@@ -1214,8 +1238,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-        GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-            .email(DUMMY_EMAIL).organisationIdentifier("org2").build();
+        GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+            .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("org2");
 
         respondentSols.add(element(respondent1));
 
@@ -1224,12 +1248,11 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         Optional<DynamicListElement> first = dynamicListTest.getListItems().stream().findFirst();
         first.ifPresent(dynamicListTest::setValue);
 
-        GeneralApplicationCaseData updatedCaseData = caseData.toBuilder().hearingDetailsResp(GAHearingDetails.builder()
-                                                                               .hearingPreferredLocation(
+        GeneralApplicationCaseData updatedCaseData = caseData.toBuilder().hearingDetailsResp(new GAHearingDetails()
+                                                                               .setHearingPreferredLocation(
                                                                                    dynamicListTest)
-                                                                               .hearingPreferencesPreferredType(
-                                                                                   GAHearingType.IN_PERSON)
-                                                                               .build()).build();
+                                                                               .setHearingPreferencesPreferredType(
+                                                                                   GAHearingType.IN_PERSON)).build();
         // Civil Claim Case Data
         CaseDetails civil = CaseDetails.builder().id(123L).build();
         when(coreCaseDataService.getCase(123L)).thenReturn(civil);
@@ -1260,39 +1283,35 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
     private GeneralApplicationCaseData getCaseWithNullUnavailableDateFrom() {
         return GeneralApplicationCaseData.builder()
-            .hearingDetailsResp(GAHearingDetails.builder()
-                                    .unavailableTrialRequiredYesOrNo(YES)
-                                    .generalAppUnavailableDates(null)
-                                    .build())
+            .hearingDetailsResp(new GAHearingDetails()
+                                    .setUnavailableTrialRequiredYesOrNo(YES)
+                                    .setGeneralAppUnavailableDates(null))
             .build();
     }
 
     private GeneralApplicationCaseData getCaseWithNullUnavailableDates() {
         return GeneralApplicationCaseData.builder()
-            .hearingDetailsResp(GAHearingDetails.builder()
-                                    .unavailableTrialRequiredYesOrNo(YES)
-                                    .generalAppUnavailableDates(getUnavailableNullDateList())
-                                    .build())
+            .hearingDetailsResp(new GAHearingDetails()
+                                    .setUnavailableTrialRequiredYesOrNo(YES)
+                                    .setGeneralAppUnavailableDates(getUnavailableNullDateList()))
             .build();
     }
 
     private GeneralApplicationCaseData getCaseWithInvalidTrailDateRange() {
         return GeneralApplicationCaseData.builder()
-            .hearingDetailsResp(GAHearingDetails.builder()
-                                    .trialRequiredYesOrNo(YES)
-                                    .trialDateFrom(TRIAL_DATE_FROM_INVALID)
-                                    .trialDateTo(TRIAL_DATE_TO_BEFORE_INVALID)
-                                    .build())
+            .hearingDetailsResp(new GAHearingDetails()
+                                    .setTrialRequiredYesOrNo(YES)
+                                    .setTrialDateFrom(TRIAL_DATE_FROM_INVALID)
+                                    .setTrialDateTo(TRIAL_DATE_TO_BEFORE_INVALID))
             .build();
     }
 
     private GeneralApplicationCaseData getCaseWithInvalidDateToRange() {
         return GeneralApplicationCaseData.builder()
-            .hearingDetailsResp(GAHearingDetails.builder()
-                                    .trialRequiredYesOrNo(YES)
-                                    .trialDateFrom(TRIAL_DATE_FROM_INVALID)
-                                    .trialDateTo(TRIAL_DATE_FROM_AFTER_INVALID)
-                                    .build())
+            .hearingDetailsResp(new GAHearingDetails()
+                                    .setTrialRequiredYesOrNo(YES)
+                                    .setTrialDateFrom(TRIAL_DATE_FROM_INVALID)
+                                    .setTrialDateTo(TRIAL_DATE_FROM_AFTER_INVALID))
             .build();
     }
 
@@ -1303,11 +1322,10 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             .defendant1PartyName("Defendant One")
             .claimant1PartyName("Claimant One")
             .claimant2PartyName("Claimant Two")
-            .hearingDetailsResp(GAHearingDetails.builder()
-                                    .trialRequiredYesOrNo(YES)
-                                    .trialDateFrom(null)
-                                    .trialDateTo(null)
-                                    .build())
+            .hearingDetailsResp(new GAHearingDetails()
+                                    .setTrialRequiredYesOrNo(YES)
+                                    .setTrialDateFrom(null)
+                                    .setTrialDateTo(null))
             .build();
     }
 
@@ -1316,16 +1334,15 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
                 .parentClaimantIsApplicant(YES)
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                        .email("abc@gmail.com").id(APP_UID).build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec()
+                        .setEmail("abc@gmail.com").setId(APP_UID))
                 .generalAppRespondentSolicitors(getRespondentSolicitors())
             .defendant2PartyName("Defendant Two")
             .defendant1PartyName("Defendant One")
             .claimant1PartyName("Claimant One")
             .claimant2PartyName("Claimant Two")
-            .hearingDetailsResp(GAHearingDetails.builder()
-                                    .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
-                                    .build())
+            .hearingDetailsResp(new GAHearingDetails()
+                                    .setHearingPreferencesPreferredType(GAHearingType.IN_PERSON))
             .build();
     }
 
@@ -1336,10 +1353,9 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             .defendant1PartyName("Defendant One")
             .claimant1PartyName("Claimant One")
             .claimant2PartyName("Claimant Two")
-            .hearingDetailsResp(GAHearingDetails.builder()
-                                    .unavailableTrialRequiredYesOrNo(YES)
-                                    .generalAppUnavailableDates(getUnavailableDateList())
-                                    .build())
+            .hearingDetailsResp(new GAHearingDetails()
+                                    .setUnavailableTrialRequiredYesOrNo(YES)
+                                    .setGeneralAppUnavailableDates(getUnavailableDateList()))
             .build();
     }
 
@@ -1350,33 +1366,29 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             .defendant1PartyName("Defendant One")
             .claimant1PartyName("Claimant One")
             .claimant2PartyName("Claimant Two")
-            .hearingDetailsResp(GAHearingDetails.builder()
-                                    .unavailableTrialRequiredYesOrNo(YES)
-                                    .generalAppUnavailableDates(getUnavailableDateBeforeToday())
-                                    .build())
+            .hearingDetailsResp(new GAHearingDetails()
+                                    .setUnavailableTrialRequiredYesOrNo(YES)
+                                    .setGeneralAppUnavailableDates(getUnavailableDateBeforeToday()))
             .build();
     }
 
     private List<Element<GAUnavailabilityDates>> getUnavailableNullDateList() {
-        GAUnavailabilityDates invalidDates = GAUnavailabilityDates.builder()
-            .unavailableTrialDateFrom(null)
-            .unavailableTrialDateTo(null)
-            .build();
+        GAUnavailabilityDates invalidDates = new GAUnavailabilityDates()
+            .setUnavailableTrialDateFrom(null)
+            .setUnavailableTrialDateTo(null);
         return wrapElements(invalidDates);
     }
 
     private List<Element<GAUnavailabilityDates>> getUnavailableDateList() {
-        GAUnavailabilityDates invalidDates = GAUnavailabilityDates.builder()
-            .unavailableTrialDateFrom(UNAVAILABILITY_DATE_FROM_INVALID)
-            .unavailableTrialDateTo(UNAVAILABILITY_DATE_TO_INVALID)
-            .build();
+        GAUnavailabilityDates invalidDates = new GAUnavailabilityDates()
+            .setUnavailableTrialDateFrom(UNAVAILABILITY_DATE_FROM_INVALID)
+            .setUnavailableTrialDateTo(UNAVAILABILITY_DATE_TO_INVALID);
         return wrapElements(invalidDates);
     }
 
     private List<Element<GAUnavailabilityDates>> getUnavailableDateBeforeToday() {
-        GAUnavailabilityDates invalidDates = GAUnavailabilityDates.builder()
-            .unavailableTrialDateFrom(UNAVAILABILITY_DATE_FROM_INVALID)
-            .build();
+        GAUnavailabilityDates invalidDates = new GAUnavailabilityDates()
+            .setUnavailableTrialDateFrom(UNAVAILABILITY_DATE_FROM_INVALID);
         return wrapElements(invalidDates);
     }
 
@@ -1386,8 +1398,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                                              .generalAppRespondent1Representative(NO)
                                              .gaRespondentDetails(DEF_UID).build()));
         return GeneralApplicationCaseData.builder().parentClaimantIsApplicant(YES)
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                        .email("abc@gmail.com").id(APP_UID).build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec()
+                        .setEmail("abc@gmail.com").setId(APP_UID))
                 .generalAppRespondentSolicitors(getRespondentSolicitors())
             .respondentsResponses(respondentsResponses)
             .build();
@@ -1396,11 +1408,11 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     private List<Element<GASolicitorDetailsGAspec>> getRespondentSolicitors() {
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-        GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id(DEF_UID)
-                .email("test@gmail.com").organisationIdentifier("org2").build();
+        GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId(DEF_UID)
+                .setEmail("test@gmail.com").setOrganisationIdentifier("org2");
 
-        GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id(DEF2_UID)
-                .email("test@gmail.com").organisationIdentifier("org3").build();
+        GASolicitorDetailsGAspec respondent2 = new GASolicitorDetailsGAspec().setId(DEF2_UID)
+                .setEmail("test@gmail.com").setOrganisationIdentifier("org3");
 
         respondentSols.add(element(respondent1));
         respondentSols.add(element(respondent2));
@@ -1428,18 +1440,14 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                                         .hearingPreferredLocation(dynamicListTest)
                                         .hearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON)
                                         .build())
-            .hearingDetailsResp(GAHearingDetails.builder()
-                                    .hearingPreferredLocation(dynamicListTest)
-                                    .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
-                                    .build())
-            .generalAppType(
-                GAApplicationType
-                    .builder()
-                    .types(types).build())
+            .hearingDetailsResp(new GAHearingDetails()
+                                    .setHearingPreferredLocation(dynamicListTest)
+                                    .setHearingPreferencesPreferredType(GAHearingType.IN_PERSON))
+            .generalAppType(new GAApplicationType(types))
             .parentClaimantIsApplicant(NO)
             .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
-            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                          .email("abc@gmail.com").id(APP_UID).build())
+            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec()
+                                          .setEmail("abc@gmail.com").setId(APP_UID))
             .generalAppRespondentSolicitors(getRespondentSolicitors())
             .businessProcess(BusinessProcess
                                  .builder()
@@ -1472,18 +1480,14 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                                        .hearingPreferredLocation(dynamicListTest)
                                         .hearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON)
                                        .build())
-            .hearingDetailsResp(GAHearingDetails.builder()
-                                    .hearingPreferredLocation(dynamicListTest)
-                                    .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
-                                    .build())
-            .generalAppType(
-                GAApplicationType
-                    .builder()
-                    .types(types).build())
+            .hearingDetailsResp(new GAHearingDetails()
+                                    .setHearingPreferredLocation(dynamicListTest)
+                                    .setHearingPreferencesPreferredType(GAHearingType.IN_PERSON))
+            .generalAppType(new GAApplicationType(types))
             .parentClaimantIsApplicant(NO)
             .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                        .email("abc@gmail.com").id(APP_UID).build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec()
+                        .setEmail("abc@gmail.com").setId(APP_UID))
             .generalAppRespondentSolicitors(getRespondentSolicitors())
             .businessProcess(BusinessProcess
                                  .builder()
@@ -1507,14 +1511,13 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         return GeneralApplicationCaseData.builder()
                 .parentClaimantIsApplicant(YES)
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                        .email("abc@gmail.com").id(APP_UID).build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec()
+                        .setEmail("abc@gmail.com").setId(APP_UID))
             .generalAppRespondentSolicitors(respondentSols)
-            .hearingDetailsResp(GAHearingDetails.builder()
-                                    .hearingPreferredLocation(
+            .hearingDetailsResp(new GAHearingDetails()
+                                    .setHearingPreferredLocation(
                                         dynamicListTest)
-                                    .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
-                                    .build())
+                                    .setHearingPreferencesPreferredType(GAHearingType.IN_PERSON))
             .respondentsResponses(respondentsResponses)
             .generalAppRespondent1Representative(
                 GARespondentRepresentative.builder()
@@ -1526,10 +1529,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             .defendant1PartyName("Defendant One")
             .claimant1PartyName("Claimant One")
             .claimant2PartyName("Claimant Two")
-            .generalAppType(
-                GAApplicationType
-                    .builder()
-                    .types(types).build())
+            .generalAppType(new GAApplicationType(types))
             .businessProcess(BusinessProcess
                                  .builder()
                                  .camundaEvent(CAMUNDA_EVENT)
@@ -1552,14 +1552,13 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         return GeneralApplicationCaseData.builder()
             .parentClaimantIsApplicant(YES)
             .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                        .email("abc@gmail.com").id(APP_UID).build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec()
+                        .setEmail("abc@gmail.com").setId(APP_UID))
             .generalAppRespondentSolicitors(respondentSols)
-            .hearingDetailsResp(GAHearingDetails.builder()
-                                    .hearingPreferredLocation(
+            .hearingDetailsResp(new GAHearingDetails()
+                                    .setHearingPreferredLocation(
                                         dynamicListTest)
-                                    .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
-                                    .build())
+                                    .setHearingPreferencesPreferredType(GAHearingType.IN_PERSON))
             .respondentsResponses(respondentsResponses)
             .generalAppRespondent1Representative(
                 GARespondentRepresentative.builder()
@@ -1569,10 +1568,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             .defendant1PartyName("Defendant One")
             .claimant1PartyName("Claimant One")
             .claimant2PartyName("Claimant Two")
-            .generalAppType(
-                GAApplicationType
-                    .builder()
-                    .types(types).build())
+            .generalAppType(new GAApplicationType(types))
             .judicialDecision(GAJudicialDecision.builder().decision(
                 GAJudgeDecisionOption.MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS).build())
             .businessProcess(BusinessProcess
@@ -1603,8 +1599,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     public GeneralApplicationCaseData getCivilCaseData(String applicantEmail, String respondent1SolEmail, String respondent2SolEmail) {
 
         return new GeneralApplicationCaseDataBuilder()
-            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id").forename("GAApplnSolicitor")
-                                          .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("id").setForename("GAApplnSolicitor")
+                                          .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
             .respondentSolicitor1EmailAddress(respondent1SolEmail)
             .respondentSolicitor2EmailAddress(respondent2SolEmail)
             .applicantSolicitor1UserDetails(IdamUserDetails.builder()

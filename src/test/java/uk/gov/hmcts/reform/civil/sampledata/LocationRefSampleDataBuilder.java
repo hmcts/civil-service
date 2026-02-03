@@ -39,14 +39,11 @@ public class LocationRefSampleDataBuilder {
 
     protected CaseData getTestCaseData(CaseData caseData) {
         return caseData.toBuilder()
-            .generalAppType(GAApplicationType.builder()
-                                .types(singletonList(EXTEND_TIME))
-                                .build())
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                               .hasAgreed(NO)
-                                               .build())
-            .generalAppPBADetails(GAPbaDetails.builder()
-                                      .build())
+            .generalAppType(new GAApplicationType()
+                                .setTypes(singletonList(EXTEND_TIME)))
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement()
+                                               .setHasAgreed(NO))
+            .generalAppPBADetails(new GAPbaDetails())
             .generalAppEvidenceDocument(wrapElements(Document.builder()
                                                          .documentUrl(STRING_CONSTANT)
                                                          .documentBinaryUrl(STRING_CONSTANT)
@@ -55,118 +52,107 @@ public class LocationRefSampleDataBuilder {
                                                          .build()))
             .generalAppDetailsOfOrder(STRING_CONSTANT)
             .generalAppReasonsOfOrder(STRING_CONSTANT)
-            .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                            .isWithNotice(NO)
-                                            .reasonsForWithoutNotice(STRING_CONSTANT)
-                                            .build())
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder()
-                                              .generalAppUrgency(YES)
-                                              .reasonsForUrgency(STRING_CONSTANT)
-                                              .urgentAppConsiderationDate(APP_DATE_EPOCH)
-                                              .build())
-            .generalAppStatementOfTruth(GAStatementOfTruth.builder()
-                                            .name(STRING_CONSTANT)
-                                            .role(STRING_CONSTANT)
-                                            .build())
-            .generalAppHearingDetails(GAHearingDetails.builder()
-                                          .judgeName(STRING_CONSTANT)
-                                          .hearingDate(APP_DATE_EPOCH)
-                                          .trialDateFrom(APP_DATE_EPOCH)
-                                          .trialDateTo(APP_DATE_EPOCH)
-                                          .hearingYesorNo(YES)
-                                          .hearingDuration(OTHER)
-                                          .generalAppHearingDays("1")
-                                          .generalAppHearingHours("2")
-                                          .generalAppHearingMinutes("30")
-                                          .supportRequirement(singletonList(OTHER_SUPPORT))
-                                          .judgeRequiredYesOrNo(YES)
-                                          .trialRequiredYesOrNo(YES)
-                                          .hearingDetailsEmailID(STRING_CONSTANT)
-                                          .supportRequirementOther(STRING_CONSTANT)
-                                          .hearingPreferredLocation(DynamicList.builder().build())
-                                          .generalAppUnavailableDates(wrapElements(GAUnavailabilityDates.builder()
-                                                                                       .unavailableTrialDateFrom(
+            .generalAppInformOtherParty(new GAInformOtherParty()
+                                            .setIsWithNotice(NO)
+                                            .setReasonsForWithoutNotice(STRING_CONSTANT))
+            .generalAppUrgencyRequirement(new GAUrgencyRequirement()
+                                              .setGeneralAppUrgency(YES)
+                                              .setReasonsForUrgency(STRING_CONSTANT)
+                                              .setUrgentAppConsiderationDate(APP_DATE_EPOCH))
+            .generalAppStatementOfTruth(new GAStatementOfTruth()
+                                            .setName(STRING_CONSTANT)
+                                            .setRole(STRING_CONSTANT))
+            .generalAppHearingDetails(new GAHearingDetails()
+                                          .setJudgeName(STRING_CONSTANT)
+                                          .setHearingDate(APP_DATE_EPOCH)
+                                          .setTrialDateFrom(APP_DATE_EPOCH)
+                                          .setTrialDateTo(APP_DATE_EPOCH)
+                                          .setHearingYesorNo(YES)
+                                          .setHearingDuration(OTHER)
+                                          .setGeneralAppHearingDays("1")
+                                          .setGeneralAppHearingHours("2")
+                                          .setGeneralAppHearingMinutes("30")
+                                          .setSupportRequirement(singletonList(OTHER_SUPPORT))
+                                          .setJudgeRequiredYesOrNo(YES)
+                                          .setTrialRequiredYesOrNo(YES)
+                                          .setHearingDetailsEmailID(STRING_CONSTANT)
+                                          .setSupportRequirementOther(STRING_CONSTANT)
+                                          .setHearingPreferredLocation(DynamicList.builder().build())
+                                          .setGeneralAppUnavailableDates(wrapElements(new GAUnavailabilityDates()
+                                                                                       .setUnavailableTrialDateFrom(
                                                                                            APP_DATE_EPOCH)
-                                                                                       .unavailableTrialDateTo(
-                                                                                           APP_DATE_EPOCH)
-                                                                                       .build()))
-                                          .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
-                                          .reasonForPreferredHearingType(STRING_CONSTANT)
-                                          .telephoneHearingPreferredType(STRING_CONSTANT)
-                                          .supportRequirementSignLanguage(STRING_CONSTANT)
-                                          .hearingPreferencesPreferredType(IN_PERSON)
-                                          .unavailableTrialRequiredYesOrNo(YES)
-                                          .supportRequirementLanguageInterpreter(STRING_CONSTANT)
-                                          .build())
+                                                                                       .setUnavailableTrialDateTo(
+                                                                                           APP_DATE_EPOCH)))
+                                          .setHearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
+                                          .setReasonForPreferredHearingType(STRING_CONSTANT)
+                                          .setTelephoneHearingPreferredType(STRING_CONSTANT)
+                                          .setSupportRequirementSignLanguage(STRING_CONSTANT)
+                                          .setHearingPreferencesPreferredType(IN_PERSON)
+                                          .setUnavailableTrialRequiredYesOrNo(YES)
+                                          .setSupportRequirementLanguageInterpreter(STRING_CONSTANT))
             .build();
     }
 
     protected CaseData getTestCaseDataForUrgencyCheckMidEvent(CaseData caseData, boolean isApplicationUrgent,
                                                               LocalDate urgencyConsiderationDate) {
-        GAUrgencyRequirement.GAUrgencyRequirementBuilder urBuilder = GAUrgencyRequirement.builder();
+        GAUrgencyRequirement urBuilder = new GAUrgencyRequirement();
         if (isApplicationUrgent) {
-            urBuilder.generalAppUrgency(YES)
-                .reasonsForUrgency(STRING_CONSTANT);
+            urBuilder.setGeneralAppUrgency(YES)
+                .setReasonsForUrgency(STRING_CONSTANT);
         } else {
-            urBuilder.generalAppUrgency(NO);
+            urBuilder.setGeneralAppUrgency(NO);
         }
-        urBuilder.urgentAppConsiderationDate(urgencyConsiderationDate);
-        GAUrgencyRequirement gaUrgencyRequirement = urBuilder.build();
+        urBuilder.setUrgentAppConsiderationDate(urgencyConsiderationDate);
+        GAUrgencyRequirement gaUrgencyRequirement = urBuilder;
         return caseData.toBuilder()
-            .generalAppType(GAApplicationType.builder()
-                                .types(singletonList(EXTEND_TIME))
-                                .build())
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                               .hasAgreed(NO)
-                                               .build())
-            .generalAppPBADetails(GAPbaDetails.builder()
-                                      .build())
+            .generalAppType(new GAApplicationType()
+                                .setTypes(singletonList(EXTEND_TIME)))
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement()
+                                               .setHasAgreed(NO))
+            .generalAppPBADetails(new GAPbaDetails())
             .generalAppDetailsOfOrder(STRING_CONSTANT)
             .generalAppReasonsOfOrder(STRING_CONSTANT)
-            .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                            .isWithNotice(NO)
-                                            .reasonsForWithoutNotice(STRING_CONSTANT)
-                                            .build())
+            .generalAppInformOtherParty(new GAInformOtherParty()
+                                            .setIsWithNotice(NO)
+                                            .setReasonsForWithoutNotice(STRING_CONSTANT))
             .generalAppUrgencyRequirement(gaUrgencyRequirement)
-            .generalAppStatementOfTruth(GAStatementOfTruth.builder()
-                                            .name(STRING_CONSTANT)
-                                            .role(STRING_CONSTANT)
-                                            .build())
+            .generalAppStatementOfTruth(new GAStatementOfTruth()
+                                            .setName(STRING_CONSTANT)
+                                            .setRole(STRING_CONSTANT))
             .generalAppEvidenceDocument(wrapElements(Document.builder()
                                                          .documentUrl(STRING_CONSTANT)
                                                          .documentBinaryUrl(STRING_CONSTANT)
                                                          .documentFileName(STRING_CONSTANT)
                                                          .documentHash(STRING_CONSTANT)
                                                          .build()))
-            .generalAppHearingDetails(GAHearingDetails.builder()
-                                          .judgeName(STRING_CONSTANT)
-                                          .hearingDate(APP_DATE_EPOCH)
-                                          .trialDateFrom(APP_DATE_EPOCH)
-                                          .trialDateTo(APP_DATE_EPOCH)
-                                          .hearingYesorNo(YES)
-                                          .hearingDuration(OTHER)
-                                          .generalAppHearingDays("1")
-                                          .generalAppHearingHours("2")
-                                          .generalAppHearingMinutes("30")
-                                          .supportRequirement(singletonList(OTHER_SUPPORT))
-                                          .judgeRequiredYesOrNo(YES)
-                                          .trialRequiredYesOrNo(YES)
-                                          .hearingDetailsEmailID(STRING_CONSTANT)
-                                          .generalAppUnavailableDates(wrapElements(GAUnavailabilityDates.builder()
-                                                                                       .unavailableTrialDateFrom(
+            .generalAppHearingDetails(new GAHearingDetails()
+                                          .setJudgeName(STRING_CONSTANT)
+                                          .setHearingDate(APP_DATE_EPOCH)
+                                          .setTrialDateFrom(APP_DATE_EPOCH)
+                                          .setTrialDateTo(APP_DATE_EPOCH)
+                                          .setHearingYesorNo(YES)
+                                          .setHearingDuration(OTHER)
+                                          .setGeneralAppHearingDays("1")
+                                          .setGeneralAppHearingHours("2")
+                                          .setGeneralAppHearingMinutes("30")
+                                          .setSupportRequirement(singletonList(OTHER_SUPPORT))
+                                          .setJudgeRequiredYesOrNo(YES)
+                                          .setTrialRequiredYesOrNo(YES)
+                                          .setHearingDetailsEmailID(STRING_CONSTANT)
+                                          .setGeneralAppUnavailableDates(wrapElements(new GAUnavailabilityDates()
+                                                                                       .setUnavailableTrialDateFrom(
                                                                                            APP_DATE_EPOCH)
-                                                                                       .unavailableTrialDateTo(
-                                                                                           APP_DATE_EPOCH).build()))
-                                          .supportRequirementOther(STRING_CONSTANT)
-                                          .hearingPreferredLocation(DynamicList.builder().build())
-                                          .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
-                                          .reasonForPreferredHearingType(STRING_CONSTANT)
-                                          .telephoneHearingPreferredType(STRING_CONSTANT)
-                                          .supportRequirementSignLanguage(STRING_CONSTANT)
-                                          .hearingPreferencesPreferredType(IN_PERSON)
-                                          .unavailableTrialRequiredYesOrNo(YES)
-                                          .supportRequirementLanguageInterpreter(STRING_CONSTANT)
-                                          .build())
+                                                                                       .setUnavailableTrialDateTo(
+                                                                                           APP_DATE_EPOCH)))
+                                          .setSupportRequirementOther(STRING_CONSTANT)
+                                          .setHearingPreferredLocation(DynamicList.builder().build())
+                                          .setHearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
+                                          .setReasonForPreferredHearingType(STRING_CONSTANT)
+                                          .setTelephoneHearingPreferredType(STRING_CONSTANT)
+                                          .setSupportRequirementSignLanguage(STRING_CONSTANT)
+                                          .setHearingPreferencesPreferredType(IN_PERSON)
+                                          .setUnavailableTrialRequiredYesOrNo(YES)
+                                          .setSupportRequirementLanguageInterpreter(STRING_CONSTANT))
             .build();
     }
 
@@ -174,22 +160,22 @@ public class LocationRefSampleDataBuilder {
                                                          LocalDate trialDateFrom, LocalDate trialDateTo,
                                                          boolean isApplicantUnavailable,
                                                          List<Element<GAUnavailabilityDates>> unavailabilityDates) {
-        GAHearingDetails.GAHearingDetailsBuilder builder = GAHearingDetails.builder();
+        GAHearingDetails builder = new GAHearingDetails();
         if (isTrialScheduled) {
-            builder.trialRequiredYesOrNo(YES);
+            builder.setTrialRequiredYesOrNo(YES);
         } else {
-            builder.trialRequiredYesOrNo(NO);
+            builder.setTrialRequiredYesOrNo(NO);
         }
         if (isApplicantUnavailable) {
-            builder.unavailableTrialRequiredYesOrNo(YES);
+            builder.setUnavailableTrialRequiredYesOrNo(YES);
         } else {
-            builder.unavailableTrialRequiredYesOrNo(NO);
+            builder.setUnavailableTrialRequiredYesOrNo(NO);
         }
-        builder.trialDateFrom(trialDateFrom);
-        builder.trialDateTo(trialDateTo);
-        builder.generalAppUnavailableDates(unavailabilityDates);
+        builder.setTrialDateFrom(trialDateFrom);
+        builder.setTrialDateTo(trialDateTo);
+        builder.setGeneralAppUnavailableDates(unavailabilityDates);
         return getTestCaseData(CaseDataBuilder.builder().build()).toBuilder()
-            .generalAppHearingDetails(builder.build())
+            .generalAppHearingDetails(builder)
             .build();
     }
 
@@ -198,78 +184,68 @@ public class LocationRefSampleDataBuilder {
     }
 
     protected List<Element<GAUnavailabilityDates>> getValidUnavailableDateList() {
-        GAUnavailabilityDates range1 = GAUnavailabilityDates.builder()
-            .unavailableTrialDateFrom(LocalDate.now())
-            .unavailableTrialDateTo(LocalDate.now().plusDays(2))
-            .build();
-        GAUnavailabilityDates range2 = GAUnavailabilityDates.builder()
-            .unavailableTrialDateFrom(LocalDate.now().plusDays(2))
-            .unavailableTrialDateTo(LocalDate.now().plusDays(2))
-            .build();
+        GAUnavailabilityDates range1 = new GAUnavailabilityDates()
+            .setUnavailableTrialDateFrom(LocalDate.now())
+            .setUnavailableTrialDateTo(LocalDate.now().plusDays(2));
+        GAUnavailabilityDates range2 = new GAUnavailabilityDates()
+            .setUnavailableTrialDateFrom(LocalDate.now().plusDays(2))
+            .setUnavailableTrialDateTo(LocalDate.now().plusDays(2));
         return wrapElements(range1, range2);
     }
 
     protected CaseData getTestCaseDataCollectionOfApps(CaseData caseData) {
-        GeneralApplication application = GeneralApplication.builder()
-            .generalAppType(GAApplicationType.builder()
-                                .types(singletonList(EXTEND_TIME))
-                                .build())
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                               .hasAgreed(NO)
-                                               .build())
-            .generalAppPBADetails(GAPbaDetails.builder()
-                                      .build())
-            .generalAppDetailsOfOrder(STRING_CONSTANT)
-            .generalAppReasonsOfOrder(STRING_CONSTANT)
-            .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                            .isWithNotice(NO)
-                                            .reasonsForWithoutNotice(STRING_CONSTANT)
-                                            .build())
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder()
-                                              .generalAppUrgency(YES)
-                                              .reasonsForUrgency(STRING_CONSTANT)
-                                              .urgentAppConsiderationDate(APP_DATE_EPOCH)
-                                              .build())
-            .generalAppStatementOfTruth(GAStatementOfTruth.builder()
-                                            .name(STRING_CONSTANT)
-                                            .role(STRING_CONSTANT)
-                                            .build())
-            .generalAppEvidenceDocument(wrapElements(Document.builder()
+        GeneralApplication application = new GeneralApplication()
+            .setGeneralAppType(new GAApplicationType()
+                                .setTypes(singletonList(EXTEND_TIME)))
+            .setGeneralAppRespondentAgreement(new GARespondentOrderAgreement()
+                                               .setHasAgreed(NO))
+            .setGeneralAppPBADetails(new GAPbaDetails())
+            .setGeneralAppDetailsOfOrder(STRING_CONSTANT)
+            .setGeneralAppReasonsOfOrder(STRING_CONSTANT)
+            .setGeneralAppInformOtherParty(new GAInformOtherParty()
+                                            .setIsWithNotice(NO)
+                                            .setReasonsForWithoutNotice(STRING_CONSTANT))
+            .setGeneralAppUrgencyRequirement(new GAUrgencyRequirement()
+                                              .setGeneralAppUrgency(YES)
+                                              .setReasonsForUrgency(STRING_CONSTANT)
+                                              .setUrgentAppConsiderationDate(APP_DATE_EPOCH))
+            .setGeneralAppStatementOfTruth(new GAStatementOfTruth()
+                                            .setName(STRING_CONSTANT)
+                                            .setRole(STRING_CONSTANT))
+            .setGeneralAppEvidenceDocument(wrapElements(Document.builder()
                                                          .documentUrl(STRING_CONSTANT)
                                                          .documentBinaryUrl(STRING_CONSTANT)
                                                          .documentFileName(STRING_CONSTANT)
                                                          .documentHash(STRING_CONSTANT)
                                                          .build()))
-            .generalAppHearingDetails(GAHearingDetails.builder()
-                                          .judgeName(STRING_CONSTANT)
-                                          .hearingDate(APP_DATE_EPOCH)
-                                          .trialDateFrom(APP_DATE_EPOCH)
-                                          .trialDateTo(APP_DATE_EPOCH)
-                                          .hearingYesorNo(YES)
-                                          .hearingDuration(OTHER)
-                                          .generalAppHearingDays("1")
-                                          .generalAppHearingHours("2")
-                                          .generalAppHearingMinutes("30")
-                                          .supportRequirement(singletonList(OTHER_SUPPORT))
-                                          .judgeRequiredYesOrNo(YES)
-                                          .trialRequiredYesOrNo(YES)
-                                          .hearingDetailsEmailID(STRING_CONSTANT)
-                                          .generalAppUnavailableDates(wrapElements(GAUnavailabilityDates.builder()
-                                                                                       .unavailableTrialDateFrom(
+            .setGeneralAppHearingDetails(new GAHearingDetails()
+                                          .setJudgeName(STRING_CONSTANT)
+                                          .setHearingDate(APP_DATE_EPOCH)
+                                          .setTrialDateFrom(APP_DATE_EPOCH)
+                                          .setTrialDateTo(APP_DATE_EPOCH)
+                                          .setHearingYesorNo(YES)
+                                          .setHearingDuration(OTHER)
+                                          .setGeneralAppHearingDays("1")
+                                          .setGeneralAppHearingHours("2")
+                                          .setGeneralAppHearingMinutes("30")
+                                          .setSupportRequirement(singletonList(OTHER_SUPPORT))
+                                          .setJudgeRequiredYesOrNo(YES)
+                                          .setTrialRequiredYesOrNo(YES)
+                                          .setHearingDetailsEmailID(STRING_CONSTANT)
+                                          .setGeneralAppUnavailableDates(wrapElements(new GAUnavailabilityDates()
+                                                                                       .setUnavailableTrialDateFrom(
                                                                                            APP_DATE_EPOCH)
-                                                                                       .unavailableTrialDateTo(
-                                                                                           APP_DATE_EPOCH).build()))
-                                          .supportRequirementOther(STRING_CONSTANT)
-                                          .hearingPreferredLocation(DynamicList.builder().build())
-                                          .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
-                                          .reasonForPreferredHearingType(STRING_CONSTANT)
-                                          .telephoneHearingPreferredType(STRING_CONSTANT)
-                                          .supportRequirementSignLanguage(STRING_CONSTANT)
-                                          .hearingPreferencesPreferredType(IN_PERSON)
-                                          .unavailableTrialRequiredYesOrNo(YES)
-                                          .supportRequirementLanguageInterpreter(STRING_CONSTANT)
-                                          .build())
-            .build();
+                                                                                       .setUnavailableTrialDateTo(
+                                                                                           APP_DATE_EPOCH)))
+                                          .setSupportRequirementOther(STRING_CONSTANT)
+                                          .setHearingPreferredLocation(DynamicList.builder().build())
+                                          .setHearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
+                                          .setReasonForPreferredHearingType(STRING_CONSTANT)
+                                          .setTelephoneHearingPreferredType(STRING_CONSTANT)
+                                          .setSupportRequirementSignLanguage(STRING_CONSTANT)
+                                          .setHearingPreferencesPreferredType(IN_PERSON)
+                                          .setUnavailableTrialRequiredYesOrNo(YES)
+                                          .setSupportRequirementLanguageInterpreter(STRING_CONSTANT));
         return getTestCaseData(caseData)
             .toBuilder()
             .generalApplications(wrapElements(application))

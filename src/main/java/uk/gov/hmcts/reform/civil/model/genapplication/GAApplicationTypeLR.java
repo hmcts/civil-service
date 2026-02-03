@@ -2,18 +2,16 @@ package uk.gov.hmcts.reform.civil.model.genapplication;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypesLR;
 
 import java.util.List;
 
-@Setter
 @Data
-@Builder(toBuilder = true)
 @NoArgsConstructor
+@Accessors(chain = true)
 public class GAApplicationTypeLR {
 
     private List<GeneralApplicationTypesLR> types;

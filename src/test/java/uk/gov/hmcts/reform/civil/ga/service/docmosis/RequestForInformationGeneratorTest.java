@@ -106,7 +106,7 @@ class RequestForInformationGeneratorTest {
     @Test
     void shouldThrowExceptionWhenNoLocationMatch() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().requestForInformationApplication()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("8").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("8"))
             .build();
 
         doThrow(new IllegalArgumentException("Court Name is not found in location data"))
@@ -226,7 +226,7 @@ class RequestForInformationGeneratorTest {
                                                      .judgeRecitalText("test")
                                                      .requestMoreInfoOption(SEND_APP_TO_OTHER_PARTY)
                                                      .judgeRequestMoreInfoByDate(now()).build())
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation("3"))
                 .build();
 
             var templateData =
@@ -299,7 +299,7 @@ class RequestForInformationGeneratorTest {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().requestForInformationApplication().build().toBuilder()
                 .defendant2PartyName(null)
                 .claimant2PartyName(null)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation("3"))
                 .isMultiParty(NO)
                 .build();
 
@@ -337,7 +337,7 @@ class RequestForInformationGeneratorTest {
                                                      .judgeRecitalText("test")
                                                      .requestMoreInfoOption(SEND_APP_TO_OTHER_PARTY)
                                                      .judgeRequestMoreInfoByDate(now()).build())
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation("3"))
                 .build();
 
             var templateData =
@@ -367,7 +367,7 @@ class RequestForInformationGeneratorTest {
                                                      .judgeRecitalText("test")
                                                      .requestMoreInfoOption(SEND_APP_TO_OTHER_PARTY)
                                                      .judgeRequestMoreInfoByDate(now()).build())
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation("3"))
                 .applicantBilingualLanguagePreference(YES)
                 .build();
 
@@ -400,7 +400,7 @@ class RequestForInformationGeneratorTest {
                                                      .judgeRecitalText("test")
                                                      .requestMoreInfoOption(SEND_APP_TO_OTHER_PARTY)
                                                      .judgeRequestMoreInfoByDate(now()).build())
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation("3"))
                 .applicantBilingualLanguagePreference(YES)
                 .build();
 

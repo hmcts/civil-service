@@ -91,12 +91,12 @@ public class TranslatedDocumentUploadedApplicantNotificationHandlerTest extends 
                     .defendant1PartyName("respondent1")
                     .generalAppRespondentSolicitors(List.of(
                         Element.<GASolicitorDetailsGAspec>builder()
-                            .value(GASolicitorDetailsGAspec.builder().email("respondent@gmail.com").build()).build()))
+                            .value(new GASolicitorDetailsGAspec().setEmail("respondent@gmail.com")).build()))
                     .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1234567").build())
                     .generalAppConsentOrder(YES)
                     .ccdCaseReference(Long.valueOf("56786"))
                     .parentCaseReference("56789")
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().email("applicant@gmail.com").build())
+                    .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail("applicant@gmail.com"))
                     .isGaApplicantLip(YES)
                     .build();
             CaseDetails civil = CaseDetails.builder().id(123L).data(Map.of("case_data", caseData)).build();
@@ -131,7 +131,7 @@ public class TranslatedDocumentUploadedApplicantNotificationHandlerTest extends 
                     .defendant1PartyName("respondent1")
                     .generalAppRespondentSolicitors(List.of(
                         Element.<GASolicitorDetailsGAspec>builder()
-                            .value(GASolicitorDetailsGAspec.builder().email("respondent@gmail.com").build()).build()))
+                            .value(new GASolicitorDetailsGAspec().setEmail("respondent@gmail.com")).build()))
                     .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1234567").build())
                     .generalAppConsentOrder(YES)
                     .ccdCaseReference(Long.valueOf("56786"))
@@ -139,7 +139,7 @@ public class TranslatedDocumentUploadedApplicantNotificationHandlerTest extends 
                     .isGaApplicantLip(YES)
                     .parentClaimantIsApplicant(YES)
                     .applicantBilingualLanguagePreference(YES)
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().email("applicant@gmail.com").build())
+                    .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail("applicant@gmail.com"))
                     .build();
             CaseDetails civil = CaseDetails.builder().id(123L).data(Map.of("case_data", caseData)).build();
 
@@ -174,7 +174,7 @@ public class TranslatedDocumentUploadedApplicantNotificationHandlerTest extends 
                     .defendant1PartyName("respondent1")
                     .generalAppRespondentSolicitors(List.of(
                         Element.<GASolicitorDetailsGAspec>builder()
-                            .value(GASolicitorDetailsGAspec.builder().email("respondent@gmail.com").build()).build()))
+                            .value(new GASolicitorDetailsGAspec().setEmail("respondent@gmail.com")).build()))
                     .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1234567").build())
                     .generalAppConsentOrder(YES)
                     .ccdCaseReference(Long.valueOf("56786"))
@@ -182,7 +182,7 @@ public class TranslatedDocumentUploadedApplicantNotificationHandlerTest extends 
                     .isGaApplicantLip(NO)
                     .parentClaimantIsApplicant(YES)
                     .respondentBilingualLanguagePreference(YES)
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().email("applicant@gmail.com").build())
+                    .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setEmail("applicant@gmail.com"))
                     .build();
             CaseDetails civil = CaseDetails.builder().id(123L).data(Map.of("case_data", caseData)).build();
 

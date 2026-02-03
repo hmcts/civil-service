@@ -81,9 +81,9 @@ public class TaskListForClaimantUpdateHandlerTest extends GeneralApplicationBase
                 .applicant1Represented(YesOrNo.NO)
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
-                                                  .value(GeneralApplicationsDetails.builder()
-                                                             .parentClaimantIsApplicant(YesOrNo.YES)
-                                                             .caseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue()).build()).build()))
+                                                  .value(new GeneralApplicationsDetails()
+                                                             .setParentClaimantIsApplicant(YesOrNo.YES)
+                                                             .setCaseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue())).build()))
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
@@ -116,9 +116,9 @@ public class TaskListForClaimantUpdateHandlerTest extends GeneralApplicationBase
                 .applicant1Represented(YesOrNo.NO)
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
-                                                  .value(GeneralApplicationsDetails.builder()
-                                                             .parentClaimantIsApplicant(YesOrNo.YES)
-                                                             .caseState(HEARING_SCHEDULED.getDisplayedValue()).build()).build()))
+                                                  .value(new GeneralApplicationsDetails()
+                                                             .setParentClaimantIsApplicant(YesOrNo.YES)
+                                                             .setCaseState(HEARING_SCHEDULED.getDisplayedValue())).build()))
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
@@ -151,9 +151,9 @@ public class TaskListForClaimantUpdateHandlerTest extends GeneralApplicationBase
                 .applicant1Represented(YesOrNo.NO)
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
-                                                  .value(GeneralApplicationsDetails.builder()
-                                                             .parentClaimantIsApplicant(YesOrNo.YES)
-                                                             .caseState(APPLICATION_CLOSED.getDisplayedValue()).build()).build()))
+                                                  .value(new GeneralApplicationsDetails()
+                                                             .setParentClaimantIsApplicant(YesOrNo.YES)
+                                                             .setCaseState(APPLICATION_CLOSED.getDisplayedValue())).build()))
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
@@ -186,9 +186,9 @@ public class TaskListForClaimantUpdateHandlerTest extends GeneralApplicationBase
                 .applicant1Represented(YesOrNo.NO)
                 .parentClaimantIsApplicant(YesOrNo.NO)
                 .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
-                                                  .value(GeneralApplicationsDetails.builder()
-                                                             .parentClaimantIsApplicant(YesOrNo.NO)
-                                                             .caseState(AWAITING_RESPONDENT_RESPONSE.getDisplayedValue()).build()).build()))
+                                                  .value(new GeneralApplicationsDetails()
+                                                             .setParentClaimantIsApplicant(YesOrNo.NO)
+                                                             .setCaseState(AWAITING_RESPONDENT_RESPONSE.getDisplayedValue())).build()))
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
@@ -221,9 +221,9 @@ public class TaskListForClaimantUpdateHandlerTest extends GeneralApplicationBase
                 .applicant1Represented(YesOrNo.NO)
                 .parentClaimantIsApplicant(YesOrNo.NO)
                 .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
-                                                  .value(GeneralApplicationsDetails.builder()
-                                                             .parentClaimantIsApplicant(YesOrNo.NO)
-                                                             .caseState(HEARING_SCHEDULED.getDisplayedValue()).build()).build()))
+                                                  .value(new GeneralApplicationsDetails()
+                                                             .setParentClaimantIsApplicant(YesOrNo.NO)
+                                                             .setCaseState(HEARING_SCHEDULED.getDisplayedValue())).build()))
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
@@ -256,9 +256,9 @@ public class TaskListForClaimantUpdateHandlerTest extends GeneralApplicationBase
                 .applicant1Represented(YesOrNo.NO)
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
-                                                  .value(GeneralApplicationsDetails.builder()
-                                                             .parentClaimantIsApplicant(YesOrNo.NO)
-                                                             .caseState(APPLICATION_CLOSED.getDisplayedValue()).build()).build()))
+                                                  .value(new GeneralApplicationsDetails()
+                                                             .setParentClaimantIsApplicant(YesOrNo.NO)
+                                                             .setCaseState(APPLICATION_CLOSED.getDisplayedValue())).build()))
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
@@ -291,9 +291,9 @@ public class TaskListForClaimantUpdateHandlerTest extends GeneralApplicationBase
                 .applicant1Represented(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
-                                                  .value(GeneralApplicationsDetails.builder()
-                                                             .parentClaimantIsApplicant(YesOrNo.YES)
-                                                             .caseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue()).build()).build()))
+                                                  .value(new GeneralApplicationsDetails()
+                                                             .setParentClaimantIsApplicant(YesOrNo.YES)
+                                                             .setCaseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue())).build()))
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);

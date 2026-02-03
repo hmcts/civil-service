@@ -102,15 +102,14 @@ public class InitiateGeneralApplicationServiceHelper {
                 && applicantSolicitorList.get(0).getUserId()
                 .equals(applicantSolicitorList.get(1).getUserId());
 
-        GeneralApplication.GeneralApplicationBuilder applicationBuilder = generalApplication.toBuilder();
         //only assign value if lip is applicant
         Boolean isGaAppSameAsParentCaseClLip = null;
         if (!CollectionUtils.isEmpty(applicantSolicitorList) && (applicantSolicitorList.size() == 1 || sameDefSol1v2)) {
-            isGaAppSameAsParentCaseClLip = setSingleGaApplicant(applicantSolicitorList, applicationBuilder,
+            isGaAppSameAsParentCaseClLip = setSingleGaApplicant(applicantSolicitorList, generalApplication,
                     applicantBuilder,  applicant1OrgCaseRole, respondent1OrgCaseRole, caseData);
         }
-        applicationBuilder
-            .generalAppApplnSolicitor(applicantBuilder);
+        generalApplication
+            .setGeneralAppApplnSolicitor(applicantBuilder);
 
         List<String> gaApplicantRolesOnMainCase = applicantSolicitorList.stream()
             .map(CaseAssignmentUserRole::getCaseRole)
@@ -136,13 +135,13 @@ public class InitiateGeneralApplicationServiceHelper {
          * Set GA respondent solicitors' details
          * */
         if (!CollectionUtils.isEmpty(respondentSolicitors)) {
-            applicationBuilder.generalAppRespondentSolicitors(collectGaRespondentSolicitors(respondentSolicitors,
-                    applicationBuilder, caseData, applicant1OrgCaseRole, respondent1OrgCaseRole));
+            generalApplication.setGeneralAppRespondentSolicitors(collectGaRespondentSolicitors(respondentSolicitors,
+                    generalApplication, caseData, applicant1OrgCaseRole, respondent1OrgCaseRole));
         }
 
         applicantPartyData = getApplicantPartyData(userRoles, userDetails, caseData);
-        applicationBuilder.applicantPartyName(applicantPartyData.getApplicantPartyName());
-        applicationBuilder.litigiousPartyID(applicantPartyData.getLitigiousPartyID());
+        generalApplication.setApplicantPartyName(applicantPartyData.getApplicantPartyName());
+        generalApplication.setLitigiousPartyID(applicantPartyData.getLitigiousPartyID());
         boolean isGAApplicantSameAsParentCaseClaimant = isGAApplicantSameAsPCClaimant(caseData,
                                                                                       applicantBuilder
                                                                                           .getOrganisationIdentifier(),
@@ -153,25 +152,24 @@ public class InitiateGeneralApplicationServiceHelper {
         } else {
             gaApplicantDisplayName = applicantPartyData.getApplicantPartyName() + " - Defendant";
         }
-        applicationBuilder.gaApplicantDisplayName(gaApplicantDisplayName);
-        applicationBuilder
-            .parentClaimantIsApplicant(isGAApplicantSameAsParentCaseClaimant
+        generalApplication.setGaApplicantDisplayName(gaApplicantDisplayName);
+        generalApplication
+            .setParentClaimantIsApplicant(isGAApplicantSameAsParentCaseClaimant
                                            ? YES
-                                           : NO).build();
+                                           : NO);
 
         /*
         * Don't consider hearing date if application is represented
         * */
-        if (Objects.nonNull(applicationBuilder.build().getIsGaApplicantLip())
-            && applicationBuilder.build().getIsGaApplicantLip().equals(YES)) {
-            checkLipUrgency(isGaAppSameAsParentCaseClLip, applicationBuilder, generalApplication, caseData, feesService);
+        if (Objects.nonNull(generalApplication.getIsGaApplicantLip())
+            && generalApplication.getIsGaApplicantLip().equals(YES)) {
+            checkLipUrgency(isGaAppSameAsParentCaseClLip, generalApplication, caseData, feesService);
         }
 
-        return applicationBuilder.build();
+        return generalApplication;
     }
 
     private void checkLipUrgency(Boolean isGaAppSameAsParentCaseClLip,
-                                 GeneralApplication.GeneralApplicationBuilder applicationBuilder,
                                  GeneralApplication generalApplication,
                                  CaseData caseData,
                                  GeneralAppFeesService feesService) {
@@ -193,27 +191,27 @@ public class InitiateGeneralApplicationServiceHelper {
             urgencyRequirement.setGeneralAppUrgency(YES);
             urgencyRequirement.setUrgentAppConsiderationDate(caseData.getHearingDate());
             urgencyRequirement.setReasonsForUrgency(LIP_URGENT_REASON);
-            applicationBuilder.generalAppUrgencyRequirement(urgencyRequirement);
+            generalApplication.setGeneralAppUrgencyRequirement(urgencyRequirement);
         } else if (caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented()) {
             GAUrgencyRequirement urgencyRequirement = new GAUrgencyRequirement();
             urgencyRequirement.setGeneralAppUrgency(NO);
             urgencyRequirement.setUrgentAppConsiderationDate(caseData.getHearingDate());
-            applicationBuilder.generalAppUrgencyRequirement(urgencyRequirement);
+            generalApplication.setGeneralAppUrgencyRequirement(urgencyRequirement);
         }
         //set main case hearing date as ga hearing date
         if (Objects.nonNull(isGaAppSameAsParentCaseClLip) && Objects.nonNull(caseData.getHearingDate())) {
             GAHearingDateGAspec hearingDate = new GAHearingDateGAspec();
             hearingDate.setHearingScheduledDate(caseData.getHearingDate());
-            applicationBuilder.generalAppHearingDate(hearingDate);
+            generalApplication.setGeneralAppHearingDate(hearingDate);
             Fee feeForGA = feesService.getFeeForGA(generalApplication, caseData.getHearingDate());
             GAPbaDetails generalAppPBADetails = new GAPbaDetails();
             generalAppPBADetails.setFee(feeForGA);
-            applicationBuilder.generalAppPBADetails(generalAppPBADetails);
+            generalApplication.setGeneralAppPBADetails(generalAppPBADetails);
         }
     }
 
     private Boolean setSingleGaApplicant(List<CaseAssignmentUserRole> applicantSolicitor,
-                                      GeneralApplication.GeneralApplicationBuilder applicationBuilder,
+                                      GeneralApplication generalApplication,
                                       GASolicitorDetailsGAspec applicantBuilder,
                                       String applicant1OrgCaseRole,
                                       String respondent1OrgCaseRole,
@@ -224,7 +222,7 @@ public class InitiateGeneralApplicationServiceHelper {
             if (applnSol.getCaseRole().equals(CaseRole.CLAIMANT.getFormattedName())
                     || applnSol.getCaseRole().equals(CaseRole.DEFENDANT.getFormattedName())) {
 
-                applicationBuilder.isGaApplicantLip(YES);
+                generalApplication.setIsGaApplicantLip(YES);
                 if (applnSol.getCaseRole().equals(CaseRole.DEFENDANT.getFormattedName())) {
                     isGaAppSameAsParentCaseClLip = false;
                 } else {
@@ -274,7 +272,7 @@ public class InitiateGeneralApplicationServiceHelper {
     }
 
     private List<Element<GASolicitorDetailsGAspec>> collectGaRespondentSolicitors(List<CaseAssignmentUserRole> respondentSolicitors,
-                                                                                  GeneralApplication.GeneralApplicationBuilder applicationBuilder,
+                                                                                  GeneralApplication generalApplication,
                                                                                   CaseData caseData,
                                                                                   String applicant1OrgCaseRole,
                                                                                   String respondent1OrgCaseRole) {
@@ -288,7 +286,7 @@ public class InitiateGeneralApplicationServiceHelper {
                 /*GA for Lips is only 1v1, check user id with ClaimantUserDetails/DefendantUserDetails*/
                 if (respSol.getCaseRole().equals(CaseRole.CLAIMANT.getFormattedName())
                         || respSol.getCaseRole().equals(CaseRole.DEFENDANT.getFormattedName())) {
-                    applicationBuilder.isGaRespondentOneLip(YES);
+                    generalApplication.setIsGaRespondentOneLip(YES);
                     specBuilder.setId(respSol.getUserId());
                     if (Objects.nonNull(caseData.getDefendantUserDetails())
                             && respSol.getUserId().equals(caseData.getDefendantUserDetails().getId())) {

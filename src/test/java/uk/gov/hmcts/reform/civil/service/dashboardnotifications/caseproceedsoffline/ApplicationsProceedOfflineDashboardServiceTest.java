@@ -42,7 +42,7 @@ class ApplicationsProceedOfflineDashboardServiceTest {
 
     private static CaseData baseCaseData() {
         List<Element<GeneralApplication>> generalApplications =
-            wrapElements(GeneralApplication.builder().build());
+            wrapElements(new GeneralApplication());
 
         return CaseDataBuilder.builder().build().toBuilder()
             .ccdCaseReference(1234L)

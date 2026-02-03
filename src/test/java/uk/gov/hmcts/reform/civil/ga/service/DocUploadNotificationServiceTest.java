@@ -198,8 +198,8 @@ public class DocUploadNotificationServiceTest {
             when(gaForLipService.isLipResp(any())).thenReturn(true);
 
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
-            GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-                .email(DUMMY_EMAIL).surname(Optional.of("surname")).forename("forename").organisationIdentifier("2").build();
+            GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+                .setEmail(DUMMY_EMAIL).setSurname(Optional.of("surname")).setForename("forename").setOrganisationIdentifier("2");
             respondentSols.add(element(respondent1));
 
             GeneralApplicationCaseData caseData = getCaseData(true, NO, YES).toBuilder()
@@ -223,8 +223,8 @@ public class DocUploadNotificationServiceTest {
             when(gaForLipService.isLipResp(any())).thenReturn(true);
 
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
-            GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-                .email(DUMMY_EMAIL).surname(Optional.of("surname")).forename("forename").organisationIdentifier("2").build();
+            GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+                .setEmail(DUMMY_EMAIL).setSurname(Optional.of("surname")).setForename("forename").setOrganisationIdentifier("2");
             respondentSols.add(element(respondent1));
 
             GeneralApplicationCaseData caseData = getCaseData(true, NO, YES).toBuilder()
@@ -303,11 +303,11 @@ public class DocUploadNotificationServiceTest {
 
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-            GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-                    .email(DUMMY_EMAIL).forename("forename").organisationIdentifier("2").build();
+            GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+                    .setEmail(DUMMY_EMAIL).setForename("forename").setOrganisationIdentifier("2");
 
-            GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id("id")
-                    .email(DUMMY_EMAIL).forename("forename").organisationIdentifier("3").build();
+            GASolicitorDetailsGAspec respondent2 = new GASolicitorDetailsGAspec().setId("id")
+                    .setEmail(DUMMY_EMAIL).setForename("forename").setOrganisationIdentifier("3");
 
             respondentSols.add(element(respondent1));
             respondentSols.add(element(respondent2));
@@ -315,8 +315,8 @@ public class DocUploadNotificationServiceTest {
             if (isMet) {
 
                 return new GeneralApplicationCaseDataBuilder()
-                        .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
-                                .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                        .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("id")
+                                .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
                         .generalAppRespondentSolicitors(respondentSols)
                         .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
                         .applicantPartyName("App")
@@ -326,10 +326,10 @@ public class DocUploadNotificationServiceTest {
                         .isGaApplicantLip(isGaApplicantLip)
                         .businessProcess(BusinessProcess.builder().status(STARTED)
                                 .processInstanceId(PROCESS_INSTANCE_ID).build())
-                        .gaInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
-                        .gaUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
+                        .gaInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
+                        .gaUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO))
                         .parentClaimantIsApplicant(YES)
-                        .gaRespondentOrderAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
+                        .gaRespondentOrderAgreement(new GARespondentOrderAgreement().setHasAgreed(NO))
                         .respondentSolicitor1EmailAddress(DUMMY_EMAIL)
                         .respondentSolicitor2EmailAddress(DUMMY_EMAIL)
                         .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -346,8 +346,8 @@ public class DocUploadNotificationServiceTest {
             } else {
                 return new GeneralApplicationCaseDataBuilder()
                         .emailPartyReference("Claimant Reference: ABC Ltd - Defendant Reference: Defendant Ltd")
-                        .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
-                                                      .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                        .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("id")
+                                                      .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
                         .generalAppRespondentSolicitors(respondentSols)
                         .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
                         .applicantPartyName("App")
@@ -357,10 +357,10 @@ public class DocUploadNotificationServiceTest {
                         .isGaApplicantLip(isGaApplicantLip)
                         .businessProcess(BusinessProcess.builder().status(STARTED)
                                              .processInstanceId(PROCESS_INSTANCE_ID).build())
-                        .gaInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
-                        .gaUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
+                        .gaInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
+                        .gaUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO))
                         .parentClaimantIsApplicant(YES)
-                        .gaRespondentOrderAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
+                        .gaRespondentOrderAgreement(new GARespondentOrderAgreement().setHasAgreed(NO))
                         .respondentSolicitor1EmailAddress(DUMMY_EMAIL)
                         .respondentSolicitor2EmailAddress(DUMMY_EMAIL)
                         .applicant1OrganisationPolicy(OrganisationPolicy.builder()

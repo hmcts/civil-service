@@ -59,7 +59,7 @@ class CaseProceedOfflineDefendantScenarioServiceTest {
     @Test
     void shouldResolveAdditionalScenarios() {
         CaseData caseData = CaseData.builder()
-            .generalApplications(wrapElements(GeneralApplication.builder().build()))
+            .generalApplications(wrapElements(new GeneralApplication()))
             .build();
 
         Map<String, Boolean> scenarios = service.resolveAdditionalScenarios(caseData);

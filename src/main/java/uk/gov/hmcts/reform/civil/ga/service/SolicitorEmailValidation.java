@@ -26,14 +26,13 @@ public class SolicitorEmailValidation {
 
     private GASolicitorDetailsGAspec updateSolDetails(String updateEmail,
                                                       GASolicitorDetailsGAspec generalAppSolicitor) {
-
-        GASolicitorDetailsGAspec.GASolicitorDetailsGAspecBuilder gaSolicitorDetailsGAspecBuilder =
-            generalAppSolicitor.toBuilder();
-
-        gaSolicitorDetailsGAspecBuilder.email(updateEmail);
-
-        return gaSolicitorDetailsGAspecBuilder.build();
-
+        GASolicitorDetailsGAspec updated = new GASolicitorDetailsGAspec();
+        updated.setId(generalAppSolicitor.getId());
+        updated.setEmail(updateEmail);
+        updated.setForename(generalAppSolicitor.getForename());
+        updated.setSurname(generalAppSolicitor.getSurname());
+        updated.setOrganisationIdentifier(generalAppSolicitor.getOrganisationIdentifier());
+        return updated;
     }
 
     private boolean checkIfOrgIdAndEmailAreSame(String organisationID, String civilSolEmail,

@@ -56,9 +56,8 @@ class GaEventEmitterServiceTest {
     @Test
     void shouldSendMessageAndTriggerEvent_whenInvoked_withTenantId() {
         var businessProcess = BusinessProcess.builder().camundaEvent("TEST_EVENT").build();
-        GeneralApplication generalApplication = GeneralApplication.builder()
-            .businessProcess(businessProcess)
-            .build();
+        GeneralApplication generalApplication = new GeneralApplication()
+            .setBusinessProcess(businessProcess);
         List<Element<GeneralApplication>> newApplication = newArrayList();
         newApplication.add(element(generalApplication));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
@@ -82,9 +81,8 @@ class GaEventEmitterServiceTest {
             .thenReturn(null);
 
         var businessProcess = BusinessProcess.builder().camundaEvent("TEST_EVENT").build();
-        GeneralApplication generalApplication = GeneralApplication.builder()
-            .businessProcess(businessProcess)
-            .build();
+        GeneralApplication generalApplication = new GeneralApplication()
+            .setBusinessProcess(businessProcess);
         List<Element<GeneralApplication>> newApplication = newArrayList();
         newApplication.add(element(generalApplication));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
@@ -143,9 +141,8 @@ class GaEventEmitterServiceTest {
     void shouldSendMessageAndNotTriggerEvent_whenNotTrue() {
         when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(new RuntimeException());
         var businessProcess = BusinessProcess.builder().camundaEvent("TEST_EVENT").build();
-        GeneralApplication generalApplication = GeneralApplication.builder()
-            .businessProcess(businessProcess)
-            .build();
+        GeneralApplication generalApplication = new GeneralApplication()
+            .setBusinessProcess(businessProcess);
         List<Element<GeneralApplication>> newApplication = newArrayList();
         newApplication.add(element(generalApplication));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
@@ -183,9 +180,8 @@ class GaEventEmitterServiceTest {
     void shouldHandleException_whenInvoked() {
         when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException);
         var businessProcess = BusinessProcess.builder().camundaEvent("TEST_EVENT").build();
-        GeneralApplication generalApplication = GeneralApplication.builder()
-            .businessProcess(businessProcess)
-            .build();
+        GeneralApplication generalApplication = new GeneralApplication()
+            .setBusinessProcess(businessProcess);
         List<Element<GeneralApplication>> newApplication = newArrayList();
         newApplication.add(element(generalApplication));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()

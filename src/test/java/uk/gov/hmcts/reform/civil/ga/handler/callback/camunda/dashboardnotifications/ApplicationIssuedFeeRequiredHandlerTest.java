@@ -103,10 +103,10 @@ public class ApplicationIssuedFeeRequiredHandlerTest extends GeneralApplicationB
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
             caseData = caseData.toBuilder()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
-                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.YES).build())
-                .generalAppType(GAApplicationType.builder().types(List.of(GeneralApplicationTypes.ADJOURN_HEARING)).build())
+                .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YesOrNo.YES))
+                .generalAppType(new GAApplicationType().setTypes(List.of(GeneralApplicationTypes.ADJOURN_HEARING)))
                 .isGaApplicantLip(YesOrNo.YES)
-                .generalAppHearingDate(GAHearingDateGAspec.builder().hearingScheduledDate(LocalDate.now().minusDays(20)).build())
+                .generalAppHearingDate(new GAHearingDateGAspec().setHearingScheduledDate(LocalDate.now().minusDays(20)))
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                           .fee(Fee.builder()

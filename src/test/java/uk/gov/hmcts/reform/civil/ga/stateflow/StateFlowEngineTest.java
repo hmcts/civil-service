@@ -91,11 +91,9 @@ public class StateFlowEngineTest {
                     .paymentDetails(PaymentDetails.builder()
                                         .status(PaymentStatus.SUCCESS)
                                         .build()).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                            .isWithNotice(YES).build())
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
             .parentClaimantIsApplicant(NO)
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                               .hasAgreed(YES).build()).build();
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YES)).build();
         GaStateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
         assertThat(stateFlow.getState()).extracting(State::getName).isNotNull()
@@ -119,11 +117,9 @@ public class StateFlowEngineTest {
                                         .status(PaymentStatus.SUCCESS)
                                         .build())
                     .fee(Fee.builder().code("FEE23").build()).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                            .isWithNotice(YES).build())
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
             .parentClaimantIsApplicant(YES)
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                               .hasAgreed(YES).build()).build();
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YES)).build();
         GaStateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
         assertThat(stateFlow.getState()).extracting(State::getName).isNotNull()
@@ -147,11 +143,9 @@ public class StateFlowEngineTest {
                                         .status(PaymentStatus.SUCCESS)
                                         .build())
                     .fee(Fee.builder().code("FEE23").build()).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                            .isWithNotice(YES).build())
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
             .parentClaimantIsApplicant(YES)
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                               .hasAgreed(YES).build()).build();
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YES)).build();
         GaStateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
         assertThat(stateFlow.getState()).extracting(State::getName).isNotNull()
@@ -174,11 +168,9 @@ public class StateFlowEngineTest {
                     .paymentDetails(PaymentDetails.builder()
                                         .status(PaymentStatus.SUCCESS)
                                         .build()).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                            .isWithNotice(YES).build())
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
             .parentClaimantIsApplicant(NO)
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                               .hasAgreed(YES).build()).build();
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YES)).build();
         GaStateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
         assertThat(stateFlow.getState()).extracting(State::getName).isNotNull()
@@ -201,11 +193,9 @@ public class StateFlowEngineTest {
                     .paymentDetails(PaymentDetails.builder()
                                         .status(PaymentStatus.SUCCESS)
                                         .build()).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                            .isWithNotice(YES).build())
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
             .parentClaimantIsApplicant(YES)
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                               .hasAgreed(YES).build()).build();
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YES)).build();
         GaStateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
         assertThat(stateFlow.getState()).extracting(State::getName).isNotNull()
@@ -224,11 +214,9 @@ public class StateFlowEngineTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().toBuilder()
             .judicialDecision(GAJudicialDecision.builder().decision(LIST_FOR_A_HEARING).build())
             .judicialListForHearing(GAJudgesHearingListGAspec.builder().build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                            .isWithNotice(YES).build())
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
             .parentClaimantIsApplicant(YES)
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                               .hasAgreed(YES).build()).build();
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YES)).build();
         GaStateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
         assertThat(stateFlow.getState()).extracting(State::getName).isNotNull()
@@ -246,11 +234,9 @@ public class StateFlowEngineTest {
     void shouldReturn_Additional_Info_WhenJudgeMadeDecision() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().toBuilder()
             .judicialDecision(GAJudicialDecision.builder().decision(REQUEST_MORE_INFO).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                            .isWithNotice(YES).build())
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
             .parentClaimantIsApplicant(YES)
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                               .hasAgreed(YES).build()).build();
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YES)).build();
         GaStateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
         assertThat(stateFlow.getState()).extracting(State::getName).isNotNull()
@@ -271,11 +257,9 @@ public class StateFlowEngineTest {
             .judicialDecisionMakeOrder(
                 GAJudicialMakeAnOrder.builder().makeAnOrder(
                     GAJudgeMakeAnOrderOption.GIVE_DIRECTIONS_WITHOUT_HEARING).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                            .isWithNotice(YES).build())
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
             .parentClaimantIsApplicant(YES)
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                               .hasAgreed(YES).build()).build();
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YES)).build();
         GaStateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
         assertThat(stateFlow.getState()).extracting(State::getName).isNotNull()
@@ -343,13 +327,11 @@ public class StateFlowEngineTest {
                                         .status(PaymentStatus.SUCCESS)
                                         .build())
                     .fee(Fee.builder().code("FEE23").build()).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                            .isWithNotice(YES).build())
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
             .isGaApplicantLip(YES)
             .applicantBilingualLanguagePreference(YES)
             .parentClaimantIsApplicant(NO)
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                               .hasAgreed(YES).build()).build();
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YES)).build();
         GaStateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
         assertThat(stateFlow.getState()).extracting(State::getName).isNotNull()
@@ -398,11 +380,9 @@ public class StateFlowEngineTest {
             .judicialDecisionMakeOrder(
                 GAJudicialMakeAnOrder.builder().makeAnOrder(
                     GAJudgeMakeAnOrderOption.GIVE_DIRECTIONS_WITHOUT_HEARING).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                            .isWithNotice(YES).build())
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
             .parentClaimantIsApplicant(YES)
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                               .hasAgreed(YES).build()).build();
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YES)).build();
         GaStateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
         assertThat(stateFlow.getState()).extracting(State::getName).isNotNull()
@@ -427,11 +407,9 @@ public class StateFlowEngineTest {
             .judicialDecisionMakeOrder(
                 GAJudicialMakeAnOrder.builder().makeAnOrder(
                     GAJudgeMakeAnOrderOption.GIVE_DIRECTIONS_WITHOUT_HEARING).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                            .isWithNotice(YES).build())
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
             .parentClaimantIsApplicant(YES)
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                               .hasAgreed(YES).build()).build();
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YES)).build();
         GaStateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
         assertThat(stateFlow.getState()).extracting(State::getName).isNotNull()
@@ -458,12 +436,10 @@ public class StateFlowEngineTest {
                                         .status(PaymentStatus.SUCCESS)
                                         .build())
                     .fee(Fee.builder().code("FEE23").build()).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                            .isWithNotice(YES).build())
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
             .parentClaimantIsApplicant(YES)
             .applicantBilingualLanguagePreference(YES)
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                               .hasAgreed(YES).build()).build();
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YES)).build();
         GaStateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
         assertThat(stateFlow.getState()).extracting(State::getName).isNotNull()
@@ -490,13 +466,11 @@ public class StateFlowEngineTest {
                                         .status(PaymentStatus.SUCCESS)
                                         .build())
                     .fee(Fee.builder().code("FEE23").build()).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                            .isWithNotice(YES).build())
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
             .parentClaimantIsApplicant(YES)
             .applicantBilingualLanguagePreference(YES)
             .respondentBilingualLanguagePreference(YES)
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                               .hasAgreed(YES).build()).build();
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YES)).build();
         GaStateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
         assertThat(stateFlow.getState()).extracting(State::getName).isNotNull()
@@ -522,12 +496,10 @@ public class StateFlowEngineTest {
                     .paymentDetails(PaymentDetails.builder()
                                         .status(PaymentStatus.SUCCESS)
                                         .build()).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                            .isWithNotice(YES).build())
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
             .parentClaimantIsApplicant(YES)
             .applicantBilingualLanguagePreference(NO)
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                               .hasAgreed(YES).build()).build();
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YES)).build();
         GaStateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
         assertThat(stateFlow.getState()).extracting(State::getName).isNotNull()
@@ -546,16 +518,14 @@ public class StateFlowEngineTest {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().toBuilder()
             .judicialDecision(GAJudicialDecision.builder().decision(REQUEST_MORE_INFO).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                            .isWithNotice(YES).build())
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
             .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder().requestMoreInfoOption(
             GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION).build())
             .parentClaimantIsApplicant(YES)
             .isGaApplicantLip(YES)
             .isGaRespondentOneLip(YES)
             .applicantBilingualLanguagePreference(YES)
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                               .hasAgreed(YES).build()).build();
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YES)).build();
         GaStateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
         assertThat(stateFlow.getState()).extracting(State::getName).isNotNull()
@@ -574,16 +544,14 @@ public class StateFlowEngineTest {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().toBuilder()
             .judicialDecision(GAJudicialDecision.builder().decision(REQUEST_MORE_INFO).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                            .isWithNotice(YES).build())
+            .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
             .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder().requestMoreInfoOption(
                 GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION).build())
             .parentClaimantIsApplicant(YES)
             .isGaApplicantLip(YES)
             .isGaRespondentOneLip(YES)
             .respondentBilingualLanguagePreference(YES)
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                               .hasAgreed(YES).build()).build();
+            .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YES)).build();
         GaStateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
         assertThat(stateFlow.getState()).extracting(State::getName).isNotNull()

@@ -140,11 +140,9 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
 
         caseDataBuilder
             .hearingDetailsResp(
-                GAHearingDetails
-                    .builder()
-                    .hearingPreferredLocation(getLocationsFromList(locationRefDataService
-                                                                       .getCourtLocations(authToken)))
-                    .build());
+                new GAHearingDetails()
+                    .setHearingPreferredLocation(getLocationsFromList(locationRefDataService
+                                                                       .getCourtLocations(authToken))));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(applicationExistsValidation(callbackParams))
@@ -357,28 +355,50 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
     }
 
     private GAHearingDetails populateHearingDetailsResp(GeneralApplicationCaseData caseData, UserInfo userInfo) {
-        GAHearingDetails gaHearingDetailsResp;
-        String preferredType = caseData.getHearingDetailsResp().getHearingPreferencesPreferredType().name();
+        GAHearingDetails source = caseData.getHearingDetailsResp();
+        String preferredType = source.getHearingPreferencesPreferredType().name();
+        GAHearingDetails gaHearingDetailsResp = copyGAHearingDetails(source);
+        gaHearingDetailsResp.setRespondentResponsePartyName(getRespondentResponsePartyName(caseData, userInfo));
+
         if ((preferredType.equals(PREFERRED_TYPE_IN_PERSON) || caseData.getIsGaRespondentOneLip() == YES)
-            && Objects.nonNull(caseData.getHearingDetailsResp().getHearingPreferredLocation())
-            && Objects.nonNull(caseData.getHearingDetailsResp().getHearingPreferredLocation().getValue())) {
-            String applicationLocationLabel = caseData.getHearingDetailsResp()
-                .getHearingPreferredLocation().getValue()
-                .getLabel();
+            && Objects.nonNull(source.getHearingPreferredLocation())
+            && Objects.nonNull(source.getHearingPreferredLocation().getValue())) {
+            String applicationLocationLabel = source.getHearingPreferredLocation().getValue().getLabel();
             DynamicList dynamicLocationList = fromList(List.of(applicationLocationLabel));
             Optional<DynamicListElement> first = dynamicLocationList.getListItems().stream()
                 .filter(l -> l.getLabel().equals(applicationLocationLabel)).findFirst();
             first.ifPresent(dynamicLocationList::setValue);
-            gaHearingDetailsResp = caseData.getHearingDetailsResp().toBuilder()
-                .respondentResponsePartyName(getRespondentResponsePartyName(caseData, userInfo))
-                .hearingPreferredLocation(dynamicLocationList).build();
-
+            gaHearingDetailsResp.setHearingPreferredLocation(dynamicLocationList);
         } else {
-            gaHearingDetailsResp = caseData.getHearingDetailsResp().toBuilder()
-                .respondentResponsePartyName(getRespondentResponsePartyName(caseData, userInfo))
-                .hearingPreferredLocation(DynamicList.builder().build()).build();
+            gaHearingDetailsResp.setHearingPreferredLocation(DynamicList.builder().build());
         }
         return gaHearingDetailsResp;
+    }
+
+    private GAHearingDetails copyGAHearingDetails(GAHearingDetails source) {
+        GAHearingDetails copy = new GAHearingDetails();
+        copy.setHearingPreferencesPreferredType(source.getHearingPreferencesPreferredType());
+        copy.setReasonForPreferredHearingType(source.getReasonForPreferredHearingType());
+        copy.setHearingPreferredLocation(source.getHearingPreferredLocation());
+        copy.setHearingDetailsTelephoneNumber(source.getHearingDetailsTelephoneNumber());
+        copy.setHearingDetailsEmailID(source.getHearingDetailsEmailID());
+        copy.setUnavailableTrialRequiredYesOrNo(source.getUnavailableTrialRequiredYesOrNo());
+        copy.setGeneralAppUnavailableDates(source.getGeneralAppUnavailableDates());
+        copy.setTrialRequiredYesOrNo(source.getTrialRequiredYesOrNo());
+        copy.setTrialDateFrom(source.getTrialDateFrom());
+        copy.setTrialDateTo(source.getTrialDateTo());
+        copy.setHearingDuration(source.getHearingDuration());
+        copy.setGeneralAppHearingDays(source.getGeneralAppHearingDays());
+        copy.setGeneralAppHearingHours(source.getGeneralAppHearingHours());
+        copy.setGeneralAppHearingMinutes(source.getGeneralAppHearingMinutes());
+        copy.setSupportRequirement(source.getSupportRequirement());
+        copy.setSupportRequirementOther(source.getSupportRequirementOther());
+        copy.setSupportRequirementSignLanguage(source.getSupportRequirementSignLanguage());
+        copy.setSupportRequirementLanguageInterpreter(source.getSupportRequirementLanguageInterpreter());
+        copy.setVulnerabilityQuestionsYesOrNo(source.getVulnerabilityQuestionsYesOrNo());
+        copy.setVulnerabilityQuestion(source.getVulnerabilityQuestion());
+        copy.setRespondentResponsePartyName(source.getRespondentResponsePartyName());
+        return copy;
     }
 
     private String getRespondentResponsePartyName(GeneralApplicationCaseData gaCaseData, UserInfo userInfo) {

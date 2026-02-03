@@ -114,8 +114,8 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .applicationIsUncloakedOnce(YES)
                 .parentClaimantIsApplicant(YES)
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id(STRING_CONSTANT).forename("GAApplnSolicitor")
-                                              .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId(STRING_CONSTANT).setForename("GAApplnSolicitor")
+                                              .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
                 .uploadDocument(uploadDocumentByApplicant)
                 .claimant1PartyName("Mr. John Rambo")
                 .defendant1PartyName("Mr. Sole Trader")
@@ -148,8 +148,8 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .applicationIsCloaked(NO)
                 .parentClaimantIsApplicant(YES)
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id(STRING_CONSTANT).forename("GAApplnSolicitor")
-                                              .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId(STRING_CONSTANT).setForename("GAApplnSolicitor")
+                                              .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
                 .uploadDocument(uploadDocumentByApplicant)
                 .claimant1PartyName("Mr. John Rambo")
                 .defendant1PartyName("Mr. Sole Trader")
@@ -180,10 +180,10 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
                 .ccdCaseReference(1678356749555475L)
                 .build().toBuilder()
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
                 .parentClaimantIsApplicant(YES)
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id(STRING_CONSTANT).forename("GAApplnSolicitor")
-                                              .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId(STRING_CONSTANT).setForename("GAApplnSolicitor")
+                                              .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
                 .uploadDocument(uploadDocumentByApplicant)
                 .claimant1PartyName("Mr. John Rambo")
                 .defendant1PartyName("Mr. Sole Trader")
@@ -209,19 +209,19 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
                                                                               .documentBinaryUrl("http://dm-store:8080/documents")
                                                                               .build()).build()));
             List<Element<GASolicitorDetailsGAspec>> gaApplAddlSolicitors = new ArrayList<>();
-            gaApplAddlSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                                 .id("id1")
-                                                 .email(DUMMY_EMAIL)
-                                                 .organisationIdentifier("1").build()));
+            gaApplAddlSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                                 .setId("id1")
+                                                 .setEmail(DUMMY_EMAIL)
+                                                 .setOrganisationIdentifier("1")));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
                 .build().toBuilder()
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YES))
                 .parentClaimantIsApplicant(YES)
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id(STRING_CONSTANT).forename("GAApplnSolicitor")
-                                              .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId(STRING_CONSTANT).setForename("GAApplnSolicitor")
+                                              .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
                 .generalAppApplicantAddlSolicitors(gaApplAddlSolicitors)
                 .uploadDocument(uploadDocumentByApplicant)
                 .claimant1PartyName("Mr. John Rambo")
@@ -248,19 +248,19 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
                                                                               .documentBinaryUrl("http://dm-store:8080/documents")
                                                                               .build()).build()));
             List<Element<GASolicitorDetailsGAspec>> gaApplAddlSolicitors = new ArrayList<>();
-            gaApplAddlSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                                 .id(STRING_CONSTANT)
-                                                 .email(DUMMY_EMAIL)
-                                                 .organisationIdentifier("1").build()));
+            gaApplAddlSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                                 .setId(STRING_CONSTANT)
+                                                 .setEmail(DUMMY_EMAIL)
+                                                 .setOrganisationIdentifier("1")));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
                 .build().toBuilder()
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YES))
                 .parentClaimantIsApplicant(YES)
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id1").forename("GAApplnSolicitor")
-                                              .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("id1").setForename("GAApplnSolicitor")
+                                              .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
                 .generalAppApplicantAddlSolicitors(gaApplAddlSolicitors)
                 .uploadDocument(uploadDocumentByApplicant)
                 .claimant1PartyName("Mr. John Rambo")
@@ -288,20 +288,20 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
                                                                                .documentBinaryUrl("http://dm-store:8080/documents")
                                                                                .build()).build()));
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
-            gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                             .id(STRING_CONSTANT)
-                                             .email(DUMMY_EMAIL)
-                                             .organisationIdentifier("2").build()));
+            gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                             .setId(STRING_CONSTANT)
+                                             .setEmail(DUMMY_EMAIL)
+                                             .setOrganisationIdentifier("2")));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
                 .build().toBuilder()
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .isMultiParty(NO)
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO))
                 .parentClaimantIsApplicant(NO)
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id").forename("GAApplnSolicitor")
-                                              .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("id").setForename("GAApplnSolicitor")
+                                              .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
                 .uploadDocument(uploadDocumentByRespondent)
                 .generalAppRespondentSolicitors(gaRespSolicitors)
                 .claimant1PartyName("Mr. John Rambo")
@@ -331,22 +331,22 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
                                                                               .build()).build()));
 
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
-            gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                             .id("id11")
-                                             .email(DUMMY_EMAIL)
-                                             .organisationIdentifier("2").build()));
-            gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                             .id(STRING_CONSTANT)
-                                             .email(DUMMY_EMAIL)
-                                             .organisationIdentifier("2").build()));
-            gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                             .id("id3")
-                                             .email(DUMMY_EMAIL)
-                                             .organisationIdentifier("2").build()));
-            gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                             .id("222")
-                                             .email(DUMMY_EMAIL)
-                                             .organisationIdentifier("3").build()));
+            gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                             .setId("id11")
+                                             .setEmail(DUMMY_EMAIL)
+                                             .setOrganisationIdentifier("2")));
+            gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                             .setId(STRING_CONSTANT)
+                                             .setEmail(DUMMY_EMAIL)
+                                             .setOrganisationIdentifier("2")));
+            gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                             .setId("id3")
+                                             .setEmail(DUMMY_EMAIL)
+                                             .setOrganisationIdentifier("2")));
+            gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                             .setId("222")
+                                             .setEmail(DUMMY_EMAIL)
+                                             .setOrganisationIdentifier("3")));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
@@ -356,8 +356,8 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
                 .generalAppRespondentSolicitors(gaRespSolicitors)
                 .parentClaimantIsApplicant(NO)
                 .isMultiParty(NO)
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("2").forename("GAApplnSolicitor")
-                                              .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("2").setForename("GAApplnSolicitor")
+                                              .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
                 .uploadDocument(uploadDocumentByApplicant)
                 .claimant1PartyName("Mr. John Rambo")
                 .defendant1PartyName("Mr. Sole Trader")
@@ -385,26 +385,26 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
                                                                               .build()).build()));
 
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
-            gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                             .id("222")
-                                             .email(DUMMY_EMAIL)
-                                             .organisationIdentifier("2").build()));
-            gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                             .id("id1")
-                                             .email(DUMMY_EMAIL)
-                                             .organisationIdentifier("2").build()));
-            gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                             .id("id3")
-                                             .email(DUMMY_EMAIL)
-                                             .organisationIdentifier("2").build()));
-            gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                             .id(STRING_CONSTANT)
-                                             .email(DUMMY_EMAIL)
-                                             .organisationIdentifier("3").build()));
-            gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                             .id("id33")
-                                             .email(DUMMY_EMAIL)
-                                             .organisationIdentifier("3").build()));
+            gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                             .setId("222")
+                                             .setEmail(DUMMY_EMAIL)
+                                             .setOrganisationIdentifier("2")));
+            gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                             .setId("id1")
+                                             .setEmail(DUMMY_EMAIL)
+                                             .setOrganisationIdentifier("2")));
+            gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                             .setId("id3")
+                                             .setEmail(DUMMY_EMAIL)
+                                             .setOrganisationIdentifier("2")));
+            gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                             .setId(STRING_CONSTANT)
+                                             .setEmail(DUMMY_EMAIL)
+                                             .setOrganisationIdentifier("3")));
+            gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                             .setId("id33")
+                                             .setEmail(DUMMY_EMAIL)
+                                             .setOrganisationIdentifier("3")));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
@@ -414,8 +414,8 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
                 .generalAppRespondentSolicitors(gaRespSolicitors)
                 .parentClaimantIsApplicant(NO)
                 .isMultiParty(YES)
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("2").forename("GAApplnSolicitor")
-                                              .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("2").setForename("GAApplnSolicitor")
+                                              .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
                 .uploadDocument(uploadDocumentByApplicant)
                 .claimant1PartyName("Mr. John Rambo")
                 .defendant1PartyName("Mr. Sole Trader")
@@ -452,14 +452,14 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
                                                 .createdDatetime(LocalDateTime.now()).build()));
 
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
-            gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                             .id("222")
-                                             .email(DUMMY_EMAIL)
-                                             .organisationIdentifier("2").build()));
-            gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                             .id(STRING_CONSTANT)
-                                             .email(DUMMY_EMAIL)
-                                             .organisationIdentifier("3").build()));
+            gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                             .setId("222")
+                                             .setEmail(DUMMY_EMAIL)
+                                             .setOrganisationIdentifier("2")));
+            gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                             .setId(STRING_CONSTANT)
+                                             .setEmail(DUMMY_EMAIL)
+                                             .setOrganisationIdentifier("3")));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
@@ -472,8 +472,8 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
                 .gaAddlDoc(documentsCollection)
                 .gaAddlDocRespondentSolTwo(documentsCollection)
                 .isMultiParty(YES)
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("2").forename("GAApplnSolicitor")
-                                              .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("2").setForename("GAApplnSolicitor")
+                                              .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
                 .uploadDocument(uploadDocumentByApplicant)
                 .claimant1PartyName("Mr. John Rambo")
                 .defendant1PartyName("Mr. Sole Trader")
@@ -505,8 +505,8 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
                 .build().toBuilder()
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .parentClaimantIsApplicant(YES)
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id(STRING_CONSTANT).forename("GAApplnSolicitor")
-                                              .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId(STRING_CONSTANT).setForename("GAApplnSolicitor")
+                                              .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
                 .uploadDocument(uploadDocumentByApplicant)
                 .claimant1PartyName("Mr. John Rambo")
                 .defendant1PartyName("Mr. Sole Trader")
@@ -533,14 +533,14 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
                                                                               .build()).build()));
 
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
-            gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                             .id("222")
-                                             .email(DUMMY_EMAIL)
-                                             .organisationIdentifier("2").build()));
-            gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
-                                             .id(STRING_CONSTANT)
-                                             .email(DUMMY_EMAIL)
-                                             .organisationIdentifier("3").build()));
+            gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                             .setId("222")
+                                             .setEmail(DUMMY_EMAIL)
+                                             .setOrganisationIdentifier("2")));
+            gaRespSolicitors.add(element(new GASolicitorDetailsGAspec()
+                                             .setId(STRING_CONSTANT)
+                                             .setEmail(DUMMY_EMAIL)
+                                             .setOrganisationIdentifier("3")));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
@@ -550,8 +550,8 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
                 .generalAppRespondentSolicitors(gaRespSolicitors)
                 .parentClaimantIsApplicant(NO)
                 .isMultiParty(YES)
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("2").forename("GAApplnSolicitor")
-                                              .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("2").setForename("GAApplnSolicitor")
+                                              .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
                 .uploadDocument(uploadDocumentByApplicant)
                 .claimant1PartyName("Mr. John Rambo")
                 .defendant1PartyName("Mr. Sole Trader")

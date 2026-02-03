@@ -336,8 +336,8 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
         List<GeneralApplicationTypes> types = List.of(
             (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
         return GeneralApplicationCaseData.builder().parentClaimantIsApplicant(YES)
-            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                          .email("abc@gmail.com").id(APP_UID).build())
+            .generalAppApplnSolicitor(new GASolicitorDetailsGAspec()
+                                          .setEmail("abc@gmail.com").setId(APP_UID))
             .generalAppWrittenRepUpload(generalAppWrittenRepUpload)
             .generalAppWrittenRepText(generalAppWrittenRepText)
             .gaAddlDoc(gaAddlDoc)
@@ -345,10 +345,7 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
                 GARespondentRepresentative.builder()
                     .generalAppRespondent1Representative(YES)
                     .build())
-            .generalAppType(
-                GAApplicationType
-                    .builder()
-                    .types(types).build())
+            .generalAppType(new GAApplicationType(types))
             .businessProcess(BusinessProcess
                                  .builder()
                                  .camundaEvent(CAMUNDA_EVENT)

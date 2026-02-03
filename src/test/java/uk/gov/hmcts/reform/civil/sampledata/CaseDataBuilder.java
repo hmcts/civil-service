@@ -5656,20 +5656,17 @@ public class CaseDataBuilder {
     public CaseDataBuilder getGeneralApplicationWithStrikeOut(final String litigiousPartyID) {
         List<GeneralApplicationTypes> types = Arrays.asList(STRIKE_OUT);
         List<Element<GeneralApplication>> generalApplicationValues = wrapElements(
-            GeneralApplication.builder()
-                .applicantPartyName("partyName")
-                .litigiousPartyID(litigiousPartyID)
-                .generalAppDateDeadline(DEADLINE)
-                .generalAppSubmittedDateGAspec(SUBMITTED_DATE_TIME)
-                .generalAppType(GAApplicationType.builder()
-                    .types(types)
-                    .build())
-
-                .caseLink(CaseLink.builder().caseReference("12345678").build())
-                .businessProcess(BusinessProcess.builder()
+            new GeneralApplication()
+                .setApplicantPartyName("partyName")
+                .setLitigiousPartyID(litigiousPartyID)
+                .setGeneralAppDateDeadline(DEADLINE)
+                .setGeneralAppSubmittedDateGAspec(SUBMITTED_DATE_TIME)
+                .setGeneralAppType(new GAApplicationType()
+                    .setTypes(types))
+                .setCaseLink(new CaseLink().setCaseReference("12345678"))
+                .setBusinessProcess(BusinessProcess.builder()
                     .camundaEvent("NotifyRoboticsOnCaseHandedOffline")
-                    .build())
-                .build());
+                    .build()));
 
         this.generalApplications = generalApplicationValues;
         return this;
@@ -5677,12 +5674,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder getGeneralStrikeOutApplicationsDetailsWithCaseState(final String caseState) {
         List<Element<GeneralApplicationsDetails>> generalApplicationsDetails = wrapElements(
-            GeneralApplicationsDetails.builder()
-                .generalApplicationType(STRIKE_OUT.getDisplayedValue())
-                .caseState(caseState)
-                .generalAppSubmittedDateGAspec(SUBMITTED_DATE_TIME)
-                .caseLink(CaseLink.builder().caseReference("12345678").build())
-                .build()
+            new GeneralApplicationsDetails()
+                .setGeneralApplicationType(STRIKE_OUT.getDisplayedValue())
+                .setCaseState(caseState)
+                .setGeneralAppSubmittedDateGAspec(SUBMITTED_DATE_TIME)
+                .setCaseLink(new CaseLink().setCaseReference("12345678"))
         );
 
         this.generalApplicationsDetails = generalApplicationsDetails;

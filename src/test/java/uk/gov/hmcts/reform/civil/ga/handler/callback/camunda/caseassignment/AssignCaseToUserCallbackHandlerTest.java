@@ -96,44 +96,41 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
         void setup() {
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-            GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-                    .email("test@gmail.com").organisationIdentifier("org2").build();
+            GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+                    .setEmail("test@gmail.com").setOrganisationIdentifier("org2");
 
-            GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id("id")
-                    .email("test@gmail.com").organisationIdentifier("org2").build();
+            GASolicitorDetailsGAspec respondent2 = new GASolicitorDetailsGAspec().setId("id")
+                    .setEmail("test@gmail.com").setOrganisationIdentifier("org2");
 
             respondentSols.add(element(respondent1));
             respondentSols.add(element(respondent2));
 
-            GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
-            builder.generalAppType(GAApplicationType.builder()
-                            .types(singletonList(SUMMARY_JUDGEMENT))
-                            .build())
-                    .claimant1PartyName("Applicant1")
-                    .isGaRespondentOneLip(NO)
-                    .isGaApplicantLip(NO)
-                    .isGaRespondentTwoLip(NO)
-                    .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
-                    .generalAppRespondentSolicitors(respondentSols)
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec
-                            .builder()
-                            .id("id")
-                            .email("TEST@gmail.com")
-                            .organisationIdentifier("Org1").build())
-                    .defendant1PartyName("Respondent1")
-                    .claimant2PartyName("Applicant2")
-                    .defendant2PartyName("Respondent2")
-                    .generalAppSuperClaimType(UNSPEC_CLAIM)
-                    .isMultiParty(YES)
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
-                    .civilServiceUserRoles(IdamUserDetails.builder()
+            GeneralApplication builder = new GeneralApplication();
+            builder.setGeneralAppType(new GAApplicationType()
+                            .setTypes(singletonList(SUMMARY_JUDGEMENT)))
+                    .setClaimant1PartyName("Applicant1")
+                    .setIsGaRespondentOneLip(NO)
+                    .setIsGaApplicantLip(NO)
+                    .setIsGaRespondentTwoLip(NO)
+                    .setGeneralAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
+                    .setGeneralAppRespondentSolicitors(respondentSols)
+                    .setGeneralAppApplnSolicitor(new GASolicitorDetailsGAspec()
+                            .setId("id")
+                            .setEmail("TEST@gmail.com")
+                            .setOrganisationIdentifier("Org1"))
+                    .setDefendant1PartyName("Respondent1")
+                    .setClaimant2PartyName("Applicant2")
+                    .setDefendant2PartyName("Respondent2")
+                    .setGeneralAppSuperClaimType(UNSPEC_CLAIM)
+                    .setIsMultiParty(YES)
+                    .setGeneralAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
+                    .setCivilServiceUserRoles(IdamUserDetails.builder()
                             .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
                             .email("applicant@someorg.com")
                             .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-                    .build();
+                    .setBusinessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build());
 
-            generalApplication = builder.build();
+            generalApplication = builder;
 
             Map<String, Object> dataMap = objectMapper.convertValue(generalApplication, new TypeReference<>() {
             });
@@ -168,49 +165,46 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
 
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
             List<Element<GASolicitorDetailsGAspec>> addlApplicantSol = new ArrayList<>();
-            GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-                    .email("test@gmail.com").organisationIdentifier("org2").build();
+            GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+                    .setEmail("test@gmail.com").setOrganisationIdentifier("org2");
 
-            GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id("id")
-                    .email("test@gmail.com").organisationIdentifier("org2").build();
-            GASolicitorDetailsGAspec addlApplicant1 = GASolicitorDetailsGAspec.builder().id("id")
-                    .email("test@gmail.com").organisationIdentifier("org1").build();
+            GASolicitorDetailsGAspec respondent2 = new GASolicitorDetailsGAspec().setId("id")
+                    .setEmail("test@gmail.com").setOrganisationIdentifier("org2");
+            GASolicitorDetailsGAspec addlApplicant1 = new GASolicitorDetailsGAspec().setId("id")
+                    .setEmail("test@gmail.com").setOrganisationIdentifier("org1");
 
             respondentSols.add(element(respondent1));
             respondentSols.add(element(respondent2));
             addlApplicantSol.add(element(addlApplicant1));
 
-            GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
-            builder.generalAppType(GAApplicationType.builder()
-                            .types(singletonList(SUMMARY_JUDGEMENT))
-                            .build())
-                    .claimant1PartyName("Applicant1")
-                    .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
-                    .generalAppRespondentSolicitors(respondentSols)
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec
-                            .builder()
-                            .id("id")
-                            .email("TEST@gmail.com")
-                            .organisationIdentifier("Org1").build())
-                    .generalAppApplicantAddlSolicitors(addlApplicantSol)
-                    .defendant1PartyName("Respondent1")
-                    .isGaRespondentOneLip(NO)
-                    .isGaApplicantLip(NO)
-                    .isGaRespondentTwoLip(NO)
-                    .claimant2PartyName("Applicant2")
-                    .defendant2PartyName("Respondent2")
-                    .isMultiParty(YesOrNo.NO)
-                    .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.NO).build())
-                    .generalAppSuperClaimType(UNSPEC_CLAIM)
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
-                    .civilServiceUserRoles(IdamUserDetails.builder()
+            GeneralApplication builder = new GeneralApplication();
+            builder.setGeneralAppType(new GAApplicationType()
+                            .setTypes(singletonList(SUMMARY_JUDGEMENT)))
+                    .setClaimant1PartyName("Applicant1")
+                    .setGeneralAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.NO))
+                    .setGeneralAppRespondentSolicitors(respondentSols)
+                    .setGeneralAppApplnSolicitor(new GASolicitorDetailsGAspec()
+                            .setId("id")
+                            .setEmail("TEST@gmail.com")
+                            .setOrganisationIdentifier("Org1"))
+                    .setGeneralAppApplicantAddlSolicitors(addlApplicantSol)
+                    .setDefendant1PartyName("Respondent1")
+                    .setIsGaRespondentOneLip(NO)
+                    .setIsGaApplicantLip(NO)
+                    .setIsGaRespondentTwoLip(NO)
+                    .setClaimant2PartyName("Applicant2")
+                    .setDefendant2PartyName("Respondent2")
+                    .setIsMultiParty(YesOrNo.NO)
+                    .setGeneralAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YesOrNo.NO))
+                    .setGeneralAppSuperClaimType(UNSPEC_CLAIM)
+                    .setGeneralAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
+                    .setCivilServiceUserRoles(IdamUserDetails.builder()
                             .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
                             .email("applicant@someorg.com")
                             .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-                    .build();
+                    .setBusinessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build());
 
-            generalApplication = builder.build();
+            generalApplication = builder;
 
             Map<String, Object> dataMap = objectMapper.convertValue(generalApplication, new TypeReference<>() {
             });
@@ -242,38 +236,35 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
 
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-            GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-                    .email("test@gmail.com").build();
+            GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+                    .setEmail("test@gmail.com");
 
             respondentSols.add(element(respondent1));
 
-            GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
-            builder.generalAppType(GAApplicationType.builder()
-                            .types(singletonList(SUMMARY_JUDGEMENT))
-                            .build())
-                    .claimant1PartyName("Applicant1")
-                    .isGaRespondentOneLip(YES)
-                    .isGaApplicantLip(NO)
-                    .isGaRespondentTwoLip(NO)
-                    .generalAppRespondentSolicitors(respondentSols)
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec
-                            .builder()
-                            .id("id")
-                            .email("TEST@gmail.com")
-                            .organisationIdentifier("Org1").build())
-                    .isMultiParty(YesOrNo.NO)
-                    .defendant1PartyName("Respondent1")
-                    .generalAppSuperClaimType(SPEC_CLAIM)
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
-                    .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YES).build())
-                    .civilServiceUserRoles(IdamUserDetails.builder()
+            GeneralApplication builder = new GeneralApplication();
+            builder.setGeneralAppType(new GAApplicationType()
+                            .setTypes(singletonList(SUMMARY_JUDGEMENT)))
+                    .setClaimant1PartyName("Applicant1")
+                    .setIsGaRespondentOneLip(YES)
+                    .setIsGaApplicantLip(NO)
+                    .setIsGaRespondentTwoLip(NO)
+                    .setGeneralAppRespondentSolicitors(respondentSols)
+                    .setGeneralAppApplnSolicitor(new GASolicitorDetailsGAspec()
+                            .setId("id")
+                            .setEmail("TEST@gmail.com")
+                            .setOrganisationIdentifier("Org1"))
+                    .setIsMultiParty(YesOrNo.NO)
+                    .setDefendant1PartyName("Respondent1")
+                    .setGeneralAppSuperClaimType(SPEC_CLAIM)
+                    .setGeneralAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
+                    .setGeneralAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YES))
+                    .setCivilServiceUserRoles(IdamUserDetails.builder()
                             .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
                             .email("applicant@someorg.com")
                             .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-                    .build();
+                    .setBusinessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build());
 
-            generalApplication = builder.build();
+            generalApplication = builder;
             Map<String, Object> data = objectMapper.convertValue(generalApplication, new TypeReference<>() {
             });
 
@@ -304,45 +295,42 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
         void setup() {
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-            GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-                    .email("test@gmail.com").organisationIdentifier("org2").build();
+            GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+                    .setEmail("test@gmail.com").setOrganisationIdentifier("org2");
 
-            GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id("id")
-                    .email("test@gmail.com").organisationIdentifier("org2").build();
+            GASolicitorDetailsGAspec respondent2 = new GASolicitorDetailsGAspec().setId("id")
+                    .setEmail("test@gmail.com").setOrganisationIdentifier("org2");
 
             respondentSols.add(element(respondent1));
             respondentSols.add(element(respondent2));
 
-            GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
-            builder.generalAppType(GAApplicationType.builder()
-                            .types(singletonList(SUMMARY_JUDGEMENT))
-                            .build())
-                    .claimant1PartyName("Applicant1")
-                    .generalAppRespondentSolicitors(respondentSols)
-                    .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec
-                            .builder()
-                            .id("id")
-                            .email("TEST@gmail.com")
-                            .organisationIdentifier("Org1").build())
-                    .isMultiParty(YES)
-                    .isGaRespondentOneLip(NO)
-                    .isGaApplicantLip(NO)
-                    .isGaRespondentTwoLip(NO)
-                    .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YES).build())
-                    .defendant1PartyName("Respondent1")
-                    .claimant2PartyName("Applicant2")
-                    .defendant2PartyName("Respondent2")
-                    .generalAppSuperClaimType(SPEC_CLAIM)
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
-                    .civilServiceUserRoles(IdamUserDetails.builder()
+            GeneralApplication builder = new GeneralApplication();
+            builder.setGeneralAppType(new GAApplicationType()
+                            .setTypes(singletonList(SUMMARY_JUDGEMENT)))
+                    .setClaimant1PartyName("Applicant1")
+                    .setGeneralAppRespondentSolicitors(respondentSols)
+                    .setGeneralAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
+                    .setGeneralAppApplnSolicitor(new GASolicitorDetailsGAspec()
+                            .setId("id")
+                            .setEmail("TEST@gmail.com")
+                            .setOrganisationIdentifier("Org1"))
+                    .setIsMultiParty(YES)
+                    .setIsGaRespondentOneLip(NO)
+                    .setIsGaApplicantLip(NO)
+                    .setIsGaRespondentTwoLip(NO)
+                    .setGeneralAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YES))
+                    .setDefendant1PartyName("Respondent1")
+                    .setClaimant2PartyName("Applicant2")
+                    .setDefendant2PartyName("Respondent2")
+                    .setGeneralAppSuperClaimType(SPEC_CLAIM)
+                    .setGeneralAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
+                    .setCivilServiceUserRoles(IdamUserDetails.builder()
                             .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
                             .email("applicant@someorg.com")
                             .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-                    .build();
+                    .setBusinessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build());
 
-            generalApplication = builder.build();
+            generalApplication = builder;
 
             Map<String, Object> dataMap = objectMapper.convertValue(generalApplication, new TypeReference<>() {
             });
@@ -367,45 +355,42 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
         void setup() {
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-            GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-                    .email("test@gmail.com").organisationIdentifier("org2").build();
+            GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+                    .setEmail("test@gmail.com").setOrganisationIdentifier("org2");
 
-            GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id("id")
-                    .email("test@gmail.com").organisationIdentifier("org2").build();
+            GASolicitorDetailsGAspec respondent2 = new GASolicitorDetailsGAspec().setId("id")
+                    .setEmail("test@gmail.com").setOrganisationIdentifier("org2");
 
             respondentSols.add(element(respondent1));
             respondentSols.add(element(respondent2));
 
-            GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
-            builder.generalAppType(GAApplicationType.builder()
-                            .types(singletonList(SUMMARY_JUDGEMENT))
-                            .build())
-                    .claimant1PartyName("Applicant1")
-                    .generalAppRespondentSolicitors(respondentSols)
-                    .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec
-                            .builder()
-                            .id("id")
-                            .email("TEST@gmail.com")
-                            .organisationIdentifier("Org1").build())
-                    .isMultiParty(YES)
-                    .isGaRespondentOneLip(NO)
-                    .isGaApplicantLip(NO)
-                    .isGaRespondentTwoLip(NO)
-                    .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.NO).build())
-                    .defendant1PartyName("Respondent1")
-                    .claimant2PartyName("Applicant2")
-                    .defendant2PartyName("Respondent2")
-                    .generalAppSuperClaimType(SPEC_CLAIM)
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
-                    .civilServiceUserRoles(IdamUserDetails.builder()
+            GeneralApplication builder = new GeneralApplication();
+            builder.setGeneralAppType(new GAApplicationType()
+                            .setTypes(singletonList(SUMMARY_JUDGEMENT)))
+                    .setClaimant1PartyName("Applicant1")
+                    .setGeneralAppRespondentSolicitors(respondentSols)
+                    .setGeneralAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.NO))
+                    .setGeneralAppApplnSolicitor(new GASolicitorDetailsGAspec()
+                            .setId("id")
+                            .setEmail("TEST@gmail.com")
+                            .setOrganisationIdentifier("Org1"))
+                    .setIsMultiParty(YES)
+                    .setIsGaRespondentOneLip(NO)
+                    .setIsGaApplicantLip(NO)
+                    .setIsGaRespondentTwoLip(NO)
+                    .setGeneralAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YesOrNo.NO))
+                    .setDefendant1PartyName("Respondent1")
+                    .setClaimant2PartyName("Applicant2")
+                    .setDefendant2PartyName("Respondent2")
+                    .setGeneralAppSuperClaimType(SPEC_CLAIM)
+                    .setGeneralAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
+                    .setCivilServiceUserRoles(IdamUserDetails.builder()
                             .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
                             .email("applicant@someorg.com")
                             .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-                    .build();
+                    .setBusinessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build());
 
-            generalApplication = builder.build();
+            generalApplication = builder;
 
             Map<String, Object> dataMap = objectMapper.convertValue(generalApplication, new TypeReference<>() {
             });
@@ -430,45 +415,42 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
         void setup() {
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-            GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-                    .email("test@gmail.com").organisationIdentifier("org2").build();
+            GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+                    .setEmail("test@gmail.com").setOrganisationIdentifier("org2");
 
-            GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id("id")
-                    .email("test@gmail.com").organisationIdentifier("org2").build();
+            GASolicitorDetailsGAspec respondent2 = new GASolicitorDetailsGAspec().setId("id")
+                    .setEmail("test@gmail.com").setOrganisationIdentifier("org2");
 
             respondentSols.add(element(respondent1));
             respondentSols.add(element(respondent2));
 
-            GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
-            builder.generalAppType(GAApplicationType.builder()
-                            .types(singletonList(ADJOURN_HEARING))
-                            .build())
-                    .claimant1PartyName("Applicant1")
-                    .generalAppRespondentSolicitors(respondentSols)
-                    .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec
-                            .builder()
-                            .id("id")
-                            .email("TEST@gmail.com")
-                            .organisationIdentifier("Org1").build())
-                    .isMultiParty(NO)
-                    .isGaRespondentOneLip(YES)
-                    .isGaApplicantLip(NO)
-                    .isGaRespondentTwoLip(NO)
-                    .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.YES).build())
-                    .defendant1PartyName("Respondent1")
-                    .claimant2PartyName("Applicant2")
-                    .defendant2PartyName("Respondent2")
-                    .generalAppSuperClaimType(SPEC_CLAIM)
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
-                    .civilServiceUserRoles(IdamUserDetails.builder()
+            GeneralApplication builder = new GeneralApplication();
+            builder.setGeneralAppType(new GAApplicationType()
+                            .setTypes(singletonList(ADJOURN_HEARING)))
+                    .setClaimant1PartyName("Applicant1")
+                    .setGeneralAppRespondentSolicitors(respondentSols)
+                    .setGeneralAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.YES))
+                    .setGeneralAppApplnSolicitor(new GASolicitorDetailsGAspec()
+                            .setId("id")
+                            .setEmail("TEST@gmail.com")
+                            .setOrganisationIdentifier("Org1"))
+                    .setIsMultiParty(NO)
+                    .setIsGaRespondentOneLip(YES)
+                    .setIsGaApplicantLip(NO)
+                    .setIsGaRespondentTwoLip(NO)
+                    .setGeneralAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YesOrNo.YES))
+                    .setDefendant1PartyName("Respondent1")
+                    .setClaimant2PartyName("Applicant2")
+                    .setDefendant2PartyName("Respondent2")
+                    .setGeneralAppSuperClaimType(SPEC_CLAIM)
+                    .setGeneralAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
+                    .setCivilServiceUserRoles(IdamUserDetails.builder()
                             .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
                             .email("applicant@someorg.com")
                             .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-                    .build();
+                    .setBusinessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build());
 
-            generalApplication = builder.build();
+            generalApplication = builder;
 
             Map<String, Object> dataMap = objectMapper.convertValue(generalApplication, new TypeReference<>() {
             });
@@ -500,39 +482,35 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
         void setup() {
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-            GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-                    .email("test@gmail.com").organisationIdentifier("org2").build();
+            GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+                    .setEmail("test@gmail.com").setOrganisationIdentifier("org2");
 
             respondentSols.add(element(respondent1));
 
-            GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
-            builder.generalAppType(GAApplicationType.builder()
-                            .types(singletonList(ADJOURN_HEARING))
-                            .build())
-                    .claimant1PartyName("Applicant1")
-                    .generalAppRespondentSolicitors(respondentSols)
-                    .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec
-                            .builder()
-                            .id("id")
-                            .email("TEST@gmail.com")
-                            .build())
-                    .isMultiParty(NO)
-                    .isGaRespondentOneLip(NO)
-                    .isGaApplicantLip(YES)
-                    .isGaRespondentTwoLip(NO)
-                    .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.YES).build())
-                    .defendant1PartyName("Respondent1")
-                    .generalAppSuperClaimType(SPEC_CLAIM)
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
-                    .civilServiceUserRoles(IdamUserDetails.builder()
+            GeneralApplication builder = new GeneralApplication();
+            builder.setGeneralAppType(new GAApplicationType()
+                            .setTypes(singletonList(ADJOURN_HEARING)))
+                    .setClaimant1PartyName("Applicant1")
+                    .setGeneralAppRespondentSolicitors(respondentSols)
+                    .setGeneralAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.YES))
+                    .setGeneralAppApplnSolicitor(new GASolicitorDetailsGAspec()
+                            .setId("id")
+                            .setEmail("TEST@gmail.com"))
+                    .setIsMultiParty(NO)
+                    .setIsGaRespondentOneLip(NO)
+                    .setIsGaApplicantLip(YES)
+                    .setIsGaRespondentTwoLip(NO)
+                    .setGeneralAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YesOrNo.YES))
+                    .setDefendant1PartyName("Respondent1")
+                    .setGeneralAppSuperClaimType(SPEC_CLAIM)
+                    .setGeneralAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
+                    .setCivilServiceUserRoles(IdamUserDetails.builder()
                             .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
                             .email("applicant@someorg.com")
                             .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-                    .build();
+                    .setBusinessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build());
 
-            generalApplication = builder.build();
+            generalApplication = builder;
 
             Map<String, Object> dataMap = objectMapper.convertValue(generalApplication, new TypeReference<>() {
             });
@@ -557,44 +535,41 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
         void setup() {
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-            GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-                    .email("test@gmail.com").organisationIdentifier("org2").build();
+            GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+                    .setEmail("test@gmail.com").setOrganisationIdentifier("org2");
 
-            GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id("id")
-                    .email("test@gmail.com").organisationIdentifier("org2").build();
+            GASolicitorDetailsGAspec respondent2 = new GASolicitorDetailsGAspec().setId("id")
+                    .setEmail("test@gmail.com").setOrganisationIdentifier("org2");
 
             respondentSols.add(element(respondent1));
             respondentSols.add(element(respondent2));
 
-            GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
-            builder.generalAppType(GAApplicationType.builder()
-                            .types(singletonList(SUMMARY_JUDGEMENT))
-                            .build())
-                    .claimant1PartyName("Applicant1")
-                    .generalAppRespondentSolicitors(respondentSols)
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec
-                            .builder()
-                            .id("id")
-                            .email("TEST@gmail.com")
-                            .organisationIdentifier("Org1").build())
-                    .isMultiParty(YES)
-                    .defendant1PartyName("Respondent1")
-                    .claimant2PartyName("Applicant2")
-                    .defendant2PartyName("Respondent2")
-                    .generalAppSuperClaimType(SPEC_CLAIM)
-                    .isGaRespondentOneLip(NO)
-                    .isGaApplicantLip(NO)
-                    .isGaRespondentTwoLip(NO)
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
-                    .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YES).build())
-                    .civilServiceUserRoles(IdamUserDetails.builder()
+            GeneralApplication builder = new GeneralApplication();
+            builder.setGeneralAppType(new GAApplicationType()
+                            .setTypes(singletonList(SUMMARY_JUDGEMENT)))
+                    .setClaimant1PartyName("Applicant1")
+                    .setGeneralAppRespondentSolicitors(respondentSols)
+                    .setGeneralAppApplnSolicitor(new GASolicitorDetailsGAspec()
+                            .setId("id")
+                            .setEmail("TEST@gmail.com")
+                            .setOrganisationIdentifier("Org1"))
+                    .setIsMultiParty(YES)
+                    .setDefendant1PartyName("Respondent1")
+                    .setClaimant2PartyName("Applicant2")
+                    .setDefendant2PartyName("Respondent2")
+                    .setGeneralAppSuperClaimType(SPEC_CLAIM)
+                    .setIsGaRespondentOneLip(NO)
+                    .setIsGaApplicantLip(NO)
+                    .setIsGaRespondentTwoLip(NO)
+                    .setGeneralAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
+                    .setGeneralAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YES))
+                    .setCivilServiceUserRoles(IdamUserDetails.builder()
                             .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
                             .email("applicant@someorg.com")
                             .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-                    .build();
+                    .setBusinessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build());
 
-            generalApplication = builder.build();
+            generalApplication = builder;
 
             Map<String, Object> dataMap = objectMapper.convertValue(generalApplication, new TypeReference<>() {
             });
@@ -619,53 +594,50 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
         void setup() {
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-            GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id3")
-                    .email("test@gmail.com").organisationIdentifier("org2").build();
+            GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id3")
+                    .setEmail("test@gmail.com").setOrganisationIdentifier("org2");
 
-            GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id("id2")
-                    .email("test@gmail.com").organisationIdentifier("org2").build();
-            GASolicitorDetailsGAspec respondent3 = GASolicitorDetailsGAspec.builder().id("id1")
-                    .email("test@gmail.com").organisationIdentifier("org2").build();
+            GASolicitorDetailsGAspec respondent2 = new GASolicitorDetailsGAspec().setId("id2")
+                    .setEmail("test@gmail.com").setOrganisationIdentifier("org2");
+            GASolicitorDetailsGAspec respondent3 = new GASolicitorDetailsGAspec().setId("id1")
+                    .setEmail("test@gmail.com").setOrganisationIdentifier("org2");
             respondentSols.add(element(respondent1));
             respondentSols.add(element(respondent2));
             respondentSols.add(element(respondent3));
 
-            GASolicitorDetailsGAspec addlApplicant = GASolicitorDetailsGAspec.builder().id("id1")
-                    .email("test@gmail.com").organisationIdentifier("Org1").build();
+            GASolicitorDetailsGAspec addlApplicant = new GASolicitorDetailsGAspec().setId("id1")
+                    .setEmail("test@gmail.com").setOrganisationIdentifier("Org1");
             List<Element<GASolicitorDetailsGAspec>> addlApplSols = new ArrayList<>();
             addlApplSols.add(element(addlApplicant));
 
-            GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
-            builder.generalAppType(GAApplicationType.builder()
-                            .types(singletonList(SUMMARY_JUDGEMENT))
-                            .build())
-                    .claimant1PartyName("Applicant1")
-                    .isGaRespondentOneLip(NO)
-                    .isGaApplicantLip(NO)
-                    .isGaRespondentTwoLip(NO)
-                    .generalAppApplicantAddlSolicitors(addlApplSols)
-                    .generalAppRespondentSolicitors(respondentSols)
-                    .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec
-                            .builder()
-                            .id("id")
-                            .email("TEST@gmail.com")
-                            .organisationIdentifier("Org1").build())
-                    .defendant1PartyName("Respondent1")
-                    .claimant2PartyName("Applicant2")
-                    .defendant2PartyName("Respondent2")
-                    .generalAppSuperClaimType(SPEC_CLAIM)
-                    .isMultiParty(YesOrNo.NO)
-                    .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.NO).build())
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
-                    .civilServiceUserRoles(IdamUserDetails.builder()
+            GeneralApplication builder = new GeneralApplication();
+            builder.setGeneralAppType(new GAApplicationType()
+                            .setTypes(singletonList(SUMMARY_JUDGEMENT)))
+                    .setClaimant1PartyName("Applicant1")
+                    .setIsGaRespondentOneLip(NO)
+                    .setIsGaApplicantLip(NO)
+                    .setIsGaRespondentTwoLip(NO)
+                    .setGeneralAppApplicantAddlSolicitors(addlApplSols)
+                    .setGeneralAppRespondentSolicitors(respondentSols)
+                    .setGeneralAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.NO))
+                    .setGeneralAppApplnSolicitor(new GASolicitorDetailsGAspec()
+                            .setId("id")
+                            .setEmail("TEST@gmail.com")
+                            .setOrganisationIdentifier("Org1"))
+                    .setDefendant1PartyName("Respondent1")
+                    .setClaimant2PartyName("Applicant2")
+                    .setDefendant2PartyName("Respondent2")
+                    .setGeneralAppSuperClaimType(SPEC_CLAIM)
+                    .setIsMultiParty(YesOrNo.NO)
+                    .setGeneralAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YesOrNo.NO))
+                    .setGeneralAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
+                    .setCivilServiceUserRoles(IdamUserDetails.builder()
                             .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
                             .email("applicant@someorg.com")
                             .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-                    .build();
+                    .setBusinessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build());
 
-            generalApplication = builder.build();
+            generalApplication = builder;
 
             Map<String, Object> dataMap = objectMapper.convertValue(generalApplication, new TypeReference<>() {
             });
@@ -716,75 +688,70 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
         void setup() {
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-            GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-                    .email("test@gmail.com").organisationIdentifier("org3").build();
+            GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+                    .setEmail("test@gmail.com").setOrganisationIdentifier("org3");
 
-            GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id("id")
-                    .email("test@gmail.com").organisationIdentifier("org2").build();
-            GASolicitorDetailsGAspec respondent3 = GASolicitorDetailsGAspec.builder().id("id")
-                    .email("test@gmail.com").organisationIdentifier("org2").build();
+            GASolicitorDetailsGAspec respondent2 = new GASolicitorDetailsGAspec().setId("id")
+                    .setEmail("test@gmail.com").setOrganisationIdentifier("org2");
+            GASolicitorDetailsGAspec respondent3 = new GASolicitorDetailsGAspec().setId("id")
+                    .setEmail("test@gmail.com").setOrganisationIdentifier("org2");
 
             respondentSols.add(element(respondent1));
             respondentSols.add(element(respondent2));
             respondentSols.add(element(respondent3));
 
-            GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
+            GeneralApplication builder = new GeneralApplication();
             builder
-                    .isGaRespondentOneLip(NO)
-                    .isGaApplicantLip(NO)
-                    .isGaRespondentTwoLip(NO)
-                    .generalAppType(GAApplicationType.builder()
-                            .types(singletonList(SUMMARY_JUDGEMENT))
-                            .build())
-                    .claimant1PartyName("Applicant1")
-                    .generalAppRespondentSolicitors(respondentSols)
-                    .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
-                            .email("TEST@gmail.com")
-                            .organisationIdentifier("Org1").build())
-                    .isMultiParty(YES)
-                    .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YES).build())
-                    .defendant1PartyName("Respondent1")
-                    .claimant2PartyName("Applicant2")
-                    .defendant2PartyName("Respondent2")
-                    .generalAppSuperClaimType(SPEC_CLAIM)
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
-                    .civilServiceUserRoles(IdamUserDetails.builder().id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
+                    .setIsGaRespondentOneLip(NO)
+                    .setIsGaApplicantLip(NO)
+                    .setIsGaRespondentTwoLip(NO)
+                    .setGeneralAppType(new GAApplicationType()
+                            .setTypes(singletonList(SUMMARY_JUDGEMENT)))
+                    .setClaimant1PartyName("Applicant1")
+                    .setGeneralAppRespondentSolicitors(respondentSols)
+                    .setGeneralAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
+                    .setGeneralAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("id")
+                            .setEmail("TEST@gmail.com")
+                            .setOrganisationIdentifier("Org1"))
+                    .setIsMultiParty(YES)
+                    .setGeneralAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YES))
+                    .setDefendant1PartyName("Respondent1")
+                    .setClaimant2PartyName("Applicant2")
+                    .setDefendant2PartyName("Respondent2")
+                    .setGeneralAppSuperClaimType(SPEC_CLAIM)
+                    .setGeneralAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
+                    .setCivilServiceUserRoles(IdamUserDetails.builder().id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
                             .email("applicant@someorg.com")
                             .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-                    .build();
+                    .setBusinessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build());
 
-            GeneralApplication.GeneralApplicationBuilder builderWithNotice = GeneralApplication.builder();
-            builderWithNotice.generalAppType(GAApplicationType.builder()
-                            .types(singletonList(SUMMARY_JUDGEMENT))
-                            .build())
-                    .claimant1PartyName("Applicant1")
-                    .generalAppRespondentSolicitors(respondentSols)
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec
-                            .builder()
-                            .id("id")
-                            .email("TEST@gmail.com")
-                            .organisationIdentifier("Org1").build())
-                    .isMultiParty(YES)
-                    .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YES).build())
-                    .defendant1PartyName("Respondent1")
-                    .claimant2PartyName("Applicant2")
-                    .defendant2PartyName("Respondent2")
-                    .generalAppSuperClaimType(SPEC_CLAIM)
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
-                    .civilServiceUserRoles(IdamUserDetails.builder()
+            GeneralApplication builderWithNotice = new GeneralApplication();
+            builderWithNotice.setGeneralAppType(new GAApplicationType()
+                            .setTypes(singletonList(SUMMARY_JUDGEMENT)))
+                    .setClaimant1PartyName("Applicant1")
+                    .setGeneralAppRespondentSolicitors(respondentSols)
+                    .setGeneralAppApplnSolicitor(new GASolicitorDetailsGAspec()
+                            .setId("id")
+                            .setEmail("TEST@gmail.com")
+                            .setOrganisationIdentifier("Org1"))
+                    .setIsMultiParty(YES)
+                    .setGeneralAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YES))
+                    .setDefendant1PartyName("Respondent1")
+                    .setClaimant2PartyName("Applicant2")
+                    .setDefendant2PartyName("Respondent2")
+                    .setGeneralAppSuperClaimType(SPEC_CLAIM)
+                    .setGeneralAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
+                    .setCivilServiceUserRoles(IdamUserDetails.builder()
                             .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
                             .email("applicant@someorg.com")
                             .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-                    .isGaRespondentOneLip(NO)
-                    .isGaApplicantLip(NO)
-                    .isGaRespondentTwoLip(NO)
-                    .build();
+                    .setBusinessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                    .setIsGaRespondentOneLip(NO)
+                    .setIsGaApplicantLip(NO)
+                    .setIsGaRespondentTwoLip(NO);
 
-            generalApplicationWithNotice = builderWithNotice.build();
-            generalApplication = builder.build();
+            generalApplicationWithNotice = builderWithNotice;
+            generalApplication = builder;
             dataMapWithNotice = objectMapper.convertValue(generalApplicationWithNotice, new TypeReference<>() {
             });
             dataMap = objectMapper.convertValue(generalApplication, new TypeReference<>() {
@@ -867,24 +834,21 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
 
     public CallbackParams getCaseDateWithNoSolicitor(String claimType) {
 
-        GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
-        builder.generalAppType(GAApplicationType.builder()
-                        .types(singletonList(SUMMARY_JUDGEMENT))
-                        .build())
-                .claimant1PartyName("Applicant1")
-                .defendant1PartyName("Respondent1")
-                .claimant2PartyName("Applicant2")
-                .defendant2PartyName("Respondent2")
-                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
-                .generalAppSuperClaimType(claimType)
-                .civilServiceUserRoles(IdamUserDetails.builder()
+        GeneralApplication builder = new GeneralApplication();
+        builder.setGeneralAppType(new GAApplicationType(singletonList(SUMMARY_JUDGEMENT)))
+                .setClaimant1PartyName("Applicant1")
+                .setDefendant1PartyName("Respondent1")
+                .setClaimant2PartyName("Applicant2")
+                .setDefendant2PartyName("Respondent2")
+                .setGeneralAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
+                .setGeneralAppSuperClaimType(claimType)
+                .setCivilServiceUserRoles(IdamUserDetails.builder()
                         .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
                         .email("applicant@someorg.com")
                         .build())
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-                .build();
+                .setBusinessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build());
 
-        GeneralApplication caseData = builder.build();
+        GeneralApplication caseData = builder;
 
         Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
         });

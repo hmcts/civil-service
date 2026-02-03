@@ -81,23 +81,22 @@ public class MigrateGaCaseDataCallbackHandlerTest extends GeneralApplicationBase
     }
 
     private GeneralApplication getGeneralApplication() {
-        return GeneralApplication.builder()
-            .generalAppType(GAApplicationType.builder().types(List.of(RELIEF_FROM_SANCTIONS)).build())
-            .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
-            .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
-            .generalAppPBADetails(GAPbaDetails.builder().build())
-            .generalAppDetailsOfOrder(STRING_CONSTANT)
-            .generalAppReasonsOfOrder(STRING_CONSTANT)
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
-            .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
-            .generalAppHearingDetails(GAHearingDetails.builder().build())
-            .generalAppRespondentSolicitors(wrapElements(GASolicitorDetailsGAspec.builder()
-                                                             .email("abc@gmail.com").build()))
-            .isMultiParty(NO)
-            .parentClaimantIsApplicant(YES)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
-                                          .caseReference(PARENT_CCD_REF.toString()).build())
-            .build();
+        return new GeneralApplication()
+            .setGeneralAppType(new GAApplicationType(List.of(RELIEF_FROM_SANCTIONS)))
+            .setGeneralAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(NO))
+            .setGeneralAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(NO))
+            .setGeneralAppPBADetails(new GAPbaDetails())
+            .setGeneralAppDetailsOfOrder(STRING_CONSTANT)
+            .setGeneralAppReasonsOfOrder(STRING_CONSTANT)
+            .setGeneralAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO))
+            .setGeneralAppStatementOfTruth(new GAStatementOfTruth())
+            .setGeneralAppHearingDetails(new GAHearingDetails())
+            .setGeneralAppRespondentSolicitors(wrapElements(new GASolicitorDetailsGAspec()
+                                                             .setEmail("abc@gmail.com")))
+            .setIsMultiParty(NO)
+            .setParentClaimantIsApplicant(YES)
+            .setGeneralAppParentCaseLink(GeneralAppParentCaseLink.builder()
+                                          .caseReference(PARENT_CCD_REF.toString()).build());
     }
 
 }

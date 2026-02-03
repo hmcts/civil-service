@@ -120,7 +120,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
         @Test
         void notificationShouldSendIfGa_Urgent_WithNoticeAndFreeFee() {
             GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YES))
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
                 .build();
 
@@ -137,7 +137,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
         @Test
         void notificationShouldSendIfGa_Urgent_WithNoticeAndFreeFeeV2() {
             GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YES))
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
                 .generalAppRespondentSolicitors(List.of())
                 .build();
@@ -153,7 +153,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
         @Test
         void notificationShouldSendIfGa_Urgent_WithNoticeAndFreeFeeV2Null() {
             GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YES))
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
                 .generalAppRespondentSolicitors(null)
                 .build();
@@ -171,16 +171,16 @@ public class GeneralApplicationCreationNotificationServiceTest {
 
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-            GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-                .email(DUMMY_EMAIL).organisationIdentifier("2").forename("LipF").surname(Optional.of("LipS")).build();
+            GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+                .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("2").setForename("LipF").setSurname(Optional.of("LipS"));
 
-            GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id("id").build();
+            GASolicitorDetailsGAspec respondent2 = new GASolicitorDetailsGAspec().setId("id");
 
             respondentSols.add(element(respondent1));
             respondentSols.add(element(respondent2));
 
             GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YES))
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
                 .generalAppRespondentSolicitors(respondentSols)
                 .build();
@@ -200,16 +200,16 @@ public class GeneralApplicationCreationNotificationServiceTest {
 
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-            GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-                .email(DUMMY_EMAIL).organisationIdentifier("2").forename("LipF").surname(Optional.of("LipS")).build();
+            GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+                .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("2").setForename("LipF").setSurname(Optional.of("LipS"));
 
-            GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id("id").build();
+            GASolicitorDetailsGAspec respondent2 = new GASolicitorDetailsGAspec().setId("id");
 
             respondentSols.add(element(respondent1));
             respondentSols.add(element(respondent2));
 
             GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO))
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
                 .generalAppRespondentSolicitors(respondentSols)
                 .build();
@@ -227,7 +227,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
         @Test
         void notificationShouldSendIfGa_Urgent_WithNoticeAndFeePaid() {
             GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YES))
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                           .fee(Fee.builder().code("PAID").build())
                                           .paymentDetails(PaymentDetails.builder().status(
@@ -246,7 +246,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
         @Test
         void notificationShouldNotSendIfGa_NonUrgent_WithNoticeAndFreeFee() {
             GeneralApplicationCaseData caseData = getCaseData(false).toBuilder()
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO))
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
                 .build();
 
@@ -260,7 +260,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
         @Test
         void notificationShouldNotSendIfGa_NonUrgent_WithNoticeAndFeePaid() {
             GeneralApplicationCaseData caseData = getCaseData(false).toBuilder()
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO))
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                           .fee(Fee.builder().code("PAID").build())
                                           .paymentDetails(PaymentDetails.builder().status(
@@ -459,11 +459,11 @@ public class GeneralApplicationCreationNotificationServiceTest {
 
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
-            GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
-                .email(DUMMY_EMAIL).organisationIdentifier("2").forename("LipF").surname(Optional.of("LipS")).build();
+            GASolicitorDetailsGAspec respondent1 = new GASolicitorDetailsGAspec().setId("id")
+                .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("2").setForename("LipF").setSurname(Optional.of("LipS"));
 
-            GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id("id")
-                .email(DUMMY_EMAIL).organisationIdentifier("3").build();
+            GASolicitorDetailsGAspec respondent2 = new GASolicitorDetailsGAspec().setId("id")
+                .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("3");
 
             respondentSols.add(element(respondent1));
             respondentSols.add(element(respondent2));
@@ -475,15 +475,15 @@ public class GeneralApplicationCreationNotificationServiceTest {
                     .claimant1PartyName("CL")
                     .defendant1PartyName("DEF")
                     .ccdCaseReference(CASE_REFERENCE)
-                    .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
-                                                  .email(DUMMY_EMAIL).organisationIdentifier("1").build())
+                    .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("id")
+                                                  .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("1"))
                     .generalAppRespondentSolicitors(respondentSols)
                     .businessProcess(BusinessProcess.builder().status(STARTED)
                                          .processInstanceId(PROCESS_INSTANCE_ID).build())
-                    .gaInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
-                    .gaUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
+                    .gaInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
+                    .gaUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO))
                     .parentClaimantIsApplicant(YES)
-                    .gaRespondentOrderAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
+                    .gaRespondentOrderAgreement(new GARespondentOrderAgreement().setHasAgreed(NO))
                     .respondentSolicitor1EmailAddress(DUMMY_EMAIL)
                     .respondentSolicitor2EmailAddress(DUMMY_EMAIL)
                     .applicant1OrganisationPolicy(OrganisationPolicy.builder()
@@ -510,9 +510,9 @@ public class GeneralApplicationCreationNotificationServiceTest {
                     .defendant1PartyName("DEF")
                     .businessProcess(BusinessProcess.builder().status(STARTED)
                                          .processInstanceId(PROCESS_INSTANCE_ID).build())
-                    .gaInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
-                    .gaUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
-                    .gaRespondentOrderAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
+                    .gaInformOtherParty(new GAInformOtherParty().setIsWithNotice(NO))
+                    .gaUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO))
+                    .gaRespondentOrderAgreement(new GARespondentOrderAgreement().setHasAgreed(NO))
                     .ccdCaseReference(CASE_REFERENCE)
                     .respondentSolicitor1EmailAddress(DUMMY_EMAIL)
                     .respondentSolicitor2EmailAddress(DUMMY_EMAIL)

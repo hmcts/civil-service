@@ -213,7 +213,7 @@ public class GaFeePaymentOutcomeHWFCallBackHandlerTest extends GeneralApplicatio
                             .build())
                     .generalAppHelpWithFees(HelpWithFees.builder().helpWithFeesReferenceNumber("ref").build())
                     .gaHwfDetails(HelpWithFeesDetails.builder().build())
-                .generalAppType(GAApplicationType.builder().types(types).build())
+                .generalAppType(new GAApplicationType(types))
                     .hwfFeeType(FeeType.APPLICATION)
                     .build();
             when(service.processHwf(any(GeneralApplicationCaseData.class)))
@@ -232,9 +232,7 @@ public class GaFeePaymentOutcomeHWFCallBackHandlerTest extends GeneralApplicatio
         @Test
         void shouldTrigger_after_payment_GaFee_shouldTriggerCosc() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                    .generalAppType(GAApplicationType.builder()
-                                        .types(List.of(GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID))
-                                        .build())
+                    .generalAppType(new GAApplicationType(List.of(GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID)))
                     .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
                                     Fee.builder()
                                             .calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())

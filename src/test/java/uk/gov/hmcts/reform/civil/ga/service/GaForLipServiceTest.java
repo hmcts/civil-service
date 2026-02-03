@@ -100,8 +100,8 @@ class GaForLipServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .applicantBilingualLanguagePreference(YesOrNo.YES)
             .parentClaimantIsApplicant(YesOrNo.YES)
-            .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                            .isWithNotice(YesOrNo.YES).build())
+            .generalAppInformOtherParty(new GAInformOtherParty()
+                                            .setIsWithNotice(YesOrNo.YES))
             .build();
         assertThat(gaForLipService.anyWelshNotice(caseData)).isTrue();
     }
@@ -111,8 +111,8 @@ class GaForLipServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .parentClaimantIsApplicant(YesOrNo.YES)
             .respondentBilingualLanguagePreference(YesOrNo.YES)
-            .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                            .isWithNotice(YesOrNo.YES).build())
+            .generalAppInformOtherParty(new GAInformOtherParty()
+                                            .setIsWithNotice(YesOrNo.YES))
             .build();
         assertThat(gaForLipService.anyWelshNotice(caseData)).isTrue();
     }
@@ -121,8 +121,8 @@ class GaForLipServiceTest {
     void shouldReturnNoticeFalse_nobody_is_welsh() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .parentClaimantIsApplicant(YesOrNo.YES)
-            .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                            .isWithNotice(YesOrNo.YES).build())
+            .generalAppInformOtherParty(new GAInformOtherParty()
+                                            .setIsWithNotice(YesOrNo.YES))
             .build();
         assertThat(gaForLipService.anyWelshNotice(caseData)).isFalse();
     }
@@ -131,8 +131,8 @@ class GaForLipServiceTest {
     void shouldReturnWithoutNoticeFalse_resp_is_welsh() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .parentClaimantIsApplicant(YesOrNo.YES)
-            .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                            .isWithNotice(YesOrNo.NO).build())
+            .generalAppInformOtherParty(new GAInformOtherParty()
+                                            .setIsWithNotice(YesOrNo.NO))
             .build();
         assertThat(gaForLipService.anyWelshNotice(caseData)).isFalse();
     }
