@@ -100,21 +100,21 @@ class UpdatePartyWitnessTaskTest {
 
     @Test
     void shouldUpdateAllDQWitnessesWithTBCWhenNamesAreNull() {
-        Witness dqWitness1 = Witness.builder().firstName(null).lastName(null).build();
-        Witness dqWitness2 = Witness.builder().firstName("Jane").lastName(null).build();
+        Witness dqWitness1 = new Witness().setFirstName(null).setLastName(null);
+        Witness dqWitness2 = new Witness().setFirstName("Jane").setLastName(null);
 
         List<Element<Witness>> dqElements = List.of(
             Element.<Witness>builder().value(dqWitness1).build(),
             Element.<Witness>builder().value(dqWitness2).build()
         );
 
-        Witnesses dqWitnesses = Witnesses.builder().details(dqElements).build();
+        Witnesses dqWitnesses = new Witnesses().setDetails(dqElements);
 
         CaseData caseData = CaseData.builder()
-            .applicant1DQ(Applicant1DQ.builder().applicant1DQWitnesses(dqWitnesses).build())
-            .applicant2DQ(Applicant2DQ.builder().applicant2DQWitnesses(dqWitnesses).build())
-            .respondent1DQ(Respondent1DQ.builder().respondent1DQWitnesses(dqWitnesses).build())
-            .respondent2DQ(Respondent2DQ.builder().respondent2DQWitnesses(dqWitnesses).build())
+            .applicant1DQ(new Applicant1DQ().setApplicant1DQWitnesses(dqWitnesses))
+            .applicant2DQ(new Applicant2DQ().setApplicant2DQWitnesses(dqWitnesses))
+            .respondent1DQ(new Respondent1DQ().setRespondent1DQWitnesses(dqWitnesses))
+            .respondent2DQ(new Respondent2DQ().setRespondent2DQWitnesses(dqWitnesses))
             .build();
 
         CaseReference ref = CaseReference.builder().caseReference("CASE123").build();
