@@ -18,10 +18,6 @@ dependencies:
     version: 1.0.31
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: xui-webapp.enabled
-  - name: idam-pr
-    version: ~2.3.0
-    repository: 'oci://hmctspublic.azurecr.io/helm'
-    condition: idam-pr.enabled
   - name: camunda-bpm
     version: 0.0.48
     repository: 'oci://hmctspublic.azurecr.io/helm'
