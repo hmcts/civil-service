@@ -58,44 +58,43 @@ public class ClaimFormMapper {
             .map(amount -> amount.setScale(2))
             .map(BigDecimal::toString)
             .orElse("0");
-        return ClaimForm.builder()
-            .totalInterestAmount(interest != null ? interest.toString() : null)
-            .howTheInterestWasCalculated(Optional.ofNullable(caseData.getInterestClaimOptions()).map(
+        return new ClaimForm()
+            .setTotalInterestAmount(interest != null ? interest.toString() : null)
+            .setHowTheInterestWasCalculated(Optional.ofNullable(caseData.getInterestClaimOptions()).map(
                 InterestClaimOptions::getDescription).orElse(null))
-            .interestRate(getInterestRate(caseData))
-            .interestExplanationText(interest != null ? generateInterestRateExplanation(caseData) : null)
-            .interestFromDate(interest != null && interest.compareTo(BigDecimal.ZERO) > 0 ? getInterestFromDate(caseData) : null)
-            .interestEndDate(interest != null && interest.compareTo(BigDecimal.ZERO) > 0 ? getInterestEndDate(caseData) : null)
-            .interestEndDateDescription(interest != null ? caseData.getBreakDownInterestDescription() : null)
-            .interestPerDayBreakdown(interestCalculator.getInterestPerDayBreakdown(caseData))
-            .whenAreYouClaimingInterestFrom(interest != null ? generateWhenAreYouPlanningInterestFrom(
+            .setInterestRate(getInterestRate(caseData))
+            .setInterestExplanationText(interest != null ? generateInterestRateExplanation(caseData) : null)
+            .setInterestFromDate(interest != null && interest.compareTo(BigDecimal.ZERO) > 0 ? getInterestFromDate(caseData) : null)
+            .setInterestEndDate(interest != null && interest.compareTo(BigDecimal.ZERO) > 0 ? getInterestEndDate(caseData) : null)
+            .setInterestEndDateDescription(interest != null ? caseData.getBreakDownInterestDescription() : null)
+            .setInterestPerDayBreakdown(interestCalculator.getInterestPerDayBreakdown(caseData))
+            .setWhenAreYouClaimingInterestFrom(interest != null ? generateWhenAreYouPlanningInterestFrom(
                 caseData) : null)
-            .timelineEvents(getTimeLine(caseData.getTimelineOfEvents()))
-            .totalClaimAmount(totalClaimAmount)
-            .interestAmount(interest != null ? interest.toString() : null)
-            .claimAmount(caseData.getClaimAmountBreakupDetails())
-            .claimFee(getClaimFee(caseData).toString())
-            .totalAmountOfClaim(calculateTotalAmountOfClaim(caseData, interest))
-            .descriptionOfClaim(caseData.getDetailsOfClaim())
-            .claimant(claimant)
-            .defendant(LipFormParty.toLipFormParty(
+            .setTimelineEvents(getTimeLine(caseData.getTimelineOfEvents()))
+            .setTotalClaimAmount(totalClaimAmount)
+            .setInterestAmount(interest != null ? interest.toString() : null)
+            .setClaimAmount(caseData.getClaimAmountBreakupDetails())
+            .setClaimFee(getClaimFee(caseData).toString())
+            .setTotalAmountOfClaim(calculateTotalAmountOfClaim(caseData, interest))
+            .setDescriptionOfClaim(caseData.getDetailsOfClaim())
+            .setClaimant(claimant)
+            .setDefendant(LipFormParty.toLipFormParty(
                 caseData.getRespondent1(),
                 getCorrespondenceAddress(defendantDetails),
                 getContactPerson(defendantDetails)
             ))
-            .generationDate(LocalDateTime.now())
-            .claimIssuedDate(caseData.getIssueDate())
-            .ccdCaseReference(formatCcdCaseReference(caseData))
-            .claimNumber(caseData.getLegacyCaseReference())
-            .flightDelayDetails(getFlightDelayDetails(caseData))
-            .evidenceList(Optional.ofNullable(caseData.getSpeclistYourEvidenceList())
+            .setGenerationDate(LocalDateTime.now())
+            .setClaimIssuedDate(caseData.getIssueDate())
+            .setCcdCaseReference(formatCcdCaseReference(caseData))
+            .setClaimNumber(caseData.getLegacyCaseReference())
+            .setFlightDelayDetails(getFlightDelayDetails(caseData))
+            .setEvidenceList(Optional.ofNullable(caseData.getSpeclistYourEvidenceList())
                               .map(Collection::stream)
                               .map(evidenceStream -> evidenceStream
                                   .map(EvidenceTemplateData::toEvidenceTemplateData)
                                   .toList())
                               .orElse(Collections.emptyList()))
-            .uiStatementOfTruth(caseData.getUiStatementOfTruth())
-            .build();
+            .setUiStatementOfTruth(caseData.getUiStatementOfTruth());
     }
 
     @Nullable

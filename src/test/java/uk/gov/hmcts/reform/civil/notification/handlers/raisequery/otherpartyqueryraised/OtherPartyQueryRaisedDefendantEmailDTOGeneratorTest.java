@@ -27,11 +27,11 @@ class OtherPartyQueryRaisedDefendantEmailDTOGeneratorTest {
     @Test
     void shouldReturnCorrectEmailTemplate_whenDefendantIsBilingual() {
         CaseData caseData = CaseDataBuilder.builder()
-            .caseDataLip(CaseDataLiP.builder()
-                             .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                         .respondent1ResponseLanguage(Language.BOTH.toString())
-                                                         .build())
-                             .build())
+            .caseDataLip(new CaseDataLiP()
+                             .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                         .setRespondent1ResponseLanguage(Language.BOTH.toString())
+                             )
+            )
             .build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getNotifyOtherLipPartyWelshPublicQueryRaised()).thenReturn(expectedTemplateId);
